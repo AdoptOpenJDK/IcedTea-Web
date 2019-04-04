@@ -37,13 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browsertesting.browsers.firefox;
 
+import net.sourceforge.jnlp.ServerAccess;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import net.sourceforge.jnlp.ServerAccess;
 
 /**
  * This class is able to backup and restore firefox profiles.

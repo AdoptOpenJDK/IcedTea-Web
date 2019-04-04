@@ -38,10 +38,11 @@ package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
 /** This class represents a curve defined by a sequence of control points */
 /*  Part of NatCubic implementation, inspire by http://www.cse.unsw.edu.au/~lambert/*/
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.ControlCurve;
-import java.awt.*;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.awt.Polygon;
 
 public class ControlCurveTest {
 

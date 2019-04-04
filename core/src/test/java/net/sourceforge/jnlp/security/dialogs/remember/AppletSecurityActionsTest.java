@@ -38,9 +38,9 @@ package net.sourceforge.jnlp.security.dialogs.remember;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class AppletSecurityActionsTest {
 

@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import java.net.URL;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.Version;
+
+import java.net.URL;
 
 class LocateJnlpClassLoader {
 

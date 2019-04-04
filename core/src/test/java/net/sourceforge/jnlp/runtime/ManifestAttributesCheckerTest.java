@@ -36,10 +36,11 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ManifestAttributesCheckerTest {
 

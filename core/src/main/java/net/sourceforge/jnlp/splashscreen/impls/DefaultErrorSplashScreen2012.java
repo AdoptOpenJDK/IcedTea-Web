@@ -36,13 +36,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls;
 
-import java.awt.Graphics;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.ErrorPainter;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentErrorSplashScreen;
+
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public final class DefaultErrorSplashScreen2012 extends BasicComponentErrorSplashScreen {
 

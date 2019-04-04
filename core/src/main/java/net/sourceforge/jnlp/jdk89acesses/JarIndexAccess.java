@@ -1,11 +1,12 @@
 package net.sourceforge.jnlp.jdk89acesses;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.jar.JarFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Class to access sun.misc.JarINdex for both jdk9 and 8.

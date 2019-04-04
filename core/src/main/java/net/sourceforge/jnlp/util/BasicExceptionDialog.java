@@ -37,15 +37,10 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.controlpanel.CachePane;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.concurrent.atomic.AtomicInteger;
+import net.sourceforge.swing.SwingUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -57,9 +52,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import net.sourceforge.swing.SwingUtils;
-import net.sourceforge.jnlp.controlpanel.CachePane;
-import net.sourceforge.jnlp.util.logging.JavaConsole;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * A dialog that displays some basic information about an exception

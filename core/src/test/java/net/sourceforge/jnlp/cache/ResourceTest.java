@@ -37,16 +37,8 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
-import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import net.sourceforge.jnlp.Version;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,9 +46,15 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.sourceforge.jnlp.Version;
-
-import org.junit.Test;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
+import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
+import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ResourceTest {
 

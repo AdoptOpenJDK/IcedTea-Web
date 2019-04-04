@@ -16,7 +16,18 @@
 
 package net.sourceforge.jnlp.services;
 
-import javax.jnlp.*;
+import javax.jnlp.BasicService;
+import javax.jnlp.ClipboardService;
+import javax.jnlp.DownloadService;
+import javax.jnlp.DownloadService2;
+import javax.jnlp.ExtendedService;
+import javax.jnlp.ExtensionInstallerService;
+import javax.jnlp.FileOpenService;
+import javax.jnlp.FileSaveService;
+import javax.jnlp.PersistenceService;
+import javax.jnlp.PrintService;
+import javax.jnlp.ServiceManagerStub;
+import javax.jnlp.UnavailableServiceException;
 
 
 /**

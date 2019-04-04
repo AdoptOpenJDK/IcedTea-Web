@@ -16,22 +16,42 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.net.*;
-import java.util.*;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.Timer;
-import javax.jnlp.*;
-import net.sourceforge.swing.SwingUtils;
-
-import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
+
+import javax.jnlp.DownloadServiceListener;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Show the progress of downloads.

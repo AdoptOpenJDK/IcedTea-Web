@@ -36,14 +36,15 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts.extensions;
 
+import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
+import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.ErrorPainter;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.ErrorPainter;
 
 public class ChristmasExtension implements SplashExtension {
 

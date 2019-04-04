@@ -37,18 +37,18 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import org.junit.Assert;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UrlUtilsTest {
 

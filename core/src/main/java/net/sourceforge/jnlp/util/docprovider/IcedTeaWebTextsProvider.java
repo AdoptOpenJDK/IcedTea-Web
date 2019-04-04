@@ -36,9 +36,10 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util.docprovider;
 
-import java.io.IOException;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
+
+import java.io.IOException;
 
 public class IcedTeaWebTextsProvider extends TextsProvider {
 

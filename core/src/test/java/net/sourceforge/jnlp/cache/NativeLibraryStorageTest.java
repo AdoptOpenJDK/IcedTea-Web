@@ -37,20 +37,19 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.util.FileTestUtils.assertNoFileLeak;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.FileTestUtils;
+import org.junit.Test;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.util.FileTestUtils;
-
-import org.junit.Test;
+import static net.sourceforge.jnlp.util.FileTestUtils.assertNoFileLeak;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class NativeLibraryStorageTest {
 

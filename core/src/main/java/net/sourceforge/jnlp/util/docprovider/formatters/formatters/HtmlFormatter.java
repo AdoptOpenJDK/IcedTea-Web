@@ -36,11 +36,12 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 public class HtmlFormatter extends ReplacingTextFormatter {
 

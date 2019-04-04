@@ -40,7 +40,6 @@ package net.sourceforge.jnlp.tools;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-import java.io.IOException;
 
 public class MessageProperties {
 

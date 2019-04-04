@@ -36,7 +36,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Polygon;
 
 public class NatCubic extends ControlCurve {
 

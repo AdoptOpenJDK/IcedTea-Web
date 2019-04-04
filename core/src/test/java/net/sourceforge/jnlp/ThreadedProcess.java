@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.util.StreamUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,7 +46,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import net.sourceforge.jnlp.util.StreamUtils;
 
 /**
  *

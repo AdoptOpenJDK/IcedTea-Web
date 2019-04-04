@@ -36,19 +36,6 @@
  */
 package net.sourceforge.jnlp.security;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.NetPermission;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-
-import javax.swing.JDialog;
-import net.sourceforge.swing.SwingUtils;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.Resource;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
@@ -61,6 +48,18 @@ import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
+
+import javax.swing.JDialog;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.NetPermission;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 /**
  * <p>

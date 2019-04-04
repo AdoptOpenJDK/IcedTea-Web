@@ -36,6 +36,8 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.tools.ico.impl;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -43,8 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 
 public class ImageInputStreamIco {
 

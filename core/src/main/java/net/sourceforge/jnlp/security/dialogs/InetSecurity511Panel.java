@@ -36,35 +36,30 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
-import java.net.ProxySelector;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.YesCancelSkip;
-import static net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel.htmlWrap;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
 
 public class InetSecurity511Panel extends SecurityDialogPanel {
 

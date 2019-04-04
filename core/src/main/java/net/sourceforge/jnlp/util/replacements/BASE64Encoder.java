@@ -24,8 +24,8 @@
  */
 package net.sourceforge.jnlp.util.replacements;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * This class implements a BASE64 Character encoder as specified in RFC1521.

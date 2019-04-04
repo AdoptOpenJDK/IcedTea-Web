@@ -1,5 +1,15 @@
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.PluginParameters;
+import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javax.swing.JButton;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -7,20 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JButton;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.PluginParameters;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
-import org.junit.AfterClass;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class AppTrustWarningPanelTest {
 

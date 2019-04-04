@@ -37,16 +37,16 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.util.logging.LogConfig;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import net.sourceforge.jnlp.util.logging.LogConfig;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultLaunchHandlerTest {
 

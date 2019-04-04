@@ -36,20 +36,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import static net.sourceforge.jnlp.security.policyeditor.PolicyEditor.identifierFromCodebase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
@@ -57,6 +43,19 @@ import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static net.sourceforge.jnlp.security.policyeditor.PolicyEditor.identifierFromCodebase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PolicyEditorTest {
 

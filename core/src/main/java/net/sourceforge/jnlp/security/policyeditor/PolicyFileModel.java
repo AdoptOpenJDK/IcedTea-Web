@@ -36,6 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.MD5SumWatcher;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.security.provider.PolicyParser;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -50,11 +55,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.MD5SumWatcher;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.security.provider.PolicyParser;
 
 import static net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier.isDefaultPolicyIdentifier;
 

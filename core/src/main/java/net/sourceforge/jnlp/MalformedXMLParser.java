@@ -36,7 +36,13 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.ccil.cowan.tagsoup.HTMLSchema;
+import org.ccil.cowan.tagsoup.Parser;
+import org.ccil.cowan.tagsoup.XMLWriter;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,14 +51,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import org.ccil.cowan.tagsoup.HTMLSchema;
-import org.ccil.cowan.tagsoup.Parser;
-import org.ccil.cowan.tagsoup.XMLWriter;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * An specialized {@link XMLParser} that uses TagSoup[1] to parse

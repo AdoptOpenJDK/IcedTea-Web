@@ -16,9 +16,9 @@
 
 package net.sourceforge.jnlp.services;
 
-import javax.jnlp.SingleInstanceService;
-
 import net.sourceforge.jnlp.JNLPFile;
+
+import javax.jnlp.SingleInstanceService;
 
 /**
  * Extends SingleInstanceService to provide a few additional methods that are

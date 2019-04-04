@@ -36,18 +36,16 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import sun.security.provider.PolicyParser;
-import org.junit.Before;
 import org.junit.Test;
+import sun.security.provider.PolicyParser;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PolicyIdentifierTest {
 

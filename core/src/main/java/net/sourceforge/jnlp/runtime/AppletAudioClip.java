@@ -16,10 +16,14 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import java.net.*;
-import java.applet.*;
-import javax.sound.sampled.*;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.Line;
+import java.applet.AudioClip;
+import java.net.URL;
 
 // based on Deane Richan's AppletAudioClip
 

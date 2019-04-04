@@ -37,13 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
+import net.sourceforge.jnlp.ServerAccess;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import net.sourceforge.jnlp.ServerAccess;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  * It is crucial that BeforeClass inits logging subsystem.

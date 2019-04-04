@@ -37,7 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
-import static org.junit.Assert.assertEquals;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -49,11 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPProxySelector;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class BrowserAwareProxySelectorTest {
 

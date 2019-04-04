@@ -36,12 +36,11 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.browsertesting.browsers;
 
-import java.util.Arrays;
-import java.util.List;
-import net.sourceforge.jnlp.ProcessAssasin;
-import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Firefox extends MozillaFamilyLinuxBrowser {
 

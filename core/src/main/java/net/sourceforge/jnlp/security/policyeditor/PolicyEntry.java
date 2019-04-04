@@ -36,6 +36,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import sun.security.provider.PolicyParser;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -47,7 +49,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import sun.security.provider.PolicyParser;
 
 /**
  * This class represents a "grant" entry in a policy file. This is defined as a policy entry block

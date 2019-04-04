@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import java.util.Locale;
 import net.sourceforge.jnlp.tools.MessageProperties;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.Assert;
+
+import java.util.Locale;
 
 public class MessagePropertiesTest {
 

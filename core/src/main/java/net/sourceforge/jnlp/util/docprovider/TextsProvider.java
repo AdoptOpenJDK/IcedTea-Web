@@ -36,6 +36,18 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.docprovider;
 
+import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.config.Defaults;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.config.Setting;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ReplacingTextFormatter;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -55,17 +67,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.sourceforge.jnlp.config.Defaults;
-import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.Setting;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ReplacingTextFormatter;
 
 public abstract class TextsProvider {
     

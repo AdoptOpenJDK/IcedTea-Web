@@ -35,12 +35,13 @@
  */
 package net.sourceforge.jnlp.controlpanel.desktopintegrationeditor;
 
-import java.io.File;
-import java.util.List;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.text.html.HTMLEditorKit;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import java.io.File;
+import java.util.List;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 

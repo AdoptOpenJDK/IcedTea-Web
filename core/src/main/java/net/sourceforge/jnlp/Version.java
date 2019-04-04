@@ -16,11 +16,14 @@
 
 package net.sourceforge.jnlp;
 
-import java.util.*;
-import javax.swing.JOptionPane;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * <p>

@@ -37,18 +37,18 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.about;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class HTMLPanel extends JPanel {
 

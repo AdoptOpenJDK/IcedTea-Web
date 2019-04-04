@@ -36,13 +36,14 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import net.sourceforge.jnlp.util.logging.headers.Header;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * This class is utility and factory around file logs.

@@ -31,6 +31,8 @@
 package net.sourceforge.nanoxml;
 
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -40,7 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * XMLElement is a representation of an XML object. The object is able to parse

@@ -35,18 +35,19 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.util.Random;
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
-import org.junit.Assert;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class OutputControllerTest {
 

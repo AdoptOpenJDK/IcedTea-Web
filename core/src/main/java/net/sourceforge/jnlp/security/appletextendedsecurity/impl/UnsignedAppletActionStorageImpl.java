@@ -35,13 +35,6 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.PatternSyntaxException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.InvalidLineException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
@@ -51,6 +44,14 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 public class UnsignedAppletActionStorageImpl extends LockingReaderWriter implements UnsignedAppletActionStorage {
 

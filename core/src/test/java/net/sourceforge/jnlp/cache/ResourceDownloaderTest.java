@@ -1,7 +1,19 @@
 package net.sourceforge.jnlp.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,21 +31,8 @@ import java.util.jar.Manifest;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Ignore
 public class ResourceDownloaderTest extends NoStdOutErrTest {

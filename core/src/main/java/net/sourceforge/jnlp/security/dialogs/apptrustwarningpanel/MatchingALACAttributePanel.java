@@ -36,6 +36,17 @@
  */
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.ParseException;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.util.UrlUtils;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
@@ -43,17 +54,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ParseException;
-import net.sourceforge.jnlp.runtime.Translator;
+
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.util.UrlUtils;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library

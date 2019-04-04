@@ -44,7 +44,11 @@ package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
  * license this under GPL+Classpath by email
  *
  */
-import java.awt.*;
+
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Polygon;
 
 public class ControlCurve {
 

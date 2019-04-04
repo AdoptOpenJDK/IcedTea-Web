@@ -36,10 +36,11 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import java.io.File;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
+import java.io.File;
 
 /**
  * This file provides the information required to do logging.

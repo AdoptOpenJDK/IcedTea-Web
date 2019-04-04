@@ -1,5 +1,9 @@
 package net.sourceforge.jnlp;
 
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -8,13 +12,8 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class TinyHttpdImplTest {
 

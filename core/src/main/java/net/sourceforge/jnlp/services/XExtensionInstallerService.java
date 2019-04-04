@@ -16,8 +16,8 @@
 
 package net.sourceforge.jnlp.services;
 
-import java.net.*;
-import javax.jnlp.*;
+import javax.jnlp.ExtensionInstallerService;
+import java.net.URL;
 
 
 /**

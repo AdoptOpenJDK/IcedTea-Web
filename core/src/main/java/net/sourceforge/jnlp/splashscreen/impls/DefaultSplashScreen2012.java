@@ -36,12 +36,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls;
 
-import java.awt.Graphics;
-
-
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
 import net.sourceforge.jnlp.splashscreen.parts.BasicComponentSplashScreen;
+
+import java.awt.Graphics;
 
 public final class DefaultSplashScreen2012 extends BasicComponentSplashScreen  {
 

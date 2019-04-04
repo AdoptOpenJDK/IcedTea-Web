@@ -35,16 +35,6 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JFrame;
 import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParserSettings;
@@ -54,10 +44,21 @@ import net.sourceforge.jnlp.runtime.html.AppletParser;
 import net.sourceforge.jnlp.runtime.html.AppletsFilter;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
-
-import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+
+import javax.swing.JFrame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public final class HtmlBoot {
 

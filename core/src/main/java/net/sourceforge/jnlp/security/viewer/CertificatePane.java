@@ -37,23 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.viewer;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.PrintStream;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.CertificateUtils;
+import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -68,19 +59,27 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import java.awt.Window;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.PrintStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
-import net.sourceforge.jnlp.security.CertificateUtils;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class CertificatePane extends JPanel {
 

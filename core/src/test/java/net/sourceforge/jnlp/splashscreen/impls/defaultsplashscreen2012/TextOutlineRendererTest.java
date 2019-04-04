@@ -36,17 +36,18 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
 import net.sourceforge.jnlp.annotations.WindowsIssue;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class TextOutlineRendererTest {
 

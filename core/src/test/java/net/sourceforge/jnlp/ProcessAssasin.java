@@ -36,10 +36,11 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.browsertesting.ReactingProcess;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import net.sourceforge.jnlp.browsertesting.ReactingProcess;
 
 /**
  * class which timeout any ThreadedProcess. This killing of 'thread with

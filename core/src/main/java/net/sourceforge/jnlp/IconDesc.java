@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp;
 
-import java.net.*;
+import java.net.URL;
 
 /**
  * The icon element.

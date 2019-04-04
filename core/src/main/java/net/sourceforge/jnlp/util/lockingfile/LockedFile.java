@@ -36,6 +36,8 @@
  */
 package net.sourceforge.jnlp.util.lockingfile;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -44,7 +46,6 @@ import java.nio.channels.FileLock;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /*
  * Process & thread locked access to a file. Creates file if it does not already exist.

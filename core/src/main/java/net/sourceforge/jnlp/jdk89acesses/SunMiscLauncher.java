@@ -32,9 +32,10 @@
  statement from your version.*/
 package net.sourceforge.jnlp.jdk89acesses;
 
-import java.lang.reflect.Method;
-import javax.swing.ImageIcon;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.swing.ImageIcon;
+import java.lang.reflect.Method;
 
 /**
  * This class is summ of access to sun.misc.Launcher which was removed in jdk9.

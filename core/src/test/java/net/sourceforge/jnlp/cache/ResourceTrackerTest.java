@@ -36,11 +36,19 @@
  */
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,21 +63,11 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
+import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ResourceTrackerTest extends NoStdOutErrTest{
 

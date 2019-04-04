@@ -38,9 +38,10 @@ package net.sourceforge.jnlp.security.policyeditor;
 
 import sun.security.provider.PolicyParser;
 
+import javax.swing.JCheckBox;
 import java.io.Serializable;
 import java.util.Map;
-import javax.swing.JCheckBox;
+
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 

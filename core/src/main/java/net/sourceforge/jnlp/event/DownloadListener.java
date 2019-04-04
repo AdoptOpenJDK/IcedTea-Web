@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp.event;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * The listener that is notified of the state of resources being

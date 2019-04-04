@@ -37,14 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import java.io.IOException;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -54,10 +46,16 @@ import net.sourceforge.jnlp.security.dialogs.CertWarningPane;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
-
+import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Handles {@link SecurityDialogMessage}s and shows appropriate security

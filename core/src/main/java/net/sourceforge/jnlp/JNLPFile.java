@@ -16,10 +16,17 @@
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.ClasspathMatcher;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.File;
 import java.io.FileInputStream;
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -31,14 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 
-import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ClasspathMatcher;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**

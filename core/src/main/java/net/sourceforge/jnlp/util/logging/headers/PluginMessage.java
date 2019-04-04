@@ -37,8 +37,9 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
-import java.util.Date;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.util.Date;
 
 public class PluginMessage  implements MessageWithHeader{
 

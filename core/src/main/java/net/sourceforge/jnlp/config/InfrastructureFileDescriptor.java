@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
 
 
 public class InfrastructureFileDescriptor {

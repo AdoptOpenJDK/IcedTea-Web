@@ -37,10 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.CacheTestUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,11 +51,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.util.CacheTestUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CacheEntryTest {
 

@@ -35,11 +35,8 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActionsTest;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
@@ -48,6 +45,10 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class LegacyUnsignedAppletActionStorageImplTest {
 

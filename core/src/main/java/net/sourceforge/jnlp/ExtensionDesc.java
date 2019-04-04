@@ -16,13 +16,16 @@
 
 package net.sourceforge.jnlp;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * The extension element.

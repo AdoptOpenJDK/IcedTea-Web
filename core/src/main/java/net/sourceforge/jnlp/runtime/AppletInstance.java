@@ -16,11 +16,12 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import java.applet.*;
-import java.awt.*;
-
-import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.applet.Applet;
+import java.awt.Container;
+import java.awt.Frame;
 
 /**
  * Represents a launched application instance created from a JNLP

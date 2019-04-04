@@ -35,6 +35,11 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.resources;
 
+import net.sourceforge.jnlp.ServerAccess;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -42,12 +47,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import net.sourceforge.jnlp.ServerAccess;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class MessagesPropertiesTest {
 

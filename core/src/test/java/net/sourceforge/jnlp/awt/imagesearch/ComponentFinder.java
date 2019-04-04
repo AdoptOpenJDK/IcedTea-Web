@@ -38,12 +38,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.awt.imagesearch;
 
+import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class ComponentFinder {
     public static final BufferedImage defaultIcon;

@@ -35,13 +35,13 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClassFinderTest {
 
