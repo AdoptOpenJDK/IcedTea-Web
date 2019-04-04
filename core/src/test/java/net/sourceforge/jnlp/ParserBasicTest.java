@@ -36,26 +36,26 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import java.io.InputStream;
-import java.util.List;
 import net.sourceforge.jnlp.mock.DummyJNLPFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.InputStream;
+import java.util.List;
+
 /**
  * Test that the parser works with basic jnlp files
  */
-public class ParserBasic extends NoStdOutErrTest {
+public class ParserBasicTest extends NoStdOutErrTest {
 
     private static Node root;
     private static Parser parser;
 
     @BeforeClass
     public static void setUp() throws ParseException {
-        ClassLoader cl = ParserBasic.class.getClassLoader();
+        ClassLoader cl = ParserBasicTest.class.getClassLoader();
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
@@ -216,7 +216,7 @@ public class ParserBasic extends NoStdOutErrTest {
 
     @Test
     public void testResourcesInsideJava() throws ParseException {
-        ClassLoader cl = ParserBasic.class.getClassLoader();
+        ClassLoader cl = ParserBasicTest.class.getClassLoader();
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
