@@ -54,6 +54,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.StreamUtils;
@@ -234,7 +235,9 @@ public class JVMPanel extends NamedBorderPanel {
             validationResult += "<span color=\"red\">" + Translator.R("CPJVMnotDir") + "</span><br />";
             latestOne = JvmValidationResult.STATE.NOT_DIR;
         }
-        File javaFile = new File(cmd + File.separator + "bin" + File.separator + "java");
+        File javaFile = new File(cmd + File.separator + "bin" + 
+                                       File.separator + "java" + 
+                                       (JNLPRuntime.isWindows() ? ".exe" : ""));
         if (javaFile.isFile()) {
             validationResult += "<span color=\"green\">" + Translator.R("CPJVMjava") + "</span><br />";
         } else {
