@@ -35,12 +35,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import java.applet.Applet;
-
+import javax.jnlp.ServiceManager;
 import javax.jnlp.SingleInstanceListener;
 import javax.jnlp.SingleInstanceService;
-import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
+import java.applet.Applet;
 
 public class SingleInstanceChecker extends Applet implements SingleInstanceListener {
 

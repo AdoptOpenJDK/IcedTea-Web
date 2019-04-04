@@ -35,20 +35,21 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import net.sourceforge.jnlp.ContentReaderListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Bug(id={"http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2011-October/016127.html","PR804","PR811"})
 public class SpacesCanBeEverywhereTests extends BrowserTest {

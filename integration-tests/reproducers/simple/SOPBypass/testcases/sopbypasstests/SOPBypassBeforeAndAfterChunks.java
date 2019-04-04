@@ -36,19 +36,20 @@
  */
 package sopbypasstests;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.AbstractMap;
-import org.junit.Test;
 
 public class SOPBypassBeforeAndAfterChunks extends BrowserTest {
 

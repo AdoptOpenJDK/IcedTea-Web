@@ -35,21 +35,16 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import net.sourceforge.jnlp.OptionsDefinitions;
-import static org.junit.Assert.assertTrue;
-
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess.AutoClose;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -58,8 +53,13 @@ import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertTrue;
 
 public class UnicodeLineBreakTests extends BrowserTest {
     private static DeploymentPropertiesModifier dp;

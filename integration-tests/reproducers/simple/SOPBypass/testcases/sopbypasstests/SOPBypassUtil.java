@@ -36,26 +36,27 @@
  */
 package sopbypasstests;
 
-import org.junit.Test;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.ClosingListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import java.net.URL;
+import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.sourceforge.jnlp.ServerLauncher;
-import org.junit.Assert;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * To workaround ignorance of AccessDenied exception from calls from localhost

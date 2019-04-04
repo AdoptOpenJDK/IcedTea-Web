@@ -35,13 +35,14 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class UnsignedJnlpApplicationTest {
 

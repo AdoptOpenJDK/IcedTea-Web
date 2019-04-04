@@ -36,11 +36,11 @@
  */
 package sopbypasstests;
 
-import org.junit.Test;
+import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.ProcessResult;
+import org.junit.Test;
 
 import static sopbypasstests.SOPBypassUtil.*;
 

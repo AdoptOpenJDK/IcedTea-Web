@@ -36,9 +36,10 @@
  */
 package sopbypasstests;
 
-import org.junit.Test;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.ProcessResult;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import org.junit.Test;
+
 import java.util.Collections;
 
 import static sopbypasstests.SOPBypassUtil.*;

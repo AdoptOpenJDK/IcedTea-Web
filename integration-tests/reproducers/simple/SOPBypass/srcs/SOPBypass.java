@@ -45,8 +45,8 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
 import java.security.AccessControlException;
+import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 public class SOPBypass extends Applet {

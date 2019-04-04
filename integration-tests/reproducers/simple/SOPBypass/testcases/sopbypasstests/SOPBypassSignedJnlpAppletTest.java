@@ -36,19 +36,9 @@
  */
 package sopbypasstests;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.ProcessResult;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import java.io.File;
-import java.net.MalformedURLException;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import org.junit.Test;
 
 import static sopbypasstests.SOPBypassUtil.*;
 

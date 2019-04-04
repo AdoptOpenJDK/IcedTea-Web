@@ -34,11 +34,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-import java.applet.*;
-import java.awt.*;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-
 public class VersionedJar {
     static public void main(String[] args) {
         System.out.println("Versioned jar was accessed.");
