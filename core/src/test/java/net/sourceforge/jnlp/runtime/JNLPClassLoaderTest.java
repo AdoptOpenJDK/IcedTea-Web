@@ -62,6 +62,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
@@ -93,6 +94,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     /* Note: Only does file leak testing for now. */
     @Test
+    @Ignore
     public void constructorFileLeakTest() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "test.jar");
@@ -154,6 +156,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
+    @Ignore
     public void getMainClassNameTestEmpty() throws Exception {
         /* Test with-out any main-class specified */ {
             File tempDirectory = FileTestUtils.createTempDirectory();

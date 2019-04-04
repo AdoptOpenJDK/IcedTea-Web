@@ -62,6 +62,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XDesktopEntryTest {
@@ -154,6 +155,7 @@ public class XDesktopEntryTest {
 
     @Test
     @KnownToFail
+    @Ignore
     public void testHomeVariable() {
         Assert.assertTrue("Variable home must be in environment of this run, is not", System.getenv().containsKey(HOME));
         Assert.assertNull("Variable home should be declared  before test run, but was not and so is faked. This should be ok and is thrown just for record. See output of ensureHomeVaribale and restoreHomeVaribale", backupedEnv);

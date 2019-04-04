@@ -124,6 +124,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     @Remote
+    @Ignore
     public void testResourceLoadSuccessCachingApplication() throws Exception {
         setWSA();
         //we are testing new resource not in cache
