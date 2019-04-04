@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.splashscreen.parts.InfoItem;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ErrorSplashScreenTest extends JDialog {
@@ -106,6 +107,7 @@ public class ErrorSplashScreenTest extends JDialog {
     }
 
     @Test
+    @Ignore
     public void splashScreenTestsPaint0() {
         //to silence junit,and test is that thsi class was instantiated ;)
         panel.setSplashWidth(width);
@@ -118,6 +120,7 @@ public class ErrorSplashScreenTest extends JDialog {
     }
 
     @Test
+    @Ignore
     public void splashScreenTestsPaint50() {
         //to silence junit,and test is that thsi class was instantiated ;)
         panel.setSplashWidth(width);
@@ -130,6 +133,7 @@ public class ErrorSplashScreenTest extends JDialog {
     }
 
     @Test
+    @Ignore
     public void splashScreenTestsPaint100() {
         //to silence junit,and test is that thsi class was instantiated ;)
         panel.setSplashWidth(width);
