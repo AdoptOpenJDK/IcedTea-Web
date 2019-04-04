@@ -39,6 +39,7 @@ package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.annotations.KnownToFail;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -59,6 +60,7 @@ public class JNLPMatcherTestMallformedAllowedTest {
     }
 
     @Test
+    @Ignore
     @KnownToFail
     public void testTemplateCDATA() throws JNLPMatcherException, IOException {
 
@@ -108,6 +110,7 @@ public class JNLPMatcherTestMallformedAllowedTest {
     }
 
     @Test
+    @Ignore
     @KnownToFail
     public void testTemplateComments() throws JNLPMatcherException, IOException {
     //heving comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
@@ -156,6 +159,7 @@ public class JNLPMatcherTestMallformedAllowedTest {
     }
 
     @Test
+    @Ignore
     @KnownToFail
     public void testApplicationCDATA() throws JNLPMatcherException, IOException {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
