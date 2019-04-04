@@ -16,6 +16,8 @@
     </properties>
 
     <modules>
+        <module>jnlp-api</module>
+        <module>common</module>
         <module>core</module>
     </modules>
 
