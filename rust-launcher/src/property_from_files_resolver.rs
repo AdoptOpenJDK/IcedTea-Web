@@ -131,7 +131,7 @@ fn try_key_from_properties_files(logger: &os_access::Os, array: &[Option<std::pa
                 let mut info2 = String::new();
                 write!(&mut info2, "itw-rust-debug: located {} in file {}", value, file.clone().expect("file should be already verified").display()).expect("unwrap failed");
                 logger.log(&info2);
-                if validator.validate(&value) {
+                if validator.validate(&value, logger) {
                     return Some(value);
                 } else {
                     //the only output out of verbose mode
