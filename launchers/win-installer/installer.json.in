@@ -1,0 +1,60 @@
+{
+  "appName": "IcedTea-Web @PACKAGE_VERSION@",
+  "versionMajor": "1",
+  "versionMinor": "7",
+  "versionMicro": "0",
+  "versionPatch": "0",
+  "vendor": "IcedTea-Web open-source project",
+  "installDirName": "WebStart",
+  "helpLink": "http://icedtea.classpath.org/wiki/IcedTea-Web",
+  "productUuid": "03ae99a2-d9b6-46af-9841-c4b810289b1b",
+  "updateUuid": "ff98de21-a283-40be-b0a5-74a6a4219de8",
+  "vendorDirName": "IcedTeaWeb",
+  "licenseFilePath": "../win-installer/LICENSE.rtf",
+  "iconPath": "../win-installer/icon.ico",
+  "topBannerBmpPath": "../win-installer/top_banner.bmp",
+  "greetingsBannerBmpPath": "../win-installer/greetings_banner.bmp",
+  "useFeatureTree": false,
+  "featureId": "itw",
+  "featureTitle": "IcedTea-Web",
+  "featureDescription": "Free Software implementation of Java Web Start, originally based on the NetX project",
+
+  "registryKeys": [
+    {
+      "root": "HKCR",
+      "key": "jnlp",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "URL:jnlp Protocol"
+        },
+        {
+          "type": "string",
+          "name": "URL Protocol",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "root": "HKCR",
+      "key": "jnlp\\shell\\open\\command",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "\"[INSTALLDIR]bin\\javaws.bat\" \"%1\""
+        }
+      ]
+    }
+  ],
+  "environmentVariables": [
+    {
+      "name": "PATH",
+      "action": "set",
+      "part": "last",
+      "value": "[INSTALLDIR]bin"
+    }
+  ]
+}
+
