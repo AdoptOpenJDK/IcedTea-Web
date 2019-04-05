@@ -16,11 +16,13 @@
 
 package net.sourceforge.jnlp;
 
-import java.net.*;
-import java.util.*;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The applet-desc element.

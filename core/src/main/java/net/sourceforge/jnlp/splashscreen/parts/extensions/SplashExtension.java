@@ -36,9 +36,10 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts.extensions;
 
+import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
+
 import java.awt.Color;
 import java.awt.Graphics;
-import net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012.BasePainter;
 
 public interface  SplashExtension {
     

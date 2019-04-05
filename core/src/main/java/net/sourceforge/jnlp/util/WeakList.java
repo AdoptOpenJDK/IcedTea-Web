@@ -16,8 +16,10 @@
 
 package net.sourceforge.jnlp.util;
 
-import java.lang.ref.*;
-import java.util.*;
+import java.lang.ref.WeakReference;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This list stores objects automatically using weak references.

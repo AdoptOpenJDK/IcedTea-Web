@@ -37,9 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -51,10 +51,9 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 public class JNLPProxySelectorTest {
 

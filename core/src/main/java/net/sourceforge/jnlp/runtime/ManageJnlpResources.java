@@ -37,14 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.ResourcesDesc;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManageJnlpResources {
 

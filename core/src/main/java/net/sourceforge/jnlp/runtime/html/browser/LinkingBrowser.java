@@ -36,16 +36,18 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime.html.browser;
 
-import java.net.Authenticator;
-import java.net.ProxySelector;
-import java.net.URL;
+import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
+import java.net.Authenticator;
+import java.net.ProxySelector;
+import java.net.URL;
+
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
-import net.sourceforge.jnlp.security.JNLPAuthenticator;
-import net.sourceforge.jnlp.util.logging.JavaConsole;
 
 public class LinkingBrowser extends JTabbedPane {
 

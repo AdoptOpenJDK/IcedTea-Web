@@ -36,10 +36,11 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.replacements;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Test various corner cases of the parser

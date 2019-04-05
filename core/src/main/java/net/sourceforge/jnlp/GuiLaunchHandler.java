@@ -37,14 +37,14 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import java.net.URL;
-import net.sourceforge.swing.SwingUtils;
-
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
+
+import java.net.URL;
 
 /**
  * A {@link LaunchHandler} that gives feedback to the user using GUI elements

@@ -41,8 +41,6 @@ import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sourceforge.jnlp.ParserSettings;
-
 public class ParserSettingsTest {
 
     @Test

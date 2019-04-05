@@ -36,6 +36,17 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -45,18 +56,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.jnlp.browsertesting.Browser;
-import net.sourceforge.jnlp.browsertesting.BrowserFactory;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import org.junit.Assert;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 @Ignore // Not working at the moment
 public class ResourcesTest extends  BrowserTest{

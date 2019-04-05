@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;

@@ -36,13 +36,14 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import java.io.File;
-import java.util.jar.Manifest;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.util.FileTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.jar.Manifest;
 
 public class ResourcesDescTest {
 

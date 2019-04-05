@@ -37,17 +37,15 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.services;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.jnlp.PrintService;
+import javax.swing.JOptionPane;
 import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-
-import javax.jnlp.*;
-import javax.swing.JOptionPane;
-
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class XPrintService implements PrintService {
 

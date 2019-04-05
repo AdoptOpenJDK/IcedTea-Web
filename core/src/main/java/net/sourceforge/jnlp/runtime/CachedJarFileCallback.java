@@ -38,6 +38,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.net.www.protocol.jar.URLJarFile;
+import sun.net.www.protocol.jar.URLJarFileCallBack;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,14 +57,6 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import net.sourceforge.jnlp.security.ConnectionFactory;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.JarFile;
-
-import net.sourceforge.jnlp.util.UrlUtils;
-
-import sun.net.www.protocol.jar.URLJarFile;
-import sun.net.www.protocol.jar.URLJarFileCallBack;
 
 /**
  * Invoked by URLJarFile to get a JarFile corresponding to a URL.

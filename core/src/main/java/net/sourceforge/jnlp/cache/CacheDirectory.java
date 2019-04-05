@@ -36,11 +36,11 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.cache;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public final class CacheDirectory {
 

@@ -36,13 +36,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import java.awt.image.BufferedImage;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
 import org.junit.Assert;
-
-
 import org.junit.Test;
+
+import java.awt.image.BufferedImage;
 
 public class BasePainterTest {
 

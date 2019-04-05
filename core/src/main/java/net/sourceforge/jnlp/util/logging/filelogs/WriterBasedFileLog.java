@@ -36,14 +36,15 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.FileLog;
+import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.FileLog;
-import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
 
 /**
  * This class writes log information to file.

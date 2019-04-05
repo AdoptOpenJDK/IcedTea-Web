@@ -35,17 +35,19 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import org.junit.Before;
+import org.junit.Test;
+import sun.security.provider.PolicyParser;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import sun.security.provider.PolicyParser;
 
 public class PolicyEditorParsingTest {
 

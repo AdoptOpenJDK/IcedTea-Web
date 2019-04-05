@@ -16,10 +16,10 @@
 
 package net.sourceforge.jnlp.cache;
 
-import java.net.*;
-import javax.jnlp.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 
-import net.sourceforge.jnlp.runtime.*;
+import javax.jnlp.DownloadServiceListener;
+import java.net.URL;
 
 /**
  * A DownloadIndicator creates DownloadServiceListeners that are

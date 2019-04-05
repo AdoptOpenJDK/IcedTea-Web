@@ -37,11 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.mock;
 
-import java.util.List;
-import java.util.Locale;
-
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MockJNLPFile extends JNLPFile {
 

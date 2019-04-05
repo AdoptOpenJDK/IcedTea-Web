@@ -37,6 +37,8 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +49,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Simple utility class that extends HashMap by adding an expiry to the entries.

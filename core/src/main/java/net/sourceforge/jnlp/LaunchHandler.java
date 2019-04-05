@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 
 /**
  * This optional interface is used to handle conditions that occur

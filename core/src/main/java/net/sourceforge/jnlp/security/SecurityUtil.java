@@ -37,6 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.KeyStores.Type;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -48,11 +53,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import javax.net.ssl.KeyManagerFactory;
-
-import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.security.KeyStores.Type;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SecurityUtil {
 

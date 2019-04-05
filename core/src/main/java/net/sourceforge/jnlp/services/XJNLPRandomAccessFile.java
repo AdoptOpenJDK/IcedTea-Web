@@ -36,11 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.services;
 
+import javax.jnlp.JNLPRandomAccessFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import javax.jnlp.JNLPRandomAccessFile;
 
 public class XJNLPRandomAccessFile implements JNLPRandomAccessFile {
 

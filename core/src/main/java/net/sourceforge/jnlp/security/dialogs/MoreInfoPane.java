@@ -37,14 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.Yes;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -52,12 +50,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.Yes;
-import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an

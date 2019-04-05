@@ -37,15 +37,15 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
-import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.SecurityUtil;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 public class SingleCertInfoPane extends CertsInfoPane {
 

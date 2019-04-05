@@ -37,6 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.browsertesting.ReactingProcess;
+import org.junit.Assert;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -45,8 +48,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import net.sourceforge.jnlp.browsertesting.ReactingProcess;
-import org.junit.Assert;
 
 
 

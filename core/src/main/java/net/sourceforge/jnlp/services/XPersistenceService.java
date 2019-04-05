@@ -16,16 +16,22 @@
 
 package net.sourceforge.jnlp.services;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.jnlp.*;
-
-import net.sourceforge.jnlp.cache.*;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.jnlp.FileContents;
+import javax.jnlp.PersistenceService;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The BasicService JNLP service.

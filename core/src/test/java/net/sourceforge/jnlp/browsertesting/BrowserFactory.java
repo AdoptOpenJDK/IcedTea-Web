@@ -37,19 +37,20 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browsertesting;
 
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.browsertesting.browsers.Chrome;
 import net.sourceforge.jnlp.browsertesting.browsers.Chromium;
 import net.sourceforge.jnlp.browsertesting.browsers.Epiphany;
 import net.sourceforge.jnlp.browsertesting.browsers.Firefox;
 import net.sourceforge.jnlp.browsertesting.browsers.Midory;
 import net.sourceforge.jnlp.browsertesting.browsers.Opera;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class BrowserFactory {
 

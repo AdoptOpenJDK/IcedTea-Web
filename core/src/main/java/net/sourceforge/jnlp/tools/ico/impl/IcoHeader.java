@@ -36,11 +36,11 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.tools.ico.impl;
 
+import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.stream.ImageInputStream;
 
 /**
  * http://www.daubnet.com/en/file-format-ico

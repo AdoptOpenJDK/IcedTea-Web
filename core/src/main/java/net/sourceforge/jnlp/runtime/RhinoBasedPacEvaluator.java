@@ -37,6 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.sourceforge.jnlp.util.TimedHashMap;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,13 +55,6 @@ import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.PropertyPermission;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import net.sourceforge.jnlp.util.TimedHashMap;
-
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Represents a Proxy Auto Config file. This object can be used to evaluate the

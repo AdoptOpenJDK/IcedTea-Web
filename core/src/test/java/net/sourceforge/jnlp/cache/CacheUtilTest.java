@@ -36,13 +36,13 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import java.io.File;
-import java.net.URL;
 import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.util.UrlUtils;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
 
 public class CacheUtilTest {
 

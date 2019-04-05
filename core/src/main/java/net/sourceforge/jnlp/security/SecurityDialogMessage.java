@@ -37,15 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import java.security.cert.X509Certificate;
-import java.util.concurrent.Semaphore;
-
-import javax.swing.JDialog;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.SecurityDialogs.DialogType;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+
+import javax.swing.JDialog;
+import java.security.cert.X509Certificate;
+import java.util.concurrent.Semaphore;
 
 /**
  * Represents a message to the security framework to show a specific security

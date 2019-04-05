@@ -15,6 +15,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.util;
 
+import mslinks.ShellLink;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.cache.CacheLRUWrapper;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -22,11 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
-import mslinks.ShellLink;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
-import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Based on https://github.com/DmitriiShamrikov/mslinkshttps://github.com/DmitriiShamrikov/mslinks

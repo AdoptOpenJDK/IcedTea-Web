@@ -33,8 +33,8 @@ statement from your version.
 */
 package net.sourceforge.jnlp.util.ui;
 
-import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
+import java.util.Vector;
 
 /**
  * A table model that in effect is a {@link DefaultTableModel} except for no

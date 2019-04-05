@@ -37,15 +37,15 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
+
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
 
 public class DeploymentPropertiesModifier {
    

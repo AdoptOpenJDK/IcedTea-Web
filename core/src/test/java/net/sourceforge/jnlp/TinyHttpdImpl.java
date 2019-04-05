@@ -36,6 +36,8 @@
  */
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.cache.ResourceTracker;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -50,8 +52,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import net.sourceforge.jnlp.cache.ResourceTracker;
 
 /**
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very

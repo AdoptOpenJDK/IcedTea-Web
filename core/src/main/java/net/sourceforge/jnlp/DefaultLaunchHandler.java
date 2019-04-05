@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp;
 
 
-import net.sourceforge.jnlp.runtime.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**

@@ -37,6 +37,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;

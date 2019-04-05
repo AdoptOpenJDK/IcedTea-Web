@@ -36,12 +36,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import sun.security.provider.PolicyParser;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,9 +51,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.security.provider.PolicyParser;
 
 import static net.sourceforge.jnlp.security.policyeditor.PolicyEntry.POLICY_ENTRY_DATA_FLAVOR;
 

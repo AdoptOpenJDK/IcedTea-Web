@@ -36,13 +36,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class MD5SumWatcher {
 

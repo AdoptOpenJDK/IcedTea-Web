@@ -38,13 +38,31 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import net.sourceforge.jnlp.ShortcutDesc;
-import static net.sourceforge.jnlp.config.PathsAndFiles.*;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static net.sourceforge.jnlp.config.PathsAndFiles.CACHE_DIR;
+import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_POLICY;
+import static net.sourceforge.jnlp.config.PathsAndFiles.LOCKS_DIR;
+import static net.sourceforge.jnlp.config.PathsAndFiles.LOG_DIR;
+import static net.sourceforge.jnlp.config.PathsAndFiles.MAIN_LOCK;
+import static net.sourceforge.jnlp.config.PathsAndFiles.PCACHE_DIR;
+import static net.sourceforge.jnlp.config.PathsAndFiles.SYS_CACERT;
+import static net.sourceforge.jnlp.config.PathsAndFiles.SYS_CERT;
+import static net.sourceforge.jnlp.config.PathsAndFiles.SYS_CLIENTCERT;
+import static net.sourceforge.jnlp.config.PathsAndFiles.SYS_JSSECAC;
+import static net.sourceforge.jnlp.config.PathsAndFiles.SYS_JSSECERT;
+import static net.sourceforge.jnlp.config.PathsAndFiles.TMP_DIR;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CACERTS;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CERTS;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CLIENTCERT;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DEPLOYMENT_FILE;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECAC;
+import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**

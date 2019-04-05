@@ -39,7 +39,7 @@ package net.sourceforge.jnlp.util.optionparser;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.OptionsDefinitions.*;
+import static net.sourceforge.jnlp.OptionsDefinitions.OPTIONS;
 
 public class ParsedOption {
 

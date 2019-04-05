@@ -35,8 +35,9 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
-import java.util.List;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
+
+import java.util.List;
 
 /**
  * This is abstract access to white/blacklist created from some permanent storage.

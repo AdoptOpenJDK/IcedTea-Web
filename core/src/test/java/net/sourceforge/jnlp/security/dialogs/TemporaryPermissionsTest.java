@@ -36,8 +36,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import static org.junit.Assert.assertEquals;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import org.junit.Test;
 
+import javax.sound.sampled.AudioPermission;
 import java.awt.AWTPermission;
 import java.io.FilePermission;
 import java.security.Permission;
@@ -46,11 +48,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.sound.sampled.AudioPermission;
-
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
-
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class TemporaryPermissionsTest {
 

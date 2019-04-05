@@ -35,16 +35,17 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import java.util.List;
-import java.util.Map;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
+
+import java.util.List;
+import java.util.Map;
+
 import static net.sourceforge.jnlp.runtime.Boot.init;
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
 
 public final class JnlpBoot {
 

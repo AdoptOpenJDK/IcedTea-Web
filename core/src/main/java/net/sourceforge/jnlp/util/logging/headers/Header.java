@@ -36,11 +36,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.util.logging.headers;
 
-import java.util.Date;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputController.Level;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
+
+import java.util.Date;
 
 public class Header {
     public static String  default_user = System.getProperty("user.name");

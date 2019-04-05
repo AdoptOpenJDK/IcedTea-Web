@@ -16,10 +16,11 @@
 
 package net.sourceforge.jnlp.event;
 
-import java.net.*;
-import java.util.*;
+import net.sourceforge.jnlp.cache.Resource;
+import net.sourceforge.jnlp.cache.ResourceTracker;
 
-import net.sourceforge.jnlp.cache.*;
+import java.net.URL;
+import java.util.EventObject;
 
 /**
  * This event is sent during the launch of an

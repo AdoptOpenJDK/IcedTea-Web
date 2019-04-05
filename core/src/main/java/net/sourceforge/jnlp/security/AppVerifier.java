@@ -37,14 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import java.security.cert.CertPath;
-import java.util.Map;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
+
+import java.security.cert.CertPath;
+import java.util.Map;
 
 /**
  * An interface that provides various details about an app's signers.

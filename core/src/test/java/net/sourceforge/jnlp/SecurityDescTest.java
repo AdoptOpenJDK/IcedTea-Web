@@ -36,11 +36,13 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import java.net.URI;
 import net.sourceforge.jnlp.mock.DummyJNLPFile;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.net.URI;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SecurityDescTest {
 

@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.WindowsIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,8 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.annotations.WindowsIssue;
 
 import static org.junit.Assert.assertTrue;
 

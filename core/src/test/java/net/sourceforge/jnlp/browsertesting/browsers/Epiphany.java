@@ -36,9 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.browsertesting.browsers;
 
+import net.sourceforge.jnlp.browsertesting.Browsers;
+
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.jnlp.browsertesting.Browsers;
 
 public class Epiphany extends MozillaFamilyLinuxBrowser {
 

@@ -37,7 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.nanoxml.XMLElement;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -45,9 +46,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
-import net.sourceforge.nanoxml.XMLElement;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 //import javax.xml.parsers.*; // commented to use right Node
 //import org.w3c.dom.*;       // class for using Tiny XML | NanoXML

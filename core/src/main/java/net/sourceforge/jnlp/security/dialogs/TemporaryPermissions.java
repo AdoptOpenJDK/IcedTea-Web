@@ -36,6 +36,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.sourceforge.jnlp.security.policyeditor.PermissionActions;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Permission;
@@ -45,10 +49,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sourceforge.jnlp.security.policyeditor.PermissionActions;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class TemporaryPermissions {
 
