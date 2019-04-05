@@ -34,7 +34,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     private final JNLPFile file;
-    private String iconLocation = null;
+    private final String iconLocation;
 
     public WindowsDesktopEntry(JNLPFile file) {
         this.file = file;
@@ -71,27 +71,28 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     @Override
     public void createWindowsMenu() throws IOException {
         // create menu item
-        String path;
+        String pathSuffix;
         try {
-            path = file.getInformation().getShortcut().getMenu().getSubMenu();
+            pathSuffix = file.getInformation().getShortcut().getMenu().getSubMenu();
         }
         catch (NullPointerException npe) {
-            path = null;
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, npe);
+            pathSuffix = null;
         }        
-        if (path == null) {
-            path = XDesktopEntry.getDesktopIconName(file);
+        if (pathSuffix == null) {
+            pathSuffix = XDesktopEntry.getDesktopIconName(file);
         }
                         
-        path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + path;
+        final String path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + pathSuffix;        
         // check to see if menu dir exists and create if not
-        File menuDir = new File(path);
+        final File menuDir = new File(path);
         if (!menuDir.exists()) {
             menuDir.mkdir();
         }
-        String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
+        final String JavaWsBin = XDesktopEntry.getJavaWsBin();
+        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
         // setup uninstall shortcut
-        ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
+        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
             ul.setIconLocation(iconLocation);

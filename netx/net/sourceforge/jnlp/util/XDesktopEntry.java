@@ -94,6 +94,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     //in pixels
     private static final int[] VALID_ICON_SIZES = new int[] { 16, 22, 32, 48, 64, 128 };
+    private static final String GIF = "gif";
+    private static final String JPG = "jpg";
+    private static final String JPEG = "jpeg";
+    private static final String PNG = "png";
     //browsers we try to find  on path for html shortcut
     public static final String[] BROWSERS = new String[]{"firefox", "midori", "epiphany", "opera", "chromium", "chrome", "konqueror"};
     public static final String FAVICON = "favicon.ico";
@@ -244,7 +248,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     continue;
                 }
                 for (String p : paths) {
-                    File file = new File(p, bin);
+                    final File file = new File(p, bin);
                     if (file.exists()) {
                         exec = file.getAbsolutePath();
                         break outerloop;
@@ -487,10 +491,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
             File target = null;
             if (JNLPRuntime.isWindows() &&
-                (targetName.toLowerCase().endsWith("gif")  || 
-                 targetName.toLowerCase().endsWith("jpg")  || 
-                 targetName.toLowerCase().endsWith("jpeg") || 
-                 targetName.toLowerCase().endsWith("png"))) {
+                (targetName.toLowerCase().endsWith(GIF)  || 
+                 targetName.toLowerCase().endsWith(JPG)  || 
+                 targetName.toLowerCase().endsWith(JPEG) || 
+                 targetName.toLowerCase().endsWith(PNG))) {
                 target = convertToIco(source, targetName);
             }            
             if (target == null) {
@@ -502,7 +506,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
     }
     
-    private File convertToIco(File source, String targetName) {
+    private File convertToIco(final File source, final String targetName) {
         try {
             BufferedImage img = ImageIO.read(source);
             short bitCount = (short)img.getColorModel().getPixelSize();
@@ -511,28 +515,28 @@ public class XDesktopEntry implements GenericDesktopEntry {
             // Therefore, the image is converted if necessary
             if (bitCount < 32)
             {
-                BufferedImage dest = new BufferedImage(
-      			  	img.getWidth(), img.getHeight(),
-        			BufferedImage.TYPE_INT_ARGB);
-                ColorConvertOp cco = new ColorConvertOp(
-        			img.getColorModel().getColorSpace(),
-        			dest.getColorModel().getColorSpace(),
-        			null);
+                final BufferedImage dest = new BufferedImage(
+                                        img.getWidth(), img.getHeight(),
+                                        BufferedImage.TYPE_INT_ARGB);
+                final ColorConvertOp cco = new ColorConvertOp(
+                                        img.getColorModel().getColorSpace(),
+                                        dest.getColorModel().getColorSpace(),
+                                        null);
                 img = cco.filter(img, dest);
                 bitCount = (short)img.getColorModel().getPixelSize();
             }
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            boolean written = ImageIO.write(img, "png", bos);
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            boolean written = ImageIO.write(img, PNG, bos);
             if (!written)
                 return null;
                         
-            byte width  = (byte)(img.getWidth()  < 256 ? img.getWidth()   : 0);
-            byte height = (byte)(img.getHeight() < 256 ? img.getHeight()  : 0);
-            byte colorCount = (byte)(bitCount < 8 ? Math.pow(2, bitCount) : 0);            
-            byte[] imgBytes = bos.toByteArray();
-            int offset = 22;
-            int fileSize = imgBytes.length + offset;
-            ByteBuffer bytes = ByteBuffer.allocate(fileSize);
+            final byte width  = (byte)(img.getWidth()  < 256 ? img.getWidth()   : 0);
+            final byte height = (byte)(img.getHeight() < 256 ? img.getHeight()  : 0);
+            final byte colorCount = (byte)(bitCount < 8 ? Math.pow(2, bitCount) : 0);            
+            final byte[] imgBytes = bos.toByteArray();
+            final int offset = 22;
+            final int fileSize = imgBytes.length + offset;
+            final ByteBuffer bytes = ByteBuffer.allocate(fileSize);
             bytes.order(ByteOrder.LITTLE_ENDIAN);
             
             // Header
@@ -551,9 +555,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             // Image
             bytes.put(imgBytes);            // Image data
 
-            File target = new File(PathsAndFiles.ICONS_DIR.getFile(), 
-                                   targetName.substring(0, 
-                                   targetName.lastIndexOf('.')) + ".ico"); 
+            final File target = new File(PathsAndFiles.ICONS_DIR.getFile(), 
+                                         targetName.substring(0, 
+                                         targetName.lastIndexOf('.')) + ".ico"); 
             try (FileOutputStream fos = new FileOutputStream(target)) {
                 fos.write(bytes.array());
                 fos.flush();
@@ -571,7 +575,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         } catch (NonFileProtocolException ex) {
             OutputController.getLogger().log(ex);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return this.iconLocation;
