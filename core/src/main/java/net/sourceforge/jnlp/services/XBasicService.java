@@ -255,7 +255,7 @@ class XBasicService implements BasicService {
     }
 
     private String promptForCommand(final String targetUrl, boolean aa) throws IOException {
-        String message = DeploymentConfiguration.VVPossibleBrowserValues();
+        final String message = DeploymentConfiguration.VVPossibleBrowserValues();
         String title = R("RBrowserLocationPromptTitle");
         if (JNLPRuntime.isHeadless()) {
             OutputController.getLogger().printOutLn(message);
@@ -305,7 +305,7 @@ class XBasicService implements BasicService {
             JTextField urlField = new JTextField(url);
             urlField.setEditable(false);
             top.add(urlField);
-            JTextArea ta = new JTextArea(DeploymentConfiguration.VVPossibleBrowserValues());
+            final JTextArea ta = new JTextArea(DeploymentConfiguration.VVPossibleBrowserValues());
             ta.setEditable(false);
             ta.setLineWrap(true);
             ta.setWrapStyleWord(false);
