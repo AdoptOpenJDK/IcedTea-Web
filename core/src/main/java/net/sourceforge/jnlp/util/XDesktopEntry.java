@@ -16,10 +16,10 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -59,31 +59,30 @@ import java.util.Map.Entry;
  * information
  *
  * @author Omair Majid
- *
- * 
+ * <p>
+ * <p>
  * This class builds also (freedesktop.org) menu entry out of a {@link JNLPFile}
  * Few notes valid November 2014:
- *    Mate/gnome 2/xfce - no meter of exec or icon put icon to defined/"others" Category
- *                      - name is as expected Name's value
- *                      - if removed, xfce kept icon until login/logout
- *    kde 4 - unknown Cathegory is sorted to Lost &amp; Found -thats bad
- *          - if icon is not found, nothing shows
- *          - name is GENERIC NAME and then little name
- *    Gnome 3 shell - exec must be valid program!
- *                  - also had issues with icon
- * 
+ * Mate/gnome 2/xfce - no meter of exec or icon put icon to defined/"others" Category
+ * - name is as expected Name's value
+ * - if removed, xfce kept icon until login/logout
+ * kde 4 - unknown Cathegory is sorted to Lost &amp; Found -thats bad
+ * - if icon is not found, nothing shows
+ * - name is GENERIC NAME and then little name
+ * Gnome 3 shell - exec must be valid program!
+ * - also had issues with icon
+ * <p>
  * conclusion:
- *  - backup icon to .config
- *  - use "Network" category
- *  - force valid launcher
- 
+ * - backup icon to .config
+ * - use "Network" category
+ * - force valid launcher
  * @author (not so proudly) Jiri Vanek
  */
 
 public class XDesktopEntry implements GenericDesktopEntry {
 
     private final static Logger LOG = LoggerFactory.getLogger(XDesktopEntry.class);
- 
+
     public static final String JAVA_ICON_NAME = "javaws";
 
     private JNLPFile file = null;
@@ -91,7 +90,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     private String iconLocation = null;
 
     //in pixels
-    private static final int[] VALID_ICON_SIZES = new int[] { 16, 22, 32, 48, 64, 128 };
+    private static final int[] VALID_ICON_SIZES = new int[]{16, 22, 32, 48, 64, 128};
     //browsers we try to find  on path for html shortcut
     public static final String[] BROWSERS = new String[]{"firefox", "midori", "epiphany", "opera", "chromium", "chrome", "konqueror"};
     public static final String FAVICON = "favicon.ico";
@@ -111,12 +110,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Returns the contents of the {@link XDesktopEntry} through the
      * {@link Reader} interface.
-     * @param menu whether to create this icon to menu
-     * @param info result of user's interference
+     *
+     * @param menu     whether to create this icon to menu
+     * @param info     result of user's interference
      * @param isSigned whether the app is signed
      * @return reader with desktop shortcut specification
      */
-     Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+    Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
 
         File generatedJnlp = null;
         if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF)) {
@@ -128,7 +128,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 LOG.error("ERROR", ex);
             }
         }
-        
+
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
         fileContents += "Name=" + getDesktopIconName() + "\n";
@@ -160,8 +160,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
         String title = "xdesktop writing";
         if (JNLPRuntime.isWebstartApplication()) {
             String htmlSwitch = "";
-            if (JNLPRuntime.isHtml()){
-                htmlSwitch = " "+OptionsDefinitions.OPTIONS.HTML.option;
+            if (JNLPRuntime.isHtml()) {
+                htmlSwitch = " " + OptionsDefinitions.OPTIONS.HTML.option;
             }
             exec = "Exec="
                     + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";
@@ -177,12 +177,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 fileContents += exec;
             } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP
                     || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF) && generatedJnlp != null) {
-                exec =  "Exec="
+                exec = "Exec="
                         + getJavaWsBin() + " \"" + generatedJnlp.getAbsolutePath() + "\"\n";
                 fileContents += exec;
                 title = title + " (generated jnlp)";
             } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
-                exec =  "Exec="
+                exec = "Exec="
                         + getJavaWsBin() + " -html  \"" + file.getSourceLocation() + "\"\n";
                 fileContents += exec;
             } else {
@@ -203,9 +203,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
         } else {
             return "browser_not_found";
         }
-        
+
     }
-    
+
     public static String getJavaWsBin() {
         //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
         //absolute - works in case of self built
@@ -219,8 +219,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         return "javaws";
     }
-    
-    
+
+
     private static String findOnPath(String[] bins) {
         String exec = null;
         //find if one of binaries is on path
@@ -287,7 +287,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * Set the icon size to use for the desktop shortcut
      *
      * @param size the size (in pixels) of the icon to use. Commonly used sizes
-     *        are of 16, 22, 32, 48, 64 and 128
+     *             are of 16, 22, 32, 48, 64 and 128
      */
     private void setIconSize(int size) {
         iconSize = size;
@@ -295,8 +295,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     /**
      * Create a desktop shortcut for this desktop entry
-     * @param menu how to create in menu
-     * @param desktop how to create on desktop
+     *
+     * @param menu     how to create in menu
+     * @param desktop  how to create on desktop
      * @param isSigned if it is signed
      */
     @Override
@@ -353,7 +354,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             LOG.error("ERROR", e);
         }
     }
-    
+
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
@@ -370,22 +371,22 @@ public class XDesktopEntry implements GenericDesktopEntry {
             try ( /*
              * Write out a Java String (UTF-16) as a UTF-8 file
              */ OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile),
-                     Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false, info, isSigned)) {
-                
+                    Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false, info, isSigned)) {
+
                 char[] buffer = new char[1024];
                 int ret = 0;
                 while (-1 != (ret = reader.read(buffer))) {
                     writer.write(buffer, 0, ret);
                 }
-                
+
             }
 
             /*
              * Install the desktop entry
              */
 
-            String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
-                    shortcutFile.getCanonicalPath() };
+            String[] execString = new String[]{"xdg-desktop-icon", "install", "--novendor",
+                    shortcutFile.getCanonicalPath()};
             LOG.debug("Execing: {}", Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
@@ -459,14 +460,14 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 cantCache();
             }
         } else {
-                URL urlLocation = getFavIconUrl(file);
-                if (urlLocation == null) {
-                    cantCache();
-                }
-                location = urlLocation.toString();
-                if (!location.startsWith("file:")) {
-                    cantCache();
-                }
+            URL urlLocation = getFavIconUrl(file);
+            if (urlLocation == null) {
+                cantCache();
+            }
+            location = urlLocation.toString();
+            if (!location.startsWith("file:")) {
+                cantCache();
+            }
 
         }
         if (location != null) {
@@ -487,15 +488,16 @@ public class XDesktopEntry implements GenericDesktopEntry {
             LOG.debug("Cached desktop shortcut icon: {} ,  With source from: {}", target, origLocation);
         }
     }
-    
+
     static String getFavIcon(JNLPFile file) {
         URL u = getFavIconUrl(file);
-        if (u == null){
+        if (u == null) {
             return null;
         } else {
             return u.toString();
         }
     }
+
     static List<String> possibleFavIconLocations(String path) {
         while (path.endsWith("/") || path.endsWith("\\")) {
             path = path.substring(0, path.length() - 1);
@@ -516,7 +518,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         return r;
     }
-    
+
     private static URL favUrl(String delimiter, String path, JNLPFile file) throws MalformedURLException {
         return new URL(
                 file.getNotNullProbalbeCodeBase().getProtocol(),
@@ -560,16 +562,16 @@ public class XDesktopEntry implements GenericDesktopEntry {
     private String getDesktopIconName() {
         return getDesktopIconName(file);
     }
-    
+
     static String getDesktopIconName(JNLPFile file) {
         return sanitize(file.createNameForDesktopFile());
     }
 
     @Override
     public File getDesktopIconFile() {
-            return new File(getDesktop(), getDesktopIconFileName());
+        return new File(getDesktop(), getDesktopIconFileName());
     }
-    
+
     static File getDesktop() {
         return new File(findFreedesktopOrgDesktopPathCatch());
     }
@@ -578,7 +580,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public File getLinuxMenuIconFile() {
         return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
     }
-    
+
     @Override
     public String getDesktopIconFileName() {
         return getDesktopIconName() + ".desktop";
@@ -619,7 +621,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @return variables (if declared) and quotation marks (unless escaped) free
      * path
      * @throws IOException if no file do not exists or key with desktop do not
-     * exists
+     *                     exists
      */
     private static String findFreedesktopOrgDesktopPath() throws IOException {
         File userDirs = new File(System.getProperty("user.home") + "/.config/user-dirs.dirs");
@@ -635,6 +637,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
 
     }
+
     static final String XDG_DESKTOP_DIR = "XDG_DESKTOP_DIR";
 
     static String getFreedesktopOrgDesktopPathFrom(BufferedReader r) throws IOException {
@@ -655,6 +658,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
         }
     }
+
     private static final String MIC = "MAGIC_QUOTIN_ITW_CONSTANT_FOR_DUMMIES";
 
     private static String filterQuotes(String string) {
@@ -688,8 +692,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
 
     }
-    
-     @Override
+
+    @Override
     public void createShortcutOnWindowsDesktop() throws IOException {
         throw new UnsupportedOperationException("not suported on linux like systems");
     }

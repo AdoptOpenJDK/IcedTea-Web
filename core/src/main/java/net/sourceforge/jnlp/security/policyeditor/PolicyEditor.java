@@ -36,7 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -45,6 +45,7 @@ import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
@@ -1717,7 +1718,7 @@ public class PolicyEditor extends JPanel {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        final OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        final OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getPolicyEditorOptions());
         
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
             JNLPRuntime.setDebug(true);

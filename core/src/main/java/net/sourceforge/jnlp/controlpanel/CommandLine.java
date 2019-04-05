@@ -18,7 +18,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
@@ -502,7 +503,7 @@ public class CommandLine {
         SwingUtils.setup();
 
         try {
-            OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+            OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
             if (optionParser.hasOption(OptionsDefinitions.OPTIONS.DETAILS) || optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)){
                 JNLPRuntime.setDebug(true);
             }

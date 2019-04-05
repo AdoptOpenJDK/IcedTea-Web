@@ -36,10 +36,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.optionparser;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions.OPTIONS;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.OptionsDefinitions.OPTIONS;
+
 
 public class ParsedOption {
 
