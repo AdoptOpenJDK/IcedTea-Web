@@ -2,6 +2,8 @@ package net.sourceforge.jnlp.cache;
 
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +21,9 @@ import java.util.jar.JarFile;
  * Be sure to call cleanupTemporayFolder when finished with the object.
  */
 public class NativeLibraryStorage {
+
+    private final static Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
+
     private final ResourceTracker tracker;
     private final List<File> nativeSearchDirectories = new ArrayList<>();
 
@@ -34,7 +39,7 @@ public class NativeLibraryStorage {
      */
     public void cleanupTemporaryFolder() {
         if (jarEntryDirectory != null) {
-            OutputController.getLogger().log("Cleaning up native directory" + jarEntryDirectory.getAbsolutePath());
+            LOG.info("Cleaning up native directory {}", jarEntryDirectory.getAbsolutePath());
             try {
                 FileUtils.recursiveDelete(jarEntryDirectory,
                         new File(System.getProperty("java.io.tmpdir")));
@@ -85,7 +90,7 @@ public class NativeLibraryStorage {
      * @param jarLocation location of jar to be searched
      */
     public void addSearchJar(URL jarLocation) {
-        OutputController.getLogger().log("Activate native: " + jarLocation);
+        LOG.info("Activate native: {}", jarLocation);
         File localFile = tracker.getCacheFile(jarLocation);
         if (localFile == null)
             return;

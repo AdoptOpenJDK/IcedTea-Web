@@ -30,6 +30,8 @@ import net.sourceforge.jnlp.util.GenericDesktopEntry;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;
@@ -53,6 +55,8 @@ import java.security.ProtectionDomain;
  * @version $Revision: 1.15 $
  */
 public class ApplicationInstance {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationInstance.class);
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -211,24 +215,21 @@ public class ApplicationInstance {
 	        //if one of menu or desktop exists, do not bother user
 	        boolean exists = false;
 	        if (possibleDesktopFile.exists()) {
-	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-	                    + possibleDesktopFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            LOG.info("ApplicationInstance.addMenuAndDesktopEntries(): file - {} already exists. Refreshing and not proceeding with desktop additions", possibleDesktopFile.getAbsolutePath());
 	            exists = true;
 	            if (JNLPRuntime.isOnline()) {
 	                entry.refreshExistingShortcuts(false, true); //update
 	            }
 	        }
 	        if (possibleMenuFile.exists()) {
-	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): file - "
-	                    + possibleMenuFile.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            LOG.info("ApplicationInstance.addMenuAndDesktopEntries(): file - {} already exists. Refreshing and not proceeding with desktop additions", possibleMenuFile.getAbsolutePath());
 	            exists = true;
 	            if (JNLPRuntime.isOnline()) {
 	                entry.refreshExistingShortcuts(true, false); //update
 	            }
 	        }
 	        if (generatedJnlp.exists()) {
-	            OutputController.getLogger().log("ApplicationInstance.addMenuAndDesktopEntries(): generated file - "
-	                    + generatedJnlp.getAbsolutePath() + " already exists. Refreshing and not proceeding with desktop additions");
+	            LOG.info("ApplicationInstance.addMenuAndDesktopEntries(): generated file - {} already exists. Refreshing and not proceeding with desktop additions", generatedJnlp.getAbsolutePath());
 	            exists = true;
 	            if (JNLPRuntime.isOnline()) {
 	                entry.refreshExistingShortcuts(true, true); //update
@@ -382,7 +383,7 @@ public class ApplicationInstance {
             Thread threads[] = new Thread[group.activeCount() * 2];
             int nthreads = group.enumerate(threads);
             for (int i = 0; i < nthreads; i++) {
-                OutputController.getLogger().log("Interrupt thread: " + threads[i]);
+                LOG.info("Interrupt thread: {}", threads[i]);
                 threads[i].interrupt();
             }
 
@@ -390,7 +391,7 @@ public class ApplicationInstance {
             Thread.yield();
             nthreads = group.enumerate(threads);
             for (int i = 0; i < nthreads; i++) {
-                OutputController.getLogger().log("Stop thread: " + threads[i]);
+                LOG.info("Stop thread: {}", threads[i]);
                 threads[i].stop();
             }
 

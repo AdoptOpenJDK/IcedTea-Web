@@ -22,6 +22,8 @@ import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -67,6 +69,8 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
  * @version $Revision: 1.22 $
  */
 public class ResourceTracker {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ResourceTracker.class);
 
     // todo: use event listener arrays instead of lists
 
@@ -220,7 +224,7 @@ public class ResourceTracker {
             CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion());
 
             if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
-                OutputController.getLogger().log("not updating: " + resource.getLocation());
+                LOG.info("not updating: {}", resource.getLocation());
 
                 synchronized (resource) {
                     resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
