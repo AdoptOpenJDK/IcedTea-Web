@@ -11,21 +11,23 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>icedtea-web-common</artifactId>
-    <name>Common</name>
-    <description>Common functionality used by other IcedTea-Web modules.</description>
+    <artifactId>xml-parser</artifactId>
+    <name>xml-parser</name>
+    <description>XML parser abstraction for the underlying strict and malformed XML parser.</description>
+
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.26</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>icedtea-web-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.26</version>
+            <groupId>org.ccil.cowan.tagsoup</groupId>
+            <artifactId>tagsoup</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
+
 
 </project>

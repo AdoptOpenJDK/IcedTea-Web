@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -31,7 +30,7 @@ public class ParseException extends Exception {
     // todo: add meaningful information, such as the invalid
     // element, parse position, etc.
 
-   
+
     /**
      * Create a parse exception with the specified message.
      * @param message to be shown in exception
@@ -48,13 +47,13 @@ public class ParseException extends Exception {
      */
     public ParseException(String message, Throwable cause) {
         super(getParserSettingsMessage() + message, cause);
-    }  
+    }
 
     public ParseException(Throwable cause) {
         super(getParserSettingsMessage(), cause);
     }
-    
-    
+
+
     static enum UsedParsers {
 
         MALFORMED, NORMAL
@@ -70,7 +69,7 @@ public class ParseException extends Exception {
     static void setUsed(UsedParsers us) {
         used = us;
     }
-    
+
     private static String getParserSettingsMessage() {
         final String tail = ""
                 + " "
@@ -84,11 +83,11 @@ public class ParseException extends Exception {
             //warn about TagSoup
             return Translator.R("TAGSOUPbroken") + tail;
         }
-        if (JNLPRuntime.isDebug()) {
-            return expected + " " + used + "; ";
-        } else {
-            return "";
-        }
+//        if (JNLPRuntime.isDebug()) {
+//            return expected + " " + used + "; ";
+//        } else {
+//            return "";
+//        }
     }
 
 }

@@ -103,10 +103,10 @@ public class Node {
 
         return children;
     }
-    
+
     /**
      * To retrieve all attribute names
-     * @return all attribute names of the Node in ArrayList<String> 
+     * @return all attribute names of the Node in ArrayList<String>
      */
     List<String> getAttributeNames() {
         if (attributeNames == null) {
@@ -146,7 +146,7 @@ public class Node {
         public ElementName(String base) {
             this.base = base;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ElementName) {
