@@ -174,8 +174,7 @@ public final class PluginBridge extends JNLPFile {
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to get JNLP file at: " + params.getJNLPHref()
-                        + " with context of URL as: " + codeBase.toExternalForm());
+                LOG.error("Unable to get JNLP file at: " + params.getJNLPHref() + " with context of URL as: " + codeBase.toExternalForm(), e);
             }
         } else {
             // Should we populate this list with applet attribute tags?
@@ -218,8 +217,8 @@ public final class PluginBridge extends JNLPFile {
 
             addArchiveEntries(archives);
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jar string: " + archive);
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "jars length: " + archives.length);
+            LOG.debug("Jar string: {}", archive);
+            LOG.debug("jars length: {}", archives.length);
         }
 
         if (main.endsWith(".class"))

@@ -218,7 +218,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantDeleteFile", eMsg == null ? f : eMsg));
+                LOG.error(R("RCantDeleteFile", eMsg == null ? f : eMsg));
             }
         }
     }
@@ -522,7 +522,7 @@ public final class FileUtils {
      *         outside the base
      */
     public static void recursiveDelete(File file, File base) throws IOException {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Deleting: " + file);
+        LOG.debug("Deleting: {}", file);
 
         if (!(file.getCanonicalPath().startsWith(base.getCanonicalPath()))) {
             throw new IOException("Trying to delete a file outside Netx's basedir: "

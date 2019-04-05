@@ -38,6 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.tools;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -52,6 +54,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * entries provided by a jar of the app.
  */
 public class CertInformation {
+
+    private final static Logger LOG = LoggerFactory.getLogger(CertInformation.class);
 
     private boolean hasExpiredCert = false;
     private boolean hasExpiringCert = false;
@@ -162,8 +166,7 @@ public class CertInformation {
      */
     public void setNumJarEntriesSigned(String jarName, int signedEntriesCount) {
         if (signedJars.containsKey(jarName)) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "WARNING: A jar that has already been "
-                        + "verified is being yet again verified: " + jarName);
+            LOG.warn("WARNING: A jar that has already been verified is being yet again verified: {}", jarName);
         } else {
             signedJars.put(jarName, signedEntriesCount);
         }

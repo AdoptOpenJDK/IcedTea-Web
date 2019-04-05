@@ -504,9 +504,9 @@ public final class DeploymentConfiguration {
         for (String key : initial.keySet()) {
             Setting<String> s = initial.get(key);
             if (!(s.getName().equals(key))) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("DCInternal", "key " + key + " does not match setting name " + s.getName()));
+                LOG.info(R("DCInternal", "key " + key + " does not match setting name " + s.getName()));
             } else if (!defaults.containsKey(key)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("DCUnknownSettingWithName", key));
+                LOG.info(R("DCUnknownSettingWithName", key));
             } else {
                 ValueValidator checker = defaults.get(key).getValidator();
                 if (checker == null) {
@@ -773,7 +773,7 @@ public final class DeploymentConfiguration {
      */
     @SuppressWarnings("unused")
     private static void dumpConfiguration(Map<String, Setting<String>> config, PrintStream out) {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "KEY: VALUE [Locked]");
+        LOG.info("KEY: VALUE [Locked]");
 
         for (String key : config.keySet()) {
             Setting<String> value = config.get(key);
@@ -800,16 +800,16 @@ public final class DeploymentConfiguration {
         File cacheDir = new File(PathsAndFiles.USER_CACHE_HOME);
         File legacyUserDir = new File(LEGACY_USER_HOME);
         if (legacyUserDir.exists()) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, TRANSFER_TITLE);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You should not see this message next time you run icedtea-web!");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Your custom dirs will not be touched and will work");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "-----------------------------------------------");
+            LOG.info(TRANSFER_TITLE);
+            LOG.info(PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
+            LOG.info("You should not see this message next time you run icedtea-web!");
+            LOG.info("Your custom dirs will not be touched and will work");
+            LOG.info("-----------------------------------------------");
 
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Preparing new directories:");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + PathsAndFiles.USER_CONFIG_HOME);
+            LOG.info("Preparing new directories:");
+            LOG.info("{}", PathsAndFiles.USER_CONFIG_HOME);
             errors += resultToStd(configDir.mkdirs());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " " + PathsAndFiles.USER_CACHE_HOME);
+            LOG.info("{}", PathsAndFiles.USER_CACHE_HOME);
             errors += resultToStd(cacheDir.mkdirs());
             //move this first, the creation of config singleton may happen anytime...
             //but must not before USER_DEPLOYMENT_FILE is moved and should not in this block
@@ -835,7 +835,7 @@ public final class DeploymentConfiguration {
             String legacyCache = LEGACY_USER_HOME + File.separator + "cache";
             String currentCache = PathsAndFiles.CACHE_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyCache, currentCache);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Adapting " + PathsAndFiles.CACHE_INDEX_FILE_NAME + " to new destination");
+            LOG.info("Adapting {} to new destination", PathsAndFiles.CACHE_INDEX_FILE_NAME);
             //replace all legacyCache by currentCache in new recently_used
             try {
                 File f = PathsAndFiles.getRecentlyUsedFile().getDefaultFile();
@@ -859,14 +859,14 @@ public final class DeploymentConfiguration {
             String currentTmp = PathsAndFiles.TMP_DIR.getDefaultFullPath();
             errors += moveLegacyToCurrent(legacyTmp, currentTmp);
 
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Removing now empty " + LEGACY_USER_HOME);
+            LOG.info("Removing now empty {}", LEGACY_USER_HOME);
             errors += resultToStd(legacyUserDir.delete());
 
             if (errors != 0) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "There occureed " + errors + " errors");
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Please double check content of old data in " + LEGACY_USER_HOME + " with ");
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "new " + PathsAndFiles.USER_CONFIG_HOME + " and " + PathsAndFiles.USER_CACHE_HOME);
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "To disable this check again, please remove " + LEGACY_USER_HOME);
+                LOG.info("There occureed {} errors", errors);
+                LOG.info("Please double check content of old data in {} with ", LEGACY_USER_HOME);
+                LOG.info("new {} and {}", PathsAndFiles.USER_CONFIG_HOME, PathsAndFiles.USER_CACHE_HOME);
+                LOG.info("To disable this check again, please remove {}", LEGACY_USER_HOME);
             }
 
         } else {
@@ -885,7 +885,7 @@ public final class DeploymentConfiguration {
         //this call should endure even if (ever) will migration code be removed
         DirectoryValidator.DirectoryCheckResults r = new DirectoryValidator().ensureDirs();
         if (r.getFailures() > 0) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, r.getMessage());
+            LOG.info(r.getMessage());
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, r.getMessage());
             }
@@ -894,17 +894,17 @@ public final class DeploymentConfiguration {
     }
 
     private static int moveLegacyToCurrent(String legacy, String current) {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Moving " + legacy + " to " + current);
+        LOG.info("Moving {} to {}", legacy, current);
         File cf = new File(current);
         File old = new File(legacy);
         if (cf.exists()) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Warning! Destination " + current + " exists!");
+            LOG.warn("Warning! Destination {} exists!", current);
         }
         if (old.exists()) {
             boolean moved = old.renameTo(cf);
             return resultToStd(moved);
         } else {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Source " + legacy + " do not exists, nothing to do");
+            LOG.info("Source {} do not exists, nothing to do", legacy);
             return 0;
         }
 
@@ -912,10 +912,10 @@ public final class DeploymentConfiguration {
 
     private static int resultToStd(boolean securityMove) {
         if (securityMove) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "OK");
+            LOG.debug("OK");
             return 0;
         } else {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "ERROR");
+            LOG.debug("ERROR");
             return 1;
         }
     }

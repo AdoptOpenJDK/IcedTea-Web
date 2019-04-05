@@ -79,7 +79,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
      * @param pacUrl the url of the PAC file to use
      */
     public RhinoBasedPacEvaluator(URL pacUrl) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Using the Rhino based PAC evaluator for url " + pacUrl);
+        LOG.error("Using the Rhino based PAC evaluator for url {}", pacUrl);
         pacHelperFunctionContents = getHelperFunctionContents();
         this.pacUrl = pacUrl;
         pacContents = getPacContents(pacUrl);
@@ -121,7 +121,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
      */
     private String getProxiesWithoutCaching(URL url) {
         if (pacHelperFunctionContents == null) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Error loading pac functions");
+            LOG.error("Error loading pac functions");
             return "DIRECT";
         }
 
@@ -251,7 +251,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
 
                 Object functionObj = scope.get("FindProxyForURL", scope);
                 if (!(functionObj instanceof Function)) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "FindProxyForURL not found");
+                    LOG.error("FindProxyForURL not found");
                     return null;
                 } else {
                     Function findProxyFunction = (Function) functionObj;

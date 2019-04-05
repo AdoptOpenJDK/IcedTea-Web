@@ -121,6 +121,6 @@ public class XPrintService implements PrintService {
                                 "Unable to find a default printer.",
                                 "Warning",
                                 JOptionPane.WARNING_MESSAGE);
-        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to print: Unable to find default printer.");
+        LOG.warn("Unable to print: Unable to find default printer.");
     }
 }

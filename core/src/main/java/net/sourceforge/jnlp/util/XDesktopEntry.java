@@ -386,7 +386,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
+            LOG.debug("Execing: {}", Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
             Process installer = pb.start();
@@ -484,7 +484,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             File target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
             Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
             this.iconLocation = target.getAbsolutePath();
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
+            LOG.debug("Cached desktop shortcut icon: {} ,  With source from: {}", target, origLocation);
         }
     }
     
@@ -596,7 +596,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         String fPath = f.getAbsolutePath();
         if (!f.exists()) {
             if (!f.mkdirs()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, fPath + message);
+                LOG.error(fPath + message);
             }
         }
         return fPath;

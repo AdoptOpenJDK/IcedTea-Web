@@ -167,9 +167,9 @@ public class CacheLRUWrapper {
          */
         if (loaded && checkData()) {
             LOG.error("ERROR", new LruCacheException());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakeCache"));
+            LOG.info(R("CFakeCache"));
             store();
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakedCache"));
+            LOG.info(R("CFakedCache"));
         }
     }
 

@@ -329,16 +329,16 @@ class JNLPSecurityManager extends AWTSecurityManager {
             if (JNLPRuntime.isDebug()) {
                 if (cl.getSecurity() == null) {
                     if (cl.getPermissions(null).implies(perm)){
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Added permission: " + perm.toString());
+                        LOG.warn("Added permission: {}", perm);
                     } else {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to add permission: " + perm.toString());
+                        LOG.warn("Unable to add permission: {}", perm);
                     }
                 } else {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Cannot get permissions for null codesource when classloader security is not null");
+                    LOG.warn("Cannot get permissions for null codesource when classloader security is not null");
                 }
             }
         } else {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Unable to add permission: " + perm + ", classloader not JNLP.");
+            LOG.debug("Unable to add permission: {}, classloader not JNLP.", perm);
         }
     }
 
@@ -355,7 +355,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         if (app != null && window instanceof Window) {
             Window w = (Window) window;
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "SM: app: " + app.getTitle() + " is adding a window: " + window + " with appContext " + AppContext.getAppContext());
+            LOG.debug("SM: app: {} is adding a window: {} with appContext {}", app.getTitle(), window, AppContext.getAppContext());
 
             weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);

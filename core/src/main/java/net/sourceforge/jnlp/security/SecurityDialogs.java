@@ -238,7 +238,7 @@ public class SecurityDialogs {
         message.extras = new Object[]{host, port, prompt, type};
 
         DialogResult response = getUserResponse(message);
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at  was " + response);
+        LOG.debug("Decided action for matching alaca at  was {}", response);
         return (NamePassword) response;
     }
 
@@ -255,7 +255,7 @@ public class SecurityDialogs {
         message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
 
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
+        LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
 
         if (selectedValue == null) {
             return false;
@@ -274,7 +274,7 @@ public class SecurityDialogs {
         message.extras = new Object[]{docBaseString, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
 
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
+        LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
 
         if (selectedValue != null) {
             return selectedValue.toBoolean();
@@ -289,7 +289,7 @@ public class SecurityDialogs {
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
         DialogResult selectedValue = getUserResponse(message);
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for missing permissions at " + file.getCodeBase() + " was " + selectedValue);
+        LOG.debug("Decided action for missing permissions at {} was {}", file.getCodeBase(), selectedValue);
 
         if (selectedValue != null) {
             return selectedValue.toBoolean();

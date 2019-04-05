@@ -261,7 +261,7 @@ public class JVMPanel extends NamedBorderPanel {
             processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, processErrorStream);
+            LOG.debug(processErrorStream);
             LOG.info(processStdOutStream);
             processErrorStream = processErrorStream.toLowerCase();
             processStdOutStream = processStdOutStream.toLowerCase();

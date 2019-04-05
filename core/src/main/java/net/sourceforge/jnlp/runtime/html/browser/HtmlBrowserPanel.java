@@ -463,8 +463,8 @@ public class HtmlBrowserPanel extends JPanel {
     }
 
     public static void warn() {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BrowserWarningLine1"));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BrowserWarningLine2"));
+        LOG.info(Translator.R("BrowserWarningLine1"));
+        LOG.info(Translator.R("BrowserWarningLine2"));
     }
 
     public static void showStandAloneWindow(String url, boolean socket) {

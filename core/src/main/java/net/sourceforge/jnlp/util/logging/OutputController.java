@@ -316,9 +316,6 @@ public class OutputController {
         log(level, (Object) s);
     }
 
-    public void log(Level level, Throwable s) {
-        log(level, (Object) s);
-    }
 
     private void log(Level level, Object o) {
         String s ="";

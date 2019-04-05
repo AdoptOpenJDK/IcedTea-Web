@@ -237,7 +237,7 @@ public class JNLPRuntime {
                 //where deployment.system.config points is not readable
                 throw new RuntimeException(getConfiguration().getLoadingException());
             }
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
+            LOG.warn(R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
         }
 
         isWebstartApplication = isApplication;
@@ -325,14 +325,14 @@ public class JNLPRuntime {
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
-                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
+                     LOG.warn("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                      return null;
                  }
             } else { // Java 7 or more (technically could be <= 1.5 but <= 1.5 is unsupported)
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
                  } catch (ClassNotFoundException cnfe) {
-                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
+                     LOG.error("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7", cnfe);
                      return null;
                  }
             }
@@ -391,7 +391,7 @@ public class JNLPRuntime {
 
     public static void setOfflineForced(boolean b) {
         offlineForced = b;
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Forcing of offline set to: " + offlineForced);
+        LOG.debug("Forcing of offline set to: {}", offlineForced);
     }
 
     public static boolean isOfflineForced() {
@@ -400,7 +400,7 @@ public class JNLPRuntime {
 
     public static void setOnlineDetected(boolean online) {
         onlineDetected = online;
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Detected online set to: " + onlineDetected);
+       LOG.debug("Detected online set to: {}", onlineDetected);
     }
 
     public static boolean isOnlineDetected() {
@@ -435,7 +435,7 @@ public class JNLPRuntime {
         try {
             InetAddress.getByName(location.getHost());
         } catch (UnknownHostException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "The host of " + location.toExternalForm() + " file seems down, or you are simply offline.");
+           LOG.error("The host of " + location.toExternalForm() + " file seems down, or you are simply offline.", e);
             return false;
         }
 
@@ -458,13 +458,12 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationError"));
+                LOG.info(R("RConfigurationError"));
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             }catch(Exception t){
-                LOG.error("ERROR", t);
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RFailingToDefault"));
+                LOG.error(R("RFailingToDefault"), t);
                 if (!JNLPRuntime.isHeadless()){
                     JOptionPane.showMessageDialog(null, R("RFailingToDefault")+"\n"+t.toString());
                 }

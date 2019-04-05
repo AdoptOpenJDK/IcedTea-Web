@@ -69,7 +69,7 @@ public class AppletsFilter {
         List<Integer> r = new ArrayList<>(found.size());
         if (ids.isEmpty()) {
             if (found.size() > 1) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HTMLmoreThenOne", found.size()));
+                LOG.info(Translator.R("HTMLmoreThenOne", found.size()));
             }
             r.add(0);
             return r;
@@ -89,20 +89,20 @@ public class AppletsFilter {
                 continue;
             }
             if (id < 0) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You have selected lesser then 0th applet. Using first");
+                LOG.info("You have selected lesser then 0th applet. Using first");
                 if (!r.contains(0)) {
                     r.add(0);
                 }
                 continue;
             }
             if (id >= found.size()) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You have selected higher then " + (found.size() - 1) + "th applet. Using last");
+                LOG.info("You have selected higher then " + (found.size() - 1) + "th applet. Using last");
                 if (!r.contains(found.size() - 1)) {
                     r.add(found.size() - 1);
                 }
                 continue;
             }
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Using " + id + "th applet from total of  count " + (found.size() - 1));
+            LOG.info("Using " + id + "th applet from total of  count " + (found.size() - 1));
             r.add(id);
         }
         return r;

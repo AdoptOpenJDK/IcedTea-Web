@@ -169,8 +169,8 @@ class KeystorePasswordAttempter {
                 //tried all known, ask for new or finally die
                 if (i + 1 == localPases.size()) {
                     String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), (i + 1));
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s1);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("KSinvalidPassword"));
+                    LOG.info(s1);
+                    LOG.info(Translator.R("KSinvalidPassword"));
                     if (JNLPRuntime.isHeadless()) {
                         OutputController.getLogger().printOutLn(s1 + "\n" + Translator.R("KSheadlesWarning"));
                         String s = OutputController.getLogger().readLine();

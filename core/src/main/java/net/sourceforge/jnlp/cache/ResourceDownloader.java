@@ -211,7 +211,7 @@ public class ResourceDownloader implements Runnable {
                     if (jnlpPath == null || jnlpPath.equals("")) {
                         jnlpPath = Boot.getOptionParser().getParam(OptionsDefinitions.OPTIONS.HTML);
                         if (jnlpPath == null || jnlpPath.equals("")) {
-                            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Not-setting jnlp-path for missing main/jnlp/html argument");
+                            LOG.info("Not-setting jnlp-path for missing main/jnlp/html argument");
                         } else {
                             entry.setJnlpPath(jnlpPath);
                         }
@@ -254,7 +254,7 @@ public class ResourceDownloader implements Runnable {
                     resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
                 }
             } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "You are trying to get resource " + resource.getLocation().toExternalForm() + " but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure");
+                LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             }
 
@@ -284,9 +284,8 @@ public class ResourceDownloader implements Runnable {
         }
 
         List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
-                + resource.toString() + " : " + urls);
+        LOG.debug("Finding best URL for: {} : {}", resource.getLocation(), options.toString());
+        LOG.debug("All possible urls for {} : {}", resource.toString(), urls);
         for (ResourceTracker.RequestMethods requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
             for (int i = 0; i < urls.size(); i++) {
                 URL url = urls.get(i);
@@ -309,18 +308,18 @@ public class ResourceDownloader implements Runnable {
                     }
                     if (response.shouldRedirect()) {
                         if (response.URL == null) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Although " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " the target was null. Not following");
+                            LOG.debug("Although {} got redirect {} code for {} request for {} the target was null. Not following", resource.toString(), response.result, requestMethod, url.toExternalForm());
                         } else {
-                            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Resource " + resource.toString() + " got redirect " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm() + " adding " + response.URL.toExternalForm() + " to list of possible urls");
+                            LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.result, requestMethod, url.toExternalForm(), response.URL.toExternalForm());
                             if (!JNLPRuntime.isAllowRedirect()) {
                                 throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.result + ") to " + response.URL.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
                             }
                             urls.add(response.URL);
                         }
                     } else if (response.isInvalid()) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "For " + resource.toString() + " the server returned " + response.result + " code for " + requestMethod + " request for " + url.toExternalForm());
+                        LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.result, requestMethod, url.toExternalForm());
                     } else {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "best url for " + resource.toString() + " is " + url.toString() + " by " + requestMethod);
+                        LOG.debug("best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
                         if (response.URL == null) {
                             response.URL = url;
                         }
@@ -348,8 +347,7 @@ public class ResourceDownloader implements Runnable {
 
             String contentEncoding = connection.getContentEncoding();
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading " + downloadTo + " using "
-                    + downloadFrom + " (encoding : " + contentEncoding + ") ");
+            LOG.debug("Downloading {} using {} (encoding : {})", downloadTo, downloadFrom, contentEncoding);
 
             boolean packgz = "pack200-gzip".equals(contentEncoding)
                     || downloadFrom.getPath().endsWith(".pack.gz");
@@ -413,7 +411,7 @@ public class ResourceDownloader implements Runnable {
 
     private void downloadFile(URLConnection connection, URL downloadLocation) throws IOException {
         CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Downloading file: " + downloadLocation + " into: " + downloadEntry.getCacheFile().getCanonicalPath());
+        LOG.debug("Downloading file: {} into: {}", downloadLocation, downloadEntry.getCacheFile().getCanonicalPath());
         if (!downloadEntry.isCurrent(connection.getLastModified())) {
             try {
                 writeDownloadToFile(downloadLocation, new BufferedInputStream(connection.getInputStream()));
@@ -476,7 +474,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void uncompressGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Extracting gzip: " + compressedLocation + " to " + uncompressedLocation);
+        LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
         byte buf[] = new byte[1024];
         int rlen;
 
@@ -497,7 +495,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void uncompressPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Extracting packgz: " + compressedLocation + " to " + uncompressedLocation);
+        LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
 
         try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {

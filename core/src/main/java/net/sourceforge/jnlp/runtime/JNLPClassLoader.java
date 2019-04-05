@@ -815,12 +815,12 @@ public class JNLPClassLoader extends URLClassLoader {
                 cachedFile = tracker.getCacheFile(jarDesc.getLocation());
             } catch (IllegalResourceDescriptorException irde) {
                 //Caused by ignored resource being removed due to not being valid
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.");
+                LOG.error("JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.", irde);
                 continue;
             }
 
             if (cachedFile == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " not found. Continuing.");
+                LOG.warn("JAR {} not found. Continuing.", jarDesc.getLocation());
                 continue; // JAR not found. Keep going.
             }
 
@@ -955,7 +955,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         .getCacheFile(jar.getLocation());
 
                 if (localFile == null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jar.getLocation() + " not found. Continuing.");
+                    LOG.warn("JAR {} not found. Continuing.", jar.getLocation());
                     continue; // JAR not found. Keep going.
                 }
 
@@ -1069,9 +1069,9 @@ public class JNLPClassLoader extends URLClassLoader {
                     String jeName = je.getName().toUpperCase();
 
                     if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating Jar InputStream from JarEntry");
+                        LOG.debug("Creating Jar InputStream from JarEntry");
                         InputStream inStream = jarFile.getInputStream(je);
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating File InputStream from lauching JNLP file");
+                        LOG.debug("Creating File InputStream from lauching JNLP file");
                         JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
@@ -1084,10 +1084,10 @@ public class JNLPClassLoader extends URLClassLoader {
                         InputStream jnlpStream = new FileInputStream(jn);
                         JNLPMatcher matcher;
                         if (jeName.equals(APPLICATION)) { // If signed application was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, false, jnlp.getParserSettings());
                         } else { // Otherwise template was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, true, jnlp.getParserSettings());
                         }
                         // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
@@ -1096,7 +1096,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         }
 
                         this.isSignedJNLP = true;
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Signed Application Verification Successful");
+                        LOG.debug("Signed Application Verification Successful");
 
                         break;
                     }
@@ -1126,7 +1126,7 @@ public class JNLPClassLoader extends URLClassLoader {
              * skip the check for a signed JNLP file
              */
         }
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Ending check for signed JNLP file...");
+        LOG.debug("Ending check for signed JNLP file...");
     }
 
     /**
@@ -1422,7 +1422,7 @@ public class JNLPClassLoader extends URLClassLoader {
                             CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
                         }
 
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Activate jar: " + location);
+                        LOG.debug("Activate jar: {}", location);
                     } catch (Exception ex) {
                         LOG.error("ERROR", ex);
                     }
@@ -2052,7 +2052,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
         if (sec == null) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("LNoSecInstance", source.toString()));
+            LOG.info(Translator.R("LNoSecInstance", source.toString()));
         }
         return sec;
     }

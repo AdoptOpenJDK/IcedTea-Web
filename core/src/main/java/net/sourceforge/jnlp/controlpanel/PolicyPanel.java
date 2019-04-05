@@ -147,11 +147,11 @@ public class PolicyPanel extends NamedBorderPanel {
             if (result == OpenFileResult.SUCCESS) {
                 policyToolLaunchHelper(frame, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Opening user JNLP policy read-only");
+                LOG.warn("Opening user JNLP policy read-only");
                 FileUtils.showReadOnlyDialog(frame);
                 policyToolLaunchHelper(frame, filePath);
             } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+                LOG.error("Could not open user JNLP policy");
                 FileUtils.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
             }
         } catch (IOException e) {

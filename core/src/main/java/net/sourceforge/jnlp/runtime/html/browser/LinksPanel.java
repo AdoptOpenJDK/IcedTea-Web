@@ -225,7 +225,7 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
     }
 
     private void addLink(String string) {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, string);
+        LOG.info(string);
         if (added.add(string)) {
             this.add(new RowHolder(string));
         }

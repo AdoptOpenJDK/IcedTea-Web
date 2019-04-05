@@ -251,8 +251,8 @@ class XBasicService implements BasicService {
             } catch (Exception ex) {
                 //ss
             }
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, DeploymentConfiguration.VVPossibleBrowserValues());
+            LOG.info(e.toString());
+            LOG.info(DeploymentConfiguration.VVPossibleBrowserValues());
             return false;
         }
     }

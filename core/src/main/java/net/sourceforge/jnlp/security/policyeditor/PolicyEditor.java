@@ -1096,7 +1096,7 @@ public class PolicyEditor extends JPanel {
      */
     private static void setButtonMnemonic(final AbstractButton button, final String mnemonic) {
         if (mnemonic.length() != 1) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not set mnemonic \"" + mnemonic + "\" for " + button);
+            LOG.debug("Could not set mnemonic \"{}\" for {}", mnemonic, button);
             return;
         }
         final char ch = mnemonic.charAt(0);

@@ -376,7 +376,7 @@ public class SecurityDialog {
 
     private void selectDefaultButton() {
         if (panel == null) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "initial value panel is null");
+            LOG.info("initial value panel is null");
         } else {
             panel.requestFocusOnDefaultButton();
         }

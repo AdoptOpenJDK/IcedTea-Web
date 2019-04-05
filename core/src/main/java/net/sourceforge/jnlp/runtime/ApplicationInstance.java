@@ -157,7 +157,7 @@ public class ApplicationInstance {
     private void addMenuAndDesktopEntries() {
         ShortcutDesc sd = file.getInformation().getShortcut();
         if (JNLPRuntime.isWindows()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Generating windows desktop shorcut");
+            LOG.debug("Generating windows desktop shorcut");
             try {
                 Object instance = null;
                 try {
