@@ -36,8 +36,21 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.security.provider.PolicyParser;
 
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
@@ -51,21 +64,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
-import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.security.provider.PolicyParser;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class TemporaryPermissionsButton extends JButton {
 

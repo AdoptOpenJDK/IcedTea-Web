@@ -16,7 +16,9 @@
 
 package net.sourceforge.jnlp.services;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,9 +29,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * This class represents a Lock for single instance jnlp applications

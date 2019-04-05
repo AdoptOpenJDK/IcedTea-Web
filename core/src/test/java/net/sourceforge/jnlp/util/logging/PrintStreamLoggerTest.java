@@ -35,11 +35,12 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 public class PrintStreamLoggerTest {
 

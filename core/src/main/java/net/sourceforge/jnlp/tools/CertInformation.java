@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -45,8 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Maintains information about a CertPath that has signed at least one of the

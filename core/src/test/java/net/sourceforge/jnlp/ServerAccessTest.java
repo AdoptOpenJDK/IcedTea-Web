@@ -36,15 +36,14 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  *

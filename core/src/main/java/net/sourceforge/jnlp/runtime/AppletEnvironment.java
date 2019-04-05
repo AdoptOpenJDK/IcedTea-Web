@@ -16,23 +16,36 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.List;
-import java.lang.reflect.InvocationTargetException;
-import java.net.*;
-import java.io.*;
-import javax.jnlp.ServiceManager;
-import javax.swing.*;
-
-import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.AppletDesc;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.splashscreen.SplashController;
-import net.sourceforge.jnlp.util.*;
+import net.sourceforge.jnlp.util.WeakList;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+
+import javax.swing.ImageIcon;
+import java.applet.Applet;
+import java.applet.AppletContext;
+import java.applet.AppletStub;
+import java.applet.AudioClip;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The applet environment including stub, context, and frame.  The

@@ -18,10 +18,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import java.awt.LayoutManager;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import java.awt.LayoutManager;
 
 /**
  * This class provides the a panel that has a border with the name specified.

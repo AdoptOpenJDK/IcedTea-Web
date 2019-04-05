@@ -36,18 +36,18 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Image;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import javax.imageio.ImageIO;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
+import net.sourceforge.jnlp.security.dialogresults.YesNo;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
+import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -59,16 +59,16 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.YesNo;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 

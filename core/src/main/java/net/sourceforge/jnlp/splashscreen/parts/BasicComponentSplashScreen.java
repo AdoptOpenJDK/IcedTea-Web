@@ -36,9 +36,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
-import javax.swing.JComponent;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
+
+import javax.swing.JComponent;
 
 public abstract class BasicComponentSplashScreen extends JComponent implements SplashPanel {
     //scaling 100%

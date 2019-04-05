@@ -37,10 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.Translator;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class ReplacingTextFormatter implements Formatter {
 

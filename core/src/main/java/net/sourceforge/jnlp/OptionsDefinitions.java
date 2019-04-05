@@ -36,13 +36,14 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 public class OptionsDefinitions {
 

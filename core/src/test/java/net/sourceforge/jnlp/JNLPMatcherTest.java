@@ -37,15 +37,16 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class JNLPMatcherTest {
 

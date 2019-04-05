@@ -36,6 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.replacements;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -43,9 +47,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Test various corner cases of the parser

@@ -37,17 +37,16 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.mock.MockJNLPFile;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import net.sourceforge.jnlp.mock.MockJNLPFile;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /** Test various corner cases of the parser */
 public class ParserTest extends NoStdOutErrTest {

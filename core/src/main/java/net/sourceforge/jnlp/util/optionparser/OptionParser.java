@@ -36,11 +36,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.optionparser;
 
+import net.sourceforge.jnlp.OptionsDefinitions;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.sourceforge.jnlp.OptionsDefinitions;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 

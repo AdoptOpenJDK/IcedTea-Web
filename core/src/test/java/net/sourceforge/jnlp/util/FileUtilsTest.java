@@ -36,6 +36,9 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.Test;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
@@ -43,11 +46,10 @@ import java.nio.file.attribute.AclFileAttributeView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class FileUtilsTest {
 

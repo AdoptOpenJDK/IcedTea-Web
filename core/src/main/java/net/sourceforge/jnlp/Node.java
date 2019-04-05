@@ -37,12 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.sourceforge.nanoxml.XMLElement;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
-
-import net.sourceforge.nanoxml.XMLElement;
 
 // this class makes assumptions on how parser calls methods (such
 // as getFirstChild->getNextChild only called by a single loop at

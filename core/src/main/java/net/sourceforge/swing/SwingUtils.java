@@ -36,15 +36,16 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.swing;
 
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.swing.JWindow;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
-import javax.swing.JWindow;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * Swing / AWT utility class

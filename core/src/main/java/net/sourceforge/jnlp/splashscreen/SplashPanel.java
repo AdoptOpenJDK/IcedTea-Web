@@ -36,12 +36,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
-import java.awt.Graphics;
-import java.awt.event.ComponentListener;
-
-import javax.swing.JComponent;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+
+import javax.swing.JComponent;
+import java.awt.Graphics;
+import java.awt.event.ComponentListener;
 
 public interface SplashPanel {
 

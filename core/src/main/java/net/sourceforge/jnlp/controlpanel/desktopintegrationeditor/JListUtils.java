@@ -35,6 +35,17 @@
  */
 package net.sourceforge.jnlp.controlpanel.desktopintegrationeditor;
 
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.util.XDesktopEntry;
+
+import javax.imageio.ImageIO;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataListener;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
@@ -44,17 +55,6 @@ import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JList;
-
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.util.XDesktopEntry;
 
 public class JListUtils {
 

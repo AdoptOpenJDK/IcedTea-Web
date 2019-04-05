@@ -1,15 +1,14 @@
 package net.sourceforge.jnlp.cache;
 
-import static org.junit.Assert.assertEquals;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class ResourceUrlCreatorTest extends NoStdOutErrTest{
 

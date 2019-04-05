@@ -37,13 +37,15 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider;
 
-import java.io.IOException;
-import java.io.StringReader;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringReader;
+
+import static org.junit.Assert.assertEquals;
 
 public class ReadAutorsTest {
     

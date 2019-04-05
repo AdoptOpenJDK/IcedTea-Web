@@ -18,11 +18,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import java.awt.BorderLayout;
+import net.sourceforge.jnlp.runtime.Translator;
 
 import javax.swing.JLabel;
-
-import net.sourceforge.jnlp.runtime.Translator;
+import java.awt.BorderLayout;
 
 /**
  * This panel is to allow access to setting the JRE but we currently do not

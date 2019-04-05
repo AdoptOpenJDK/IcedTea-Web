@@ -24,19 +24,18 @@ package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.splashscreen.SplashController;
+import net.sourceforge.jnlp.splashscreen.SplashPanel;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.applet.AppletViewerPanelAccess;
+import sun.awt.SunToolkit;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import net.sourceforge.jnlp.splashscreen.SplashController;
-import net.sourceforge.jnlp.splashscreen.SplashPanel;
-import net.sourceforge.jnlp.splashscreen.SplashUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import sun.applet.AppletViewerPanelAccess;
-import sun.awt.SunToolkit;
 
 /**
  * This panel calls into netx to run an applet, and pipes the display

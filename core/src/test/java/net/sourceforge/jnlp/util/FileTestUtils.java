@@ -37,8 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
-import static org.junit.Assert.assertEquals;
+import net.sourceforge.jnlp.ServerAccess;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,10 +52,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
-import net.sourceforge.jnlp.ServerAccess;
+import static org.junit.Assert.assertEquals;
 
 public class FileTestUtils {
 

@@ -36,11 +36,10 @@
  */
 package net.sourceforge.jnlp.about;
 
-import java.io.IOException;
-import java.net.URL;
-
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import java.io.IOException;
+import java.net.URL;
 
 public class InternalHTMLPanel extends HTMLPanel {
 

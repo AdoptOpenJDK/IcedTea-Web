@@ -16,9 +16,9 @@
 
 package net.sourceforge.jnlp.event;
 
-import java.util.*;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 
-import net.sourceforge.jnlp.runtime.*;
+import java.util.EventObject;
 
 /**
  * This event is sent when an application is terminated.

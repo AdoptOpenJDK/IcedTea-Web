@@ -18,20 +18,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
+import net.sourceforge.jnlp.about.AboutDialog;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-
-import net.sourceforge.jnlp.about.AboutDialog;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 /**
  * This class provides a GUI interface which shows some basic information on

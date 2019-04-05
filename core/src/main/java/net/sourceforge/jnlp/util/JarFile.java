@@ -36,12 +36,13 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 /**
  * A wrapper over {@link java.util.jar.JarFile} that verifies zip headers to

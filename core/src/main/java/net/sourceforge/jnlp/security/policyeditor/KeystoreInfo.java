@@ -36,7 +36,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import java.net.URL;
 import java.util.Objects;
 
 // http://docs.oracle.com/javase/7/docs/technotes/guides/security/PolicyFiles.html

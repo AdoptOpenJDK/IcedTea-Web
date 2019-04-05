@@ -36,8 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.closinglisteners;
 
-import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
-
 public class StringMatchClosingListener extends StringBasedClosingListener {
 
     public StringMatchClosingListener(String s) {

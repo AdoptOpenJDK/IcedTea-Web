@@ -5,13 +5,12 @@
 
 package net.sourceforge.jnlp.util.logging;
 
-import java.util.Date;
-import java.util.TimeZone;
-
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Date;
+import java.util.TimeZone;
 
 
 public class JavaConsoleTest {

@@ -36,12 +36,13 @@
  */
 package net.sourceforge.jnlp.security;
 
-import java.security.Permission;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.security.Permission;
 
 public class KeyStoresTest {
 

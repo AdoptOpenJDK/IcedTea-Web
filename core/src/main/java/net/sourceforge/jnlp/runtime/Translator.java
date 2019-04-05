@@ -16,11 +16,12 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 /**
  * Utility class to provide simple methods to help localize messages

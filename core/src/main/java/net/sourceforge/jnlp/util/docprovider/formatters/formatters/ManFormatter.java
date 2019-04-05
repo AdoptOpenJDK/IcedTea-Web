@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 public class ManFormatter extends ReplacingTextFormatter {
 

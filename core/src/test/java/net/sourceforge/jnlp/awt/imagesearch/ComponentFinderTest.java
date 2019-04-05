@@ -36,9 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.awt.imagesearch;
 
-import java.awt.image.BufferedImage;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.awt.image.BufferedImage;
 
 /**
  *

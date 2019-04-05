@@ -16,8 +16,39 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.DefaultLaunchHandler;
+import net.sourceforge.jnlp.GuiLaunchHandler;
+import net.sourceforge.jnlp.LaunchHandler;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.DefaultDownloadIndicator;
+import net.sourceforge.jnlp.cache.DownloadIndicator;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
+import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.services.XServiceManagerStub;
+import net.sourceforge.jnlp.util.BasicExceptionDialog;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.JavaConsole;
+import net.sourceforge.jnlp.util.logging.LogConfig;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import sun.net.www.protocol.jar.URLJarFile;
 
+import javax.jnlp.ServiceManager;
+import javax.naming.ConfigurationException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.text.html.parser.ParserDelegator;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -42,39 +73,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.jnlp.ServiceManager;
-import javax.naming.ConfigurationException;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.text.html.parser.ParserDelegator;
-
-import net.sourceforge.jnlp.DefaultLaunchHandler;
-import net.sourceforge.jnlp.GuiLaunchHandler;
-import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.DefaultDownloadIndicator;
-import net.sourceforge.jnlp.cache.DownloadIndicator;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.security.JNLPAuthenticator;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.SecurityDialogMessageHandler;
-import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.services.XServiceManagerStub;
-import net.sourceforge.jnlp.util.BasicExceptionDialog;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.JavaConsole;
-import net.sourceforge.jnlp.util.logging.LogConfig;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.net.www.protocol.jar.URLJarFile;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * <p>

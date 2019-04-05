@@ -37,14 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browsertesting;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import org.junit.Ignore;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.internal.runners.model.EachTestNotifier;
@@ -54,6 +48,12 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class BrowserTestRunner extends BlockJUnit4ClassRunner {
 

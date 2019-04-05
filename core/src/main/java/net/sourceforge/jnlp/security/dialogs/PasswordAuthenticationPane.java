@@ -37,9 +37,17 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import java.awt.BorderLayout;
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.SecurityDialog;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.NamePassword;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -47,15 +55,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.NamePassword;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials

@@ -40,8 +40,8 @@ import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultErrorSplashScreen2012;
+import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class SplashUtils {

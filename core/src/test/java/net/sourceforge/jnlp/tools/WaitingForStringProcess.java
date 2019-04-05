@@ -1,10 +1,11 @@
 package net.sourceforge.jnlp.tools;
 
 
-import java.util.List;
 import net.sourceforge.jnlp.ContentReaderListener;
 import net.sourceforge.jnlp.ServerAccess;
 import org.junit.Assert;
+
+import java.util.List;
 
 /**
  * You can see ClipboardContext reproducers as examples

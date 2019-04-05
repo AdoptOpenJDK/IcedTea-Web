@@ -36,16 +36,17 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
+import net.sourceforge.jnlp.runtime.AppletEnvironment;
+import net.sourceforge.jnlp.runtime.AppletInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.splashscreen.impls.*;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class SplashUtilsTest {
 

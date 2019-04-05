@@ -36,17 +36,18 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AppletParser {
 

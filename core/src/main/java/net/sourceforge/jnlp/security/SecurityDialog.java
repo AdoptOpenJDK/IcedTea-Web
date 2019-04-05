@@ -37,18 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.URL;
-import java.security.cert.X509Certificate;
-
-import javax.swing.JDialog;
-import java.awt.Window;
-import net.sourceforge.swing.SwingUtils;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
@@ -68,6 +56,17 @@ import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
 import net.sourceforge.jnlp.security.dialogs.ViwableDialog;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
+
+import javax.swing.JDialog;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dialog.ModalityType;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.URL;
+import java.security.cert.X509Certificate;
 
 /**
  * Provides methods for showing security warning dialogs for a wide range of

@@ -36,11 +36,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
-import java.util.HashMap;
-import java.util.Map;
-import net.sourceforge.jnlp.splashscreen.impls.*;
+import net.sourceforge.jnlp.splashscreen.impls.DefaultErrorSplashScreen2012;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ErrorSplashUtilsTest {
 

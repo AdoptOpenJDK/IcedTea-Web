@@ -4,14 +4,15 @@
  */
 package net.sourceforge.jnlp.config;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class DirectoryValidator {
     

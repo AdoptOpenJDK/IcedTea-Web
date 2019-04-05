@@ -36,6 +36,14 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -48,13 +56,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.sourceforge.jnlp.browsertesting.Browser;
-import net.sourceforge.jnlp.browsertesting.BrowserFactory;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
-import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  *

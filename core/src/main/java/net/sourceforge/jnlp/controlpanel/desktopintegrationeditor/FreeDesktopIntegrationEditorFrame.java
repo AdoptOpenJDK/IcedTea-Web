@@ -35,15 +35,12 @@
  */
 package net.sourceforge.jnlp.controlpanel.desktopintegrationeditor;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
+import net.sourceforge.jnlp.util.XDesktopEntry;
+import net.sourceforge.jnlp.util.logging.ConsoleOutputPaneModel;
+import net.sourceforge.swing.SwingUtils;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -57,13 +54,17 @@ import javax.swing.JTextPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
-import net.sourceforge.jnlp.util.XDesktopEntry;
-import net.sourceforge.jnlp.util.logging.ConsoleOutputPaneModel;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
-import net.sourceforge.swing.SwingUtils;
 
 public class FreeDesktopIntegrationEditorFrame extends JFrame {
 

@@ -36,13 +36,14 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-import java.awt.Component;
-import java.awt.Container;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+
+import java.awt.Component;
+import java.awt.Container;
 
 public class RememberDialog {
 

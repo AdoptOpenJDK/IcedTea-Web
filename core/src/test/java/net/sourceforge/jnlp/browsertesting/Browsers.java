@@ -37,8 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browsertesting;
 
-import java.io.File;
 import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
+
+import java.io.File;
 
 /**
  * When all represent all configured browser, one represens one random

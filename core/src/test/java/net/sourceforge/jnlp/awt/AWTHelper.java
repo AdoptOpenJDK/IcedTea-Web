@@ -36,6 +36,15 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.awt;
 
+import net.sourceforge.jnlp.awt.awtactions.KeyboardActions;
+import net.sourceforge.jnlp.awt.awtactions.MouseActions;
+import net.sourceforge.jnlp.awt.imagesearch.ComponentFinder;
+import net.sourceforge.jnlp.awt.imagesearch.ComponentNotFoundException;
+import net.sourceforge.jnlp.awt.imagesearch.ImageSeeker;
+import net.sourceforge.jnlp.closinglisteners.Rule;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+
+import javax.imageio.ImageIO;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Point;
@@ -45,16 +54,6 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import net.sourceforge.jnlp.awt.awtactions.KeyboardActions;
-import net.sourceforge.jnlp.awt.awtactions.MouseActions;
-import net.sourceforge.jnlp.awt.imagesearch.ComponentFinder;
-import net.sourceforge.jnlp.awt.imagesearch.ComponentNotFoundException;
-import net.sourceforge.jnlp.awt.imagesearch.ImageSeeker;
-import net.sourceforge.jnlp.closinglisteners.Rule;
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 
 public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable{
 

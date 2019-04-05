@@ -37,12 +37,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 public class PlainTextFormatter extends ReplacingTextFormatter {
 

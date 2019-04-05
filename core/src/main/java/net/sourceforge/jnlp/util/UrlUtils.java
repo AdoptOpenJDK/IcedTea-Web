@@ -36,9 +36,12 @@
  */
 package net.sourceforge.jnlp.util;
 
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
+import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,8 +60,6 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import javax.net.ssl.SSLSocketFactory;
-import net.sourceforge.jnlp.JNLPFile;
 
 public class UrlUtils {
 

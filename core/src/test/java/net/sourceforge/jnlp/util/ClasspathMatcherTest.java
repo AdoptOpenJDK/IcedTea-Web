@@ -36,12 +36,13 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class ClasspathMatcherTest {
 

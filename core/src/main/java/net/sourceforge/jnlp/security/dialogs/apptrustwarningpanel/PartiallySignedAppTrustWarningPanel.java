@@ -36,15 +36,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
-
-import java.awt.Dimension;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
@@ -59,6 +50,14 @@ import net.sourceforge.jnlp.security.dialogs.TemporaryPermissionsButton;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.Dimension;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 

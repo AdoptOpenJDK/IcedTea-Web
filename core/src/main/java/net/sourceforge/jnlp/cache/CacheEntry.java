@@ -16,14 +16,14 @@
 
 package net.sourceforge.jnlp.cache;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.io.File;
 import java.net.URL;
 
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * Describes an entry in the cache.

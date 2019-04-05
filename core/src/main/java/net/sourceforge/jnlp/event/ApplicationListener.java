@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp.event;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * The listener that is notified when an application instance is
