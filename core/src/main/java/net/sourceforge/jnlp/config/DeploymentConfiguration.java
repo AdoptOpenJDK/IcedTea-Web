@@ -957,4 +957,18 @@ public final class DeploymentConfiguration {
         
         return r.toString().trim();
     }
+
+    /**
+     * convenient method to show VVPossibleBrowserValues with all four params
+     *
+     * @return translation of VVPossibleBrowserValues with all params in
+     */
+    public static String VVPossibleBrowserValues() {
+        return R("VVPossibleBrowserValues", DeploymentConfiguration.LEGACY_WIN32_URL__HANDLER,
+                DeploymentConfiguration.BROWSER_ENV_VAR,
+                DeploymentConfiguration.INTERNAL_HTML,
+                DeploymentConfiguration.ALWAYS_ASK,
+                DeploymentConfiguration.KEY_BROWSER_PATH
+        );
+    }
 }

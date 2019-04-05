@@ -38,7 +38,6 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.runtime.Translator;
 
 import java.io.File;
 import java.net.URL;
@@ -365,7 +364,7 @@ public class BasicValueValidators {
 
             @Override
             public String getPossibleValues() {
-                return Translator.VVPossibleBrowserValues();
+                return DeploymentConfiguration.VVPossibleBrowserValues();
             }
         };
     }

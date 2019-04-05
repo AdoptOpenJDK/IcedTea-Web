@@ -22,27 +22,15 @@ import net.sourceforge.jnlp.config.BasicValueValidators;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import javax.jnlp.BasicService;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -261,13 +249,13 @@ class XBasicService implements BasicService {
                 //ss
             }
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.VVPossibleBrowserValues());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, DeploymentConfiguration.VVPossibleBrowserValues());
             return false;
         }
     }
 
     private String promptForCommand(final String targetUrl, boolean aa) throws IOException {
-        String message = Translator.VVPossibleBrowserValues();
+        String message = DeploymentConfiguration.VVPossibleBrowserValues();
         String title = R("RBrowserLocationPromptTitle");
         if (JNLPRuntime.isHeadless()) {
             OutputController.getLogger().printOutLn(message);
@@ -317,7 +305,7 @@ class XBasicService implements BasicService {
             JTextField urlField = new JTextField(url);
             urlField.setEditable(false);
             top.add(urlField);
-            JTextArea ta = new JTextArea(Translator.VVPossibleBrowserValues());
+            JTextArea ta = new JTextArea(DeploymentConfiguration.VVPossibleBrowserValues());
             ta.setEditable(false);
             ta.setLineWrap(true);
             ta.setWrapStyleWord(false);
