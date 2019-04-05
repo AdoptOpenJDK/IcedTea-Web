@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.option.OptionsDefinitions.OPTIONS;
 
@@ -48,6 +50,7 @@ import static net.adoptopenjdk.icedteaweb.option.OptionsDefinitions.OPTIONS;
  * This class allows to print the various set of options.
  */
 public class OptionsDefinitionsPrinter {
+    private final static Logger LOG = LoggerFactory.getLogger(OptionsDefinitionsPrinter.class);
 
     public static List<OPTIONS> getItwsettingsCommands() {
         return Arrays.asList(new OPTIONS[]{
@@ -124,8 +127,8 @@ public class OptionsDefinitionsPrinter {
 
     public static void main(String[] args) throws IOException {
         if ((args == null) || (args.length == 0)) {
-            System.out.println(String.format("Missing one of the arguments: %s | %s | %s",
-                    TextsProvider.JAVAWS, TextsProvider.ITWEB_SETTINGS, TextsProvider.POLICY_EDITOR));
+            LOG.error("Missing one of the arguments: {} | {} | {}",
+                    TextsProvider.JAVAWS, TextsProvider.ITWEB_SETTINGS, TextsProvider.POLICY_EDITOR);
             System.exit(0);
         }
         switch (args[0]) {
