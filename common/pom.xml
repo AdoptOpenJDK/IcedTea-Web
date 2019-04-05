@@ -12,6 +12,8 @@
     </parent>
 
     <artifactId>icedtea-web-common</artifactId>
+    <name>Common</name>
+    <description>Common functionality used by other IcedTea-Web modules.</description>
 
 
 </project>

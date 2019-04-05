@@ -12,6 +12,7 @@
     </parent>
 
     <artifactId>jnlp-api</artifactId>
-
+    <name>JNLP API</name>
+    <description>Service interfaces according to JNLP API Reference, v1.0.</description>
 
 </project>

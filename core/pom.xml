@@ -12,6 +12,9 @@
     </parent>
 
     <artifactId>icedtea-web-core</artifactId>
+    <name>Core</name>
+    <description>Main functionality of IcedTea-Web.</description>
+
 
     <dependencies>
         <dependency>
