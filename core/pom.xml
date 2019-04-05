@@ -12,8 +12,21 @@
     </parent>
 
     <artifactId>icedtea-web-core</artifactId>
+    <name>Core</name>
+    <description>Main functionality of IcedTea-Web.</description>
+
 
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jnlp-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>icedtea-web-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.github.vatbub</groupId>
             <artifactId>mslinks</artifactId>
