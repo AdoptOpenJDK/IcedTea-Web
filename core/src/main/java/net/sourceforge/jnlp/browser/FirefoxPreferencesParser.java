@@ -37,16 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>

@@ -36,8 +36,16 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
@@ -50,15 +58,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class is taking HTML document url as input, try to sanitize with
@@ -95,7 +94,7 @@ public class AppletExtractor {
                 Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
             } else {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));    
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));
             }
         } catch (Exception ex) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlBroken"));

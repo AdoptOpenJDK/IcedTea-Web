@@ -37,7 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.optionparser;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import org.junit.Test;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class OptionParserTest {
     @Test
     public void testGetSingleOptionValue() {
         String[] args = {"-update", "blob"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         String value = parser.getParam(OptionsDefinitions.OPTIONS.UPDATE);
         assertEquals("blob", value);
@@ -61,7 +62,7 @@ public class OptionParserTest {
     @Test
     public void testGetSingleOptionMultipleValues() {
         String[] args = {"-arg", "blob", "meow"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.indexOf("blob"));
@@ -72,7 +73,7 @@ public class OptionParserTest {
     @Test
     public void testGetDifferentOptionValues() {
         String[] args = {"-param", "blob", "-arg", "yelp"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.PARAM);
         assertEquals(0, values.indexOf("blob"));
@@ -87,7 +88,7 @@ public class OptionParserTest {
     @Test
     public void testSupportedOptionValueNotBeingUsed() {
         String[] args = {};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
@@ -96,7 +97,7 @@ public class OptionParserTest {
     @Test
     public void testOptionValueWithNoArgument() {
         String[] args = {"-arg"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
@@ -105,7 +106,7 @@ public class OptionParserTest {
     @Test
     public void testOneOptionMultipleTimesMultipleValues() {
         String[] args = {"-arg", "poke", "blob", "-arg", "meep"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(3, values.size());
@@ -117,7 +118,7 @@ public class OptionParserTest {
     @Test
     public void testMultipleOptionsMultipleValues() {
         String[] args = {"-param", "poke", "blob", "-arg", "meep", "feep", "blurp"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.PARAM);
         assertEquals(2, values.size());
@@ -133,7 +134,7 @@ public class OptionParserTest {
     @Test
     public void testCheckOptionExists() {
         String[] args = {"-headless", "-fish", "-busybee", "boat"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         boolean value = parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS);
         assertTrue(value);
@@ -142,7 +143,7 @@ public class OptionParserTest {
     @Test
     public void testCheckOptionExistsAsNotFirstArg() {
         String[] args = {"-run", "fish", "-castle", "-headless"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         boolean value = parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS);
         assertTrue(value);
@@ -151,7 +152,7 @@ public class OptionParserTest {
     @Test
     public void testCheckOptionNotExists() {
         String[] args = {"-run", "fish", "-castle", "cat"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         boolean value = parser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS);
         assertFalse(value);
@@ -163,7 +164,7 @@ public class OptionParserTest {
                 "-headless", "-arg", "-about",
                 "-arg", "blah1", "blah2", "blah3", "-noupdate", "-arg",
                 "blah4", "blah5", "blah6", "-headless", "File.jnlp"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(6, values.size());
@@ -183,14 +184,14 @@ public class OptionParserTest {
                 "-arg", "-about",
                 "-arg", "blah1", "blah2", "blah3","-about", "-arg",
                 "blah4", "blah5", "blah6", "File.jnlp", "-headless", "-noupdate"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         assertTrue(parser.hasOption(OptionsDefinitions.OPTIONS.ABOUT));
     }
 
     @Test
     public void testMainArgExists() {
         String[] args = {"File.jnlp"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
         assertEquals("File.jnlp", parser.getMainArg());
@@ -199,7 +200,7 @@ public class OptionParserTest {
     @Test
     public void testMultipleMainArgsReturnsFirstMainArg() {
         String[] args = {"File.jnlp", "FileTwo,jnlp", "FileThree.jnlp"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
         assertEquals("File.jnlp", parser.getMainArg());
@@ -208,7 +209,7 @@ public class OptionParserTest {
     @Test
     public void testSameTagMultipleTimesWithMainArg() {
         String[] args = {"-headless", "-headless","File.jnlp", "-headless", "-headless", "-headless"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
         assertEquals("File.jnlp", parser.getMainArg());
@@ -218,7 +219,7 @@ public class OptionParserTest {
     @Test
     public void testSameTagMultipleTimesWithoutMainArg() {
         String[] args = {"-headless", "-headless", "-headless", "-headless", "-headless"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertFalse(parser.mainArgExists());
         assertEquals("",parser.getMainArg());
@@ -228,7 +229,7 @@ public class OptionParserTest {
     @Test
     public void testMultipleArgTagSurroundingMainArgAfterNoArgOption() {
         String[] args = {"-arg", "blue", "green", "red", "-headless", "File.jnlp", "-arg", "yellow", "purple"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.indexOf("blue"));
         assertEquals(1, values.indexOf("green"));
@@ -244,7 +245,7 @@ public class OptionParserTest {
     public void testOptionWithDashInMiddleWontBeAltered() {
         String[] args = {"ar-g", "blue", "green", "red"};
 
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(values.size(), 0);
     }
@@ -253,7 +254,7 @@ public class OptionParserTest {
     public void testGetParamsWithNoValueHasNoValues() {
         String[] args = {"-arg"};
 
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(0, values.size());
     }
@@ -262,7 +263,7 @@ public class OptionParserTest {
     public void testOnlyFirstDashIsAcceptable() {
         String[] args = {"-arg", "blue", "a-rg", "-headless", "-arg", "green", "-ar-g"};
 
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(4, values.size());
         assertEquals(0, values.indexOf("blue"));
@@ -293,7 +294,7 @@ public class OptionParserTest {
     @Test
     public void testOptionWithEqualsParamIsValid() {
         String[] args = {"-arg=blue"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(1, values.size());
@@ -303,7 +304,7 @@ public class OptionParserTest {
     @Test
     public void testMultipleOptionWithEqualsParamIsValid() {
         String[] args = {"-arg=blue", "-property=red", "-param=green"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(1, values.size());
@@ -319,7 +320,7 @@ public class OptionParserTest {
     @Test
     public void testSameOptionWithEqualsParamMultipleTimesIsValid() {
         String[] args = {"-arg=blue", "-arg=red", "-arg=green"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(3, values.size());
@@ -331,7 +332,7 @@ public class OptionParserTest {
     @Test
     public void testParamsCanHaveEqualsSigns() {
         String[] args = {"-arg", "colour=red", "height=50", "width=222", "circular=true"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(4, values.size());
@@ -344,7 +345,7 @@ public class OptionParserTest {
     @Test
     public void testParamsCanHaveDashes() {
         String[] args = {"-arg", "-red", "-koala", "-panda", "-grizzly"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(4, values.size());
@@ -357,7 +358,7 @@ public class OptionParserTest {
     @Test
     public void testParamsCanHaveDashesAndEqualsSigns() {
         String[] args = {"-arg", "-red=colour", "-koala=animal", "-panda=bear", "-grizzly=bear"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
         assertEquals(4, values.size());
@@ -370,7 +371,7 @@ public class OptionParserTest {
     @Test
     public void testMainArgAfterNoArgOption() {
         String[] args = {"-arg", "-red=colour", "-headless", "File.jnlp", "-arg", "-grizzly=bear"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertEquals("File.jnlp", parser.getMainArg());
     }
@@ -378,7 +379,7 @@ public class OptionParserTest {
     @Test
     public void testMainArgAfterOneArgOption() {
         String[] args = {"-arg", "-red=colour", "-update", "200", "File.jnlp", "-arg", "-grizzly=bear"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertEquals("File.jnlp", parser.getMainArg());
     }
@@ -386,7 +387,7 @@ public class OptionParserTest {
     @Test
     public void testMainArgAfterManyArgsOptionIsNotAccepted() {
         String[] args = {"-arg", "-red=colour", "-arg", "200", "File.jnlp", "-arg", "-grizzly=bear"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         assertFalse(parser.mainArgExists());
         assertNotEquals("File.jnlp", parser.getMainArg());
@@ -395,7 +396,7 @@ public class OptionParserTest {
     @Test
     public void testOptionWithMultipleEqualSignsOnlyParsesFirstEquals() {
         String[] args = {"-arg=grizzly=panda=goldfish=mouse"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.ARG);
 
@@ -406,7 +407,7 @@ public class OptionParserTest {
     @Test
     public void testGetParam() {
         String[] args = {"-arg", "blue"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
         assertEquals("blue", value);
@@ -415,7 +416,7 @@ public class OptionParserTest {
     @Test
     public void testGetParamWithManyParams() {
         String[] args = {"-arg", "blue", "red", "green"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
         assertEquals("blue", value);
@@ -424,7 +425,7 @@ public class OptionParserTest {
     @Test
     public void testGetParamWithNoParams() {
         String[] args = {"-arg"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         String value = parser.getParam(OptionsDefinitions.OPTIONS.ARG);
         assertEquals("", value);
@@ -433,21 +434,21 @@ public class OptionParserTest {
     @Test
     public void testGetNumberOfOptions() {
         String[] args = {"-arg", "-version", "-param", "-property", "-update"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         assertEquals(5, parser.getNumberOfOptions());
     }
 
     @Test
     public void testGetNumberOfOptionsWithOtherOptions() {
         String[] args = {"-arg", "-version", "-param", "-property", "-update", "-set", "-reset"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         assertEquals(5, parser.getNumberOfOptions());
     }
 
     @Test
     public void testEvenNumberSupportsEqualsChar() {
         String[] args = {"-set", "yes", "no", "blue=red", "green", "orange", "yellow=purple=roseyred"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         List<String> values = parser.getParams(OptionsDefinitions.OPTIONS.SET);
         assertEquals("yes", values.get(0));
         assertEquals("no", values.get(1));
@@ -462,6 +463,6 @@ public class OptionParserTest {
     @Test(expected = UnevenParameterException.class)
     public void testEvenNumberSupportsEqualsCharThrowsExceptionWhenParametersIsUneven() {
         String[] args = {"-set", "yes", "no", "blue=red", "green"};
-        OptionParser parser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser parser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
     }
 }
