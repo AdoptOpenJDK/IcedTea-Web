@@ -576,16 +576,16 @@ public class JavaConsole implements ObservableMessagesProvider {
                             }
                             processPluginMessage(s);
                         } catch (Exception ex) {
-                            OutputController.getLogger().log(ex);
+                            LOG.error("ERROR", ex);
                         }
                     }
                 } catch (Exception ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                     if (br != null) {
                         try {
                             br.close();
                         } catch (Exception exx) {
-                            OutputController.getLogger().log(exx);
+                            LOG.error("ERROR", exx);
                         }
                     }
                 }

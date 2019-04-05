@@ -64,7 +64,7 @@ public class UnixSystemLog implements SingleStreamLogger{
                 LOG.debug("System logger called with result of {}", p.exitValue());
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
     }
 

@@ -204,9 +204,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
         try {
             return jdkIndependentHexEncoderImpl(signature);
         } catch (Exception ex) {
-            String s = "Failed to encode signature: " + ex.toString();
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, s);
-            OutputController.getLogger().log(ex);
+            LOG.error("Failed to encode signature", ex);
             return s;
         }
     }

@@ -157,7 +157,7 @@ public final class Boot implements PrivilegedAction<Void> {
                     PropertyDesc propDesc = PropertyDesc.fromString(prop);
                     JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
                 } catch (LaunchException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                 }
             }
         }
@@ -281,7 +281,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     static void fatalError(String message) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "netx: " + message);
+        LOG.error("netx: " + message);
         JNLPRuntime.exit(1);
     }
 
@@ -295,7 +295,7 @@ public final class Boot implements PrivilegedAction<Void> {
         try {
             location = getMainFile();
         } catch (InvalidArgumentException e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             fatalError("Invalid argument: " + e);
         }
 
@@ -319,7 +319,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 url = new URL(location);
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             fatalError("Invalid jnlp file " + location);
         }
 

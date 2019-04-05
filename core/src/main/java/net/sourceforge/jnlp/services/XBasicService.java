@@ -211,8 +211,7 @@ class XBasicService implements BasicService {
                 }
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             return false;
         }
     }
@@ -245,7 +244,7 @@ class XBasicService implements BasicService {
             StreamUtils.waitForSafely(p);
             return (p.exitValue() == 0);
         } catch (Exception e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             try {
                 //time for stderr to deal with it in verbose mode
                 Thread.sleep(50);
@@ -327,7 +326,7 @@ class XBasicService implements BasicService {
                         try {
                             JNLPRuntime.getConfiguration().save();
                         } catch (IOException ex) {
-                            OutputController.getLogger().log(ex);
+                            LOG.error("ERROR", ex);
                         }
                     }
                     PromptUrl.this.dispose();

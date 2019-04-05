@@ -490,7 +490,7 @@ public class JNLPFile {
         try {
             return UrlUtils.removeFileName(getSourceLocation());
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
         return getSourceLocation();
     }
@@ -887,7 +887,7 @@ public class JNLPFile {
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             throw new RuntimeException(ex.toString());
         }
     }

@@ -452,7 +452,7 @@ public class ManifestAttributesChecker {
         try {
             documentBase = new URL(s);
         } catch (MalformedURLException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
         return documentBase;
     }

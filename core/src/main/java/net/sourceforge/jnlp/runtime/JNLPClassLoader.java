@@ -354,8 +354,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            LOG.error("{} and {} are declared. Ignoring certificate issue", OptionsDefinitions.OPTIONS.NOSEC.option, DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
-            OutputController.getLogger().log(ex);
+            LOG.error(OptionsDefinitions.OPTIONS.NOSEC.option + " and " + DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES + " are declared. Ignoring certificate issue", ex);
         } else {
             throw ex;
         }
@@ -1119,8 +1118,7 @@ public class JNLPClassLoader extends URLClassLoader {
              */
 
         } catch (Exception e) {
-
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
 
             /*
              * After this exception is caught, it is escaped. If an exception is
@@ -1180,7 +1178,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public void setApplication(ApplicationInstance app) {
         if (this.app != null) {
-            OutputController.getLogger().log(new IllegalStateException("Application can only be set once"));
+            LOG.error("ERROR", new IllegalStateException("Application can only be set once"));
             return;
         }
 
@@ -1234,7 +1232,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         throw new NullPointerException("Code source security was null");
                     }
                     if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                        OutputController.getLogger().log(new NullPointerException("Warning! Code source security type was null"));
+                        LOG.error("ERROR", new NullPointerException("Warning! Code source security type was null"));
                     }
                     Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
                     if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
@@ -1267,7 +1265,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             return result;
         } catch (RuntimeException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             throw ex;
         }
     }
@@ -1428,7 +1426,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Activate jar: " + location);
                     } catch (Exception ex) {
-                        OutputController.getLogger().log(ex);
+                        LOG.error("ERROR", ex);
                     }
 
                     // some programs place a native library in any jar
@@ -1601,7 +1599,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     result = loadClassExt(name);
                     return result;
                 } catch (ClassNotFoundException cnfe1) {
-                    OutputController.getLogger().log(cnfe1);
+                    LOG.error("ERROR", cnfe1);
                 }
 
                 // As a last resort, look in any available indexes
@@ -1627,7 +1625,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 try {
                                     addNewJar(desc);
                                 } catch (Exception e) {
-                                    OutputController.getLogger().log(e);
+                                    LOG.error("ERROR", e);
                                 }
                             }
 
@@ -1824,7 +1822,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 result = e.nextElement();
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
         }
 
         // If result is still null, look in the codebase loader
@@ -2050,7 +2048,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     addNewJar(des);
                     sec = jarLocationSecurityMap.get(source);
                 } catch (Throwable t) {
-                    OutputController.getLogger().log(t);
+                    LOG.error("ERROR", t);
                     sec = null;
                 }
             }
@@ -2196,8 +2194,7 @@ public class JNLPClassLoader extends URLClassLoader {
             try {
                 tracker.removeResource(eachJar.getLocation());
             } catch (Exception e) {
-                OutputController.getLogger().log(e);
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Failed to remove resource from tracker, continuing..");
+                LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
             File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), null);
@@ -2441,7 +2438,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 codebaseHost);
                     }
                 } catch (final Exception e) {
-                    OutputController.getLogger().log(e);
+                    LOG.error("ERROR", e);
                     return new SecurityDesc(classLoader.file,
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);

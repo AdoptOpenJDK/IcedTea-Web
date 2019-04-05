@@ -612,7 +612,7 @@ public final class PluginBridge extends JNLPFile {
             try {
                 return StreamUtils.readStreamAsString(getStream());
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
             return null;
         }

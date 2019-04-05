@@ -117,7 +117,7 @@ public class MalformedXMLParser extends XMLParser {
         } catch (SAXException | IOException e1) {
             throw new ParseException(R("PBadXML"), e1);
         } catch (NoClassDefFoundError  e2) {
-            OutputController.getLogger().log(e2);
+            LOG.error("ERROR", e2);
             ParseException.setUsed(null);
             return original;
         }

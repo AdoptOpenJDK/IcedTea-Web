@@ -140,7 +140,7 @@ public class ResourceDownloader implements Runnable {
                 initializeOfflineResource();
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
@@ -329,8 +329,7 @@ public class ResourceDownloader implements Runnable {
                     }
                 } catch (IOException e) {
                     // continue to next candidate
-                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ");
-                    OutputController.getLogger().log(e);
+                    LOG.error("While processing " + url.toString() + " by " + requestMethod + " for resource " + resource.toString() + " got " + e + ": ", e);
                 }
             }
         }
@@ -374,7 +373,7 @@ public class ResourceDownloader implements Runnable {
             }
             resource.fireDownloadEvent(); // fire DOWNLOADED
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll();
@@ -421,8 +420,7 @@ public class ResourceDownloader implements Runnable {
             } catch (IOException ex) {
                 String IH = "Invalid Http response";
                 if (ex.getMessage().equals(IH)) {
-                    OutputController.getLogger().log(ex);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "'" + IH + "' message detected. Attempting direct socket");
+                    LOG.error("'" + IH + "' message detected. Attempting direct socket", ex);
                     Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(connection.getURL());
                     LOG.info("Header of: {} ({})", connection.getURL(), downloadLocation);
                     String head = (String) result[0];

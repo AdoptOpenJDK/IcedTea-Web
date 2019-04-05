@@ -39,6 +39,8 @@ package net.sourceforge.jnlp.security;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.swing.JOptionPane;
@@ -58,6 +60,8 @@ import java.util.List;
 import java.util.Map;
 
 class KeystorePasswordAttempter {
+
+    private final static Logger LOG = LoggerFactory.getLogger(KeystorePasswordAttempter.class);
 
     private static final char[] DEFAULT_PASSWORD = "changeit".toCharArray();
 
@@ -161,7 +165,7 @@ class KeystorePasswordAttempter {
                     firstEx = ex;
                 }
                 messages += "'" + ex.getMessage() + "' ";
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
                 //tried all known, ask for new or finally die
                 if (i + 1 == localPases.size()) {
                     String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), (i + 1));

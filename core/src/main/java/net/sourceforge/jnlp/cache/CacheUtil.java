@@ -135,8 +135,8 @@ public class CacheUtil {
                 result = conn.getPermission();
                  ConnectionFactory.getConnectionFactory().disconnect(conn);                
             } catch (java.io.IOException ioe) {
+                LOG.error("ERROR", ioe);
                 // should try to figure out the permission
-                OutputController.getLogger().log(ioe);
             }
         }
 
@@ -275,7 +275,7 @@ public class CacheUtil {
                     try {
                         FileUtils.recursiveDelete(scList, scList);
                     } catch (Exception e) {
-                        OutputController.getLogger().log(e);
+                        LOG.error("ERROR", e);
                     }
                 }
             }
@@ -398,7 +398,7 @@ public class CacheUtil {
                 try {
                     locking.release();
                 } catch (IOException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                 }
             }
         }
@@ -428,7 +428,7 @@ public class CacheUtil {
 
             return result;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             return isCached(source, version); // if can't connect return whether already in cache
         }
     }
@@ -597,7 +597,7 @@ public class CacheUtil {
                             FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                             lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
-                            OutputController.getLogger().log(ioe);
+                            LOG.error("ERROR", ioe);
                         }
 
                         break;
@@ -793,7 +793,7 @@ public class CacheUtil {
                                   100);
             }
         } catch (InterruptedException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         } finally {
             if (listener != null)
                 indicator.disposeListener(listener);

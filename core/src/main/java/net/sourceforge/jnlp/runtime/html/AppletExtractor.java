@@ -102,8 +102,7 @@ public class AppletExtractor {
                 OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));    
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlBroken"));
-            OutputController.getLogger().log(ex);
+            LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
         }
         return is;
     }   

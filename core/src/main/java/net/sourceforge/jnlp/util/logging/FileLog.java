@@ -105,8 +105,8 @@ public final class FileLog  {
                 s = new WriterBasedFileLog(defaultloggerName, getFileName(id), false);
             }
         } catch (Exception ex) {
+            LOG.error("ERROR", ex);
             //we do not wont to block whole logging just because initialization error in "new FileLog()"
-            OutputController.getLogger().log(ex);
             s = new SingleStreamLoggerImpl();
         }
         return s;

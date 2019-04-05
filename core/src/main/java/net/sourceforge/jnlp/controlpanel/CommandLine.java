@@ -29,6 +29,8 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextForm
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -66,6 +68,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  */
 public class CommandLine {
 
+    private final static Logger LOG = LoggerFactory.getLogger(CommandLine.class);
+
     public static final int ERROR = 1;
     public static final int SUCCESS = 0;
 
@@ -87,8 +91,7 @@ public class CommandLine {
         try {
             config.load(false);
         } catch (ConfigurationException | MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationFatal"));
-            OutputController.getLogger().log(e);
+            LOG.error(R("RConfigurationFatal"), e);
         }
     }
 
@@ -260,8 +263,7 @@ public class CommandLine {
             try {
                 old.getValidator().validate(value);
             } catch (IllegalArgumentException e) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
-                OutputController.getLogger().log(e);
+                LOG.error(R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()), e);
                 return ERROR;
             }
         }

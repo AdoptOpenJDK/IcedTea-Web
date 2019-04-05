@@ -125,7 +125,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 generatedJnlp = getGeneratedJnlpFileName();
                 FileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
         }
         
@@ -314,7 +314,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 try {
                     cacheIcon();
                 } catch (NonFileProtocolException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                     //default icon will be used later
                 }
             }
@@ -548,7 +548,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
         } catch (Exception ex) {
             //favicon 404 or similar
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
         return null;
     }

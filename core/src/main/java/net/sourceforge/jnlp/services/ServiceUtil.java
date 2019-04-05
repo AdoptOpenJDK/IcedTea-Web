@@ -24,6 +24,8 @@ import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jnlp.BasicService;
 import javax.jnlp.ClipboardService;
@@ -54,6 +56,8 @@ import java.security.PrivilegedExceptionAction;
  * @version $Revision: 1.8 $
  */
 public class ServiceUtil {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ServiceUtil.class);
 
     /**
      * @return the BasicService reference, or null if the service is
@@ -323,11 +327,11 @@ public class ServiceUtil {
             try {
                 c = Class.forName(stack1.getClassName());
             } catch (Exception e1) {
-                OutputController.getLogger().log(e1);
+                LOG.error("ERROR", e1);
                 try {
                     c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
                 }catch (Exception e2) {
-                    OutputController.getLogger().log(e2);
+                    LOG.error("ERROR", e2);
                 }
             }
             // Everything up to the desired class/method must be trusted

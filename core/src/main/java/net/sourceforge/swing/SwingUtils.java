@@ -38,6 +38,8 @@ package net.sourceforge.swing;
 
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JWindow;
 import javax.swing.RepaintManager;
@@ -51,6 +53,8 @@ import java.lang.reflect.InvocationTargetException;
  * Swing / AWT utility class
  */
 public final class SwingUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(SwingUtils.class);
 
     private static final boolean DEBUG_EDT = System.getProperty("icedtea-web.edt.debug", "false").equalsIgnoreCase("true");
 
@@ -177,8 +181,7 @@ public final class SwingUtils {
                         window = new JWindow().getOwner();
                         window.setName("getOrCreateWindowOwner");
                     } catch (Exception ex) {
-                        OutputController.getLogger().log(ex);
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                        LOG.error(Translator.R("HEADLESS_MISSCONFIGURED"), ex);
                     }
                 }
             });

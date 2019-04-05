@@ -222,7 +222,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
                     }
                 } catch (IOException eex) {
-                    OutputController.getLogger().log(eex);
+                    LOG.error("ERROR", eex);
                     keepGoing = false;
                 } catch (IllegalArgumentException eeex){
                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, eeex.toString());

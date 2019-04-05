@@ -130,7 +130,7 @@ public class NativeLibraryStorage {
                 }
             }
         } catch (IOException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
     }
 

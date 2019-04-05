@@ -46,6 +46,8 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -71,6 +73,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
+
+    private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);
 
     private RememberPanel rememberPanel;
     
@@ -114,9 +118,9 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
                 } catch (IOException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                 } catch (URISyntaxException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error("ERROR", ex);
                 }
             }
         });

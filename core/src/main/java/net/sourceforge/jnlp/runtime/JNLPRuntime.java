@@ -350,8 +350,7 @@ public class JNLPRuntime {
 
             return (TrustManager) tmCtor.newInstance();
         } catch (RuntimeException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK 6 or 7?");
-            OutputController.getLogger().log(e);
+            LOG.error("Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK 6 or 7?", e);
             throw e;
         }
     }
@@ -755,8 +754,7 @@ public class JNLPRuntime {
                         }
                     } catch (HeadlessException ex) {
                         headless = true;
-                        OutputController.getLogger().log(ex);
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                        LOG.error(Translator.R("HEADLESS_MISSCONFIGURED"), ex);
                     }
                 }
             }
@@ -857,7 +855,7 @@ public class JNLPRuntime {
             fileLock = null;
             LOG.debug("Release shared lock on {}", PathsAndFiles.MAIN_LOCK.getFullPath());
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -901,7 +899,7 @@ public class JNLPRuntime {
                 pluginDebug = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
             } catch (Exception ex) {
                 pluginDebug = false;
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
         }
         return pluginDebug;

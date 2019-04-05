@@ -20,6 +20,8 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.AWTPermission;
 import java.io.FilePermission;
@@ -49,6 +51,8 @@ import java.util.Set;
  * @version $Revision: 1.7 $
  */
 public class SecurityDesc {
+
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
 
     /**
      * Represents the security level requested by an applet/application, as specified in its JNLP or HTML.
@@ -415,8 +419,7 @@ public class SecurityDesc {
                 OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
                 OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
             } catch (final URISyntaxException e) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions");
-                OutputController.getLogger().log(e);
+                LOG.error("Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions", e);
             }
         }
         try {
@@ -430,8 +433,7 @@ public class SecurityDesc {
             OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
             OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
         } catch (final URISyntaxException e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions");
-            OutputController.getLogger().log(e);
+            LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions", e);
         }
         return permissions;
     }

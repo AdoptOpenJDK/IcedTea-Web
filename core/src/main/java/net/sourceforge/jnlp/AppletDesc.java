@@ -167,7 +167,7 @@ public class AppletDesc implements LaunchDesc {
                         LOG.info("using its {}={}", key, sizeFromParam);
                         return Integer.valueOf(sizeFromParam);
                     } catch (NumberFormatException ex) {
-                        OutputController.getLogger().log(ex);
+                        LOG.error("ERROR", ex);
                     }
                 }
             }

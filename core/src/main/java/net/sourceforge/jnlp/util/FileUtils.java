@@ -21,6 +21,8 @@ import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -64,6 +66,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  */
 
 public final class FileUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
     private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
 
@@ -343,7 +347,7 @@ public final class FileUtils {
         try {
             file = file.getCanonicalFile();
         } catch (final IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             return null;
         }
         if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {

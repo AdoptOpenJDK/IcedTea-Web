@@ -39,6 +39,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,6 +58,8 @@ import java.util.List;
  * 
  */
 public class OutputController {
+
+    private final static Logger LOG = LoggerFactory.getLogger(OutputController.class);
 
    public static enum Level {
 
@@ -127,7 +131,7 @@ public class OutputController {
                     }
 
                 } catch (Throwable t) {
-                    OutputController.getLogger().log(t);
+                    LOG.error("ERROR", t);
                 }
             }
         }
@@ -315,15 +319,7 @@ public class OutputController {
     public void log(Level level, Throwable s) {
         log(level, (Object) s);
     }
-
-    public void log(String s) {
-        log(Level.MESSAGE_DEBUG, (Object) s);
-    }
-
-    public void log(Throwable s) {
-        log(Level.ERROR_DEBUG, (Object) s);
-    }
-
+    
     private void log(Level level, Object o) {
         String s ="";
         if (o == null) {

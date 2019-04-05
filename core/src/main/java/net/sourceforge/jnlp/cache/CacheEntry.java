@@ -145,7 +145,7 @@ public class CacheEntry {
             LOG.info("isCurrent:lastModified cache:{} actual:{}", cachedModified, lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             return cached;
         }
     }
@@ -172,7 +172,7 @@ public class CacheEntry {
             else
                 return true;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
 
             return false; // should throw?
         }

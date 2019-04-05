@@ -1416,7 +1416,7 @@ public final class Parser {
             instance = klass.newInstance();
             //catch both, for case that tagsoup was removed after build
         } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             klass = Class.forName(NORMAL_PARSER_CLASS);
             instance = klass.newInstance();
         }
@@ -1439,7 +1439,7 @@ public final class Parser {
             //only getRequiredAttribute can throw this
             //and as there is call to getMainClass  with required false
             //it is not going to be thrown
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             return null;
         }
     }

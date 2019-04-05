@@ -149,8 +149,7 @@ public class ResourceTracker {
         try {
             location = UrlUtils.normalizeUrl(location);
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Normalization of " + location.toString() + " have failed");
-            OutputController.getLogger().log(ex);
+            LOG.error("Normalization of " + location.toString() + " have failed", ex);
         }
         Resource resource = Resource.getResource(location, version, updatePolicy);
 
@@ -323,7 +322,7 @@ public class ResourceTracker {
                 // TODO: Should be toURI().toURL()
                 return f.toURL();
         } catch (MalformedURLException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
 
         return location;
@@ -373,7 +372,7 @@ public class ResourceTracker {
 
             return null;
         } catch (InterruptedException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             return null; // need an error exception to throw
         }
     }

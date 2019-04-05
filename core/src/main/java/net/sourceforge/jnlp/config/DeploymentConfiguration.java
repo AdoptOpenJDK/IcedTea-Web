@@ -516,9 +516,8 @@ public final class DeploymentConfiguration {
                 try {
                     checker.validate(s.getValue());
                 } catch (IllegalArgumentException e) {
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("DCIncorrectValue", key, s.getValue(), checker.getPossibleValues()));
+                    LOG.error(R("DCIncorrectValue", key, s.getValue(), checker.getPossibleValues()), e);
                     s.setValue(s.getDefaultValue());
-                    OutputController.getLogger().log(e);
                 }
             }
         }
@@ -540,7 +539,7 @@ public final class DeploymentConfiguration {
                 jrePath = jreSetting.getValue();
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
 
         File jreFile;
@@ -634,7 +633,7 @@ public final class DeploymentConfiguration {
                 ce.initCause(e);
                 throw ce;
             }
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
             return null;
         }
     }
@@ -787,8 +786,7 @@ public final class DeploymentConfiguration {
         try {
             move14AndOlderFilesTo15Structure();
         } catch (Throwable t) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Critical error during converting old files to new. Continuing");
-            OutputController.getLogger().log(t);
+            LOG.error("Critical error during converting old files to new. Continuing", t);
         }
 
     }
@@ -955,7 +953,7 @@ public final class DeploymentConfiguration {
                 }
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
         }
         
         return r.toString().trim();

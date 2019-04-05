@@ -41,6 +41,8 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +63,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * 
  */
 public class CacheLRUWrapper {
+
+    private final static Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
     
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
@@ -162,7 +166,7 @@ public class CacheLRUWrapper {
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
-            OutputController.getLogger().log(new LruCacheException());
+            LOG.error("ERROR", new LruCacheException());
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakeCache"));
             store();
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakedCache"));

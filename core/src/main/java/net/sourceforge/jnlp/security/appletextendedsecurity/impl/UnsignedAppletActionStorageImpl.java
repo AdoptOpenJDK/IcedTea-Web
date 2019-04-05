@@ -122,7 +122,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
                 item.write(bw);
                 bw.newLine();
             }catch (InvalidLineException ex){
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
         }
     }
@@ -290,7 +290,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
         try{
             version = Integer.valueOf(versionS);
         } catch (NumberFormatException e){
-            OutputController.getLogger().log(e);
+            LOG.error("ERROR", e);
         }
         if (version < 2){
             LOG.debug("Stoping laoding of vulnereable {}. Will be replaced", getBackingFile().getAbsolutePath());
@@ -320,8 +320,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             }
             FileUtils.saveFile(s, backup);
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Error during backuping: " + ex.getMessage());
-            OutputController.getLogger().log(ex);
+            LOG.error("Error during backuping", ex);
         }
     }
 }

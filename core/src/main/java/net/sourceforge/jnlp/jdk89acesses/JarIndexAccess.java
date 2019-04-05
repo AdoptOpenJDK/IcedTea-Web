@@ -31,7 +31,7 @@ public class JarIndexAccess {
                 LOG.error("Running jdk9+ ?", ex);
                 jarIndexClass = Class.forName("jdk.internal.util.jar.JarIndex");
             } catch (ClassNotFoundException exx) {
-                OutputController.getLogger().log(exx);
+                LOG.error("JarIndex not found!", exx);
                 throw new RuntimeException("JarIndex not found!");
             }
         }

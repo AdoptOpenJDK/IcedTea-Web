@@ -38,6 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -47,6 +49,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class StreamUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
 
     /**
      * Closes a stream, without throwing IOException.
@@ -59,7 +63,7 @@ public class StreamUtils {
             try {
                 stream.close();
             } catch (IOException e) {
-                OutputController.getLogger().log(e);
+                LOG.error("ERROR", e);
             }
         }
     }

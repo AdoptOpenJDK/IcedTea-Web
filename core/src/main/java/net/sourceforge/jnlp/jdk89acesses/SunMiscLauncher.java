@@ -33,6 +33,8 @@
 package net.sourceforge.jnlp.jdk89acesses;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import java.lang.reflect.Method;
@@ -44,6 +46,8 @@ import java.lang.reflect.Method;
  */
 public class SunMiscLauncher {
 
+    private final static Logger LOG = LoggerFactory.getLogger(SunMiscLauncher.class);
+
     public static ImageIcon getSecureImageIcon(String resource) {
         try {
             Class clazz = Class.forName("sun.misc.Launcher");
@@ -52,8 +56,7 @@ public class SunMiscLauncher {
             ClassLoader cl = (ClassLoader) m.invoke(obj);
             return new ImageIcon(cl.getResource(resource));
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader");
+            LOG.error("sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader", ex);
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
         }
     }

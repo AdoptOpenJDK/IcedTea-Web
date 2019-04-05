@@ -289,7 +289,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(u);
             return u;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }
@@ -302,7 +302,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(url);
             return url;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }

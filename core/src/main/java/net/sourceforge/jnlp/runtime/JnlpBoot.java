@@ -74,7 +74,7 @@ public final class JnlpBoot {
             // default handler prints this
             JNLPRuntime.exit(1);
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             Boot.fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
         }
         return true;

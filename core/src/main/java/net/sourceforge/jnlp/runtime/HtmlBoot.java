@@ -183,7 +183,7 @@ public final class HtmlBoot {
                 splashScreen.dispose();
             }
         } catch (final Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error("ERROR", ex);
             if (splashScreen != null) {
                 SwingUtils.invokeLater(new Runnable() {
 
