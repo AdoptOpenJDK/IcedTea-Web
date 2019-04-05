@@ -502,8 +502,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
     }
     
-    private File convertToIco(File source, String targetName)
-    {
+    private File convertToIco(File source, String targetName) {
         try {
             BufferedImage img = ImageIO.read(source);
             short bitCount = (short)img.getColorModel().getPixelSize();

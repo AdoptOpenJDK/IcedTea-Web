@@ -60,8 +60,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         String path = getDesktopLnkPath();
         String JavaWsBin = XDesktopEntry.getJavaWsBin();
         ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
-        if (iconLocation != null) 
+        if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
+        }
         sl.saveTo(path);
         // write shortcut path to list
         manageShortcutList(ManageMode.A, path);
@@ -77,8 +78,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         catch (NullPointerException npe) {
             path = null;
         }        
-        if (path == null)
+        if (path == null) {
             path = XDesktopEntry.getDesktopIconName(file);
+        }
                         
         path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + path;
         // check to see if menu dir exists and create if not
@@ -90,8 +92,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
         // setup uninstall shortcut
         ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
-        if (iconLocation != null) 
-        {
+        if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
             ul.setIconLocation(iconLocation);
         }
