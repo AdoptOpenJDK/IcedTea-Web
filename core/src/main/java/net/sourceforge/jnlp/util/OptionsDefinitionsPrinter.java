@@ -36,12 +36,11 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import static net.adoptopenjdk.icedteaweb.option.OptionsDefinitions.OPTIONS;
 
@@ -124,6 +123,11 @@ public class OptionsDefinitionsPrinter {
     }
 
     public static void main(String[] args) throws IOException {
+        if ((args == null) || (args.length == 0)) {
+            System.out.println(String.format("Missing one of the arguments: %s | %s | %s",
+                    TextsProvider.JAVAWS, TextsProvider.ITWEB_SETTINGS, TextsProvider.POLICY_EDITOR));
+            System.exit(0);
+        }
         switch (args[0]) {
             case TextsProvider.JAVAWS:
                 printOptions(getJavaWsOptions());
@@ -140,10 +144,12 @@ public class OptionsDefinitionsPrinter {
     }
 
     private static void printOptions(final List<OPTIONS> options) {
-        final StringBuilder sb = new StringBuilder();
-        for (OPTIONS option : options) {
-            sb.append(option.option).append(" ");
+        if (options != null && !options.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            for (OPTIONS option : options) {
+                sb.append(option.option).append(" ");
+            }
+            System.out.println(sb.toString().trim());
         }
-        System.out.println(sb.toString().trim());
     }
 }
