@@ -251,7 +251,9 @@ public final class DeploymentConfiguration {
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
     
     public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
-    
+
+    private static final String VV_POSSIBLE_BROWSER_VALUES = "VVPossibleBrowserValues";
+
     private ConfigurationException loadingException = null;
 
     public void setLoadingException(ConfigurationException ex) {
@@ -964,7 +966,7 @@ public final class DeploymentConfiguration {
      * @return translation of VVPossibleBrowserValues with all params in
      */
     public static String VVPossibleBrowserValues() {
-        return R("VVPossibleBrowserValues", DeploymentConfiguration.LEGACY_WIN32_URL__HANDLER,
+        return R(VV_POSSIBLE_BROWSER_VALUES, DeploymentConfiguration.LEGACY_WIN32_URL__HANDLER,
                 DeploymentConfiguration.BROWSER_ENV_VAR,
                 DeploymentConfiguration.INTERNAL_HTML,
                 DeploymentConfiguration.ALWAYS_ASK,
