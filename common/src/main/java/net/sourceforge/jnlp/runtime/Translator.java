@@ -16,8 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -82,21 +80,6 @@ public class Translator {
     public static String R(String message, Object... params) {
         return getInstance().getMessage(message, params);
     }
-     
-    /**
-     * convenient method to show VVPossibleBrowserValues with all four params
-     *
-     * @return translation of VVPossibleBrowserValues with all params in
-     */
-    public static String VVPossibleBrowserValues() {
-        return R("VVPossibleBrowserValues", DeploymentConfiguration.LEGACY_WIN32_URL__HANDLER,
-                DeploymentConfiguration.BROWSER_ENV_VAR,
-                DeploymentConfiguration.INTERNAL_HTML,
-                DeploymentConfiguration.ALWAYS_ASK,
-                DeploymentConfiguration.KEY_BROWSER_PATH
-        );
-    }
-
    
     /**
      * @return the localized resource string using the specified arguments.
