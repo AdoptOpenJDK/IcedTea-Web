@@ -39,7 +39,7 @@ import net.sourceforge.swing.SwingUtils;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
-import javax.swing.*;
+import javax.swing.UIManager;
 import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
