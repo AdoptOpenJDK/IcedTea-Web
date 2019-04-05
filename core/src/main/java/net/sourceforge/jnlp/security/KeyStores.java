@@ -41,6 +41,8 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,6 +63,8 @@ import java.util.StringTokenizer;
  * used.
  */
 public final class KeyStores {
+
+    private final static Logger LOG = LoggerFactory.getLogger(KeyStores.class);
 
     public static class KeyStoreWithPath {
 
@@ -142,7 +146,7 @@ public final class KeyStores {
             //to keystore, then this will not be blocker for garbage collection
             keystoresPaths.put(ks.hashCode(), location);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
         return new KeyStoreWithPath(ks, location);
     }

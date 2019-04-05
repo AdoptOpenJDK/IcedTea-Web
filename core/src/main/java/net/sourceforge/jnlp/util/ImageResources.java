@@ -38,6 +38,8 @@ exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.Image;
@@ -51,6 +53,8 @@ import java.util.Map;
 public enum ImageResources {
 
     INSTANCE;
+
+    private final static Logger LOG = LoggerFactory.getLogger(ImageResources.class);
 
     private static final String APPLICATION_ICON_PATH = "net/sourceforge/jnlp/resources/netx-icon.png";
 
@@ -83,7 +87,7 @@ public enum ImageResources {
                 cache.put(APPLICATION_ICON_PATH, image);
                 return image;
             } catch (IOException ioe) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+                LOG.error("ERROR", ioe);
             }
         }
         return null;

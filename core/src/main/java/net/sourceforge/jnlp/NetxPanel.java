@@ -96,7 +96,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
          * Log any exceptions thrown while loading, initializing, starting,
          * and stopping the applet. 
          */
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, t); //new logger
+        LOG.error("ERROR", t);
         super.showAppletException(t);
     }
 
@@ -119,7 +119,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
 
         } catch (Exception e) {
             status = APPLET_ERROR;
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         } finally {
             // PR1157: This needs to occur even in the case of an exception

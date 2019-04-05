@@ -959,14 +959,14 @@ public class Launcher {
                     }
                 }
             } catch (LaunchException ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure) {
                     JNLPRuntime.exit(1);
                 }
             }  catch (Throwable ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
                 throw new RuntimeException(ex);
             }
         }

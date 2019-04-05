@@ -102,7 +102,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 autoConfigUrl = new URL(autoConfigString);
             } catch (MalformedURLException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             }
         }
 
@@ -164,7 +164,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 proxyPort = Integer.valueOf(port);
             } catch (NumberFormatException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             }
         }
         return proxyPort;
@@ -175,7 +175,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+        LOG.error("ERROR", ioe);
     }
 
     /**
@@ -382,7 +382,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             proxies.add(Proxy.NO_PROXY);
         }
 

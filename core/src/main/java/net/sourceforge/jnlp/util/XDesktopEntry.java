@@ -325,7 +325,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 installMenuLauncher(menu, isSigned);
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -348,9 +348,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
             LOG.debug("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
     
@@ -398,9 +398,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
         } catch (FileNotFoundException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -606,7 +606,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error("ERROR", ex);
             return System.getProperty("user.home") + "/Desktop";
         }
     }

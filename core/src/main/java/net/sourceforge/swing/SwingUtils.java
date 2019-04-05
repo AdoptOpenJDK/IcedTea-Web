@@ -107,7 +107,7 @@ public final class SwingUtils {
 
     public static void checkEDT() {
         if (!isEventDispatchThread()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, new Exception("EDT violation"));
+            LOG.error("EDT VIOLATION", new Exception("EDT violation"));
         }
     }
 
@@ -165,9 +165,9 @@ public final class SwingUtils {
             try {
                 callOnAppContext(doRun);
             } catch (InterruptedException ie) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ie);
+                LOG.error("ERROR", ie);
             } catch (InvocationTargetException ite) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ite);
+                LOG.error("ERROR", ite);
             }
         }
     }

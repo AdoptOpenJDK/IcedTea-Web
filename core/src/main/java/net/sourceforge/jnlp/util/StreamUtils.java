@@ -128,13 +128,13 @@ public class StreamUtils {
             try {
                 p.waitFor();
             } catch (InterruptedException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+                LOG.error("ERROR", e);
             }
             try {
                 p.exitValue();
                 pTerminated = true;
             } catch (IllegalThreadStateException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+                LOG.error("ERROR", e);
             }
         }
     }

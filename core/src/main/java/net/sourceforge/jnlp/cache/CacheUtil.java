@@ -870,7 +870,7 @@ public class CacheUtil {
                             try {
                                 FileUtils.recursiveDelete(f, f);
                             } catch (IOException e1) {
-                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
+                                LOG.error("ERROR", e1);
                             }
                         }
 

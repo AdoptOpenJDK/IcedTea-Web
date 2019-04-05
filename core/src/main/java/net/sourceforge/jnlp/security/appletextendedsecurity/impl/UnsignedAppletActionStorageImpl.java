@@ -226,7 +226,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             }
             return result;
         } catch (PatternSyntaxException ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
+            LOG.error("ERROR", ex);
             return false;
         }
     }

@@ -285,8 +285,7 @@ public class JNLPRuntime {
 
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...", e);
         }
 
         // plug in a custom authenticator and proxy selector
@@ -464,8 +463,7 @@ public class JNLPRuntime {
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             }catch(Exception t){
-                //all exceptions are causing InstantiatizationError so this do it much more readble
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, t);
+                LOG.error("ERROR", t);
                 OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RFailingToDefault"));
                 if (!JNLPRuntime.isHeadless()){
                     JOptionPane.showMessageDialog(null, R("RFailingToDefault")+"\n"+t.toString());
@@ -829,7 +827,7 @@ public class JNLPRuntime {
                 LOG.debug("Acquired shared lock on {} to indicate javaws is running", netxRunningFile);
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {

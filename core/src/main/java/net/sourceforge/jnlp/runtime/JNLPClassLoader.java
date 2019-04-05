@@ -580,7 +580,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
                 loaderList.add(loader);
             } catch (Exception ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
             }
         }
         //}
@@ -655,8 +655,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 try {
                     addToCodeBaseLoader(new URL(file.getCodeBase(), codeBaseFolder));
                 } catch (MalformedURLException mfe) {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Problem trying to add folder to code base:");
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, mfe);
+                    LOG.error("Problem trying to add folder to code base:", mfe);
                 }
             }
         }
@@ -736,7 +735,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
                 LaunchException ex = new LaunchException(null, null, R("LSFatal"),
                         R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " + e.getMessage());
                 consultCertificateSecurityException(ex);
@@ -769,7 +768,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         try {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, extCnfe);
+                            LOG.error("ERROR", extCnfe);
                             throw new LaunchException(file, extCnfe, R("LSFatal"), R("LCInit"), R("LCantDetermineMainClass"), R("LCantDetermineMainClassInfo"));
                         }
                     } else {
@@ -1387,8 +1386,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                             jarLocationSecurityMap.put(fakeRemote, jarSecurity);
 
                                         } catch (MalformedURLException mfue) {
-                                            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Unable to add extracted nested jar to classpath");
-                                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, mfue);
+                                            LOG.error("Unable to add extracted nested jar to classpath", mfue);
                                         }
                                     }
 
@@ -1725,7 +1723,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // throw additional exceptions. So instead, just ignore it. 
             // Exception => jar will not get added to classpath, which will 
             // result in CNFE from loadClass.
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -1750,7 +1748,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } catch (ClassNotFoundException | PrivilegedActionException ex) {
             } catch (ClassFormatError cfe) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, cfe);
+                LOG.error("ERROR", cfe);
             } catch (NullJnlpFileException ex) {
                 throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
             }
@@ -1847,7 +1845,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 lresources = findResourcesBySearching(name);
             }
         } catch (LaunchException le) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, le);
+            LOG.error("ERROR", le);
         }
 
         return lresources;

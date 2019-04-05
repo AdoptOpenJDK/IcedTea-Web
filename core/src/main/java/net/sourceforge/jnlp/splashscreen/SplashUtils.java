@@ -182,7 +182,7 @@ public class SplashUtils {
             pluginSplashEnvironmetVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
             splashEnvironmetVar = System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error("ERROR", ex);
         }
         SplashPanel sp = null;
         if (SplashReason.JAVAWS.equals(splashReason)) {

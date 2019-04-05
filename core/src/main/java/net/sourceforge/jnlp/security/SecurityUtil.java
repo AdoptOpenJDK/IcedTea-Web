@@ -40,6 +40,8 @@ package net.sourceforge.jnlp.security;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
@@ -55,6 +57,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 public class SecurityUtil {
+
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityUtil.class);
 
   
     public static String getTrustedCertsFilename() throws Exception {
@@ -216,7 +220,7 @@ public class SecurityUtil {
                     loadKeyStore(ks, file);
                 }
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
                 throw e;
             } finally {
                 if (fis != null)

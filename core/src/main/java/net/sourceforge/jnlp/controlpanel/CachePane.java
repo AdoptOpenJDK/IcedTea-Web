@@ -30,6 +30,8 @@ import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -73,6 +75,9 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class CachePane extends JPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(CachePane.class);
+
     final JDialog parent;
     final DeploymentConfiguration config;
     private JComponent defaultFocusComponent;
@@ -310,7 +315,7 @@ public class CachePane extends JPanel {
                             FileUtils.createParentDir(netxRunningFile);
                             FileUtils.createRestrictedFile(netxRunningFile, true);
                         } catch (IOException e1) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
+                            LOG.error("ERROR", e1);
                         }
                     }
 
@@ -344,11 +349,11 @@ public class CachePane extends JPanel {
                             fl.release();
                             fl.channel().close();
                         } catch (IOException e1) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
+                            LOG.error("ERROR", e1);
                         }
                     }
                 } catch (Exception exception) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
+                    LOG.error("ERROR", exception);
                 } finally {
                     restoreDisabled();
                 }
@@ -378,7 +383,7 @@ public class CachePane extends JPanel {
                     visualCleanCache(parent);
                     populateTable();
                 } catch (Exception exception) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
+                    LOG.error("ERROR", exception);
                 } finally {
                     restoreDisabled();
                 }
@@ -410,7 +415,7 @@ public class CachePane extends JPanel {
                         cacheTable.setBackground(SystemColor.text);
                     }
                 } catch (Exception exception) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
+                    LOG.error("ERROR", exception);
                 } finally {
                     refreshButton.setEnabled(true);
                     doneButton.setEnabled(true);
@@ -435,7 +440,7 @@ public class CachePane extends JPanel {
                 tableModel.addRow(v);
             }
         } catch (Exception exception) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, exception);
+            LOG.error("ERROR", exception);
         } finally {
             // Reset cursor
             parent.getContentPane().setCursor(Cursor.getDefaultCursor());

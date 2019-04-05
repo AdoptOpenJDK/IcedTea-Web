@@ -42,6 +42,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,6 +65,8 @@ import java.util.PropertyPermission;
  * @see <a href="http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file">The PAC File</a>
  */
 public class RhinoBasedPacEvaluator implements PacEvaluator {
+
+    private final static Logger LOG = LoggerFactory.getLogger(RhinoBasedPacEvaluator.class);
 
     private final String pacHelperFunctionContents;
     private final String pacContents;
@@ -186,7 +190,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                 pacFuncsReader.close();
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             contents = null;
         }
 
@@ -257,7 +261,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                     return (String) result;
                 }
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
                 return "DIRECT";
             } finally {
                 Context.exit();

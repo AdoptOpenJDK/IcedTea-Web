@@ -166,7 +166,7 @@ public class ApplicationInstance {
                     instance = cons.newInstance(file);
                     //catch both, for case that mslink was removed after build
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+                   LOG.error("ERROR", e);
                 }
                 GenericDesktopEntry wde = (GenericDesktopEntry) instance;
                 if (!wde.getDesktopIconFile().exists()) {
@@ -202,9 +202,8 @@ public class ApplicationInstance {
                     wde.createWindowsMenu();
                 }
             } catch (Throwable ex) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
                 String message = Translator.R("WinDesktopError");
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, message);
+                LOG.error(message, ex);
             }
         } else {
             // do non-windows desktop stuff

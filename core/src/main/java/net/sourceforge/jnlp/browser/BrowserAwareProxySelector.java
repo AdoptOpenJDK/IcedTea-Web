@@ -128,7 +128,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 browserAutoConfigUrl = new URL(url);
             }
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
 
         if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
@@ -241,7 +241,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             proxies.add(Proxy.NO_PROXY);
         }
 

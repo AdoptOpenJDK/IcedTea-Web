@@ -77,19 +77,19 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
                         notifySingleInstanceListeners(arguments);
                     } catch (Exception exception) {
                         // not much to do here...
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, exception);
+                        LOG.error("ERROR", exception);
                     }
 
                 }
             } catch (IOException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } finally {
                 if (listeningSocket != null) {
                     try {
                         listeningSocket.close();
                     } catch (IOException e) {
                         // Give up.
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                        LOG.error("ERROR", e);
                     }
                 }
             }

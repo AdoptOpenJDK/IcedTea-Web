@@ -1325,7 +1325,7 @@ public class XMLElement {
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         } finally {
             LOG.debug("");//force new line in all cases
             LOG.debug(line.toString()); //flush remaining line

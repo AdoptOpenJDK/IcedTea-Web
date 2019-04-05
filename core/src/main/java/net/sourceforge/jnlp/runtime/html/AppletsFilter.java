@@ -85,7 +85,7 @@ public class AppletsFilter {
             try {
                 id = Integer.parseInt(ids.get(i));
             } catch (NumberFormatException ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
                 continue;
             }
             if (id < 0) {

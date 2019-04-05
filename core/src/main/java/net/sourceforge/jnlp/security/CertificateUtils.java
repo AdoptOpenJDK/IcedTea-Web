@@ -177,7 +177,7 @@ public class CertificateUtils {
                     } // else continue
                 }
             }catch (KeyStoreException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
                 // continue
             }
         }

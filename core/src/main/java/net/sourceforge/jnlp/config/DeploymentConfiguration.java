@@ -843,7 +843,7 @@ public final class DeploymentConfiguration {
                 s = s.replace(legacyCache, currentCache);
                 FileUtils.saveFile(s, f);
             } catch (IOException ex) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, ex);
+                LOG.error("ERROR", ex);
                 errors++;
             }
 

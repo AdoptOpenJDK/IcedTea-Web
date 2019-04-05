@@ -155,7 +155,7 @@ public class CertificatePane extends JPanel {
         try {
             keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -292,7 +292,7 @@ public class CertificatePane extends JPanel {
             }
         } catch (Exception e) {
             // TODO handle exception
-           OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -428,7 +428,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    LOG.error("ERROR", ex);
                 }
             }
         }
@@ -472,7 +472,7 @@ public class CertificatePane extends JPanel {
                     }
                 }
             } catch (Exception ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
             }
         }
     }
@@ -514,7 +514,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 }
             } catch (Exception ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
             }
 
         }

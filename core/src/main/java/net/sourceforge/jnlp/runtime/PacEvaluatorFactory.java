@@ -82,17 +82,15 @@ public class PacEvaluatorFactory {
             } catch (ClassNotFoundException e) {
                 // ignore
             } catch (InstantiationException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } catch (IllegalAccessException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } catch (NoSuchMethodException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } catch (IllegalArgumentException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } catch (InvocationTargetException e) {
-                if (e.getCause() != null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e.getCause());
-                }
+                LOG.error("ERROR", e);
             }
         }
 

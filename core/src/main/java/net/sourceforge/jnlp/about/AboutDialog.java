@@ -159,7 +159,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
                     about_lang = getClass().getResource(about_url_stub + "_" + lang + ".html");
                     about_lang.openStream().close();
                 } catch (Exception ex) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                    LOG.error("ERROR", ex);
                     //probably unknown locale, switch to english
                     about_lang = getClass().getResource(about_url_stub + "_en.html");
                 }

@@ -246,7 +246,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR",  e);
             return ERROR;
         }
 
@@ -327,7 +327,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             return ERROR;
         }
 
@@ -522,7 +522,7 @@ public class CommandLine {
                 JNLPRuntime.exit(result);
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+            LOG.error("ERROR", e);
             JNLPRuntime.exit(1);
         }
     }

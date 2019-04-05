@@ -102,7 +102,7 @@ public class UrlUtils {
         try {
             return new URL(URLDecoder.decode(url.toString(), UTF8));
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             return url;
         }
     }
@@ -155,7 +155,7 @@ public class UrlUtils {
         try {
             return normalizeUrl(url, encodeFileUrls);
         } catch (MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
         return url;
     }

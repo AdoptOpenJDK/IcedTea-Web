@@ -18,6 +18,8 @@ package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.lockingfile.LockedFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +38,8 @@ import java.util.Properties;
  * @version $Revision: 1.4 $
  */
 public class PropertiesFile extends Properties {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
 
     /** the file to save to */
     LockedFile lockedFile;
@@ -148,7 +152,7 @@ public class PropertiesFile extends Properties {
                     }
                 }
             } catch (IOException ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
             }
         }
 
@@ -174,7 +178,7 @@ public class PropertiesFile extends Properties {
                 if (s != null) s.close();
             }
         } catch (IOException ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error("ERROR", ex);
         }
     }
 
@@ -182,7 +186,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.lock();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 
@@ -190,7 +194,7 @@ public class PropertiesFile extends Properties {
         try {
             return lockedFile.tryLock();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
         return false;
     }
@@ -203,7 +207,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.unlock();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
 

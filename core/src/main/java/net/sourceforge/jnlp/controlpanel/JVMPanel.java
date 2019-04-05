@@ -265,8 +265,8 @@ public class JVMPanel extends NamedBorderPanel {
             LOG.info(processStdOutStream);
             processErrorStream = processErrorStream.toLowerCase();
             processStdOutStream = processStdOutStream.toLowerCase();
-        } catch (Exception ex) {;
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+        } catch (Exception ex) {
+            LOG.error("ERROR", ex);
 
         }
         if (r == null) {

@@ -27,6 +27,8 @@ import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.naming.ConfigurationException;
@@ -68,6 +70,9 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * 
  */
 public class ControlPanel extends JFrame {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ControlPanel.class);
+
     private JVMPanel jvmPanel;
 
     /**
@@ -380,7 +385,7 @@ public class ControlPanel extends JFrame {
             JLabel label = new JLabel("Not Implemented", icon, SwingConstants.CENTER);
             notImplementedPanel.add(label);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
         return notImplementedPanel;
     }
@@ -392,7 +397,7 @@ public class ControlPanel extends JFrame {
         try {
             config.save();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             JOptionPane.showMessageDialog(this, e);
         }
     }
@@ -409,7 +414,7 @@ public class ControlPanel extends JFrame {
 
             // if configuration is not loaded, we will get NullPointerExceptions
             // everywhere
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
 
         try {

@@ -19,6 +19,8 @@ package net.sourceforge.jnlp.controlpanel;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -32,6 +34,8 @@ import javax.swing.text.Document;
  *
  */
 public class DocumentAdapter implements DocumentListener {
+
+    private final static Logger LOG = LoggerFactory.getLogger(DocumentAdapter.class);
 
     String[] fields;
     int index;
@@ -95,7 +99,7 @@ public class DocumentAdapter implements DocumentListener {
                 config.setProperty(property, value);
             }
         } catch (BadLocationException e1) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
+            LOG.error("ERROR", e1);
         }
     }
 

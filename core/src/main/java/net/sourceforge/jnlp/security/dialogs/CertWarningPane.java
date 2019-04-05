@@ -358,7 +358,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         } catch (Exception ex) {
                     // TODO: Let NetX show a dialog here notifying user
             // about being unable to add cert to keystore
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error("ERROR", ex);
         }
     }
 

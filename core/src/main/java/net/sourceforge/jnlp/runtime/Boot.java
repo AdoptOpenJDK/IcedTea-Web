@@ -129,7 +129,7 @@ public final class Boot implements PrivilegedAction<Void> {
             try {
                 CertificateViewer.main(null);
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error("ERROR", e);
             } finally {
                 //no matter what happens, terminate
                 return;

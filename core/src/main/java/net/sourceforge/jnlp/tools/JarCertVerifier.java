@@ -299,7 +299,7 @@ public class JarCertVerifier implements CertVerifier {
                     entriesVec);
 
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
             throw e;
         }
     }

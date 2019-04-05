@@ -575,7 +575,7 @@ public final class FileUtils {
                 }
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
         return lock;
     }

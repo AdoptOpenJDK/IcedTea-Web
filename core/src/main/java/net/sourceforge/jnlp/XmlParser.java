@@ -39,6 +39,8 @@ package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.nanoxml.XMLElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -60,6 +62,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * Used by net.sourceforge.jnlp.Parser
  */
 class XMLParser {
+
+    private final static Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
     /**
      * Parses input from an InputStream and returns a Node representing the
@@ -107,7 +111,7 @@ class XMLParser {
                             try {
                                 pout.close();
                             } catch (IOException ioe) {
-                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+                                LOG.error("ERROR", ioe);
                             }
                         }
                     }).start();

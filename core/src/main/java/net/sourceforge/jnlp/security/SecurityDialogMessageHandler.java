@@ -218,20 +218,17 @@ public class SecurityDialogMessageHandler implements Runnable {
                             }
                         }
                         RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));
-                    } catch (Exception ex) {    
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                    } catch (Exception ex) {
+                        LOG.error("ERROR", ex);
                     }
                 } catch (IOException eex) {
                     LOG.error("ERROR", eex);
                     keepGoing = false;
                 } catch (IllegalArgumentException eeex){
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, eeex.toString());
-                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, eeex);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HDwrongValue"));
+                    LOG.error(Translator.R("HDwrongValue"), eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, ex.toString());
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    LOG.error("ERROR", ex);
                     repeatAll = true;
                 }
             } while (keepGoing);
@@ -265,7 +262,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         try {
             queue.put(message);
         } catch (InterruptedException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("ERROR", e);
         }
     }
     

@@ -222,7 +222,7 @@ public class ResourceDownloader implements Runnable {
                     entry.setJnlpPath(jnlpPath);
                 }
             } catch (Exception ex){
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
             }
             entry.store();
 

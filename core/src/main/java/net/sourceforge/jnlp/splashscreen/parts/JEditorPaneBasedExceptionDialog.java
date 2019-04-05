@@ -43,6 +43,8 @@ import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -70,6 +72,8 @@ import java.util.Date;
 import java.util.List;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JEditorPaneBasedExceptionDialog.class);
 
     // components
     private JButton closeButton;
@@ -112,7 +116,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             Icon icon = new ImageIcon(this.getClass().getResource("/net/sourceforge/jnlp/resources/warning.png"));
             iconLabel.setIcon(icon);
         } catch (Exception lex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, lex);
+            LOG.error("ERROR", lex);
         }
         htmlErrorAndHelpPanel.addHyperlinkListener(this);
         homeButton.setVisible(false);
@@ -226,7 +230,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 try{
                AboutDialog.display(true, TextsProvider.ITW_PLUGIN);
             }catch(Exception ex){
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    LOG.error("ERROR", ex);
                 JOptionPane.showConfirmDialog(JEditorPaneBasedExceptionDialog.this, ex);
             }
             }
@@ -256,7 +260,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(data, data);
             } catch (Exception ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error("ERROR", ex);
                 JOptionPane.showMessageDialog(this, Translator.R(InfoItem.SPLASH + "cantCopyEx"));
             }
         } else {
