@@ -36,7 +36,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -53,43 +54,13 @@ import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
 import sun.security.provider.PolicyParser;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.Color;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Window;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1714,7 +1685,7 @@ public class PolicyEditor extends JPanel {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        final OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getPolicyEditorOptions());
+        final OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getPolicyEditorOptions());
         
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
             JNLPRuntime.setDebug(true);

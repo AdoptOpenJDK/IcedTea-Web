@@ -15,8 +15,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.about.AboutDialog;
@@ -38,7 +39,7 @@ import net.sourceforge.swing.SwingUtils;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
-import javax.swing.UIManager;
+import javax.swing.*;
 import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
@@ -106,7 +107,7 @@ public final class Boot implements PrivilegedAction<Void> {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
+        optionParser = new OptionParser(argsIn, OptionsDefinitionsPrinter.getJavaWsOptions());
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
             JNLPRuntime.setDebug(true);

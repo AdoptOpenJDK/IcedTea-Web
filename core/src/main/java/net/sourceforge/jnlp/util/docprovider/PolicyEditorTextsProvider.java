@@ -36,7 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
@@ -84,7 +84,7 @@ public class PolicyEditorTextsProvider extends TextsProvider {
     @Override
     public String getOptions() {
         return super.getOptions()
-                + getFormatter().wrapParagraph(optionsToString(OptionsDefinitions.getPolicyEditorOptions()));
+                + getFormatter().wrapParagraph(optionsToString(OptionsDefinitionsPrinter.getPolicyEditorOptions()));
     }
 
     @Override

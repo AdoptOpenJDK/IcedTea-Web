@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.Setting;
