@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.about;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class HTMLPanel extends JPanel {
         try {
              pane = new JEditorPane(url);
         } catch (IOException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 
             //no need to have invalid url fatal
         }

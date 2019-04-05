@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -146,7 +147,7 @@ public final class KeyStores {
             //to keystore, then this will not be blocker for garbage collection
             keystoresPaths.put(ks.hashCode(), location);
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return new KeyStoreWithPath(ks, location);
     }

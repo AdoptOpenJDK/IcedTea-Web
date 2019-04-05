@@ -39,6 +39,7 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.sourceforge.jnlp.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -233,7 +234,7 @@ public class InformationElement {
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);
             return ie;
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             String message = Translator.R(InfoItem.SPLASH + "errorInInformation");
             InformationElement ie = new InformationElement();
             ie.setHomepage("");

@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class PluginMessage  implements MessageWithHeader{
             int i = orig.indexOf(p.thread2);
             restOfMessage = orig.substring(i + p.thread2.length() + 2); //+": "
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             this.wasError = true;
         }
     }

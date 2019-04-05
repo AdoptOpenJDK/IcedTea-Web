@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -167,14 +168,14 @@ public class AppletDesc implements LaunchDesc {
                         LOG.info("using its {}={}", key, sizeFromParam);
                         return Integer.valueOf(sizeFromParam);
                     } catch (NumberFormatException ex) {
-                        LOG.error("ERROR", ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 }
             }
             LOG.info("defaulting to {}", depVal);
             return depVal;
         } catch (final NumberFormatException | NullPointerException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null;
         }
     }

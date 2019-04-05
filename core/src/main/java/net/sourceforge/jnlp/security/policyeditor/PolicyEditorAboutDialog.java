@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +134,7 @@ public class PolicyEditorAboutDialog extends JFrame {
                 try {
                     Desktop.getDesktop().browse(event.getURL().toURI());
                 } catch (final URISyntaxException | IOException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         }

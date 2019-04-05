@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -224,10 +225,10 @@ public class AppletEnvironment implements AppletContext, AppletStub {
                     }
                 });
             } catch (InterruptedException | InvocationTargetException ie) {
-                LOG.error("ERROR", ie);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ie);
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 
             // should also kill the applet?
         }

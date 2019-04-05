@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DirectoryValidator;
 import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -347,7 +348,7 @@ public final class FileUtils {
         try {
             file = file.getCanonicalFile();
         } catch (final IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
         if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {
@@ -575,7 +576,7 @@ public final class FileUtils {
                 }
             }
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return lock;
     }

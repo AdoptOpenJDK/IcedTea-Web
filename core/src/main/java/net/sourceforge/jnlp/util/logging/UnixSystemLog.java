@@ -36,6 +36,7 @@
 
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class UnixSystemLog implements SingleStreamLogger{
                 LOG.debug("System logger called with result of {}", p.exitValue());
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 

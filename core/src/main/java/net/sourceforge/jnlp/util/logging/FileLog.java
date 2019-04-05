@@ -36,6 +36,7 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
@@ -105,7 +106,7 @@ public final class FileLog  {
                 s = new WriterBasedFileLog(defaultloggerName, getFileName(id), false);
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             //we do not wont to block whole logging just because initialization error in "new FileLog()"
             s = new SingleStreamLoggerImpl();
         }

@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.security.SecurityDialog;
@@ -222,7 +223,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
                 } catch (IOException | URISyntaxException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         });

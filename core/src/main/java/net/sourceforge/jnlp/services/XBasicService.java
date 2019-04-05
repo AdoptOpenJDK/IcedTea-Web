@@ -40,6 +40,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -221,7 +223,7 @@ class XBasicService implements BasicService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return false;
         }
     }
@@ -254,7 +256,7 @@ class XBasicService implements BasicService {
             StreamUtils.waitForSafely(p);
             return (p.exitValue() == 0);
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             try {
                 //time for stderr to deal with it in verbose mode
                 Thread.sleep(50);
@@ -336,7 +338,7 @@ class XBasicService implements BasicService {
                         try {
                             JNLPRuntime.getConfiguration().save();
                         } catch (IOException ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                     PromptUrl.this.dispose();

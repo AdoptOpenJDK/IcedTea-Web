@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -131,7 +132,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
                     try {
                         Desktop.getDesktop().browse(new URI(INFO_LINK));
                     } catch (Exception ex) {
-                        LOG.error("ERROR", ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         if (!JNLPRuntime.isHeadless()) {
                             JOptionPane.showMessageDialog(null, ex);
                         }

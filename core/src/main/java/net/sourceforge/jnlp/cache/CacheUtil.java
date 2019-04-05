@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -137,7 +138,7 @@ public class CacheUtil {
                 result = conn.getPermission();
                 ConnectionFactory.getConnectionFactory().disconnect(conn);
             } catch (java.io.IOException ioe) {
-                LOG.error("ERROR", ioe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                 // should try to figure out the permission
             }
         }
@@ -277,7 +278,7 @@ public class CacheUtil {
                     try {
                         FileUtils.recursiveDelete(scList, scList);
                     } catch (Exception e) {
-                        LOG.error("ERROR", e);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     }
                 }
             }
@@ -402,7 +403,7 @@ public class CacheUtil {
                 try {
                     locking.release();
                 } catch (IOException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         }
@@ -432,7 +433,7 @@ public class CacheUtil {
 
             return result;
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return isCached(source, version); // if can't connect return whether already in cache
         }
     }
@@ -603,7 +604,7 @@ public class CacheUtil {
                             FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                             lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
-                            LOG.error("ERROR", ioe);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                         }
 
                         break;
@@ -800,7 +801,7 @@ public class CacheUtil {
                         100);
             }
         } catch (InterruptedException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         } finally {
             if (listener != null)
                 indicator.disposeListener(listener);
@@ -877,7 +878,7 @@ public class CacheUtil {
                             try {
                                 FileUtils.recursiveDelete(f, f);
                             } catch (IOException e1) {
-                                LOG.error("ERROR", e1);
+                                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                             }
                         }
 

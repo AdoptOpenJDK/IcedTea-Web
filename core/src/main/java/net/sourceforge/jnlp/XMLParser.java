@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.nanoxml.XMLElement;
 import org.slf4j.Logger;
@@ -111,7 +112,7 @@ class XMLParser {
                             try {
                                 pout.close();
                             } catch (IOException ioe) {
-                                LOG.error("ERROR", ioe);
+                                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                             }
                         }
                     }).start();

@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,15 +83,15 @@ public class PacEvaluatorFactory {
             } catch (ClassNotFoundException e) {
                 // ignore
             } catch (InstantiationException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (IllegalAccessException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (NoSuchMethodException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (IllegalArgumentException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (InvocationTargetException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
 

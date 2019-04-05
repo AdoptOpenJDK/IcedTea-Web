@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
@@ -140,7 +141,7 @@ public class ResourceDownloader implements Runnable {
                 initializeOfflineResource();
             }
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
@@ -222,7 +223,7 @@ public class ResourceDownloader implements Runnable {
                     entry.setJnlpPath(jnlpPath);
                 }
             } catch (Exception ex){
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             entry.store();
 
@@ -371,7 +372,7 @@ public class ResourceDownloader implements Runnable {
             }
             resource.fireDownloadEvent(); // fire DOWNLOADED
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll();

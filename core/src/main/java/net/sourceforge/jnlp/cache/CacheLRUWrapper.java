@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -95,7 +96,7 @@ public class CacheLRUWrapper {
                 FileUtils.createParentDir(recentlyUsed.getFile());
                 FileUtils.createRestrictedFile(recentlyUsed.getFile(), true);
             } catch (IOException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
     }
@@ -166,7 +167,7 @@ public class CacheLRUWrapper {
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
-            LOG.error("ERROR", new LruCacheException());
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new LruCacheException());
             LOG.info(R("CFakeCache"));
             store();
             LOG.info(R("CFakedCache"));

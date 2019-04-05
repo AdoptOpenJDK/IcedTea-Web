@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.policyeditor.PermissionActions;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -104,7 +105,7 @@ public class TemporaryPermissions {
             return perm;
         } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException
                 | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
     }

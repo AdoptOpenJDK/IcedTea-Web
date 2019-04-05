@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.ParserSettings;
@@ -183,7 +184,7 @@ public final class HtmlBoot {
                 splashScreen.dispose();
             }
         } catch (final Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             if (splashScreen != null) {
                 SwingUtils.invokeLater(new Runnable() {
 

@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
@@ -118,9 +119,9 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
                 } catch (IOException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 } catch (URISyntaxException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         });

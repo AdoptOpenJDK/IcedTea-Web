@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -165,7 +166,7 @@ public class BasicExceptionDialog {
                 try {
                     JavaConsole.getConsole().showConsoleLater(true);
                 } catch (Exception ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     JOptionPane.showConfirmDialog(parent, ex);
                 }
             }
@@ -192,7 +193,7 @@ public class BasicExceptionDialog {
                         try {
                             CachePane.visualCleanCache(parent);
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });

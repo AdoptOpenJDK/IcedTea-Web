@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.viewer;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -155,7 +156,7 @@ public class CertificatePane extends JPanel {
         try {
             keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -292,7 +293,7 @@ public class CertificatePane extends JPanel {
             }
         } catch (Exception e) {
             // TODO handle exception
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -314,7 +315,7 @@ public class CertificatePane extends JPanel {
                 LOG.info("{} -> {}", keyStore.getPath(), resolved.getCanonicalPath());
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         DefaultTableModel tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
         userTable.setModel(tableModel);
@@ -428,7 +429,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         }
@@ -472,7 +473,7 @@ public class CertificatePane extends JPanel {
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
     }
@@ -514,7 +515,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 }
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
 
         }
@@ -558,7 +559,7 @@ public class CertificatePane extends JPanel {
                 net.sourceforge.jnlp.controlpanel.ControlPanel.main(new String[0]);
                 parent.dispose();    
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 JOptionPane.showMessageDialog(parent, ex);
 
             }

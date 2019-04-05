@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.appletextendedsecurity.InvalidLineException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
@@ -122,7 +123,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
                 item.write(bw);
                 bw.newLine();
             }catch (InvalidLineException ex){
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
     }
@@ -226,7 +227,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             }
             return result;
         } catch (PatternSyntaxException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return false;
         }
     }
@@ -290,7 +291,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
         try{
             version = Integer.valueOf(versionS);
         } catch (NumberFormatException e){
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         if (version < 2){
             LOG.debug("Stoping laoding of vulnereable {}. Will be replaced", getBackingFile().getAbsolutePath());

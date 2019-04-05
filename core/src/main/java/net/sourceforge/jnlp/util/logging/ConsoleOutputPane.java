@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
@@ -202,7 +203,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                             insertChars.setLocation(e.getXOnScreen(), e.getYOnScreen());
                             insertChars.setVisible(!insertChars.isVisible());
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });
@@ -222,7 +223,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                             insertChars.setLocation(regExFilter.getLocationOnScreen());
                             insertChars.setVisible(!insertChars.isVisible());
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });
@@ -290,7 +291,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 try {
                     refreshPaneBody(reset);
                 } catch (Exception ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 } finally {
                     done.set(true);
                 }
@@ -694,7 +695,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                             regExFilter.setCaretPosition(i + 1);
                             insertChars.setVisible(false);
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });
@@ -716,7 +717,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                             regExFilter.setCaretPosition(i + 1);
                             insertChars.setVisible(false);
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });
@@ -737,7 +738,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                             model.usedPattern = model.lastValidPattern;
                             insertChars.setVisible(false);
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 });
@@ -802,7 +803,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             }
             mark.setText(Translator.R("COPmark") + "(" + matches + ")");
         } catch (BadLocationException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 
@@ -829,7 +830,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             }
             lastPostion = document.getLength() - find.length() - 1;
         } catch (BadLocationException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 
@@ -856,7 +857,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             }
             lastPostion = 0;
         } catch (BadLocationException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 

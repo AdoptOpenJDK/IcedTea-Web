@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class ClassFinder extends JDialog {
                             }
                         }
                     } catch (IOException ex) {
-                        LOG.error("ERROR", ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 }
             }

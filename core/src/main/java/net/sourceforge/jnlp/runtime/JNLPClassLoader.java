@@ -54,6 +54,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
+
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
@@ -579,7 +581,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
                 loaderList.add(loader);
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         //}
@@ -734,7 +736,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 LaunchException ex = new LaunchException(null, null, R("LSFatal"),
                         R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " + e.getMessage());
                 consultCertificateSecurityException(ex);
@@ -767,7 +769,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         try {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
-                            LOG.error("ERROR", extCnfe);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, extCnfe);
                             throw new LaunchException(file, extCnfe, R("LSFatal"), R("LCInit"), R("LCantDetermineMainClass"), R("LCantDetermineMainClassInfo"));
                         }
                     } else {
@@ -1116,7 +1118,7 @@ public class JNLPClassLoader extends URLClassLoader {
              */
 
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
 
             /*
              * After this exception is caught, it is escaped. If an exception is
@@ -1176,7 +1178,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public void setApplication(ApplicationInstance app) {
         if (this.app != null) {
-            LOG.error("ERROR", new IllegalStateException("Application can only be set once"));
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new IllegalStateException("Application can only be set once"));
             return;
         }
 
@@ -1230,7 +1232,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         throw new NullPointerException("Code source security was null");
                     }
                     if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                        LOG.error("ERROR", new NullPointerException("Warning! Code source security type was null"));
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new NullPointerException("Warning! Code source security type was null"));
                     }
                     Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
                     if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
@@ -1263,7 +1265,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             return result;
         } catch (RuntimeException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw ex;
         }
     }
@@ -1423,7 +1425,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                         LOG.debug("Activate jar: {}", location);
                     } catch (Exception ex) {
-                        LOG.error("ERROR", ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
 
                     // some programs place a native library in any jar
@@ -1596,7 +1598,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     result = loadClassExt(name);
                     return result;
                 } catch (ClassNotFoundException cnfe1) {
-                    LOG.error("ERROR", cnfe1);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cnfe1);
                 }
 
                 // As a last resort, look in any available indexes
@@ -1622,7 +1624,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 try {
                                     addNewJar(desc);
                                 } catch (Exception e) {
-                                    LOG.error("ERROR", e);
+                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                                 }
                             }
 
@@ -1722,7 +1724,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // throw additional exceptions. So instead, just ignore it. 
             // Exception => jar will not get added to classpath, which will 
             // result in CNFE from loadClass.
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -1747,7 +1749,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } catch (ClassNotFoundException | PrivilegedActionException ex) {
             } catch (ClassFormatError cfe) {
-                LOG.error("ERROR", cfe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cfe);
             } catch (NullJnlpFileException ex) {
                 throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
             }
@@ -1819,7 +1821,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 result = e.nextElement();
             }
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         // If result is still null, look in the codebase loader
@@ -1844,7 +1846,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 lresources = findResourcesBySearching(name);
             }
         } catch (LaunchException le) {
-            LOG.error("ERROR", le);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, le);
         }
 
         return lresources;
@@ -2045,7 +2047,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     addNewJar(des);
                     sec = jarLocationSecurityMap.get(source);
                 } catch (Throwable t) {
-                    LOG.error("ERROR", t);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
                     sec = null;
                 }
             }
@@ -2435,7 +2437,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 codebaseHost);
                     }
                 } catch (final Exception e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     return new SecurityDesc(classLoader.file,
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);

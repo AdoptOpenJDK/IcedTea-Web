@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,7 @@ public class HttpsCertVerifier implements CertVerifier {
         try {
             certPaths.add(CertificateFactory.getInstance("X.509").generateCertPath(list));
         } catch (CertificateException ce) {
-            LOG.error("ERROR", ce);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ce);
             // carry on
         }
 
@@ -192,9 +193,9 @@ public class HttpsCertVerifier implements CertVerifier {
                 names = names.substring(2); // remove proceeding ", "
 
         } catch (CertificateParsingException cpe) {
-            LOG.error("ERROR", cpe);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cpe);
         } catch (IOException ioe) {
-            LOG.error("ERROR", ioe);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
         }
 
         return names;

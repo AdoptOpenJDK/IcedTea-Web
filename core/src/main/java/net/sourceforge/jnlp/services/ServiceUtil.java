@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
@@ -327,11 +328,11 @@ public class ServiceUtil {
             try {
                 c = Class.forName(stack1.getClassName());
             } catch (Exception e1) {
-                LOG.error("ERROR", e1);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                 try {
                     c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
                 }catch (Exception e2) {
-                    LOG.error("ERROR", e2);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);
                 }
             }
             // Everything up to the desired class/method must be trusted

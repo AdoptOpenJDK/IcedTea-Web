@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 autoConfigUrl = new URL(autoConfigString);
             } catch (MalformedURLException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
 
@@ -164,7 +165,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 proxyPort = Integer.valueOf(port);
             } catch (NumberFormatException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
         return proxyPort;
@@ -175,7 +176,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        LOG.error("ERROR", ioe);
+        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
     }
 
     /**
@@ -382,7 +383,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             proxies.add(Proxy.NO_PROXY);
         }
 

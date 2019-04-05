@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -85,7 +86,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
                     mainHtmlPane.setPage(event.getURL());
                 }
             } catch (IOException ioe) {
-                LOG.error("ERROR", ioe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
             }
         }
     }

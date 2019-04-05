@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -125,7 +126,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 generatedJnlp = getGeneratedJnlpFileName();
                 FileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
 
@@ -315,7 +316,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 try {
                     cacheIcon();
                 } catch (NonFileProtocolException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     //default icon will be used later
                 }
             }
@@ -326,7 +327,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 installMenuLauncher(menu, isSigned);
             }
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -349,9 +350,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
             LOG.debug("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -399,9 +400,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
         } catch (FileNotFoundException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -550,7 +551,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
         } catch (Exception ex) {
             //favicon 404 or similar
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return null;
     }
@@ -608,7 +609,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return System.getProperty("user.home") + "/Desktop";
         }
     }

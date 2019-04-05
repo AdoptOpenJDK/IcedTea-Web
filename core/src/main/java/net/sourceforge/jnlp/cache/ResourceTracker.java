@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
@@ -322,7 +323,7 @@ public class ResourceTracker {
                 // TODO: Should be toURI().toURL()
                 return f.toURL();
         } catch (MalformedURLException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
 
         return location;
@@ -372,7 +373,7 @@ public class ResourceTracker {
 
             return null;
         } catch (InterruptedException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null; // need an error exception to throw
         }
     }

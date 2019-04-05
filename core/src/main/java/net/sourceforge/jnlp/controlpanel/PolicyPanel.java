@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
@@ -197,7 +198,7 @@ public class PolicyPanel extends NamedBorderPanel {
                 try {
                     pb.start();
                 } catch (IOException ioe) {
-                    LOG.error("ERROR", ioe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                     try {
                         reflectivePolicyToolLaunch(filePath);
                     } catch (Exception e) {
@@ -272,7 +273,7 @@ public class PolicyPanel extends NamedBorderPanel {
                     }
                 });
             } catch (MalformedURLException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }
@@ -298,7 +299,7 @@ public class PolicyPanel extends NamedBorderPanel {
                     }
                 });
             } catch (MalformedURLException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }

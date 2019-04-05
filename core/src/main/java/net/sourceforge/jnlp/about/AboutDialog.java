@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.about;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
@@ -159,7 +160,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
                     about_lang = getClass().getResource(about_url_stub + "_" + lang + ".html");
                     about_lang.openStream().close();
                 } catch (Exception ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     //probably unknown locale, switch to english
                     about_lang = getClass().getResource(about_url_stub + "_en.html");
                 }
@@ -202,7 +203,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
                     }
                     helpPanel = new InternalHTMLPanel(target.toURI().toURL());
                 } catch (IOException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
             contentPane = helpPanel;

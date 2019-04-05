@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -200,7 +201,7 @@ public class JNLPPolicy extends Policy {
                 URI policyUri = new URI(policyLocation.replace("\\","/"));
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
         return policy;

@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -362,7 +363,7 @@ public class PolicyEditor extends JPanel {
                     PolicyEditor.this.setFile(getDefaultPolicyFilePath());
                     PolicyEditor.this.getFile().createNewFile();
                 } catch (final IOException | URISyntaxException e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     return;
                 }
                 openAndParsePolicyFile();
@@ -447,13 +448,13 @@ public class PolicyEditor extends JPanel {
                     identifier = PolicyEditorController.getPolicyEntryFromClipboard().getPolicyIdentifier();
                     pasteEntry(promptForPolicyIdentifier(identifier));
                 } catch (final UnsupportedFlavorException ufe) {
-                    LOG.error("ERROR", ufe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ufe);
                     showClipboardErrorDialog();
                 } catch (final PolicyParser.ParsingException pe) {
-                    LOG.error("ERROR", pe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, pe);
                     showInvalidPolicyExceptionDialog(identifier);
                 } catch (final IOException ioe) {
-                    LOG.error("ERROR", ioe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                     showCouldNotAccessClipboardDialog();
                 }
             }
@@ -742,7 +743,7 @@ public class PolicyEditor extends JPanel {
                 try {
                     editor.policyEditorController.savePolicyFile();
                 } catch (final IOException e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     editor.showCouldNotSaveDialog();
                     return;
                 }
@@ -1480,7 +1481,7 @@ public class PolicyEditor extends JPanel {
         try {
             policyEditorController.openAndParsePolicyFile();
         } catch (IOException | PolicyParser.ParsingException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return;
         }
 
@@ -1528,7 +1529,7 @@ public class PolicyEditor extends JPanel {
                     }
                     policyEditorController.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
-                    LOG.error("ERROR", fnfe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, fnfe);
                     FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException | PolicyParser.ParsingException e) {
                     LOG.error(R("RCantOpenFile", policyEditorController.getFile().getPath()), e);
@@ -1588,7 +1589,7 @@ public class PolicyEditor extends JPanel {
                     }
                     policyEditorController.savePolicyFile();
                 } catch (final IOException e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     showCouldNotSaveDialog();
                 }
                 return null;
@@ -1674,11 +1675,11 @@ public class PolicyEditor extends JPanel {
         try {
             changed = policyEditorController.fileHasChanged();
         } catch (FileNotFoundException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             JOptionPane.showMessageDialog(PolicyEditor.this, R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
             return JOptionPane.NO_OPTION;
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             changed = true;
         }
         if (changed) {
@@ -1686,7 +1687,7 @@ public class PolicyEditor extends JPanel {
             try {
                 policyFilePath = policyEditorController.getFile().getCanonicalPath();
             } catch (final IOException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 policyFilePath = policyEditorController.getFile().getPath();
             }
             return JOptionPane.showConfirmDialog(PolicyEditor.this, R("PEFileModifiedDetail", policyFilePath,
@@ -1821,7 +1822,7 @@ public class PolicyEditor extends JPanel {
             try {
                 filepath = getDefaultPolicyFilePath();
             } catch (URISyntaxException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 throw new RuntimeException(e);
             }
         }

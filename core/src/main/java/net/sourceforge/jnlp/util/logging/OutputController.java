@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
@@ -131,7 +132,7 @@ public class OutputController {
                     }
 
                 } catch (Throwable t) {
-                    LOG.error("ERROR", t);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
                 }
             }
         }

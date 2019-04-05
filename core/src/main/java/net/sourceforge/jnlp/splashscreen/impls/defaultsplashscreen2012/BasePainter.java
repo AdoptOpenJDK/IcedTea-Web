@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
@@ -422,7 +423,7 @@ public class BasePainter implements Observer {
                     this.notifyObservers();
                     Thread.sleep(MOOVING_TEXT_DELAY);
                 } catch (Exception e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 }
             }
         }
@@ -456,7 +457,7 @@ public class BasePainter implements Observer {
                     //it is risinfg slower and slower
                     Thread.sleep((waterLevel / 4) * 30);
                 } catch (Exception e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 }
             }
         }

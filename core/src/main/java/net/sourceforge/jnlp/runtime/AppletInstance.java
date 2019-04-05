@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -145,7 +146,7 @@ public class AppletInstance extends ApplicationInstance {
             applet.stop();
             applet.destroy();
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
 
         environment.destroy();

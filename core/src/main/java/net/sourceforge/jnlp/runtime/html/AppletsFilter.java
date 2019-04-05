@@ -5,6 +5,7 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -85,7 +86,7 @@ public class AppletsFilter {
             try {
                 id = Integer.parseInt(ids.get(i));
             } catch (NumberFormatException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 continue;
             }
             if (id < 0) {

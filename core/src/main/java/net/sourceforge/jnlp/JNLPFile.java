@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -490,7 +491,7 @@ public class JNLPFile {
         try {
             return UrlUtils.removeFileName(getSourceLocation());
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return getSourceLocation();
     }
@@ -887,7 +888,7 @@ public class JNLPFile {
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw new RuntimeException(ex.toString());
         }
     }

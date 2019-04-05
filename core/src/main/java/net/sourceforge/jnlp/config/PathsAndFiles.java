@@ -36,6 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -329,7 +330,7 @@ public class PathsAndFiles {
                     }
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
 
         }

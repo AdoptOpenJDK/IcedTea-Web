@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -82,7 +83,7 @@ public class SplashUtils {
         } catch (Throwable t) {
                 // prinitng this exception is discutable. I have let it in for case that
                 //some retyping will fail
-            LOG.error("ERROR", t);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
         }
     }
 
@@ -182,7 +183,7 @@ public class SplashUtils {
             pluginSplashEnvironmetVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
             splashEnvironmetVar = System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         SplashPanel sp = null;
         if (SplashReason.JAVAWS.equals(splashReason)) {

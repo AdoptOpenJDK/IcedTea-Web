@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.runtime.html.browser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -289,7 +290,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(u);
             return u;
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }
@@ -302,7 +303,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(url);
             return url;
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }

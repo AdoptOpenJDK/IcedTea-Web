@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
@@ -358,7 +359,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         } catch (Exception ex) {
                     // TODO: Let NetX show a dialog here notifying user
             // about being unable to add cert to keystore
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 

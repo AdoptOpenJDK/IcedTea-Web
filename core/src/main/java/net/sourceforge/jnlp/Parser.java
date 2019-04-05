@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
@@ -1416,7 +1417,7 @@ public final class Parser {
             instance = klass.newInstance();
             //catch both, for case that tagsoup was removed after build
         } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             klass = Class.forName(NORMAL_PARSER_CLASS);
             instance = klass.newInstance();
         }
@@ -1439,7 +1440,7 @@ public final class Parser {
             //only getRequiredAttribute can throw this
             //and as there is call to getMainClass  with required false
             //it is not going to be thrown
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null;
         }
     }

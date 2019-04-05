@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -139,7 +140,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
             try {
                 return new URL(codebase);
             } catch (MalformedURLException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         return null;

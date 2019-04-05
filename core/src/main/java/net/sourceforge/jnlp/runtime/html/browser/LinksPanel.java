@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.runtime.html.browser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -105,7 +106,7 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
                     try {
                         Desktop.getDesktop().browse(new URI(url));
                     } catch (Exception ex) {
-                        LOG.error("ERROR", ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         if (!JNLPRuntime.isHeadless()) {
                             JOptionPane.showMessageDialog(null, ex);
                         }

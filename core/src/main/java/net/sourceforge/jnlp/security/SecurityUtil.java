@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -220,7 +221,7 @@ public class SecurityUtil {
                     loadKeyStore(ks, file);
                 }
             } catch (Exception e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 throw e;
             } finally {
                 if (fis != null)

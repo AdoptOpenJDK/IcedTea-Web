@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.tools.ico.IcoSpi;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -539,7 +540,7 @@ public final class DeploymentConfiguration {
                 jrePath = jreSetting.getValue();
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
 
         File jreFile;
@@ -633,7 +634,7 @@ public final class DeploymentConfiguration {
                 ce.initCause(e);
                 throw ce;
             }
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
     }
@@ -843,7 +844,7 @@ public final class DeploymentConfiguration {
                 s = s.replace(legacyCache, currentCache);
                 FileUtils.saveFile(s, f);
             } catch (IOException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 errors++;
             }
 
@@ -874,12 +875,12 @@ public final class DeploymentConfiguration {
             try {
                 LOG.info("config: {} file exists: {}", PathsAndFiles.USER_CONFIG_HOME, configDir.exists());
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             try {
                 LOG.info("cache: {} file exists: {}", PathsAndFiles.USER_CACHE_HOME, cacheDir.exists());
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         //this call should endure even if (ever) will migration code be removed
@@ -915,7 +916,7 @@ public final class DeploymentConfiguration {
             LOG.debug("OK");
             return 0;
         } else {
-            LOG.debug("ERROR");
+            LOG.debug(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE);
             return 1;
         }
     }
@@ -953,7 +954,7 @@ public final class DeploymentConfiguration {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         
         return r.toString().trim();

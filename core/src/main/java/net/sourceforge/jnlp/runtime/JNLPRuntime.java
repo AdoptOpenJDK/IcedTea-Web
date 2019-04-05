@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.GuiLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
@@ -826,7 +827,7 @@ public class JNLPRuntime {
                 LOG.debug("Acquired shared lock on {} to indicate javaws is running", netxRunningFile);
             }
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {
@@ -852,7 +853,7 @@ public class JNLPRuntime {
             fileLock = null;
             LOG.debug("Release shared lock on {}", PathsAndFiles.MAIN_LOCK.getFullPath());
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -896,7 +897,7 @@ public class JNLPRuntime {
                 pluginDebug = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
             } catch (Exception ex) {
                 pluginDebug = false;
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         return pluginDebug;

@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -164,7 +165,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                     f.pack();
                     f.setVisible(true);
                 } catch (Exception ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         });
@@ -537,7 +538,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             conf.setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
             conf.save();
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             JOptionPane.showMessageDialog(this, ex);
         }
     }
@@ -578,7 +579,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelMatchingNote") + "\n" + appletItemsToCaption(i, Translator.R("APPEXTSECguiPanelMatched") + ": "));
             }
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelMatchingError", ex));
         }
 
@@ -595,7 +596,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         try {
             f = File.createTempFile("appletTable", "validation");
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelCanNOtValidate", ex.toString()));
             return;
         }
@@ -624,7 +625,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             }
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableValid"));
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             JOptionPane.showMessageDialog(this, Translator.R("APPEXTSECguiPanelTableInvalid", ex.toString()));
         } finally {
             f.delete();

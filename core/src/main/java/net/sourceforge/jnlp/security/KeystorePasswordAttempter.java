@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -165,7 +166,7 @@ class KeystorePasswordAttempter {
                     firstEx = ex;
                 }
                 messages += "'" + ex.getMessage() + "' ";
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 //tried all known, ask for new or finally die
                 if (i + 1 == localPases.size()) {
                     String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), (i + 1));

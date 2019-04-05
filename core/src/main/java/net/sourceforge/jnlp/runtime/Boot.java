@@ -15,6 +15,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
@@ -130,7 +131,7 @@ public final class Boot implements PrivilegedAction<Void> {
             try {
                 CertificateViewer.main(null);
             } catch (Exception e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } finally {
                 //no matter what happens, terminate
                 return;
@@ -158,7 +159,7 @@ public final class Boot implements PrivilegedAction<Void> {
                     PropertyDesc propDesc = PropertyDesc.fromString(prop);
                     JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
                 } catch (LaunchException ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         }
@@ -296,7 +297,7 @@ public final class Boot implements PrivilegedAction<Void> {
         try {
             location = getMainFile();
         } catch (InvalidArgumentException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             fatalError("Invalid argument: " + e);
         }
 
@@ -320,7 +321,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 url = new URL(location);
             }
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             fatalError("Invalid jnlp file " + location);
         }
 

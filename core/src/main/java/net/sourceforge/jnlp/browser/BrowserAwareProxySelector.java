@@ -36,6 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.browser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
@@ -128,7 +129,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 browserAutoConfigUrl = new URL(url);
             }
         } catch (MalformedURLException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
@@ -241,7 +242,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             proxies.add(Proxy.NO_PROXY);
         }
 

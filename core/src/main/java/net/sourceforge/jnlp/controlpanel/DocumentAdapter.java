@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -99,7 +100,7 @@ public class DocumentAdapter implements DocumentListener {
                 config.setProperty(property, value);
             }
         } catch (BadLocationException e1) {
-            LOG.error("ERROR", e1);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
         }
     }
 

@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.AppletInstance;
@@ -959,14 +960,14 @@ public class Launcher {
                     }
                 }
             } catch (LaunchException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure) {
                     JNLPRuntime.exit(1);
                 }
             }  catch (Throwable ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 throw new RuntimeException(ex);
             }
         }

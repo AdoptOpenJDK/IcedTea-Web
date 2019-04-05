@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.SecurityDesc;
@@ -166,7 +167,7 @@ public class ApplicationInstance {
                     instance = cons.newInstance(file);
                     //catch both, for case that mslink was removed after build
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-                   LOG.error("ERROR", e);
+                   LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 }
                 GenericDesktopEntry wde = (GenericDesktopEntry) instance;
                 if (!wde.getDesktopIconFile().exists()) {

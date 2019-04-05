@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
@@ -177,7 +178,7 @@ public abstract class SecurityDialogPanel extends JPanel {
             String methodName = "getText";
             return aClass.getMethod(methodName);
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null;
         }
     }
@@ -186,7 +187,7 @@ public abstract class SecurityDialogPanel extends JPanel {
         try {
             return (String) getText.invoke(c1);
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null;
         }
     }

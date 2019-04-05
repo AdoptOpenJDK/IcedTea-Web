@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -77,19 +78,19 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
                         notifySingleInstanceListeners(arguments);
                     } catch (Exception exception) {
                         // not much to do here...
-                        LOG.error("ERROR", exception);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
                     }
 
                 }
             } catch (IOException e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } finally {
                 if (listeningSocket != null) {
                     try {
                         listeningSocket.close();
                     } catch (IOException e) {
                         // Give up.
-                        LOG.error("ERROR", e);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     }
                 }
             }

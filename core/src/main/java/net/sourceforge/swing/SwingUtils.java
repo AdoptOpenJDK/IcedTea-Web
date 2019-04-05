@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.swing;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -165,9 +166,9 @@ public final class SwingUtils {
             try {
                 callOnAppContext(doRun);
             } catch (InterruptedException ie) {
-                LOG.error("ERROR", ie);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ie);
             } catch (InvocationTargetException ite) {
-                LOG.error("ERROR", ite);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ite);
             }
         }
     }

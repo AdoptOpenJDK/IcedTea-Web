@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
@@ -247,7 +248,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            LOG.error("ERROR",  e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE,  e);
             return ERROR;
         }
 
@@ -328,7 +329,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return ERROR;
         }
 
@@ -523,7 +524,7 @@ public class CommandLine {
                 JNLPRuntime.exit(result);
             }
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             JNLPRuntime.exit(1);
         }
     }

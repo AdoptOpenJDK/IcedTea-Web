@@ -25,6 +25,7 @@
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -299,7 +300,7 @@ public class JarCertVerifier implements CertVerifier {
                     entriesVec);
 
         } catch (Exception e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             throw e;
         }
     }

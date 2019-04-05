@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -310,7 +311,7 @@ public class SecurityDesc {
                 URI policyUri = new URI("file://" + policyLocation);
                 policy = Policy.getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (Exception e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
         // return the appropriate policy, or null

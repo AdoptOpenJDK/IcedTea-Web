@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -116,7 +117,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             Icon icon = new ImageIcon(this.getClass().getResource("/net/sourceforge/jnlp/resources/warning.png"));
             iconLabel.setIcon(icon);
         } catch (Exception lex) {
-            LOG.error("ERROR", lex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, lex);
         }
         htmlErrorAndHelpPanel.addHyperlinkListener(this);
         homeButton.setVisible(false);
@@ -230,7 +231,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 try{
                AboutDialog.display(true, TextsProvider.ITW_PLUGIN);
             }catch(Exception ex){
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 JOptionPane.showConfirmDialog(JEditorPaneBasedExceptionDialog.this, ex);
             }
             }
@@ -260,7 +261,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(data, data);
             } catch (Exception ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 JOptionPane.showMessageDialog(this, Translator.R(InfoItem.SPLASH + "cantCopyEx"));
             }
         } else {

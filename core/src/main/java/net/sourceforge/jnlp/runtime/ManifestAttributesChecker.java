@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.ExtensionDesc;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -450,7 +451,7 @@ public class ManifestAttributesChecker {
         try {
             documentBase = new URL(s);
         } catch (MalformedURLException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return documentBase;
     }

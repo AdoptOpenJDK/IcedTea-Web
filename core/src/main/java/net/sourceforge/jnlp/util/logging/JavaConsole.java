@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -572,16 +573,16 @@ public class JavaConsole implements ObservableMessagesProvider {
                             }
                             processPluginMessage(s);
                         } catch (Exception ex) {
-                            LOG.error("ERROR", ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 } catch (Exception ex) {
-                    LOG.error("ERROR", ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     if (br != null) {
                         try {
                             br.close();
                         } catch (Exception exx) {
-                            LOG.error("ERROR", exx);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exx);
                         }
                     }
                 }

@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public enum ImageResources {
                 cache.put(APPLICATION_ICON_PATH, image);
                 return image;
             } catch (IOException ioe) {
-                LOG.error("ERROR", ioe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
             }
         }
         return null;

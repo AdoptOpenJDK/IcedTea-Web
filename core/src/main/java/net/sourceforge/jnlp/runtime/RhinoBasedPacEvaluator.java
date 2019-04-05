@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.TimedHashMap;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.mozilla.javascript.Context;
@@ -190,7 +191,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                 pacFuncsReader.close();
             }
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             contents = null;
         }
 
@@ -261,7 +262,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                     return (String) result;
                 }
             } catch (Exception e) {
-                LOG.error("ERROR", e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 return "DIRECT";
             } finally {
                 Context.exit();

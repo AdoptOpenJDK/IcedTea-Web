@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.lockingfile.LockedFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -152,7 +153,7 @@ public class PropertiesFile extends Properties {
                     }
                 }
             } catch (IOException ex) {
-                LOG.error("ERROR", ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
 
@@ -178,7 +179,7 @@ public class PropertiesFile extends Properties {
                 if (s != null) s.close();
             }
         } catch (IOException ex) {
-            LOG.error("ERROR", ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 
@@ -186,7 +187,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.lock();
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -194,7 +195,7 @@ public class PropertiesFile extends Properties {
         try {
             return lockedFile.tryLock();
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return false;
     }
@@ -207,7 +208,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.unlock();
         } catch (IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 

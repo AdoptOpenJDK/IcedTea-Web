@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -140,7 +141,7 @@ public class PolicyFileModel {
             try {
                 fileLock.release();
             } catch (final IOException e) {
-               LOG.error("ERROR", e);
+               LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
     }
@@ -188,13 +189,13 @@ public class PolicyFileModel {
             }
             parser.write(new FileWriter(file));
         } catch (final IOException e) {
-            LOG.error("ERROR", e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } finally {
             if (fileLock != null) {
                 try {
                     fileLock.release();
                 } catch (final IOException e) {
-                    LOG.error("ERROR", e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 }
 
             }
