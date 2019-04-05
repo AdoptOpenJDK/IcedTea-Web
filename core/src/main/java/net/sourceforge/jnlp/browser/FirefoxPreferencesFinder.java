@@ -37,9 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,11 +45,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Finds the file corresponding to firefox's (default) preferences file
  */
 public class FirefoxPreferencesFinder {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FirefoxPreferencesFinder.class);
 
     /**
      * Returns a file object representing firefox's preferences file
@@ -84,7 +86,7 @@ public class FirefoxPreferencesFinder {
             throw new FileNotFoundException(profilesPath);
         }
 
-        OutputController.getLogger().log("Using firefox's profiles file: " + profilesPath);
+        LOG.info("Using firefox's profiles file: {}", profilesPath);
 
         BufferedReader reader = new BufferedReader(new FileReader(profilesPath));
 
@@ -142,7 +144,7 @@ public class FirefoxPreferencesFinder {
             throw new FileNotFoundException("preferences file");
         } else {
             String fullPath = configPath + path + File.separator + "prefs.js";
-            OutputController.getLogger().log("Found preferences file: " + fullPath);
+            LOG.info("Found preferences file: ", fullPath);
             return new File(fullPath);
         }
     }

@@ -17,6 +17,8 @@
 package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +36,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.8 $
  */
 public class ExtensionDesc {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ExtensionDesc.class);
 
     /** the extension name */
     private final String name;
@@ -126,7 +130,7 @@ public class ExtensionDesc {
         if (file == null) {
             file = new JNLPFile(location);
 
-            OutputController.getLogger().log("Resolve: " + file.getInformation().getTitle());
+            LOG.info("Resolve: {}", file.getInformation().getTitle());
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())

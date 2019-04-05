@@ -87,6 +87,8 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -101,6 +103,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.20 $
  */
 public class JNLPClassLoader extends URLClassLoader {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPClassLoader.class);
 
     // todo: initializePermissions should get the permissions from
     // extension classes too so that main file classes can load
@@ -301,7 +305,7 @@ public class JNLPClassLoader extends URLClassLoader {
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
-        OutputController.getLogger().log("New classloader: " + file.getFileLocation());
+        LOG.info("New classloader: {}", file.getFileLocation());
         strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
@@ -349,7 +353,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            OutputController.getLogger().log(OptionsDefinitions.OPTIONS.NOSEC.option + " and " + DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES + " are declared. Ignoring certificate issue");
+            LOG.error("{} and {} are declared. Ignoring certificate issue", OptionsDefinitions.OPTIONS.NOSEC.option, DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
             OutputController.getLogger().log(ex);
         } else {
             throw ex;
@@ -595,10 +599,10 @@ public class JNLPClassLoader extends URLClassLoader {
             Permission p = CacheUtil.getReadPermission(jar.getLocation(), jar.getVersion());
 
             if (p == null) {
-                OutputController.getLogger().log("Unable to add permission for " + jar.getLocation());
+                LOG.info("Unable to add permission for {}", jar.getLocation());
             } else {
                 resourcePermissions.add(p);
-                OutputController.getLogger().log("Permission added: " + p.toString());
+                LOG.info("Permission added: {}", p.toString());
             }
         }
     }
@@ -2039,7 +2043,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (sec == null && !alreadyTried.contains(source)) {
                 alreadyTried.add(source);
                 //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
-                OutputController.getLogger().log("Application is trying to get permissions for " + source.toString() + ", which was not added by standard way. Trying to download and verify!");
+                LOG.info("Application is trying to get permissions for {}, which was not added by standard way. Trying to download and verify!", source.toString());
                 try {
                     JARDesc des = new JARDesc(source, null, null, false, false, false, false);
                     addNewJar(des);
@@ -2200,11 +2204,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
             File directory = new File(directoryUrl);
 
-            OutputController.getLogger().log("Deleting cached file: " + cachedFile.getAbsolutePath());
+            LOG.info("Deleting cached file: {}", cachedFile.getAbsolutePath());
 
             cachedFile.delete();
 
-            OutputController.getLogger().log("Deleting cached directory: " + directory.getAbsolutePath());
+            LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
 
             directory.delete();
         }
@@ -2222,7 +2226,7 @@ public class JNLPClassLoader extends URLClassLoader {
         JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
 
         for (JARDesc eachJar : jars) {
-            OutputController.getLogger().log("Downloading and initializing jar: " + eachJar.getLocation().toString());
+            LOG.info("Downloading and initializing jar: {}", eachJar.getLocation().toString());
 
             this.addNewJar(eachJar, UpdatePolicy.FORCE);
         }
@@ -2257,7 +2261,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (action == DownloadAction.DOWNLOAD_TO_CACHE) {
                 JARDesc jarToCache = new JARDesc(ref, resourceVersion, null, false, true, false, true);
-                OutputController.getLogger().log("Downloading and initializing jar: " + ref.toString());
+                LOG.info("Downloading and initializing jar: {}", ref.toString());
 
                 foundLoader.addNewJar(jarToCache, UpdatePolicy.FORCE);
 

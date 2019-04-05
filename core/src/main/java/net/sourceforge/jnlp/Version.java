@@ -19,6 +19,8 @@ package net.sourceforge.jnlp;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
@@ -46,7 +48,9 @@ import java.util.StringTokenizer;
  * @version $Revision: 1.5 $
  */
 public class Version {
-    
+
+    private final static Logger LOG = LoggerFactory.getLogger(Version.class);
+
     /**
      * This is special case of version, used only for checking jre version. If
      * jre do not match, in strict not-headless mode the dialog with
@@ -88,7 +92,7 @@ public class Version {
                     OutputController.getLogger().log(OutputController.Level.WARNING_ALL, s);
                 }
             } else {
-                OutputController.getLogger().log("good - your JRE - " + getJreVersion() + " - match requested JRE - " + v);
+                LOG.info("good - your JRE - {} - match requested JRE - {}", getJreVersion(), v);
             }
         }
 

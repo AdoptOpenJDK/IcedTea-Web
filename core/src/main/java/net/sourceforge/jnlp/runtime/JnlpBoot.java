@@ -40,6 +40,8 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,8 @@ import static net.sourceforge.jnlp.runtime.Boot.init;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public final class JnlpBoot {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JnlpBoot.class);
 
     private final OptionParser optionParser;
 
@@ -61,7 +65,7 @@ public final class JnlpBoot {
             return false;
         }
         try {
-            OutputController.getLogger().log("Proceeding with jnlp");
+            LOG.info("Proceeding with jnlp");
             Launcher launcher = new Launcher(true);
             launcher.setParserSettings(settings);
             launcher.setInformationToMerge(extra);
