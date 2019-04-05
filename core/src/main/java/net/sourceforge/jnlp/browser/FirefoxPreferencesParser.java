@@ -38,6 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.browser;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -60,6 +62,8 @@ import java.util.Map;
  * </code></pre>
  */
 public final class FirefoxPreferencesParser {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FirefoxPreferencesParser.class);
 
     File prefsFile = null;
     Map<String, String> prefs = null;
@@ -139,7 +143,7 @@ public final class FirefoxPreferencesParser {
         } finally {
             reader.close();
         }
-        OutputController.getLogger().log("Read " + prefs.size() + " entries from Firefox's preferences");
+        LOG.info("Read {} entries from Firefox's preferences", prefs.size());
     }
 
     /**

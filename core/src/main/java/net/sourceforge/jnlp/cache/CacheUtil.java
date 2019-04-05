@@ -27,6 +27,8 @@ import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.BufferedInputStream;
@@ -71,7 +73,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  */
 public class CacheUtil {
 
-
+    private final static Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -218,7 +220,7 @@ public class CacheUtil {
                         if (application.equalsIgnoreCase(jnlpPath) || application.equalsIgnoreCase(getDomain(path))) {
                             pf.setProperty("delete", "true");
                             pf.store();
-                            OutputController.getLogger().log("marked for deletion: " + path);
+                            LOG.info("marked for deletion: {}", path);
                         }
                     }
                 }
@@ -268,7 +270,7 @@ public class CacheUtil {
                     fDelete = true;
                 }
                 if (fDelete) {
-                    OutputController.getLogger().log("Deleting item = " + sPath);
+                    LOG.info("Deleting item = {}", sPath);
                     File scList = new File(sPath);
                     try {
                         FileUtils.recursiveDelete(scList, scList);
@@ -379,14 +381,14 @@ public class CacheUtil {
                 FileChannel channel = fis.getChannel();
                 locking  = channel.tryLock();
                 if (locking == null) {
-                    OutputController.getLogger().log("Other instances of javaws are running");
+                    LOG.info("Other instances of javaws are running");
                     return false;
                 }
-                OutputController.getLogger().log("No other instances of javaws are running");
+                LOG.info("No other instances of javaws are running");
                 return true;
 
             } else {
-                OutputController.getLogger().log("No instance file found");
+                LOG.info("No instance file found");
                 return true;
             }
         } catch (IOException e) {
@@ -422,7 +424,7 @@ public class CacheUtil {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
             boolean result = entry.isCurrent(lastModifed);
 
-            OutputController.getLogger().log("isCurrent: " + source + " = " + result);
+            LOG.info("isCurrent: {} = {}", source, result);
 
             return result;
         } catch (Exception ex) {
@@ -447,7 +449,7 @@ public class CacheUtil {
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
 
-        OutputController.getLogger().log("isCached: " + source + " = " + result);
+        LOG.info("isCached: {} = {}", source, result);
 
         return result;
     }

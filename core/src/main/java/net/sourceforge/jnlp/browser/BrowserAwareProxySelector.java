@@ -41,6 +41,8 @@ import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
 import net.sourceforge.jnlp.runtime.PacEvaluatorFactory;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +64,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @see JNLPProxySelector
  */
 public class BrowserAwareProxySelector extends JNLPProxySelector {
+
+    private final static Logger LOG = LoggerFactory.getLogger(BrowserAwareProxySelector.class);
 
     /* firefox's constants */
     public static final int BROWSER_PROXY_TYPE_NONE = 0;
@@ -218,7 +222,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 proxies.add(Proxy.NO_PROXY);
         }
 
-        OutputController.getLogger().log("Browser selected proxies: " + proxies.toString());
+        LOG.info("Browser selected proxies: {}", proxies);
 
         return proxies;
     }
