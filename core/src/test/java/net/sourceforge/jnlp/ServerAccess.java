@@ -36,14 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.browsertesting.Browser;
-import net.sourceforge.jnlp.browsertesting.BrowserFactory;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
-import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +48,14 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  *
@@ -164,8 +164,8 @@ public class ServerAccess {
         findPortTestingSocket.close();
         return port;
     }
-    public static final  String HEADLES_OPTION=OptionsDefinitions.OPTIONS.HEADLESS.option;
-    public static final  String VERBOSE_OPTION=OptionsDefinitions.OPTIONS.VERBOSE.option;
+    public static final  String HEADLES_OPTION= OptionsDefinitions.OPTIONS.HEADLESS.option;
+    public static final  String VERBOSE_OPTION= OptionsDefinitions.OPTIONS.VERBOSE.option;
 
     /**
      * we would like to have an singleton instance ASAP

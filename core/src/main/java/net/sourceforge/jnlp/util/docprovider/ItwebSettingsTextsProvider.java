@@ -37,7 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
@@ -103,7 +105,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
     @Override
     public String getCommands() {
         return super.getDescription()
-                + getFormatter().wrapParagraph(optionsToString(OptionsDefinitions.getItwsettingsCommands()));
+                + getFormatter().wrapParagraph(optionsToString(OptionsDefinitionsPrinter.getItwsettingsCommands()));
     }
 
     @Override

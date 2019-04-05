@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -77,7 +77,7 @@ public class CommandLineTest extends NoStdOutErrTest{
         String[] args = {
                 "set", "deployment.security.level", "ALLOW_UNSIGNED"
         };
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
 
@@ -94,7 +94,7 @@ public class CommandLineTest extends NoStdOutErrTest{
         String[] args = {
                 "set", "unknown", "does_not_matter"
         };
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
 
@@ -112,7 +112,7 @@ public class CommandLineTest extends NoStdOutErrTest{
         String[] args = {
                 "set", "blah", "blah"
         };
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
         String contents = new String(Files.readAllBytes(userDeployFile.toPath()));
@@ -133,7 +133,7 @@ public class CommandLineTest extends NoStdOutErrTest{
                 "set", "blue", "blah", "blah", "green"
         };
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
         String contents = new String(Files.readAllBytes(userDeployFile.toPath()));
@@ -154,7 +154,7 @@ public class CommandLineTest extends NoStdOutErrTest{
                 "set", "deployment.security.level", "INTENTIONALLY_INCORRECT"
         };
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
 
@@ -171,7 +171,7 @@ public class CommandLineTest extends NoStdOutErrTest{
                 "set", "blue", "blah", "purple"
         };
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
 
@@ -186,7 +186,7 @@ public class CommandLineTest extends NoStdOutErrTest{
                 "set", "blue", "blah red"
         };
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
         String contents = new String(Files.readAllBytes(userDeployFile.toPath()));
@@ -207,7 +207,7 @@ public class CommandLineTest extends NoStdOutErrTest{
                 "set", "blue green", "blah"
         };
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
         CommandLine commandLine = new CommandLine(optionParser);
         int status = commandLine.handleSetCommand();
         String contents = new String(Files.readAllBytes(userDeployFile.toPath()));
