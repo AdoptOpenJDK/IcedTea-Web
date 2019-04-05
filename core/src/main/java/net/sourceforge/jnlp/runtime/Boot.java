@@ -36,10 +36,12 @@ import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
-import javax.swing.*;
+import javax.swing.UIManager;
 import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
@@ -63,6 +65,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.21 $
  */
 public final class Boot implements PrivilegedAction<Void> {
+
+    private final static Logger LOG = LoggerFactory.getLogger(Boot.class);
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
@@ -167,7 +171,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (Exception e) {
-                    OutputController.getLogger().log("Unable to set system look and feel");
+                    LOG.error("Unable to set system look and feel", e);
                 }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display(TextsProvider.JAVAWS);
@@ -301,7 +305,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.exit(1);
         }
 
-        OutputController.getLogger().log(R("BFileLoc") + ": " + location);
+        LOG.info("{}: {}", R("BFileLoc"), location);
 
         URL url = null;
 
@@ -310,7 +314,7 @@ public final class Boot implements PrivilegedAction<Void> {
             {
                 url = new File(location).toURL(); // Why use file.getCanonicalFile?
             } else if (ServiceUtil.getBasicService() != null) {
-                OutputController.getLogger().log("Warning, null basicService");
+                LOG.warn("Warning, null basicService");
                 url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
             } else {
                 url = new URL(location);

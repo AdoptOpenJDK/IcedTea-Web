@@ -22,6 +22,8 @@ import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -49,6 +51,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.13 $
  */
 public final class Parser {
+
+    private final static Logger LOG = LoggerFactory.getLogger(Parser.class);
 
     private static String CODEBASE = "codebase";
     private static String MAINCLASS = "main-class";
@@ -493,8 +497,8 @@ public final class Parser {
      * @throws RequiredElementException
      */
     void checkForInformation() throws RequiredElementException {
-        OutputController.getLogger().log("Homepage: " + file.getInformation().getHomepage());
-        OutputController.getLogger().log("Description: " + file.getInformation().getDescription());
+        LOG.info("Homepage: {}", file.getInformation().getHomepage());
+       LOG.info("Description: {}", file.getInformation().getDescription());
         file.getTitle(strict);
         file.getVendor(strict);
     }

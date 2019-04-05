@@ -56,7 +56,7 @@ public class Node {
     private Node children[];
     private List <String> attributeNames= null;
 
-    Node(XMLElement xml) {
+    public Node(XMLElement xml) {
         this.xml = xml;
     }
 

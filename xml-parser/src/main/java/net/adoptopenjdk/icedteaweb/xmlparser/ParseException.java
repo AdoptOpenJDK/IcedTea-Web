@@ -84,10 +84,11 @@ public class ParseException extends Exception {
             //warn about TagSoup
             return Translator.R("TAGSOUPbroken") + tail;
         }
+// TODO: find a solution for debug switch
 //        if (JNLPRuntime.isDebug()) {
-            return expected + " " + used + "; ";
+//            return expected + " " + used + "; ";
 //        } else {
-//            return "";
+            return "";
 //        }
     }
 

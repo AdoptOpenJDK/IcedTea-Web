@@ -26,6 +26,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +65,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
 
     public static enum ManifestBoolean {
         TRUE, FALSE, UNDEFINED;
@@ -349,7 +353,7 @@ public class JNLPFile {
             title = R("PMissingMandatorySubstitution", R("PMissingTitle"));
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingTitle")) + ": " + title);
         } else {
-            OutputController.getLogger().log("Acceptable title tag found, contains: " + title);
+            LOG.info("Acceptable title tag found, contains: {}", title);
         }
         return title;
     }
@@ -414,7 +418,7 @@ public class JNLPFile {
             vendor = R("PMissingMandatorySubstitution", R("PMissingVendor"));
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingVendor")) + ": " + vendor);
         } else {
-            OutputController.getLogger().log("Acceptable vendor tag found, contains: " + vendor);
+            LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
         return vendor;
     }

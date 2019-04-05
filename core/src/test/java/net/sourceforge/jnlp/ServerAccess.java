@@ -166,7 +166,7 @@ public class ServerAccess {
         return port;
     }
     public static final  String HEADLES_OPTION= OptionsDefinitions.OPTIONS.HEADLESS.option;
-    public static final  String VERBOSE_OPTION=OptionsDefinitions.OPTIONS.VERBOSE.option;
+    public static final  String VERBOSE_OPTION= OptionsDefinitions.OPTIONS.VERBOSE.option;
 
     /**
      * we would like to have an singleton instance ASAP

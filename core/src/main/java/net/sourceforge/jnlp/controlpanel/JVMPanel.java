@@ -41,6 +41,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -61,6 +63,8 @@ import java.io.File;
 
 @SuppressWarnings("serial")
 public class JVMPanel extends NamedBorderPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JVMPanel.class);
 
     public static class JvmValidationResult {
 
@@ -258,7 +262,7 @@ public class JVMPanel extends NamedBorderPanel {
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, processErrorStream);
-            OutputController.getLogger().log(processStdOutStream);
+            LOG.info(processStdOutStream);
             processErrorStream = processErrorStream.toLowerCase();
             processStdOutStream = processStdOutStream.toLowerCase();
         } catch (Exception ex) {;

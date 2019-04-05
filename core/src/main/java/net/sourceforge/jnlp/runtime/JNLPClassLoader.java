@@ -14,40 +14,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.AppletDesc;
-import net.sourceforge.jnlp.ApplicationDesc;
-import net.sourceforge.jnlp.ExtensionDesc;
-import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPMatcher;
-import net.sourceforge.jnlp.JNLPMatcherException;
-import net.sourceforge.jnlp.LaunchDesc;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.ResourcesDesc;
-import net.sourceforge.jnlp.SecurityDesc;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
-import net.sourceforge.jnlp.cache.NativeLibraryStorage;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
-import net.sourceforge.jnlp.security.AppVerifier;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -88,6 +54,41 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.AppletDesc;
+import net.sourceforge.jnlp.ApplicationDesc;
+import net.sourceforge.jnlp.ExtensionDesc;
+import net.sourceforge.jnlp.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPMatcher;
+import net.sourceforge.jnlp.JNLPMatcherException;
+import net.sourceforge.jnlp.LaunchDesc;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.ResourcesDesc;
+import net.sourceforge.jnlp.SecurityDesc;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
+import net.sourceforge.jnlp.cache.NativeLibraryStorage;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.security.PluginAppVerifier;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -102,6 +103,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.20 $
  */
 public class JNLPClassLoader extends URLClassLoader {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPClassLoader.class);
 
     // todo: initializePermissions should get the permissions from
     // extension classes too so that main file classes can load
@@ -302,7 +305,7 @@ public class JNLPClassLoader extends URLClassLoader {
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
-        OutputController.getLogger().log("New classloader: " + file.getFileLocation());
+        LOG.info("New classloader: {}", file.getFileLocation());
         strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
@@ -350,7 +353,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            OutputController.getLogger().log(OptionsDefinitions.OPTIONS.NOSEC.option + " and " + DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES + " are declared. Ignoring certificate issue");
+            LOG.error("{} and {} are declared. Ignoring certificate issue", OptionsDefinitions.OPTIONS.NOSEC.option, DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
             OutputController.getLogger().log(ex);
         } else {
             throw ex;
@@ -596,10 +599,10 @@ public class JNLPClassLoader extends URLClassLoader {
             Permission p = CacheUtil.getReadPermission(jar.getLocation(), jar.getVersion());
 
             if (p == null) {
-                OutputController.getLogger().log("Unable to add permission for " + jar.getLocation());
+                LOG.info("Unable to add permission for {}", jar.getLocation());
             } else {
                 resourcePermissions.add(p);
-                OutputController.getLogger().log("Permission added: " + p.toString());
+                LOG.info("Permission added: {}", p.toString());
             }
         }
     }
@@ -2040,7 +2043,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (sec == null && !alreadyTried.contains(source)) {
                 alreadyTried.add(source);
                 //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
-                OutputController.getLogger().log("Application is trying to get permissions for " + source.toString() + ", which was not added by standard way. Trying to download and verify!");
+                LOG.info("Application is trying to get permissions for {}, which was not added by standard way. Trying to download and verify!", source.toString());
                 try {
                     JARDesc des = new JARDesc(source, null, null, false, false, false, false);
                     addNewJar(des);
@@ -2201,11 +2204,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
             File directory = new File(directoryUrl);
 
-            OutputController.getLogger().log("Deleting cached file: " + cachedFile.getAbsolutePath());
+            LOG.info("Deleting cached file: {}", cachedFile.getAbsolutePath());
 
             cachedFile.delete();
 
-            OutputController.getLogger().log("Deleting cached directory: " + directory.getAbsolutePath());
+            LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
 
             directory.delete();
         }
@@ -2223,7 +2226,7 @@ public class JNLPClassLoader extends URLClassLoader {
         JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
 
         for (JARDesc eachJar : jars) {
-            OutputController.getLogger().log("Downloading and initializing jar: " + eachJar.getLocation().toString());
+            LOG.info("Downloading and initializing jar: {}", eachJar.getLocation().toString());
 
             this.addNewJar(eachJar, UpdatePolicy.FORCE);
         }
@@ -2258,7 +2261,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (action == DownloadAction.DOWNLOAD_TO_CACHE) {
                 JARDesc jarToCache = new JARDesc(ref, resourceVersion, null, false, true, false, true);
-                OutputController.getLogger().log("Downloading and initializing jar: " + ref.toString());
+                LOG.info("Downloading and initializing jar: {}", ref.toString());
 
                 foundLoader.addNewJar(jarToCache, UpdatePolicy.FORCE);
 

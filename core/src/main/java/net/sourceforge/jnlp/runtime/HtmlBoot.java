@@ -46,9 +46,12 @@ import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -60,6 +63,8 @@ import java.util.Map;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public final class HtmlBoot {
+
+    private final static Logger LOG = LoggerFactory.getLogger(HtmlBoot.class);
 
     private final OptionParser optionParser;
 
@@ -130,7 +135,7 @@ public final class HtmlBoot {
             return false;
         }
         try {
-            OutputController.getLogger().log("Proceeding with html");
+            LOG.info("Proceeding with html");
             final URL html = Boot.getFileLocation();
             AppletExtractor axe = new AppletExtractor(html, settings);
             AppletsFilter filtered = new AppletsFilter(axe.findAppletsOnPage(), html, vars.subList(1, vars.size()));

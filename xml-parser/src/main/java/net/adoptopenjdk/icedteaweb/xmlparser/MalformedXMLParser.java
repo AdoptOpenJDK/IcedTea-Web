@@ -66,7 +66,6 @@ public class MalformedXMLParser extends XMLParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(MalformedXMLParser.class);
 
-
     /**
      * Parses the data from an {@link InputStream} to create a XML tree.
      * Returns a {@link Node} representing the root of the tree.
@@ -77,7 +76,7 @@ public class MalformedXMLParser extends XMLParser {
      */
     @Override
     public Node getRootNode(InputStream input) throws ParseException {
-        LOG.debug("Using MalformedXMLParser");
+        LOG.info("Using MalformedXMLParser");
         InputStream xmlInput = xmlizeInputStream(input);
         return super.getRootNode(xmlInput);
     }
