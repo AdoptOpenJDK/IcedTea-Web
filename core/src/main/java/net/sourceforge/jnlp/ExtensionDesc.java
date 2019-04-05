@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.io.IOException;

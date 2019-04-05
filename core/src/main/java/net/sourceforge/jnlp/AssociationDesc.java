@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 public final class AssociationDesc {
 
     /** the extensions this application wants to register with */

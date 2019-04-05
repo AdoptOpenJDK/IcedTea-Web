@@ -14,6 +14,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
 import net.sourceforge.jnlp.ExtensionDesc;
@@ -24,8 +26,6 @@ import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchDesc;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ResourcesDesc;
@@ -527,7 +527,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param enableCodeBase whether to enable codebase search or not
      * @return classlaoder of this appp
      * @throws java.io.IOException when IO fails
-     * @throws net.sourceforge.jnlp.ParseException when parsing fails
+     * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
     public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy, String mainName, boolean enableCodeBase)

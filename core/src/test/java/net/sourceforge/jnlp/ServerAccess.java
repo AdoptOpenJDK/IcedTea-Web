@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -164,7 +165,7 @@ public class ServerAccess {
         findPortTestingSocket.close();
         return port;
     }
-    public static final  String HEADLES_OPTION=OptionsDefinitions.OPTIONS.HEADLESS.option;
+    public static final  String HEADLES_OPTION= OptionsDefinitions.OPTIONS.HEADLESS.option;
     public static final  String VERBOSE_OPTION=OptionsDefinitions.OPTIONS.VERBOSE.option;
 
     /**

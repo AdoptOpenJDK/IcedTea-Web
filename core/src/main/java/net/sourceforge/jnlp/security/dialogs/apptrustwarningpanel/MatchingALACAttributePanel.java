@@ -37,7 +37,7 @@
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;

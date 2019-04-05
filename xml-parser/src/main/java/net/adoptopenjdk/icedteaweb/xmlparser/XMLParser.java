@@ -35,10 +35,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.nanoxml.XMLElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -59,8 +59,10 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  *
  * Used by net.sourceforge.jnlp.Parser
  */
-class XMLParser {
+public class XMLParser {
 
+    private final static Logger LOG = LoggerFactory.getLogger(XMLParser.class);
+    
     /**
      * Parses input from an InputStream and returns a Node representing the
      * root of the parse tree.
@@ -107,7 +109,7 @@ class XMLParser {
                             try {
                                 pout.close();
                             } catch (IOException ioe) {
-                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+                                LOG.error("Error in XML parser", ioe);
                             }
                         }
                     }).start();

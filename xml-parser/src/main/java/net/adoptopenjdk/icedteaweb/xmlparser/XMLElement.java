@@ -28,7 +28,7 @@
 
 /* JAM: hacked the source to remove unneeded methods and comments. */
 
-package net.sourceforge.nanoxml;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
 
 import java.io.IOException;
@@ -89,7 +89,7 @@ import java.util.Vector;
  * which has to return a new copy of the receiver.
  * </dd></dl>
  *
- * @see net.sourceforge.nanoxml.XMLParseException
+ * @see XMLParseException
  *
  * @author Marc De Scheemaecker
  *         &lt;<A href="mailto:cyberelf@mac.com">cyberelf@mac.com</A>&gt;
@@ -457,7 +457,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader)
@@ -487,7 +487,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader,

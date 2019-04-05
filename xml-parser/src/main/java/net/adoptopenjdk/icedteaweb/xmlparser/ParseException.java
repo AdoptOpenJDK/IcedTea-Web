@@ -14,8 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -54,7 +55,7 @@ public class ParseException extends Exception {
     }
 
 
-    static enum UsedParsers {
+    public enum UsedParsers {
 
         MALFORMED, NORMAL
     }
@@ -62,11 +63,11 @@ public class ParseException extends Exception {
     private static UsedParsers expected;
     private static UsedParsers used;
 
-    static void setExpected(UsedParsers ex) {
+    public static void setExpected(UsedParsers ex) {
         expected = ex;
     }
 
-    static void setUsed(UsedParsers us) {
+    public static void setUsed(UsedParsers us) {
         used = us;
     }
 
@@ -84,7 +85,7 @@ public class ParseException extends Exception {
             return Translator.R("TAGSOUPbroken") + tail;
         }
 //        if (JNLPRuntime.isDebug()) {
-//            return expected + " " + used + "; ";
+            return expected + " " + used + "; ";
 //        } else {
 //            return "";
 //        }

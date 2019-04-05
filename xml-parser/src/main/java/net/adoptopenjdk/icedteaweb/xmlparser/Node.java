@@ -35,9 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp;
-
-import net.sourceforge.nanoxml.XMLElement;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -62,7 +60,7 @@ public class Node {
         this.xml = xml;
     }
 
-    Node getFirstChild() {
+    public Node getFirstChild() {
         if (children == null) {
             getChildNodes();
         }
@@ -75,18 +73,18 @@ public class Node {
         }
     }
 
-    Node getNextSibling() {
+    public Node getNextSibling() {
         return next;
     }
 
-    void normalize() {
+    public void normalize() {
     }
 
-    String getNodeValue() {
+    public String getNodeValue() {
         return xml.getContent();
     }
 
-    Node[] getChildNodes() {
+    public Node[] getChildNodes() {
         if (children == null) {
             List<Node> list = new ArrayList<Node>();
 
@@ -108,7 +106,7 @@ public class Node {
      * To retrieve all attribute names
      * @return all attribute names of the Node in ArrayList<String>
      */
-    List<String> getAttributeNames() {
+    public List<String> getAttributeNames() {
         if (attributeNames == null) {
             attributeNames= new ArrayList<String>();
 
@@ -120,7 +118,7 @@ public class Node {
         return attributeNames;
     }
 
-    String getAttribute(String name) {
+    public String getAttribute(String name) {
         return (String) xml.getAttribute(name);
     }
 

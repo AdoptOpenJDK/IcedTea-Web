@@ -36,9 +36,9 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -95,7 +95,7 @@ public class AppletExtractor {
                 Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
             } else {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));    
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));
             }
         } catch (Exception ex) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlBroken"));

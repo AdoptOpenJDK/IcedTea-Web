@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,7 +64,7 @@ public class JREDesc {
      * @param initialHeapSize initial heap size
      * @param maximumHeapSize maximum head size
      * @param resources list of ResourceDesc objects
-     * @throws net.sourceforge.jnlp.ParseException is something goes wrong
+     * @throws ParseException is something goes wrong
      */
     public JREDesc(Version.JreVersion version, URL location,
             String vmArgs, String initialHeapSize,
