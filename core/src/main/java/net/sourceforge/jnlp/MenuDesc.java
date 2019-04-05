@@ -25,7 +25,7 @@ public class MenuDesc {
      * Create a new menu descriptor
      * @param subMenu sub-menu of this menu if any or null.
      */
-    public MenuDesc(String subMenu) {
+    public MenuDesc(final String subMenu) {
         this.subMenu = subMenu;
     }
 

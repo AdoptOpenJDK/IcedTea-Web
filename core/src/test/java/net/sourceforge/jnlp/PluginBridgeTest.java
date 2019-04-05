@@ -22,15 +22,7 @@
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,13 +30,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+
+import org.junit.AfterClass;
+import org.junit.Assert;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
-    private class MockJNLPCreator extends JNLPCreator {
+
+    private class MockJnlpFileFactory extends JNLPFileFactory {
 
         private URL JNLPHref;
 
@@ -98,7 +101,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String absoluteLocation = "http://absolute.href.com/test.jnlp";
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", absoluteLocation);
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(absoluteLocation, mockCreator.getJNLPHref().toExternalForm());
     }
@@ -109,7 +112,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String relativeLocation = "sub/dir/test.jnlp";
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(codeBase.toExternalForm() + relativeLocation,
                 mockCreator.getJNLPHref().toExternalForm());
@@ -122,7 +125,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String relativeLocation = "/app/test/test.jnlp";
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(desiredDomain + relativeLocation,
                 mockCreator.getJNLPHref().toExternalForm());
@@ -135,7 +138,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String relativeLocation = "/app/test/test.jnlp";
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
         assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.NONE);
         
@@ -222,7 +225,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
                 "ICAgICAgICAgICAgd2lkdGg9IjAiDQogICAgICAgICAgICAgICAgaGVpZ2h0PSIwIg0KICAgICAg" +
                 "ICAgICAgLz4NCiAgICAgICAgICAgIDwvam5scD4=";
 
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
         params.put("jnlp_embedded", jnlpFileEncoded);
@@ -297,7 +300,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
                 "ICB3aWR0aD0iMCINCiAgICAgICAgICAgICAgICBoZWlnaHQ9IjAiDQogICAgICAgICAgICAvPg0K" +
                 "ICAgICAgICAgICAgPC9qbmxwPg==";
 
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
         params.put("jnlp_embedded", jnlpFileEncoded);
@@ -326,7 +329,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         //Embedded jnlp is invalid
         String jnlpFileEncoded = "thisContextIsInvalid";
 
-        MockJNLPCreator mockCreator = new MockJNLPCreator();
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", relativeLocation);
         params.put("jnlp_embedded", jnlpFileEncoded);

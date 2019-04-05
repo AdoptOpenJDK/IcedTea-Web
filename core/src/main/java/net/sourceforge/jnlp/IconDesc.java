@@ -72,7 +72,7 @@ public class IconDesc {
      * @param depth the depth, or -1 if unknown
      * @param size the size, or -1 if unknown
      */
-    IconDesc(URL location, Object kind, int width, int height, int depth, int size) {
+    IconDesc(final URL location, final Object kind, final int width, final int height, final int depth, final int size) {
         this.location = location;
         this.kind = kind;
         this.width = width;

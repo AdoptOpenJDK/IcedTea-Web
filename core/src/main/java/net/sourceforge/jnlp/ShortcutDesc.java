@@ -97,7 +97,7 @@ public final class ShortcutDesc {
      * (whatever that means on gnome/kde/other ...)
      * @param menu if/what menu this shortcut should be added to
      */
-    public void setMenu(MenuDesc menu) {
+    public void setMenu(final MenuDesc menu) {
         this.menu = menu;
     }
 
@@ -108,7 +108,7 @@ public final class ShortcutDesc {
         return menu;
     }
 
-    public static String deploymentJavawsShortcutToString(String i) {
+    public static String deploymentJavawsShortcutToString(final String i) {
         switch (i) {
             case ShortcutDesc.CREATE_NEVER:
                 return Translator.R("DSPNeverCreate");

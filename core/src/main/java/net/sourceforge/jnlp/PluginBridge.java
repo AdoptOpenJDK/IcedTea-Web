@@ -22,14 +22,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +35,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
 
 /**
  * Allows reuse of code that expects a JNLPFile object,
@@ -63,7 +63,7 @@ public final class PluginBridge extends JNLPFile {
     private String debugJnlp;
 
     /**
-     * Creates a new PluginBridge using a default JNLPCreator.
+     * Creates a new PluginBridge using a default JNLPFileFactory.
      * @param codebase as specified in attribute
      * @param documentBase as specified in attribute
      * @param jar jar attribute value
@@ -76,7 +76,7 @@ public final class PluginBridge extends JNLPFile {
     public PluginBridge(URL codebase, URL documentBase, String jar, String main,
                         int width, int height, PluginParameters params)
             throws Exception {
-        this(codebase, documentBase, jar, main, width, height, params, new JNLPCreator());
+        this(codebase, documentBase, jar, main, width, height, params, new JNLPFileFactory());
     }
 
     /**
@@ -98,7 +98,7 @@ public final class PluginBridge extends JNLPFile {
     }
 
     public PluginBridge(URL codebase, URL documentBase, String archive, String main,
-                        int width, int height, final PluginParameters params, JNLPCreator jnlpCreator)
+                        int width, int height, final PluginParameters params, JNLPFileFactory factory)
             throws Exception {
         specVersion = new Version("1.0");
         fileVersion = new Version("1.1");
@@ -134,7 +134,7 @@ public final class PluginBridge extends JNLPFile {
                     // see http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2746#c3
                     URL codebaseRewriter=UrlUtils.ensureSlashTail(UrlUtils.removeFileName(jnlp));
                     this.codeBase = codebaseRewriter;
-                    jnlpFile = jnlpCreator.create(jnlp, null, defaultSettings, JNLPRuntime.getDefaultUpdatePolicy(), codebaseRewriter);
+                    jnlpFile = factory.create(jnlp, null, defaultSettings, JNLPRuntime.getDefaultUpdatePolicy(), codebaseRewriter);
                     debugJnlp = new StreamProvider() {
 
                         @Override
