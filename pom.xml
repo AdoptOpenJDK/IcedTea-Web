@@ -24,6 +24,7 @@
         <module>xml-parser</module>
         <module>core</module>
         <module>integration</module>
+        <module>clients</module>
     </modules>
 
     <repositories>
