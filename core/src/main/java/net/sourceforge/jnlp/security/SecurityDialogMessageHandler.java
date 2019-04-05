@@ -47,6 +47,8 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 
 import java.awt.event.ActionEvent;
@@ -76,6 +78,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class SecurityDialogMessageHandler implements Runnable {
 
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogMessageHandler.class);
+
     /** the queue of incoming messages to show security dialogs */
     private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<>();
 
@@ -85,7 +89,7 @@ public class SecurityDialogMessageHandler implements Runnable {
      */
     @Override
     public void run() {
-        OutputController.getLogger().log("Starting security dialog thread");
+        LOG.debug("Starting security dialog thread");
         while (true) {
             try {
                 SecurityDialogMessage msg = queue.take();

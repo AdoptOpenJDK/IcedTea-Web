@@ -54,6 +54,8 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecurit
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,6 +68,8 @@ import static net.sourceforge.jnlp.config.BasicValueValidators.splitCombination;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class ManifestAttributesChecker {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ManifestAttributesChecker.class);
 
     private final SecurityDesc security;
     private final JNLPFile file;
@@ -286,7 +290,7 @@ public class ManifestAttributesChecker {
                 if (!userApproved) {
                     throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
                 } else {
-                    OutputController.getLogger().log("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
+                    LOG.debug("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
                 }
             }
             return;
@@ -373,14 +377,14 @@ public class ManifestAttributesChecker {
             }
 
         }
-        OutputController.getLogger().log("Found alaca URLs to be verified");
+        LOG.debug("Found alaca URLs to be verified");
         for (URL url : usedUrls) {
-            OutputController.getLogger().log(" - " + url.toExternalForm());
+            LOG.debug(" - {}", url.toExternalForm());
         }
         if (usedUrls.isEmpty()) {
             //I hope this is the case, when the resources is/are
             //only codebase classes. Then it should be safe to return.
-            OutputController.getLogger().log("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
+            LOG.debug("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
             return;
         }
 
@@ -388,15 +392,15 @@ public class ManifestAttributesChecker {
         for (URL u : usedUrls) {
             if (UrlUtils.equalsIgnoreLastSlash(u, codebase)
                     && UrlUtils.equalsIgnoreLastSlash(u, stripDocbase(documentBase))) {
-                OutputController.getLogger().log("OK - "+u.toExternalForm()+" is from codebase/docbase.");
+                LOG.debug("OK - {} is from codebase/docbase.", u.toExternalForm());
             } else {
                 allOk = false;
-                OutputController.getLogger().log("Warning! "+u.toExternalForm()+" is NOT from codebase/docbase.");
+                LOG.warn("Warning! {} is NOT from codebase/docbase.", u.toExternalForm());
             }
         }
         if (allOk) {
             //all resoources are from codebase or document base. it is ok to proceeed.
-            OutputController.getLogger().log("All applications resources (" + usedUrls.toArray(new URL[0])[0] + ") are from codebas/documentbase " + codebase + "/" + documentBase + ", skipping Application-Library-Allowable-Codebase Attribute check.");
+            LOG.debug("All applications resources ({}) are from codebase/documentbase {}/{}, skipping Application-Library-Allowable-Codebase Attribute check.", usedUrls.toArray(new URL[0])[0], codebase, documentBase);
             return;
         }
         
@@ -411,7 +415,7 @@ public class ManifestAttributesChecker {
             if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {
-                OutputController.getLogger().log("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings");
+                LOG.debug("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings");
                 return;
             }
         } else {
@@ -419,7 +423,7 @@ public class ManifestAttributesChecker {
                 if (!att.matches(foundUrl)) {
                     throw new LaunchException("The resource from " + foundUrl + " does not match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
                 } else {
-                    OutputController.getLogger().log("The resource from " + foundUrl + " does  match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Continuing.");
+                    LOG.debug("The resource from {} does  match the  location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
                 }
             }
         }
@@ -427,7 +431,7 @@ public class ManifestAttributesChecker {
         if (!userApproved) {
             throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user.");
         } else {
-            OutputController.getLogger().log("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings.");
+            LOG.debug("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings.");
         }
     }
     

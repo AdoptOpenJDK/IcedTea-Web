@@ -41,6 +41,8 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import net.sourceforge.jnlp.util.logging.headers.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,6 +51,8 @@ import java.util.Date;
  * This class is utility and factory around file logs.
  */
 public final class FileLog  {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FileLog.class);
 
     public static Header getHeadlineHeader() {
         return new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false);
@@ -110,7 +114,7 @@ public final class FileLog  {
 
     private static String getFileName(String id) {
         String s = LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + id + "-" + getStamp() + ".log";
-        OutputController.getLogger().log("Attempting to log into: " + s);
+        LOG.debug("Attempting to log into: {}", s);
         return s;
     }
     

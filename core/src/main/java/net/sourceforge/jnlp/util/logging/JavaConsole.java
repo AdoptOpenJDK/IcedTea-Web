@@ -43,6 +43,8 @@ import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -86,6 +88,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  *
  */
 public class JavaConsole implements ObservableMessagesProvider {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JavaConsole.class);
 
     final private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
     final private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
@@ -554,7 +558,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public void createPluginReader(final File file) {
-        OutputController.getLogger().log("Starting processing of plugin-debug-to-console " + file.getAbsolutePath());
+        LOG.debug("Starting processing of plugin-debug-to-console {}", file.getAbsolutePath());
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -585,12 +589,12 @@ public class JavaConsole implements ObservableMessagesProvider {
                         }
                     }
                 }
-                OutputController.getLogger().log("Ended processing of plugin-debug-to-console " + file.getAbsolutePath());
+                LOG.debug("Ended processing of plugin-debug-to-console {}", file.getAbsolutePath());
             }
         }, "plugin-debug-to-console reader thread");
         t.setDaemon(true);
         t.start();
 
-        OutputController.getLogger().log("Started processing of plugin-debug-to-console " + file.getAbsolutePath());
+        LOG.debug("Started processing of plugin-debug-to-console {}", file.getAbsolutePath());
     }
 }

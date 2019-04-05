@@ -37,6 +37,8 @@
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,8 @@ import java.net.HttpURLConnection;
 
 public class HttpUtils {
 
+    private final static Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
+    
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * Captured IOException is consumed and printed
@@ -53,8 +57,7 @@ public class HttpUtils {
         try {
             consumeAndCloseConnection(c);
         } catch (IOException ex) {
-            OutputController.getLogger().log("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.");
-            OutputController.getLogger().log(ex);
+            LOG.error("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.", ex);
         }
     }
 

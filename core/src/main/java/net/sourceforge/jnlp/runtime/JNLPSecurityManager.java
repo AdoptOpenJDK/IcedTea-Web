@@ -21,6 +21,8 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
@@ -47,6 +49,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.17 $
  */
 class JNLPSecurityManager extends AWTSecurityManager {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPSecurityManager.class);
 
     // todo: some apps like JDiskReport can close the VM even when
     // an exit class is set - fix!
@@ -290,7 +294,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
             super.checkPermission(perm);
         } catch (SecurityException ex) {
-            OutputController.getLogger().log("Denying permission: " + perm);
+            LOG.debug("Denying permission: {}", perm);
             throw ex;
         }
     }

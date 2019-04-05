@@ -32,6 +32,8 @@ package net.sourceforge.nanoxml;
 
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -98,6 +100,8 @@ import java.util.Vector;
  * @version $Name:  $, $Revision: 1.2 $
  */
 public class XMLElement {
+    
+    private final static Logger LOG = LoggerFactory.getLogger(XMLElement.class);
 
     /**
      * The attributes given to the element.
@@ -1263,7 +1267,7 @@ public class XMLElement {
                     out.print(ch);
                     out.flush();
                     if (ch == 10) {
-                        OutputController.getLogger().log(line.toString());
+                        LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1308,7 +1312,7 @@ public class XMLElement {
                 else {
                     out.print(ch);
                     if (ch == 10) {
-                        OutputController.getLogger().log(line.toString());
+                        LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1323,8 +1327,8 @@ public class XMLElement {
             // throw the ParseException if something goes wrong.
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } finally {
-            OutputController.getLogger().log("");//force new line in all cases
-            OutputController.getLogger().log(line.toString()); //flush remaining line
+            LOG.debug("");//force new line in all cases
+            LOG.debug(line.toString()); //flush remaining line
 
         }
     }

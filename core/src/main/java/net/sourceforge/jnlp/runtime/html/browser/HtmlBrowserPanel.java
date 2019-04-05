@@ -40,6 +40,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -73,6 +75,8 @@ import java.util.List;
  *
  */
 public class HtmlBrowserPanel extends JPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(HtmlBrowserPanel.class);
 
     private void fireDocumentChanged(String current) {
         for (DocumentChangededListener documentChangededListener : documentChangededListeners) {
@@ -313,7 +317,7 @@ public class HtmlBrowserPanel extends JPanel {
         //url conenction is checking response code.It can be used as 511 is unimplemented
         String[] result;
         if (isUseSocket()) {
-            OutputController.getLogger().log("Using socket connection");
+            LOG.debug("Using socket connection");
             Charset ch = (Charset)(encodingBox.getSelectedItem());
             if (ch == null) { 
                 result = UrlUtils.loadUrlWithInvalidHeader(url);
@@ -321,7 +325,7 @@ public class HtmlBrowserPanel extends JPanel {
                 result = UrlUtils.loadUrlWithInvalidHeader(url, ch);
             }
         } else {
-            OutputController.getLogger().log("Using URLconnection");
+            LOG.debug("Using URLconnection");
             String s;
             Charset ch = (Charset)(encodingBox.getSelectedItem());
             if (ch == null) { 
@@ -331,7 +335,7 @@ public class HtmlBrowserPanel extends JPanel {
             }
             result = new String[]{s, s, s};
         }
-        OutputController.getLogger().log(result[0]);
+        LOG.debug(result[0]);
         if (result[2].trim().isEmpty()) {
             result[2] = result[1];
         }

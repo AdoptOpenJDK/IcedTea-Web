@@ -7,6 +7,8 @@ package net.sourceforge.jnlp.runtime.html;
 
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -21,6 +23,8 @@ import java.util.List;
  * @author jvanek
  */
 public class AppletsFilter {
+
+    private final static Logger LOG = LoggerFactory.getLogger(AppletsFilter.class);
 
     private final List<Element> found;
     private final URL docBase;
@@ -39,8 +43,8 @@ public class AppletsFilter {
             Element element = appletElement.get(i);
             AppletParser ap = new AppletParser(element, docBase);
             aps.add(ap);
-            OutputController.getLogger().log("added: "+(aps.size()-1));
-            OutputController.getLogger().log(ap.toString());
+            LOG.debug("added: {}", aps.size()-1);
+            LOG.debug(ap.toString());
         }
         return aps;
     }
@@ -55,7 +59,7 @@ public class AppletsFilter {
             Element element = found.get(i);
             if (id.contains(i)) {
                 r.add(element);
-                OutputController.getLogger().log("adding applet id: " + i + " as: " + (r.size() - 1));
+                LOG.debug("adding applet id: {} as: {}", i, r.size() - 1);
             }
         }
         return r;

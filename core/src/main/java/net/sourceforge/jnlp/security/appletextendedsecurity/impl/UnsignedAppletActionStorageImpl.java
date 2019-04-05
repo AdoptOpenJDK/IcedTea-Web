@@ -44,6 +44,8 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,6 +56,8 @@ import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 public class UnsignedAppletActionStorageImpl extends LockingReaderWriter implements UnsignedAppletActionStorage {
+
+    private final static Logger LOG = LoggerFactory.getLogger(UnsignedAppletActionStorageImpl.class);
 
     protected List<UnsignedAppletActionEntry> items;
     private String readVersion = null;
@@ -289,7 +293,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             OutputController.getLogger().log(e);
         }
         if (version < 2){
-            OutputController.getLogger().log("Stoping laoding of vulnereable "+getBackingFile().getAbsolutePath()+". Will be replaced");
+            LOG.debug("Stoping laoding of vulnereable {}. Will be replaced", getBackingFile().getAbsolutePath());
             loadingDisabled = true;
             backupOldFile(version, getBackingFile());
         } else {

@@ -49,6 +49,8 @@ import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JDialog;
 import java.awt.Dialog.ModalityType;
@@ -75,6 +77,8 @@ import java.util.concurrent.Semaphore;
  * </p>
  */
 public class SecurityDialogs {
+
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
 
     /**
      * Types of dialogs we can create
@@ -246,7 +250,7 @@ public class SecurityDialogs {
         if (codeBase != null) {
             urlToShow = codeBase.toString();
         } else {
-            OutputController.getLogger().log("Warning, null codebase wants to show in ALACA!");
+            LOG.warn("Warning, null codebase wants to show in ALACA!");
         }
         message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);

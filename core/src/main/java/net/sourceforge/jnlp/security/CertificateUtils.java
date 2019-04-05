@@ -40,6 +40,8 @@ package net.sourceforge.jnlp.security;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -66,6 +68,8 @@ import java.util.Random;
  */
 public class CertificateUtils {
 
+    private final static Logger LOG = LoggerFactory.getLogger(CertificateUtils.class);
+
     /**
      * Adds the X509Certficate in the file to the KeyStore. Note that it does
      * not update the copy of the KeyStore on disk.
@@ -78,7 +82,7 @@ public class CertificateUtils {
     public static final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
 
-        OutputController.getLogger().log("Importing certificate from " + file + " into " + ks);
+        LOG.debug("Importing certificate from {} into {}", file, ks);
 
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -103,7 +107,7 @@ public class CertificateUtils {
     public static final void addToKeyStore(X509Certificate cert, KeyStore ks)
             throws KeyStoreException {
 
-        OutputController.getLogger().log("Importing " + cert.getSubjectX500Principal().getName());
+        LOG.debug("Importing {}", cert.getSubjectX500Principal().getName());
 
         // does this certificate already exist?
         String alias = ks.getCertificateAlias(cert);
@@ -168,7 +172,7 @@ public class CertificateUtils {
                     // Verify against this entry
                     String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
-                        OutputController.getLogger().log(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
+                        LOG.debug(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
                         return true;
                     } // else continue
                 }

@@ -18,6 +18,8 @@ package net.sourceforge.jnlp.runtime;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -42,6 +44,8 @@ import java.util.StringTokenizer;
  * @see java.net.ProxySelector
  */
 public abstract class JNLPProxySelector extends ProxySelector {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPProxySelector.class);
 
     public static final int PROXY_TYPE_UNKNOWN = -1;
     public static final int PROXY_TYPE_NONE = 0;
@@ -180,11 +184,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public List<Proxy> select(URI uri) {
-        OutputController.getLogger().log("Selecting proxy for: " + uri);
+        LOG.debug("Selecting proxy for: {}", uri);
         
         if (inBypassList(uri)) {
             List<Proxy> proxies = Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
-            OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
+            LOG.debug("Selected proxies: {}", Arrays.toString(proxies.toArray()));
             return proxies;
         }
 
@@ -209,7 +213,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 break;
         }
 
-        OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
+        LOG.debug("Selected proxies: {}", Arrays.toString(proxies.toArray()));
         return proxies;
     }
 
@@ -437,7 +441,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             } else if (token.startsWith("DIRECT")) {
                 proxies.add(Proxy.NO_PROXY);
             } else {
-                 OutputController.getLogger().log("Unrecognized proxy token: " + token);
+                 LOG.debug("Unrecognized proxy token: {}", token);
             }
         }
 

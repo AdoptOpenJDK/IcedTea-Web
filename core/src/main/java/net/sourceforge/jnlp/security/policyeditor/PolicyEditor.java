@@ -51,6 +51,8 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextForm
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractAction;
@@ -124,6 +126,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * the JDK PolicyTool.
  */
 public class PolicyEditor extends JPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PolicyEditor.class);
 
     private boolean closed = false;
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
@@ -1466,10 +1470,10 @@ public class PolicyEditor extends JPanel {
         final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
-            OutputController.getLogger().log(R("PECouldNotOpen"));
+            LOG.debug(R("PECouldNotOpen"));
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            OutputController.getLogger().log(R("RFileReadOnly"));
+            LOG.debug(R("RFileReadOnly"));
         }
 
         try {

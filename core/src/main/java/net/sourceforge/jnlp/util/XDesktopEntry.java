@@ -27,6 +27,8 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -79,6 +81,8 @@ import java.util.Map.Entry;
  */
 
 public class XDesktopEntry implements GenericDesktopEntry {
+
+    private final static Logger LOG = LoggerFactory.getLogger(XDesktopEntry.class);
  
     public static final String JAVA_ICON_NAME = "javaws";
 
@@ -187,7 +191,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 fileContents += exec;
             }
         }
-        OutputController.getLogger().log(title + " " + exec);
+        LOG.debug("{} {}", title, exec);
         return new StringReader(fileContents);
 
     }
@@ -342,7 +346,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 }
 
             }
-            OutputController.getLogger().log("Menu item created: " + f.getAbsolutePath());
+            LOG.debug("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         } catch (IOException e) {

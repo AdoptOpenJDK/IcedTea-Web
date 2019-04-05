@@ -37,6 +37,8 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
@@ -95,6 +97,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.19 $
  */
 public class JNLPRuntime {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
 
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
@@ -218,8 +222,8 @@ public class JNLPRuntime {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            OutputController.getLogger().log("Unable to set system look and feel");
+        } catch (final Exception e) {
+            LOG.error("Unable to set system look and feel", e);
         }
 
         if (JavaConsole.canShowOnStartup(isApplication)) {
@@ -743,7 +747,7 @@ public class JNLPRuntime {
                 boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.IGNORE_HEADLESS_CHECK));
                 if (noCheck) {
                     headless = false;
-                    OutputController.getLogger().log(DeploymentConfiguration.IGNORE_HEADLESS_CHECK + " set to " + noCheck + ". Avoding headless check.");
+                    LOG.debug("{} set to {}. Avoding headless check.", DeploymentConfiguration.IGNORE_HEADLESS_CHECK, noCheck);
                 } else {
                     try {
                         if (GraphicsEnvironment.isHeadless()) {
@@ -824,8 +828,7 @@ public class JNLPRuntime {
             }
             
             if (fileLock != null && fileLock.isShared()) {
-                OutputController.getLogger().log("Acquired shared lock on " +
-                            netxRunningFile.toString() + " to indicate javaws is running");
+                LOG.debug("Acquired shared lock on {} to indicate javaws is running", netxRunningFile);
             }
         } catch (IOException e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
@@ -852,7 +855,7 @@ public class JNLPRuntime {
             fileLock.release();
             fileLock.channel().close();
             fileLock = null;
-            OutputController.getLogger().log("Release shared lock on " + PathsAndFiles.MAIN_LOCK.getFullPath());
+            LOG.debug("Release shared lock on {}", PathsAndFiles.MAIN_LOCK.getFullPath());
         } catch (IOException e) {
             OutputController.getLogger().log(e);
         }
