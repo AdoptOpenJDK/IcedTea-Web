@@ -21,6 +21,7 @@
     <modules>
         <module>jnlp-api</module>
         <module>common</module>
+        <module>xml-parser</module>
         <module>core</module>
     </modules>
 

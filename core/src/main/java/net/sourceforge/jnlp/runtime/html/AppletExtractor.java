@@ -37,8 +37,8 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;

@@ -27,7 +27,6 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

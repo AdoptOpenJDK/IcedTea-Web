@@ -28,14 +28,15 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>icedtea-web-xml-parser</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.vatbub</groupId>
             <artifactId>mslinks</artifactId>
             <version>1.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ccil.cowan.tagsoup</groupId>
-            <artifactId>tagsoup</artifactId>
-            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>rhino</groupId>

@@ -28,11 +28,9 @@
 
 /* JAM: hacked the source to remove unneeded methods and comments. */
 
-package net.sourceforge.nanoxml;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +92,7 @@ import java.util.Vector;
  * which has to return a new copy of the receiver.
  * </dd></dl>
  *
- * @see net.sourceforge.nanoxml.XMLParseException
+ * @see XMLParseException
  *
  * @author Marc De Scheemaecker
  *         &lt;<A href="mailto:cyberelf@mac.com">cyberelf@mac.com</A>&gt;
@@ -464,7 +462,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader)
@@ -494,7 +492,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader,
@@ -1268,7 +1266,7 @@ public class XMLElement {
                     out.print(ch);
                     out.flush();
                     if (ch == 10) {
-                        LOG.debug(line.toString());
+                        //LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1313,7 +1311,7 @@ public class XMLElement {
                 else {
                     out.print(ch);
                     if (ch == 10) {
-                        LOG.debug(line.toString());
+                        //LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1326,10 +1324,11 @@ public class XMLElement {
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            throw new RuntimeException("Error in XML", e);
+            //LOG.error("ERROR", e);
         } finally {
-            LOG.debug("");//force new line in all cases
-            LOG.debug(line.toString()); //flush remaining line
+            //LOG.debug("");//force new line in all cases
+            //LOG.debug(line.toString()); //flush remaining line
 
         }
     }

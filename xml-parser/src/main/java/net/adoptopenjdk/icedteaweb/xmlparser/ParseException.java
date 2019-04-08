@@ -14,10 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -29,10 +28,12 @@ import net.sourceforge.jnlp.runtime.Translator;
  */
 public class ParseException extends Exception {
 
+    private static UsedParsers expected;
+    private static UsedParsers used;
+
     // todo: add meaningful information, such as the invalid
     // element, parse position, etc.
 
-   
     /**
      * Create a parse exception with the specified message.
      * @param message to be shown in exception
@@ -49,29 +50,20 @@ public class ParseException extends Exception {
      */
     public ParseException(String message, Throwable cause) {
         super(getParserSettingsMessage() + message, cause);
-    }  
+    }
 
     public ParseException(Throwable cause) {
         super(getParserSettingsMessage(), cause);
     }
-    
-    
-    static enum UsedParsers {
 
-        MALFORMED, NORMAL
-    }
-
-    private static UsedParsers expected;
-    private static UsedParsers used;
-
-    static void setExpected(UsedParsers ex) {
+    public static void setExpected(UsedParsers ex) {
         expected = ex;
     }
 
-    static void setUsed(UsedParsers us) {
+    public static void setUsed(UsedParsers us) {
         used = us;
     }
-    
+
     private static String getParserSettingsMessage() {
         final String tail = ""
                 + " "
@@ -85,11 +77,12 @@ public class ParseException extends Exception {
             //warn about TagSoup
             return Translator.R("TAGSOUPbroken") + tail;
         }
-        if (JNLPRuntime.isDebug()) {
-            return expected + " " + used + "; ";
-        } else {
+// TODO: find a solution for debug switch
+//        if (JNLPRuntime.isDebug()) {
+//            return expected + " " + used + "; ";
+//        } else {
             return "";
-        }
+//        }
     }
 
 }

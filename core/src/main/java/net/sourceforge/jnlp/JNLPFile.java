@@ -17,6 +17,8 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.xmlparser.Node;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -24,7 +26,6 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

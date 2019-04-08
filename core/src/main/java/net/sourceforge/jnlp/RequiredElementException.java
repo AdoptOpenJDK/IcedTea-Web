@@ -17,6 +17,8 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 /**
  * Thrown when a field that is required from the information tag is not found
  * under the current JVM's locale or as a generalized element.
