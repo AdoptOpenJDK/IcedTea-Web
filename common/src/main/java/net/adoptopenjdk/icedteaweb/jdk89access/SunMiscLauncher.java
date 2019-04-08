@@ -30,32 +30,33 @@
  you may extend this exception to your version of the library, but you are not
  obligated to do so. If you do not wish to do so, delete this exception
  statement from your version.*/
-package net.sourceforge.jnlp.jdk89acesses;
+package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import javax.swing.ImageIcon;
 import java.lang.reflect.Method;
+import javax.swing.ImageIcon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This class is summ of access to sun.misc.Launcher which was removed in jdk9.
+ * Class providing secure image icon using sun.misc.Launcher, which was removed in jdk9.
  *
  * @author jvanek
  */
 public class SunMiscLauncher {
+    private final static Logger LOG = LoggerFactory.getLogger(SunMiscLauncher.class);
 
-    public static ImageIcon getSecureImageIcon(String resource) {
+    public static ImageIcon getSecureImageIcon(final String resource) {
         try {
-            Class clazz = Class.forName("sun.misc.Launcher");
-            Object obj  = clazz.newInstance();
-            Method m = clazz.getMethod("getClassLoader");
-            ClassLoader cl = (ClassLoader) m.invoke(obj);
+            final Class clazz = Class.forName("sun.misc.Launcher");
+            final Object obj  = clazz.newInstance();
+            final Method m = clazz.getMethod("getClassLoader");
+            final ClassLoader cl = (ClassLoader) m.invoke(obj);
+
             return new ImageIcon(cl.getResource(resource));
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader");
+            LOG.error("ERROR", ex);
+            LOG.debug("sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader");
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
         }
     }
-
 }
