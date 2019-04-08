@@ -16,6 +16,14 @@
 
 package net.sourceforge.jnlp.cache;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
@@ -24,14 +32,6 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
@@ -97,9 +97,9 @@ public class ResourceTracker {
     public static enum RequestMethods{
         HEAD, GET, TESTING_UNDEF;
 
-    private static final RequestMethods[] requestMethods = {RequestMethods.HEAD, RequestMethods.GET};
+    private static final HttpMethod[] requestMethods = {HttpMethod.HEAD, HttpMethod.GET};
 
-        public static RequestMethods[] getValidRequestMethods() {
+        public static HttpMethod[] getValidRequestMethods() {
             return requestMethods;
         }
     }

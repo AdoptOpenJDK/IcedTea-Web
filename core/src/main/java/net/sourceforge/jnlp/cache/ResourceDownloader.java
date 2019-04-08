@@ -1,19 +1,5 @@
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.runtime.Boot;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.ConnectionFactory;
-import net.sourceforge.jnlp.security.SecurityDialogs;
-import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
-import net.adoptopenjdk.icedteaweb.http.HttpUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -33,6 +19,20 @@ import java.util.Map;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.sourceforge.jnlp.security.SecurityDialogs;
+import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
@@ -54,7 +54,7 @@ public class ResourceDownloader implements Runnable {
         this.lock = lock;
     }
 
-    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
+    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, HttpMethod requestMethod) throws IOException {
         return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
     }
 
@@ -67,7 +67,7 @@ public class ResourceDownloader implements Runnable {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException
      */
-    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
+    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, HttpMethod requestMethod) throws IOException {
         UrlRequestResult result = new UrlRequestResult();
         URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
@@ -77,7 +77,7 @@ public class ResourceDownloader implements Runnable {
 
         if (connection instanceof HttpURLConnection) {
             HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            httpConnection.setRequestMethod(requestMethod.toString());
+            httpConnection.setRequestMethod(requestMethod.name());
 
             int responseCode = httpConnection.getResponseCode();
 
@@ -287,7 +287,7 @@ public class ResourceDownloader implements Runnable {
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                 + resource.toString() + " : " + urls);
-        for (ResourceTracker.RequestMethods requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
+        for (HttpMethod requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
             for (int i = 0; i < urls.size(); i++) {
                 URL url = urls.get(i);
                 try {
