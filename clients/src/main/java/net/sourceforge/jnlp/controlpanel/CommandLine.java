@@ -25,6 +25,13 @@ import java.util.List;
 import java.util.Map;
 import javax.naming.ConfigurationException;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.naming.ConfigurationException;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
@@ -32,6 +39,7 @@ import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
@@ -496,7 +504,7 @@ public class CommandLine {
     /**
      * The starting point of the program
      * @param args the command line arguments to this program
-     * @throws java.lang.Exception when it goes wrong
+     * @throws Exception when it goes wrong
      */
     public static void main(String[] args) throws Exception {
         // setup Swing EDT tracing:
