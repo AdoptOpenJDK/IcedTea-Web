@@ -77,8 +77,8 @@ public class XMLParser {
      * @throws ParseException if parsing fails
      */
     public Node getRootNode(final InputStream input) throws ParseException {
-
-        try {
+        // A BufferedInputStream is used to allow marking and reseting of a stream.
+        try(final BufferedInputStream bs = new BufferedInputStream(input)) {
             /* SAX
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
@@ -94,9 +94,6 @@ public class XMLParser {
             Node document = new Node(TinyParser.parseXML(input));
             Node jnlpNode = getChildNode(document, "jnlp"); // skip comments
             */
-
-            //A BufferedInputStream is used to allow marking and reseting of a stream.
-            final BufferedInputStream bs = new BufferedInputStream(input);
 
             /* NANO */
             final XMLElement xml = new XMLElement();
