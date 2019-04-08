@@ -45,11 +45,14 @@ import org.slf4j.LoggerFactory;
 public class SunMiscLauncher {
     private final static Logger LOG = LoggerFactory.getLogger(SunMiscLauncher.class);
 
+    private static final String CLASS_SUN_MISC_LAUNCHER = "sun.misc.Launcher";
+    private static final String METHOD_GET_CLASS_LOADER = "getClassLoader";
+
     public static ImageIcon getSecureImageIcon(final String resource) {
         try {
-            final Class clazz = Class.forName("sun.misc.Launcher");
+            final Class clazz = Class.forName(CLASS_SUN_MISC_LAUNCHER);
             final Object obj  = clazz.newInstance();
-            final Method m = clazz.getMethod("getClassLoader");
+            final Method m = clazz.getMethod(METHOD_GET_CLASS_LOADER);
             final ClassLoader cl = (ClassLoader) m.invoke(obj);
 
             return new ImageIcon(cl.getResource(resource));
