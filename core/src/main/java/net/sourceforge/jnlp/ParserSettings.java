@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 
 /**

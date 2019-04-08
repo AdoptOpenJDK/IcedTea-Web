@@ -19,6 +19,8 @@ package net.sourceforge.jnlp.cache;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -32,6 +34,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.10 $
  */
 public class CacheEntry {
+
+    private final static Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
 
     private static final String KEY_CONTENT_LENGTH = "content-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
@@ -131,14 +135,14 @@ public class CacheEntry {
      */
     public boolean isCurrent(long lastModified) {
         boolean cached = isCached();
-        OutputController.getLogger().log("isCurrent:isCached " + cached);
+        LOG.info("isCurrent:isCached {}", cached);
 
         if (!cached) {
             return false;
         }
         try {
             long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
-            OutputController.getLogger().log("isCurrent:lastModified cache:" + cachedModified +  " actual:" + lastModified);
+            LOG.info("isCurrent:lastModified cache:{} actual:{}", cachedModified, lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
             OutputController.getLogger().log(ex);
@@ -161,7 +165,7 @@ public class CacheEntry {
             long cachedLength = localFile.length();
             long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
 
-            OutputController.getLogger().log("isCached: remote:" + remoteLength + " cached:" + cachedLength);
+            LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
 
             if (remoteLength >= 0 && cachedLength != remoteLength)
                 return false;

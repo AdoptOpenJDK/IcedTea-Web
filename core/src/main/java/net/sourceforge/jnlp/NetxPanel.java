@@ -28,6 +28,8 @@ import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.splashscreen.SplashPanel;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.applet.AppletViewerPanelAccess;
 import sun.awt.SunToolkit;
 
@@ -44,6 +46,9 @@ import java.util.concurrent.ConcurrentMap;
  * @author      Francis Kung &lt;fkung@redhat.com&gt;
  */
 public class NetxPanel extends AppletViewerPanelAccess implements SplashController {
+
+    private final static Logger LOG = LoggerFactory.getLogger(NetxPanel.class);
+
     private final PluginParameters parameters;
     private PluginBridge bridge = null;
     private AppletInstance appInst = null;
@@ -137,11 +142,11 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
         synchronized (JNLPRuntime.initMutex) {
             //The custom NetX Policy and SecurityManager are set here.
             if (!JNLPRuntime.isInitialized()) {
-                OutputController.getLogger().log("initializing JNLPRuntime...");
+                LOG.info("initializing JNLPRuntime...");
 
                 JNLPRuntime.initialize(false);
             } else {
-                OutputController.getLogger().log("JNLPRuntime already initialized");
+                LOG.info("JNLPRuntime already initialized");
             }
         }
 

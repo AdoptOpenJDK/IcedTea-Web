@@ -35,8 +35,8 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.JNLPSplashScreen;
-import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.html.AppletExtractor;
@@ -46,6 +46,8 @@ import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JFrame;
 import java.awt.Point;
@@ -61,6 +63,8 @@ import java.util.Map;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public final class HtmlBoot {
+
+    private final static Logger LOG = LoggerFactory.getLogger(HtmlBoot.class);
 
     private final OptionParser optionParser;
 
@@ -131,7 +135,7 @@ public final class HtmlBoot {
             return false;
         }
         try {
-            OutputController.getLogger().log("Proceeding with html");
+            LOG.info("Proceeding with html");
             final URL html = Boot.getFileLocation();
             AppletExtractor axe = new AppletExtractor(html, settings);
             AppletsFilter filtered = new AppletsFilter(axe.findAppletsOnPage(), html, vars.subList(1, vars.size()));

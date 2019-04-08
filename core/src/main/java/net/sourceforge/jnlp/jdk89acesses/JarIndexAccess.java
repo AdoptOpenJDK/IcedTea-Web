@@ -1,6 +1,8 @@
 package net.sourceforge.jnlp.jdk89acesses;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +17,8 @@ import java.util.jar.JarFile;
  */
 public class JarIndexAccess {
 
+    private final static Logger LOG = LoggerFactory.getLogger(JarIndexAccess.class);
+
     private static Class<?> jarIndexClass;
     /*JarIndex*/
     private final Object parent;
@@ -24,8 +28,7 @@ public class JarIndexAccess {
             jarIndexClass = Class.forName("sun.misc.JarIndex");
         } catch (ClassNotFoundException ex) {
             try {
-                OutputController.getLogger().log(ex);
-                OutputController.getLogger().log("Running jdk9+ ?");
+                LOG.error("Running jdk9+ ?", ex);
                 jarIndexClass = Class.forName("jdk.internal.util.jar.JarIndex");
             } catch (ClassNotFoundException exx) {
                 OutputController.getLogger().log(exx);

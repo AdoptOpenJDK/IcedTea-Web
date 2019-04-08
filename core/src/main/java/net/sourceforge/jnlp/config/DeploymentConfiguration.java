@@ -20,6 +20,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.tools.ico.IcoSpi;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.spi.IIORegistry;
 import javax.naming.ConfigurationException;
@@ -53,6 +55,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * http://download.oracle.com/javase/1.5.0/docs/guide/deployment/deployment-guide/properties.html
  */
 public final class DeploymentConfiguration {
+
+    private final static Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
 
     public static final String DEPLOYMENT_CONFIG_FILE = "deployment.config";
     public static final String DEPLOYMENT_PROPERTIES = "deployment.properties";
@@ -251,7 +255,9 @@ public final class DeploymentConfiguration {
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
     
     public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
-    
+
+    private static final String VV_POSSIBLE_BROWSER_VALUES = "VVPossibleBrowserValues";
+
     private ConfigurationException loadingException = null;
 
     public void setLoadingException(ConfigurationException ex) {
@@ -306,10 +312,9 @@ public final class DeploymentConfiguration {
          try {
             IcoSpi spi = new IcoSpi();
             IIORegistry.getDefaultInstance().registerServiceProvider(spi);
-            OutputController.getLogger().log("Ico provider registered correctly.");
+            LOG.info("Ico provider registered correctly.");
         } catch (Exception ex) {
-            OutputController.getLogger().log("Exception registering ico provider.");
-            OutputController.getLogger().log(ex);
+            LOG.error("Exception registering ico provider.", ex);
         }
     }
 
@@ -358,7 +363,7 @@ public final class DeploymentConfiguration {
 
         if (systemConfigFile != null) {
             if (loadSystemConfiguration(systemConfigFile)) {
-                OutputController.getLogger().log("System level " + DEPLOYMENT_CONFIG_FILE + " is mandatory: " + systemPropertiesMandatory);
+                LOG.info("System level {} is mandatory: {}", DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
                 /* Second, read the System level deployment.properties file */
                 systemProperties = loadProperties(ConfigType.System, systemPropertiesFile,
                         systemPropertiesMandatory);
@@ -559,14 +564,13 @@ public final class DeploymentConfiguration {
      */
     private boolean loadSystemConfiguration(URL configFile) throws ConfigurationException {
 
-        OutputController.getLogger().log("Loading system configuation from: " + configFile);
+        LOG.info("Loading system configuation from: {}", configFile);
 
         Map<String, Setting<String>> systemConfiguration = new HashMap<>();
         try {
             systemConfiguration = parsePropertiesFile(configFile);
         } catch (IOException e) {
-            OutputController.getLogger().log("No System level " + DEPLOYMENT_CONFIG_FILE + " found.");
-            OutputController.getLogger().log(e);
+            LOG.error("No System level " + DEPLOYMENT_CONFIG_FILE + " found.", e);
             return false;
         }
 
@@ -578,20 +582,19 @@ public final class DeploymentConfiguration {
         try {
             Setting<String> urlSettings = systemConfiguration.get(KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
-                OutputController.getLogger().log("No System level " + DEPLOYMENT_PROPERTIES + " found in "+configFile.toExternalForm());
+                LOG.info("No System level {} found in {}", DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
             Setting<String> mandatory = systemConfiguration.get(KEY_SYSTEM_CONFIG_MANDATORY);
             systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
-            OutputController.getLogger().log("System level settings " + DEPLOYMENT_PROPERTIES + " are mandatory:" + systemPropertiesMandatory);
+            LOG.info("System level settings {} are mandatory: {}", DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
             URL url = new URL(urlString);
             systemPropertiesFile = url;
-            OutputController.getLogger().log("Using System level" + DEPLOYMENT_PROPERTIES + ": " + systemPropertiesFile);
+            LOG.info("Using System level {} : {}", DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log("Invalid url for " + DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm());
-            OutputController.getLogger().log(e);
+            LOG.error("Invalid url for " + DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm(), e);
             if (systemPropertiesMandatory){
                 ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
@@ -614,7 +617,7 @@ public final class DeploymentConfiguration {
     private Map<String, Setting<String>> loadProperties(ConfigType type, URL file, boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
-            OutputController.getLogger().log("No " + type.toString() + " level " + DEPLOYMENT_PROPERTIES + " found.");
+            LOG.info("No {} level {} found.", type.toString(), DEPLOYMENT_PROPERTIES);
             if (!mandatory) {
                 return null;
             } else {
@@ -622,7 +625,7 @@ public final class DeploymentConfiguration {
             }
         }
 
-        OutputController.getLogger().log("Loading " + type.toString() + " level properties from: " + file);
+        LOG.info("Loading {} level properties from: {}", type.toString(), file);
         try {
             return parsePropertiesFile(file);
         } catch (IOException e) {
@@ -652,7 +655,7 @@ public final class DeploymentConfiguration {
             sm.checkWrite(userPropertiesFile.toString());
         }
 
-        OutputController.getLogger().log("Saving properties into " + userPropertiesFile.toString());
+        LOG.info("Saving properties into {}", userPropertiesFile.toString());
         Properties toSave = new Properties();
 
         for (String key : currentConfiguration.keySet()) {
@@ -678,7 +681,7 @@ public final class DeploymentConfiguration {
             if (backupPropertiesFile.exists()){
                 boolean result = backupPropertiesFile.delete();
                 if(!result){
-                    OutputController.getLogger().log("Failed to delete backup properties file " + backupPropertiesFile+ " silently continuing.");
+                    LOG.info("Failed to delete backup properties file {} silently continuing.", backupPropertiesFile);
                 }
             }
             if (!userPropertiesFile.renameTo(backupPropertiesFile)) {
@@ -869,16 +872,16 @@ public final class DeploymentConfiguration {
             }
 
         } else {
-            OutputController.getLogger().log("System is already following XDG .cache and .config specifications");
+            LOG.info("System is already following XDG .cache and .config specifications");
             try {
-                OutputController.getLogger().log("config: " + PathsAndFiles.USER_CONFIG_HOME + " file exists: " + configDir.exists());
+                LOG.info("config: {} file exists: {}", PathsAndFiles.USER_CONFIG_HOME, configDir.exists());
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
             try {
-                OutputController.getLogger().log("cache: " + PathsAndFiles.USER_CACHE_HOME + " file exists:" + cacheDir.exists());
+                LOG.info("cache: {} file exists: {}", PathsAndFiles.USER_CACHE_HOME, cacheDir.exists());
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error("ERROR", ex);
             }
         }
         //this call should endure even if (ever) will migration code be removed
@@ -956,5 +959,19 @@ public final class DeploymentConfiguration {
         }
         
         return r.toString().trim();
+    }
+
+    /**
+     * convenient method to show VVPossibleBrowserValues with all four params
+     *
+     * @return translation of VVPossibleBrowserValues with all params in
+     */
+    public static String VVPossibleBrowserValues() {
+        return R(VV_POSSIBLE_BROWSER_VALUES, DeploymentConfiguration.LEGACY_WIN32_URL__HANDLER,
+                DeploymentConfiguration.BROWSER_ENV_VAR,
+                DeploymentConfiguration.INTERNAL_HTML,
+                DeploymentConfiguration.ALWAYS_ASK,
+                DeploymentConfiguration.KEY_BROWSER_PATH
+        );
     }
 }

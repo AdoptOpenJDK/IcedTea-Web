@@ -15,30 +15,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.services;
 
-import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.BasicValueValidators;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
-import javax.jnlp.BasicService;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -52,6 +28,28 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
+import javax.jnlp.BasicService;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import net.sourceforge.jnlp.InformationDesc;
+import net.sourceforge.jnlp.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.BasicValueValidators;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import static net.sourceforge.jnlp.config.BasicValueValidators.verifyFileOrCommand;
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -261,13 +259,13 @@ class XBasicService implements BasicService {
                 //ss
             }
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, e.toString());
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.VVPossibleBrowserValues());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, DeploymentConfiguration.VVPossibleBrowserValues());
             return false;
         }
     }
 
     private String promptForCommand(final String targetUrl, boolean aa) throws IOException {
-        String message = Translator.VVPossibleBrowserValues();
+        final String message = DeploymentConfiguration.VVPossibleBrowserValues();
         String title = R("RBrowserLocationPromptTitle");
         if (JNLPRuntime.isHeadless()) {
             OutputController.getLogger().printOutLn(message);
@@ -317,7 +315,7 @@ class XBasicService implements BasicService {
             JTextField urlField = new JTextField(url);
             urlField.setEditable(false);
             top.add(urlField);
-            JTextArea ta = new JTextArea(Translator.VVPossibleBrowserValues());
+            final JTextArea ta = new JTextArea(DeploymentConfiguration.VVPossibleBrowserValues());
             ta.setEditable(false);
             ta.setLineWrap(true);
             ta.setWrapStyleWord(false);

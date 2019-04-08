@@ -1,7 +1,7 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -11,6 +11,8 @@ import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
 import net.sourceforge.jnlp.util.HttpUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -41,6 +43,8 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 
 public class ResourceDownloader implements Runnable {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
     private final Resource resource;
     private final Object lock;
@@ -86,7 +90,7 @@ public class ResourceDownloader implements Runnable {
 
         Map<String, List<String>> header = connection.getHeaderFields();
         for (Map.Entry<String, List<String>> entry : header.entrySet()) {
-            OutputController.getLogger().log("Key : " + entry.getKey() + " ,Value : " + entry.getValue());
+            LOG.info("Key : {} ,Value : {}", entry.getKey(), entry.getValue());
         }
         /*
          * Do this only on 301,302,303(?)307,308>
@@ -420,11 +424,11 @@ public class ResourceDownloader implements Runnable {
                     OutputController.getLogger().log(ex);
                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "'" + IH + "' message detected. Attempting direct socket");
                     Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(connection.getURL());
-                    OutputController.getLogger().log("Header of: " + connection.getURL() + " (" + downloadLocation + ")");
+                    LOG.info("Header of: {} ({})", connection.getURL(), downloadLocation);
                     String head = (String) result[0];
                     byte[] body = (byte[]) result[1];
-                    OutputController.getLogger().log(head);
-                    OutputController.getLogger().log("Body is: " + body.length + " bytes long");
+                    LOG.info(head);
+                    LOG.info("Body is: {} bytes long", body.length);
                     writeDownloadToFile(downloadLocation, new ByteArrayInputStream(body));
                 } else {
                     throw ex;

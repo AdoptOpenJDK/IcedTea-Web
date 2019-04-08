@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,7 +65,7 @@ public class ParserSettingsTest {
     public void testSetGlobalParserSettingsFromOptionParser() {
         String args[] = {"-xml", "-strict"};
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
         ParserSettings globalSettings = ParserSettings.getGlobalParserSettings();
 
@@ -76,7 +78,7 @@ public class ParserSettingsTest {
     public void testSetGlobalParserSettingsFromOptionParserHasSameOptionsAsOptionParser() {
         String args[] = {"-xml", "-strict"};
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getJavaWsOptions());
+        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
 
         Assert.assertEquals(settings.isStrict(), optionParser.hasOption(OptionsDefinitions.OPTIONS.STRICT));
