@@ -16,6 +16,18 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.IconDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.util.logging.OutputController;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,17 +49,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.IconDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}

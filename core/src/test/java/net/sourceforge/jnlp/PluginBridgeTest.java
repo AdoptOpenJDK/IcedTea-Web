@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;

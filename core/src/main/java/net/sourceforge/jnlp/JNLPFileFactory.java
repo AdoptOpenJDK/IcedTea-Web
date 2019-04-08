@@ -22,10 +22,11 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+
 import java.io.IOException;
 import java.net.URL;
-
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 
 public class JNLPFileFactory {
     public JNLPFile create(final URL location, final Version version, final ParserSettings settings,
