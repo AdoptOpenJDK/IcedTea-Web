@@ -34,7 +34,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +60,7 @@ public class HttpUtils {
     }
 
     /**
-     * Ensure a HttpURLConnection is fully read, required for correct behavior
+     * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * 
      * @param c connection to be closed
      * @throws IOException if connection fade
