@@ -30,14 +30,16 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Based on https://github.com/DmitriiShamrikov/mslinkshttps://github.com/DmitriiShamrikov/mslinks
+ * Based on https://github.com/DmitriiShamrikov/mslinks
  */
 public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     private final JNLPFile file;
+    private final String iconLocation;
 
     public WindowsDesktopEntry(JNLPFile file) {
         this.file = file;
+        this.iconLocation = new XDesktopEntry(file).cacheAndGetIconLocation();
     }
 
     @Override
@@ -58,11 +60,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     public void createShortcutOnWindowsDesktop() throws IOException {
         String path = getDesktopLnkPath();
         String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        String favIcon = getFavIcon();
         ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
-        if (favIcon != null) {
-            favIcon = favIcon.substring(6);
-            sl.setIconLocation(favIcon);
+        if (iconLocation != null) {
+            sl.setIconLocation(iconLocation);
         }
         sl.saveTo(path);
         // write shortcut path to list
@@ -72,31 +72,37 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     @Override
     public void createWindowsMenu() throws IOException {
         // create menu item
-        // see if menu is defined in jnlp, else don't do it
-        String path = file.getInformation().getShortcut().getMenu().getSubMenu();
-        if (path != null) {
-            path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + path;
-            // check to see if menu dir exists and create if not
-            File menuDir = new File(path);
-            if (!menuDir.exists()) {
-                menuDir.mkdir();
-            }
-            String JavaWsBin = XDesktopEntry.getJavaWsBin();
-            String favIcon = getFavIcon();
-            ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
-            // setup uninstall shortcut
-            ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
-            if (favIcon != null) {
-                favIcon = favIcon.substring(6);
-                sl.setIconLocation(favIcon);
-                ul.setIconLocation(favIcon);
-            }
-            sl.saveTo(path + "/" + file.getInformation().getTitle()+ ".lnk");
-            ul.saveTo(path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
-            // write shortcuts to list
-            manageShortcutList(ManageMode.A, path + "/" + file.getInformation().getTitle() + ".lnk");
-            manageShortcutList(ManageMode.A, path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
+        String pathSuffix;
+        try {
+            pathSuffix = file.getInformation().getShortcut().getMenu().getSubMenu();
         }
+        catch (NullPointerException npe) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, npe);
+            pathSuffix = null;
+        }        
+        if (pathSuffix == null) {
+            pathSuffix = XDesktopEntry.getDesktopIconName(file);
+        }
+                        
+        final String path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + pathSuffix;        
+        // check to see if menu dir exists and create if not
+        final File menuDir = new File(path);
+        if (!menuDir.exists()) {
+            menuDir.mkdir();
+        }
+        final String JavaWsBin = XDesktopEntry.getJavaWsBin();
+        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
+        // setup uninstall shortcut
+        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
+        if (iconLocation != null) {
+            sl.setIconLocation(iconLocation);
+            ul.setIconLocation(iconLocation);
+        }
+        sl.saveTo(path + "/" + file.getInformation().getTitle()+ ".lnk");
+        ul.saveTo(path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
+        // write shortcuts to list
+        manageShortcutList(ManageMode.A, path + "/" + file.getInformation().getTitle() + ".lnk");
+        manageShortcutList(ManageMode.A, path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
     }
 
     private void manageShortcutList(ManageMode mode, String path) throws IOException {
