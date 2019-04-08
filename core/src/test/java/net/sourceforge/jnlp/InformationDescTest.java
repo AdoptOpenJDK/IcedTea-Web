@@ -37,6 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import org.junit.Test;
 
 import java.net.MalformedURLException;

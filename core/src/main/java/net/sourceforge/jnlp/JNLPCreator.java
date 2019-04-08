@@ -22,6 +22,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 
 import java.io.IOException;

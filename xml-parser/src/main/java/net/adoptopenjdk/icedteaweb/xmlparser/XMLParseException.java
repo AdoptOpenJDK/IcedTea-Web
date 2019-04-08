@@ -26,7 +26,7 @@
  *  3. This notice may not be removed or altered from any source distribution.
  *****************************************************************************/
 
-package net.sourceforge.nanoxml;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
 /**
  * An XMLParseException is thrown when an error occures while parsing an XML
@@ -36,7 +36,7 @@ package net.sourceforge.nanoxml;
  * <p>
  * $Date: 2002/08/03 04:05:32 $</p>
  *
- * @see net.sourceforge.nanoxml.XMLElement
+ * @see XMLElement
  *
  * @author Marc De Scheemaecker
  * @version $Name:  $, $Revision: 1.1 $
@@ -113,7 +113,7 @@ public class XMLParseException
      * unknown.
      *
      * @return  line in source where exception occurred
-     * @see net.sourceforge.nanoxml.XMLParseException#NO_LINE
+     * @see XMLParseException#NO_LINE
      */
     public int getLineNr() {
         return this.lineNr;
