@@ -36,25 +36,26 @@
  */
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpUtils {
+    private final static Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
 
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * Captured IOException is consumed and printed
-     * @param c the connection to be closed silently
+     * @param c the connection to be closed silentlyboolean isHeadRequest = request.equals(
      */
-    public static void consumeAndCloseConnectionSilently(HttpURLConnection c) {
+    public static void consumeAndCloseConnectionSilently(final HttpURLConnection c) {
         try {
             consumeAndCloseConnection(c);
         } catch (IOException ex) {
-            OutputController.getLogger().log("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.");
-            OutputController.getLogger().log(ex);
+            LOG.debug("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.");
+            LOG.error("ERROR", ex);
         }
     }
 
@@ -64,7 +65,7 @@ public class HttpUtils {
      * @param c connection to be closed
      * @throws IOException if connection fade
      */
-    public static void consumeAndCloseConnection(HttpURLConnection c) throws IOException {
+    public static void consumeAndCloseConnection(final HttpURLConnection c) throws IOException {
         try (InputStream in = c.getInputStream()) {
             byte[] throwAwayBuffer = new byte[256];
             while (in.read(throwAwayBuffer) > 0) {
