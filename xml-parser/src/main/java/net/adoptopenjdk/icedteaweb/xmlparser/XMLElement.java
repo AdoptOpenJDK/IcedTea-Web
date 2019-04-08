@@ -28,10 +28,8 @@
 
 /* JAM: hacked the source to remove unneeded methods and comments. */
 
-package net.sourceforge.nanoxml;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
-
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -91,7 +89,7 @@ import java.util.Vector;
  * which has to return a new copy of the receiver.
  * </dd></dl>
  *
- * @see net.sourceforge.nanoxml.XMLParseException
+ * @see XMLParseException
  *
  * @author Marc De Scheemaecker
  *         &lt;<A href="mailto:cyberelf@mac.com">cyberelf@mac.com</A>&gt;
@@ -196,7 +194,7 @@ public class XMLElement {
      * Character read too much for the comment remover.
      */
     private char sanitizeCharReadTooMuch;
-    
+
    /**
      * Whether the BOM header appeared
      */
@@ -459,7 +457,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader)
@@ -489,7 +487,7 @@ public class XMLElement {
      *
      * @throws java.io.IOException
      *     If an error occured while reading the input.
-     * @throws net.sourceforge.nanoxml.XMLParseException
+     * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
     public void parseFromReader(Reader reader,
@@ -601,7 +599,7 @@ public class XMLElement {
                 return false;
         }
     }
-    
+
     /**
      * This method scans an identifier from the current reader.
      *
@@ -619,7 +617,7 @@ public class XMLElement {
     }
      /**
      * This method scans an leading identifier from the current reader.
-     * 
+     *
      * UNlike scanWhitespace, it skipps also BOM
      *
      * @return the next character following the whitespace.
@@ -1263,7 +1261,7 @@ public class XMLElement {
                     out.print(ch);
                     out.flush();
                     if (ch == 10) {
-                        OutputController.getLogger().log(line.toString());
+                        //LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1308,7 +1306,7 @@ public class XMLElement {
                 else {
                     out.print(ch);
                     if (ch == 10) {
-                        OutputController.getLogger().log(line.toString());
+                        //LOG.debug(line.toString());
                         line = new StringBuilder("line: " + newline + " ");
                         newline++;
                     } else {
@@ -1321,10 +1319,11 @@ public class XMLElement {
         } catch (Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            throw new RuntimeException("Error in XML", e);
+            //LOG.error("ERROR", e);
         } finally {
-            OutputController.getLogger().log("");//force new line in all cases
-            OutputController.getLogger().log(line.toString()); //flush remaining line
+            //LOG.debug("");//force new line in all cases
+            //LOG.debug(line.toString()); //flush remaining line
 
         }
     }

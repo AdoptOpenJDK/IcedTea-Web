@@ -34,9 +34,8 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.ccil.cowan.tagsoup.XMLWriter;
@@ -68,10 +67,10 @@ public class MalformedXMLParser extends XMLParser {
     private final static Logger LOG = LoggerFactory.getLogger(MalformedXMLParser.class);
 
     /**
-     * Parses the data from an {@link java.io.InputStream} to create a XML tree.
+     * Parses the data from an {@link InputStream} to create a XML tree.
      * Returns a {@link Node} representing the root of the tree.
      *
-     * @param input the {@link java.io.InputStream} to read data from
+     * @param input the {@link InputStream} to read data from
      * @return root node of document
      * @throws ParseException if an exception occurs while parsing the input
      */
@@ -117,7 +116,7 @@ public class MalformedXMLParser extends XMLParser {
         } catch (SAXException | IOException e1) {
             throw new ParseException(R("PBadXML"), e1);
         } catch (NoClassDefFoundError  e2) {
-            OutputController.getLogger().log(e2);
+            LOG.error("ERROR", e2);
             ParseException.setUsed(null);
             return original;
         }

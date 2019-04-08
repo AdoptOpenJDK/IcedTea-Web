@@ -57,7 +57,7 @@ public class ResourcesDesc {
      * @param os the os of these resources
      * @param arch the arch of these resources
      */
-    public ResourcesDesc(JNLPFile jnlpFile, Locale locales[], String os[], String arch[]) {
+    public ResourcesDesc(final JNLPFile jnlpFile, final Locale locales[], final String os[], final String arch[]) {
         this.jnlpFile = jnlpFile;
         this.locales = locales;
         this.os = os;
@@ -68,16 +68,16 @@ public class ResourcesDesc {
      * @return the JVMs.
      */
     public JREDesc[] getJREs() {
-        List<JREDesc> lresources = getResources(JREDesc.class);
+        final List<JREDesc> lresources = getResources(JREDesc.class);
         return lresources.toArray(new JREDesc[lresources.size()]);
     }
 
-    public static JARDesc getMainJAR(JARDesc jars[] ) {
+    public static JARDesc getMainJAR(final JARDesc jars[] ) {
         return getMainJAR(Arrays.asList(jars));
     }
 
     public static JARDesc getMainJAR(List<JARDesc> jars) {
-        for (JARDesc jar : jars) {
+        for (final JARDesc jar : jars) {
             if (jar.isMain()) {
                 return jar;
             } 
@@ -102,7 +102,7 @@ public class ResourcesDesc {
      * @return all of the JARs.
      */
     public JARDesc[] getJARs() {
-        List<JARDesc> lresources = getResources(JARDesc.class);
+        final List<JARDesc> lresources = getResources(JARDesc.class);
         return lresources.toArray(new JARDesc[lresources.size()]);
     }
 
@@ -111,11 +111,11 @@ public class ResourcesDesc {
      *
      * @param partName the part name, null and "" equivalent
      */
-    public JARDesc[] getJARs(String partName) {
-        List<JARDesc> lresources = getResources(JARDesc.class);
+    public JARDesc[] getJARs(final String partName) {
+        final List<JARDesc> lresources = getResources(JARDesc.class);
 
         for (int i = lresources.size(); i-- > 0;) {
-            JARDesc jar = lresources.get(i);
+            final JARDesc jar = lresources.get(i);
 
             if (!("" + jar.getPart()).equals("" + partName))
                 lresources.remove(i);
@@ -128,7 +128,7 @@ public class ResourcesDesc {
      * @return the Extensions.
      */
     public ExtensionDesc[] getExtensions() {
-        List<ExtensionDesc> lresources = getResources(ExtensionDesc.class);
+        final List<ExtensionDesc> lresources = getResources(ExtensionDesc.class);
         return lresources.toArray(new ExtensionDesc[lresources.size()]);
     }
 
@@ -136,7 +136,7 @@ public class ResourcesDesc {
      * @return the Packages.
      */
     public PackageDesc[] getPackages() {
-        List<PackageDesc> lresources = getResources(PackageDesc.class);
+        final List<PackageDesc> lresources = getResources(PackageDesc.class);
         return lresources.toArray(new PackageDesc[lresources.size()]);
     }
 
@@ -146,11 +146,11 @@ public class ResourcesDesc {
      * @param className the fully qualified class name
      * @return the PackageDesc objects matching the class name
      */
-    public PackageDesc[] getPackages(String className) {
-        List<PackageDesc> lresources = getResources(PackageDesc.class);
+    public PackageDesc[] getPackages(final String className) {
+        final List<PackageDesc> lresources = getResources(PackageDesc.class);
 
         for (int i = lresources.size(); i-- > 0;) {
-            PackageDesc pk = lresources.get(i);
+            final PackageDesc pk = lresources.get(i);
 
             if (!pk.matches(className))
                 lresources.remove(i);
@@ -163,7 +163,7 @@ public class ResourcesDesc {
      * @return the Properties as a list.
      */
     public PropertyDesc[] getProperties() {
-        List<PropertyDesc> lresources = getResources(PropertyDesc.class);
+        final List<PropertyDesc> lresources = getResources(PropertyDesc.class);
         return lresources.toArray(new PropertyDesc[lresources.size()]);
     }
 
@@ -171,8 +171,8 @@ public class ResourcesDesc {
      * @return the properties as a map.
      */
     public Map<String, String> getPropertiesMap() {
-        Map<String, String> properties = new HashMap<>();
-        List<PropertyDesc> lresources = getResources(PropertyDesc.class);
+        final Map<String, String> properties = new HashMap<>();
+        final List<PropertyDesc> lresources = getResources(PropertyDesc.class);
         for (PropertyDesc prop : lresources) {
             properties.put(prop.getKey(), prop.getValue());
         }
@@ -216,13 +216,13 @@ public class ResourcesDesc {
      * @param type resource to be found
      * @return all resources of the specified type.
      */
-    public <T> List<T> getResources(Class<T> type) {
-        List<T> result = new ArrayList<>();
-        for (Object resource : resources) {
+    public <T> List<T> getResources(final Class<T> type) {
+        final List<T> result = new ArrayList<>();
+        for (final Object resource : resources) {
             if (resource instanceof JREDesc) {
-                JREDesc jre = (JREDesc) resource;
-                List<ResourcesDesc> descs = jre.getResourcesDesc();
-                for (ResourcesDesc desc : descs) {
+                final JREDesc jre = (JREDesc) resource;
+                final List<ResourcesDesc> descs = jre.getResourcesDesc();
+                for (final ResourcesDesc desc : descs) {
                     result.addAll(desc.getResources(type));
                 }
             }
@@ -234,12 +234,12 @@ public class ResourcesDesc {
         return result;
     }
 
-    private static <T> boolean isWontedResource(Object resource, Class<T> type) {
-        T l = getWontedResource(resource, type);
+    private static <T> boolean isWontedResource(final Object resource, final Class<T> type) {
+        final T l = getWontedResource(resource, type);
         return l != null;
     }
 
-    private static <T> T getWontedResource(Object resource, Class<T> type) {
+    private static <T> T getWontedResource(final Object resource, final Class<T> type) {
         if (type.isAssignableFrom(resource.getClass())) {
             return type.cast(resource);
         }
@@ -250,7 +250,7 @@ public class ResourcesDesc {
      * Add a resource.
      * @param resource to be added
      */
-    public void addResource(Object resource) {
+    public void addResource(final Object resource) {
         // if this is going to stay public it should probably take an
         // interface instead of an Object
         if (resource == null)

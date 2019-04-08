@@ -40,7 +40,7 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
 package net.sourceforge.jnlp.splashscreen.parts;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.ParserSettings;
 import org.junit.Assert;
 import org.junit.Test;

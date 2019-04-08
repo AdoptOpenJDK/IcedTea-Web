@@ -59,7 +59,7 @@ public class JARDesc {
      * @param nativeJar whether the JAR contains native libraries
      * @param cacheable whether the JAR can be cached or not
      */
-    public JARDesc(URL location, Version version, String part, boolean lazy, boolean main, boolean nativeJar, boolean cacheable) {
+    public JARDesc(final URL location, final Version version, final String part, final boolean lazy, final boolean main, final boolean nativeJar, final boolean cacheable) {
         this.location = location;
         this.version = version;
         this.part = part;

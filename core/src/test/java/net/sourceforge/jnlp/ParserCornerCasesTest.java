@@ -37,9 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.Node;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.nanoxml.XMLElement;
-import net.sourceforge.nanoxml.XMLParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLElement;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParseException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

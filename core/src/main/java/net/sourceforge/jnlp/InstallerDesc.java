@@ -25,14 +25,14 @@ package net.sourceforge.jnlp;
 public class InstallerDesc implements LaunchDesc {
 
     /** the main class name and package. */
-    private String mainClass;
+    private final String mainClass;
 
     /**
      * Creates a installer descriptor.
      *
      * @param mainClass main class name and package
      */
-    public InstallerDesc(String mainClass) {
+    public InstallerDesc(final String mainClass) {
         this.mainClass = mainClass;
     }
 

@@ -36,7 +36,7 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
-import net.sourceforge.jnlp.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;

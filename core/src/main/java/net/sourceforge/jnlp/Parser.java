@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.Node;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
@@ -794,7 +797,7 @@ public final class Parser {
     /**
      * @param parent
      * @return the component descriptor.
-     * @throws net.sourceforge.jnlp.ParseException
+     * @throws ParseException
      */
     ComponentDesc getComponent(Node parent) throws ParseException {
 
@@ -829,7 +832,7 @@ public final class Parser {
     /**
      * @return the association descriptor.
      * @param node
-     * @throws net.sourceforge.jnlp.ParseException
+     * @throws ParseException
      */
     private AssociationDesc getAssociation(Node node) throws ParseException {
         String[] extensions = getRequiredAttribute(node, "extensions", null).split(" ");
@@ -1374,8 +1377,8 @@ public final class Parser {
         return result;
     }
 
-    public static final String MALFORMED_PARSER_CLASS = "net.sourceforge.jnlp.MalformedXMLParser";
-    public static final String NORMAL_PARSER_CLASS = "net.sourceforge.jnlp.XMLParser";
+    public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
+    public static final String NORMAL_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.XMLParser";
 
     /**
      * @return the root node from the XML document in the specified input
@@ -1402,10 +1405,10 @@ public final class Parser {
         String className;
         if (settings.isMalformedXmlAllowed()) {
             className = MALFORMED_PARSER_CLASS;
-            ParseException.setExpected(ParseException.UsedParsers.MALFORMED);
+            ParseException.setExpected(UsedParsers.MALFORMED);
         } else {
             className = NORMAL_PARSER_CLASS;
-            ParseException.setExpected(ParseException.UsedParsers.NORMAL);
+            ParseException.setExpected(UsedParsers.NORMAL);
         }
 
         Class<?> klass;
@@ -1423,10 +1426,10 @@ public final class Parser {
 
         switch (instance.getClass().getName()) {
             case MALFORMED_PARSER_CLASS:
-                ParseException.setUsed(ParseException.UsedParsers.MALFORMED);
+                ParseException.setUsed(UsedParsers.MALFORMED);
                 break;
             case NORMAL_PARSER_CLASS:
-                ParseException.setUsed(ParseException.UsedParsers.NORMAL);
+                ParseException.setUsed(UsedParsers.NORMAL);
                 break;
         }
         return instance;

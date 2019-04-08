@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 public final class AssociationDesc {
 
     /** the extensions this application wants to register with */
@@ -24,7 +26,7 @@ public final class AssociationDesc {
     /** the mime type for the association */
     private final String mimeType;
 
-    public AssociationDesc(String mimeType, String[] extensions) throws ParseException {
+    public AssociationDesc(final String mimeType, final String[] extensions) throws ParseException {
         checkMimeType(mimeType);
         this.mimeType = mimeType;
         this.extensions = extensions;

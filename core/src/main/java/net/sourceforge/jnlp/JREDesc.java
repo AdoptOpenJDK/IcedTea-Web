@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,22 +37,22 @@ public class JREDesc {
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
     /** the platform version or the product version if location is not null */
-    final private Version.JreVersion version;
+    private final Version.JreVersion version;
 
     /** the location of a JRE product or null */
-    final private URL location;
+    private final URL location;
 
     /** inital heap size */
-    final private String initialHeapSize;
+    private final String initialHeapSize;
 
     /** maximum head size */
-    final private String maximumHeapSize;
+    private final String maximumHeapSize;
 
     /** args to pass to the vm */
-    final private String vmArgs;
+    private final String vmArgs;
 
     /** list of ResourceDesc objects */
-    final private List<ResourcesDesc> resources;
+    private final List<ResourcesDesc> resources;
 
     /**
      * Create a JRE descriptor.
@@ -62,11 +64,11 @@ public class JREDesc {
      * @param initialHeapSize initial heap size
      * @param maximumHeapSize maximum head size
      * @param resources list of ResourceDesc objects
-     * @throws net.sourceforge.jnlp.ParseException is something goes wrong
+     * @throws ParseException is something goes wrong
      */
-    public JREDesc(Version.JreVersion version, URL location,
-            String vmArgs, String initialHeapSize,
-            String maximumHeapSize, List<ResourcesDesc> resources) throws ParseException {
+    public JREDesc(final Version.JreVersion version, final URL location,
+                   final String vmArgs, final String initialHeapSize,
+                   final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
         this.location = location;
         this.vmArgs = vmArgs;
@@ -134,21 +136,20 @@ public class JREDesc {
      * @return trimmed heapSize if correct
      * @throws ParseException if heapSize is invalid
      */
-    static String checkHeapSize(String heapSize) throws ParseException {
+    static String checkHeapSize(final String heapSize) throws ParseException {
         // need to implement for completeness even though not used in netx
         if (heapSize == null) {
             return null;
         }
-        heapSize = heapSize.trim();
+        final String realHeapSize = heapSize.trim();
         // the last character must be 0-9 or k/K/m/M/g/G
         //0 or 0k/m/g is also accepted value
-        String heapSizeLower = heapSize.toLowerCase();
+        String heapSizeLower = realHeapSize.toLowerCase();
         Matcher heapMatcher = heapPattern.matcher(heapSizeLower);
         if (!heapMatcher.matches()) {
-            throw new ParseException(R("PBadHeapSize", heapSize));
+            throw new ParseException(R("PBadHeapSize", realHeapSize));
         }
-        return heapSize;
-        
+        return realHeapSize;
     }
 
 }
