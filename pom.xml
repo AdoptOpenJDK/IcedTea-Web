@@ -23,6 +23,7 @@
         <module>common</module>
         <module>xml-parser</module>
         <module>core</module>
+        <module>integration</module>
     </modules>
 
 </project>
