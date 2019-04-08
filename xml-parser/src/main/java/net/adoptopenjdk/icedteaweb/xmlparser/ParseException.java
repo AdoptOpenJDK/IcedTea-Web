@@ -28,9 +28,11 @@ import net.sourceforge.jnlp.runtime.Translator;
  */
 public class ParseException extends Exception {
 
+    private static UsedParsers expected;
+    private static UsedParsers used;
+
     // todo: add meaningful information, such as the invalid
     // element, parse position, etc.
-
 
     /**
      * Create a parse exception with the specified message.
@@ -53,15 +55,6 @@ public class ParseException extends Exception {
     public ParseException(Throwable cause) {
         super(getParserSettingsMessage(), cause);
     }
-
-
-    public enum UsedParsers {
-
-        MALFORMED, NORMAL
-    }
-
-    private static UsedParsers expected;
-    private static UsedParsers used;
 
     public static void setExpected(UsedParsers ex) {
         expected = ex;

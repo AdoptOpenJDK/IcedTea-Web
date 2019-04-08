@@ -18,6 +18,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
@@ -1404,10 +1405,10 @@ public final class Parser {
         String className;
         if (settings.isMalformedXmlAllowed()) {
             className = MALFORMED_PARSER_CLASS;
-            ParseException.setExpected(ParseException.UsedParsers.MALFORMED);
+            ParseException.setExpected(UsedParsers.MALFORMED);
         } else {
             className = NORMAL_PARSER_CLASS;
-            ParseException.setExpected(ParseException.UsedParsers.NORMAL);
+            ParseException.setExpected(UsedParsers.NORMAL);
         }
 
         Class<?> klass;
@@ -1425,10 +1426,10 @@ public final class Parser {
 
         switch (instance.getClass().getName()) {
             case MALFORMED_PARSER_CLASS:
-                ParseException.setUsed(ParseException.UsedParsers.MALFORMED);
+                ParseException.setUsed(UsedParsers.MALFORMED);
                 break;
             case NORMAL_PARSER_CLASS:
-                ParseException.setUsed(ParseException.UsedParsers.NORMAL);
+                ParseException.setUsed(UsedParsers.NORMAL);
                 break;
         }
         return instance;
