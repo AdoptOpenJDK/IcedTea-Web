@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>xml-parser</artifactId>
+            <artifactId>icedtea-web-xml-parser</artifactId>
             <version>${project.version}</version>
         </dependency>
 

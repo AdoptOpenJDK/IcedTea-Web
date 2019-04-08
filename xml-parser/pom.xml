@@ -11,10 +11,9 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>xml-parser</artifactId>
-    <name>xml-parser</name>
+    <artifactId>icedtea-web-xml-parser</artifactId>
+    <name>XML Parser</name>
     <description>XML parser abstraction for the underlying strict and malformed XML parser.</description>
-
 
     <dependencies>
         <dependency>
@@ -28,6 +27,5 @@
             <version>1.2</version>
         </dependency>
     </dependencies>
-
 
 </project>
