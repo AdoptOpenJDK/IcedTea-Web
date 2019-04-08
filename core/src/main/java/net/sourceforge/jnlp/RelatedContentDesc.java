@@ -27,7 +27,7 @@ public class RelatedContentDesc {
     private String description = null;
 
     /** the location of the content */
-    private URL location = null;
+    private final URL location;
 
     /** the icon for this related content */
     private IconDesc icon = null;
@@ -36,7 +36,7 @@ public class RelatedContentDesc {
      * Create a related-content descriptor
      * @param href the url of the related content
      */
-    public RelatedContentDesc(URL href) {
+    public RelatedContentDesc(final URL href) {
         this.location = href;
     }
 
@@ -44,7 +44,7 @@ public class RelatedContentDesc {
      * Set the title of this content
      * @param title the title of this content
      */
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -59,7 +59,7 @@ public class RelatedContentDesc {
      * Set the description of this related content
      * @param description to be set
      */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -81,7 +81,7 @@ public class RelatedContentDesc {
      * Set the icon for this related content
      * @param icon set to be used
      */
-    public void setIconDesc(IconDesc icon) {
+    public void setIconDesc(final IconDesc icon) {
         this.icon = icon;
     }
 

@@ -88,10 +88,10 @@ public class UpdateDesc {
         PROMPT_RUN,
     }
 
-    private Check check;
-    private Policy policy;
+    private final Check check;
+    private final Policy policy;
 
-    public UpdateDesc(Check check, Policy policy) {
+    public UpdateDesc(final Check check, final Policy policy) {
         this.check = check;
         this.policy = policy;
     }
