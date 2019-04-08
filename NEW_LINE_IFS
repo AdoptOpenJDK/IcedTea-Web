@@ -1,8 +1,0 @@
-#!/bin/sh
-NEW_LINE_IFS="
-"
-
-IFS_BACKUP="$IFS"; 
-#echo "1xx""$IFS""xx" ; 
-IFS="$NEW_LINE_IFS" ; 
-#echo "2xx""$IFS""xx" ; 

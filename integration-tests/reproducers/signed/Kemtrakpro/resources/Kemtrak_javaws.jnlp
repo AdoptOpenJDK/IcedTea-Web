@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<jnlp spec="7.0+" href="Kemtrak_javaws.jnlp" version="1.302.1.29">
+<!-- spec above has to be "7.0+" otherwise the caching-updating does not work -->
+    <information>
+        <title>Kemtrak 007</title>
+        <vendor>Kemtrak AB</vendor>
+		<shortcut install="false">
+			<!-- needed here to prevent shortcut-->
+		</shortcut>
+    </information>
+	
+	<update check="always" policy="always" />
+
+	<security>
+		<all-permissions/>
+	</security>
+	<resources>
+		<property name="jnlp.versionEnabled" value="true"/>
+		<java version="1.7.0.45"/>
+		<java version="1.7.0.51"/>
+		<java version="1.7.0.55"/>
+		<java version="1.7.0.60"/>
+		<java version="1.7.0.65"/>
+		<java version="1.7.0.67"/>
+		<java version="1.7.0.71"/>
+		<java version="1.7.0.72"/>
+		<java version="1.7.0.75"/>
+		<java version="1.7.0.76"/>
+		<java version="1.7.0.79"/>
+		<java version="1.7.0.80"/>
+		<java version="1.7.0.85"/>
+		<java version="1.7.0.91"/>
+		<java version="1.7.0.95"/>
+		<java version="1.7.0.97"/>
+		<java version="1.7.0.99"/>
+		<java version="1.7.0.101"/>
+		<java version="1.7.0.111"/>
+		<java version="1.7.0.121"/>
+		<java version="1.7.0.131"/>
+		<java version="1.8+"/>
+		<jar href="Kemtrakpro.jar" version="1.302.1.29" main="true" />
+		<jar href="jcalendar.jar" version="1.302.1.29"/>
+	</resources>
+    <application-desc main-class="Kemtrak">
+    </application-desc>
+<!-- can add txt here to change file size to force cache update - txt 790412 abcdefg -->
+</jnlp>    
