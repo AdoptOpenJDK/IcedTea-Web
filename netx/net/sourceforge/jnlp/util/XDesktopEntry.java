@@ -496,7 +496,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                  targetName.toLowerCase().endsWith(JPEG) || 
                  targetName.toLowerCase().endsWith(PNG))) {
                 target = convertToIco(source, targetName);
-            }            
+            }
             if (target == null) {
                 target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
                 Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -565,6 +565,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return target;
         }
         catch (IOException e) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             return null;
         }
     }
