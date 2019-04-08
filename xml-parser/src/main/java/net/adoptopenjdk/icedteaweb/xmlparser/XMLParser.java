@@ -96,7 +96,7 @@ public class XMLParser {
             */
 
             //A BufferedInputStream is used to allow marking and reseting of a stream.
-            BufferedInputStream bs = new BufferedInputStream(input);
+            final BufferedInputStream bs = new BufferedInputStream(input);
 
             /* NANO */
             final XMLElement xml = new XMLElement();
@@ -117,8 +117,7 @@ public class XMLParser {
                         }
                     }).start();
             xml.parseFromReader(new InputStreamReader(pin));
-            Node jnlpNode = new Node(xml);
-            return jnlpNode;
+            return new Node(xml);
         } catch (Exception ex) {
             throw new ParseException(R("PBadXML"), ex);
         }
