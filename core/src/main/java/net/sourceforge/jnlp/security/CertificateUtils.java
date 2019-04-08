@@ -57,6 +57,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -65,6 +66,8 @@ import java.util.Random;
  * KeyStore and printing certificates.
  */
 public class CertificateUtils {
+
+    public static final String X_509 = "X509";
 
     /**
      * Adds the X509Certficate in the file to the KeyStore. Note that it does
@@ -75,22 +78,18 @@ public class CertificateUtils {
      * @throws java.io.IOException if IO fails
      * @throws java.security.KeyStoreException if keystore fails
      */
-    public static final void addToKeyStore(File file, KeyStore ks) throws CertificateException,
+    public static final void addToKeyStore(final File file, final KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
 
         OutputController.getLogger().log("Importing certificate from " + file + " into " + ks);
 
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-        CertificateFactory cf = CertificateFactory.getInstance("X509");
-        X509Certificate cert = null;
-
-        try {
-            cert = (X509Certificate) cf.generateCertificate(bis);
+        final CertificateFactory cf = CertificateFactory.getInstance(X_509);
+        try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+            final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
+            addToKeyStore(cert, ks);
         } catch (ClassCastException cce) {
             throw new CertificateException("Input file is not an X509 Certificate", cce);
         }
-
-        addToKeyStore(cert, ks);
     }
 
     /**
@@ -100,24 +99,25 @@ public class CertificateUtils {
      * @param ks keystore to save to
      * @throws java.security.KeyStoreException if keystore fails
      */
-    public static final void addToKeyStore(X509Certificate cert, KeyStore ks)
+    public static final void addToKeyStore(final X509Certificate cert, final KeyStore ks)
             throws KeyStoreException {
+        Objects.requireNonNull(ks);
 
         OutputController.getLogger().log("Importing " + cert.getSubjectX500Principal().getName());
 
         // does this certificate already exist?
-        String alias = ks.getCertificateAlias(cert);
-        if (alias != null) {
+        if(ks.getCertificateAlias(cert) != null) {
             return;
         }
 
         // create a unique alias for this new certificate
-        Random random = new Random();
-        do {
-            alias = new BigInteger(20, random).toString();
-        } while (ks.getCertificate(alias) != null);
-
-        ks.setCertificateEntry(alias, cert);
+        final Random random = new Random(System.currentTimeMillis());
+        if(ks.getCertificateAlias(cert) == null) {
+            final String alias = new BigInteger(20, random).toString();
+            if(ks.getCertificate(alias) == null) {
+                ks.setCertificateEntry(alias, cert);
+            }
+        }
     }
 
     public static void addPKCS12ToKeyStore(File file, KeyStore ks, char[] password)

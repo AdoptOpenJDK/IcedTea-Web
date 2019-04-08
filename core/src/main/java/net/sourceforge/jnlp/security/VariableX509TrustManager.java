@@ -91,6 +91,9 @@ final public class VariableX509TrustManager {
 
     private final List<X509TrustManager> caTrustManagers = new ArrayList<>();
 
+    public static void main(String[] args) {
+        new VariableX509TrustManager();
+    }
 
     /**
      * Constructor initializes the system, user and custom stores
