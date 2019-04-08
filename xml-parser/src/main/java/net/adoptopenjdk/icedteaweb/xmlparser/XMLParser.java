@@ -49,11 +49,6 @@ import java.io.PipedOutputStream;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
-//import javax.xml.parsers.*; // commented to use right Node
-//import org.w3c.dom.*;       // class for using Tiny XML | NanoXML
-//import org.xml.sax.*;
-//import gd.xml.tiny.*;
-
 /**
  * A gateway to the actual implementation of the parsers.
  *
@@ -62,7 +57,17 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 public class XMLParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(XMLParser.class);
-    
+
+    private static final String ENCODING_UNICODE_LITTLE = "UnicodeLittle";
+    private static final String ENCODING_UTF_8 = "UTF-8";
+    private static final String ENCODING_UTF_16 = "UTF-16";
+    private static final String ENCODING_UTF_16_BE = "UTF-16BE";
+    private static final String ENCODING_UTF_16_LE = "UTF-16LE";
+    private static final String ENCODING_UTF_32_BE = "UTF-32BE";
+    private static final String ENCODING_UTF_32_LE = "UTF-32LE";
+    private static final String ENCODING_X_UTF_32_BE_BOM = "X-UTF-32BE-BOM";
+    private static final String ENCODING_X_UTF_32_LE_BOM = "X-UTF-32LE-BOM";
+
     /**
      * Parses input from an InputStream and returns a Node representing the
      * root of the parse tree.
@@ -71,7 +76,7 @@ public class XMLParser {
      * @return a {@link Node} representing the root of the parsed XML
      * @throws ParseException if parsing fails
      */
-    public Node getRootNode(InputStream input) throws ParseException {
+    public Node getRootNode(final InputStream input) throws ParseException {
 
         try {
             /* SAX
@@ -90,8 +95,7 @@ public class XMLParser {
             Node jnlpNode = getChildNode(document, "jnlp"); // skip comments
             */
 
-            //A BufferedInputStream is used to allow marking and reseting
-            //of a stream.
+            //A BufferedInputStream is used to allow marking and reseting of a stream.
             BufferedInputStream bs = new BufferedInputStream(input);
 
             /* NANO */
@@ -99,8 +103,7 @@ public class XMLParser {
             final PipedInputStream pin = new PipedInputStream();
             final PipedOutputStream pout = new PipedOutputStream(pin);
             final InputStreamReader isr = new InputStreamReader(bs, getEncoding(bs));
-            // Clean the jnlp xml file of all comments before passing
-            // it to the parser.
+            // Clean the jnlp xml file of all comments before passing it to the parser.
             new Thread(
                     new Runnable() {
                         @Override
@@ -127,7 +130,7 @@ public class XMLParser {
      * @param input the InputStream
      * @return a String representation of encoding
      */
-    private static String getEncoding(InputStream input) throws IOException {
+    private static String getEncoding(final InputStream input) throws IOException {
         //Fixme: This only recognizes UTF-8, UTF-16, and
         //UTF-32, which is enough to parse the prolog portion of xml to
         //find out the exact encoding (if it exists). The reason being
@@ -136,11 +139,9 @@ public class XMLParser {
         //So what needs to be done is to parse the prolog and retrieve
         //the exact encoding from it.
 
-        int[] s = new int[4];
-        String encoding = "UTF-8";
+        final int[] s = new int[4];
 
-        //Determine what the first four bytes are and store
-        //them into an int array.
+        //Determine what the first four bytes are and store them into an int array.
         input.mark(4);
         for (int i = 0; i < 4; i++) {
             s[i] = input.read();
@@ -153,35 +154,29 @@ public class XMLParser {
         if (s[0] == 255) {
             if (s[1] == 254) {
                 if (s[2] != 0 || s[3] != 0) {
-                    encoding = "UnicodeLittle";
+                    return ENCODING_UNICODE_LITTLE;
                 } else {
-                    encoding = "X-UTF-32LE-BOM";
+                    return ENCODING_X_UTF_32_LE_BOM;
                 }
             }
-        } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 ||
-                s[3] != 0)) {
-            encoding = "UTF-16";
+        } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 || s[3] != 0)) {
+            return ENCODING_UTF_16;
 
-        } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 &&
-                s[3] == 255) {
-            encoding = "X-UTF-32BE-BOM";
+        } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 && s[3] == 255) {
+            return ENCODING_X_UTF_32_BE_BOM;
 
-        } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 &&
-                s[3] == 60) {
-            encoding = "UTF-32BE";
+        } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 60) {
+            return ENCODING_UTF_32_BE;
 
-        } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 &&
-                s[3] == 0) {
-            encoding = "UTF-32LE";
+        } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 && s[3] == 0) {
+            return ENCODING_UTF_32_LE;
 
-        } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 &&
-                s[3] == 63) {
-            encoding = "UTF-16BE";
-        } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 &&
-                s[3] == 0) {
-            encoding = "UTF-16LE";
+        } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 && s[3] == 63) {
+            return ENCODING_UTF_16_BE;
+        } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 && s[3] == 0) {
+            return ENCODING_UTF_16_LE;
         }
 
-        return encoding;
+        return ENCODING_UTF_8;
     }
 }
