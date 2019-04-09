@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration;
 
-import dev.rico.internal.core.Assert;
+import net.adoptopenjdk.icedteaweb.Assert;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 
