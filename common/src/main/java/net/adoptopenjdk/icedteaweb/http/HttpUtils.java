@@ -53,9 +53,8 @@ public class HttpUtils {
     public static void consumeAndCloseConnectionSilently(final HttpURLConnection c) {
         try {
             consumeAndCloseConnection(c);
-        } catch (IOException ex) {
-            LOG.debug("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.");
-            LOG.error("ERROR", ex);
+        } catch (final IOException ex) {
+            LOG.error("Following exception should be harmless, but may help in finding root cause.", ex);
         }
     }
 
