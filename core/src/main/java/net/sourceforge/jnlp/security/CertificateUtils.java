@@ -37,9 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -67,6 +70,8 @@ import java.util.Random;
  */
 public class CertificateUtils {
 
+    private final static Logger LOG = LoggerFactory.getLogger(CertificateUtils.class);
+
     public static final String X_509 = "X509";
 
     /**
@@ -81,7 +86,7 @@ public class CertificateUtils {
     public static final void addToKeyStore(final File file, final KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
 
-        OutputController.getLogger().log("Importing certificate from " + file + " into " + ks);
+        LOG.debug("Importing certificate from {} into {}", file, ks);
 
         final CertificateFactory cf = CertificateFactory.getInstance(X_509);
         try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
@@ -103,7 +108,7 @@ public class CertificateUtils {
             throws KeyStoreException {
         Objects.requireNonNull(ks);
 
-        OutputController.getLogger().log("Importing " + cert.getSubjectX500Principal().getName());
+        LOG.debug("Importing {}", cert.getSubjectX500Principal().getName());
 
         // does this certificate already exist?
         if(ks.getCertificateAlias(cert) != null) {
@@ -115,8 +120,8 @@ public class CertificateUtils {
         if(ks.getCertificateAlias(cert) == null) {
             final String alias = new BigInteger(20, random).toString();
             if(ks.getCertificate(alias) == null) {
-                ks.setCertificateEntry(alias, cert);
-            }
+        ks.setCertificateEntry(alias, cert);
+    }
         }
     }
 
@@ -168,12 +173,12 @@ public class CertificateUtils {
                     // Verify against this entry
                     String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
-                        OutputController.getLogger().log(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
+                        LOG.debug(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
                         return true;
                     } // else continue
                 }
             }catch (KeyStoreException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 // continue
             }
         }

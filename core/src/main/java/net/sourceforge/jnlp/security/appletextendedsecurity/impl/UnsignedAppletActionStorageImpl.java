@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.appletextendedsecurity.InvalidLineException;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionStorage;
@@ -44,6 +45,8 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,6 +57,8 @@ import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 public class UnsignedAppletActionStorageImpl extends LockingReaderWriter implements UnsignedAppletActionStorage {
+
+    private final static Logger LOG = LoggerFactory.getLogger(UnsignedAppletActionStorageImpl.class);
 
     protected List<UnsignedAppletActionEntry> items;
     private String readVersion = null;
@@ -118,7 +123,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
                 item.write(bw);
                 bw.newLine();
             }catch (InvalidLineException ex){
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
     }
@@ -222,7 +227,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             }
             return result;
         } catch (PatternSyntaxException ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return false;
         }
     }
@@ -286,10 +291,10 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
         try{
             version = Integer.valueOf(versionS);
         } catch (NumberFormatException e){
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         if (version < 2){
-            OutputController.getLogger().log("Stoping laoding of vulnereable "+getBackingFile().getAbsolutePath()+". Will be replaced");
+            LOG.debug("Stoping laoding of vulnereable {}. Will be replaced", getBackingFile().getAbsolutePath());
             loadingDisabled = true;
             backupOldFile(version, getBackingFile());
         } else {
@@ -305,7 +310,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     private void backupOldFile(int version, File backingFile) {
         try {
             File backup = new File(backingFile.getAbsolutePath() + "." + version + BACKUP_SUFFIX);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "backuping " + getBackingFile().getAbsolutePath() + " as " + backup.getName());
+            LOG.info("backuping {} as {}", getBackingFile().getAbsolutePath(), backup.getName());
             String warning = "- !WARNING! this is automated copy of old " + backingFile.getName() + " which was removed/replaced. Before you blindly copy those items back, please note, that this file might be modified without your approval by evil attacker. It is advised to not return below lines, or verify them before returning";
             String s = FileUtils.loadFileAsString(backingFile);
             s.replaceFirst("\\s*", "");
@@ -316,8 +321,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             }
             FileUtils.saveFile(s, backup);
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Error during backuping: " + ex.getMessage());
-            OutputController.getLogger().log(ex);
+            LOG.error("Error during backuping", ex);
         }
     }
 }

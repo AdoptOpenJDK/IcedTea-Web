@@ -38,9 +38,36 @@ package net.sourceforge.jnlp.security.policyeditor;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dialog.ModalityType;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -68,55 +95,31 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
+import net.sourceforge.jnlp.util.FileDialogFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
 import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
-
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.Dialog.ModalityType;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -125,6 +128,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * the JDK PolicyTool.
  */
 public class PolicyEditor extends JPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PolicyEditor.class);
 
     private boolean closed = false;
     private final Map<PolicyEditorPermissions, JCheckBox> checkboxMap = new TreeMap<>();
@@ -358,7 +363,7 @@ public class PolicyEditor extends JPanel {
                     PolicyEditor.this.setFile(getDefaultPolicyFilePath());
                     PolicyEditor.this.getFile().createNewFile();
                 } catch (final IOException | URISyntaxException e) {
-                    OutputController.getLogger().log(e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     return;
                 }
                 openAndParsePolicyFile();
@@ -443,13 +448,13 @@ public class PolicyEditor extends JPanel {
                     identifier = PolicyEditorController.getPolicyEntryFromClipboard().getPolicyIdentifier();
                     pasteEntry(promptForPolicyIdentifier(identifier));
                 } catch (final UnsupportedFlavorException ufe) {
-                    OutputController.getLogger().log(ufe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ufe);
                     showClipboardErrorDialog();
                 } catch (final PolicyParser.ParsingException pe) {
-                    OutputController.getLogger().log(pe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, pe);
                     showInvalidPolicyExceptionDialog(identifier);
                 } catch (final IOException ioe) {
-                    OutputController.getLogger().log(ioe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                     showCouldNotAccessClipboardDialog();
                 }
             }
@@ -738,7 +743,7 @@ public class PolicyEditor extends JPanel {
                 try {
                     editor.policyEditorController.savePolicyFile();
                 } catch (final IOException e) {
-                    OutputController.getLogger().log(e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     editor.showCouldNotSaveDialog();
                     return;
                 }
@@ -1093,7 +1098,7 @@ public class PolicyEditor extends JPanel {
      */
     private static void setButtonMnemonic(final AbstractButton button, final String mnemonic) {
         if (mnemonic.length() != 1) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not set mnemonic \"" + mnemonic + "\" for " + button);
+            LOG.debug("Could not set mnemonic \"{}\" for {}", mnemonic, button);
             return;
         }
         final char ch = mnemonic.charAt(0);
@@ -1467,16 +1472,16 @@ public class PolicyEditor extends JPanel {
         final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
-            OutputController.getLogger().log(R("PECouldNotOpen"));
+            LOG.debug(R("PECouldNotOpen"));
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            OutputController.getLogger().log(R("RFileReadOnly"));
+            LOG.debug(R("RFileReadOnly"));
         }
 
         try {
             policyEditorController.openAndParsePolicyFile();
         } catch (IOException | PolicyParser.ParsingException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return;
         }
 
@@ -1499,12 +1504,12 @@ public class PolicyEditor extends JPanel {
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
             if (policyEditorController.getFile().exists()) {
-                FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
+                FileDialogFactory.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
             }
             return;
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            FileUtils.showReadOnlyDialog(PolicyEditor.this);
+            FileDialogFactory.showReadOnlyDialog(PolicyEditor.this);
         }
 
         final Window parentWindow = SwingUtils.getWindowAncestor(this);
@@ -1524,12 +1529,11 @@ public class PolicyEditor extends JPanel {
                     }
                     policyEditorController.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
-                    OutputController.getLogger().log(fnfe);
-                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, fnfe);
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException | PolicyParser.ParsingException e) {
-                    OutputController.getLogger().log(e);
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantOpenFile", policyEditorController.getFile().getPath()));
-                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    LOG.error(R("RCantOpenFile", policyEditorController.getFile().getPath()), e);
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
                 return null;
             }
@@ -1585,7 +1589,7 @@ public class PolicyEditor extends JPanel {
                     }
                     policyEditorController.savePolicyFile();
                 } catch (final IOException e) {
-                    OutputController.getLogger().log(e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     showCouldNotSaveDialog();
                 }
                 return null;
@@ -1671,11 +1675,11 @@ public class PolicyEditor extends JPanel {
         try {
             changed = policyEditorController.fileHasChanged();
         } catch (FileNotFoundException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             JOptionPane.showMessageDialog(PolicyEditor.this, R("PEFileMissing"), R("PEFileModified"), JOptionPane.WARNING_MESSAGE);
             return JOptionPane.NO_OPTION;
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             changed = true;
         }
         if (changed) {
@@ -1683,7 +1687,7 @@ public class PolicyEditor extends JPanel {
             try {
                 policyFilePath = policyEditorController.getFile().getCanonicalPath();
             } catch (final IOException e) {
-                OutputController.getLogger().log(e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 policyFilePath = policyEditorController.getFile().getPath();
             }
             return JOptionPane.showConfirmDialog(PolicyEditor.this, R("PEFileModifiedDetail", policyFilePath,
@@ -1818,7 +1822,7 @@ public class PolicyEditor extends JPanel {
             try {
                 filepath = getDefaultPolicyFilePath();
             } catch (URISyntaxException e) {
-                OutputController.getLogger().log(e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 throw new RuntimeException(e);
             }
         }

@@ -1,6 +1,9 @@
 package net.sourceforge.jnlp.security.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,6 +32,9 @@ import java.net.URISyntaxException;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class PolicyEditorAboutDialog extends JFrame {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PolicyEditorAboutDialog.class);
+
     private final String content;
     private final JScrollPane scrollPane = new JScrollPane();
     private final JTextPane textArea = new JTextPane();
@@ -128,7 +134,7 @@ public class PolicyEditorAboutDialog extends JFrame {
                 try {
                     Desktop.getDesktop().browse(event.getURL().toURI());
                 } catch (final URISyntaxException | IOException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         }

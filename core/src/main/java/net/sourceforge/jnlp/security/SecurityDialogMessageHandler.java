@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -47,6 +48,8 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 
 import java.awt.event.ActionEvent;
@@ -76,6 +79,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class SecurityDialogMessageHandler implements Runnable {
 
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogMessageHandler.class);
+
     /** the queue of incoming messages to show security dialogs */
     private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<>();
 
@@ -85,7 +90,7 @@ public class SecurityDialogMessageHandler implements Runnable {
      */
     @Override
     public void run() {
-        OutputController.getLogger().log("Starting security dialog thread");
+        LOG.debug("Starting security dialog thread");
         while (true) {
             try {
                 SecurityDialogMessage msg = queue.take();
@@ -214,20 +219,17 @@ public class SecurityDialogMessageHandler implements Runnable {
                             }
                         }
                         RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));
-                    } catch (Exception ex) {    
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
+                    } catch (Exception ex) {
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 } catch (IOException eex) {
-                    OutputController.getLogger().log(eex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, eex);
                     keepGoing = false;
                 } catch (IllegalArgumentException eeex){
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, eeex.toString());
-                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, eeex);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HDwrongValue"));
+                    LOG.error(Translator.R("HDwrongValue"), eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, ex.toString());
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     repeatAll = true;
                 }
             } while (keepGoing);
@@ -261,7 +263,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         try {
             queue.put(message);
         } catch (InterruptedException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
     

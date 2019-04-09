@@ -16,6 +16,15 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.event.DownloadEvent;
+import net.sourceforge.jnlp.event.DownloadListener;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,14 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.event.DownloadEvent;
-import net.sourceforge.jnlp.event.DownloadListener;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
@@ -90,7 +91,7 @@ public class ResourceTracker {
 
     // defines
     //    ResourceTracker.Downloader (download threads)
-    
+
       /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
 
@@ -136,8 +137,7 @@ public class ResourceTracker {
         try {
             location = UrlUtils.normalizeUrl(location);
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Normalization of " + location.toString() + " have failed");
-            OutputController.getLogger().log(ex);
+            LOG.error("Normalization of " + location.toString() + " have failed", ex);
         }
         Resource resource = Resource.getResource(location, version, updatePolicy);
 
@@ -310,7 +310,7 @@ public class ResourceTracker {
                 // TODO: Should be toURI().toURL()
                 return f.toURL();
         } catch (MalformedURLException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
 
         return location;
@@ -360,7 +360,7 @@ public class ResourceTracker {
 
             return null;
         } catch (InterruptedException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null; // need an error exception to throw
         }
     }

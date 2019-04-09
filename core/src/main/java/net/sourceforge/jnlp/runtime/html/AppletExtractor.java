@@ -45,6 +45,8 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -67,6 +69,8 @@ import java.util.List;
  * method.
  */
 public class AppletExtractor {
+
+    private final static Logger LOG = LoggerFactory.getLogger(AppletExtractor.class);
 
     private final URL html;
     private static final String[] APPLETS = new String[]{
@@ -95,11 +99,10 @@ public class AppletExtractor {
                 Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
             } else {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));
+                LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", OptionsDefinitions.OPTIONS.XML.option));
             }
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("TAGSOUPhtmlBroken"));
-            OutputController.getLogger().log(ex);
+            LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
         }
         return is;
     }   
@@ -115,7 +118,7 @@ public class AppletExtractor {
     }
     
     private List<Element> findAppletsOnPageImpl(Document doc) throws ParserConfigurationException, SAXException, IOException {
-        OutputController.getLogger().log("Root element :" + doc.getDocumentElement().getNodeName());
+        LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
         //search for embed/object
         //<embed type="application/x-java-applet" 
@@ -131,7 +134,7 @@ public class AppletExtractor {
     }
 
     private Document openDocument(InputStream is) throws SAXException, ParserConfigurationException, IOException {
-        OutputController.getLogger().log("Reading " + html.toExternalForm());
+        LOG.debug("Reading {}", html.toExternalForm());
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
         doc.getDocumentElement().normalize();
         return doc;
@@ -164,7 +167,7 @@ public class AppletExtractor {
             for (int temp = 0; temp < nList.getLength(); temp++) {
 
                 Node nNode = nList.item(temp);
-                OutputController.getLogger().log("Found in html: " + nNode.getNodeName());
+                LOG.debug("Found in html: {}", nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     if (elementValidator.isElementValid(eElement)) {

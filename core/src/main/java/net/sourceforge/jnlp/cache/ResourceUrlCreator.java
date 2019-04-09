@@ -36,10 +36,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,6 +50,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ResourceUrlCreator {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
     protected final Resource resource;
     protected final DownloadOptions downloadOptions;
@@ -106,7 +111,7 @@ public class ResourceUrlCreator {
                     try {
                         urls.add(0, copyUrltoHttps(u));
                     } catch (Exception ex) {
-                        OutputController.getLogger().log(ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 }
             }

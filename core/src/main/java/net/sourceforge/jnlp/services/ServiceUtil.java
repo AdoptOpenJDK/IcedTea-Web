@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
@@ -24,6 +25,8 @@ import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jnlp.BasicService;
 import javax.jnlp.ClipboardService;
@@ -54,6 +57,8 @@ import java.security.PrivilegedExceptionAction;
  * @version $Revision: 1.8 $
  */
 public class ServiceUtil {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ServiceUtil.class);
 
     /**
      * @return the BasicService reference, or null if the service is
@@ -183,10 +188,10 @@ public class ServiceUtil {
         @Override
         public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
             if (JNLPRuntime.isDebug()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "call privileged method: " + method.getName());
+                LOG.debug("call privileged method: {}", method.getName());
                 if (args != null) {
                     for (Object arg : args) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "           arg: " + arg);
+                        LOG.debug("arg: {}", arg);
                     }
                 }
             }
@@ -201,7 +206,7 @@ public class ServiceUtil {
             try {
                 Object result = AccessController.doPrivileged(invoker);
 
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "        result: " + result);
+                LOG.debug("result: {}", result);
 
                 return result;
             } catch (PrivilegedActionException e) {
@@ -323,11 +328,11 @@ public class ServiceUtil {
             try {
                 c = Class.forName(stack1.getClassName());
             } catch (Exception e1) {
-                OutputController.getLogger().log(e1);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                 try {
                     c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
                 }catch (Exception e2) {
-                    OutputController.getLogger().log(e2);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);
                 }
             }
             // Everything up to the desired class/method must be trusted

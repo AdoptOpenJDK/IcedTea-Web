@@ -52,6 +52,8 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,6 +64,8 @@ import java.util.List;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class UnsignedAppletTrustConfirmation {
+
+    private final static Logger LOG = LoggerFactory.getLogger(UnsignedAppletTrustConfirmation.class);
 
     private static final AppletStartupSecuritySettings securitySettings = AppletStartupSecuritySettings.getInstance();
 
@@ -203,18 +207,18 @@ public class UnsignedAppletTrustConfirmation {
     public static void checkUnsignedWithUserIfRequired(JNLPFile file) throws LaunchException {
 
         if (unsignedAppletsAreForbidden()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Not running unsigned applet at " + file.getCodeBase() +" because unsigned applets are disallowed by security policy.");
+            LOG.debug("Not running unsigned applet at {} because unsigned applets are disallowed by security policy.", file.getCodeBase());
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletPolicyDenied"));
         }
 
         if (!unsignedConfirmationIsRequired()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running unsigned applet at " + file.getCodeBase() +" does not require confirmation according to security policy.");
+            LOG.debug("Running unsigned applet at {} does not require confirmation according to security policy.", file.getCodeBase());
             return;
         }
 
         YesNo warningResponse = SecurityDialogs.showUnsignedWarningDialog(file);
 
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for unsigned applet at " + file.getCodeBase() + " was " + warningResponse);
+        LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || !warningResponse.compareValue(BasicDialogValue.Primitive.YES)) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletUserDenied"));
@@ -226,13 +230,13 @@ public class UnsignedAppletTrustConfirmation {
             CertVerifier certVerifier) throws LaunchException {
 
         if (!unsignedConfirmationIsRequired()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Running partially signed applet at " + file.getCodeBase() + " does not require confirmation according to security policy.");
+            LOG.debug("Running partially signed applet at {} does not require confirmation according to security policy.", file.getCodeBase());
             return;
         }
 
         YesNoSandbox warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
 
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Decided action for unsigned applet at " + file.getCodeBase() + " was " + warningResponse);
+        LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
         
         if (warningResponse == null || warningResponse.compareValue(BasicDialogValue.Primitive.NO)) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LPartiallySignedApplet"), R("LPartiallySignedAppletUserDenied"));

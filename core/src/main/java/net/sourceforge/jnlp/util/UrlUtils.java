@@ -36,8 +36,10 @@
  */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedReader;
@@ -64,6 +66,8 @@ import java.util.Objects;
 
 public class UrlUtils {
 
+    private final static Logger LOG = LoggerFactory.getLogger(UrlUtils.class);
+
     private static final String UTF8 = "utf-8";
     public static final String FILE_PROTOCOL = "file";
     public static final String SLASH = "/";
@@ -86,7 +90,7 @@ public class UrlUtils {
             final URL strippedUrl = new URL(urlParts[0]);
             return normalizeUrl(strippedUrl, encodeFileUrls);
         } catch (final IOException | URISyntaxException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return url;
     }
@@ -109,8 +113,8 @@ public class UrlUtils {
     public static URL decodeUrlQuietly(final URL url) {
         try {
             return new URL(URLDecoder.decode(url.toString(), UTF8));
-        } catch (final IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+        } catch (IOException e) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return url;
         }
     }
@@ -162,8 +166,8 @@ public class UrlUtils {
     public static URL normalizeUrlQuietly(final URL url, final boolean encodeFileUrls) {
         try {
             return normalizeUrl(url, encodeFileUrls);
-        } catch (final MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+        } catch (MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return url;
     }
@@ -208,8 +212,8 @@ public class UrlUtils {
         s = s.substring(0, i);
         try {
             return sanitizeLastSlash(new URL(src.getProtocol(), src.getHost(), src.getPort(), s));
-        } catch (final MalformedURLException ex) {
-            OutputController.getLogger().log(ex);
+        } catch (MalformedURLException ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return nsrc;
         }
     }
@@ -331,8 +335,8 @@ public class UrlUtils {
             if (notNullUrlEquals(nu1, nu2)) {
                 return true;
             }
-        } catch (final Exception ex) {
-            OutputController.getLogger().log(ex);
+        } catch (Exception ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return false;
     }
@@ -392,8 +396,8 @@ public class UrlUtils {
         final String s = ensureSlashTail(u.toExternalForm());
         try {
             return new URL(s);
-        } catch (final MalformedURLException ex) {
-            OutputController.getLogger().log(ex);
+        } catch (MalformedURLException ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return u;
         }
 
@@ -436,8 +440,8 @@ public class UrlUtils {
             final String parent = file.substring(0, i + 1);
             final String stripped = normalized.replace(file, parent);
             return stripped;
-        } catch (final Exception ex) {
-            OutputController.getLogger().log(ex);
+        } catch (Exception ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return documentbase.toExternalForm();
         }
 
@@ -458,8 +462,8 @@ public class UrlUtils {
             tries++;
             try {
                 is = connection.getInputStream();
-            } catch (final IOException ioe) {
-                OutputController.getLogger().log(ioe);
+            } catch (IOException ioe) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                 if (connection instanceof HttpURLConnection) {
                     HttpURLConnection httpConn = (HttpURLConnection) connection;
                     int statusCode = httpConn.getResponseCode();

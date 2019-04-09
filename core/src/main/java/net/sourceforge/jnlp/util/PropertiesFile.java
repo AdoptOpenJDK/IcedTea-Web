@@ -16,8 +16,10 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.lockingfile.LockedFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +38,8 @@ import java.util.Properties;
  * @version $Revision: 1.4 $
  */
 public class PropertiesFile extends Properties {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
 
     /**
      * the file to save to
@@ -145,7 +149,7 @@ public class PropertiesFile extends Properties {
                 lastStore = currentStore;
                 return true;
             } catch (final IOException ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         return false;
@@ -163,7 +167,7 @@ public class PropertiesFile extends Properties {
             s.getChannel().force(true);
             lastStore = file.lastModified();
         } catch (final IOException ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 
@@ -171,7 +175,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.lock();
         } catch (final IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -179,7 +183,7 @@ public class PropertiesFile extends Properties {
         try {
             return lockedFile.tryLock();
         } catch (final IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return false;
     }
@@ -192,7 +196,7 @@ public class PropertiesFile extends Properties {
         try {
             lockedFile.unlock();
         } catch (final IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 

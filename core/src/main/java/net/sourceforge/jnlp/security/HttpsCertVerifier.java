@@ -37,7 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.util.DerValue;
 import sun.security.util.HostnameChecker;
 import sun.security.x509.X500Name;
@@ -59,6 +62,8 @@ import java.util.List;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class HttpsCertVerifier implements CertVerifier {
+
+    private final static Logger LOG = LoggerFactory.getLogger(HttpsCertVerifier.class);
 
     private X509Certificate[] chain;
     private String authType;
@@ -100,8 +105,7 @@ public class HttpsCertVerifier implements CertVerifier {
         try {
             certPaths.add(CertificateFactory.getInstance("X.509").generateCertPath(list));
         } catch (CertificateException ce) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ce);
-
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ce);
             // carry on
         }
 
@@ -173,7 +177,7 @@ public class HttpsCertVerifier implements CertVerifier {
             Collection<List<?>> subjAltNames = c.getSubjectAlternativeNames();
             X500Name subjectName = HostnameChecker.getSubjectX500Name(c);
             DerValue derValue = subjectName.findMostSpecificAttribute
-                                                        (X500Name.commonName_oid);
+                    (X500Name.commonName_oid);
             names += derValue.getAsString();
 
             if (subjAltNames != null) {
@@ -189,9 +193,9 @@ public class HttpsCertVerifier implements CertVerifier {
                 names = names.substring(2); // remove proceeding ", "
 
         } catch (CertificateParsingException cpe) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, cpe);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cpe);
         } catch (IOException ioe) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
         }
 
         return names;

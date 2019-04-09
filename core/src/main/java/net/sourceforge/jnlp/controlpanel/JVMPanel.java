@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -261,12 +262,12 @@ public class JVMPanel extends NamedBorderPanel {
             processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, processErrorStream);
+            LOG.debug(processErrorStream);
             LOG.info(processStdOutStream);
             processErrorStream = processErrorStream.toLowerCase();
             processStdOutStream = processStdOutStream.toLowerCase();
-        } catch (Exception ex) {;
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+        } catch (Exception ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 
         }
         if (r == null) {

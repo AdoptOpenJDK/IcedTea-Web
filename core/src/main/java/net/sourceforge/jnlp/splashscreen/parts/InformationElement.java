@@ -39,10 +39,13 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.sourceforge.jnlp.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +56,8 @@ import java.util.List;
  * javaws provide from source jnlp file
  */
 public class InformationElement {
+
+    private final static Logger LOG = LoggerFactory.getLogger(InformationElement.class);
 
     private InfoItem title;
     private InfoItem vendor;
@@ -229,7 +234,7 @@ public class InformationElement {
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);
             return ie;
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             String message = Translator.R(InfoItem.SPLASH + "errorInInformation");
             InformationElement ie = new InformationElement();
             ie.setHomepage("");
