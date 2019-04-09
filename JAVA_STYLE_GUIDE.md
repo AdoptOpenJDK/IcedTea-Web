@@ -84,6 +84,53 @@ public final class SpecificService {
 }
 ```
 
+Next to general immutability all collections that are returned by classes should be immutable. If a collection should be
+mutated from the outside methods can be added to the class.
+
+Negative example:
+
+```java
+public class SpecificService {
+
+    private List<String> names = new ArrayList();
+
+    public List<String> getNames() {return names;}
+
+    public void setNames(List<String> names) {this.names = names;}
+
+}
+
+//somewhere else:
+SpecificService service = ....
+service.getNames().add("Duke");
+
+```
+
+Good example:
+
+```java
+public class SpecificService {
+
+    private final List<String> names = new ArrayList();
+
+    public List<String> getNames() {return Collections.unmodifiableList(names);}
+
+    public void addName(final String name) {this.names.add(name);}
+
+    public void removeName(final String name) {this.names.remove(name);}
+
+}
+
+//somewhere else:
+final SpecificService service = ....
+service.addName("Duke");
+
+// service.getNames().add("Duke"); <- This call would throw an exception now
+
+
+```
+
+
 ### Do null checks
 Each parameter, variable & field that is accessed after initalization / change must be directly checked for a `null` value.
 
