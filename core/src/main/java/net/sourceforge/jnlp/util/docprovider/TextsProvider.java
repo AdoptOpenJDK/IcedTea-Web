@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.Setting;
@@ -217,18 +217,18 @@ public abstract class TextsProvider {
         return encoding;
     }
 
-    protected String optionsToString(List<OptionsDefinitions.OPTIONS> opts) {
-        Collections.sort(opts, new Comparator<OptionsDefinitions.OPTIONS>() {
+    protected String optionsToString(List<CommandLineOptions> opts) {
+        Collections.sort(opts, new Comparator<CommandLineOptions>() {
 
             @Override
-            public int compare(OptionsDefinitions.OPTIONS o1, OptionsDefinitions.OPTIONS o2) {
-                return o1.option.compareToIgnoreCase(o2.option);
+            public int compare(CommandLineOptions o1, CommandLineOptions o2) {
+                return o1.getOption().compareToIgnoreCase(o2.getOption());
             }
         });
 
         StringBuilder sb = new StringBuilder();
-        for (OptionsDefinitions.OPTIONS o : opts) {
-            sb.append(getFormatter().getOption(o.option + " " + o.helperString, o.getLocalizedDescription()+"("+o.getArgumentExplanation()+")"));
+        for (CommandLineOptions o : opts) {
+            sb.append(getFormatter().getOption(o.getOption() + " " + o.getHelperString(), o.getLocalizedDescription()+"("+o.getArgumentExplanation()+")"));
 
         }
         return sb.toString();

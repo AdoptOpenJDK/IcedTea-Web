@@ -196,6 +196,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     }
 
     @Test
+    @Ignore //Tests sometimes fails in case of proxy that redirects to a page in case of 404
     public void testCheckUrlRemoteNotOk() throws ConfigurationException, IOException {
         boolean is = DeploymentConfiguration.checkUrl(new URL("http://some.not/surely/existing.file"));
         Assert.assertFalse("File was supposed to not exists", is);

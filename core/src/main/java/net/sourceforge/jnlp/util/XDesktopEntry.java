@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
@@ -173,7 +173,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (JNLPRuntime.isWebstartApplication()) {
             String htmlSwitch = "";
             if (JNLPRuntime.isHtml()){
-                htmlSwitch = " "+ OptionsDefinitions.OPTIONS.HTML.option;
+                htmlSwitch = " "+ CommandLineOptions.HTML.getOption();
             }
             exec = "Exec="
                     + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";

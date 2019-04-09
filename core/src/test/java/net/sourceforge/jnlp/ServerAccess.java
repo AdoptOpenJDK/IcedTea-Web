@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.browsertesting.Browser;
 import net.sourceforge.jnlp.browsertesting.BrowserFactory;
 import net.sourceforge.jnlp.browsertesting.Browsers;
@@ -165,8 +165,8 @@ public class ServerAccess {
         findPortTestingSocket.close();
         return port;
     }
-    public static final  String HEADLES_OPTION= OptionsDefinitions.OPTIONS.HEADLESS.option;
-    public static final  String VERBOSE_OPTION= OptionsDefinitions.OPTIONS.VERBOSE.option;
+    public static final  String HEADLES_OPTION= CommandLineOptions.HEADLESS.getOption();
+    public static final  String VERBOSE_OPTION= CommandLineOptions.VERBOSE.getOption();
 
     /**
      * we would like to have an singleton instance ASAP
@@ -571,7 +571,7 @@ public class ServerAccess {
         return executeJavawsHeadless(null, resource,stdoutl,stderrl,null);
     }
     public ProcessResult executeJavawsClearCache() throws Exception {
-         return executeProcess(Arrays.asList(new String[]{getJavawsLocation(), OptionsDefinitions.OPTIONS.CLEARCACHE.option,  ServerAccess.HEADLES_OPTION}));
+         return executeProcess(Arrays.asList(new String[]{getJavawsLocation(), CommandLineOptions.CLEARCACHE.getOption(),  ServerAccess.HEADLES_OPTION}));
     }
      
     /**

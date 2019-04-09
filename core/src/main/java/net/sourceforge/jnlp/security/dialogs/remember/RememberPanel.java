@@ -100,7 +100,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
         ButtonGroup group = new ButtonGroup();
         applyToAppletButton = new JRadioButton(R("SRememberAppletOnly"));
         applyToAppletButton.setSelected(true);
-        applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this option' is selected
+        applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this NumberOfArguments' is selected
 
         applyToCodeBaseButton = new JRadioButton(SecurityDialogPanel.htmlWrap(R("SRememberCodebase", codebase)));
         applyToCodeBaseButton.setEnabled(false);

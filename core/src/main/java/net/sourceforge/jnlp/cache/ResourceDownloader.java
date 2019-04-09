@@ -1,9 +1,9 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -210,9 +210,9 @@ public class ResourceDownloader implements Runnable {
                 //in contrary, usally si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
                 String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed 
                 if (jnlpPath == null || jnlpPath.equals("")) {
-                    jnlpPath = Boot.getOptionParser().getParam(OptionsDefinitions.OPTIONS.JNLP);
+                    jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);
                     if (jnlpPath == null || jnlpPath.equals("")) {
-                        jnlpPath = Boot.getOptionParser().getParam(OptionsDefinitions.OPTIONS.HTML);
+                        jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.HTML);
                         if (jnlpPath == null || jnlpPath.equals("")) {
                             LOG.info("Not-setting jnlp-path for missing main/jnlp/html argument");
                         } else {

@@ -51,7 +51,7 @@ public class ManFormatter extends ReplacingTextFormatter {
         public static final String NAME = "NAME";
         public static final String SYNOPSIS = "SYNOPSIS";
         public static final String DESCRIPTION = "DESCRIPTION";
-        public static final String OPTIONS = "OPTIONS";
+        public static final String OPTIONS = "CommandLineOptions";
         public static final String COMMANDS = "COMMANDS";
         public static final String EXAMPLES = "EXAMPLES";
         public static final String FILES = "FILES";

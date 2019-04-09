@@ -163,7 +163,7 @@ public class JNLPRuntime {
     /** flag keeping rest of jnlpruntime live that javaws was lunched as -html */
     private static boolean html=false;
 
-    /** all security dialogs will be consumed and we will pretend the Sandbox option was chosen */
+    /** all security dialogs will be consumed and we will pretend the Sandbox NumberOfArguments was chosen */
     private static boolean trustNone = false;
     
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/

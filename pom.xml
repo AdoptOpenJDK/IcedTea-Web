@@ -23,6 +23,14 @@
         <module>common</module>
         <module>xml-parser</module>
         <module>core</module>
+        <module>integration</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
 
 </project>

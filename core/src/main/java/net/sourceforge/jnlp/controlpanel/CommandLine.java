@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.sourceforge.jnlp.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
@@ -29,7 +29,7 @@ import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * Encapsulates a command line interface to the deployment configuration.
  * <p>
  * The central method is {@link #handle()}, which calls one of the
- * various 'handle' methods. The commands listed in OptionsDefinitions.getItwsettingsCommands
+ * various 'handle' methods. The commands listed in CommandLineOptions.getItwsettingsCommands
  * are supported. For each supported command, a method handleCOMMANDCommand exists.
  * This method actually takes action based on the command. Generally, a
  * printCOMMANDHelp method also exists, and prints out the help message for
@@ -77,7 +77,7 @@ public class CommandLine {
 
     public final String PROGRAM_NAME;
 
-    private OptionParser optionParser;
+    private CommandLineOptionsParser optionParser;
 
     DeploymentConfiguration config = null;
 
@@ -85,7 +85,7 @@ public class CommandLine {
      * Creates a new instance
      * @param optionParser used to parse applications arguments
      */
-    public CommandLine(OptionParser optionParser) {
+    public CommandLine(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
         PROGRAM_NAME = System.getProperty("icedtea-web.bin.name");
 
@@ -137,7 +137,7 @@ public class CommandLine {
      * @return result of handling the command. SUCCESS if no errors occurred.
      */
     public int handleListCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printListHelp();
             return SUCCESS;
         }
@@ -174,12 +174,12 @@ public class CommandLine {
      * get command.
      */
     public int handleGetCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printGetHelp();
             return SUCCESS;
         }
 
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.GET);
+        List<String> args = optionParser.getParams(CommandLineOptions.GET);
         Map<String, Setting<String>> all = config.getRaw();
 
         List<String> unknownProperties = new ArrayList<>(args);
@@ -213,12 +213,12 @@ public class CommandLine {
      * the command
      */
     public int handleSetCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printSetHelp();
             return SUCCESS;
         }
 
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.SET);
+        List<String> args = optionParser.getParams(CommandLineOptions.SET);
 
         String key = null;
         String value;
@@ -288,12 +288,12 @@ public class CommandLine {
      * the command
      */
     public int handleResetCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printResetHelp();
             return SUCCESS;
         }
 
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.RESET);
+        List<String> args = optionParser.getParams(CommandLineOptions.RESET);
 
         boolean resetAll = false;
         if (args.contains("all")) {
@@ -352,12 +352,12 @@ public class CommandLine {
      * the command
      */
     public int handleInfoCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printInfoHelp();
             return SUCCESS;
         }
 
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.INFO);
+        List<String> args = optionParser.getParams(CommandLineOptions.INFO);
 
         Map<String, Setting<String>> all = config.getRaw();
 
@@ -393,12 +393,12 @@ public class CommandLine {
      * the command
      */
     public int handleCheckCommand() {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printCheckHelp();
             return SUCCESS;
         }
 
-        List<String> args = optionParser.getParams(OptionsDefinitions.OPTIONS.CHECK);
+        List<String> args = optionParser.getParams(CommandLineOptions.CHECK);
 
         if (!args.isEmpty()) {
             printCheckHelp();
@@ -448,19 +448,19 @@ public class CommandLine {
         } else if (getNumberOfOptions() > 1) {
             LOG.info(R("CLUnexpectedNumberOfCommands"));
             val = handleHelpCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LIST)) {
+        } else if (optionParser.hasOption(CommandLineOptions.LIST)) {
             val = handleListCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.SET)) {
+        } else if (optionParser.hasOption(CommandLineOptions.SET)) {
             val = handleSetCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.RESET)) {
+        } else if (optionParser.hasOption(CommandLineOptions.RESET)) {
             val = handleResetCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.GET)) {
+        } else if (optionParser.hasOption(CommandLineOptions.GET)) {
             val = handleGetCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.INFO)) {
+        } else if (optionParser.hasOption(CommandLineOptions.INFO)) {
             val = handleInfoCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CHECK)) {
+        } else if (optionParser.hasOption(CommandLineOptions.CHECK)) {
             val = handleCheckCommand();
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        } else if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             val = handleHelpCommand();
         } else {
             handleHelpCommand();
@@ -477,18 +477,18 @@ public class CommandLine {
     private boolean isDetailsValid() {
         int size = optionParser.getMainArgs().size();
         return (optionParser.getMainArgs().contains("details") && size == 1
-                && optionParser.hasOption(OptionsDefinitions.OPTIONS.LIST) && getNumberOfOptions() == 1);
+                && optionParser.hasOption(CommandLineOptions.LIST) && getNumberOfOptions() == 1);
     }
 
     private int getNumberOfOptions() {
         int number = optionParser.getNumberOfOptions();
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP2)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             number--;
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
+        if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             number--;
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+        if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             number--;
         }
         return number;
@@ -504,11 +504,11 @@ public class CommandLine {
         SwingUtils.setup();
 
         try {
-            OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getItwsettingsCommands());
-            if (optionParser.hasOption(OptionsDefinitions.OPTIONS.DETAILS) || optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)){
+            CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getItwsettingsCommands());
+            if (optionParser.hasOption(CommandLineOptions.DETAILS) || optionParser.hasOption(CommandLineOptions.VERBOSE)){
                 JNLPRuntime.setDebug(true);
             }
-            if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+            if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
                 JNLPRuntime.setHeadless(true);
             }
             DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();

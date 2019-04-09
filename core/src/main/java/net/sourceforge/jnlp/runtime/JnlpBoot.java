@@ -40,7 +40,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +54,9 @@ public final class JnlpBoot {
 
     private final static Logger LOG = LoggerFactory.getLogger(JnlpBoot.class);
 
-    private final OptionParser optionParser;
+    private final CommandLineOptionsParser optionParser;
 
-    public JnlpBoot(OptionParser optionParser) {
+    public JnlpBoot(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
     }
 

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<jnlp spec='1.0' codebase='http://localhost/' href='jnlp.jnlp'>
+    <information>
+        <title>Large JNLP</title>
+        <vendor>The IcedTea Project</vendor>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+    </resources>
+</jnlp>
+

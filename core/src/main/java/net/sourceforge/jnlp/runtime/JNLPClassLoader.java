@@ -56,7 +56,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.ApplicationDesc;
@@ -88,7 +88,6 @@ import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -355,7 +354,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            LOG.error(OptionsDefinitions.OPTIONS.NOSEC.option + " and " + DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES + " are declared. Ignoring certificate issue", ex);
+            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
         } else {
             throw ex;
         }

@@ -37,8 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
@@ -88,9 +88,9 @@ public class JavaWsTextsProvider extends TextsProvider {
         String add3 = Translator.R("JWSoptionsL3");
         String adds = getFormatter().wrapParagraph(add1 + getFormatter().getNewLine() + add2 + getFormatter().getNewLine() + add3);
         String runtime = getFormatter().getBold(Translator.R("JWSoptionsTitle1")) + getFormatter().getNewLine()
-                + optionsToString(OptionsDefinitionsPrinter.getJavaWsRuntimeOptions());
+                + optionsToString(CommandLineOptionsDefinition.getJavaWsRuntimeOptions());
         String control = getFormatter().getBold(Translator.R("JWSoptionsTitle2")) + getFormatter().getNewLine()
-                + optionsToString(OptionsDefinitionsPrinter.getJavaWsControlOptions());
+                + optionsToString(CommandLineOptionsDefinition.getJavaWsControlOptions());
         return title + adds + getFormatter().wrapParagraph(control) + getFormatter().wrapParagraph(runtime);
     }
 
@@ -99,15 +99,15 @@ public class JavaWsTextsProvider extends TextsProvider {
         return super.getExamples()
                 + getFormatter().wrapParagraph(
                         getFormatter().getOption(getId() + " "
-                                + OptionsDefinitions.OPTIONS.ABOUT.option, Translator.R("JWSexampleL1"))
+                                + CommandLineOptions.ABOUT.getOption(), Translator.R("JWSexampleL1"))
                         + getFormatter().getOption(getId() + " "
-                                + OptionsDefinitions.OPTIONS.ABOUT.option + " "
-                                + OptionsDefinitions.OPTIONS.HEADLESS.option, Translator.R("JWSexampleL2"))
+                                + CommandLineOptions.ABOUT.getOption() + " "
+                                + CommandLineOptions.HEADLESS.getOption(), Translator.R("JWSexampleL2"))
                         + getFormatter().getOption(getId() + "  "
-                                + OptionsDefinitions.OPTIONS.NOFORK.option + " "
-                                + OptionsDefinitions.OPTIONS.NOHEADERS.option + " "
-                                + OptionsDefinitions.OPTIONS.REDIRECT.option + " "
-                                + OptionsDefinitions.OPTIONS.OFFLINE.option + " http://mypage.web/dangerous.jnlp", Translator.R("JWSexampleL3", "dangerous.jnlp", "mypage.web")));
+                                + CommandLineOptions.NOFORK.getOption() + " "
+                                + CommandLineOptions.NOHEADERS.getOption() + " "
+                                + CommandLineOptions.REDIRECT.getOption() + " "
+                                + CommandLineOptions.OFFLINE.getOption() + " http://mypage.web/dangerous.jnlp", Translator.R("JWSexampleL3", "dangerous.jnlp", "mypage.web")));
     }
 
     @Override
