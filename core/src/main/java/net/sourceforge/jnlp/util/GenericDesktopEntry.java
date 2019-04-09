@@ -32,21 +32,21 @@ import java.io.IOException;
 public interface GenericDesktopEntry {
 
     //linux
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned);
+    void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned);
 
-    public void refreshExistingShortcuts(boolean desktop, boolean menu);
+    void refreshExistingShortcuts(boolean desktop, boolean menu);
 
-    public File getGeneratedJnlpFileName();
+    File getGeneratedJnlpFileName();
 
-    public File getLinuxMenuIconFile();
+    File getLinuxMenuIconFile();
 
     //windows
-    public void createShortcutOnWindowsDesktop() throws IOException;
+    void createShortcutOnWindowsDesktop() throws IOException;
 
-    public void createWindowsMenu() throws IOException;
+    void createWindowsMenu() throws IOException;
 
     //shared!
-    public String getDesktopIconFileName();
+    String getDesktopIconFileName();
 
-    public File getDesktopIconFile();
+    File getDesktopIconFile();
 }

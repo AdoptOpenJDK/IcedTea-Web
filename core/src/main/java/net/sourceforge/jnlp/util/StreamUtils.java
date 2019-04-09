@@ -45,8 +45,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Objects;
 
 public class StreamUtils {
+
+    public static final int DEFAULT_BYTE_SIZE = 1024;
+    public static final String UTF_8 = "UTF-8";
 
     /**
      * Closes a stream, without throwing IOException.
@@ -54,11 +58,11 @@ public class StreamUtils {
      * 
      * @param stream the stream that will be closed
      */
-    public static void closeSilently(Closeable stream) {
+    public static void closeSilently(final Closeable stream) {
         if (stream != null) {
             try {
                 stream.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 OutputController.getLogger().log(e);
             }
         }
@@ -70,11 +74,13 @@ public class StreamUtils {
      * @param output stream where to copy input
      * @throws java.io.IOException if IO fails
      */
-    public static void copyStream(InputStream input, OutputStream output)
+    public static void copyStream(final InputStream input, final OutputStream output)
             throws IOException {
-        byte[] buffer = new byte[1024];
+        Objects.requireNonNull(input);
+        Objects.requireNonNull(input);
+        final byte[] buffer = new byte[DEFAULT_BYTE_SIZE];
         while (true) {
-            int bytesRead = input.read(buffer);
+            final int bytesRead = input.read(buffer);
             if (bytesRead == -1) {
                 break;
             }
@@ -82,24 +88,24 @@ public class StreamUtils {
         }
     }
 
-    public static String readStreamAsString(InputStream stream)  throws IOException {
+    public static String readStreamAsString(final InputStream stream)  throws IOException {
         return readStreamAsString(stream, false);
     }
     
-    public static String readStreamAsString(InputStream stream, String encoding)  throws IOException {
+    public static String readStreamAsString(final InputStream stream, final String encoding)  throws IOException {
         return readStreamAsString(stream, false, encoding);
     }
     
     public static String readStreamAsString(InputStream stream, boolean includeEndOfLines) throws IOException {
-        return readStreamAsString(stream, includeEndOfLines, "UTF-8");
+        return readStreamAsString(stream, includeEndOfLines, UTF_8);
     }
             
-    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines, String encoding) throws IOException {
-        InputStreamReader is = new InputStreamReader(stream, encoding);
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(is);
+    public static String readStreamAsString(final InputStream stream, final boolean includeEndOfLines, final String encoding) throws IOException {
+        final InputStreamReader is = new InputStreamReader(stream, encoding);
+        final StringBuilder sb = new StringBuilder();
+        final BufferedReader br = new BufferedReader(is);
         while (true) {
-            String read = br.readLine();
+            final String read = br.readLine();
             if (read == null) {
                 break;
             }
@@ -107,29 +113,28 @@ public class StreamUtils {
             if (includeEndOfLines){
                 sb.append('\n');
             }
-
         }
-
         return sb.toString();
     }
     
     /**
      * This should be workaround for https://en.wikipedia.org/wiki/Spurious_wakeup which real can happen in case of processes.
      * See http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2015-June/032350.html thread
-     * @param p process to be waited for
+     * @param process process to be waited for
      */
-    public static void waitForSafely(Process p) {
+    public static void waitForSafely(final Process process) {
+        Objects.requireNonNull(process);
         boolean pTerminated = false;
         while (!pTerminated) {
             try {
-                p.waitFor();
-            } catch (InterruptedException e) {
+                process.waitFor();
+            } catch (final InterruptedException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
             }
             try {
-                p.exitValue();
+                process.exitValue();
                 pTerminated = true;
-            } catch (IllegalThreadStateException e) {
+            } catch (final IllegalThreadStateException e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
             }
         }
