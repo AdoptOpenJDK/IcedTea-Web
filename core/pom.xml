@@ -49,13 +49,6 @@
             <version>1.7.26</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>dev.rico</groupId>
-            <artifactId>rico-core</artifactId>
-            <version>1.0.0-CR2</version>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -1,9 +1,8 @@
 package net.adoptopenjdk.icedteaweb.impl;
 
-import dev.rico.core.functional.Subscription;
-import dev.rico.internal.core.Assert;
 import net.adoptopenjdk.icedteaweb.Application;
 import net.adoptopenjdk.icedteaweb.ApplicationManager;
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
 import org.slf4j.Logger;
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 public class ApplicationManagerImpl implements ApplicationManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationManagerImpl.class);
-
-    private final List<Consumer<List<Application>>> changeListeners = new CopyOnWriteArrayList<>();
 
     private final List<Application> applications = new CopyOnWriteArrayList<>();
 
@@ -43,13 +40,6 @@ public class ApplicationManagerImpl implements ApplicationManager {
     @Override
     public List<Application> getInstalledApplications() {
         return Collections.unmodifiableList(applications);
-    }
-
-    @Override
-    public Subscription addChangeListener(final Consumer<List<Application>> changeListener) {
-        Assert.requireNonNull(changeListener, "changeListener");
-        changeListeners.add(changeListener);
-        return () -> changeListeners.remove(changeListener);
     }
 
     private Application installSync(final URL url) {

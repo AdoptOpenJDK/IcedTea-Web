@@ -29,11 +29,5 @@
             <version>1.11.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>dev.rico</groupId>
-            <artifactId>rico-client</artifactId>
-            <version>1.0.0-CR2</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
