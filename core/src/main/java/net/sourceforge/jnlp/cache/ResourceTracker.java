@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
@@ -91,18 +90,6 @@ public class ResourceTracker {
 
     // defines
     //    ResourceTracker.Downloader (download threads)
-
-    // separately locks on (in order of aquire order, ie, sync on prefetch never syncs on lock):
-    //   lock, prefetch, this.resources, each resource, listeners
-    public static enum RequestMethods{
-        HEAD, GET, TESTING_UNDEF;
-
-    private static final HttpMethod[] requestMethods = {HttpMethod.HEAD, HttpMethod.GET};
-
-        public static HttpMethod[] getValidRequestMethods() {
-            return requestMethods;
-        }
-    }
     
       /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
