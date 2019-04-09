@@ -37,7 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -47,6 +50,8 @@ import java.util.Properties;
 
 
 public class PacEvaluatorFactory {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PacEvaluatorFactory.class);
 
     public static PacEvaluator getPacEvaluator(URL pacUrl) {
         boolean useRhino = false;
@@ -60,8 +65,7 @@ public class PacEvaluatorFactory {
             properties = new Properties();
             properties.load(in);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "PAC provider is broken or don't exists. This is ok unless your applicatin is using JavaScript.");
-            OutputController.getLogger().log(e);
+            LOG.error("PAC provider is broken or don't exists. This is ok unless your applicatin is using JavaScript.", e);
         }
 
         if (properties == null) {
@@ -79,17 +83,15 @@ public class PacEvaluatorFactory {
             } catch (ClassNotFoundException e) {
                 // ignore
             } catch (InstantiationException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (IllegalAccessException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (NoSuchMethodException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (IllegalArgumentException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } catch (InvocationTargetException e) {
-                if (e.getCause() != null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e.getCause());
-                }
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
 

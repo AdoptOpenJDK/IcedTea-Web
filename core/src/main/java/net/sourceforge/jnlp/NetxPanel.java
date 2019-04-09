@@ -22,6 +22,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.splashscreen.SplashController;
@@ -96,7 +97,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
          * Log any exceptions thrown while loading, initializing, starting,
          * and stopping the applet. 
          */
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, t); //new logger
+        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
         super.showAppletException(t);
     }
 
@@ -119,7 +120,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
 
         } catch (Exception e) {
             status = APPLET_ERROR;
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         } finally {
             // PR1157: This needs to occur even in the case of an exception

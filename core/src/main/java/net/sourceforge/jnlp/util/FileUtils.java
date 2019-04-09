@@ -16,15 +16,6 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.swing.SwingUtils;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,6 +45,12 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.config.DirectoryValidator;
+import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -64,6 +61,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  */
 
 public final class FileUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
     private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
 
@@ -214,7 +213,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RCantDeleteFile", eMsg == null ? f : eMsg));
+                LOG.error(R("RCantDeleteFile", eMsg == null ? f : eMsg));
             }
         }
     }
@@ -343,7 +342,7 @@ public final class FileUtils {
         try {
             file = file.getCanonicalFile();
         } catch (final IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
         if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {
@@ -391,67 +390,6 @@ public final class FileUtils {
                 return OpenFileResult.FAILURE;
         }
         return OpenFileResult.FAILURE;
-    }
-
-    /**
-     * Show a dialog informing the user that the file is currently read-only
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     */
-    public static void showReadOnlyDialog(final Component frame) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
-            }
-        });
-    }
-
-    /**
-     * Show a generic error dialog indicating the  file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     */
-    public static void showCouldNotOpenFilepathDialog(final Component frame, final String filePath) {
-        showCouldNotOpenDialog(frame, R("RCantOpenFile", filePath));
-    }
-
-    /**
-     * Show an error dialog indicating the file could not be opened, with a particular reason
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
-     */
-    public static void showCouldNotOpenFileDialog(final Component frame, final String filePath, final OpenFileResult reason) {
-        final String message;
-        switch (reason) {
-            case CANT_CREATE:
-                message = R("RCantCreateFile", filePath);
-                break;
-            case CANT_WRITE:
-                message = R("RCantWriteFile", filePath);
-                break;
-            case NOT_FILE:
-                message = R("RExpectedFile", filePath);
-                break;
-            default:
-                message = R("RCantOpenFile", filePath);
-                break;
-        }
-        showCouldNotOpenDialog(frame, message);
-    }
-
-    /**
-     * Show a dialog informing the user that the file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param message a {@link String} giving the specific reason the file could not be opened
-     */
-    public static void showCouldNotOpenDialog(final Component frame, final String message) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 
     /**
@@ -518,7 +456,7 @@ public final class FileUtils {
      *         outside the base
      */
     public static void recursiveDelete(File file, File base) throws IOException {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Deleting: " + file);
+        LOG.debug("Deleting: {}", file);
 
         if (!(file.getCanonicalPath().startsWith(base.getCanonicalPath()))) {
             throw new IOException("Trying to delete a file outside Netx's basedir: "
@@ -571,7 +509,7 @@ public final class FileUtils {
                 }
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return lock;
     }

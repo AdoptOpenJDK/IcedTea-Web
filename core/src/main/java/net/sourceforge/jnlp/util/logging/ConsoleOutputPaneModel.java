@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.util.logging;
 
-import net.sourceforge.jnlp.util.logging.OutputController.Level;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
@@ -92,18 +91,18 @@ public class ConsoleOutputPaneModel {
             for (String string : plugin) {
                 origData.add(new PluginMessage(string));
             }
-            origData.add(new JavaMessage(new Header(Level.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 1"));
-            origData.add(new JavaMessage(new Header(Level.ERROR_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 3"));
-            origData.add(new JavaMessage(new Header(Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 2"));
-            origData.add(new JavaMessage(new Header(Level.WARNING_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 4"));
-            origData.add(new JavaMessage(new Header(Level.MESSAGE_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 9"));
-            JavaMessage m1 = new JavaMessage(new Header(Level.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app1");
-            JavaMessage m2 = new JavaMessage(new Header(Level.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app2");
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 1"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 3"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 2"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 4"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 9"));
+            JavaMessage m1 = new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app1");
+            JavaMessage m2 = new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app2");
             m1.getHeader().isClientApp = true;
             m2.getHeader().isClientApp = true;
             origData.add(m1);
             origData.add(m2);
-            origData.add(new JavaMessage(new Header(Level.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 0 - multilined \n"
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 0 - multilined \n"
                     + "since beggining\n"
                     + "         later\n"
                     + "again from beggingin\n"

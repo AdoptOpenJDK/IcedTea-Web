@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.SecurityDesc;
@@ -157,7 +158,7 @@ public class ApplicationInstance {
     private void addMenuAndDesktopEntries() {
         ShortcutDesc sd = file.getInformation().getShortcut();
         if (JNLPRuntime.isWindows()) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Generating windows desktop shorcut");
+            LOG.debug("Generating windows desktop shorcut");
             try {
                 Object instance = null;
                 try {
@@ -166,7 +167,7 @@ public class ApplicationInstance {
                     instance = cons.newInstance(file);
                     //catch both, for case that mslink was removed after build
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+                   LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 }
                 GenericDesktopEntry wde = (GenericDesktopEntry) instance;
                 if (!wde.getDesktopIconFile().exists()) {
@@ -202,9 +203,8 @@ public class ApplicationInstance {
                     wde.createWindowsMenu();
                 }
             } catch (Throwable ex) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, ex);
                 String message = Translator.R("WinDesktopError");
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, message);
+                LOG.error(message, ex);
             }
         } else {
             // do non-windows desktop stuff

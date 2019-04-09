@@ -31,6 +31,9 @@
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -96,6 +99,8 @@ import java.util.Vector;
  * @version $Name:  $, $Revision: 1.2 $
  */
 public class XMLElement {
+    
+    private final static Logger LOG = LoggerFactory.getLogger(XMLElement.class);
 
     public static final String AMP_KEY = "amp";
     public static final String QUOT_KEY = "quot";
@@ -204,7 +209,7 @@ public class XMLElement {
      * Character read too much for the comment remover.
      */
     private char sanitizeCharReadTooMuch;
-
+    
    /**
      * Whether the BOM header appeared
      */
@@ -577,7 +582,7 @@ public class XMLElement {
                 return false;
         }
     }
-
+    
     /**
      * This method scans an identifier from the current reader.
      *
@@ -595,7 +600,7 @@ public class XMLElement {
     }
      /**
      * This method scans an leading identifier from the current reader.
-     *
+     * 
      * UNlike scanWhitespace, it skipps also BOM
      *
      * @return the next character following the whitespace.

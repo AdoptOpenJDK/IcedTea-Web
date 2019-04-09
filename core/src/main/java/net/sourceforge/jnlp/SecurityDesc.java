@@ -16,10 +16,13 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.AWTPermission;
 import java.io.FilePermission;
@@ -49,6 +52,8 @@ import java.util.Set;
  * @version $Revision: 1.7 $
  */
 public class SecurityDesc {
+
+    private final static Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
 
     /**
      * Represents the security level requested by an applet/application, as specified in its JNLP or HTML.
@@ -166,8 +171,7 @@ public class SecurityDesc {
             urlPermissionClass = (Class<Permission>) Class.forName("java.net.URLPermission");
             urlPermissionConstructor = urlPermissionClass.getDeclaredConstructor(String.class);
         } catch (final ReflectiveOperationException | SecurityException e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while reflectively finding URLPermission - host is probably not running Java 8+");
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+            LOG.error("Exception while reflectively finding URLPermission - host is probably not running Java 8+", e);
             urlPermissionClass = null;
             urlPermissionConstructor = null;
         }
@@ -307,7 +311,7 @@ public class SecurityDesc {
                 URI policyUri = new URI("file://" + policyLocation);
                 policy = Policy.getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
         // return the appropriate policy, or null
@@ -412,11 +416,9 @@ public class SecurityDesc {
                 final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
                 permissions.add(p);
             } catch (final ReflectiveOperationException e) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
-                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+                LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
             } catch (final URISyntaxException e) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions");
-                OutputController.getLogger().log(e);
+                LOG.error("Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions", e);
             }
         }
         try {
@@ -427,11 +429,9 @@ public class SecurityDesc {
             final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
             permissions.add(p);
         } catch (final ReflectiveOperationException e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?");
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, e);
+            LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
         } catch (final URISyntaxException e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions");
-            OutputController.getLogger().log(e);
+            LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions", e);
         }
         return permissions;
     }

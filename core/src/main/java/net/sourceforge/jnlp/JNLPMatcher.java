@@ -37,8 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,33 +52,31 @@ import java.util.List;
 /**
  * To compare launching JNLP file with signed APPLICATION.JNLP or
  * APPLICATION_TEMPLATE.jnlp.
- * 
+ * <p>
  * Used by net.sourceforge.jnlp.runtime.JNLPCLassLoader
  */
 
 public final class JNLPMatcher {
 
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPMatcher.class);
+
     private final Node appTemplateNode;
     private final Node launchJNLPNode;
     private final boolean isTemplate;
-    
+
     /**
      * Public constructor
-     * 
-     * @param appTemplate
-     *            the reader stream of the signed APPLICATION.jnlp or
-     *            APPLICATION_TEMPLATE.jnlp
-     * @param launchJNLP
-     *            the reader stream of the launching JNLP file
-     * @param isTemplate
-     *            a boolean that specifies if appTemplateFile is a template
-     * @param p settings of parser
-     * @throws JNLPMatcherException
-     *             if IOException, XMLParseException is thrown during parsing;
-     *             Or launchJNLP/appTemplate is null
+     *
+     * @param appTemplate the reader stream of the signed APPLICATION.jnlp or
+     *                    APPLICATION_TEMPLATE.jnlp
+     * @param launchJNLP  the reader stream of the launching JNLP file
+     * @param isTemplate  a boolean that specifies if appTemplateFile is a template
+     * @param p           settings of parser
+     * @throws JNLPMatcherException if IOException, XMLParseException is thrown during parsing;
+     *                              Or launchJNLP/appTemplate is null
      */
     public JNLPMatcher(InputStream appTemplate, InputStream launchJNLP,
-            boolean isTemplate, ParserSettings p) throws JNLPMatcherException {
+                       boolean isTemplate, ParserSettings p) throws JNLPMatcherException {
 
         if (appTemplate == null && launchJNLP == null)
             throw new JNLPMatcherException("Template JNLP file and Launching JNLP file are both null.");
@@ -84,7 +84,7 @@ public final class JNLPMatcher {
             throw new JNLPMatcherException("Template JNLP file is null.");
         else if (launchJNLP == null)
             throw new JNLPMatcherException("Launching JNLP file is null.");
-            
+
         try {
             this.appTemplateNode = Parser.getRootNode(appTemplate, p);
             this.launchJNLPNode = Parser.getRootNode(launchJNLP, p);
@@ -100,23 +100,20 @@ public final class JNLPMatcher {
 
     /**
      * Compares both JNLP files
-     * 
+     *
      * @return true if both JNLP files are 'matched', otherwise false
      */
     public boolean isMatch() {
-    
+
         return matchNodes(appTemplateNode, launchJNLPNode);
-    
+
     }
 
     /**
      * Compares two Nodes regardless of the order of their children/attributes
-     * 
-     * @param appTemplate
-     *            signed application or template's Node
-     * @param launchJNLP
-     *            launching JNLP file's Node
-     * 
+     *
+     * @param appTemplate signed application or template's Node
+     * @param launchJNLP  launching JNLP file's Node
      * @return true if both Nodes are 'matched', otherwise false
      */
     private boolean matchNodes(Node appTemplate, Node launchJNLP) {
@@ -133,11 +130,11 @@ public final class JNLPMatcher {
             if (templateNode.getNodeName().equals(launchNode.getNodeName())) {
 
                 if (appTemplateChild.size() == launchJNLPChild.size()) { // Compare
-                                                                         // children
+                    // children
 
                     int childLength = appTemplateChild.size();
 
-                    for (int i = 0; i < childLength;) {
+                    for (int i = 0; i < childLength; ) {
                         for (int j = 0; j < childLength; j++) {
                             boolean isSame = matchNodes(appTemplateChild.get(i), launchJNLPChild.get(j));
                             if (!isSame && j == childLength - 1) {
@@ -173,10 +170,9 @@ public final class JNLPMatcher {
 
     /**
      * Compares attributes of two {@link Node Nodes} regardless of order
-     * 
+     *
      * @param templateNode signed application or template's {@link Node} with attributes
-     * @param launchNode launching JNLP file's {@link Node} with attributes
-     * 
+     * @param launchNode   launching JNLP file's {@link Node} with attributes
      * @return {@code true} if both {@link Node Nodes} have 'matched' attributes, otherwise {@code false}
      */
     private boolean matchAttributes(Node templateNode, Node launchNode) {
@@ -196,7 +192,7 @@ public final class JNLPMatcher {
                 for (int i = 0; i < size; i++) {
 
                     if (launchJNLPAttributes.get(i).equals(appTemplateAttributes.get(i))) { // If both Node's attribute name are the
-                                                                                            // same then compare the values
+                        // same then compare the values
 
                         String attribute = launchJNLPAttributes.get(i);
                         boolean isSame = templateNode.getAttribute(attribute).equals( // Check if the Attribute values match
@@ -217,10 +213,10 @@ public final class JNLPMatcher {
         }
         return false;
     }
-    
+
     /***
      * Closes an input stream
-     * 
+     *
      * @param stream
      *            The input stream that will be closed
      */
@@ -229,13 +225,13 @@ public final class JNLPMatcher {
             try {
                 stream.close();
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
     }
 
     /***
      * Closes an output stream
-     * 
+     *
      * @param stream
      *            The output stream that will be closed
      */
@@ -244,7 +240,7 @@ public final class JNLPMatcher {
             try {
                 stream.close();
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
     }
 }

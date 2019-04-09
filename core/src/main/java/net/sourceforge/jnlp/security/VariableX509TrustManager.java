@@ -37,17 +37,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.reflect.InvocationTargetException;
@@ -71,6 +71,8 @@ import java.util.Objects;
  */
 
 final public class VariableX509TrustManager {
+
+    private final static Logger LOG = LoggerFactory.getLogger(VariableX509TrustManager.class);
 
     public final static String SUN_X_509 = "SunX509";
 
@@ -102,19 +104,19 @@ final public class VariableX509TrustManager {
         try {
             loadManagers(Arrays.asList(KeyStores.getCertKeyStores()), certTrustManagers);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         try {
             loadManagers(Arrays.asList(KeyStores.getCAKeyStores()), caTrustManagers);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         try {
             loadManagers(Arrays.asList(KeyStores.getClientKeyStores()), clientTrustManagers);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
