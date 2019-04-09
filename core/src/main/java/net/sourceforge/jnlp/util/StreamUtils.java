@@ -37,7 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -48,6 +50,8 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 public class StreamUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
 
     public static final int DEFAULT_BYTE_SIZE = 1024;
     public static final String UTF_8 = "UTF-8";
@@ -63,7 +67,7 @@ public class StreamUtils {
             try {
                 stream.close();
             } catch (final IOException e) {
-                OutputController.getLogger().log(e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
     }
@@ -129,13 +133,13 @@ public class StreamUtils {
             try {
                 process.waitFor();
             } catch (final InterruptedException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
             try {
                 process.exitValue();
                 pTerminated = true;
             } catch (final IllegalThreadStateException e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
     }

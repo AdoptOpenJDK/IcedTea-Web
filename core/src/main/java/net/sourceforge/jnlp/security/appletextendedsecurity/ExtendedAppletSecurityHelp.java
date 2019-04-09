@@ -35,10 +35,13 @@
  */
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -51,6 +54,8 @@ import java.awt.Dimension;
 import java.io.IOException;
 
 public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements HyperlinkListener {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ExtendedAppletSecurityHelp.class);
 
     public ExtendedAppletSecurityHelp(java.awt.Frame parent, boolean modal, String reference) {
         this(parent, modal);
@@ -81,7 +86,7 @@ public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements H
                     mainHtmlPane.setPage(event.getURL());
                 }
             } catch (IOException ioe) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
             }
         }
     }

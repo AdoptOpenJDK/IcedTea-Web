@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
@@ -44,6 +45,8 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -71,6 +74,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * file path to the user's personal policy file location presupplied.
  */
 public class PolicyPanel extends NamedBorderPanel {
+
+    private final static Logger LOG = LoggerFactory.getLogger(PolicyPanel.class);
 
     private PolicyEditorWindow policyEditor = null;
     private final DeploymentConfiguration config;
@@ -143,16 +148,15 @@ public class PolicyPanel extends NamedBorderPanel {
             if (result == OpenFileResult.SUCCESS) {
                 policyToolLaunchHelper(frame, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Opening user JNLP policy read-only");
+                LOG.warn("Opening user JNLP policy read-only");
                 FileUtils.showReadOnlyDialog(frame);
                 policyToolLaunchHelper(frame, filePath);
             } else {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+                LOG.error("Could not open user JNLP policy");
                 FileUtils.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+            LOG.error("Could not open user JNLP policy", e);
             FileUtils.showCouldNotOpenFilepathDialog(frame, filePath);
         }
     }
@@ -194,12 +198,11 @@ public class PolicyPanel extends NamedBorderPanel {
                 try {
                     pb.start();
                 } catch (IOException ioe) {
-                    OutputController.getLogger().log(ioe);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                     try {
                         reflectivePolicyToolLaunch(filePath);
                     } catch (Exception e) {
-                        OutputController.getLogger().log(e);
-                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not open user JNLP policy");
+                        LOG.error("Could not open user JNLP policy", e);
                         FileUtils.showCouldNotOpenDialog(frame, R("CPPolicyEditorNotFound"));
                     }
                 }
@@ -270,7 +273,7 @@ public class PolicyPanel extends NamedBorderPanel {
                     }
                 });
             } catch (MalformedURLException ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }
@@ -296,7 +299,7 @@ public class PolicyPanel extends NamedBorderPanel {
                     }
                 });
             } catch (MalformedURLException ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }

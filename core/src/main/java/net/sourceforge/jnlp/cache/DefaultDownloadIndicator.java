@@ -22,6 +22,8 @@ import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jnlp.DownloadServiceListener;
 import javax.swing.Icon;
@@ -60,6 +62,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.3 $
  */
 public class DefaultDownloadIndicator implements DownloadIndicator {
+
+    private final static Logger LOG = LoggerFactory.getLogger(DefaultDownloadIndicator.class);
 
     // todo: rewrite this to cut down on size/complexity; smarter
     // panels (JList, renderer) understand resources instead of
@@ -371,7 +375,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
             // each update.
             String s = downloading + " " + downloadName + ": " + percent + "% " + complete + ".";
             if (JNLPRuntime.isHeadless()){
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, s);
+                LOG.info(s);
             }
             header.setText(s);
             Container c = header.getParent();

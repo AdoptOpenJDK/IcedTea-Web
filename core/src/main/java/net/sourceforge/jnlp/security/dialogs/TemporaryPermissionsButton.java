@@ -44,6 +44,8 @@ import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindo
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractButton;
@@ -68,6 +70,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class TemporaryPermissionsButton extends JButton {
 
+    private final static Logger LOG = LoggerFactory.getLogger(TemporaryPermissionsButton.class);
+
     private final JPopupMenu menu;
     private final JButton linkedButton;
     private PolicyEditorWindow policyEditorWindow = null;
@@ -89,10 +93,7 @@ public class TemporaryPermissionsButton extends JButton {
 
         if (file == null || securityDelegate == null || linkedButton == null) {
             this.setEnabled(false);
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Temporary Permissions Button disabled due to null fields."
-                    + " file: " + file
-                    + ", securityDelegate: " + securityDelegate
-                    + ", linkedButton: " + linkedButton);
+            LOG.debug("Temporary Permissions Button disabled due to null fields. file: {}, securityDelegate: {}, linkedButton: {}", file, securityDelegate, linkedButton);
         } else {
             linkedButton.addActionListener(new ActionListener() {
                 @Override

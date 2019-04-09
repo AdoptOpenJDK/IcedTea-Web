@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -43,6 +44,8 @@ import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -86,6 +89,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  *
  */
 public class JavaConsole implements ObservableMessagesProvider {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JavaConsole.class);
 
     final private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
     final private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
@@ -268,9 +273,9 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Performing Garbage Collection....");
+                LOG.info("Performing Garbage Collection....");
                 System.gc();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("ButDone"));
+                LOG.info(R("ButDone"));
                 printMemoryInfo();
                 updateModel();
             }
@@ -283,9 +288,9 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLErunningFinalizers"));
+                LOG.info(R("CONSOLErunningFinalizers"));
                 Runtime.getRuntime().runFinalization();
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("ButDone"));
+                LOG.info(R("ButDone"));
                 printMemoryInfo();
                 updateModel();
             }
@@ -432,16 +437,15 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     protected void printSystemProperties() {
 
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEsystemProperties") + ":");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "");
+        LOG.info(" ----");
+        LOG.info(R("CONSOLEsystemProperties") + ":");
+        LOG.info("");
         Properties p = System.getProperties();
         Set<Object> keys = p.keySet();
         for (Object key : keys) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, key.toString() + ": " + p.get(key));
+            LOG.info(key.toString() + ": " + p.get(key));
         }
-
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+        LOG.info(" ----");
     }
 
     public void setClassLoaderInfoProvider(ClassLoaderInfoProvider clip) {
@@ -450,30 +454,27 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void printClassLoaders() {
         if (classLoaderInfoProvider == null) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEnoClassLoaders"));
+            LOG.debug(R("CONSOLEnoClassLoaders"));
         } else {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEclassLoaders") + ": ");
+            LOG.debug(" ----");
+            LOG.debug(R("CONSOLEclassLoaders") + ": ");
             Set<String> loaders = classLoaderInfoProvider.getLoaderInfo().keySet();
             for (String loader : loaders) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, loader + "\n"
+                LOG.debug(loader + "\n"
                         + "  codebase = "
                         + classLoaderInfoProvider.getLoaderInfo().get(loader));
             }
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+            LOG.debug(" ----");
         }
     }
 
     private void printMemoryInfo() {
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----- ");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  " + R("CONSOLEmemoryInfo") + ":");
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "   " + R("CONSOLEmemoryMax") + ":   "
-                + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    " + R("CONSOLEmemoryTotal") + ": "
-                + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "    " + R("CONSOLEmemoryFree") + ":  "
-                + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, " ----");
+        LOG.info(" ----- ");
+        LOG.info("  " + R("CONSOLEmemoryInfo") + ":");
+        LOG.info("   " + R("CONSOLEmemoryMax") + ":   " + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
+        LOG.info("    " + R("CONSOLEmemoryTotal") + ": " + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
+        LOG.info("    " + R("CONSOLEmemoryFree") + ":  " + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
+        LOG.info(" ----");
 
     }
 
@@ -481,9 +482,9 @@ public class JavaConsole implements ObservableMessagesProvider {
         Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
         Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CONSOLEthread") + " " + key.getId() + ": " + key.getName());
+            LOG.info(R("CONSOLEthread") + " " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  " + element);
+                LOG.info("  " + element);
             }
 
         }
@@ -554,7 +555,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public void createPluginReader(final File file) {
-        OutputController.getLogger().log("Starting processing of plugin-debug-to-console " + file.getAbsolutePath());
+        LOG.debug("Starting processing of plugin-debug-to-console {}", file.getAbsolutePath());
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -572,25 +573,25 @@ public class JavaConsole implements ObservableMessagesProvider {
                             }
                             processPluginMessage(s);
                         } catch (Exception ex) {
-                            OutputController.getLogger().log(ex);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                         }
                     }
                 } catch (Exception ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     if (br != null) {
                         try {
                             br.close();
                         } catch (Exception exx) {
-                            OutputController.getLogger().log(exx);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exx);
                         }
                     }
                 }
-                OutputController.getLogger().log("Ended processing of plugin-debug-to-console " + file.getAbsolutePath());
+                LOG.debug("Ended processing of plugin-debug-to-console {}", file.getAbsolutePath());
             }
         }, "plugin-debug-to-console reader thread");
         t.setDaemon(true);
         t.start();
 
-        OutputController.getLogger().log("Started processing of plugin-debug-to-console " + file.getAbsolutePath());
+        LOG.debug("Started processing of plugin-debug-to-console {}", file.getAbsolutePath());
     }
 }

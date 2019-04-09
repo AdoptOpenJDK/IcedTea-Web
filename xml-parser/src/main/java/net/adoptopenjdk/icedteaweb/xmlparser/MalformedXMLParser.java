@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.ccil.cowan.tagsoup.XMLWriter;
@@ -116,7 +117,7 @@ public class MalformedXMLParser extends XMLParser {
         } catch (SAXException | IOException e1) {
             throw new ParseException(R("PBadXML"), e1);
         } catch (NoClassDefFoundError  e2) {
-            LOG.error("ERROR", e2);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);
             ParseException.setUsed(null);
             return original;
         }

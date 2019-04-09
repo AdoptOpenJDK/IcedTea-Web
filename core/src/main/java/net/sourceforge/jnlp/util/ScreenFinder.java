@@ -36,7 +36,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -51,6 +54,8 @@ import java.awt.Window;
 
 public class ScreenFinder {
 
+    private final static Logger LOG = LoggerFactory.getLogger(ScreenFinder.class);
+
     public static GraphicsDevice getCurrentScreen() {
         Point p = MouseInfo.getPointerInfo().getLocation();
         return getScreenOnCoords(p);
@@ -61,7 +66,7 @@ public class ScreenFinder {
             Point p = MouseInfo.getPointerInfo().getLocation();
             return getScreenOnCoordsWithoutBounds(p);
         } catch (HeadlessException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return new Rectangle(800, 600);
         }
 
@@ -104,7 +109,7 @@ public class ScreenFinder {
             Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
             return new Rectangle((int) screenSize.getX() + insets.left, (int) screenSize.getY() + insets.top, (int) screenSize.getWidth() - insets.left, (int) screenSize.getHeight() - insets.bottom);
         } catch (HeadlessException | IllegalArgumentException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return new Rectangle(800, 600);
         }
     }

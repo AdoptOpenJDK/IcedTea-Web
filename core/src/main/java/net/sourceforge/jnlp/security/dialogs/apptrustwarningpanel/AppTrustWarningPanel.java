@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.security.SecurityDialog;
@@ -50,6 +51,8 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -86,6 +89,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest
  */
 public abstract class AppTrustWarningPanel extends SecurityDialogPanel implements RememberableDialog{
+
+    private final static Logger LOG = LoggerFactory.getLogger(AppTrustWarningPanel.class);
 
     protected int PANE_WIDTH = 500;
 
@@ -218,7 +223,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
                 } catch (IOException | URISyntaxException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
             }
         });

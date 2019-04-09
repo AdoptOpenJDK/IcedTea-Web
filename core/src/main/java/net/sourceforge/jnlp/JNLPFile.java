@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
@@ -25,7 +26,6 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,7 +251,7 @@ public class JNLPFile {
                          ((int)(Math.random()*Integer.MAX_VALUE)) + "-" +
                          location;
 
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "UNIQUEKEY=" + this.uniqueKey);
+        LOG.debug("UNIQUEKEY=" + this.uniqueKey);
     }
 
     /**
@@ -270,7 +270,7 @@ public class JNLPFile {
         this(location, version, settings, policy);
         this.uniqueKey = uniqueKey;
 
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "UNIQUEKEY (override) =" + this.uniqueKey);
+        LOG.warn("UNIQUEKEY (override) =" + this.uniqueKey);
     }
 
     /**
@@ -349,9 +349,9 @@ public class JNLPFile {
             throw new MissingTitleException();
         }
         if (title.trim().isEmpty()) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingElement", R("PMissingTitle")));
+            LOG.warn(R("PMissingElement", R("PMissingTitle")));
             title = R("PMissingMandatorySubstitution", R("PMissingTitle"));
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingTitle")) + ": " + title);
+            LOG.warn(R("PMissingMandatoryWarning", R("PMissingTitle")) + ": {}", title);
         } else {
             LOG.info("Acceptable title tag found, contains: {}", title);
         }
@@ -388,7 +388,7 @@ public class JNLPFile {
     public String getTitleFromManifest() {
         String inManifestTitle = getManifestsAttributes().getApplicationName();
         if (inManifestTitle == null && getManifestsAttributes().isLoader()) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, TITLE_NOT_FOUND);
+            LOG.warn(TITLE_NOT_FOUND);
         }
         return inManifestTitle;
     }
@@ -414,9 +414,9 @@ public class JNLPFile {
             throw new MissingVendorException();
         }
         if (vendor.trim().isEmpty()) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingElement", R("PMissingVendor")));
+            LOG.warn(R("PMissingElement", R("PMissingVendor")));
             vendor = R("PMissingMandatorySubstitution", R("PMissingVendor"));
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("PMissingMandatoryWarning", R("PMissingVendor")) + ": " + vendor);
+            LOG.warn(R("PMissingMandatoryWarning", R("PMissingVendor")) + ": " + vendor);
         } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
@@ -492,7 +492,7 @@ public class JNLPFile {
         try {
             return UrlUtils.removeFileName(getSourceLocation());
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return getSourceLocation();
     }
@@ -889,7 +889,7 @@ public class JNLPFile {
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw new RuntimeException(ex.toString());
         }
     }
@@ -1025,7 +1025,7 @@ public class JNLPFile {
          */
         public String getMainClass(){
             if (loader == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide main class");
+                LOG.debug("Jars not ready to provide main class");
                 return null;    
             }
             return loader.getMainClass();
@@ -1143,7 +1143,7 @@ public class JNLPFile {
          */
         public String getAttribute(Attributes.Name name) {
             if (loader == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jars not ready to provide attribute " + name);
+                LOG.debug("Jars not ready to provide attribute {}", name);
                 return null;
             }
             return loader.checkForAttributeInJars(Arrays.asList(getResources().getJARs()), name);

@@ -25,6 +25,7 @@
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -36,6 +37,8 @@ import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.NetscapeCertTypeExtension;
@@ -65,6 +68,8 @@ import java.util.jar.JarEntry;
  */
 
 public class JarCertVerifier implements CertVerifier {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JarCertVerifier.class);
 
     private static final String META_INF = "META-INF/";
 
@@ -118,8 +123,7 @@ public class JarCertVerifier implements CertVerifier {
     public boolean getAlreadyTrustPublisher() {
         boolean allPublishersTrusted = appVerifier.hasAlreadyTrustedPublisher(
                 certs, jarSignableEntries);
-        OutputController.getLogger().log("App already has trusted publisher: "
-                    + allPublishersTrusted);
+        LOG.debug("App already has trusted publisher: {}", allPublishersTrusted);
         return allPublishersTrusted;
     }
 
@@ -127,7 +131,7 @@ public class JarCertVerifier implements CertVerifier {
     public boolean getRootInCacerts() {
         boolean allRootCAsTrusted = appVerifier.hasRootInCacerts(certs,
                 jarSignableEntries);
-        OutputController.getLogger().log("App has trusted root CA: " + allRootCAsTrusted);
+        LOG.debug("App has trusted root CA: {}", allRootCAsTrusted);
         return allRootCAsTrusted;
     }
 
@@ -183,8 +187,7 @@ public class JarCertVerifier implements CertVerifier {
             return true;
         boolean fullySigned = appVerifier.isFullySigned(certs,
                 jarSignableEntries);
-        OutputController.getLogger().log("App already has trusted publisher: "
-                    + fullySigned);
+        LOG.debug("App already has trusted publisher: {}", fullySigned);
         return fullySigned;
     }
 
@@ -297,7 +300,7 @@ public class JarCertVerifier implements CertVerifier {
                     entriesVec);
 
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             throw e;
         }
     }
@@ -418,8 +421,7 @@ public class JarCertVerifier implements CertVerifier {
             result = VerifyResult.UNSIGNED;
         }
 
-        OutputController.getLogger().log("Jar found at " + jarName
-                    + "has been verified as " + result);
+        LOG.debug("Jar found at {} has been verified as {}", jarName, result);
         return result;
     }
 
@@ -450,7 +452,7 @@ public class JarCertVerifier implements CertVerifier {
             // TODO: Warn user about not being able to
             // look through their cacerts/trusted.certs
             // file depending on exception.
-            OutputController.getLogger().log("WARNING: Unable to read through cert store files.");
+            LOG.warn("Unable to read through cert store files.");
             throw e;
         }
 

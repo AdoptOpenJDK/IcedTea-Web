@@ -37,7 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.about;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -52,6 +55,8 @@ import java.net.URL;
 
 public class HTMLPanel extends JPanel {
 
+    private final static Logger LOG = LoggerFactory.getLogger(HTMLPanel.class);
+
     protected JEditorPane pane = new JEditorPane();
     
     public HTMLPanel(URL url) {
@@ -60,8 +65,9 @@ public class HTMLPanel extends JPanel {
         try {
              pane = new JEditorPane(url);
         } catch (IOException ex) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+
             //no need to have invalid url fatal
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
         }
         pane.setContentType("text/html");
         pane.setEditable(false);
