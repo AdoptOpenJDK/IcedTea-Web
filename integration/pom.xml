@@ -12,6 +12,8 @@
     </parent>
 
     <artifactId>icedtea-web-integration-tests</artifactId>
+    <name>Integration Tests</name>
+    <description>This module contains integration tests for the main JNLP application execution scenarios.</description>
 
 
     <dependencies>
