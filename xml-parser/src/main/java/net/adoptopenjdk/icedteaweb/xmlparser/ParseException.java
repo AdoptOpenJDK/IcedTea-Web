@@ -16,7 +16,7 @@
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.Translator;
 
 /**
@@ -71,7 +71,7 @@ public class ParseException extends Exception {
                 + " ";
         if (expected == UsedParsers.NORMAL && used == UsedParsers.NORMAL) {
             //warn about xml mode
-            return Translator.R("TAGSOUPnotUsed", OptionsDefinitions.OPTIONS.XML.option)+tail;
+            return Translator.R("TAGSOUPnotUsed", CommandLineOptions.XML.getOption())+tail;
         }
         if (expected == UsedParsers.MALFORMED && used != UsedParsers.MALFORMED) {
             //warn about TagSoup

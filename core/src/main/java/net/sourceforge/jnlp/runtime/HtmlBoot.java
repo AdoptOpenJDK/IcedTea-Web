@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PluginBridge;
@@ -44,7 +44,7 @@ import net.sourceforge.jnlp.runtime.html.AppletParser;
 import net.sourceforge.jnlp.runtime.html.AppletsFilter;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +66,9 @@ public final class HtmlBoot {
 
     private final static Logger LOG = LoggerFactory.getLogger(HtmlBoot.class);
 
-    private final OptionParser optionParser;
+    private final CommandLineOptionsParser optionParser;
 
-    public HtmlBoot(OptionParser optionParser) {
+    public HtmlBoot(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
     }
 
@@ -115,7 +115,7 @@ public final class HtmlBoot {
     private JNLPSplashScreen splashScreen;
 
     boolean run(Map<String, List<String>> extra) {
-        if (!optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+        if (!optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             SwingUtils.invokeLater(new Runnable() {
 
                 @Override
@@ -128,7 +128,7 @@ public final class HtmlBoot {
         }
         );
         }
-        List<String> vars = optionParser.getParams(OptionsDefinitions.OPTIONS.HTML);
+        List<String> vars = optionParser.getParams(CommandLineOptions.HTML);
         JNLPRuntime.setForksAllowed(false);//needed?
         ParserSettings settings = Boot.init(extra);
         if (settings == null) {

@@ -37,8 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 
 /**
  * Contains settings to be used by the Parser while parsing JNLP files.
@@ -105,10 +105,10 @@ public class ParserSettings {
      * at boot on the command line. These settings are also stored so they
      * can be retrieved at a later time.
      */
-    public static ParserSettings setGlobalParserSettingsFromOptionParser(OptionParser optionParser) {
+    public static ParserSettings setGlobalParserSettingsFromOptionParser(CommandLineOptionsParser optionParser) {
         ParserSettings settings = new
-                ParserSettings(optionParser.hasOption(OptionsDefinitions.OPTIONS.STRICT), true,
-                !optionParser.hasOption(OptionsDefinitions.OPTIONS.XML));
+                ParserSettings(optionParser.hasOption(CommandLineOptions.STRICT), true,
+                !optionParser.hasOption(CommandLineOptions.XML));
         setGlobalParserSettings(settings);
         return globalParserSettings;
     }

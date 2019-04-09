@@ -194,7 +194,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                 showCacheSizeSpinnerGUIElements(limitCacheSizeCheckBox.isSelected());
             }
         });
-        // This displays the option for changing location of cache
+        // This displays the NumberOfArguments for changing location of cache
         // User can NOT edit the text field must do it through dialog.
         location.setEditable(false); // Can not c&p into the location field.
         bLocation.addActionListener(new ActionListener() {

@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
@@ -28,6 +28,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.BufferedReader;
@@ -54,7 +55,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.imageio.ImageIO;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -167,7 +167,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (JNLPRuntime.isWebstartApplication()) {
             String htmlSwitch = "";
             if (JNLPRuntime.isHtml()){
-                htmlSwitch = " "+ OptionsDefinitions.OPTIONS.HTML.option;
+                htmlSwitch = " "+ CommandLineOptions.HTML.getOption();
             }
             exec = "Exec="
                     + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";

@@ -267,7 +267,7 @@ public class ManifestAttributesChecker {
     private void checkPermissionsAttribute() throws LaunchException {
         if (securityDelegate.getRunInSandbox()) {
             OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "The 'Permissions' attribute of this application is '" + file.getManifestsAttributes().permissionsToString()
-                    + "'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.");
+                    + "'. You have chosen the Sandbox run NumberOfArguments, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.");
             return;
         }
 

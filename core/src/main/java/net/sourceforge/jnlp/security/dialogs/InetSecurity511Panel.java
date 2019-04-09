@@ -36,7 +36,7 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
@@ -179,7 +179,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
         sb.append(super.getText()).append("\n");
         sb.append(Translator.R("Headless511line1")).append("\n");
         sb.append(Translator.R("Headless511line2")).append("\n");
-        sb.append(Translator.R("Headless511line3", OptionsDefinitions.OPTIONS.BROWSER.option)).append("\n");
+        sb.append(Translator.R("Headless511line3", CommandLineOptions.BROWSER.getOption())).append("\n");
 
         return sb.toString();
     }

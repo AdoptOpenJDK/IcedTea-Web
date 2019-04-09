@@ -32,40 +32,13 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
- */
+*/
 
-package net.sourceforge.jnlp.util.optionparser;
+package net.adoptopenjdk.icedteaweb.commandline;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions.OPTIONS;
+public class UnevenParameterException extends RuntimeException {
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-
-public class ParsedOption {
-
-    private OPTIONS option;
-    private List<String> params = new ArrayList<>();
-
-    ParsedOption(OPTIONS option) {
-        this.option = option;
+    public UnevenParameterException(final String argument) {
+        super(argument);
     }
-
-    public List<String> getParams() {
-        return new ArrayList<>(params);
-    }
-
-    public void addParam(String param) {
-        params.add(param);
-    }
-
-    public void setParams(List<String> params) {
-        this.params = new ArrayList<>(params);
-    }
-
-    public OPTIONS getOption() {
-        return option;
-    }
-
 }

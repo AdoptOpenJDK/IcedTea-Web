@@ -68,8 +68,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -82,7 +83,7 @@ import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import sun.security.provider.PolicyParser;
 
@@ -1715,13 +1716,13 @@ public class PolicyEditor extends JPanel {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        final OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getPolicyEditorOptions());
+        final CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getPolicyEditorOptions());
         
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
+        if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             JNLPRuntime.setDebug(true);
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP1)) {
             final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider("utf-8", new PlainTextFormatter(), true, true);
             String HELP_MESSAGE = "\n";
             if (JNLPRuntime.isDebug()) {
@@ -1759,9 +1760,9 @@ public class PolicyEditor extends JPanel {
         });
     }
 
-    static String getCodebaseArgument(final OptionParser optionParser) {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CODEBASE)) {
-            final String codebase = optionParser.getParam(OptionsDefinitions.OPTIONS.CODEBASE);
+    static String getCodebaseArgument(final CommandLineOptionsParser optionParser) {
+        if (optionParser.hasOption(CommandLineOptions.CODEBASE)) {
+            final String codebase = optionParser.getParam(CommandLineOptions.CODEBASE);
             try {
                 new URL(codebase);
             } catch (final MalformedURLException e) {
@@ -1773,9 +1774,9 @@ public class PolicyEditor extends JPanel {
         }
     }
 
-    static String getSignedByArgument(final OptionParser optionParser) {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.SIGNEDBY)) {
-            final String signedBy = optionParser.getParam(OptionsDefinitions.OPTIONS.SIGNEDBY);
+    static String getSignedByArgument(final CommandLineOptionsParser optionParser) {
+        if (optionParser.hasOption(CommandLineOptions.SIGNEDBY)) {
+            final String signedBy = optionParser.getParam(CommandLineOptions.SIGNEDBY);
             if (signedBy.isEmpty()) {
                 throw new IllegalArgumentException(R("PESignedByEmpty"));
             } else {
@@ -1786,9 +1787,9 @@ public class PolicyEditor extends JPanel {
         }
     }
 
-    static Set<PolicyParser.PrincipalEntry> getPrincipalsArgument(final OptionParser optionParser) {
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.PRINCIPALS)) {
-            final List<String> rawPrincipals = optionParser.getParams(OptionsDefinitions.OPTIONS.PRINCIPALS);
+    static Set<PolicyParser.PrincipalEntry> getPrincipalsArgument(final CommandLineOptionsParser optionParser) {
+        if (optionParser.hasOption(CommandLineOptions.PRINCIPALS)) {
+            final List<String> rawPrincipals = optionParser.getParams(CommandLineOptions.PRINCIPALS);
             final Set<PolicyParser.PrincipalEntry> principals = new HashSet<>();
             for (int i = 0; i < rawPrincipals.size(); i+= 2) {
                 principals.add(new PolicyParser.PrincipalEntry(rawPrincipals.get(i), rawPrincipals.get(i + 1)));
@@ -1799,9 +1800,9 @@ public class PolicyEditor extends JPanel {
         }
     }
 
-    static String getFilePathArgument(final OptionParser optionParser) {
-        final boolean openDefaultFile = optionParser.hasOption(OptionsDefinitions.OPTIONS.DEFAULTFILE);
-        final boolean hasFileArgument = optionParser.hasOption(OptionsDefinitions.OPTIONS.FILE);
+    static String getFilePathArgument(final CommandLineOptionsParser optionParser) {
+        final boolean openDefaultFile = optionParser.hasOption(CommandLineOptions.DEFAULTFILE);
+        final boolean hasFileArgument = optionParser.hasOption(CommandLineOptions.FILE);
         final boolean hasMainArgument = optionParser.mainArgExists();
         if ((hasFileArgument && openDefaultFile) || (hasMainArgument && openDefaultFile)) {
             throw new IllegalArgumentException(R("PEDefaultFileFilePathSpecifiedError"));
@@ -1811,7 +1812,7 @@ public class PolicyEditor extends JPanel {
 
         String filepath = null;
         if (hasFileArgument) {
-            filepath = cleanFilePathArgument(optionParser.getParam(OptionsDefinitions.OPTIONS.FILE));
+            filepath = cleanFilePathArgument(optionParser.getParam(CommandLineOptions.FILE));
         } else if (hasMainArgument) {
             filepath = cleanFilePathArgument(optionParser.getMainArg());
         } else if (openDefaultFile) {

@@ -37,9 +37,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class ParserSettingsTest {
     public void testSetGlobalParserSettingsFromOptionParser() {
         String args[] = {"-xml", "-strict"};
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
+        CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
         ParserSettings globalSettings = ParserSettings.getGlobalParserSettings();
 
@@ -78,10 +78,10 @@ public class ParserSettingsTest {
     public void testSetGlobalParserSettingsFromOptionParserHasSameOptionsAsOptionParser() {
         String args[] = {"-xml", "-strict"};
 
-        OptionParser optionParser = new OptionParser(args, OptionsDefinitionsPrinter.getJavaWsOptions());
+        CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
 
-        Assert.assertEquals(settings.isStrict(), optionParser.hasOption(OptionsDefinitions.OPTIONS.STRICT));
-        Assert.assertEquals(settings.isMalformedXmlAllowed(), !optionParser.hasOption(OptionsDefinitions.OPTIONS.XML));
+        Assert.assertEquals(settings.isStrict(), optionParser.hasOption(CommandLineOptions.STRICT));
+        Assert.assertEquals(settings.isMalformedXmlAllowed(), !optionParser.hasOption(CommandLineOptions.XML));
     }
 }

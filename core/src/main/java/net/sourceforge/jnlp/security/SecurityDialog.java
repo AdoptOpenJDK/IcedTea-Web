@@ -179,7 +179,7 @@ public class SecurityDialog {
      * Shows more information regarding jar code signing
      *
      * @param certVerifier the JarCertVerifier used to verify this application
-     * @param parent the parent option pane
+     * @param parent the parent NumberOfArguments pane
      */
     public static void showMoreInfoDialog(
                 CertVerifier certVerifier, SecurityDialog parent) {
@@ -197,7 +197,7 @@ public class SecurityDialog {
      * Displays CertPath information in a readable table format.
      *
      * @param certVerifier the JarCertVerifier used to verify this application
-     * @param parent the parent option pane
+     * @param parent the parent NumberOfArguments pane
      */
     public static void showCertInfoDialog(CertVerifier certVerifier,
                 Component parent) {

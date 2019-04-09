@@ -15,9 +15,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.about.AboutDialog;
@@ -33,8 +33,8 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
-import net.sourceforge.jnlp.util.optionparser.UnevenParameterException;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,13 +94,12 @@ public final class Boot implements PrivilegedAction<Void> {
             + "   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.\n"
             + "\n";
 
-    private static OptionParser optionParser;
+    private static CommandLineOptionsParser optionParser;
 
-    public static OptionParser getOptionParser() {
+    public static CommandLineOptionsParser getOptionParser() {
         return optionParser;
     }
-    
-    
+
 
     /**
      * Launch the JNLP file specified by the command-line arguments.
@@ -111,22 +110,22 @@ public final class Boot implements PrivilegedAction<Void> {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        optionParser = new OptionParser(argsIn, OptionsDefinitionsPrinter.getJavaWsOptions());
+        optionParser = new CommandLineOptionsParser(argsIn, CommandLineOptionsDefinition.getJavaWsOptions());
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
+        if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             JNLPRuntime.setDebug(true);
         }
 
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HEADLESS)) {
+        if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             JNLPRuntime.setHeadless(true);
         }
 
         DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VIEWER)) {
+        if (optionParser.hasOption(CommandLineOptions.VIEWER)) {
             try {
                 CertificateViewer.main(null);
             } catch (Exception e) {
@@ -137,21 +136,21 @@ public final class Boot implements PrivilegedAction<Void> {
             }
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERSION)) {
+        if (optionParser.hasOption(CommandLineOptions.VERSION)) {
             OutputController.getLogger().printOutLn(nameAndVersion);
             JNLPRuntime.exit(0);
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LICENSE)) {
+        if (optionParser.hasOption(CommandLineOptions.LICENSE)) {
             OutputController.getLogger().printOutLn(miniLicense);
             JNLPRuntime.exit(0);
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HELP1)) {
+        if (optionParser.hasOption(CommandLineOptions.HELP1)) {
             handleMessage();
             JNLPRuntime.exit(0);
         }
-        List<String> properties = optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY);
+        List<String> properties = optionParser.getParams(CommandLineOptions.PROPERTY);
         if (properties != null) {
             for (String prop : properties) {
                 try {
@@ -163,7 +162,7 @@ public final class Boot implements PrivilegedAction<Void> {
             }
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.ABOUT)) {
+        if (optionParser.hasOption(CommandLineOptions.ABOUT)) {
             handleAbout();
             if (JNLPRuntime.isHeadless()) {
                 JNLPRuntime.exit(0);
@@ -179,35 +178,35 @@ public final class Boot implements PrivilegedAction<Void> {
             }
         }
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.UPDATE)) {
-            int value = Integer.parseInt(optionParser.getParam(OptionsDefinitions.OPTIONS.UPDATE));
+        if (optionParser.hasOption(CommandLineOptions.UPDATE)) {
+            int value = Integer.parseInt(optionParser.getParam(CommandLineOptions.UPDATE));
             JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOUPDATE)) {
+        if (optionParser.hasOption(CommandLineOptions.NOUPDATE)) {
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOFORK)) {
+        if (optionParser.hasOption(CommandLineOptions.NOFORK)) {
             JNLPRuntime.setForksAllowed(false);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.TRUSTALL)) {
+        if (optionParser.hasOption(CommandLineOptions.TRUSTALL)) {
             JNLPRuntime.setTrustAll(true);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
+        if (optionParser.hasOption(CommandLineOptions.HTML)) {
             JNLPRuntime.setHtml(true);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.TRUSTNONE)) {
+        if (optionParser.hasOption(CommandLineOptions.TRUSTNONE)) {
             JNLPRuntime.setTrustNone(true);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.NOHEADERS)) {
+        if (optionParser.hasOption(CommandLineOptions.NOHEADERS)) {
             JNLPRuntime.setIgnoreHeaders(true);
         }
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.REDIRECT)) {
+        if (optionParser.hasOption(CommandLineOptions.REDIRECT)) {
             JNLPRuntime.setAllowRedirect(true);
         }
 
         //if it is browser go by ots own, otherwise procedd with normal ITW logic
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.BROWSER)) {
-            String url = optionParser.getParam(OptionsDefinitions.OPTIONS.BROWSER);
+        if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
+            String url = optionParser.getParam(CommandLineOptions.BROWSER);
             LinkingBrowser.showStandAloneWindow(url, false);
         } else {
 
@@ -267,7 +266,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
         Map<String, List<String>> extra = new HashMap<>();
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
+        if (optionParser.hasOption(CommandLineOptions.HTML)) {
             boolean run = new HtmlBoot(optionParser).run(extra);
             if (!run) {
                 return null;
@@ -332,14 +331,14 @@ public final class Boot implements PrivilegedAction<Void> {
      */
     private static String getMainFile() throws InvalidArgumentException {
         if (optionParser.getMainArgs().size() > 1
-                || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP))
-                || (optionParser.mainArgExists() && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))
-                || (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP) && optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML))) {
+                || (optionParser.mainArgExists() && optionParser.hasOption(CommandLineOptions.JNLP))
+                || (optionParser.mainArgExists() && optionParser.hasOption(CommandLineOptions.HTML))
+                || (optionParser.hasOption(CommandLineOptions.JNLP) && optionParser.hasOption(CommandLineOptions.HTML))) {
             throw new InvalidArgumentException(optionParser.getMainArgs().toString());
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.JNLP)) {
-            return fixJnlpProtocol(optionParser.getParam(OptionsDefinitions.OPTIONS.JNLP));
-        } else if (optionParser.hasOption(OptionsDefinitions.OPTIONS.HTML)) {
-            return optionParser.getParam(OptionsDefinitions.OPTIONS.HTML);
+        } else if (optionParser.hasOption(CommandLineOptions.JNLP)) {
+            return fixJnlpProtocol(optionParser.getParam(CommandLineOptions.JNLP));
+        } else if (optionParser.hasOption(CommandLineOptions.HTML)) {
+            return optionParser.getParam(CommandLineOptions.HTML);
         } else if (optionParser.mainArgExists()) {
             return fixJnlpProtocol(optionParser.getMainArg());
         }
@@ -350,11 +349,11 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     static ParserSettings init(Map<String, List<String>> extra) {
-        JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(OptionsDefinitions.OPTIONS.NOSEC));
-        JNLPRuntime.setOfflineForced(optionParser.hasOption(OptionsDefinitions.OPTIONS.OFFLINE));
+        JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(CommandLineOptions.NOSEC));
+        JNLPRuntime.setOfflineForced(optionParser.hasOption(CommandLineOptions.OFFLINE));
         JNLPRuntime.initialize(true);
 
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LISTCACHEIDS)) {
+        if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app 
@@ -372,7 +371,7 @@ public final class Boot implements PrivilegedAction<Void> {
          * code. But we need to know what the cache and base directories are,
          * and baseDir is initialized here
          */
-        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CLEARCACHE)) {
+        if (optionParser.hasOption(CommandLineOptions.CLEARCACHE)) {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app 
@@ -384,9 +383,9 @@ public final class Boot implements PrivilegedAction<Void> {
             return null;
         }
 
-        extra.put("arguments", optionParser.getParams(OptionsDefinitions.OPTIONS.ARG));
-        extra.put("parameters", optionParser.getParams(OptionsDefinitions.OPTIONS.PARAM));
-        extra.put("properties", optionParser.getParams(OptionsDefinitions.OPTIONS.PROPERTY));
+        extra.put("arguments", optionParser.getParams(CommandLineOptions.ARG));
+        extra.put("parameters", optionParser.getParams(CommandLineOptions.PARAM));
+        extra.put("properties", optionParser.getParams(CommandLineOptions.PROPERTY));
 
         return ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
     }

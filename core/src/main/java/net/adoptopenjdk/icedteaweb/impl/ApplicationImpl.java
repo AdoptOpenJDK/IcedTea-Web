@@ -23,7 +23,6 @@ public class ApplicationImpl implements Application {
 
     @Override
     public CompletableFuture<Process> start() {
-
         try {
             launcher.launch(file);
         } catch (LaunchException e) {

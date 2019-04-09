@@ -38,8 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.util.docprovider;
 
 
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
@@ -105,7 +105,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
     @Override
     public String getCommands() {
         return super.getDescription()
-                + getFormatter().wrapParagraph(optionsToString(OptionsDefinitionsPrinter.getItwsettingsCommands()));
+                + getFormatter().wrapParagraph(optionsToString(CommandLineOptionsDefinition.getItwsettingsCommands()));
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
         return super.getExamples()
                 + getFormatter().wrapParagraph(
                         getFormatter().getOption(getId(), Translator.R("IWSexampleL1"))
-                        + getFormatter().getOption(getId() + "  " + OptionsDefinitions.OPTIONS.RESET.option + " " + DeploymentConfiguration.KEY_PROXY_TYPE, " " + Translator.R("IWSexampleL2", DeploymentConfiguration.KEY_PROXY_TYPE)))
+                        + getFormatter().getOption(getId() + "  " + CommandLineOptions.RESET.getOption() + " " + DeploymentConfiguration.KEY_PROXY_TYPE, " " + Translator.R("IWSexampleL2", DeploymentConfiguration.KEY_PROXY_TYPE)))
                 + getFormatter().getNewLine()
                 + getFormatter().wrapParagraph(getKpMinorTitle() + getFormatter().getNewLine()
                         + getFormatter().wrapParagraph(getProperties()));

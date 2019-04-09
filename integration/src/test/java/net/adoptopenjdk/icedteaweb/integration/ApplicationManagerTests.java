@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.ApplicationManager;
 import net.adoptopenjdk.icedteaweb.impl.ApplicationManagerImpl;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -18,6 +19,7 @@ public class ApplicationManagerTests {
     public GenericContainer container = ContainerUtils.create(JnlpAppConstants.JNLP_APP_1);
 
     @Test
+    @Ignore
     public void testApplicationInstallation() throws Exception {
         //given:
         Boot.main(new String[]{});
@@ -33,6 +35,7 @@ public class ApplicationManagerTests {
     }
 
     @Test
+    @Ignore
     public void testApplicationDeletion() throws Exception {
         //given:
         Boot.main(new String[]{});

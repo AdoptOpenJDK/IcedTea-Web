@@ -416,7 +416,7 @@ public class BasicValueValidators {
 
     /**
      * Returns a {@link ValueValidator} that checks if an object is a string from
-     * one of the provided single option Strings or a combination from
+     * one of the provided single NumberOfArguments Strings or a combination from
      * the provided combination Strings.
      * @param singleValues an array of Strings which are considered valid only by themselves
      * @param comboValues an array of Strings which are considered valid in any combination
