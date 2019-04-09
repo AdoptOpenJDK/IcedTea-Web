@@ -36,6 +36,7 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.http.HttpUtils;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
 import net.sourceforge.jnlp.util.logging.OutputController;
