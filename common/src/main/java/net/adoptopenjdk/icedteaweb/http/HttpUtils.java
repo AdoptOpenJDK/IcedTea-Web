@@ -67,7 +67,7 @@ public class HttpUtils {
      */
     public static void consumeAndCloseConnection(final HttpURLConnection c) throws IOException {
         try (InputStream in = c.getInputStream()) {
-            byte[] throwAwayBuffer = new byte[256];
+            final byte[] throwAwayBuffer = new byte[256];
             while (in.read(throwAwayBuffer) > 0) {
                 /* ignore contents */
             }

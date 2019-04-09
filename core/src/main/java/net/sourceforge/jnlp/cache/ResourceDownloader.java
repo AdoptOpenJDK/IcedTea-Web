@@ -46,6 +46,8 @@ public class ResourceDownloader implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
+    private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
+
     private final Resource resource;
     private final Object lock;
 
@@ -287,7 +289,7 @@ public class ResourceDownloader implements Runnable {
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                 + resource.toString() + " : " + urls);
-        for (HttpMethod requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
+        for (HttpMethod requestMethod : validRequestMethods) {
             for (int i = 0; i < urls.size(); i++) {
                 URL url = urls.get(i);
                 try {

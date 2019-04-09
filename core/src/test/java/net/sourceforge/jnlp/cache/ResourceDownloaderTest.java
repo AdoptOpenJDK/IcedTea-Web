@@ -185,32 +185,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void getUrlResponseCodeTestWrongRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            Exception exception = null;
-            try {
-                ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
-            } catch (Exception ex) {
-                exception = ex;
-            }
-            Assert.assertNotNull(exception);
-            exception = null;
-            f.delete();
-            try {
-                ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<String, String>(), ResourceTracker.RequestMethods.TESTING_UNDEF);
-            } catch (Exception ex) {
-                exception = ex;
-            }
-            Assert.assertNotNull(exception);;
-        } finally {
-            redirectErrBack();
-        }
-
-    }
-
-    @Test
     public void findBestUrltest() throws Exception {
         redirectErr();
         try {
