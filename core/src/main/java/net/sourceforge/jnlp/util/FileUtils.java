@@ -16,18 +16,6 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -57,6 +45,12 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.config.DirectoryValidator;
+import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -396,67 +390,6 @@ public final class FileUtils {
                 return OpenFileResult.FAILURE;
         }
         return OpenFileResult.FAILURE;
-    }
-
-    /**
-     * Show a dialog informing the user that the file is currently read-only
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     */
-    public static void showReadOnlyDialog(final Component frame) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
-            }
-        });
-    }
-
-    /**
-     * Show a generic error dialog indicating the  file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     */
-    public static void showCouldNotOpenFilepathDialog(final Component frame, final String filePath) {
-        showCouldNotOpenDialog(frame, R("RCantOpenFile", filePath));
-    }
-
-    /**
-     * Show an error dialog indicating the file could not be opened, with a particular reason
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param filePath a {@link String} representing the path to the file we failed to open
-     * @param reason a {@link OpenFileResult} specifying more precisely why we failed to open the file
-     */
-    public static void showCouldNotOpenFileDialog(final Component frame, final String filePath, final OpenFileResult reason) {
-        final String message;
-        switch (reason) {
-            case CANT_CREATE:
-                message = R("RCantCreateFile", filePath);
-                break;
-            case CANT_WRITE:
-                message = R("RCantWriteFile", filePath);
-                break;
-            case NOT_FILE:
-                message = R("RExpectedFile", filePath);
-                break;
-            default:
-                message = R("RCantOpenFile", filePath);
-                break;
-        }
-        showCouldNotOpenDialog(frame, message);
-    }
-
-    /**
-     * Show a dialog informing the user that the file could not be opened
-     * @param frame a {@link JFrame} to act as parent to this dialog
-     * @param message a {@link String} giving the specific reason the file could not be opened
-     */
-    public static void showCouldNotOpenDialog(final Component frame, final String message) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 
     /**
