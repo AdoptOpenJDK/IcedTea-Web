@@ -38,7 +38,7 @@ import java.io.Reader;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -97,6 +97,16 @@ import java.util.Vector;
  */
 public class XMLElement {
 
+    public static final String AMP_KEY = "amp";
+    public static final String QUOT_KEY = "quot";
+    public static final String APOS_KEY = "apos";
+    public static final String LT_KEY = "lt";
+    public static final String GT_KEY = "gt";
+    public static final char AMP_CHAR = '&';
+    public static final char QUOT_CHAR = '"';
+    public static final char APOS_CHAR = '\'';
+    public static final char LT_CHAR = '<';
+    public static final char GT_CHAR = '>';
     /**
      * The attributes given to the element.
      *
@@ -106,7 +116,7 @@ public class XMLElement {
      *     <li>The keys and the values are strings.</li>
      * </ul></dd></dl>
      */
-    private Map<String, Object> attributes;
+    private final Map<String, Object> attributes;
 
     /**
      * Child elements of the element.
@@ -118,7 +128,7 @@ public class XMLElement {
      *         or a subclass of {@code XMLElement}.</li>
      * </ul></dd></dl>
      */
-    private Vector<XMLElement> children;
+    private final Vector<XMLElement> children;
 
     /**
      * The name of the element.
@@ -158,7 +168,7 @@ public class XMLElement {
      *     <li>The values are char arrays</li>
      * </ul></dd></dl>
      */
-    private Map<String, char[]> entities;
+    private final Map<String, char[]> entities;
 
     /**
      * The line number where the element starts.
@@ -167,19 +177,19 @@ public class XMLElement {
      * <ul><li>{@code lineNr >= 0}</li>
      * </ul></dd></dl>
      */
-    private int lineNr;
+    private final int lineNr;
 
     /**
      * {@code true} if the case of the element and attribute names are case
      * insensitive.
      */
-    private boolean ignoreCase;
+    private final boolean ignoreCase;
 
     /**
      * {@code true} if the leading and trailing whitespace of {@code #PCDATA}
      * sections have to be ignored.
      */
-    private boolean ignoreWhitespace;
+    private final boolean ignoreWhitespace;
 
     /**
      * Character read too much.
@@ -226,17 +236,15 @@ public class XMLElement {
      * <ul><li>{@code new XMLElement(new HashMap(), false, true)}</li></ul>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>{@linkplain #countChildren} =&gt; 0</li>
      *     <li>{@linkplain #enumerateChildren} =&gt; empty enumeration</li>
      *     <li>enumeratePropertyNames() =&gt; empty enumeration</li>
      *     <li>getChildren() =&gt; empty vector</li>
      *     <li>{@linkplain #getContent} =&gt; ""</li>
-     *     <li>{@linkplain #getLineNr} =&gt; 0</li>
      *     <li>{@linkplain #getName} =&gt; null</li>
      * </ul></dd></dl>
      */
     public XMLElement() {
-        this(new HashMap<String, char[]>(), false, true, true);
+        this(new HashMap<>(), false, true, true);
     }
 
     /**
@@ -266,40 +274,32 @@ public class XMLElement {
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>{@linkplain #countChildren} =&gt; 0</li>
      *     <li>{@linkplain #enumerateChildren} =&gt; empty enumeration</li>
      *     <li>enumeratePropertyNames() =&gt; empty enumeration</li>
      *     <li>getChildren() =&gt; empty vector</li>
      *     <li>{@linkplain #getContent} =&gt; ""</li>
-     *     <li>{@linkplain #getLineNr} =&gt; 0</li>
      *     <li>{@linkplain #getName} =&gt; null</li>
      * </ul></dd></dl>
      */
-    protected XMLElement(Map<String, char[]> entities,
-                         boolean skipLeadingWhitespace,
-                         boolean fillBasicConversionTable,
-                         boolean ignoreCase) {
+    protected XMLElement(final Map<String, char[]> entities,
+                         final boolean skipLeadingWhitespace,
+                         final boolean fillBasicConversionTable,
+                         final boolean ignoreCase) {
         this.ignoreWhitespace = skipLeadingWhitespace;
         this.ignoreCase = ignoreCase;
         this.name = null;
         this.contents = "";
         this.attributes = new HashMap<>();
         this.children = new Vector<>();
-        this.entities = entities;
+        this.entities = Objects.requireNonNull(entities);
         this.lineNr = 0;
-        Set<String> e = this.entities.keySet();
-        for(String key: e) {
-            Object value = this.entities.get(key);
-            if (value instanceof String) {
-                entities.put(key, ((String) value).toCharArray());
-            }
-        }
+
         if (fillBasicConversionTable) {
-            this.entities.put("amp", new char[] { '&' });
-            this.entities.put("quot", new char[] { '"' });
-            this.entities.put("apos", new char[] { '\'' });
-            this.entities.put("lt", new char[] { '<' });
-            this.entities.put("gt", new char[] { '>' });
+            this.entities.put(AMP_KEY, new char[] {AMP_CHAR});
+            this.entities.put(QUOT_KEY, new char[] {QUOT_CHAR});
+            this.entities.put(APOS_KEY, new char[] {APOS_CHAR});
+            this.entities.put(LT_KEY, new char[] {LT_CHAR});
+            this.entities.put(GT_KEY, new char[] {GT_CHAR});
         }
     }
 
@@ -316,14 +316,13 @@ public class XMLElement {
      * </ul></dd></dl>
      *
      * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>{@linkplain #countChildren} =&gt; old.countChildren() + 1</li>
      *     <li>{@linkplain #enumerateChildren} =&gt; old.enumerateChildren()
                + child</li>
      *     <li>getChildren() =&gt; old.enumerateChildren() + child</li>
      * </ul></dd></dl>
      *
      */
-    public void addChild(XMLElement child) {
+    public void addChild(final XMLElement child) {
         this.children.addElement(child);
     }
 
@@ -348,23 +347,13 @@ public class XMLElement {
      *         =&gt; value</li>
      * </ul></dd></dl>
      */
-    public void setAttribute(String name,
-                             Object value) {
+    public void setAttribute(final String name,
+                             final Object value) {
         if (this.ignoreCase) {
-            name = name.toUpperCase();
+            this.attributes.put(name.toUpperCase(), value.toString());
+        } else {
+            this.attributes.put(name, value.toString());
         }
-        this.attributes.put(name, value.toString());
-    }
-
-    /**
-     * @return the number of child elements of the element.
-     *
-     * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>{@code result >= 0}</li>
-     * </ul></dd></dl>
-     */
-    public int countChildren() {
-        return this.children.size();
     }
 
     /**
@@ -398,18 +387,6 @@ public class XMLElement {
     }
 
     /**
-     * @return the line nr in the source data on which the element is found.
-     * This method returns {@code 0} there is no associated source data.
-     *
-     * <dl><dt><b>Postconditions:</b></dt><dd>
-     * <ul><li>{@code result >= 0}</li>
-     * </ul></dd></dl>
-     */
-    public int getLineNr() {
-        return this.lineNr;
-    }
-
-    /**
      * @return an attribute of the element.
      * <p>
      * If the attribute doesn't exist, {@code null} is returned.
@@ -421,12 +398,12 @@ public class XMLElement {
      *     <li>{@code name} is a valid XML identifier</li>
      * </ul></dd></dl>
      */
-    public Object getAttribute(String name) {
+    public Object getAttribute(final String name) {
         if (this.ignoreCase) {
-            name = name.toUpperCase();
+            return this.attributes.get(name.toUpperCase());
+        } else {
+            return this.attributes.get(name);
         }
-        Object value = this.attributes.get(name);
-        return value;
     }
 
     /**
@@ -460,7 +437,7 @@ public class XMLElement {
      * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
-    public void parseFromReader(Reader reader)
+    public void parseFromReader(final Reader reader)
             throws IOException, XMLParseException {
         this.parseFromReader(reader, /*startingLineNr*/1);
     }
@@ -490,8 +467,8 @@ public class XMLElement {
      * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
-    public void parseFromReader(Reader reader,
-                                int startingLineNr)
+    public void parseFromReader(final Reader reader,
+                                final int startingLineNr)
             throws IOException, XMLParseException {
         this.charReadTooMuch = '\0';
         this.reader = reader;
@@ -536,7 +513,7 @@ public class XMLElement {
      * @param content
      *     The new content string.
      */
-    public void setContent(String content) {
+    public void setContent(final String content) {
         this.contents = content;
     }
 
@@ -551,7 +528,7 @@ public class XMLElement {
      *     <li>{@code name} is a valid XML identifier</li>
      * </ul></dd></dl>
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -574,8 +551,9 @@ public class XMLElement {
      * </ul></dd></dl>
      * @throws java.io.IOException if something goes wrong
      */
-    protected void scanIdentifier(StringBuffer result)
+    protected void scanIdentifier(final StringBuffer result)
             throws IOException {
+        Objects.requireNonNull(result);
         for (;;) {
             char ch = this.readChar();
             if (((ch < 'A') || (ch > 'Z')) && ((ch < 'a') || (ch > 'z'))
@@ -588,7 +566,7 @@ public class XMLElement {
         }
     }
 
-    private boolean isRegularWhiteSpace(char ch) {
+    private boolean isRegularWhiteSpace(final char ch) {
         switch (ch) {
             case ' ':
             case '\t':
@@ -609,7 +587,7 @@ public class XMLElement {
     private char scanWhitespace()
             throws IOException {
         while(true) {
-            char ch = this.readChar();
+            final char ch = this.readChar();
             if (!isRegularWhiteSpace(ch)) {
                 return ch;
             }
@@ -626,7 +604,7 @@ public class XMLElement {
     private char scanLeadingWhitespace()
             throws IOException {
         while(true) {
-            char ch = this.readChar();
+            final char ch = this.readChar();
             //this is BOM , when used without \\u, appear like space, but causes issues on windows development
             if (ch == '\uFEFF') {
                 BOM = true;
@@ -649,10 +627,11 @@ public class XMLElement {
      * </ul></dd></dl>
      * @throws java.io.IOException if something goes wrong
      */
-    protected char scanWhitespace(StringBuffer result)
+    protected char scanWhitespace(final StringBuffer result)
             throws IOException {
+        Objects.requireNonNull(result);
         while (true) {
-            char ch = this.readChar();
+            final char ch = this.readChar();
             if (!isRegularWhiteSpace(ch)) {
                 return ch;
             } else {
@@ -678,14 +657,14 @@ public class XMLElement {
      * @param string where to append the result
      * @throws java.io.IOException if something goes wrong
      */
-    protected void scanString(StringBuffer string)
+    protected void scanString(final StringBuffer string)
             throws IOException {
-        char delimiter = this.readChar();
+        final char delimiter = this.readChar();
         if ((delimiter != '\'') && (delimiter != '"')) {
             throw this.expectedInput("' or \"");
         }
         for (;;) {
-            char ch = this.readChar();
+            final char ch = this.readChar();
             if (ch == delimiter) {
                 return;
             } else if (ch == '&') {
@@ -710,7 +689,7 @@ public class XMLElement {
      * @param data where to append data
      * @throws java.io.IOException if something goes wrong
      */
-    protected void scanPCData(StringBuffer data)
+    protected void scanPCData(final StringBuffer data)
             throws IOException {
         for (;;) {
             char ch = this.readChar();
@@ -742,7 +721,7 @@ public class XMLElement {
      * @return whether the CDATA were ok
      * @throws java.io.IOException if something goes wrong
      */
-    protected boolean checkCDATA(StringBuffer buf)
+    protected boolean checkCDATA(final StringBuffer buf)
             throws IOException {
         char ch = this.readChar();
         if (ch != '[') {
@@ -839,20 +818,21 @@ public class XMLElement {
      * </ul></dd></dl>
      * @throws java.io.IOException if something goes wrong
      */
-    protected void skipSpecialTag(int bracketLevel)
+    protected void skipSpecialTag(final int bracketLevel)
             throws IOException {
+        int internalBracketLevel = bracketLevel;
         int tagLevel = 1; // <
         char stringDelimiter = '\0';
-        if (bracketLevel == 0) {
+        if (internalBracketLevel == 0) {
             char ch = this.readChar();
             if (ch == '[') {
-                bracketLevel += 1;
+                internalBracketLevel += 1;
             } else if (ch == '-') {
                 ch = this.readChar();
                 if (ch == '[') {
-                    bracketLevel += 1;
+                    internalBracketLevel += 1;
                 } else if (ch == ']') {
-                    bracketLevel -= 1;
+                    internalBracketLevel -= 1;
                 } else if (ch == '-') {
                     this.skipComment();
                     return;
@@ -864,7 +844,7 @@ public class XMLElement {
             if (stringDelimiter == '\0') {
                 if ((ch == '"') || (ch == '\'')) {
                     stringDelimiter = ch;
-                } else if (bracketLevel <= 0) {
+                } else if (internalBracketLevel <= 0) {
                     if (ch == '<') {
                         tagLevel += 1;
                     } else if (ch == '>') {
@@ -872,9 +852,9 @@ public class XMLElement {
                     }
                 }
                 if (ch == '[') {
-                    bracketLevel += 1;
+                    internalBracketLevel += 1;
                 } else if (ch == ']') {
-                    bracketLevel -= 1;
+                    internalBracketLevel -= 1;
                 }
             } else {
                 if (ch == stringDelimiter) {
@@ -898,9 +878,9 @@ public class XMLElement {
      * @return true if literal was ok
      * @throws java.io.IOException  if something goes wrong
      */
-    protected boolean checkLiteral(String literal)
+    protected boolean checkLiteral(final String literal)
             throws IOException {
-        int length = literal.length();
+        final int length = literal.length();
         for (int i = 0; i < length; i += 1) {
             if (this.readChar() != literal.charAt(i)) {
                 return false;
@@ -917,11 +897,11 @@ public class XMLElement {
     protected char readChar()
             throws IOException {
         if (this.charReadTooMuch != '\0') {
-            char ch = this.charReadTooMuch;
+            final char ch = this.charReadTooMuch;
             this.charReadTooMuch = '\0';
             return ch;
         } else {
-            int i = this.reader.read();
+            final int i = this.reader.read();
             if (i < 0) {
                 throw this.unexpectedEndOfData();
             } else if (i == 10) {
@@ -944,18 +924,18 @@ public class XMLElement {
      * </ul></dd></dl>
      * @throws java.io.IOException if something goes wrong
      */
-    protected void scanElement(XMLElement elt)
+    protected void scanElement(final XMLElement elt)
             throws IOException {
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         this.scanIdentifier(buf);
-        String lname = buf.toString();
+        final String lname = buf.toString();
         elt.setName(lname);
         char ch = this.scanWhitespace();
         while ((ch != '>') && (ch != '/')) {
             buf.setLength(0);
             this.unreadChar(ch);
             this.scanIdentifier(buf);
-            String key = buf.toString();
+            final String key = buf.toString();
             ch = this.scanWhitespace();
             if (ch != '=') {
                 throw this.expectedInput("=");
@@ -1013,7 +993,7 @@ public class XMLElement {
                     this.skipComment();
                 } else {
                     this.unreadChar(ch);
-                    XMLElement child = this.createAnotherElement();
+                    final XMLElement child = this.createAnotherElement();
                     this.scanElement(child);
                     elt.addChild(child);
                 }
@@ -1057,10 +1037,10 @@ public class XMLElement {
      * </ul></dd></dl>
      * @throws java.io.IOException if something goes wrong
      */
-    protected void resolveEntity(StringBuffer buf)
+    protected void resolveEntity(final StringBuffer buf)
             throws IOException {
         char ch = '\0';
-        StringBuffer keyBuf = new StringBuffer();
+        final StringBuffer keyBuf = new StringBuffer();
         for (;;) {
             ch = this.readChar();
             if (ch == ';') {
@@ -1068,7 +1048,7 @@ public class XMLElement {
             }
             keyBuf.append(ch);
         }
-        String key = keyBuf.toString();
+        final String key = keyBuf.toString();
         if (key.charAt(0) == '#') {
             try {
                 if (key.charAt(1) == 'x') {
@@ -1099,7 +1079,7 @@ public class XMLElement {
      *     <li>{@code ch != '\0'}</li>
      * </ul></dd></dl>
      */
-    protected void unreadChar(char ch) {
+    protected void unreadChar(final char ch) {
         this.charReadTooMuch = ch;
     }
 
@@ -1114,8 +1094,8 @@ public class XMLElement {
      * </ul></dd></dl>
      * @return exception to be thrown
      */
-    protected XMLParseException invalidValueSet(String name) {
-        String msg = "Invalid value set (entity name = \"" + name + "\")";
+    protected XMLParseException invalidValueSet(final String name) {
+        final String msg = "Invalid value set (entity name = \"" + name + "\")";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
@@ -1145,25 +1125,10 @@ public class XMLElement {
      * @return  exception to be used
      */
     protected XMLParseException unexpectedEndOfData() {
-        String msg = "Unexpected end of data reached";
+        final String msg = "Unexpected end of data reached";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
-    /**
-     * Creates a parse exception for when a syntax error occured.
-     *
-     * @param context The context in which the error occured.
-     *
-     * <dl><dt><b>Preconditions:</b></dt><dd>
-     * <ul><li>{@code context != null}</li>
-     *     <li>{@code context.length() &gt; 0}</li>
-     * </ul></dd></dl>
-     * @return exception to be used
-     */
-    protected XMLParseException syntaxError(String context) {
-        String msg = "Syntax error while parsing " + context;
-        return new XMLParseException(this.getName(), this.parserLineNr, msg);
-    }
 
     /**
      * Creates a parse exception for when the next character read is not
@@ -1178,8 +1143,8 @@ public class XMLElement {
      * </ul></dd></dl>
      * @return exception to be used
      */
-    protected XMLParseException expectedInput(String charSet) {
-        String msg = "Expected: " + charSet;
+    protected XMLParseException expectedInput(final String charSet) {
+        final String msg = "Expected: " + charSet;
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
@@ -1196,8 +1161,8 @@ public class XMLElement {
      * </ul></dd></dl>
      * @return exception to be used
      */
-    protected XMLParseException expectedInput(String charSet, char ch) {
-        String msg = "Expected: '" + charSet + "'" + " but got: '" + ch + "'";
+    protected XMLParseException expectedInput(final String charSet, final char ch) {
+        final String msg = "Expected: '" + charSet + "'" + " but got: '" + ch + "'";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
@@ -1212,8 +1177,8 @@ public class XMLElement {
      *     <li>{@code name.length() &gt; 0}</li>
      * </ul></dd></dl>
      */
-    protected XMLParseException unknownEntity(String name) {
-        String msg = "Unknown or invalid entity: &" + name + ";";
+    protected XMLParseException unknownEntity(final String name) {
+        final String msg = "Unknown or invalid entity: &" + name + ";";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
 
@@ -1225,9 +1190,9 @@ public class XMLElement {
      * @param pout The {@link java.io.PipedOutputStream} that will be receiving the
      *             filtered xml file.
      */
-    public void sanitizeInput(Reader isr, OutputStream pout) {
+    public void sanitizeInput(final Reader isr, final OutputStream pout) {
         StringBuilder line = new StringBuilder();
-        try (PrintStream out = new PrintStream(pout)) {
+        try (final PrintStream out = new PrintStream(pout)) {
             this.sanitizeCharReadTooMuch = '\0';
             this.reader = isr;
             this.parserLineNr = 0;
@@ -1316,7 +1281,7 @@ public class XMLElement {
                 prev = next;
             }
             isr.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // Print the stack trace here -- xml.parseFromReader() will
             // throw the ParseException if something goes wrong.
             throw new RuntimeException("Error in XML", e);
@@ -1328,10 +1293,4 @@ public class XMLElement {
         }
     }
 
-    public boolean isBOM() {
-        return BOM;
-    }
-    
-    
-    
 }
