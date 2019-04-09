@@ -47,6 +47,7 @@ import java.util.Arrays;
 public class MD5SumWatcher {
 
     private final File watchedFile;
+
     private byte[] md5sum;
 
     /**

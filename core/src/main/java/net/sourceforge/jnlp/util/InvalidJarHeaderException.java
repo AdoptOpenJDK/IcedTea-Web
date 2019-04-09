@@ -40,9 +40,9 @@ package net.sourceforge.jnlp.util;
  * Thrown from net.sourceforge.jnlp.utilJArFile when verification of headers fails
  * 
  */
-public class InvalidJarHeaderException extends RuntimeException{
+public class InvalidJarHeaderException extends RuntimeException {
 
-    public InvalidJarHeaderException(String string) {
+    public InvalidJarHeaderException(final String string) {
         super(string);
     }
     

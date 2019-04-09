@@ -1,6 +1,8 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.http.HttpUtils;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -8,7 +10,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
-import net.sourceforge.jnlp.util.HttpUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class ResourceDownloader implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
+    private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
+
     private final Resource resource;
     private final Object lock;
 
@@ -54,7 +57,7 @@ public class ResourceDownloader implements Runnable {
         this.lock = lock;
     }
 
-    static int getUrlResponseCode(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
+    static int getUrlResponseCode(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
         return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
     }
 
@@ -67,19 +70,19 @@ public class ResourceDownloader implements Runnable {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException
      */
-    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(URL url, Map<String, String> requestProperties, ResourceTracker.RequestMethods requestMethod) throws IOException {
-        UrlRequestResult result = new UrlRequestResult();
-        URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
+    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
+        final UrlRequestResult result = new UrlRequestResult();
+        final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
-        for (Map.Entry<String, String> property : requestProperties.entrySet()) {
+        for (final Map.Entry<String, String> property : requestProperties.entrySet()) {
             connection.addRequestProperty(property.getKey(), property.getValue());
         }
 
         if (connection instanceof HttpURLConnection) {
-            HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            httpConnection.setRequestMethod(requestMethod.toString());
+            final HttpURLConnection httpConnection = (HttpURLConnection) connection;
+            httpConnection.setRequestMethod(requestMethod.name());
 
-            int responseCode = httpConnection.getResponseCode();
+            final int responseCode = httpConnection.getResponseCode();
 
             /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
@@ -88,15 +91,15 @@ public class ResourceDownloader implements Runnable {
             result.result = responseCode;
         }
 
-        Map<String, List<String>> header = connection.getHeaderFields();
-        for (Map.Entry<String, List<String>> entry : header.entrySet()) {
+        final Map<String, List<String>> header = connection.getHeaderFields();
+        for (final Map.Entry<String, List<String>> entry : header.entrySet()) {
             LOG.info("Key : {} ,Value : {}", entry.getKey(), entry.getValue());
         }
         /*
          * Do this only on 301,302,303(?)307,308>
          * Now setting value for all, and lets upper stack to handle it
          */
-        String possibleRedirect = connection.getHeaderField("Location");
+        final String possibleRedirect = connection.getHeaderField("Location");
         if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
             result.URL = new URL(possibleRedirect);
         }
@@ -133,7 +136,7 @@ public class ResourceDownloader implements Runnable {
 
     private void initializeOnlineResource() {
         try {
-            UrlRequestResult finalLocation = findBestUrl(resource);
+            final UrlRequestResult finalLocation = findBestUrl(resource);
             if (finalLocation != null) {
                 initializeFromURL(finalLocation);
             } else {
@@ -149,12 +152,12 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void initializeFromURL(UrlRequestResult location) throws IOException {
+    private void initializeFromURL(final UrlRequestResult location) throws IOException {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
         try {
             resource.setDownloadLocation(location.URL);
-            URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.URL); // this won't change so should be okay not-synchronized
+            final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.URL); // this won't change so should be okay not-synchronized
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
@@ -239,11 +242,11 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void initializeOfflineResource() {
-        CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+        final CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
 
         try {
-            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+            final File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
 
             if (localFile != null && localFile.exists()) {
                 long size = localFile.length();
@@ -277,17 +280,17 @@ public class ResourceDownloader implements Runnable {
      * @param resource the resource
      * @return the best URL, or null if all failed to resolve
      */
-    protected UrlRequestResult findBestUrl(Resource resource) {
+    protected UrlRequestResult findBestUrl(final Resource resource) {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {
             options = new DownloadOptions(false, false);
         }
 
-        List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
+        final List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Finding best URL for: " + resource.getLocation() + " : " + options.toString());
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "All possible urls for "
                 + resource.toString() + " : " + urls);
-        for (ResourceTracker.RequestMethods requestMethod : ResourceTracker.RequestMethods.getValidRequestMethods()) {
+        for (final HttpMethod requestMethod : validRequestMethods) {
             for (int i = 0; i < urls.size(); i++) {
                 URL url = urls.get(i);
                 try {
