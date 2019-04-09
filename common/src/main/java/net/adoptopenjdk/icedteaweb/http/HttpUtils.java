@@ -48,7 +48,7 @@ public class HttpUtils {
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * Captured IOException is consumed and printed
-     * @param c the connection to be closed silentlyboolean isHeadRequest = request.equals(
+     * @param c the connection to be closed silently
      */
     public static void consumeAndCloseConnectionSilently(final HttpURLConnection c) {
         try {
