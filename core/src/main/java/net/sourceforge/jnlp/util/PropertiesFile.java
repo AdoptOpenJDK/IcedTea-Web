@@ -18,7 +18,6 @@ package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.lockingfile.LockedFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,31 +41,37 @@ public class PropertiesFile extends Properties {
 
     private final static Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
 
-    /** the file to save to */
-    LockedFile lockedFile;
+    /**
+     * the file to save to
+     */
+    private final LockedFile lockedFile;
 
-    /** the header string */
-    String header = "netx file";
-    
-    /** time of last modification, lazy loaded on getProperty */
-    long lastStore;
+    /**
+     * the header string
+     */
+    private final String header;
+
+    /**
+     * time of last modification, lazy loaded on getProperty
+     */
+    private long lastStore;
 
     /**
      * Create a properties object backed by the specified file.
      *
      * @param file the file to save and load to
      */
-    public PropertiesFile(File file) {
-        this.lockedFile = LockedFile.getInstance(file);
+    public PropertiesFile(final File file) {
+        this(file, "netx file");
     }
 
     /**
      * Create a properties object backed by the specified file.
      *
-     * @param file the file to save and load to
+     * @param file   the file to save and load to
      * @param header the file header
      */
-    public PropertiesFile(File file, String header) {
+    public PropertiesFile(final File file, final String header) {
         this.lockedFile = LockedFile.getInstance(file);
         this.header = header;
     }
@@ -76,10 +81,10 @@ public class PropertiesFile extends Properties {
      * does not exist.
      */
     @Override
-    public String getProperty(String key) {
-        if (lastStore == 0)
+    public String getProperty(final String key) {
+        if (lastStore == 0) {
             load();
-
+        }
         return super.getProperty(key);
     }
 
@@ -88,10 +93,10 @@ public class PropertiesFile extends Properties {
      * if the key does not exist.
      */
     @Override
-    public String getProperty(String key, String defaultValue) {
-        if (lastStore == 0)
+    public String getProperty(final String key, final String defaultValue) {
+        if (lastStore == 0) {
             load();
-
+        }
         return super.getProperty(key, defaultValue);
     }
 
@@ -101,10 +106,10 @@ public class PropertiesFile extends Properties {
      * @return the previous value
      */
     @Override
-    public Object setProperty(String key, String value) {
-        if (lastStore == 0)
+    public Object setProperty(final String key, final String value) {
+        if (lastStore == 0) {
             load();
-
+        }
         return super.setProperty(key, value);
     }
 
@@ -119,18 +124,18 @@ public class PropertiesFile extends Properties {
      * Ensures that the file backing these properties has been
      * loaded; call this method before calling any method defined by
      * a superclass.
-     * 
+     *
      * @return true, if file was (re-)loaded
-     *         false, if file was still current
+     * false, if file was still current
      */
     public boolean load() {
-        File file = lockedFile.getFile();
+        final File file = lockedFile.getFile();
         if (!file.exists()) {
             return false;
         }
 
-        long currentStore = file.lastModified();
-        long currentTime = System.currentTimeMillis();
+        final long currentStore = file.lastModified();
+        final long currentTime = System.currentTimeMillis();
 
         /* (re)load file, if
          *  - it wasn't loaded/stored, yet (lastStore == 0)
@@ -138,25 +143,15 @@ public class PropertiesFile extends Properties {
          *  - current file modification timestamp has not changed since last store AND current system time equals current file modification timestamp
          *    This is necessary because some filesystems seems only to provide accuracy of the timestamp on the level of seconds!
          */
-        if(lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
-            InputStream s = null;
-            try {
-
-                try {
-                    s = new FileInputStream(file);
-                    load(s);
-                } finally {
-                    if (s != null) {
-                        s.close();
-                        lastStore=currentStore;
-                        return true;
-                    }
-                }
-            } catch (IOException ex) {
+        if (lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
+            try (InputStream s = new FileInputStream(file)) {
+                load(s);
+                lastStore = currentStore;
+                return true;
+            } catch (final IOException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
-
         return false;
     }
 
@@ -164,21 +159,14 @@ public class PropertiesFile extends Properties {
      * Saves the properties to the file.
      */
     public void store() {
-        File file = lockedFile.getFile();
-        FileOutputStream s = null;
-        try {
-            try {
-                file.getParentFile().mkdirs();
-                s = new FileOutputStream(file);
-                store(s, header);
-
-                // fsync()
-                s.getChannel().force(true);
-                lastStore = file.lastModified();
-            } finally {
-                if (s != null) s.close();
-            }
-        } catch (IOException ex) {
+        final File file = lockedFile.getFile();
+        try (final FileOutputStream s = new FileOutputStream(file)) {
+            file.getParentFile().mkdirs();
+            store(s, header);
+            // fsync()
+            s.getChannel().force(true);
+            lastStore = file.lastModified();
+        } catch (final IOException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
@@ -186,7 +174,7 @@ public class PropertiesFile extends Properties {
     public void lock() {
         try {
             lockedFile.lock();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
@@ -194,7 +182,7 @@ public class PropertiesFile extends Properties {
     public boolean tryLock() {
         try {
             return lockedFile.tryLock();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return false;
@@ -207,7 +195,7 @@ public class PropertiesFile extends Properties {
     public void unlock() {
         try {
             lockedFile.unlock();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }

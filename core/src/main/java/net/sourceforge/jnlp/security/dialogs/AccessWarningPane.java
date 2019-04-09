@@ -41,7 +41,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;

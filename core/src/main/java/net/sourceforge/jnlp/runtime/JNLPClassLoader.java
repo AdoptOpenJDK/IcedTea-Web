@@ -79,7 +79,7 @@ import net.sourceforge.jnlp.cache.NativeLibraryStorage;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
+import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;

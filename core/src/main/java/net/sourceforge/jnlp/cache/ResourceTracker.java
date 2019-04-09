@@ -22,7 +22,6 @@ import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.event.DownloadEvent;
 import net.sourceforge.jnlp.event.DownloadListener;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,18 +92,6 @@ public class ResourceTracker {
     // defines
     //    ResourceTracker.Downloader (download threads)
 
-    // separately locks on (in order of aquire order, ie, sync on prefetch never syncs on lock):
-    //   lock, prefetch, this.resources, each resource, listeners
-    public static enum RequestMethods{
-        HEAD, GET, TESTING_UNDEF;
-
-    private static final RequestMethods[] requestMethods = {RequestMethods.HEAD, RequestMethods.GET};
-
-        public static RequestMethods[] getValidRequestMethods() {
-            return requestMethods;
-        }
-    }
-    
       /** notified on initialization or download of a resource */
     private static final Object lock = new Object(); // used to lock static structures
 

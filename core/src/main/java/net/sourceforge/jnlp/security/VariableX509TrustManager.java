@@ -41,7 +41,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.util.HostnameChecker;
@@ -49,7 +48,6 @@ import sun.security.validator.ValidatorException;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.reflect.InvocationTargetException;
@@ -64,6 +62,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class implements an X509 Trust Manager. The certificates it trusts are
@@ -75,109 +74,83 @@ final public class VariableX509TrustManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(VariableX509TrustManager.class);
 
-    /** TrustManagers containing trusted CAs */
-    private X509TrustManager[] caTrustManagers = null;
+    public final static String SUN_X_509 = "SunX509";
 
-    /** TrustManagers containing trusted certificates */
-    private X509TrustManager[] certTrustManagers = null;
+    public final static String SUN_JSSE = "SunJSSE";
 
-    /** TrustManagers containing trusted client certificates */
-    private X509TrustManager[] clientTrustManagers = null;
-
-    private ArrayList<Certificate> temporarilyTrusted = new ArrayList<>();
-    private ArrayList<Certificate> temporarilyUntrusted = new ArrayList<>();
 
     private static VariableX509TrustManager instance = null;
+
+
+    private final List<Certificate> temporarilyTrusted = new ArrayList<>();
+
+    private final List<Certificate> temporarilyUntrusted = new ArrayList<>();
+
+    private final List<X509TrustManager> certTrustManagers = new ArrayList<>();
+
+    private final List<X509TrustManager> clientTrustManagers = new ArrayList<>();
+
+
+    private final List<X509TrustManager> caTrustManagers = new ArrayList<>();
+
+    public static void main(String[] args) {
+        new VariableX509TrustManager();
+    }
 
     /**
      * Constructor initializes the system, user and custom stores
      */
     public VariableX509TrustManager() {
-
-        /*
-         * Load TrustManagers for trusted certificates
-         */
         try {
-            /** KeyStores containing trusted certificates */
-            KeyStore[] trustedCertKeyStores = KeyStores.getCertKeyStores();
-            certTrustManagers = new X509TrustManager[trustedCertKeyStores.length];
-
-            for (int j = 0; j < trustedCertKeyStores.length; j++) {
-                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-                tmFactory.init(trustedCertKeyStores[j]);
-
-                // tm factory initialized, now get the managers so we can assign the X509 one
-                TrustManager[] trustManagers = tmFactory.getTrustManagers();
-
-                for (TrustManager trustManager : trustManagers) {
-                    if (trustManager instanceof X509TrustManager) {
-                        certTrustManagers[j] = (X509TrustManager) trustManager;
-                    }
-                }
-            }
+            loadManagers(Arrays.asList(KeyStores.getCertKeyStores()), certTrustManagers);
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
-        /*
-         * Load TrustManagers for trusted CAs
-         */
         try {
-            /** KeyStores containing trusted CAs */
-            KeyStore[] trustedCAKeyStores = KeyStores.getCAKeyStores();
-            caTrustManagers = new X509TrustManager[trustedCAKeyStores.length];
-
-            for (int j = 0; j < caTrustManagers.length; j++) {
-                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-                tmFactory.init(trustedCAKeyStores[j]);
-
-                // tm factory initialized, now get the managers so we can extract the X509 one
-                TrustManager[] trustManagers = tmFactory.getTrustManagers();
-
-                for (TrustManager trustManager : trustManagers) {
-                    if (trustManager instanceof X509TrustManager) {
-                        caTrustManagers[j] = (X509TrustManager) trustManager;
-                    }
-                }
-            }
+            loadManagers(Arrays.asList(KeyStores.getCAKeyStores()), caTrustManagers);
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
-        /*
-         * Load TrustManagers for trusted clients certificates
-         */
         try {
-            KeyStore[] clientKeyStores = KeyStores.getClientKeyStores();
-            clientTrustManagers = new X509TrustManager[clientKeyStores.length];
-
-            for (int j = 0; j < clientTrustManagers.length; j++) {
-                TrustManagerFactory tmFactory = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
-                tmFactory.init(clientKeyStores[j]);
-
-                // tm factory initialized, now get the managers so we can extract the X509 one
-                TrustManager[] trustManagers = tmFactory.getTrustManagers();
-
-                for (TrustManager trustManager : trustManagers) {
-                    if (trustManager instanceof X509TrustManager) {
-                        clientTrustManagers[j] = (X509TrustManager) trustManager;
-                    }
-                }
-            }
+            loadManagers(Arrays.asList(KeyStores.getClientKeyStores()), clientTrustManagers);
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
+    private void loadManagers(final List<KeyStore> keyStores, final List<X509TrustManager> managers) {
+        Objects.requireNonNull(keyStores);
+        Objects.requireNonNull(managers);
+
+        keyStores.stream()
+                .map(keyStore -> getTrustManagerFactory(keyStore))
+                .flatMap(trustManagerFactory -> Arrays.asList(trustManagerFactory.getTrustManagers()).stream())
+                .filter(trustManager -> trustManager instanceof X509TrustManager)
+                .forEach(trustManager -> managers.add((X509TrustManager) trustManager));
+    }
+
+    private TrustManagerFactory getTrustManagerFactory(final KeyStore keyStore) {
+        try {
+            final TrustManagerFactory tmFactory = TrustManagerFactory.getInstance(SUN_X_509, SUN_JSSE);
+            tmFactory.init(keyStore);
+            return tmFactory;
+        } catch (final Exception e) {
+            throw new RuntimeException("Error while creating TrustManagerFactory");
+        }
+    }
+
     /**
      * Check if client is trusted (no support for custom here, only system/user)
-     * @param chain certificate chain
+     *
+     * @param chain    certificate chain
      * @param authType type of authentification
      * @param hostName hostnem
      * @throws java.security.cert.CertificateException if certificate is wrong
      */
-    public void checkTrustClient(X509Certificate[] chain, String authType,
-                                   String hostName)
+    public void checkTrustClient(final X509Certificate[] chain, final String authType,
+                                 final String hostName)
             throws CertificateException {
 
         boolean trusted = false;
@@ -187,7 +160,7 @@ final public class VariableX509TrustManager {
                 clientTrustManager.checkClientTrusted(chain, authType);
                 trusted = true;
                 break;
-            }catch (ValidatorException caex) {
+            } catch (ValidatorException caex) {
                 savedException = caex;
             }
         }
@@ -200,21 +173,21 @@ final public class VariableX509TrustManager {
 
     /**
      * Check if the server is trusted.
-     *
+     * <p>
      * First, existing stores are checked to see if the certificate is trusted.
      * Next, if the certificate is not explicitly trusted by the user, a host
      * name check is performed. The user is them prompted as needed.
      *
-     * @param chain The cert chain
+     * @param chain    The cert chain
      * @param authType The auth type algorithm
      * @param hostName The expected hostName that the server should have
-     * @param socket The SSLSocket in use (may be null)
-     * @param engine The SSLEngine in use (may be null)
+     * @param socket   The SSLSocket in use (may be null)
+     * @param engine   The SSLEngine in use (may be null)
      * @throws java.security.cert.CertificateException if certificate is wrong
      */
     public synchronized void checkTrustServer(X509Certificate[] chain,
-                             String authType, String hostName,
-                             SSLSocket socket, SSLEngine engine) throws CertificateException {
+                                              String authType, String hostName,
+                                              SSLSocket socket, SSLEngine engine) throws CertificateException {
         CertificateException ce = null;
         boolean trusted = true;
         boolean CNMatched = false;
@@ -267,7 +240,7 @@ final public class VariableX509TrustManager {
 
     /**
      * Check system, user and custom trust manager.
-     *
+     * <p>
      * This method is intended to work with both, JRE6 and JRE7. If socket
      * and engine are null, it assumes that the call is for JRE6 (i.e. not
      * javax.net.ssl.X509ExtendedTrustManager which is Java 7 specific). If
@@ -275,10 +248,10 @@ final public class VariableX509TrustManager {
      * are javax.net.ssl.X509ExtendedTrustManager instances and will
      * invoke their check methods.
      *
-     * @param chain The certificate chain
+     * @param chain    The certificate chain
      * @param authType The authentication type
-     * @param socket the SSLSocket being used for the connection
-     * @param engine the SSLEngine being used for the connection
+     * @param socket   the SSLSocket being used for the connection
+     * @param engine   the SSLEngine being used for the connection
      */
     private void checkAllManagers(X509Certificate[] chain, String authType, Socket socket, SSLEngine engine) throws CertificateException {
 
@@ -299,13 +272,13 @@ final public class VariableX509TrustManager {
                             Method mcheckServerTrusted = x509ETMClass.getDeclaredMethod("checkServerTrusted", X509Certificate[].class, String.class, SSLEngine.class);
                             mcheckServerTrusted.invoke(caTrustManager, chain, authType, engine);
                         }
-                    }catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException nsme) {
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException nsme) {
                         throw new ValidatorException(nsme.getMessage());
                     }
                 }
                 trusted = true;
                 break;
-            }catch (ValidatorException caex) {
+            } catch (ValidatorException caex) {
                 savedException = caex;
             }
         }
@@ -319,7 +292,7 @@ final public class VariableX509TrustManager {
                 certTrustManager.checkServerTrusted(chain, authType);
                 trusted = true;
                 break;
-            }catch (ValidatorException caex) {
+            } catch (ValidatorException caex) {
                 savedException = caex;
             }
         }
@@ -349,12 +322,12 @@ final public class VariableX509TrustManager {
                 certTrustManager.checkServerTrusted(chain, authType);
                 explicitlyTrusted = true;
                 break;
-            }catch (ValidatorException uex) {
+            } catch (ValidatorException uex) {
                 if (temporarilyTrusted.contains(chain[0])) {
                     explicitlyTrusted = true;
                     break;
                 }
-            }catch (CertificateException ce) {
+            } catch (CertificateException ce) {
                 // not explicitly trusted
             }
         }
@@ -405,14 +378,14 @@ final public class VariableX509TrustManager {
     /**
      * Ask user if the certificate should be trusted
      *
-     * @param chain The certificate chain
+     * @param chain    The certificate chain
      * @param authType The authentication algorithm
      * @return user's response
      */
     private boolean askUser(final X509Certificate[] chain, final String authType,
                             final boolean isTrusted, final boolean hostMatched,
                             final String hostName) {
-         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
                 YesNoSandbox r = SecurityDialogs.showCertWarningDialog(

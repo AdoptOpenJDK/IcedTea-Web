@@ -32,14 +32,14 @@ public class PropertyDesc {
      * @return new PropertyDesc based on parsed key=value, though composed from key and value
      * @throws net.sourceforge.jnlp.LaunchException if creations fails
      */
-    public static PropertyDesc fromString(String prop) throws LaunchException {
+    public static PropertyDesc fromString(final String prop) throws LaunchException {
         // allows empty property, not sure about validity of that.
         int equals = prop.indexOf("=");
         if (equals == -1) {
             throw new LaunchException(R("BBadProp", prop));
         }
-        String key = prop.substring(0, equals);
-        String value = prop.substring(equals + 1, prop.length());
+        final String key = prop.substring(0, equals);
+        final String value = prop.substring(equals + 1, prop.length());
 
         return new PropertyDesc(key, value);
 
@@ -57,7 +57,7 @@ public class PropertyDesc {
      * @param key the key name
      * @param value the value
      */
-    public PropertyDesc(String key, String value) {
+    public PropertyDesc(final String key, final String value) {
         this.key = key;
         this.value = value;
     }

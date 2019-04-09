@@ -19,11 +19,11 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,8 +65,8 @@ public class AppletDesc implements LaunchDesc {
      * @param height the height
      * @param parameters the parameters
      */
-    public AppletDesc(String name, String mainClass, URL documentBase, int width, int height,
-                      Map<String, String> parameters) {
+    public AppletDesc(final String name, final String mainClass, final URL documentBase, final int width, final int height,
+                      final Map<String, String> parameters) {
         this.name = name;
         this.mainClass = mainClass;
         this.documentBase = documentBase;
@@ -97,12 +97,16 @@ public class AppletDesc implements LaunchDesc {
         return documentBase;
     }
 
+    private Integer getConfigurationPropertyAsInt(final String name) {
+        return Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(name));
+    }
+
     /**
      * @return the width
      */
     public int getWidth() {
-        if (width < Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD))) {
-            Integer nww = fixWidth();
+        if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
+            final Integer nww = fixWidth();
             if (nww != null) {
                 return nww;
             }
@@ -114,8 +118,8 @@ public class AppletDesc implements LaunchDesc {
      * @return the height
      */
     public int getHeight() {
-        if (height < Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD))) {
-            Integer nwh = fixHeight();
+        if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
+            final Integer nwh = fixHeight();
             if (nwh != null) {
                 return nwh;
             }
@@ -127,7 +131,7 @@ public class AppletDesc implements LaunchDesc {
      * @return  the applet parameters
      */
     public Map<String, String> getParameters() {
-        return new HashMap<>(parameters);
+        return Collections.unmodifiableMap(parameters);
     }
 
     /**
@@ -138,7 +142,7 @@ public class AppletDesc implements LaunchDesc {
      * @param name key of value
      * @param value value to be added
      */
-    public void addParameter(String name, String value) {
+    public void addParameter(final String name, final String value) {
         parameters.put(name, value);
     }
 
@@ -149,10 +153,10 @@ public class AppletDesc implements LaunchDesc {
         return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH, "Width", "width", "WIDTH");
     }
 
-    private Integer fixSize(String depKey, String... keys) {
+    private Integer fixSize(final String depKey, final String... keys) {
         LOG.info("Found to small applet!");
         try {
-            Integer depVal = Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(depKey));
+            final Integer depVal = getConfigurationPropertyAsInt(depKey);
             if (depVal == 0) {
                 LOG.info("using its size");
                 return null;
@@ -162,7 +166,7 @@ public class AppletDesc implements LaunchDesc {
                 return Math.abs(depVal);
             }
             for (final String key : keys) {
-                String sizeFromParam = parameters.get(key);
+                final String sizeFromParam = parameters.get(key);
                 if (sizeFromParam != null) {
                     try {
                         LOG.info("using its {}={}", key, sizeFromParam);

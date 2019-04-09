@@ -40,7 +40,7 @@ package net.sourceforge.jnlp.security.dialogs;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.jdk89acesses.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;

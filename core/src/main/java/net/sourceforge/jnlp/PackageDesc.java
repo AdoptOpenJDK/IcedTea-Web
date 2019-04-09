@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp;
 
+import java.util.Objects;
+
 /**
  * The package element.
  *
@@ -24,6 +26,7 @@ package net.sourceforge.jnlp;
  */
 public class PackageDesc {
 
+    public static final String ASTERIX_SUFFIX = ".*";
     /** the package name */
     private final String name;
 
@@ -40,8 +43,8 @@ public class PackageDesc {
      * @param part the part required by the package
      * @param recursive whether the package includes subpackages
      */
-    public PackageDesc(String name, String part, boolean recursive) {
-        this.name = name;
+    public PackageDesc(final String name, final String part, final boolean recursive) {
+        this.name = Objects.requireNonNull(name);
         this.part = part;
         this.recursive = recursive;
     }
@@ -52,23 +55,21 @@ public class PackageDesc {
      * @param className the fully qualified class name
 
      */
-    public boolean matches(String className) {
+    public boolean matches(final String className) {
         // form 1: exact class
-        if (name.equals(className))
+        if (Objects.equals(name, className)) {
             return true;
-
+        }
         // form 2: package.*
-        if (name.endsWith(".*")) {
-            String pkName = name.substring(0, name.length() - 1);
-
+        Objects.requireNonNull(className);
+        if (name.endsWith(ASTERIX_SUFFIX)) {
+            final String pkName = name.substring(0, name.length() - 1);
             if (className.startsWith(pkName)) {
                 String postfix = className.substring(pkName.length() + 1);
-
                 if (recursive || -1 == postfix.indexOf("."))
                     return true;
             }
         }
-
         return false;
     }
 

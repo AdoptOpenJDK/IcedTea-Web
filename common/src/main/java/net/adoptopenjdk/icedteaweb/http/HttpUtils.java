@@ -34,9 +34,8 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb.http;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,23 +52,23 @@ public class HttpUtils {
      * Captured IOException is consumed and printed
      * @param c the connection to be closed silently
      */
-    public static void consumeAndCloseConnectionSilently(HttpURLConnection c) {
+    public static void consumeAndCloseConnectionSilently(final HttpURLConnection c) {
         try {
             consumeAndCloseConnection(c);
-        } catch (IOException ex) {
-            LOG.error("Following exception: '" + ex.getMessage() + "' should be harmless, but may help in finding root cause.", ex);
+        } catch (final IOException ex) {
+            LOG.error("Following exception should be harmless, but may help in finding root cause.", ex);
         }
     }
 
     /**
-     * Ensure a HttpURLConnection is fully read, required for correct behavior
+     * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * 
      * @param c connection to be closed
      * @throws IOException if connection fade
      */
-    public static void consumeAndCloseConnection(HttpURLConnection c) throws IOException {
+    public static void consumeAndCloseConnection(final HttpURLConnection c) throws IOException {
         try (InputStream in = c.getInputStream()) {
-            byte[] throwAwayBuffer = new byte[256];
+            final byte[] throwAwayBuffer = new byte[256];
             while (in.read(throwAwayBuffer) > 0) {
                 /* ignore contents */
             }

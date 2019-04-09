@@ -60,6 +60,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -78,13 +79,14 @@ public class BasicExceptionDialog {
      *
      * @param exception the exception to indicate
      */
-    public static void show(Exception exception) {
-        String detailsText = OutputController.exceptionToString(exception);
+    public static void show(final Exception exception) {
+        Objects.requireNonNull(exception);
+        final String detailsText = OutputController.exceptionToString(exception);
 
         final JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.ERROR_MESSAGE);
+        final JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.ERROR_MESSAGE);
         final JDialog errorDialog = optionPane.createDialog(R("Error"));
         errorDialog.setName("BasicExceptionDialog");
         SwingUtils.info(errorDialog);
@@ -93,9 +95,9 @@ public class BasicExceptionDialog {
         final JPanel quickInfoPanelAll = new JPanel();
         final JPanel quickInfoPanelMessage = new JPanel();
         final JPanel quickInfoPanelButtons = new JPanel();
-        BoxLayout layoutAll = new BoxLayout(quickInfoPanelAll, BoxLayout.Y_AXIS);
-        BoxLayout layoutMessage = new BoxLayout(quickInfoPanelMessage, BoxLayout.X_AXIS);
-        BoxLayout layoutButtons = new BoxLayout(quickInfoPanelButtons, BoxLayout.X_AXIS);
+        final BoxLayout layoutAll = new BoxLayout(quickInfoPanelAll, BoxLayout.Y_AXIS);
+        final BoxLayout layoutMessage = new BoxLayout(quickInfoPanelMessage, BoxLayout.X_AXIS);
+        final BoxLayout layoutButtons = new BoxLayout(quickInfoPanelButtons, BoxLayout.X_AXIS);
         quickInfoPanelAll.setLayout(layoutAll);
         quickInfoPanelMessage.setLayout(layoutMessage);
         quickInfoPanelButtons.setLayout(layoutButtons);
@@ -103,7 +105,7 @@ public class BasicExceptionDialog {
         quickInfoPanelAll.add(quickInfoPanelMessage);
         quickInfoPanelAll.add(quickInfoPanelButtons);
 
-        JLabel errorLabel = new JLabel(exception.getMessage());
+        final JLabel errorLabel = new JLabel(exception.getMessage());
         errorLabel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
         quickInfoPanelMessage.add(errorLabel);
 
@@ -124,7 +126,7 @@ public class BasicExceptionDialog {
         fillRest.setAlignmentY(JComponent.LEFT_ALIGNMENT);
         quickInfoPanelButtons.add(fillRest);
 
-        JTextArea textArea = new JTextArea();
+        final JTextArea textArea = new JTextArea();
         textArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         textArea.setEditable(false);
         textArea.setText(detailsText);
@@ -133,7 +135,7 @@ public class BasicExceptionDialog {
 
         viewDetails.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 if (viewDetails.getActionCommand().equals("show")) {
                     mainPanel.add(scrollPane, BorderLayout.CENTER);
                     viewDetails.setActionCommand("hide");
@@ -157,12 +159,12 @@ public class BasicExceptionDialog {
     }
 
      public static JButton getShowButton(final Component parent) {
-        JButton consoleButton = new JButton();
+         final JButton consoleButton = new JButton();
         consoleButton.setText(R("DPJavaConsole"));
         consoleButton.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(final java.awt.event.ActionEvent evt) {
                 try {
                     JavaConsole.getConsole().showConsoleLater(true);
                 } catch (Exception ex) {
@@ -179,13 +181,13 @@ public class BasicExceptionDialog {
     }
 
     public static JButton getClearCacheButton(final Component parent) {
-        JButton clearAllButton = new JButton();
+        final JButton clearAllButton = new JButton();
         clearAllButton.setText(R("CVCPCleanCache"));
         clearAllButton.setToolTipText(R("CVCPCleanCacheTip"));
         clearAllButton.addActionListener(new java.awt.event.ActionListener() {
 
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(final java.awt.event.ActionEvent evt) {
                 SwingUtils.invokeLater(new Runnable() {
 
                     @Override

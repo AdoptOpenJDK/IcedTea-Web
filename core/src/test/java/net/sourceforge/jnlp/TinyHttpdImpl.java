@@ -36,8 +36,6 @@
  */
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.cache.ResourceTracker;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -51,7 +49,9 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 
 /**
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very
@@ -136,8 +136,8 @@ public class TinyHttpdImpl extends Thread {
                     String request = t.nextToken();
                     String filePath = t.nextToken();
 
-                    boolean isHeadRequest = request.equals(ResourceTracker.RequestMethods.HEAD.toString());
-                    boolean isGetRequest = request.equals(ResourceTracker.RequestMethods.GET.toString());
+                    boolean isHeadRequest = Objects.equals(request, HttpMethod.HEAD.name());
+                    boolean isGetRequest = Objects.equals(request, HttpMethod.GET.name());
 
                     if (isHeadRequest && !isSupportingHeadRequest()) {
                         ServerAccess.logOutputReprint("Received HEAD request but not supported");

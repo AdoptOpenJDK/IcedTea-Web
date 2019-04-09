@@ -52,6 +52,7 @@ public class MD5SumWatcher {
     private final static Logger LOG = LoggerFactory.getLogger(MD5SumWatcher.class);
 
     private final File watchedFile;
+
     private byte[] md5sum;
 
     /**

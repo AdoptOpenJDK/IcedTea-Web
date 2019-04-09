@@ -30,9 +30,8 @@
  you may extend this exception to your version of the library, but you are not
  obligated to do so. If you do not wish to do so, delete this exception
  statement from your version.*/
-package net.sourceforge.jnlp.jdk89acesses;
+package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,25 +39,27 @@ import javax.swing.ImageIcon;
 import java.lang.reflect.Method;
 
 /**
- * This class is summ of access to sun.misc.Launcher which was removed in jdk9.
+ * Class providing secure image icon using sun.misc.Launcher, which was removed in jdk9.
  *
  * @author jvanek
  */
 public class SunMiscLauncher {
-
     private final static Logger LOG = LoggerFactory.getLogger(SunMiscLauncher.class);
 
-    public static ImageIcon getSecureImageIcon(String resource) {
+    private static final String CLASS_SUN_MISC_LAUNCHER = "sun.misc.Launcher";
+    private static final String METHOD_GET_CLASS_LOADER = "getClassLoader";
+
+    public static ImageIcon getSecureImageIcon(final String resource) {
         try {
-            Class clazz = Class.forName("sun.misc.Launcher");
-            Object obj  = clazz.newInstance();
-            Method m = clazz.getMethod("getClassLoader");
-            ClassLoader cl = (ClassLoader) m.invoke(obj);
+            final Class clazz = Class.forName(CLASS_SUN_MISC_LAUNCHER);
+            final Object obj  = clazz.newInstance();
+            final Method m = clazz.getMethod(METHOD_GET_CLASS_LOADER);
+            final ClassLoader cl = (ClassLoader) m.invoke(obj);
+
             return new ImageIcon(cl.getResource(resource));
         } catch (Exception ex) {
             LOG.error("sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader", ex);
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
         }
     }
-
 }

@@ -32,7 +32,7 @@ public class ApplicationDesc implements LaunchDesc {
     private final String mainClass;
 
     /** the arguments */
-    private  String arguments[];
+    private final List<String> arguments;
     private final boolean fx;
 
     /**
@@ -41,9 +41,9 @@ public class ApplicationDesc implements LaunchDesc {
      * @param mainClass the main class name and package
      * @param arguments the arguments
      */
-    public ApplicationDesc(String mainClass, String[] arguments, boolean isFX) {
+    public ApplicationDesc(final String mainClass, final String[] arguments, final boolean isFX) {
         this.mainClass = mainClass;
-        this.arguments = arguments;
+        this.arguments = Arrays.asList(arguments);
         this.fx = isFX;
     }
 
@@ -59,18 +59,15 @@ public class ApplicationDesc implements LaunchDesc {
      * @return the arguments
      */
     public String[] getArguments() {
-        return arguments.clone();
+        return arguments.toArray(new String[0]);
     }
 
     /**
      * Add an argument to the end of the arguments.
      * @param arg argument of command
      */
-    public void addArgument(String arg) {
-        List<String> l = new ArrayList<>(Arrays.asList(arguments));
-        l.add(arg);
-
-        arguments = l.toArray(arguments);
+    public void addArgument(final String arg) {
+        arguments.add(arg);
     }
 
 }
