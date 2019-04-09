@@ -55,6 +55,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.AppletDesc;
@@ -87,7 +88,6 @@ import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -355,7 +355,6 @@ public class JNLPClassLoader extends URLClassLoader {
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
             LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
-            OutputController.getLogger().log(ex);
         } else {
             throw ex;
         }
@@ -581,7 +580,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
                 loaderList.add(loader);
             } catch (Exception ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         //}
@@ -656,8 +655,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 try {
                     addToCodeBaseLoader(new URL(file.getCodeBase(), codeBaseFolder));
                 } catch (MalformedURLException mfe) {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Problem trying to add folder to code base:");
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, mfe);
+                    LOG.error("Problem trying to add folder to code base:", mfe);
                 }
             }
         }
@@ -737,7 +735,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 LaunchException ex = new LaunchException(null, null, R("LSFatal"),
                         R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " + e.getMessage());
                 consultCertificateSecurityException(ex);
@@ -770,7 +768,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         try {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
-                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, extCnfe);
+                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, extCnfe);
                             throw new LaunchException(file, extCnfe, R("LSFatal"), R("LCInit"), R("LCantDetermineMainClass"), R("LCantDetermineMainClassInfo"));
                         }
                     } else {
@@ -817,12 +815,12 @@ public class JNLPClassLoader extends URLClassLoader {
                 cachedFile = tracker.getCacheFile(jarDesc.getLocation());
             } catch (IllegalResourceDescriptorException irde) {
                 //Caused by ignored resource being removed due to not being valid
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.");
+                LOG.error("JAR " + jarDesc.getLocation() + " is not a valid jar file. Continuing.", irde);
                 continue;
             }
 
             if (cachedFile == null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jarDesc.getLocation() + " not found. Continuing.");
+                LOG.warn("JAR {} not found. Continuing.", jarDesc.getLocation());
                 continue; // JAR not found. Keep going.
             }
 
@@ -957,7 +955,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         .getCacheFile(jar.getLocation());
 
                 if (localFile == null) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "JAR " + jar.getLocation() + " not found. Continuing.");
+                    LOG.warn("JAR {} not found. Continuing.", jar.getLocation());
                     continue; // JAR not found. Keep going.
                 }
 
@@ -1071,9 +1069,9 @@ public class JNLPClassLoader extends URLClassLoader {
                     String jeName = je.getName().toUpperCase();
 
                     if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating Jar InputStream from JarEntry");
+                        LOG.debug("Creating Jar InputStream from JarEntry");
                         InputStream inStream = jarFile.getInputStream(je);
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Creating File InputStream from lauching JNLP file");
+                        LOG.debug("Creating File InputStream from lauching JNLP file");
                         JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
@@ -1086,10 +1084,10 @@ public class JNLPClassLoader extends URLClassLoader {
                         InputStream jnlpStream = new FileInputStream(jn);
                         JNLPMatcher matcher;
                         if (jeName.equals(APPLICATION)) { // If signed application was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, false, jnlp.getParserSettings());
                         } else { // Otherwise template was found
-                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, true, jnlp.getParserSettings());
                         }
                         // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
@@ -1098,7 +1096,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         }
 
                         this.isSignedJNLP = true;
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Signed Application Verification Successful");
+                        LOG.debug("Signed Application Verification Successful");
 
                         break;
                     }
@@ -1119,8 +1117,7 @@ public class JNLPClassLoader extends URLClassLoader {
              */
 
         } catch (Exception e) {
-
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
 
             /*
              * After this exception is caught, it is escaped. If an exception is
@@ -1129,7 +1126,7 @@ public class JNLPClassLoader extends URLClassLoader {
              * skip the check for a signed JNLP file
              */
         }
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Ending check for signed JNLP file...");
+        LOG.debug("Ending check for signed JNLP file...");
     }
 
     /**
@@ -1180,7 +1177,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public void setApplication(ApplicationInstance app) {
         if (this.app != null) {
-            OutputController.getLogger().log(new IllegalStateException("Application can only be set once"));
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new IllegalStateException("Application can only be set once"));
             return;
         }
 
@@ -1234,7 +1231,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         throw new NullPointerException("Code source security was null");
                     }
                     if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                        OutputController.getLogger().log(new NullPointerException("Warning! Code source security type was null"));
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new NullPointerException("Warning! Code source security type was null"));
                     }
                     Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
                     if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
@@ -1267,7 +1264,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             return result;
         } catch (RuntimeException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw ex;
         }
     }
@@ -1389,8 +1386,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                             jarLocationSecurityMap.put(fakeRemote, jarSecurity);
 
                                         } catch (MalformedURLException mfue) {
-                                            OutputController.getLogger().log(OutputController.Level.WARNING_DEBUG, "Unable to add extracted nested jar to classpath");
-                                            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, mfue);
+                                            LOG.error("Unable to add extracted nested jar to classpath", mfue);
                                         }
                                     }
 
@@ -1426,9 +1422,9 @@ public class JNLPClassLoader extends URLClassLoader {
                             CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
                         }
 
-                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Activate jar: " + location);
+                        LOG.debug("Activate jar: {}", location);
                     } catch (Exception ex) {
-                        OutputController.getLogger().log(ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
 
                     // some programs place a native library in any jar
@@ -1601,7 +1597,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     result = loadClassExt(name);
                     return result;
                 } catch (ClassNotFoundException cnfe1) {
-                    OutputController.getLogger().log(cnfe1);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cnfe1);
                 }
 
                 // As a last resort, look in any available indexes
@@ -1627,7 +1623,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 try {
                                     addNewJar(desc);
                                 } catch (Exception e) {
-                                    OutputController.getLogger().log(e);
+                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                                 }
                             }
 
@@ -1727,7 +1723,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // throw additional exceptions. So instead, just ignore it. 
             // Exception => jar will not get added to classpath, which will 
             // result in CNFE from loadClass.
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -1752,7 +1748,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } catch (ClassNotFoundException | PrivilegedActionException ex) {
             } catch (ClassFormatError cfe) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, cfe);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cfe);
             } catch (NullJnlpFileException ex) {
                 throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
             }
@@ -1824,7 +1820,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 result = e.nextElement();
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         // If result is still null, look in the codebase loader
@@ -1849,7 +1845,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 lresources = findResourcesBySearching(name);
             }
         } catch (LaunchException le) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, le);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, le);
         }
 
         return lresources;
@@ -2050,13 +2046,13 @@ public class JNLPClassLoader extends URLClassLoader {
                     addNewJar(des);
                     sec = jarLocationSecurityMap.get(source);
                 } catch (Throwable t) {
-                    OutputController.getLogger().log(t);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
                     sec = null;
                 }
             }
         }
         if (sec == null) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("LNoSecInstance", source.toString()));
+            LOG.info(Translator.R("LNoSecInstance", source.toString()));
         }
         return sec;
     }
@@ -2196,8 +2192,7 @@ public class JNLPClassLoader extends URLClassLoader {
             try {
                 tracker.removeResource(eachJar.getLocation());
             } catch (Exception e) {
-                OutputController.getLogger().log(e);
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Failed to remove resource from tracker, continuing..");
+                LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
             File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), null);
@@ -2441,7 +2436,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 codebaseHost);
                     }
                 } catch (final Exception e) {
-                    OutputController.getLogger().log(e);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     return new SecurityDesc(classLoader.file,
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);

@@ -33,9 +33,9 @@ public class JavaConsoleTest {
         Assert.assertTrue(p1.header.isC);
         Assert.assertTrue(p2.header.isC);
         Assert.assertTrue(p3.header.isC);
-        Assert.assertEquals(OutputController.Level.MESSAGE_DEBUG, p1.header.level);
-        Assert.assertEquals(OutputController.Level.WARNING_ALL, p2.header.level);
-        Assert.assertEquals(OutputController.Level.ERROR_ALL, p3.header.level);
+        Assert.assertEquals(OutputControllerLevel.MESSAGE_DEBUG, p1.header.level);
+        Assert.assertEquals(OutputControllerLevel.WARNING_ALL, p2.header.level);
+        Assert.assertEquals(OutputControllerLevel.ERROR_ALL, p3.header.level);
         Assert.assertTrue(p1.header.date.toString().contains(TEST_TIME) && p1.header.date.toString().contains("2013"));
         Assert.assertTrue(p2.header.date.toString().contains("ITW-C-PLUGIN"));
         Assert.assertTrue(p3.header.date.toString().contains(TEST_TIME) && p3.header.date.toString().contains("2013"));
@@ -62,7 +62,7 @@ public class JavaConsoleTest {
         PluginMessage p4 = new PluginMessage(S4);
         Assert.assertTrue(p4.wasError);
         Assert.assertTrue(p4.header.isC);
-        Assert.assertEquals(OutputController.Level.WARNING_ALL, p4.header.level);
+        Assert.assertEquals(OutputControllerLevel.WARNING_ALL, p4.header.level);
         Assert.assertTrue(p4.header.date.toString().contains(new Date().toString().substring(0, 16))); //means no Tue Nov 19 09:43:50 :)
         Assert.assertTrue(p4.header.thread1.equals("unknown"));
         Assert.assertTrue(p4.header.thread2.equals("unknown"));

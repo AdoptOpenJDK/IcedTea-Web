@@ -36,15 +36,17 @@
  */
 package net.adoptopenjdk.icedteaweb.http;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpUtils {
-    private final static Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 
+public class HttpUtils {
+
+    private final static Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
+    
     /**
      * Ensure a HttpURLConnection is fully read, required for correct behavior.
      * Captured IOException is consumed and printed

@@ -36,8 +36,11 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -55,6 +58,8 @@ import java.net.URL;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class RememberPanel extends JPanel implements RemeberActionProvider {
+
+    private final static Logger LOG = LoggerFactory.getLogger(RememberPanel.class);
 
     protected JCheckBox permanencyCheckBox;
     protected JRadioButton applyToAppletButton;
@@ -135,7 +140,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
             try {
                 return new URL(codebase);
             } catch (MalformedURLException ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         return null;

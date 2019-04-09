@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.ccil.cowan.tagsoup.XMLWriter;
@@ -51,8 +52,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
-import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
  * An specialized {@link XMLParser} that uses TagSoup[1] to parse
@@ -75,9 +74,9 @@ public class MalformedXMLParser extends XMLParser {
      * @throws ParseException if an exception occurs while parsing the input
      */
     @Override
-    public Node getRootNode(InputStream input) throws ParseException {
+    public Node getRootNode(final InputStream input) throws ParseException {
         LOG.info("Using MalformedXMLParser");
-        InputStream xmlInput = xmlizeInputStream(input);
+        final InputStream xmlInput = xmlizeInputStream(input);
         return super.getRootNode(xmlInput);
     }
 
@@ -90,12 +89,10 @@ public class MalformedXMLParser extends XMLParser {
      * version of the input XML
      * @throws ParseException if an exception occurs while parsing the input
      */
-    public  static InputStream xmlizeInputStream(InputStream original) throws ParseException {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            HTMLSchema schema = new HTMLSchema();
-            XMLReader reader = new Parser();
+    public  static InputStream xmlizeInputStream(final InputStream original) throws ParseException {
+        try(final ByteArrayOutputStream out = new ByteArrayOutputStream()){
+            final HTMLSchema schema = new HTMLSchema();
+            final XMLReader reader = new Parser();
 
             //TODO walk through the javadoc and tune more settings
             //see tagsoup javadoc for details 
@@ -104,19 +101,16 @@ public class MalformedXMLParser extends XMLParser {
             reader.setFeature(Parser.ignorableWhitespaceFeature, true);
             reader.setFeature(Parser.ignoreBogonsFeature, false);
 
-            Writer writeger = new OutputStreamWriter(out);
-            XMLWriter x = new XMLWriter(writeger);
-
-            reader.setContentHandler(x);
-
-            InputSource s = new InputSource(original);
-
+            final Writer writer = new OutputStreamWriter(out);
+            final XMLWriter xmlWriter = new XMLWriter(writer);
+            reader.setContentHandler(xmlWriter);
+            final InputSource s = new InputSource(original);
             reader.parse(s);
             return new ByteArrayInputStream(out.toByteArray());
-        } catch (SAXException | IOException e1) {
-            throw new ParseException(R("PBadXML"), e1);
-        } catch (NoClassDefFoundError  e2) {
-            LOG.error("ERROR", e2);
+        } catch (final SAXException | IOException e1) {
+            throw new ParseException("Invalid XML document syntax.", e1);
+        } catch (final NoClassDefFoundError  e2) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);
             ParseException.setUsed(null);
             return original;
         }

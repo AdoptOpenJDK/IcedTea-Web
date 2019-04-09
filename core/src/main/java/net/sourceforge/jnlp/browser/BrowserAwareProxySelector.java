@@ -36,6 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.browser;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
@@ -103,8 +104,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         try {
             initFromBrowserConfig();
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RProxyFirefoxNotFound"));
+            LOG.error(R("RProxyFirefoxNotFound"), e);
             browserProxyType = PROXY_TYPE_NONE;
         }
     }
@@ -129,7 +129,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 browserAutoConfigUrl = new URL(url);
             }
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
@@ -218,7 +218,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 if (optionDescription == null) {
                     optionDescription = "Unknown";
                 }
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG,R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
+                LOG.debug(R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
                 proxies.add(Proxy.NO_PROXY);
         }
 
@@ -242,7 +242,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             proxies.add(Proxy.NO_PROXY);
         }
 

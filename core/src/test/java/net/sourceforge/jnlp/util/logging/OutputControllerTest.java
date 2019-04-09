@@ -94,50 +94,50 @@ public class OutputControllerTest {
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
-        oc.log(OutputController.Level.MESSAGE_DEBUG, line1);
-        oc.log(OutputController.Level.ERROR_DEBUG, line1);
+        oc.log(OutputControllerLevel.MESSAGE_DEBUG, line1);
+        oc.log(OutputControllerLevel.ERROR_DEBUG, line1);
         oc.flush();
         Assert.assertFalse(r1.evaluate(os1.toString("utf-8")));
         Assert.assertFalse(r1.evaluate(os2.toString("utf-8")));
-        oc.log(OutputController.Level.MESSAGE_ALL, line1);
-        oc.log(OutputController.Level.ERROR_DEBUG, line1);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line1);
+        oc.log(OutputControllerLevel.ERROR_DEBUG, line1);
         oc.flush();
         Assert.assertTrue(r1.evaluate(os1.toString("utf-8")));
         Assert.assertFalse(r1.evaluate(os2.toString("utf-8")));
-        oc.log(OutputController.Level.ERROR_ALL, line1);
+        oc.log(OutputControllerLevel.ERROR_ALL, line1);
         oc.flush();
         Assert.assertTrue(r1.evaluate(os2.toString("utf-8")));
 
         LogConfig.getLogConfig().setEnableLogging(true);
-        oc.log(OutputController.Level.MESSAGE_DEBUG, line2);
+        oc.log(OutputControllerLevel.MESSAGE_DEBUG, line2);
         oc.flush();
         Assert.assertTrue(r2.evaluate(os1.toString("utf-8")));
         Assert.assertFalse(r2.evaluate(os2.toString("utf-8")));
-        oc.log(OutputController.Level.ERROR_DEBUG, line2);
+        oc.log(OutputControllerLevel.ERROR_DEBUG, line2);
         oc.flush();
         Assert.assertTrue(r2.evaluate(os1.toString("utf-8")));
         Assert.assertTrue(r2.evaluate(os2.toString("utf-8")));
 
-        oc.log(OutputController.Level.ERROR_DEBUG, line3);
+        oc.log(OutputControllerLevel.ERROR_DEBUG, line3);
         oc.flush();
         Assert.assertFalse(r3.evaluate(os1.toString("utf-8")));
         Assert.assertTrue(r3.evaluate(os2.toString("utf-8")));
-        oc.log(OutputController.Level.MESSAGE_DEBUG, line3);
+        oc.log(OutputControllerLevel.MESSAGE_DEBUG, line3);
         oc.flush();
         Assert.assertTrue(r3.evaluate(os1.toString("utf-8")));
         Assert.assertTrue(r3.evaluate(os2.toString("utf-8")));
 
         LogConfig.getLogConfig().setEnableLogging(false);
-        oc.log(OutputController.Level.WARNING_DEBUG, line4);
+        oc.log(OutputControllerLevel.WARNING_DEBUG, line4);
         oc.flush();
         Assert.assertFalse(r4.evaluate(os1.toString("utf-8")));
         Assert.assertFalse(r4.evaluate(os2.toString("utf-8")));
-        oc.log(OutputController.Level.WARNING_ALL, line5);
+        oc.log(OutputControllerLevel.WARNING_ALL, line5);
         oc.flush();
         Assert.assertTrue(r5.evaluate(os1.toString("utf-8")));
         Assert.assertTrue(r5.evaluate(os2.toString("utf-8")));
         LogConfig.getLogConfig().setEnableLogging(true);
-        oc.log(OutputController.Level.WARNING_DEBUG, line4);
+        oc.log(OutputControllerLevel.WARNING_DEBUG, line4);
         oc.flush();
         Assert.assertTrue(r4.evaluate(os1.toString("utf-8")));
         Assert.assertTrue(r4.evaluate(os2.toString("utf-8")));
@@ -164,7 +164,7 @@ public class OutputControllerTest {
             for (int i = 0; i < iterations; i++) {
                 try {
                     //be sure this pattern is kept in assers
-                    oc.log(OutputController.Level.WARNING_ALL, "thread " + id + " line " + i);
+                    oc.log(OutputControllerLevel.WARNING_ALL, "thread " + id + " line " + i);
                     Thread.sleep(random.nextInt(delayable));
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
@@ -266,18 +266,18 @@ public class OutputControllerTest {
         ByteArrayOutputStream os1 = new ByteArrayOutputStream();
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         OutputController oc = new OutputController(new PrintStream(os1), new PrintStream(os2));
-        oc.log(OutputController.Level.MESSAGE_ALL, line1);
-        oc.log(OutputController.Level.ERROR_ALL, line1);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line1);
+        oc.log(OutputControllerLevel.ERROR_ALL, line1);
         oc.flush();
         ByteArrayOutputStream os3 = new ByteArrayOutputStream();
         ByteArrayOutputStream os4 = new ByteArrayOutputStream();
         oc.setOut(new PrintStream(os3));
-        oc.log(OutputController.Level.MESSAGE_ALL, line2);
-        oc.log(OutputController.Level.ERROR_ALL, line2);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line2);
+        oc.log(OutputControllerLevel.ERROR_ALL, line2);
         oc.flush();
         oc.setErr(new PrintStream(os4));
-        oc.log(OutputController.Level.MESSAGE_ALL, line3);
-        oc.log(OutputController.Level.ERROR_ALL, line3);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line3);
+        oc.log(OutputControllerLevel.ERROR_ALL, line3);
         oc.flush();
 
         Assert.assertTrue(r1.evaluate(os1.toString("utf-8")));
@@ -298,8 +298,8 @@ public class OutputControllerTest {
 
         LogConfig.getLogConfig().setLogToStreams(false);
 
-        oc.log(OutputController.Level.MESSAGE_ALL, line4);
-        oc.log(OutputController.Level.ERROR_ALL, line4);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line4);
+        oc.log(OutputControllerLevel.ERROR_ALL, line4);
 
         Assert.assertFalse(r4.evaluate(os1.toString("utf-8")));
         Assert.assertFalse(r4.evaluate(os2.toString("utf-8")));
@@ -326,9 +326,9 @@ public class OutputControllerTest {
         f2.deleteOnExit();
         oc.setFileLog(new WriterBasedFileLog(f1.getAbsolutePath(), false));
         LogConfig.getLogConfig().setLogToFile(true);
-        oc.log(OutputController.Level.MESSAGE_ALL, line1);
-        oc.log(OutputController.Level.ERROR_ALL, line2);
-        oc.log(OutputController.Level.MESSAGE_ALL, line3);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line1);
+        oc.log(OutputControllerLevel.ERROR_ALL, line2);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line3);
         oc.flush();
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);
         s2 = StreamUtils.readStreamAsString(new FileInputStream(f2), true);
@@ -341,8 +341,8 @@ public class OutputControllerTest {
         Assert.assertFalse(r3.evaluate(s2));
 
         oc.setFileLog(new WriterBasedFileLog(f2.getAbsolutePath(), false));
-        oc.log(OutputController.Level.ERROR_ALL, line5);
-        oc.log(OutputController.Level.MESSAGE_ALL, line5);
+        oc.log(OutputControllerLevel.ERROR_ALL, line5);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line5);
         oc.flush();
 
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);
@@ -359,8 +359,8 @@ public class OutputControllerTest {
         Assert.assertTrue(r5.evaluate(s2));
 
         LogConfig.getLogConfig().setLogToFile(false);
-        oc.log(OutputController.Level.ERROR_ALL, line6);
-        oc.log(OutputController.Level.MESSAGE_ALL, line6);
+        oc.log(OutputControllerLevel.ERROR_ALL, line6);
+        oc.log(OutputControllerLevel.MESSAGE_ALL, line6);
         oc.flush();
         
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);

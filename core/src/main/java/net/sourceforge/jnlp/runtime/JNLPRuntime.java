@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.GuiLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
@@ -37,6 +38,8 @@ import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
@@ -95,6 +98,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.19 $
  */
 public class JNLPRuntime {
+
+    private final static Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
 
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
@@ -218,8 +223,8 @@ public class JNLPRuntime {
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            OutputController.getLogger().log("Unable to set system look and feel");
+        } catch (final Exception e) {
+            LOG.error("Unable to set system look and feel", e);
         }
 
         if (JavaConsole.canShowOnStartup(isApplication)) {
@@ -233,7 +238,7 @@ public class JNLPRuntime {
                 //where deployment.system.config points is not readable
                 throw new RuntimeException(getConfiguration().getLoadingException());
             }
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
+            LOG.warn(R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
         }
 
         isWebstartApplication = isApplication;
@@ -281,8 +286,7 @@ public class JNLPRuntime {
 
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...");
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...", e);
         }
 
         // plug in a custom authenticator and proxy selector
@@ -322,14 +326,14 @@ public class JNLPRuntime {
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
-                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
+                     LOG.warn("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                      return null;
                  }
             } else { // Java 7 or more (technically could be <= 1.5 but <= 1.5 is unsupported)
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
                  } catch (ClassNotFoundException cnfe) {
-                     OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7");
+                     LOG.error("Unable to find class net.sourceforge.jnlp.security.VariableX509TrustManagerJDK7", cnfe);
                      return null;
                  }
             }
@@ -346,8 +350,7 @@ public class JNLPRuntime {
 
             return (TrustManager) tmCtor.newInstance();
         } catch (RuntimeException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK 6 or 7?");
-            OutputController.getLogger().log(e);
+            LOG.error("Unable to load JDK-specific TrustManager. Was this version of IcedTea-Web compiled with JDK 6 or 7?", e);
             throw e;
         }
     }
@@ -389,7 +392,7 @@ public class JNLPRuntime {
 
     public static void setOfflineForced(boolean b) {
         offlineForced = b;
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Forcing of offline set to: " + offlineForced);
+        LOG.debug("Forcing of offline set to: {}", offlineForced);
     }
 
     public static boolean isOfflineForced() {
@@ -398,7 +401,7 @@ public class JNLPRuntime {
 
     public static void setOnlineDetected(boolean online) {
         onlineDetected = online;
-        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Detected online set to: " + onlineDetected);
+       LOG.debug("Detected online set to: {}", onlineDetected);
     }
 
     public static boolean isOnlineDetected() {
@@ -433,7 +436,7 @@ public class JNLPRuntime {
         try {
             InetAddress.getByName(location.getHost());
         } catch (UnknownHostException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "The host of " + location.toExternalForm() + " file seems down, or you are simply offline.");
+           LOG.error("The host of " + location.toExternalForm() + " file seems down, or you are simply offline.", e);
             return false;
         }
 
@@ -456,14 +459,12 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationError"));
+                LOG.info(R("RConfigurationError"));
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             }catch(Exception t){
-                //all exceptions are causing InstantiatizationError so this do it much more readble
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, t);
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("RFailingToDefault"));
+                LOG.error(R("RFailingToDefault"), t);
                 if (!JNLPRuntime.isHeadless()){
                     JOptionPane.showMessageDialog(null, R("RFailingToDefault")+"\n"+t.toString());
                 }
@@ -743,7 +744,7 @@ public class JNLPRuntime {
                 boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.IGNORE_HEADLESS_CHECK));
                 if (noCheck) {
                     headless = false;
-                    OutputController.getLogger().log(DeploymentConfiguration.IGNORE_HEADLESS_CHECK + " set to " + noCheck + ". Avoding headless check.");
+                    LOG.debug("{} set to {}. Avoding headless check.", DeploymentConfiguration.IGNORE_HEADLESS_CHECK, noCheck);
                 } else {
                     try {
                         if (GraphicsEnvironment.isHeadless()) {
@@ -751,8 +752,7 @@ public class JNLPRuntime {
                         }
                     } catch (HeadlessException ex) {
                         headless = true;
-                        OutputController.getLogger().log(ex);
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                        LOG.error(Translator.R("HEADLESS_MISSCONFIGURED"), ex);
                     }
                 }
             }
@@ -824,11 +824,10 @@ public class JNLPRuntime {
             }
             
             if (fileLock != null && fileLock.isShared()) {
-                OutputController.getLogger().log("Acquired shared lock on " +
-                            netxRunningFile.toString() + " to indicate javaws is running");
+                LOG.debug("Acquired shared lock on {} to indicate javaws is running", netxRunningFile);
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread("JNLPRuntimeShutdownHookThread") {
@@ -852,9 +851,9 @@ public class JNLPRuntime {
             fileLock.release();
             fileLock.channel().close();
             fileLock = null;
-            OutputController.getLogger().log("Release shared lock on " + PathsAndFiles.MAIN_LOCK.getFullPath());
+            LOG.debug("Release shared lock on {}", PathsAndFiles.MAIN_LOCK.getFullPath());
         } catch (IOException e) {
-            OutputController.getLogger().log(e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -898,7 +897,7 @@ public class JNLPRuntime {
                 pluginDebug = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
             } catch (Exception ex) {
                 pluginDebug = false;
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         return pluginDebug;

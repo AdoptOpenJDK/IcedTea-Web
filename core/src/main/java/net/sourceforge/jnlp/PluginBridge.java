@@ -22,6 +22,16 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -35,16 +45,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Allows reuse of code that expects a JNLPFile object,
@@ -174,8 +174,7 @@ public final class PluginBridge extends JNLPFile {
             } catch (MalformedURLException e) {
                 // Don't fail because we cannot get the jnlp file. Parameters are optional not required.
                 // it is the site developer who should ensure that file exist.
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to get JNLP file at: " + params.getJNLPHref()
-                        + " with context of URL as: " + codeBase.toExternalForm());
+                LOG.error("Unable to get JNLP file at: " + params.getJNLPHref() + " with context of URL as: " + codeBase.toExternalForm(), e);
             }
         } else {
             // Should we populate this list with applet attribute tags?
@@ -218,8 +217,8 @@ public final class PluginBridge extends JNLPFile {
 
             addArchiveEntries(archives);
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Jar string: " + archive);
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "jars length: " + archives.length);
+            LOG.debug("Jar string: {}", archive);
+            LOG.debug("jars length: {}", archives.length);
         }
 
         if (main.endsWith(".class"))
@@ -612,7 +611,7 @@ public final class PluginBridge extends JNLPFile {
             try {
                 return StreamUtils.readStreamAsString(getStream());
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             return null;
         }

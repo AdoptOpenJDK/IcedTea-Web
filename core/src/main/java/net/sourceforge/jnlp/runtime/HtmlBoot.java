@@ -35,6 +35,7 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.JNLPSplashScreen;
 import net.sourceforge.jnlp.ParserSettings;
@@ -43,7 +44,6 @@ import net.sourceforge.jnlp.runtime.html.AppletExtractor;
 import net.sourceforge.jnlp.runtime.html.AppletParser;
 import net.sourceforge.jnlp.runtime.html.AppletsFilter;
 import net.sourceforge.jnlp.util.ScreenFinder;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
@@ -183,7 +183,7 @@ public final class HtmlBoot {
                 splashScreen.dispose();
             }
         } catch (final Exception ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             if (splashScreen != null) {
                 SwingUtils.invokeLater(new Runnable() {
 

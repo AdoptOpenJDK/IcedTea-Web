@@ -29,6 +29,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 public class ParseException extends Exception {
 
     private static UsedParsers expected;
+
     private static UsedParsers used;
 
     // todo: add meaningful information, such as the invalid
@@ -38,7 +39,7 @@ public class ParseException extends Exception {
      * Create a parse exception with the specified message.
      * @param message to be shown in exception
      */
-    public ParseException(String message) {
+    public ParseException(final String message) {
         super(getParserSettingsMessage() + message);
     }
 
@@ -48,19 +49,19 @@ public class ParseException extends Exception {
      * @param message to be used by exception
      * @param cause cause of exception
      */
-    public ParseException(String message, Throwable cause) {
+    public ParseException(final String message, final Throwable cause) {
         super(getParserSettingsMessage() + message, cause);
     }
 
-    public ParseException(Throwable cause) {
+    public ParseException(final Throwable cause) {
         super(getParserSettingsMessage(), cause);
     }
 
-    public static void setExpected(UsedParsers ex) {
+    public static void setExpected(final UsedParsers ex) {
         expected = ex;
     }
 
-    public static void setUsed(UsedParsers us) {
+    public static void setUsed(final UsedParsers us) {
         used = us;
     }
 

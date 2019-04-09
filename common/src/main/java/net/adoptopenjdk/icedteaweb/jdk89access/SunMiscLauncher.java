@@ -32,10 +32,11 @@
  statement from your version.*/
 package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import java.lang.reflect.Method;
-import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.ImageIcon;
+import java.lang.reflect.Method;
 
 /**
  * Class providing secure image icon using sun.misc.Launcher, which was removed in jdk9.
@@ -57,8 +58,7 @@ public class SunMiscLauncher {
 
             return new ImageIcon(cl.getResource(resource));
         } catch (Exception ex) {
-            LOG.error("ERROR", ex);
-            LOG.debug("sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader");
+            LOG.error("sun.misc.Launcher not found. Running jdk9 or higher? Using unsecure BootClassLoader", ex);
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
         }
     }

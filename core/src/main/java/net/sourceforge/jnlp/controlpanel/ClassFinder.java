@@ -35,7 +35,10 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JDialog;
 import java.io.File;
@@ -53,6 +56,8 @@ import java.util.jar.JarInputStream;
  * utility class to find any Interface implementing classes in netx/icedtea-web
  */
 public class ClassFinder extends JDialog {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ClassFinder.class);
 
     public static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
     public static final String CUSTOM_CLASS_PATH_PROPERTY = "custom.class.path";
@@ -95,7 +100,7 @@ public class ClassFinder extends JDialog {
                             }
                         }
                     } catch (IOException ex) {
-                        OutputController.getLogger().log(ex);
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 }
             }

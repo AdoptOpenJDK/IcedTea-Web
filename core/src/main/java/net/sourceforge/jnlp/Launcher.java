@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.AppletInstance;
@@ -233,7 +234,7 @@ public class Launcher {
             //First checks whether offline-allowed tag is specified inside the jnlp file.
             if (!file.getInformation().isOfflineAllowed() && !JNLPRuntime.isOnlineDetected()) {
                 {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Remote systems unreachable, and client application is not able to run offline. Exiting.");
+                    LOG.error("Remote systems unreachable, and client application is not able to run offline. Exiting.");
                     return null;
                 }
             }
@@ -241,7 +242,7 @@ public class Launcher {
             //Xoffline IS specified
             if (!file.getInformation().isOfflineAllowed() && !JNLPRuntime.isOnlineDetected()) {
                 {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Remote systems unreachable, and client application is not able to run offline. However, you specified -Xoffline argument. Attmpting to run.");
+                    LOG.error("Remote systems unreachable, and client application is not able to run offline. However, you specified -Xoffline argument. Attmpting to run.");
                 }
             }
         }
@@ -553,7 +554,7 @@ public class Launcher {
                         R("LCantDetermineMainClassInfo")));
             }
 
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Starting application [" + mainName + "] ...");
+            LOG.info("Starting application [{}] ...", mainName);
             
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
@@ -608,7 +609,7 @@ public class Launcher {
 
         for (Thread thread : threads) {
             if (thread != null) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Setting " + classLoader + " as the classloader for thread " + thread.getName());
+                LOG.debug("Setting {} as the classloader for thread {}", classLoader, thread.getName());
                 thread.setContextClassLoader(classLoader);
             }
         }
@@ -959,14 +960,14 @@ public class Launcher {
                     }
                 }
             } catch (LaunchException ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 exception = ex;
                 // Exit if we can't launch the application.
                 if (exitOnFailure) {
                     JNLPRuntime.exit(1);
                 }
             }  catch (Throwable ex) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 throw new RuntimeException(ex);
             }
         }

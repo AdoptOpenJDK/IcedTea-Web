@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
@@ -30,6 +31,8 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextForm
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -67,6 +70,8 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  */
 public class CommandLine {
 
+    private final static Logger LOG = LoggerFactory.getLogger(CommandLine.class);
+
     public static final int ERROR = 1;
     public static final int SUCCESS = 0;
 
@@ -88,8 +93,7 @@ public class CommandLine {
         try {
             config.load(false);
         } catch (ConfigurationException | MalformedURLException e) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationFatal"));
-            OutputController.getLogger().log(e);
+            LOG.error(R("RConfigurationFatal"), e);
         }
     }
 
@@ -182,7 +186,7 @@ public class CommandLine {
         unknownProperties.removeAll(all.keySet());
         if (unknownProperties.size() > 0) {
             for (String property : unknownProperties) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", property));
+                LOG.info(R("CLUnknownProperty", property));
             }
             return ERROR;
         }
@@ -244,7 +248,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE,  e);
             return ERROR;
         }
 
@@ -261,8 +265,7 @@ public class CommandLine {
             try {
                 old.getValidator().validate(value);
             } catch (IllegalArgumentException e) {
-                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()));
-                OutputController.getLogger().log(e);
+                LOG.error(R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()), e);
                 return ERROR;
             }
         }
@@ -298,7 +301,7 @@ public class CommandLine {
             if (args.size() > 1) {
                 for (String arg : args) {
                     if (!arg.equals("all")) {
-                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", arg));
+                        LOG.info(R("CLUnknownCommand", arg));
                     }
                 }
             }
@@ -314,7 +317,7 @@ public class CommandLine {
         } else {
             for (String key : args) {
                 if (!all.containsKey(key)) {
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", key));
+                    LOG.info(R("CLUnknownProperty", key));
                     return ERROR;
                 } else {
                     Setting<String> setting = all.get(key);
@@ -326,7 +329,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return ERROR;
         }
 
@@ -361,7 +364,7 @@ public class CommandLine {
         for (String key : args) {
             Setting<String> value = all.get(key);
             if (value == null) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLNoInfo"));
+                LOG.info(R("CLNoInfo"));
             } else {
                 OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
                 OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
@@ -409,12 +412,12 @@ public class CommandLine {
 
         boolean allValid = true;
         for (Setting<String> setting : validator.getIncorrectSetting()) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues()));
+            LOG.info(R("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues()));
             allValid = false;
         }
 
         for (Setting<String> setting : validator.getUnrecognizedSetting()) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownProperty", setting.getName()));
+            LOG.info(R("CLUnknownProperty", setting.getName()));
             allValid = false;
         }
 
@@ -438,12 +441,12 @@ public class CommandLine {
         int val;
         if (hasUnrecognizedCommands()) {
             for (String unknown : optionParser.getMainArgs()) {
-                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnknownCommand", unknown));
+                LOG.info(R("CLUnknownCommand", unknown));
             }
             handleHelpCommand();
             val = ERROR;
         } else if (getNumberOfOptions() > 1) {
-            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CLUnexpectedNumberOfCommands"));
+            LOG.info(R("CLUnexpectedNumberOfCommands"));
             val = handleHelpCommand();
         } else if (optionParser.hasOption(CommandLineOptions.LIST)) {
             val = handleListCommand();
@@ -521,7 +524,7 @@ public class CommandLine {
                 JNLPRuntime.exit(result);
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             JNLPRuntime.exit(1);
         }
     }

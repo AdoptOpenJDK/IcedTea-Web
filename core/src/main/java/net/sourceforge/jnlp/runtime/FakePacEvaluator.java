@@ -38,6 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.runtime;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 
@@ -47,9 +49,12 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * A dummy PacEvaluator that always returns "DIRECT"
  */
 public class FakePacEvaluator implements PacEvaluator {
+
+    private final static Logger LOG = LoggerFactory.getLogger(FakePacEvaluator.class);
+
     @Override
     public String getProxies(URL url) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("RPRoxyPacNotSupported"));
+        LOG.error(R("RPRoxyPacNotSupported"));
         return "DIRECT";
     }
 }

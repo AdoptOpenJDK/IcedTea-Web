@@ -37,11 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.TimedHashMap;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,6 +67,8 @@ import java.util.PropertyPermission;
  */
 public class RhinoBasedPacEvaluator implements PacEvaluator {
 
+    private final static Logger LOG = LoggerFactory.getLogger(RhinoBasedPacEvaluator.class);
+
     private final String pacHelperFunctionContents;
     private final String pacContents;
     private final URL pacUrl;
@@ -75,7 +80,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
      * @param pacUrl the url of the PAC file to use
      */
     public RhinoBasedPacEvaluator(URL pacUrl) {
-        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Using the Rhino based PAC evaluator for url " + pacUrl);
+        LOG.error("Using the Rhino based PAC evaluator for url {}", pacUrl);
         pacHelperFunctionContents = getHelperFunctionContents();
         this.pacUrl = pacUrl;
         pacContents = getPacContents(pacUrl);
@@ -117,7 +122,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
      */
     private String getProxiesWithoutCaching(URL url) {
         if (pacHelperFunctionContents == null) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Error loading pac functions");
+            LOG.error("Error loading pac functions");
             return "DIRECT";
         }
 
@@ -186,7 +191,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                 pacFuncsReader.close();
             }
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             contents = null;
         }
 
@@ -247,7 +252,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
 
                 Object functionObj = scope.get("FindProxyForURL", scope);
                 if (!(functionObj instanceof Function)) {
-                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "FindProxyForURL not found");
+                    LOG.error("FindProxyForURL not found");
                     return null;
                 } else {
                     Function findProxyFunction = (Function) functionObj;
@@ -257,7 +262,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                     return (String) result;
                 }
             } catch (Exception e) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                 return "DIRECT";
             } finally {
                 Context.exit();

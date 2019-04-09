@@ -89,7 +89,7 @@ public class Version {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    OutputController.getLogger().log(OutputController.Level.WARNING_ALL, s);
+                    LOG.warn(s);
                 }
             } else {
                 LOG.info("good - your JRE - {} - match requested JRE - {}", getJreVersion(), v);

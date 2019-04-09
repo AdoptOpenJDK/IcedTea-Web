@@ -42,6 +42,8 @@ import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 import sun.net.www.protocol.jar.URLJarFileCallBack;
 
@@ -64,6 +66,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Large parts of this class are based on JarFileFactory and URLJarFile.
  */
 final class CachedJarFileCallback implements URLJarFileCallBack {
+
+    private final static Logger LOG = LoggerFactory.getLogger(CachedJarFileCallback.class);
 
     private static final CachedJarFileCallback INSTANCE = new CachedJarFileCallback();
 
@@ -111,7 +115,7 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
                 // 2) For the plug-in, we want to cache files from class-path so we do it manually
                 returnFile.getManifest().getMainAttributes().putValue("Class-Path", "");
 
-                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Class-Path attribute cleared for " + returnFile.getName());
+                LOG.debug("Class-Path attribute cleared for {}", returnFile.getName());
                 
 
             } catch (NullPointerException npe) {

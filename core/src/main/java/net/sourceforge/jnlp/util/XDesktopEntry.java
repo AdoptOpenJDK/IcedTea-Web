@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -27,6 +28,9 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -85,7 +89,9 @@ import java.util.Map.Entry;
  */
 
 public class XDesktopEntry implements GenericDesktopEntry {
- 
+
+    private final static Logger LOG = LoggerFactory.getLogger(XDesktopEntry.class);
+
     public static final String JAVA_ICON_NAME = "javaws";
 
     private JNLPFile file = null;
@@ -131,7 +137,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 generatedJnlp = getGeneratedJnlpFileName();
                 FileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
-                OutputController.getLogger().log(ex);
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
         
@@ -197,7 +203,6 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 fileContents += exec;
             }
         }
-        OutputController.getLogger().log(title + " " + exec);
         return new StringReader(fileContents);
 
     }
@@ -322,7 +327,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 try {
                     cacheIcon();
                 } catch (NonFileProtocolException ex) {
-                    OutputController.getLogger().log(ex);
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     //default icon will be used later
                 }
             }
@@ -333,7 +338,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 installMenuLauncher(menu, isSigned);
             }
         } catch (Exception e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -354,11 +359,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 }
 
             }
-            OutputController.getLogger().log("Menu item created: " + f.getAbsolutePath());
+            LOG.info("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
     
@@ -394,7 +399,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
+            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
             Process installer = pb.start();
@@ -406,9 +411,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
         } catch (FileNotFoundException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
@@ -502,7 +507,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
             this.iconLocation = target.getAbsolutePath();
-            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
+            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
         }
     }
     
@@ -565,7 +570,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return target;
         }
         catch (IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
     }
@@ -574,10 +579,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             cacheIcon();
         } catch (NonFileProtocolException ex) {
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         catch (final IOException e) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return this.iconLocation;
     }
@@ -642,7 +647,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
         } catch (Exception ex) {
             //favicon 404 or similar
-            OutputController.getLogger().log(ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return null;
     }
@@ -690,7 +695,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         String fPath = f.getAbsolutePath();
         if (!f.exists()) {
             if (!f.mkdirs()) {
-                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, fPath + message);
+                OutputController.getLogger().log(OutputControllerLevel.ERROR_ALL, fPath + message);
             }
         }
         return fPath;
@@ -700,7 +705,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
-            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return System.getProperty("user.home") + "/Desktop";
         }
     }
