@@ -39,7 +39,7 @@ package net.sourceforge.jnlp.util.logging.headers;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.logging.OutputController.Level;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class Header {
     
     public String user = default_user;
     public boolean application = true;
-    public Level level = Level.WARNING_ALL;
+    public OutputControllerLevel level = OutputControllerLevel.WARNING_ALL;
     public Date timestamp  = new Date();
     public String date = timestamp.toString();
     public boolean isC = false;//false=> java
@@ -66,15 +66,15 @@ public class Header {
     public Header() {
     }
 
-    public Header(Level level, boolean isC) {
+    public Header(OutputControllerLevel level, boolean isC) {
         this(level, Thread.currentThread().getStackTrace(), Thread.currentThread(), isC);   
     }
     
-    public Header(Level level, StackTraceElement[] stack, Thread thread, boolean isC) {
+    public Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, boolean isC) {
         this(level, stack, thread, new Date(), isC);
     }
 
-    public Header(Level level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
+    public Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
         this.application = JNLPRuntime.isWebstartApplication();
         this.level = level;
         this.timestamp = d;

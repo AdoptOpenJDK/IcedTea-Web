@@ -38,7 +38,7 @@ exception statement from your version. */
 package net.sourceforge.jnlp.util.logging.headers;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,11 +64,11 @@ public class PluginMessage  implements MessageWithHeader{
                 p.preinit = true;
             }
             if (s.startsWith(PluginHeader.PLUGIN_DEBUG) || s.startsWith(PluginHeader.PLUGIN_DEBUG_PREINIT)) {
-                p.level = OutputController.Level.MESSAGE_DEBUG;
+                p.level = OutputControllerLevel.MESSAGE_DEBUG;
             } else if (s.startsWith(PluginHeader.PLUGIN_ERROR) || s.startsWith(PluginHeader.PLUGIN_ERROR_PREINIT)) {
-                p.level = OutputController.Level.ERROR_ALL;
+                p.level = OutputControllerLevel.ERROR_ALL;
             } else {
-                p.level = OutputController.Level.WARNING_ALL;
+                p.level = OutputControllerLevel.WARNING_ALL;
             }
             String[] init = PluginHeader.whiteSpaces.split(s);
             p.timestamp = new Date(Long.parseLong(init[1]) / 1000);
