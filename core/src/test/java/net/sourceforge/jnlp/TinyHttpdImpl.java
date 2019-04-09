@@ -49,6 +49,7 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 
@@ -135,8 +136,8 @@ public class TinyHttpdImpl extends Thread {
                     String request = t.nextToken();
                     String filePath = t.nextToken();
 
-                    boolean isHeadRequest = request.equals(HttpMethod.HEAD.name());
-                    boolean isGetRequest = request.equals(HttpMethod.GET.name());
+                    boolean isHeadRequest = Objects.equals(request, HttpMethod.HEAD.name());
+                    boolean isGetRequest = Objects.equals(request, HttpMethod.GET.name());
 
                     if (isHeadRequest && !isSupportingHeadRequest()) {
                         ServerAccess.logOutputReprint("Received HEAD request but not supported");
