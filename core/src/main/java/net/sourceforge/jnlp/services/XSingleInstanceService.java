@@ -16,13 +16,10 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.jnlp.SingleInstanceListener;
 import java.io.IOException;
@@ -42,8 +39,6 @@ import java.util.Set;
  * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
  */
 public class XSingleInstanceService implements ExtendedSingleInstanceService {
-
-    private final static Logger LOG = LoggerFactory.getLogger(XSingleInstanceService.class);
 
     boolean initialized = false;
     List<SingleInstanceListener> listeners = new LinkedList<SingleInstanceListener>();
@@ -67,7 +62,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
                 listeningSocket = new ServerSocket(0);
                 lockFile.createWithPort(listeningSocket.getLocalPort());
 
-                LOG.debug("Starting SingleInstanceServer on port {}", listeningSocket);
+                OutputController.getLogger().log("Starting SingleInstanceServer on port" + listeningSocket);
 
                 while (true) {
                     try {
@@ -78,19 +73,19 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
                         notifySingleInstanceListeners(arguments);
                     } catch (Exception exception) {
                         // not much to do here...
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, exception);
                     }
 
                 }
             } catch (IOException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } finally {
                 if (listeningSocket != null) {
                     try {
                         listeningSocket.close();
                     } catch (IOException e) {
                         // Give up.
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
                     }
                 }
             }
@@ -138,7 +133,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
         SingleInstanceLock lockFile = new SingleInstanceLock(jnlpFile);
         if (lockFile.isValid()) {
             int port = lockFile.getPort();
-            LOG.debug("Lock file is valid (port={}). Exiting.", port);
+            OutputController.getLogger().log("Lock file is valid (port=" + port + "). Exiting.");
 
             String[] args = null;
             if (jnlpFile.isApplet()) {
@@ -204,7 +199,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
             serverCommunicationSocket.close();
 
         } catch (UnknownHostException unknownHost) {
-            LOG.error("Unable to find localhost");
+            OutputController.getLogger().log("Unable to find localhost");
             throw new RuntimeException(unknownHost);
         }
     }

@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -44,12 +43,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultErrorSplashScreen2012;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SplashUtils {
-
-    private final static Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
     static final String ICEDTEA_WEB_PLUGIN_SPLASH = "ICEDTEA_WEB_PLUGIN_SPLASH";
     static final String ICEDTEA_WEB_SPLASH = "ICEDTEA_WEB_SPLASH";
@@ -83,7 +78,7 @@ public class SplashUtils {
         } catch (Throwable t) {
                 // prinitng this exception is discutable. I have let it in for case that
                 //some retyping will fail
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
+                OutputController.getLogger().log(t);
         }
     }
 
@@ -183,7 +178,7 @@ public class SplashUtils {
             pluginSplashEnvironmetVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
             splashEnvironmetVar = System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
         }
         SplashPanel sp = null;
         if (SplashReason.JAVAWS.equals(splashReason)) {

@@ -40,6 +40,7 @@ package net.adoptopenjdk.icedteaweb.xmlparser;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 // this class makes assumptions on how parser calls methods (such
 // as getFirstChild->getNextChild only called by a single loop at
@@ -51,13 +52,16 @@ import java.util.List;
  */
 /* NANO */
 public class Node {
-    private XMLElement xml;
+    private final XMLElement xml;
+
     private Node next;
+
     private Node children[];
+
     private List <String> attributeNames= null;
 
-    public Node(XMLElement xml) {
-        this.xml = xml;
+    public Node(final XMLElement xml) {
+        this.xml = Objects.requireNonNull(xml);
     }
 
     public Node getFirstChild() {
@@ -86,7 +90,7 @@ public class Node {
 
     public Node[] getChildNodes() {
         if (children == null) {
-            List<Node> list = new ArrayList<Node>();
+            final List<Node> list = new ArrayList<>();
 
             for (Enumeration<XMLElement> e = xml.enumerateChildren(); e.hasMoreElements();) {
                 list.add(new Node(e.nextElement()));
@@ -108,10 +112,10 @@ public class Node {
      */
     public List<String> getAttributeNames() {
         if (attributeNames == null) {
-            attributeNames= new ArrayList<String>();
+            attributeNames= new ArrayList<>();
 
             for (Enumeration<String> e = xml.enumerateAttributeNames(); e.hasMoreElements();) {
-                attributeNames.add(new String(e.nextElement()));
+                attributeNames.add(e.nextElement());
             }
         }
 
@@ -131,121 +135,8 @@ public class Node {
         }
     }
 
-
     @Override
     public String toString() {
         return getNodeName().getOriginal();
     }
-
-    public static class ElementName {
-
-        private final String base;
-
-        public ElementName(String base) {
-            this.base = base;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof ElementName) {
-                return ((ElementName) obj).base.equals(base);
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return base.hashCode();
-        }
-
-        public String getName() {
-            if (base.contains(":")) {
-                return base.split(":")[1];
-            } else {
-                return base;
-            }
-        }
-        public String getPrefix() {
-            if (base.contains(":")) {
-                return base.split(":")[0];
-            } else {
-                return "";
-            }
-        }
-
-        private String getOriginal() {
-            return base + "(" + getPrefix() + ":" + getName() + ")";
-        }
-
-    }
 }
-
-/**
- * This class converts the TinyXML's ParsedXML nodes into the
- * regular XML Node interface (for the methods used by Parser).
- */
-/* TINY
-class Node {
-    private ParsedXML tinyNode;
-    private Node next;
-    private Node children[];
-    private String attributeNames[];
-
-    Node(ParsedXML tinyNode) {
-        this.tinyNode = tinyNode;
-    }
-
-    Node getFirstChild() {
-        if (children == null)
-            getChildNodes();
-
-        if (children.length == 0)
-            return null;
-        else
-            return children[0];
-    }
-
-    Node getNextSibling() {
-        return next;
-    }
-
-    void normalize() {
-    }
-
-    String getNodeValue() {
-        return tinyNode.getContent();
-    }
-
-    Node[] getChildNodes() {
-        if (children == null) {
-            List list = new ArrayList();
-
-            for (Enumeration e = tinyNode.elements(); e.hasMoreElements();) {
-                list.add( new Node((ParsedXML)e.nextElement()) );
-            }
-            children = (Node[]) list.toArray( new Node[list.size()] );
-
-            for (int i=0; i < children.length-1; i++)
-                children[i].next = children[i+1];
-        }
-
-        return children;
-    }
-    
-    String getAttribute(String name) {
-        return tinyNode.getAttribute(name);
-    }
-
-    String getNodeName() {
-        if (tinyNode.getName() == null)
-            return "";
-        else
-            return tinyNode.getName();
-    }
-
-    public String toString() {
-        return getNodeName();
-    }
-}
-*/

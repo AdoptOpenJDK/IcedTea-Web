@@ -36,14 +36,11 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import net.sourceforge.jnlp.util.logging.headers.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,10 +50,8 @@ import java.util.Date;
  */
 public final class FileLog  {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FileLog.class);
-
     public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false);
+        return new Header(OutputController.Level.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false);
     }
 
     private static String getColon() {
@@ -106,8 +101,8 @@ public final class FileLog  {
                 s = new WriterBasedFileLog(defaultloggerName, getFileName(id), false);
             }
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             //we do not wont to block whole logging just because initialization error in "new FileLog()"
+            OutputController.getLogger().log(ex);
             s = new SingleStreamLoggerImpl();
         }
         return s;
@@ -115,7 +110,7 @@ public final class FileLog  {
 
     private static String getFileName(String id) {
         String s = LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + id + "-" + getStamp() + ".log";
-        LOG.debug("Attempting to log into: {}", s);
+        OutputController.getLogger().log("Attempting to log into: " + s);
         return s;
     }
     

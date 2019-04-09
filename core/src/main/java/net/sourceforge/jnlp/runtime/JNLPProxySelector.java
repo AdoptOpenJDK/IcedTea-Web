@@ -16,11 +16,8 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -45,8 +42,6 @@ import java.util.StringTokenizer;
  * @see java.net.ProxySelector
  */
 public abstract class JNLPProxySelector extends ProxySelector {
-
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPProxySelector.class);
 
     public static final int PROXY_TYPE_UNKNOWN = -1;
     public static final int PROXY_TYPE_NONE = 0;
@@ -103,7 +98,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 autoConfigUrl = new URL(autoConfigString);
             } catch (MalformedURLException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
 
@@ -165,7 +160,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 proxyPort = Integer.valueOf(port);
             } catch (NumberFormatException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
         return proxyPort;
@@ -176,7 +171,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ioe);
     }
 
     /**
@@ -185,11 +180,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public List<Proxy> select(URI uri) {
-        LOG.debug("Selecting proxy for: {}", uri);
+        OutputController.getLogger().log("Selecting proxy for: " + uri);
         
         if (inBypassList(uri)) {
             List<Proxy> proxies = Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
-            LOG.debug("Selected proxies: {}", Arrays.toString(proxies.toArray()));
+            OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
             return proxies;
         }
 
@@ -214,7 +209,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 break;
         }
 
-        LOG.debug("Selected proxies: {}", Arrays.toString(proxies.toArray()));
+        OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
         return proxies;
     }
 
@@ -383,7 +378,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
             proxies.addAll(getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             proxies.add(Proxy.NO_PROXY);
         }
 
@@ -442,7 +437,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             } else if (token.startsWith("DIRECT")) {
                 proxies.add(Proxy.NO_PROXY);
             } else {
-                 LOG.debug("Unrecognized proxy token: {}", token);
+                 OutputController.getLogger().log("Unrecognized proxy token: " + token);
             }
         }
 

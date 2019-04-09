@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.AppletDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -24,8 +23,6 @@ import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import java.applet.Applet;
@@ -60,8 +57,6 @@ import java.util.Map;
  * @version $Revision: 1.12 $
  */
 public class AppletEnvironment implements AppletContext, AppletStub {
-    
-    private final static Logger LOG = LoggerFactory.getLogger(AppletEnvironment.class);
 
     /** the JNLP file */
     private JNLPFile file;
@@ -225,10 +220,10 @@ public class AppletEnvironment implements AppletContext, AppletStub {
                     }
                 });
             } catch (InterruptedException | InvocationTargetException ie) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ie);
+                OutputController.getLogger().log(ie);
             }
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
 
             // should also kill the applet?
         }
@@ -257,7 +252,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
      */
     public void setApplet(Applet applet) {
         if (this.applet != null) {
-            LOG.error("Applet can only be set once.", new IllegalStateException("Applet can only be set once."));
+            OutputController.getLogger().log(new IllegalStateException("Applet can only be set once."));
             return;
         }
         this.applet = applet;

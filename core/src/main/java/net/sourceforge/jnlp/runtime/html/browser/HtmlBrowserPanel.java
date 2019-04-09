@@ -36,13 +36,10 @@
  */
 package net.sourceforge.jnlp.runtime.html.browser;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -76,8 +73,6 @@ import java.util.List;
  *
  */
 public class HtmlBrowserPanel extends JPanel {
-
-    private final static Logger LOG = LoggerFactory.getLogger(HtmlBrowserPanel.class);
 
     private void fireDocumentChanged(String current) {
         for (DocumentChangededListener documentChangededListener : documentChangededListeners) {
@@ -290,7 +285,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(u);
             return u;
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }
@@ -303,7 +298,7 @@ public class HtmlBrowserPanel extends JPanel {
             load(url);
             return url;
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             if (!JNLPRuntime.isHeadless()) {
                 JOptionPane.showMessageDialog(null, ex);
             }
@@ -318,7 +313,7 @@ public class HtmlBrowserPanel extends JPanel {
         //url conenction is checking response code.It can be used as 511 is unimplemented
         String[] result;
         if (isUseSocket()) {
-            LOG.debug("Using socket connection");
+            OutputController.getLogger().log("Using socket connection");
             Charset ch = (Charset)(encodingBox.getSelectedItem());
             if (ch == null) { 
                 result = UrlUtils.loadUrlWithInvalidHeader(url);
@@ -326,7 +321,7 @@ public class HtmlBrowserPanel extends JPanel {
                 result = UrlUtils.loadUrlWithInvalidHeader(url, ch);
             }
         } else {
-            LOG.debug("Using URLconnection");
+            OutputController.getLogger().log("Using URLconnection");
             String s;
             Charset ch = (Charset)(encodingBox.getSelectedItem());
             if (ch == null) { 
@@ -336,7 +331,7 @@ public class HtmlBrowserPanel extends JPanel {
             }
             result = new String[]{s, s, s};
         }
-        LOG.debug(result[0]);
+        OutputController.getLogger().log(result[0]);
         if (result[2].trim().isEmpty()) {
             result[2] = result[1];
         }
@@ -464,8 +459,8 @@ public class HtmlBrowserPanel extends JPanel {
     }
 
     public static void warn() {
-        LOG.info(Translator.R("BrowserWarningLine1"));
-        LOG.info(Translator.R("BrowserWarningLine2"));
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BrowserWarningLine1"));
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BrowserWarningLine2"));
     }
 
     public static void showStandAloneWindow(String url, boolean socket) {

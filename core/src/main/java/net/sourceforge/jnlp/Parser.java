@@ -16,13 +16,13 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
+import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1419,7 +1419,7 @@ public final class Parser {
             instance = klass.newInstance();
             //catch both, for case that tagsoup was removed after build
         } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
             klass = Class.forName(NORMAL_PARSER_CLASS);
             instance = klass.newInstance();
         }
@@ -1442,7 +1442,7 @@ public final class Parser {
             //only getRequiredAttribute can throw this
             //and as there is call to getMainClass  with required false
             //it is not going to be thrown
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             return null;
         }
     }
@@ -1462,14 +1462,14 @@ public final class Parser {
             Matcher matcher = anyWhiteSpace.matcher(main);
             boolean found = matcher.find();
             if (found && !strict) {
-                LOG.warn("Warning! main-class contains whitespace - '{}'", main);
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Warning! main-class contains whitespace - '" + main + "'");
                 main = main.trim();
-                LOG.warn("Trimmed - '{}'", main);
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "Trimmed - '" + main + "'");
             }
             boolean valid = true;
             if (!Character.isJavaIdentifierStart(main.charAt(0))) {
                 valid = false;
-                LOG.debug("Invlaid char in main-class: '{}'", main.charAt(0));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Invlaid char in main-class: '" + main.charAt(0) + "'");
             }
             for (int i = 1; i < main.length(); i++) {
                 if (main.charAt(i) == '.') {
@@ -1478,11 +1478,11 @@ public final class Parser {
                 }
                 if (!Character.isJavaIdentifierPart(main.charAt(i))) {
                     valid = false;
-                    LOG.debug("Invlaid char in main-class: '{}'", main.charAt(i));
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Invlaid char in main-class: '" + main.charAt(i) + "'");
                 }
             }
             if (!valid) {
-                LOG.warn("main-class contains invalid characters - '{}'. Check with vendor.", main);
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL, "main-class contains invalid characters - '" + main + "'. Check with vendor.");
                 if (strict) {
                     throw new ParseException("main-class contains invalid characters - '" + main + "'. Check with vendor. You are in strict mode. This is fatal.");
                 }

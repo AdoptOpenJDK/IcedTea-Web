@@ -37,16 +37,11 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.util.Date;
 
 public class PluginMessage  implements MessageWithHeader{
-
-    private final static Logger LOG = LoggerFactory.getLogger(PluginMessage.class);
 
     public PluginHeader header;
     public String restOfMessage;
@@ -64,11 +59,11 @@ public class PluginMessage  implements MessageWithHeader{
                 p.preinit = true;
             }
             if (s.startsWith(PluginHeader.PLUGIN_DEBUG) || s.startsWith(PluginHeader.PLUGIN_DEBUG_PREINIT)) {
-                p.level = OutputControllerLevel.MESSAGE_DEBUG;
+                p.level = OutputController.Level.MESSAGE_DEBUG;
             } else if (s.startsWith(PluginHeader.PLUGIN_ERROR) || s.startsWith(PluginHeader.PLUGIN_ERROR_PREINIT)) {
-                p.level = OutputControllerLevel.ERROR_ALL;
+                p.level = OutputController.Level.ERROR_ALL;
             } else {
-                p.level = OutputControllerLevel.WARNING_ALL;
+                p.level = OutputController.Level.WARNING_ALL;
             }
             String[] init = PluginHeader.whiteSpaces.split(s);
             p.timestamp = new Date(Long.parseLong(init[1]) / 1000);
@@ -82,7 +77,7 @@ public class PluginMessage  implements MessageWithHeader{
             int i = orig.indexOf(p.thread2);
             restOfMessage = orig.substring(i + p.thread2.length() + 2); //+": "
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             this.wasError = true;
         }
     }

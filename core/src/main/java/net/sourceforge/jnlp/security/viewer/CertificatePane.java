@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.viewer;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -46,8 +45,6 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -85,8 +82,6 @@ import java.util.List;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class CertificatePane extends JPanel {
-
-    private final static Logger LOG = LoggerFactory.getLogger(CertificatePane.class);
 
     /**
      * The certificates stored in the certificates file.
@@ -156,7 +151,7 @@ public class CertificatePane extends JPanel {
         try {
             keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -293,7 +288,7 @@ public class CertificatePane extends JPanel {
             }
         } catch (Exception e) {
             // TODO handle exception
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+           OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
     }
 
@@ -309,13 +304,13 @@ public class CertificatePane extends JPanel {
             File resolved = src.getCanonicalFile();
             if (resolved.equals(src)) {
                 certPath.setText(keyStore.getPath());
-                LOG.info(keyStore.getPath());
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, keyStore.getPath());
             } else {
                 certPath.setText(keyStore.getPath() + " -> " + resolved.getCanonicalPath());
-                LOG.info("{} -> {}", keyStore.getPath(), resolved.getCanonicalPath());
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, keyStore.getPath() + " -> " + resolved.getCanonicalPath());
             }
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
         }
         DefaultTableModel tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
         userTable.setModel(tableModel);
@@ -429,7 +424,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 }
             }
         }
@@ -473,7 +468,7 @@ public class CertificatePane extends JPanel {
                     }
                 }
             } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             }
         }
     }
@@ -515,7 +510,7 @@ public class CertificatePane extends JPanel {
                     repopulateTables();
                 }
             } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
             }
 
         }
@@ -559,7 +554,7 @@ public class CertificatePane extends JPanel {
                 net.sourceforge.jnlp.controlpanel.ControlPanel.main(new String[0]);
                 parent.dispose();    
             } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(ex);
                 JOptionPane.showMessageDialog(parent, ex);
 
             }

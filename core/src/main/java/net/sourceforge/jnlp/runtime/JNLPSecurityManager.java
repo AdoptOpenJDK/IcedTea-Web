@@ -21,8 +21,6 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
@@ -49,8 +47,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * @version $Revision: 1.17 $
  */
 class JNLPSecurityManager extends AWTSecurityManager {
-
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPSecurityManager.class);
 
     // todo: some apps like JDiskReport can close the VM even when
     // an exit class is set - fix!
@@ -294,7 +290,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
             super.checkPermission(perm);
         } catch (SecurityException ex) {
-            LOG.debug("Denying permission: {}", perm);
+            OutputController.getLogger().log("Denying permission: " + perm);
             throw ex;
         }
     }
@@ -329,16 +325,16 @@ class JNLPSecurityManager extends AWTSecurityManager {
             if (JNLPRuntime.isDebug()) {
                 if (cl.getSecurity() == null) {
                     if (cl.getPermissions(null).implies(perm)){
-                        LOG.warn("Added permission: {}", perm);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Added permission: " + perm.toString());
                     } else {
-                        LOG.warn("Unable to add permission: {}", perm);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to add permission: " + perm.toString());
                     }
                 } else {
-                    LOG.warn("Cannot get permissions for null codesource when classloader security is not null");
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Cannot get permissions for null codesource when classloader security is not null");
                 }
             }
         } else {
-            LOG.debug("Unable to add permission: {}, classloader not JNLP.", perm);
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Unable to add permission: " + perm + ", classloader not JNLP.");
         }
     }
 
@@ -355,7 +351,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         if (app != null && window instanceof Window) {
             Window w = (Window) window;
 
-            LOG.debug("SM: app: {} is adding a window: {} with appContext {}", app.getTitle(), window, AppContext.getAppContext());
+            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "SM: app: " + app.getTitle() + " is adding a window: " + window + " with appContext " + AppContext.getAppContext());
 
             weakWindows.add(w); // for mapping window -> app
             weakApplications.add(app);

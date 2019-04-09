@@ -37,13 +37,10 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -69,8 +66,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * A dialog that displays some basic information about an exception
  */
 public class BasicExceptionDialog {
-
-    private final static Logger LOG = LoggerFactory.getLogger(BasicExceptionDialog.class);
 
     private static final AtomicInteger dialogInstancess = new AtomicInteger();
 
@@ -167,8 +162,8 @@ public class BasicExceptionDialog {
             public void actionPerformed(final java.awt.event.ActionEvent evt) {
                 try {
                     JavaConsole.getConsole().showConsoleLater(true);
-                } catch (Exception ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                } catch (final Exception ex) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                     JOptionPane.showConfirmDialog(parent, ex);
                 }
             }
@@ -194,8 +189,8 @@ public class BasicExceptionDialog {
                     public void run() {
                         try {
                             CachePane.visualCleanCache(parent);
-                        } catch (Exception ex) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                        } catch (final Exception ex) {
+                            OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
                         }
                     }
                 });

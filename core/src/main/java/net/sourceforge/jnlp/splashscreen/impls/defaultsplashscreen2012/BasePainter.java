@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.impls.defaultsplashscreen2012;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils.SplashReason;
 import net.sourceforge.jnlp.splashscreen.impls.DefaultSplashScreen2012;
@@ -47,8 +46,6 @@ import net.sourceforge.jnlp.splashscreen.parts.extensions.ExtensionManager;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -68,8 +65,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class BasePainter implements Observer {
-
-    private final static Logger LOG = LoggerFactory.getLogger(BasePainter.class);
 
     protected final BasicComponentSplashScreen master;
     //animations
@@ -423,7 +418,7 @@ public class BasePainter implements Observer {
                     this.notifyObservers();
                     Thread.sleep(MOOVING_TEXT_DELAY);
                 } catch (Exception e) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                    OutputController.getLogger().log(e);
                 }
             }
         }
@@ -457,7 +452,7 @@ public class BasePainter implements Observer {
                     //it is risinfg slower and slower
                     Thread.sleep((waterLevel / 4) * 30);
                 } catch (Exception e) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                    OutputController.getLogger().log(e);
                 }
             }
         }

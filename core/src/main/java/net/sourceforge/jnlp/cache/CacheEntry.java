@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -146,7 +145,7 @@ public class CacheEntry {
             LOG.info("isCurrent:lastModified cache:{} actual:{}", cachedModified, lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             return cached;
         }
     }
@@ -173,7 +172,7 @@ public class CacheEntry {
             else
                 return true;
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
 
             return false; // should throw?
         }

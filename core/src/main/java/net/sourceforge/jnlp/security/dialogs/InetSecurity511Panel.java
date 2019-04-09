@@ -36,7 +36,6 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -45,8 +44,7 @@ import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.YesCancelSkip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -64,8 +62,6 @@ import java.net.URL;
 import java.util.List;
 
 public class InetSecurity511Panel extends SecurityDialogPanel {
-
-    private final static Logger LOG = LoggerFactory.getLogger(InetSecurity511Panel.class);
 
     private static final String INFO_LINK = "https://tools.ietf.org/html/rfc6585#section-6";
     private static boolean skip = false;
@@ -130,7 +126,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
                     try {
                         Desktop.getDesktop().browse(new URI(INFO_LINK));
                     } catch (Exception ex) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                        OutputController.getLogger().log(ex);
                         if (!JNLPRuntime.isHeadless()) {
                             JOptionPane.showMessageDialog(null, ex);
                         }

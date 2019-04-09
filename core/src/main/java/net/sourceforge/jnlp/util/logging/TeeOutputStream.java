@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.util.logging;
 
 
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import net.sourceforge.jnlp.util.logging.OutputController.Level;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 
@@ -127,11 +128,11 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         }
     }
 
-    private OutputControllerLevel getlevel() {
+    private Level getlevel() {
         if (isError()) {
-            return OutputControllerLevel.ERROR_ALL;
+            return OutputController.Level.ERROR_ALL;
         } else {
-            return OutputControllerLevel.MESSAGE_ALL;
+            return OutputController.Level.MESSAGE_ALL;
         }
     }
 

@@ -38,8 +38,6 @@ package net.sourceforge.jnlp.security.dialogs.remember;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,8 +49,6 @@ import java.util.Map.Entry;
 
 //from legacy, just wrapper around map
 public class AppletSecurityActions implements Iterable<SavedRememberAction> {
-
-    private final static Logger LOG = LoggerFactory.getLogger(AppletSecurityActions.class);
 
     private final Map<String, SavedRememberAction> actions = new HashMap<>();
 
@@ -150,7 +146,7 @@ public class AppletSecurityActions implements Iterable<SavedRememberAction> {
                 SavedRememberAction sa = new SavedRememberAction(q, legacyToCurrent(x));//maybe better switch then toChar?
                 asas.actions.put(classToKey(MatchingALACAttributePanel.class), sa);
             } else {
-                LOG.debug("Unknown saved legacy item on position {} of char: {}", i, x);
+                OutputController.getLogger().log("Unknown saved legacy item on position " + i + " of char: " + x);
             }
             i++;
         }

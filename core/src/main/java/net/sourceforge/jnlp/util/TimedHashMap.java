@@ -38,8 +38,6 @@ exception statement from your version. */
 package net.sourceforge.jnlp.util;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,8 +62,6 @@ import static java.util.Objects.requireNonNull;
  * @param V The Object type
  */
 public class TimedHashMap<K, V> implements Map<K, V> {
-
-    private final static Logger LOG = LoggerFactory.getLogger(TimedHashMap.class);
 
     private static class TimedEntry<T> {
         private final T value;
@@ -146,11 +142,11 @@ public class TimedHashMap<K, V> implements Map<K, V> {
 
             // Item exists. If it has not expired, renew its access time and return it
             if (age <= timeout) {
-                LOG.debug("Returning entry {} from cache for {}", actualMap.get(key), key);
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Returning entry " + actualMap.get(key) + " from cache for " + key);
                 timedEntry.updateTimestamp();
                 return timedEntry.value;
             } else {
-                LOG.debug("Cached entry for {} has expired (age={} seconds)", key, (age * 1e-9));
+                OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached entry for " + key + " has expired (age=" + (age * 1e-9) + " seconds)");
             }
         }
 

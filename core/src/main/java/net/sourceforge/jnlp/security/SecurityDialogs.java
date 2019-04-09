@@ -49,8 +49,6 @@ import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JDialog;
 import java.awt.Dialog.ModalityType;
@@ -77,8 +75,6 @@ import java.util.concurrent.Semaphore;
  * </p>
  */
 public class SecurityDialogs {
-
-    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
 
     /**
      * Types of dialogs we can create
@@ -238,7 +234,7 @@ public class SecurityDialogs {
         message.extras = new Object[]{host, port, prompt, type};
 
         DialogResult response = getUserResponse(message);
-        LOG.debug("Decided action for matching alaca at  was {}", response);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at  was " + response);
         return (NamePassword) response;
     }
 
@@ -250,12 +246,12 @@ public class SecurityDialogs {
         if (codeBase != null) {
             urlToShow = codeBase.toString();
         } else {
-            LOG.warn("Warning, null codebase wants to show in ALACA!");
+            OutputController.getLogger().log("Warning, null codebase wants to show in ALACA!");
         }
         message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
 
-        LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
 
         if (selectedValue == null) {
             return false;
@@ -274,7 +270,7 @@ public class SecurityDialogs {
         message.extras = new Object[]{docBaseString, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
         DialogResult selectedValue = getUserResponse(message);
 
-        LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for matching alaca at " + file.getCodeBase() + " was " + selectedValue);
 
         if (selectedValue != null) {
             return selectedValue.toBoolean();
@@ -289,7 +285,7 @@ public class SecurityDialogs {
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
         DialogResult selectedValue = getUserResponse(message);
-        LOG.debug("Decided action for missing permissions at {} was {}", file.getCodeBase(), selectedValue);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Decided action for missing permissions at " + file.getCodeBase() + " was " + selectedValue);
 
         if (selectedValue != null) {
             return selectedValue.toBoolean();

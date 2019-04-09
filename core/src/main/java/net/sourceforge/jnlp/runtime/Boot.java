@@ -15,7 +15,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
@@ -131,7 +130,7 @@ public final class Boot implements PrivilegedAction<Void> {
             try {
                 CertificateViewer.main(null);
             } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             } finally {
                 //no matter what happens, terminate
                 return;
@@ -159,7 +158,7 @@ public final class Boot implements PrivilegedAction<Void> {
                     PropertyDesc propDesc = PropertyDesc.fromString(prop);
                     JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
                 } catch (LaunchException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(ex);
                 }
             }
         }
@@ -283,7 +282,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     static void fatalError(String message) {
-        LOG.error("netx: " + message);
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "netx: " + message);
         JNLPRuntime.exit(1);
     }
 
@@ -297,7 +296,7 @@ public final class Boot implements PrivilegedAction<Void> {
         try {
             location = getMainFile();
         } catch (InvalidArgumentException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
             fatalError("Invalid argument: " + e);
         }
 
@@ -321,7 +320,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 url = new URL(location);
             }
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
             fatalError("Invalid jnlp file " + location);
         }
 

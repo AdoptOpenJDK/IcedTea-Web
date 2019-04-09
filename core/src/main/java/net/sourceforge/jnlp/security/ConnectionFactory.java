@@ -38,8 +38,6 @@ exception statement from your version. */
 package net.sourceforge.jnlp.security;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -51,8 +49,6 @@ import java.util.List;
 
 
 public class ConnectionFactory {
-
-    private final static Logger LOG = LoggerFactory.getLogger(ConnectionFactory.class);
 
     private final List<URLConnection> httpsConnections = new ArrayList<>();
 
@@ -72,10 +68,10 @@ public class ConnectionFactory {
     }
 
     public URLConnection openConnection(URL url) throws IOException {
-        LOG.debug("Connecting {}", url.toExternalForm());
+        OutputController.getLogger().log("Connecting " + url.toExternalForm());
         if (url.getProtocol().equalsIgnoreCase("https")) {
             if (isSyncForced()) {
-                LOG.debug("Waiting for {} connections to finish", httpsConnections.size());
+                OutputController.getLogger().log("Waiting for " + httpsConnections.size() + " connections to finish");
                 while (!httpsConnections.isEmpty()) {
                     try {
                         Thread.sleep(100);
@@ -87,7 +83,7 @@ public class ConnectionFactory {
             return openHttpsConnection(url);
         } else {
             URLConnection conn = url.openConnection();
-            LOG.debug("done {}", url.toExternalForm());
+            OutputController.getLogger().log("done " + url.toExternalForm());
             return conn;
         }
     }
@@ -95,15 +91,15 @@ public class ConnectionFactory {
     private synchronized URLConnection openHttpsConnection(URL url) throws IOException {
         URLConnection conn = null;
         conn = url.openConnection();
-        LOG.debug("Adding {}", conn);
+        OutputController.getLogger().log("Adding " + conn.toString());
         httpsConnections.add(conn);
-        LOG.debug("done {}", url.toExternalForm());
+        OutputController.getLogger().log("done " + url.toExternalForm());
         return conn;
     }
 
     public void disconnect(URLConnection conn) {
         if (conn != null) {
-            LOG.debug("Disconnecting {}", conn.toString());
+            OutputController.getLogger().log("Disconnecting " + conn.toString());
             if (conn instanceof HttpsURLConnection) {
                 closeHttpsConnection((HttpsURLConnection) conn);
             } else {
@@ -112,7 +108,7 @@ public class ConnectionFactory {
                 }
             }
         } else {
-            LOG.debug("\"Disconnecting\" null connection. This is ok if you are offline.");
+            OutputController.getLogger().log("\"Disconnecting\" null connection. This is ok if you are offline.");
         }
     }
 
@@ -123,7 +119,7 @@ public class ConnectionFactory {
             URLConnection urlConnection = httpsConnections.get(i);
             if (urlConnection == conn) {
                 httpsConnections.remove(i);
-                LOG.debug("Removed {}", urlConnection.toString());
+                OutputController.getLogger().log("Removed " + urlConnection.toString());
                 i--;
 
             }

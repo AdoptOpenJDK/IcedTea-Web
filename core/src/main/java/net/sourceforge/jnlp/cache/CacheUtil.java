@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -83,15 +82,15 @@ public class CacheUtil {
      * URL is returned.
      *
      * @param location location of the resource
-     * @param version  the version, or {@code null}
-     * @param policy   how to handle update
+     * @param version the version, or {@code null}
+     * @param policy how to handle update
      * @return either the location in the cache or the original location
      */
     public static URL getCachedResourceURL(URL location, Version version, UpdatePolicy policy) {
         try {
             File f = getCachedResourceFile(location, version, policy);
             //url was ponting to nowhere eg 404
-            if (f == null) {
+            if (f == null){
                 //originally  f.toUrl was throwing NPE
                 return null;
                 //returning null seems to be better
@@ -102,16 +101,15 @@ public class CacheUtil {
             return location;
         }
     }
-
+    
     /**
      * This is returning File object of cached resource originally from URL
-     *
      * @param location original location of blob
-     * @param version  version of resource
-     * @param policy   update policy of resource
-     * @return location in ITW cache on filesystem
+     * @param version version of resource
+     * @param policy update policy of resource
+     * @return location in ITW cache on filesystem 
      */
-    public static File getCachedResourceFile(URL location, Version version, UpdatePolicy policy) {
+    public static File  getCachedResourceFile(URL location, Version version, UpdatePolicy policy) {
         ResourceTracker rt = new ResourceTracker();
         rt.addResource(location, version, null, policy);
         File f = rt.getCacheFile(location);
@@ -121,9 +119,8 @@ public class CacheUtil {
     /**
      * Returns the Permission object necessary to access the
      * resource, or {@code null} if no permission is needed.
-     *
      * @param location location of the resource
-     * @param version  the version, or {@code null}
+     * @param version the version, or {@code null}
      * @return permissions of the location
      */
     public static Permission getReadPermission(URL location, Version version) {
@@ -136,10 +133,10 @@ public class CacheUtil {
                 // this is what URLClassLoader does
                 URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(location);
                 result = conn.getPermission();
-                ConnectionFactory.getConnectionFactory().disconnect(conn);
+                 ConnectionFactory.getConnectionFactory().disconnect(conn);                
             } catch (java.io.IOException ioe) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                 // should try to figure out the permission
+                OutputController.getLogger().log(ioe);
             }
         }
 
@@ -148,11 +145,10 @@ public class CacheUtil {
 
     /**
      * Clears the cache by deleting all the Netx cache files
-     * <p>
+     *
      * Note: Because of how our caching system works, deleting jars of another javaws
      * process is using them can be quite disasterous. Hence why Launcher creates lock files
      * and we check for those by calling {@link #okToClearCache()}
-     *
      * @return true if the cache could be cleared and was cleared
      */
     public static boolean clearCache() {
@@ -163,7 +159,8 @@ public class CacheUtil {
         if (!checkToClearCache()) {
             return false;
         }
-        LOG.debug("Clearing cache directory: {}", cacheDir);
+
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing cache directory: " + cacheDir);
         lruHandler.lock();
         try {
             cacheDir = cacheDir.getCanonicalFile();
@@ -189,7 +186,7 @@ public class CacheUtil {
             return false;
         }
 
-        LOG.warn(Translator.R("BXSingleCacheCleared", application));
+        OutputController.getLogger().log(OutputController.Level.WARNING_ALL, Translator.R("BXSingleCacheCleared", application));
         List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
@@ -200,12 +197,12 @@ public class CacheUtil {
             }
         }
         if (found == 0) {
-            LOG.error(Translator.R("BXSingleCacheClearNotFound", application));
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("BXSingleCacheClearNotFound", application));
         }
         if (found > 1) {
-            LOG.error(Translator.R("BXSingleCacheMoreThenOneId", application));
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("BXSingleCacheMoreThenOneId", application));
         }
-        LOG.info(Translator.R("BXSingleCacheFileCount", files));
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BXSingleCacheFileCount", files));
         CacheLRUWrapper.getInstance().lock();
         try {
             Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
@@ -244,7 +241,7 @@ public class CacheUtil {
 
     public static boolean checkToClearCache() {
         if (!okToClearCache()) {
-            LOG.error(R("CCannotClearCache"));
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, R("CCannotClearCache"));
             return false;
         }
         return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
@@ -252,7 +249,7 @@ public class CacheUtil {
 
     public static void removeWindowsShortcuts(String jnlpApp)
             throws IOException {
-        LOG.debug("Clearing Windows shortcuts");
+        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing Windows shortcuts");
         if (CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
             List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName("UTF-8"));
             Iterator it = lines.iterator();
@@ -278,7 +275,7 @@ public class CacheUtil {
                     try {
                         FileUtils.recursiveDelete(scList, scList);
                     } catch (Exception e) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                        OutputController.getLogger().log(e);
                     }
                 }
             }
@@ -292,38 +289,37 @@ public class CacheUtil {
         }
 
     }
-
-    public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
-        List<CacheId> items = getCacheIds(filter, jnlpPath, domain);
-        if (JNLPRuntime.isDebug()) {
-            for (CacheId id : items) {
-                LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.files.size());
-                for (Object[] o : id.getFiles()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < o.length; i++) {
-                        Object object = o[i];
-                        if (object == null) {
-                            object = "??";
-                        }
-                        sb.append(object.toString()).append(" ;  ");
-                    }
-                    LOG.info("  * {}", sb);
-                }
-            }
-        } else {
-            for (CacheId id : items) {
-                LOG.info(id.getId());
-            }
-        }
-    }
-
-    /**
-     * This method load all known IDs of applications and  will gather all members, which share the id
-     *
+    
+     public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
+         List<CacheId> items = getCacheIds(filter, jnlpPath, domain);
+         if (JNLPRuntime.isDebug()) {
+             for (CacheId id : items) {
+                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, id.getId()+" ("+id.getType()+") ["+id.files.size()+"]");
+                 for(Object[] o: id.getFiles()){
+                     StringBuilder sb = new StringBuilder();
+                     for (int i = 0; i < o.length; i++) {
+                         Object object = o[i];
+                         if (object == null) {
+                             object = "??";
+                         }
+                         sb.append(object.toString()).append(" ;  ");
+                     }
+                     OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "  * " + sb);
+                 }
+             }
+         } else {
+             for (CacheId id : items) {
+                 OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, id.getId());
+             }
+         }
+     }
+     
+     /**
+      * This method load all known IDs of applications and  will gather all members, which share the id
      * @param filter - regex to filter keys
-     * @return
-     */
-    public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
+      * @return 
+      */
+      public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
         CacheLRUWrapper.getInstance().lock();
         final List<CacheId> r = new ArrayList<>();
         try {
@@ -373,7 +369,6 @@ public class CacheUtil {
 
     /**
      * Returns a boolean indicating if it ok to clear the netx application cache at this point
-     *
      * @return true if the cache can be cleared at this time without problems
      */
     private static boolean okToClearCache() {
@@ -382,9 +377,9 @@ public class CacheUtil {
         try {
             if (otherJavawsRunning.isFile()) {
                 FileOutputStream fis = new FileOutputStream(otherJavawsRunning);
-
+                
                 FileChannel channel = fis.getChannel();
-                locking = channel.tryLock();
+                locking  = channel.tryLock();
                 if (locking == null) {
                     LOG.info("Other instances of javaws are running");
                     return false;
@@ -403,7 +398,7 @@ public class CacheUtil {
                 try {
                     locking.release();
                 } catch (IOException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(ex);
                 }
             }
         }
@@ -414,8 +409,8 @@ public class CacheUtil {
      * cache and it is up to date.  This method may not return
      * immediately.
      *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
+     * @param source the source {@link URL}
+     * @param version the versions to check for
      * @param lastModifed time in milis since epoch of last modfication
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
@@ -433,7 +428,7 @@ public class CacheUtil {
 
             return result;
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             return isCached(source, version); // if can't connect return whether already in cache
         }
     }
@@ -442,7 +437,7 @@ public class CacheUtil {
      * Returns true if the cache has a local copy of the contents of
      * the URL matching the specified version string.
      *
-     * @param source  the source URL
+     * @param source the source URL
      * @param version the versions to check for
      * @return true if the source is in the cache
      * @throws IllegalArgumentException if the source is not cacheable
@@ -463,8 +458,7 @@ public class CacheUtil {
      * Returns whether the resource can be cached as a local file;
      * if not, then URLConnection.openStream can be used to obtain
      * the contents.
-     *
-     * @param source  the url of resource
+     * @param source the url of resource
      * @param version version of resource
      * @return whether this resource can be cached
      */
@@ -472,10 +466,10 @@ public class CacheUtil {
         if (source == null)
             return false;
 
-        if (source.getProtocol().equals("file")) {
+        if (source.getProtocol().equals("file")){
             return false;
         }
-        if (source.getProtocol().equals("jar")) {
+        if (source.getProtocol().equals("jar")){
             return false;
         }
         return true;
@@ -487,7 +481,7 @@ public class CacheUtil {
      * not download the resource.  The latest version of the
      * resource that matches the specified version will be returned.
      *
-     * @param source  the source {@link URL}
+     * @param source the source {@link URL}
      * @param version the version id of the local file
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the source is not cacheable
@@ -521,7 +515,7 @@ public class CacheUtil {
 
     /**
      * This will return a File pointing to the location of cache item.
-     *
+     * 
      * @param urlPath Path of cache item within cache directory.
      * @return File if we have searched before, {@code null} otherwise.
      */
@@ -556,7 +550,6 @@ public class CacheUtil {
 
     /**
      * Returns the parent directory of the cached resource.
-     *
      * @param filePath The path of the cached resource directory.
      * @return parent dir of cache
      */
@@ -565,13 +558,13 @@ public class CacheUtil {
         String tempPath;
         String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getFullPath();
 
-        while (path.startsWith(cacheDir) && !path.equals(cacheDir)) {
-            tempPath = new File(path).getParent();
+        while(path.startsWith(cacheDir) && !path.equals(cacheDir)){
+                tempPath = new File(path).getParent();
 
-            if (tempPath.equals(cacheDir))
-                break;
+                if (tempPath.equals(cacheDir))
+                    break;
 
-            path = tempPath;
+                path = tempPath;
         }
         return path;
     }
@@ -580,8 +573,8 @@ public class CacheUtil {
      * This will create a new entry for the cache item. It is however not
      * initialized but any future calls to getCacheFile with the source and
      * version given to here, will cause it to return this item.
-     *
-     * @param source  the source URL
+     * 
+     * @param source the source URL
      * @param version the version id of the local file
      * @return the file location in the cache.
      */
@@ -593,7 +586,7 @@ public class CacheUtil {
                 lruHandler.lock();
                 lruHandler.load();
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
-                    String path = lruHandler.getCacheDir().getFullPath() + File.separator + i;
+                    String path = lruHandler.getCacheDir().getFullPath()+ File.separator + i;
                     File cDir = new File(path);
                     if (!cDir.exists()) {
                         // We can use this directory.
@@ -604,7 +597,7 @@ public class CacheUtil {
                             FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                             lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
+                            OutputController.getLogger().log(ioe);
                         }
 
                         break;
@@ -623,7 +616,7 @@ public class CacheUtil {
      * Returns a buffered output stream open for writing to the
      * cache file.
      *
-     * @param source  the remote location
+     * @param source the remote location
      * @param version the file version to write to
      * @return the stream to write to resource
      * @throws java.io.IOException if IO breaks
@@ -639,7 +632,6 @@ public class CacheUtil {
      * Copies from an input stream to an output stream.  On
      * completion, both streams will be closed.  Streams are
      * buffered automatically.
-     *
      * @param is stream to read from
      * @param os stream to write to
      * @throws java.io.IOException if copy fails
@@ -672,7 +664,7 @@ public class CacheUtil {
      * result in a File that is located somewhere within /tmp/
      *
      * @param location the url
-     * @param subdir   the subdirectory
+     * @param subdir the subdirectory
      * @return the file
      */
     public static File urlToPath(URL location, String subdir) {
@@ -743,10 +735,10 @@ public class CacheUtil {
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
      *
-     * @param app       application instance with context for this resource
-     * @param tracker   the resource tracker
+     * @param app application instance with context for this resource
+     * @param tracker the resource tracker
      * @param resources the resources to wait for
-     * @param title     name of the download
+     * @param title name of the download
      */
     public static void waitForResources(ApplicationInstance app, ResourceTracker tracker, URL resources[], String title) {
         DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
@@ -787,21 +779,21 @@ public class CacheUtil {
 
                 for (URL url : undownloaded) {
                     listener.progress(url, "version",
-                            tracker.getAmountRead(url),
-                            tracker.getTotalSize(url),
-                            percent);
+                                      tracker.getAmountRead(url),
+                                      tracker.getTotalSize(url),
+                                      percent);
                 }
             } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
 
             // make sure they read 100% until indicator closes
             for (URL url : undownloaded) {
                 listener.progress(url, "version",
-                        tracker.getTotalSize(url),
-                        tracker.getTotalSize(url),
-                        100);
+                                  tracker.getTotalSize(url),
+                                  tracker.getTotalSize(url),
+                                  100);
             }
         } catch (InterruptedException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
         } finally {
             if (listener != null)
                 indicator.disposeListener(listener);
@@ -839,16 +831,16 @@ public class CacheUtil {
                     PropertiesFile pf = new PropertiesFile(new File(path + CacheDirectory.INFO_SUFFIX));
                     boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
-                    /*
-                     * This will get me the root directory specific to this cache item.
-                     * Example:
-                     *  cacheDir = /home/user1/.icedtea/cache
-                     *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
-                     *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
-                     *  then rstr becomes: /home/user1/.icedtea/cache/0
-                     */
+                /*
+                 * This will get me the root directory specific to this cache item.
+                 * Example:
+                 *  cacheDir = /home/user1/.icedtea/cache
+                 *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
+                 *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
+                 *  then rstr becomes: /home/user1/.icedtea/cache/0
+                 */
                     String rStr = file.getPath().substring(lruHandler.getCacheDir().getFullPath().length());
-                    rStr = lruHandler.getCacheDir().getFullPath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                    rStr = lruHandler.getCacheDir().getFullPath()+ rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
                     long len = file.length();
 
                     if (keep.contains(file.getPath().substring(rStr.length()))) {
@@ -856,14 +848,14 @@ public class CacheUtil {
                         continue;
                     }
 
-                    /*
-                     * we remove entries from our lru if any of the following condition is met.
-                     * Conditions:
-                     *  - delete: file has been marked for deletion.
-                     *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
-                     *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
-                     *  on disk would exceed the maximum size.
-                     */
+                /*
+                 * we remove entries from our lru if any of the following condition is met.
+                 * Conditions:
+                 *  - delete: file has been marked for deletion.
+                 *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
+                 *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
+                 *  on disk would exceed the maximum size.
+                 */
                     if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
                         lruHandler.removeEntry(key);
                         remove.add(rStr);
@@ -878,7 +870,7 @@ public class CacheUtil {
                             try {
                                 FileUtils.recursiveDelete(f, f);
                             } catch (IOException e1) {
-                                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
+                                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e1);
                             }
                         }
 
@@ -986,7 +978,7 @@ public class CacheUtil {
         @Override
         public String toString() {
             return id;
-        }
+        }   
 
         public List<Object[]> getFiles() {
             return files;
@@ -995,7 +987,9 @@ public class CacheUtil {
         public String getId() {
             return id;
         }
-
+        
+        
+        
 
         @Override
         public boolean equals(Object obj) {

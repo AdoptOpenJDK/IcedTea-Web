@@ -45,8 +45,6 @@ import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -61,7 +59,6 @@ import java.net.URL;
 
 public class JNLPSplashScreen extends JDialog {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPSplashScreen.class);
 
     ResourceTracker resourceTracker;
 
@@ -98,13 +95,13 @@ public class JNLPSplashScreen extends JDialog {
                 try {
                     splashImage = ImageIO.read(resourceTracker.getCacheFile(splashImageUrl));
                     if (splashImage == null) {
-                        LOG.debug("Error loading splash image: {}", url);
+                        OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     }
                 } catch (IOException e) {
-                    LOG.error("Error loading splash image: " + url, e);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     splashImage = null;
                 } catch (IllegalArgumentException argumentException) {
-                    LOG.error("Error loading splash image: " + url, argumentException);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Error loading splash image: " + url);
                     splashImage = null;
                 }
             }

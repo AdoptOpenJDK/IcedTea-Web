@@ -5,11 +5,8 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -24,8 +21,6 @@ import java.util.List;
  * @author jvanek
  */
 public class AppletsFilter {
-
-    private final static Logger LOG = LoggerFactory.getLogger(AppletsFilter.class);
 
     private final List<Element> found;
     private final URL docBase;
@@ -44,8 +39,8 @@ public class AppletsFilter {
             Element element = appletElement.get(i);
             AppletParser ap = new AppletParser(element, docBase);
             aps.add(ap);
-            LOG.debug("added: {}", aps.size()-1);
-            LOG.debug(ap.toString());
+            OutputController.getLogger().log("added: "+(aps.size()-1));
+            OutputController.getLogger().log(ap.toString());
         }
         return aps;
     }
@@ -60,7 +55,7 @@ public class AppletsFilter {
             Element element = found.get(i);
             if (id.contains(i)) {
                 r.add(element);
-                LOG.debug("adding applet id: {} as: {}", i, r.size() - 1);
+                OutputController.getLogger().log("adding applet id: " + i + " as: " + (r.size() - 1));
             }
         }
         return r;
@@ -70,7 +65,7 @@ public class AppletsFilter {
         List<Integer> r = new ArrayList<>(found.size());
         if (ids.isEmpty()) {
             if (found.size() > 1) {
-                LOG.info(Translator.R("HTMLmoreThenOne", found.size()));
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HTMLmoreThenOne", found.size()));
             }
             r.add(0);
             return r;
@@ -86,24 +81,24 @@ public class AppletsFilter {
             try {
                 id = Integer.parseInt(ids.get(i));
             } catch (NumberFormatException ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 continue;
             }
             if (id < 0) {
-                LOG.info("You have selected lesser then 0th applet. Using first");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You have selected lesser then 0th applet. Using first");
                 if (!r.contains(0)) {
                     r.add(0);
                 }
                 continue;
             }
             if (id >= found.size()) {
-                LOG.info("You have selected higher then " + (found.size() - 1) + "th applet. Using last");
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "You have selected higher then " + (found.size() - 1) + "th applet. Using last");
                 if (!r.contains(found.size() - 1)) {
                     r.add(found.size() - 1);
                 }
                 continue;
             }
-            LOG.info("Using " + id + "th applet from total of  count " + (found.size() - 1));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "Using " + id + "th applet from total of  count " + (found.size() - 1));
             r.add(id);
         }
         return r;

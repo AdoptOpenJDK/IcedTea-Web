@@ -36,10 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,8 +45,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class MD5SumWatcher {
-
-    private final static Logger LOG = LoggerFactory.getLogger(MD5SumWatcher.class);
 
     private final File watchedFile;
 
@@ -64,7 +59,7 @@ public class MD5SumWatcher {
         try {
             this.md5sum = getSum();
         } catch (final IOException ioe) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
+            OutputController.getLogger().log(ioe);
             this.md5sum = null;
         }
     }
@@ -94,7 +89,7 @@ public class MD5SumWatcher {
             // There definitely should be an MD5 algorithm, but if not, all we can do is fail.
             // This really, really is not expected to happen, so rethrow as RuntimeException
             // to avoid having to check for NoSuchAlgorithmExceptions all the time
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
             throw new RuntimeException(e);
         }
         final boolean changed = !Arrays.equals(newSum, md5sum);

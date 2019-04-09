@@ -36,12 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.policyeditor.PermissionActions;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -54,8 +51,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TemporaryPermissions {
-
-    private final static Logger LOG = LoggerFactory.getLogger(TemporaryPermissions.class);
 
     // Look for expandable properties in targets, eg ${user.home} or ${java.io.tmpdir}
     private static final Pattern expandablePattern = Pattern.compile("\\$\\{([a-zA-Z0-9\\.}]+)*\\}");
@@ -105,7 +100,7 @@ public class TemporaryPermissions {
             return perm;
         } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException
                 | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
             return null;
         }
     }

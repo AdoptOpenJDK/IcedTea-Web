@@ -16,12 +16,9 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
@@ -48,8 +45,6 @@ import java.util.Enumeration;
  * @version $Revision: 1.7 $
  */
 public class JNLPPolicy extends Policy {
-
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
 
     /** classes from this source have all permissions */
     private static CodeSource shellSource;
@@ -201,7 +196,7 @@ public class JNLPPolicy extends Policy {
                 URI policyUri = new URI(policyLocation.replace("\\","/"));
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
         return policy;

@@ -36,7 +36,6 @@
  */
 package net.sourceforge.jnlp.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
@@ -47,8 +46,6 @@ import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -74,8 +71,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
-
-    private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);
 
     private RememberPanel rememberPanel;
     
@@ -119,9 +114,9 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
                         Desktop.getDesktop().browse(e.getURL().toURI());
                     }
                 } catch (IOException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(ex);
                 } catch (URISyntaxException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(ex);
                 }
             }
         });

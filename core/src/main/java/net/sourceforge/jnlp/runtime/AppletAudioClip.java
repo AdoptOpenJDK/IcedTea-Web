@@ -17,8 +17,6 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -37,8 +35,6 @@ import java.net.URL;
  */
 public class AppletAudioClip implements AudioClip {
 
-    private final static Logger LOG = LoggerFactory.getLogger(AppletAudioClip.class);
-
     /** the clip */
     private Clip clip;
 
@@ -56,7 +52,8 @@ public class AppletAudioClip implements AudioClip {
             clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
             clip.open(stream);
         } catch (Exception ex) {
-            LOG.error("Error loading sound:" + location.toString(), ex);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Error loading sound:" + location.toString());
+            OutputController.getLogger().log(ex);
             clip = null;
         }
     }

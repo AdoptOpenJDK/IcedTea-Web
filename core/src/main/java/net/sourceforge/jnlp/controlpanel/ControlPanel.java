@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
@@ -28,8 +27,6 @@ import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.naming.ConfigurationException;
@@ -71,9 +68,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * 
  */
 public class ControlPanel extends JFrame {
-
-    private final static Logger LOG = LoggerFactory.getLogger(ControlPanel.class);
-
     private JVMPanel jvmPanel;
 
     /**
@@ -386,7 +380,7 @@ public class ControlPanel extends JFrame {
             JLabel label = new JLabel("Not Implemented", icon, SwingConstants.CENTER);
             notImplementedPanel.add(label);
         } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
         return notImplementedPanel;
     }
@@ -398,7 +392,7 @@ public class ControlPanel extends JFrame {
         try {
             config.save();
         } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             JOptionPane.showMessageDialog(this, e);
         }
     }
@@ -415,7 +409,7 @@ public class ControlPanel extends JFrame {
 
             // if configuration is not loaded, we will get NullPointerExceptions
             // everywhere
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
 
         try {

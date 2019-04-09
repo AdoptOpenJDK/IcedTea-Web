@@ -16,16 +16,14 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The applet-desc element.
@@ -171,15 +169,15 @@ public class AppletDesc implements LaunchDesc {
                     try {
                         LOG.info("using its {}={}", key, sizeFromParam);
                         return Integer.valueOf(sizeFromParam);
-                    } catch (NumberFormatException ex) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    } catch (final NumberFormatException ex) {
+                        LOG.error("ERROR", ex);
                     }
                 }
             }
             LOG.info("defaulting to {}", depVal);
             return depVal;
         } catch (final NumberFormatException | NullPointerException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("ERROR", ex);
             return null;
         }
     }

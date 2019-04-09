@@ -39,12 +39,8 @@ package net.sourceforge.jnlp;
 
 
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLaunchHandler implements LaunchHandler {
-
-    private final static Logger LOG = LoggerFactory.getLogger(AbstractLaunchHandler.class);
 
     protected final OutputController logger;
 
@@ -67,8 +63,9 @@ public abstract class AbstractLaunchHandler implements LaunchHandler {
         if (ex.getCause() != null) {
             result.append(recursiveDescription(ex.getCause()));
         }
+        logger.log(OutputController.Level.MESSAGE_ALL, result.toString());
 
-        LOG.error(result.toString(), ex);
+        logger.log(ex);
         
     }
 

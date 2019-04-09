@@ -38,8 +38,6 @@ exception statement from your version.
 package net.sourceforge.jnlp.services;
 
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.jnlp.PrintService;
 import javax.swing.JOptionPane;
@@ -50,8 +48,6 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
 public class XPrintService implements PrintService {
-
-    private final static Logger LOG = LoggerFactory.getLogger(XPrintService.class);
 
     // If pj is null, then we do not have a printer to use.
     private PrinterJob pj;
@@ -87,7 +83,8 @@ public class XPrintService implements PrintService {
                     pj.print();
                     return true;
                 } catch (PrinterException pe) {
-                    LOG.error("Could not print", pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, pe);
                     return false;
                 }
             }
@@ -105,7 +102,8 @@ public class XPrintService implements PrintService {
                     pj.print();
                     return true;
                 } catch (PrinterException pe) {
-                    LOG.error("Could not print: ", pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Could not print: " + pe);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, pe);
                     return false;
                 }
 
@@ -121,6 +119,6 @@ public class XPrintService implements PrintService {
                                 "Unable to find a default printer.",
                                 "Warning",
                                 JOptionPane.WARNING_MESSAGE);
-        LOG.warn("Unable to print: Unable to find default printer.");
+        OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Unable to print: Unable to find default printer.");
     }
 }

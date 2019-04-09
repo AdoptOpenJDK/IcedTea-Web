@@ -36,12 +36,9 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.config;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -53,8 +50,6 @@ import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_CON
 import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_PROPERTIES;
 
 public class PathsAndFiles {
-
-    private final static Logger LOG = LoggerFactory.getLogger(PathsAndFiles.class);
 
     public static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
 
@@ -330,7 +325,7 @@ public class PathsAndFiles {
                     }
                 }
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(ex);
             }
 
         }

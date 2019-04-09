@@ -37,14 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.about;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -64,8 +61,6 @@ import java.util.Locale;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public final class AboutDialog extends JPanel implements Runnable, ActionListener {
-
-    private final static Logger LOG = LoggerFactory.getLogger(AboutDialog.class);
 
     private static final String about_url_stub = "/net/sourceforge/jnlp/resources/about";
     private static final String authors_url = "/net/sourceforge/jnlp/resources/AUTHORS.html";
@@ -160,7 +155,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
                     about_lang = getClass().getResource(about_url_stub + "_" + lang + ".html");
                     about_lang.openStream().close();
                 } catch (Exception ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, ex);
                     //probably unknown locale, switch to english
                     about_lang = getClass().getResource(about_url_stub + "_en.html");
                 }
@@ -203,7 +198,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
                     }
                     helpPanel = new InternalHTMLPanel(target.toURI().toURL());
                 } catch (IOException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    OutputController.getLogger().log(ex);
                 }
             }
             contentPane = helpPanel;

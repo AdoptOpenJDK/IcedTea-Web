@@ -57,8 +57,6 @@ import net.sourceforge.jnlp.security.dialogs.ViwableDialog;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JDialog;
 import java.awt.BorderLayout;
@@ -79,8 +77,6 @@ import java.security.cert.X509Certificate;
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
 public class SecurityDialog {
-
-    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialog.class);
 
     /** The type of dialog we want to show */
     private final DialogType dialogType;
@@ -376,19 +372,19 @@ public class SecurityDialog {
 
     private void selectDefaultButton() {
         if (panel == null) {
-            LOG.info("initial value panel is null");
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "initial value panel is null");
         } else {
             panel.requestFocusOnDefaultButton();
         }
     }
 
     public void setValue(DialogResult value) {
-        LOG.debug("Setting value: {}", value);
+        OutputController.getLogger().log("Setting value:" + value);
         this.value = value;
     }
 
     public DialogResult getValue() {
-        LOG.debug("Returning value: {}", value);
+        OutputController.getLogger().log("Returning value:" + value);
         return value;
     }
 

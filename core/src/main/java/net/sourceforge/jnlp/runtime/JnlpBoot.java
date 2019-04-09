@@ -35,7 +35,6 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
@@ -75,7 +74,7 @@ public final class JnlpBoot {
             // default handler prints this
             JNLPRuntime.exit(1);
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
             Boot.fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
         }
         return true;

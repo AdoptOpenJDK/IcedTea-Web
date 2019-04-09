@@ -36,12 +36,9 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
 import java.io.File;
@@ -62,8 +59,6 @@ import java.util.TreeSet;
 import static net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier.isDefaultPolicyIdentifier;
 
 public class PolicyFileModel {
-
-    private final static Logger LOG = LoggerFactory.getLogger(PolicyFileModel.class);
 
     private File file;
     /**
@@ -141,7 +136,7 @@ public class PolicyFileModel {
             try {
                 fileLock.release();
             } catch (final IOException e) {
-               LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(e);
             }
         }
     }
@@ -189,13 +184,13 @@ public class PolicyFileModel {
             }
             parser.write(new FileWriter(file));
         } catch (final IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            OutputController.getLogger().log(e);
         } finally {
             if (fileLock != null) {
                 try {
                     fileLock.release();
                 } catch (final IOException e) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                    OutputController.getLogger().log(e);
                 }
 
             }

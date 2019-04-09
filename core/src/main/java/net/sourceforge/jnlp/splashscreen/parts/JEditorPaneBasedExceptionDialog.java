@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.runtime.Translator;
@@ -44,8 +43,6 @@ import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -73,8 +70,6 @@ import java.util.Date;
 import java.util.List;
 
 public class JEditorPaneBasedExceptionDialog extends JDialog implements HyperlinkListener {
-
-    private final static Logger LOG = LoggerFactory.getLogger(JEditorPaneBasedExceptionDialog.class);
 
     // components
     private JButton closeButton;
@@ -117,7 +112,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
             Icon icon = new ImageIcon(this.getClass().getResource("/net/sourceforge/jnlp/resources/warning.png"));
             iconLabel.setIcon(icon);
         } catch (Exception lex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, lex);
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, lex);
         }
         htmlErrorAndHelpPanel.addHyperlinkListener(this);
         homeButton.setVisible(false);
@@ -231,7 +226,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 try{
                AboutDialog.display(true, TextsProvider.ITW_PLUGIN);
             }catch(Exception ex){
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 JOptionPane.showConfirmDialog(JEditorPaneBasedExceptionDialog.this, ex);
             }
             }
@@ -261,7 +256,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(data, data);
             } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, ex);
                 JOptionPane.showMessageDialog(this, Translator.R(InfoItem.SPLASH + "cantCopyEx"));
             }
         } else {

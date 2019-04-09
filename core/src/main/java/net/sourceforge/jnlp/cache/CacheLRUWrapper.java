@@ -36,14 +36,11 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,8 +61,6 @@ import static net.sourceforge.jnlp.runtime.Translator.R;
  * 
  */
 public class CacheLRUWrapper {
-
-    private final static Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
     
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
@@ -96,7 +91,7 @@ public class CacheLRUWrapper {
                 FileUtils.createParentDir(recentlyUsed.getFile());
                 FileUtils.createRestrictedFile(recentlyUsed.getFile(), true);
             } catch (IOException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
             }
         }
     }
@@ -167,10 +162,10 @@ public class CacheLRUWrapper {
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new LruCacheException());
-            LOG.info(R("CFakeCache"));
+            OutputController.getLogger().log(new LruCacheException());
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakeCache"));
             store();
-            LOG.info(R("CFakedCache"));
+            OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("CFakedCache"));
         }
     }
 

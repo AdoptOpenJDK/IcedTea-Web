@@ -35,10 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel.desktopintegrationeditor;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JList;
 import javax.swing.JTextPane;
@@ -49,8 +46,6 @@ import java.util.List;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 public class PreviewSelectionJTextPane extends JTextPane {
-
-    private final static Logger LOG = LoggerFactory.getLogger(PreviewSelectionJTextPane.class);
 
     private final JList iconsList;
     private final JList menuList;
@@ -125,7 +120,7 @@ public class PreviewSelectionJTextPane extends JTextPane {
             this.setText(sb.toString());
 
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
         }
 
     }
@@ -141,7 +136,7 @@ public class PreviewSelectionJTextPane extends JTextPane {
 
             }
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            OutputController.getLogger().log(ex);
         }
         return s;
     }
