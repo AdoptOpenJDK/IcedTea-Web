@@ -36,58 +36,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.policyeditor;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
-import net.sourceforge.jnlp.about.AboutDialog;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
-import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.OptionParser;
-import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.security.provider.PolicyParser;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog.ModalityType;
@@ -120,6 +68,58 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.option.OptionsDefinitions;
+import net.sourceforge.jnlp.about.AboutDialog;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions.Group;
+import net.sourceforge.jnlp.util.FileDialogFactory;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.util.ImageResources;
+import net.sourceforge.jnlp.util.OptionsDefinitionsPrinter;
+import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.security.provider.PolicyParser;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -1504,12 +1504,12 @@ public class PolicyEditor extends JPanel {
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
             if (policyEditorController.getFile().exists()) {
-                FileUtils.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
+                FileDialogFactory.showCouldNotOpenFilepathDialog(PolicyEditor.this, policyEditorController.getFile().getPath());
             }
             return;
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            FileUtils.showReadOnlyDialog(PolicyEditor.this);
+            FileDialogFactory.showReadOnlyDialog(PolicyEditor.this);
         }
 
         final Window parentWindow = SwingUtils.getWindowAncestor(this);
@@ -1530,10 +1530,10 @@ public class PolicyEditor extends JPanel {
                     policyEditorController.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, fnfe);
-                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException | PolicyParser.ParsingException e) {
                     LOG.error(R("RCantOpenFile", policyEditorController.getFile().getPath()), e);
-                    FileUtils.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
                 return null;
             }

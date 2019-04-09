@@ -36,23 +36,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.controlpanel;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
-import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -64,6 +47,22 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.sourceforge.jnlp.util.FileDialogFactory;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -149,21 +148,21 @@ public class PolicyPanel extends NamedBorderPanel {
                 policyToolLaunchHelper(frame, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
                 LOG.warn("Opening user JNLP policy read-only");
-                FileUtils.showReadOnlyDialog(frame);
+                FileDialogFactory.showReadOnlyDialog(frame);
                 policyToolLaunchHelper(frame, filePath);
             } else {
                 LOG.error("Could not open user JNLP policy");
-                FileUtils.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
+                FileDialogFactory.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
             }
         } catch (IOException e) {
             LOG.error("Could not open user JNLP policy", e);
-            FileUtils.showCouldNotOpenFilepathDialog(frame, filePath);
+            FileDialogFactory.showCouldNotOpenFilepathDialog(frame, filePath);
         }
     }
 
     /**
-     * Launch the simplified PolicyEditor for a specified file path
-     * @param frame a {@link JFrame} to act as parent to warning dialogs which may appear
+     * Launch the simplified PolicyEditor for a specified file path.
+     *
      * @param filePath a {@link String} representing the path to the file to be opened
      */
     private void launchSimplePolicyEditor(final String filePath) {
@@ -203,7 +202,7 @@ public class PolicyPanel extends NamedBorderPanel {
                         reflectivePolicyToolLaunch(filePath);
                     } catch (Exception e) {
                         LOG.error("Could not open user JNLP policy", e);
-                        FileUtils.showCouldNotOpenDialog(frame, R("CPPolicyEditorNotFound"));
+                        FileDialogFactory.showCouldNotOpenDialog(frame, R("CPPolicyEditorNotFound"));
                     }
                 }
             }
@@ -274,7 +273,7 @@ public class PolicyPanel extends NamedBorderPanel {
                 });
             } catch (MalformedURLException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
+                FileDialogFactory.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }
     }
@@ -300,7 +299,7 @@ public class PolicyPanel extends NamedBorderPanel {
                 });
             } catch (MalformedURLException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                FileUtils.showCouldNotOpenFilepathDialog(frame, fileUrlString);
+                FileDialogFactory.showCouldNotOpenFilepathDialog(frame, fileUrlString);
             }
         }
     }
