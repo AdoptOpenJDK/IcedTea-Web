@@ -30,6 +30,7 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.sourceforge.jnlp.util.legacy.MigrationUtils;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -511,7 +512,7 @@ public class CommandLine {
             if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
                 JNLPRuntime.setHeadless(true);
             }
-            DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
+            MigrationUtils.move14AndOlderFilesTo15StructureCatched();
             if (args.length == 0) {
                 ControlPanel.main(new String[] {});
             } else {
