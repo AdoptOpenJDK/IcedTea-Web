@@ -47,10 +47,10 @@ import org.junit.Test;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
 
 public class SupportedLanguagesTest {
-    private static final Locale locale_en = SupportedLanguages.en.getLocale();
-    private static final Locale locale_cs = SupportedLanguages.cs.getLocale();
-    private static final Locale locale_de = SupportedLanguages.de.getLocale();
-    private static final Locale locale_pl = SupportedLanguages.pl.getLocale();
+    private static final Locale locale_en = SupportedLanguages.ENGLISH.getLocale();
+    private static final Locale locale_cs = SupportedLanguages.CZECH.getLocale();
+    private static final Locale locale_de = SupportedLanguages.GERMAN.getLocale();
+    private static final Locale locale_pl = SupportedLanguages.POLISH.getLocale();
 
     private void testMessageStringEquals(Locale locale, String key, String expected) {
         final String message = getMessage(locale, key);

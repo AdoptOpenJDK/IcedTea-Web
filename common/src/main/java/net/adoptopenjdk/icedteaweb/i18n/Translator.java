@@ -104,7 +104,7 @@ public class Translator {
             return resources.getString(key);
         }
         catch (NullPointerException e) {
-            throw new IllegalArgumentException(format("Key '%s' to lookup resource bundle text must not be null."));
+            throw new IllegalArgumentException(format("Key '%s' to lookup resource bundle text must not be null.", key));
         }
         catch (MissingResourceException | ClassCastException e) {
             if (Objects.equals(key, MISSING_RESOURCE_PLACEHOLDER)) {
