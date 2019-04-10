@@ -37,7 +37,7 @@
 package net.sourceforge.jnlp.security.dialogs;
 
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.ScreenFinder;
 import net.sourceforge.swing.SwingUtils;
 
 import javax.swing.JDialog;

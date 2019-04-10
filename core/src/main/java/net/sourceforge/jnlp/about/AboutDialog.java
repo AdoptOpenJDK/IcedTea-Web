@@ -52,7 +52,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.ScreenFinder;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.swing.SwingUtils;

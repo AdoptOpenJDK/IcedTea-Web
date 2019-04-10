@@ -43,7 +43,7 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.html.AppletExtractor;
 import net.sourceforge.jnlp.runtime.html.AppletParser;
 import net.sourceforge.jnlp.runtime.html.AppletsFilter;
-import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;

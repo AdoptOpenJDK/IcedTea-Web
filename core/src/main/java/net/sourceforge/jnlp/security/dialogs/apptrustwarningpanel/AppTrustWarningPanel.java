@@ -49,8 +49,7 @@ import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
-import net.sourceforge.jnlp.util.ScreenFinder;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.ScreenFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
