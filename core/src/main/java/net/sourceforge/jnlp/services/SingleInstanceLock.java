@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class represents a Lock for single instance jnlp applications

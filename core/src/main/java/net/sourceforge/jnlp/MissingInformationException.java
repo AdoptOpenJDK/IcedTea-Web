@@ -17,7 +17,7 @@
 
 package net.sourceforge.jnlp;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Thrown when the required information tag is not found

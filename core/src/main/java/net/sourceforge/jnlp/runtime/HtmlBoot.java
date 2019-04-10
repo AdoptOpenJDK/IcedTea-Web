@@ -60,7 +60,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public final class HtmlBoot {
 

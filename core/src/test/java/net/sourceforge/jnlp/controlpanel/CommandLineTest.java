@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

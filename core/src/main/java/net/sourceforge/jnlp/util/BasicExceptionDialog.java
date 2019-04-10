@@ -63,7 +63,7 @@ import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * A dialog that displays some basic information about an exception

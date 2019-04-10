@@ -36,7 +36,6 @@
 package net.sourceforge.jnlp.controlpanel.desktopintegrationeditor;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import java.io.File;
 import java.util.List;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class PreviewSelectionJTextPane extends JTextPane {
 

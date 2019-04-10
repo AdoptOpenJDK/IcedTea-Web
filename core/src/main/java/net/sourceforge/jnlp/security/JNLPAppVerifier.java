@@ -49,7 +49,7 @@ import net.sourceforge.jnlp.tools.JarCertVerifier;
 import java.security.cert.CertPath;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class JNLPAppVerifier implements AppVerifier {
 

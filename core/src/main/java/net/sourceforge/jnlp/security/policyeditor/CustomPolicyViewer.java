@@ -59,7 +59,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.TreeSet;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This implements a simple list viewer for custom policies, ie policies

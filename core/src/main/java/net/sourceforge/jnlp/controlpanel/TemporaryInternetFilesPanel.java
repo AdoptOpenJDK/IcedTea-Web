@@ -20,7 +20,7 @@ package net.sourceforge.jnlp.controlpanel;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

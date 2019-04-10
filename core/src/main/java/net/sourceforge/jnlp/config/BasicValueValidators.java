@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Provides {@link ValueValidator} implementations for some common value types

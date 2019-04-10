@@ -64,7 +64,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class FreeDesktopIntegrationEditorFrame extends JFrame {
 

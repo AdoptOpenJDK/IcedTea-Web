@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.i18n;
 
 import java.io.File;
 import java.io.FileOutputStream;

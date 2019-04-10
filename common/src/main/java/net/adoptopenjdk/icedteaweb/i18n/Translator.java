@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.i18n;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -28,7 +28,7 @@ import static java.lang.String.format;
  * Utility class to provide simple methods to help localize messages.
  */
 public class Translator {
-    private static final String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = "net.sourceforge.jnlp.resources.Messages";
+    static final String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = "net.adoptopenjdk.icedteaweb.i18n.Messages";
     static final String MISSING_RESOURCE_PLACEHOLDER = "RNoResource";
 
     private static class TranslatorHolder {
@@ -109,6 +109,7 @@ public class Translator {
         catch (MissingResourceException | ClassCastException e) {
             if (Objects.equals(key, MISSING_RESOURCE_PLACEHOLDER)) {
                 throw new IllegalStateException(
+
                         format("No missing resource placeholder key '%s' found in resource bundles.", key));
             } else {
                 // try with custom fallback placeholder that should be included in the bundle

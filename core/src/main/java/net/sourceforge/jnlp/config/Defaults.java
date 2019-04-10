@@ -63,7 +63,7 @@ import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CLIENTCERT;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DEPLOYMENT_FILE;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECAC;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class stores the default configuration

@@ -35,24 +35,25 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.i18n;
 
-import net.sourceforge.jnlp.tools.MessageProperties;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Locale;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
 
-public class MessagePropertiesTest {
-
-    private static final Locale locale_en = MessageProperties.SupportedLanguage.en.getLocale(),
-            locale_cs = MessageProperties.SupportedLanguage.cs.getLocale(),
-            locale_de = MessageProperties.SupportedLanguage.de.getLocale(),
-            locale_pl = MessageProperties.SupportedLanguage.pl.getLocale();
+public class SupportedLanguagesTest {
+    private static final Locale locale_en = SupportedLanguages.en.getLocale();
+    private static final Locale locale_cs = SupportedLanguages.cs.getLocale();
+    private static final Locale locale_de = SupportedLanguages.de.getLocale();
+    private static final Locale locale_pl = SupportedLanguages.pl.getLocale();
 
     private void testMessageStringEquals(Locale locale, String key, String expected) {
-        String message = MessageProperties.getMessage(locale, key);
+        final String message = getMessage(locale, key);
         Assert.assertEquals(message, expected);
     }
 
@@ -80,24 +81,45 @@ public class MessagePropertiesTest {
     @Test
     @Ignore // only works if 'en' is fallback - fails on german system
     public void testNonexistentLocalization() throws Exception {
-        String message_en = MessageProperties.getMessage(locale_en, "Continue");
-        String message_abcd = MessageProperties.getMessage(new Locale("abcd"), "Continue");
+        final String message_en = getMessage(locale_en, "Continue");
+        final String message_abcd = getMessage(new Locale("abcd"), "Continue");
         Assert.assertEquals(message_en, message_abcd); // There is no abcd localization, should fall back to English
     }
 
     @Test
     public void testDefaultLocalization() throws Exception {
-        String sysPropLang = System.getProperty("user.language");
-        Locale sysPropLocale = new Locale(sysPropLang);
+        final String sysPropLang = System.getProperty("user.language");
+        final Locale sysPropLocale = new Locale(sysPropLang);
 
-        Locale defaultLocale = Locale.getDefault();
+        final Locale defaultLocale = Locale.getDefault();
 
-        String sysPropMessage = MessageProperties.getMessage(sysPropLocale, "LThreadInterruptedInfo");
-        String defaultMessage = MessageProperties.getMessage(defaultLocale, "LThreadInterruptedInfo");
-        String implMessage = MessageProperties.getMessage("LThreadInterruptedInfo");
+        final String sysPropMessage = getMessage(sysPropLocale, "LThreadInterruptedInfo");
+        final String defaultMessage = getMessage(defaultLocale, "LThreadInterruptedInfo");
+        final String implMessage = getMessage("LThreadInterruptedInfo");
 
         Assert.assertEquals(sysPropMessage, implMessage);
         Assert.assertEquals(defaultMessage, implMessage);
+    }
+
+
+    /**
+     * Same as {@link #getMessage(Locale, String)}, using the current default Locale
+     */
+    private String getMessage(final String key) {
+        return getMessage(Locale.getDefault(), key);
+    }
+
+    /**
+     * Retrieve a localized message from resource file
+     * @param locale the localization of Messages.properties to search
+     * @param key
+     * @return the message corresponding to the given key from the specified localization
+     *
+     * can throw wrapped IOException if the specified Messages localization is unavailable
+     */
+    private String getMessage(final Locale locale, final String key) {
+        final ResourceBundle bundle = PropertyResourceBundle.getBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale);
+        return bundle.getString(key);
     }
 
 }
