@@ -71,9 +71,9 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
     }
 
     @Override
-    public synchronized void addDirtyRegion(final JComponent jComponent, final int i, final int i1, final int i2, final int i3) {
+    public synchronized void addDirtyRegion(final JComponent jComponent, final int x, final int y, final int width, final int height) {
         checkThreadViolations(jComponent);
-        super.addDirtyRegion(jComponent, i, i1, i2, i3);
+        super.addDirtyRegion(jComponent, x, y, width, height);
     }
 
     private void checkThreadViolations(final JComponent c) {
