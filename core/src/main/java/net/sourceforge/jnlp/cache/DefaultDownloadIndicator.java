@@ -19,7 +19,7 @@ package net.sourceforge.jnlp.cache;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.ScreenFinder;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

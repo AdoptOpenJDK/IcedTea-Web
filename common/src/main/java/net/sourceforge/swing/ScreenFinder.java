@@ -34,10 +34,9 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
-package net.sourceforge.jnlp.util;
+package net.sourceforge.swing;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
