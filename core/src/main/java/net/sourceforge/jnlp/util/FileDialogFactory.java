@@ -3,7 +3,7 @@ package net.sourceforge.jnlp.util;
 import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

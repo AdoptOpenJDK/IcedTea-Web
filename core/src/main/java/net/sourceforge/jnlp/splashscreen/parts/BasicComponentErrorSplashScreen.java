@@ -37,7 +37,7 @@ exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen.parts;
 
 import net.sourceforge.jnlp.splashscreen.SplashErrorPanel;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 public abstract class BasicComponentErrorSplashScreen extends BasicComponentSplashScreen implements SplashErrorPanel {
 

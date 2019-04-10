@@ -5,7 +5,7 @@
  * most complex was found:
 http://web.archive.org/web/20150523152453/https://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
  */
-package net.sourceforge.swing;
+package net.adoptopenjdk.icedteaweb.ui.swing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
