@@ -22,7 +22,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.controlpanel.desktopintegrationeditor.FreeDesktopIntegrationEditorFrame;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.Box;
 import javax.swing.JButton;

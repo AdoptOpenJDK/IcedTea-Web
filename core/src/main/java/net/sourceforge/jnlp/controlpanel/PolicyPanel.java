@@ -60,7 +60,7 @@ import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindo
 import net.sourceforge.jnlp.util.FileDialogFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

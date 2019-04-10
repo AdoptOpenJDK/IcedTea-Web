@@ -22,8 +22,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.util.WeakList;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
