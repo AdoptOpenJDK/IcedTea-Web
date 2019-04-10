@@ -8,6 +8,8 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.1 (YYYY-MM-DD):
+
 New in release 1.8 (2019-03-12):
 * added support for javafx-desc and so allwong run of pure-javafx only applications
 * --nosecurity enhanced for possibility to skip invalid signatures
