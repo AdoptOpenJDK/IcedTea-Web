@@ -56,31 +56,29 @@ public class ScreenFinder {
     private final static Logger LOG = LoggerFactory.getLogger(ScreenFinder.class);
 
     public static GraphicsDevice getCurrentScreen() {
-        Point p = MouseInfo.getPointerInfo().getLocation();
+        final Point p = MouseInfo.getPointerInfo().getLocation();
         return getScreenOnCoords(p);
-
     }
+
     public static Rectangle  getCurrentScreenSizeWithoutBounds() {
         try {
-            Point p = MouseInfo.getPointerInfo().getLocation();
+            final Point p = MouseInfo.getPointerInfo().getLocation();
             return getScreenOnCoordsWithoutBounds(p);
         } catch (HeadlessException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return new Rectangle(800, 600);
         }
-
     }
 
-     public static void  centerWindowsToCurrentScreen(Window w) {
-        Rectangle bounds = getCurrentScreenSizeWithoutBounds();
+     public static void  centerWindowsToCurrentScreen(final Window w) {
+        final Rectangle bounds = getCurrentScreenSizeWithoutBounds();
         w.setLocation(bounds.x + (bounds.width - w.getWidth())/2,
                 bounds.y + (bounds.height - w.getHeight())/2);
-
     }
 
-    public static GraphicsDevice getScreenOnCoords(Point point) {
-        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] devices = e.getScreenDevices();
+    public static GraphicsDevice getScreenOnCoords(final Point point) {
+        final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final GraphicsDevice[] devices = e.getScreenDevices();
         GraphicsDevice result = null;
         //now get the configuration(s) for each device
         for (GraphicsDevice device : devices) {
@@ -101,17 +99,15 @@ public class ScreenFinder {
         return result;
     }
 
-    public static Rectangle getScreenOnCoordsWithoutBounds(Point p) {
+    public static Rectangle getScreenOnCoordsWithoutBounds(final Point p) {
         try {
-            GraphicsDevice device = getScreenOnCoords(p);
-            Rectangle screenSize = device.getDefaultConfiguration().getBounds();
-            Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
+            final GraphicsDevice device = getScreenOnCoords(p);
+            final Rectangle screenSize = device.getDefaultConfiguration().getBounds();
+            final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(device.getDefaultConfiguration());
             return new Rectangle((int) screenSize.getX() + insets.left, (int) screenSize.getY() + insets.top, (int) screenSize.getWidth() - insets.left, (int) screenSize.getHeight() - insets.bottom);
         } catch (HeadlessException | IllegalArgumentException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return new Rectangle(800, 600);
         }
     }
-
-
 }
