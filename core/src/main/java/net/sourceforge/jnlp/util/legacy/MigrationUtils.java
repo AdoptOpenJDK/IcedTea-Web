@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility to migrate legacy to current structures when changes are required in new versions of the application.
+ * @deprecated
  */
+@Deprecated
 public class MigrationUtils {
     private final static Logger LOG = LoggerFactory.getLogger(MigrationUtils.class);
 
