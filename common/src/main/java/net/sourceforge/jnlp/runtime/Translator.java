@@ -19,9 +19,10 @@ package net.sourceforge.jnlp.runtime;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 /**
  * Utility class to provide simple methods to help localize messages.
@@ -106,10 +107,13 @@ public class Translator {
             throw new IllegalArgumentException(format("Key '%s' to lookup resource bundle text must not be null."));
         }
         catch (MissingResourceException | ClassCastException e) {
-            if (key == MISSING_RESOURCE_PLACEHOLDER) {
-                return "No localized text found";
+            if (Objects.equals(key, MISSING_RESOURCE_PLACEHOLDER)) {
+                throw new IllegalStateException(
+                        format("No missing resource placeholder key '%s' found in resource bundles.", key));
             } else {
-                return translate(MISSING_RESOURCE_PLACEHOLDER, new Object[]{key});
+                // try with custom fallback placeholder that should be included in the bundle
+                final String languageCode = Locale.getDefault().getLanguage();
+                return translate(MISSING_RESOURCE_PLACEHOLDER, new Object[]{key, languageCode});
             }
         }
     }

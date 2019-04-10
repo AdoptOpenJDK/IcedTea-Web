@@ -15,11 +15,18 @@ import static org.junit.Assert.assertEquals;
 
 public class TranslatorTest {
 
+    private static final String KEY = "key";
+    private static final String UNKNOWN_KEY = "unknown.key";
+    private static final String ARGUMENT_KEY = "argument.key";
+    private static final String APOSTROPHE_KEY = "apostrophe.key";
+
     private Translator translator;
+    private Translator translatorWithBundleWithoutMissingResourceFallback;
 
     @Before
     public void setup() throws IOException {
-        translator = new Translator(createTestBundle());
+        translator = new Translator(createTestBundleWithMissingResourceFallback());
+        translatorWithBundleWithoutMissingResourceFallback = new Translator(createTestBundleWithoutMissingResourceFallback());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -29,8 +36,14 @@ public class TranslatorTest {
 
     @Test
     public void testTranslateWithRegularKey() {
-        String message = translator.translate("key");
+        String message = translator.translate(KEY);
         assertEquals("value", message);
+    }
+
+    @Test
+    public void testTranslateWithRegularKeyAndArguments() {
+        String message = translator.translate(ARGUMENT_KEY, new Object[] {"argument1", "argument2"});
+        assertEquals("value argument1 argument2", message);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -40,53 +53,59 @@ public class TranslatorTest {
 
     @Test
     public void testTranslateNonExistingKey() {
-        String message = translator.translate("unknown-key");
-        assertEquals("no-resource", message);
+        String message = translator.translate(UNKNOWN_KEY);
+        assertEquals(UNKNOWN_KEY + "_en", message);
     }
 
-
-
-    @Test
-    public void testTranslateMessageWithArgs() {
-        String message = translator.translate("argkey", new Object[] {"Hello"});
-        assertEquals("value Hello", message);
+    @Test(expected = IllegalStateException.class)
+    public void testTranslateNonExistingKeyWithBundleWithoutMissingResourceFallback() {
+        translatorWithBundleWithoutMissingResourceFallback.translate(UNKNOWN_KEY);
     }
 
     @Test
     public void testTranslateMessageWithApostrophe() {
         //Message format requires apostrophes to be escaped by using two ''
         //The properties files follow this requirement
-        String message = translator.translate("apostrophekey");
-        assertEquals("keywith'", message);
+        String message = translator.translate(APOSTROPHE_KEY);
+        assertEquals("valuewith'", message);
     }
 
     @Test
-    public void singletonTest1() {
-        String message = Translator.R("key");
-        Assert.assertNotEquals("value", message);
-    }
-    @Test
-    public void singletonTest2() {
-        String message = Translator.R("unknown-key");
-        Assert.assertTrue(message.contains("unknown-key"));
+    public void testExistenceOfMissingResourcePlaceholderInSingletonDefaultBundle() {
+        String message = Translator.R(Translator.MISSING_RESOURCE_PLACEHOLDER);
+        Assert.assertNotNull(message);
     }
 
-
-    private ResourceBundle createTestBundle() throws IOException {
-        File f = new File(System.getProperty("java.io.tmpdir"), "test.properties");
+    private ResourceBundle createTestBundleWithMissingResourceFallback() throws IOException {
+        final File f = new File(System.getProperty("java.io.tmpdir"), "test_en.properties");
         f.createNewFile();
         f.deleteOnExit();
 
-        FileOutputStream fos = new FileOutputStream(f);
-        String message = "key=value\n"
-                + "argkey=value {0}\n"
-                + "apostrophekey=keywith''\n"
-                + Translator.MISSING_RESOURCE_PLACEHOLDER + "=no-resource\n";
+        final FileOutputStream fos = new FileOutputStream(f);
+        final String message = "key=value\n"
+                + "argument.key=value {0} {1}\n"
+                + "apostrophe.key=valuewith''\n"
+                + Translator.MISSING_RESOURCE_PLACEHOLDER + "={0}_{1}\n";
         fos.write(message.getBytes());
 
-        URL u = f.getParentFile().toURI().toURL();
-        ClassLoader loader = new URLClassLoader(new URL[] {u});
+        final URL u = f.getParentFile().toURI().toURL();
+        final ClassLoader loader = new URLClassLoader(new URL[] {u});
 
         return ResourceBundle.getBundle("test", Locale.getDefault(), loader);
+    }
+
+    private ResourceBundle createTestBundleWithoutMissingResourceFallback() throws IOException {
+        final File f = new File(System.getProperty("java.io.tmpdir"), "test2.properties");
+        f.createNewFile();
+        f.deleteOnExit();
+
+        final FileOutputStream fos = new FileOutputStream(f);
+        final String message = "key=value\n";
+        fos.write(message.getBytes());
+
+        final URL u = f.getParentFile().toURI().toURL();
+        final ClassLoader loader = new URLClassLoader(new URL[] {u});
+
+        return ResourceBundle.getBundle("test2", Locale.getDefault(), loader);
     }
 }
