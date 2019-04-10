@@ -43,7 +43,6 @@ import net.sourceforge.jnlp.util.docprovider.JavaWsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.legacy.MigrationUtils;
 import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
@@ -123,8 +122,6 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             JNLPRuntime.setHeadless(true);
         }
-
-        MigrationUtils.move14AndOlderFilesTo15StructureCatched();
 
         if (optionParser.hasOption(CommandLineOptions.VIEWER)) {
             try {

@@ -55,7 +55,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.legacy.MigrationUtils;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -403,7 +402,6 @@ public class ControlPanel extends JFrame {
     }
 
     public static void main(String[] args) throws Exception {
-        MigrationUtils.move14AndOlderFilesTo15StructureCatched();
         final DeploymentConfiguration config = new DeploymentConfiguration();
         try {
             config.load();
