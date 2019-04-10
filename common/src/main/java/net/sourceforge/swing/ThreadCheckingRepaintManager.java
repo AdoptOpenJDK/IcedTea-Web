@@ -7,12 +7,10 @@ http://web.archive.org/web/20150523152453/https://weblogs.java.net/blog/alexfrom
  */
 package net.sourceforge.swing;
 
-import javax.swing.JComponent;
-import javax.swing.RepaintManager;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
-import static net.sourceforge.swing.SwingUtils.trace;
+import javax.swing.JComponent;
+import javax.swing.RepaintManager;
 
 /**
  * For usage of this class, please refer to http://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
@@ -96,9 +94,9 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
                 //no problems here, since repaint() is thread safe
                 return;
             }
-            trace("----------Wrong Thread START");
-            trace(getStrackTraceAsString(exception));
-            trace("----------Wrong Thread END");
+            SwingUtils.trace("----------Wrong Thread START");
+            SwingUtils.trace(getStrackTraceAsString(exception));
+            SwingUtils.trace("----------Wrong Thread END");
         }
     }
 
