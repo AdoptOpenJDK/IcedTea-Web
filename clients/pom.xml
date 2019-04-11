@@ -13,7 +13,7 @@
 
     <artifactId>icedtea-web-clients</artifactId>
     <name>Clients</name>
-    <description>The IceTea-Web CLI clients and GUI clients.</description>
+    <description>The IceTea-Web Command Line Interface (CLI) clients and the Graphical User Interface (GUI) clients.</description>
 
     <dependencies>
         <dependency>
