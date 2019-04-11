@@ -38,7 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 import net.sourceforge.jnlp.runtime.Boot;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

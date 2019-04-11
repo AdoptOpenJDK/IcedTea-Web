@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.config;
 
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 
 class SecurityValueValidator implements ValueValidator {
 

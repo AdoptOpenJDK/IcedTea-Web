@@ -3,11 +3,11 @@ package net.sourceforge.jnlp.util;
 import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This factory is used to create popup dialogs for file-related user interaction.

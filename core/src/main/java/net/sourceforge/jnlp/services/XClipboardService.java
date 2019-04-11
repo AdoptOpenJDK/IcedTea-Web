@@ -37,11 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.services;
 
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-
-import javax.jnlp.ClipboardService;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Transferable;
+import javax.jnlp.ClipboardService;
+import net.sourceforge.jnlp.security.AccessType;
 
 /**
  * The ClipboardService JNLP service.

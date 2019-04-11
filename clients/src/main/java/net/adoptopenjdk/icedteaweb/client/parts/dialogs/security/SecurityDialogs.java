@@ -40,6 +40,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.Resource;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.NamePassword;
@@ -61,22 +62,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.NamePassword;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesCancel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandbox;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandboxLimited;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.cache.Resource;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancel;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>

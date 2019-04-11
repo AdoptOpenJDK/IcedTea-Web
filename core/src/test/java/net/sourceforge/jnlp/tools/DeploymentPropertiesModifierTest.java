@@ -40,7 +40,7 @@ package net.sourceforge.jnlp.tools;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;

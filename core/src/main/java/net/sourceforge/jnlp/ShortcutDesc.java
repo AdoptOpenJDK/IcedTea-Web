@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 public final class ShortcutDesc {
 

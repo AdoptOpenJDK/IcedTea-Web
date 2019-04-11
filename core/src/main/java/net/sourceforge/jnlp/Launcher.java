@@ -28,7 +28,7 @@ import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.awt.SunToolkit;
@@ -46,7 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Launches JNLPFiles either in the foreground or background.

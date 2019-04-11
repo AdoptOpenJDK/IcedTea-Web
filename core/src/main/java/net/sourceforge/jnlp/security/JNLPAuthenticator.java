@@ -37,10 +37,9 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.NamePassword;
-
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 
 public class JNLPAuthenticator extends Authenticator {
 

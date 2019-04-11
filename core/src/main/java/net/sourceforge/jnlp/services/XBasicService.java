@@ -49,14 +49,14 @@ import net.sourceforge.jnlp.config.BasicValueValidators;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
+import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.config.BasicValueValidators.verifyFileOrCommand;
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * The BasicService JNLP service.

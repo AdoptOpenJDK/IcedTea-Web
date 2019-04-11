@@ -37,10 +37,10 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 
 import java.awt.Component;
 import java.awt.Container;

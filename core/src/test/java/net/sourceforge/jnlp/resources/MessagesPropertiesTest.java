@@ -64,7 +64,7 @@ public class MessagesPropertiesTest {
         public static final LocalesIdentifier RU = new LocalesIdentifier("ru");
         
         public static final String mainFileName = "Messages";
-        public static final String pckg = "net.sourceforge.jnlp.resources";
+        public static final String pckg = "net.adoptopenjdk.icedteaweb.i18n";
         private final String country;
         private final String language;
         private final Locale locale;

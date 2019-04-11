@@ -40,10 +40,10 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesCancelSkip;
+import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancelSkip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

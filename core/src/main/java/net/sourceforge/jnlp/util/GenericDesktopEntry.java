@@ -17,10 +17,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
-
 import java.io.File;
 import java.io.IOException;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 
 /**
  *

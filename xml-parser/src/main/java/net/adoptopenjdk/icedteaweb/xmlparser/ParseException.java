@@ -17,7 +17,7 @@
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 /**
  * Thrown to indicate that an error has occurred while parsing a

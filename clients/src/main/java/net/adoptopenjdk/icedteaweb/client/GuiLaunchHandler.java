@@ -47,7 +47,6 @@ import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.util.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 

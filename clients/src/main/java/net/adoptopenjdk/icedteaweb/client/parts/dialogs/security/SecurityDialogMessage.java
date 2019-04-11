@@ -40,8 +40,9 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Semaphore;
 import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 
 /**

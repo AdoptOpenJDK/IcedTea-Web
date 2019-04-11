@@ -37,19 +37,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import java.security.cert.CertPath;
+import java.util.Map;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
-import java.security.cert.CertPath;
-import java.util.Map;
-
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class JNLPAppVerifier implements AppVerifier {
 

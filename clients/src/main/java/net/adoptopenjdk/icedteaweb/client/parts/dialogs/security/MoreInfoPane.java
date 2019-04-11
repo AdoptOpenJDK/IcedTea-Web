@@ -39,9 +39,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.Yes;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
