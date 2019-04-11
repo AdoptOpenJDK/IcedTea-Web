@@ -1,7 +1,7 @@
 {
   "appName": "IcedTea-Web @PACKAGE_VERSION@",
   "versionMajor": "1",
-  "versionMinor": "7",
+  "versionMinor": "9",
   "versionMicro": "0",
   "versionPatch": "0",
   "vendor": "IcedTea-Web open-source project",
@@ -21,8 +21,24 @@
 
   "registryKeys": [
     {
-      "root": "HKCR",
-      "key": "jnlp",
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\.jnlp",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "JNLPFile"
+        },
+        {
+          "type": "string",
+          "name": "Content Type",
+          "value": "application/x-java-jnlp-file"
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\jnlp",
       "values": [
         {
           "type": "string",
@@ -37,13 +53,67 @@
       ]
     },
     {
-      "root": "HKCR",
-      "key": "jnlp\\shell\\open\\command",
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\jnlp\\shell\\open\\command",
       "values": [
         {
           "type": "string",
           "name": "",
-          "value": "\"[INSTALLDIR]bin\\javaws.bat\" \"%1\""
+          "value": "\"[INSTALLDIR]bin\\javaws.exe\" \"%1\""
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\JNLPFile",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "JNLP File"
+        },
+        {
+          "type": "integer",
+          "name": "EditFlags",
+          "value": "65536"
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\JNLPFile\\shell\\open\\command",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "\"[INSTALLDIR]bin\\javaws.exe\" \"%1\""
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\jnlps",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "URL:jnlp Protocol"
+        },
+        {
+          "type": "string",
+          "name": "URL Protocol",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\jnlps\\shell\\open\\command",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "\"[INSTALLDIR]bin\\javaws.exe\" \"%1\""
         }
       ]
     }
