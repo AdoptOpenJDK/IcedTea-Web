@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
 import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;

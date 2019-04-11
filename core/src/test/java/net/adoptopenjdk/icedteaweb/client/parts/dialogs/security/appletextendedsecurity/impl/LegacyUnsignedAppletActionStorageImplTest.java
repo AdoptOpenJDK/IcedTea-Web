@@ -35,6 +35,7 @@ exception statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl;
 
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -43,7 +44,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Applet
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActionsTest;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
-import net.sourceforge.jnlp.ServerAccess;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

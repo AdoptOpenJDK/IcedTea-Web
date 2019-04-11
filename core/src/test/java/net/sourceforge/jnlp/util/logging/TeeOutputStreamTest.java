@@ -1,7 +1,7 @@
 package net.sourceforge.jnlp.util.logging;
 
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.annotations.WindowsIssue;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import org.junit.Before;
 import org.junit.Test;
 

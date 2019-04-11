@@ -39,7 +39,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.mock.MockJNLPFile;
+import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;

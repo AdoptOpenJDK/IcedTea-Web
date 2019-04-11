@@ -37,8 +37,8 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.util.FileTestUtils;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

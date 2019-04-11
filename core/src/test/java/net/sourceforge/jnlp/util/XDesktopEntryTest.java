@@ -53,10 +53,10 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridgeTest;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.annotations.WindowsIssue;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.After;
 import org.junit.AfterClass;

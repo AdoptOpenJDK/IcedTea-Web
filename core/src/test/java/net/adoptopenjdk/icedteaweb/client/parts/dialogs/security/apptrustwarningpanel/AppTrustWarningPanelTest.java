@@ -3,7 +3,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

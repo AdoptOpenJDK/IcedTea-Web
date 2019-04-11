@@ -36,13 +36,16 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.browsertesting.Browser;
-import net.sourceforge.jnlp.browsertesting.BrowserFactory;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.browsertesting.browsers.LinuxBrowser;
+import net.adoptopenjdk.icedteaweb.testing.ContentReaderListener;
+import net.adoptopenjdk.icedteaweb.testing.ProcessResult;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
+import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browser.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

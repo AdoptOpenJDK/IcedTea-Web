@@ -48,10 +48,10 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarning
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.AfterClass;

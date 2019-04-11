@@ -39,7 +39,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLElement;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParseException;
 import org.junit.Assert;

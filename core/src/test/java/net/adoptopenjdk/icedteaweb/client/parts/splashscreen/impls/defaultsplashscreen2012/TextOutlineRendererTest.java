@@ -36,7 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
-import net.sourceforge.jnlp.annotations.WindowsIssue;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Ignore;

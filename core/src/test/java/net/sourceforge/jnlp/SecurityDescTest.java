@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.mock.DummyJNLPFile;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import org.junit.Test;
 
 import java.net.URI;

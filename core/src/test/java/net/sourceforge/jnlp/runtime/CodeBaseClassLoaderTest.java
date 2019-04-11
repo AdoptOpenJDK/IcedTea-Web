@@ -43,11 +43,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.SecurityDesc;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.Bug;
-import net.sourceforge.jnlp.annotations.Remote;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.mock.DummyJNLPFile;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;

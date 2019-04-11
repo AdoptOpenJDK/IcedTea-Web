@@ -35,6 +35,7 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl;
 
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -47,7 +48,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Applet
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
