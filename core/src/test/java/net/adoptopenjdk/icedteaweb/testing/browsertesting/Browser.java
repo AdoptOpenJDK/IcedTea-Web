@@ -48,6 +48,4 @@ public interface Browser extends ReactingProcess{
     String getUserDefaultPluginExpectedLocation();
     Browsers getID();
     List<String> getComaptibilitySwitches();
-    List<String> getDefaultSwitches();
-
 }

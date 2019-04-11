@@ -46,11 +46,9 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
 
     //attributes possibly set by user
     private String initStr = null;
-    private int appletHeight;
-    private int appletWidth;
 
     //other 
-    protected final StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb = new StringBuilder();
     private boolean actionStarted = false;
     private Robot robot;
 
@@ -130,7 +128,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 
      * @return
      */
-    public Rule<String, String> getInitStrAsRule(){
+    private Rule<String, String> getInitStrAsRule(){
     	if( initStr != null ){
             return new ContainsRule(this.initStr);
     	}else{
@@ -147,7 +145,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     }
     
     //boolean controls getters
-    protected boolean appletIsReady(String content) {
+    private boolean appletIsReady(String content) {
         return this.getInitStrAsRule().evaluate(content);
     }
 
@@ -167,7 +165,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @throws AWTFrameworkException
      * @throws AWTFrameworkException 
      */
-    public void captureScreenAndFindAppletByIcon() throws AWTFrameworkException {
+    private void captureScreenAndFindAppletByIcon() throws AWTFrameworkException {
         throw new AWTFrameworkException("AWTFramework cannot find applet without dimension or marker!");
     }
 
@@ -177,7 +175,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 
      * @throws AWTFrameworkException
      */
-    public void findAndActivateApplet() throws AWTFrameworkException
+    private void findAndActivateApplet() throws AWTFrameworkException
     {
         captureScreenAndFindAppletByIcon();
         clickInTheMiddleOfApplet();
@@ -189,7 +187,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * method clickInTheMiddleOfApplet focuses the applet by clicking in the
      * middle of its location rectangle
      */
-    public void clickInTheMiddleOfApplet() {
+    private void clickInTheMiddleOfApplet() {
         MouseActions.clickInside(null, this.robot);
     }
     

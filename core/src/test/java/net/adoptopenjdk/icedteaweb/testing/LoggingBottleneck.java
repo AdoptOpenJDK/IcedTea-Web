@@ -81,7 +81,7 @@ public class LoggingBottleneck {
      * map of classes, each have map of methods, each have errorlist, outLIst, and allList (allist contains also not std or err messages)
      * class.testMethod.logs
      */
-    final Map<String, Map<String, TestsLogs>> processLogs = Collections.synchronizedMap(new HashMap<String, Map<String, TestsLogs>>(1000));
+    private final Map<String, Map<String, TestsLogs>> processLogs = Collections.synchronizedMap(new HashMap<String, Map<String, TestsLogs>>(1000));
     private boolean added = false;
 
     synchronized public static LoggingBottleneck getDefaultLoggingBottleneck() {
@@ -102,11 +102,11 @@ public class LoggingBottleneck {
         }
     }
 
-   synchronized void writeXmlLog() throws IOException {
+   private synchronized void writeXmlLog() throws IOException {
        writeXmlLog(Collections.unmodifiableMap(processLogs));
    }
 
-    synchronized static void writeXmlLog(Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
+    private synchronized static void writeXmlLog(Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
         Writer w = new OutputStreamWriter(new FileOutputStream(DEFAULT_LOG_FILE));
         Set<Entry<String, Map<String, TestsLogs>>> classes = processLogs.entrySet();
         w.write("<" + LOGS_ELEMENT + ">");
@@ -217,7 +217,7 @@ public class LoggingBottleneck {
         DEFAULT_STDLOGS_WRITER.flush();
     }
     
-   synchronized public  static String clearChars(String ss) {
+   private synchronized static String clearChars(String ss) {
         StringBuilder s = new StringBuilder(ss);
         for (int i = 0; i < s.length(); i++) {
             char q = s.charAt(i);

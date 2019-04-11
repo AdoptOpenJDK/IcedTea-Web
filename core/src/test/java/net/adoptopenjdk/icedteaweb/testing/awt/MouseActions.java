@@ -58,7 +58,7 @@ public class MouseActions {
      * @param robot
      * @param delayMs
      */
-    public static void click(int mouseKeyMask, Robot robot, int delayMs){
+    private static void click(int mouseKeyMask, Robot robot, int delayMs){
         robot.delay(delayMs);
         robot.mousePress(mouseKeyMask);
         robot.delay(delayMs);
@@ -71,7 +71,7 @@ public class MouseActions {
      * @param robot
      * @param delayMs
      */
-    public static void moveMouseToMiddle(Rectangle rectangle, Robot robot, int delayMs){
+    private static void moveMouseToMiddle(Rectangle rectangle, Robot robot, int delayMs){
         robot.delay(delayMs);
         int x = rectangle.x + (rectangle.width/2);
         int y = rectangle.y + (rectangle.height/2);
@@ -87,14 +87,14 @@ public class MouseActions {
      * @param robot
      * @param delayMs
      */
-    public static void clickInside(int mouseKey, Rectangle rectangle, Robot robot, int delayMs){
+    private static void clickInside(int mouseKey, Rectangle rectangle, Robot robot, int delayMs){
         moveMouseToMiddle(rectangle, robot, delayMs);
         robot.delay(delayMs);
         click(mouseKey, robot, delayMs);
     }
 
     
-    public static void clickInside(Rectangle rectangle, Robot robot, int delayMs){
+    private static void clickInside(Rectangle rectangle, Robot robot, int delayMs){
         clickInside(InputEvent.BUTTON1_MASK, rectangle, robot, delayMs);
     }
     

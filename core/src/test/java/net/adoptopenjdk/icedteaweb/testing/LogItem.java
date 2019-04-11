@@ -41,9 +41,9 @@ import java.util.Date;
 
 class LogItem {
 
-    public final Date timeStamp = new Date();
-    public final StackTraceElement[] fullTrace = Thread.currentThread().getStackTrace();
-    public final String text;
+    private final Date timeStamp = new Date();
+    private final StackTraceElement[] fullTrace = Thread.currentThread().getStackTrace();
+    private final String text;
     private static final String ITEM_ELEMENT = "item";
     private static final String ITEM_ID_ATTRIBUTE = "id";
     private static final String STAMP_ELEMENT = "stamp";

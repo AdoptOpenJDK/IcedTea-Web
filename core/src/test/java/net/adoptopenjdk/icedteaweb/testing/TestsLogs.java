@@ -42,9 +42,9 @@ import java.util.List;
 
 class TestsLogs {
 
-    public final List<LogItem> outs = new LinkedList<LogItem>();
-    public final List<LogItem> errs = new LinkedList<LogItem>();
-    public final List<LogItem> all = new LinkedList<LogItem>();
+    private final List<LogItem> outs = new LinkedList<LogItem>();
+    private final List<LogItem> errs = new LinkedList<LogItem>();
+    private final List<LogItem> all = new LinkedList<LogItem>();
     private static final String LOG_ELEMENT = "log";
     private static final String LOG_ID_ATTRIBUTE = "id";
 

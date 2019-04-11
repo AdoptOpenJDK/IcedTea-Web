@@ -40,7 +40,7 @@ import net.adoptopenjdk.icedteaweb.testing.ClosingListener;
 
 public abstract class CountingClosingListener extends ClosingListener {
 
-    protected final StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb = new StringBuilder();
 
     @Override
     public void charReaded(char ch) {

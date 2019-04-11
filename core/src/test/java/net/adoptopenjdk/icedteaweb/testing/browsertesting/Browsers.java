@@ -50,7 +50,7 @@ public enum Browsers {
 
    none, all, one, opera, googleChrome, chromiumBrowser, firefox, midori,epiphany;
 
-    public static final String CHROMIUM;
+    private static final String CHROMIUM;
 
     static {
         final String def = "chromium";

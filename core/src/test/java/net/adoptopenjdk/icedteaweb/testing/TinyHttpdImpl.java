@@ -99,14 +99,6 @@ public class TinyHttpdImpl extends Thread {
         this.supportLastModified = supportLastModified;
     }
 
-    private String extractMemory(String filePath) throws UnsupportedEncodingException {
-        //the memory is last item in form, browsers generraly agree on this
-        int i = filePath.lastIndexOf("=");
-        filePath = filePath.substring(i);
-        filePath = URLDecoder.decode(filePath, "utf-8");
-        return filePath;
-    }
-
     @Override
     public void run() {
         try {

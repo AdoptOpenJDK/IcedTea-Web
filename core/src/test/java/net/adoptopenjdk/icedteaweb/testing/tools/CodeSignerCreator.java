@@ -58,7 +58,7 @@ public class CodeSignerCreator {
      * @return An X509 certificate setup with properties using the specified parameters.
      * @throws Exception
      */
-    public static X509Certificate createCert(String dname, Date notBefore, int validity)
+    private static X509Certificate createCert(String dname, Date notBefore, int validity)
             throws Exception {
         int keysize = 2048;
         String keyAlgName = "RSA";

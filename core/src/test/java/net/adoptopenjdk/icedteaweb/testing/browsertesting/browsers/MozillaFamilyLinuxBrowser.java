@@ -53,11 +53,6 @@ public  abstract class MozillaFamilyLinuxBrowser  extends LinuxBrowser{
     }
 
     @Override
-    public List<String> getDefaultSwitches() {
-        return null;
-    }
-   
-    @Override
     public String getUserDefaultPluginExpectedLocation() {
         return   System.getProperty("user.home")+"/.mozilla/plugins";
     }

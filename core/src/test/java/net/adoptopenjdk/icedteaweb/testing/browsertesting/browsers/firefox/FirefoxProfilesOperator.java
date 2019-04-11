@@ -105,7 +105,7 @@ public class FirefoxProfilesOperator {
 
     }
 
-    public void removeProfiles() throws IOException {
+    private void removeProfiles() throws IOException {
         if (!backuped) {
             return;
         }
@@ -137,7 +137,7 @@ public class FirefoxProfilesOperator {
         }
     }
 
-    public static void deleteRecursively(File f) throws IOException {
+    private static void deleteRecursively(File f) throws IOException {
         if (f.isDirectory()) {
             for (File c : f.listFiles()) {
                 deleteRecursively(c);
@@ -150,7 +150,7 @@ public class FirefoxProfilesOperator {
         }
     }
 
-    public static void copyRecursively(File srcFileDir, File destDir) throws IOException {
+    private static void copyRecursively(File srcFileDir, File destDir) throws IOException {
         if (srcFileDir.isDirectory()) {
             File nwDest = new File(destDir, srcFileDir.getName());
             nwDest.mkdir();

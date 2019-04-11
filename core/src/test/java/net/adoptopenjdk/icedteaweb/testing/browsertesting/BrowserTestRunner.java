@@ -125,7 +125,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
         ff.invoke(null, browser);
     }
 
-    protected void runChildX(final FrameworkMethod method, RunNotifier notifier, Browsers browser, boolean browserIgnoration) {
+    private void runChildX(final FrameworkMethod method, RunNotifier notifier, Browsers browser, boolean browserIgnoration) {
         Description description = describeChild(method, browser);
         if (method.getAnnotation(Ignore.class) != null) {
             notifier.fireTestIgnored(description);
@@ -147,8 +147,8 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
     /**
      * Runs a {@link Statement} that represents a leaf (aka atomic) test.
      */
-    protected final void runLeaf(Statement statement, Description description,
-            RunNotifier notifier, boolean ignore) {
+    private void runLeaf(Statement statement, Description description,
+                         RunNotifier notifier, boolean ignore) {
         EachTestNotifier eachNotifier = new EachTestNotifier(notifier, description);
         eachNotifier.fireTestStarted();
           if (ignore) {
@@ -166,7 +166,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    protected Description describeChild(FrameworkMethod method, Browsers browser) {
+    private Description describeChild(FrameworkMethod method, Browsers browser) {
         if (browser == null) {
             return super.describeChild(method);
         } else {

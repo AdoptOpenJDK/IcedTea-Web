@@ -44,7 +44,7 @@ import java.util.List;
 public class Epiphany extends MozillaFamilyLinuxBrowser {
 
     
-    final String[] cs = {};
+    private final String[] cs = {};
 
     public Epiphany(String bin) {
         super(bin);

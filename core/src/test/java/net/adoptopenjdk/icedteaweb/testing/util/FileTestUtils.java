@@ -59,7 +59,7 @@ public class FileTestUtils {
 
     /* Get the open file-descriptor count for the process. Note that this is
      * specific to Unix-like operating systems. */
-    static public long getOpenFileDescriptorCount() {
+    private static long getOpenFileDescriptorCount() {
         MBeanServer beanServer = ManagementFactory.getPlatformMBeanServer();
         try {
             return (Long) beanServer.getAttribute(new ObjectName(

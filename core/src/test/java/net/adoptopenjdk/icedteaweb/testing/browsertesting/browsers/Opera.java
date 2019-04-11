@@ -59,16 +59,11 @@ public class Opera extends LinuxBrowser {
     }
 
 
-    final String[] cs={"-nosession", "-nomail", "-nolirc", "-newtab"};
+    private final String[] cs={"-nosession", "-nomail", "-nolirc", "-newtab"};
 
     @Override
     public List<String> getComaptibilitySwitches() {
         return Arrays.asList(cs);
-    }
-
-    @Override
-    public List<String> getDefaultSwitches() {
-        return null;
     }
 
 }

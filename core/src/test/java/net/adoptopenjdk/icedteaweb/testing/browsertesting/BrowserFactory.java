@@ -56,7 +56,7 @@ public class BrowserFactory {
 
     private static final BrowserFactory factory = new BrowserFactory(System.getProperty(ServerAccess.USED_BROWSERS));
     private final List<Browser> configuredBrowsers;
-    final Random oneGenerator = new Random();
+    private final Random oneGenerator = new Random();
 
     public static BrowserFactory getFactory() {
         return factory;
@@ -121,7 +121,7 @@ public class BrowserFactory {
 
     }
 
-    public Browser getRandom() {
+    private Browser getRandom() {
         if (configuredBrowsers.isEmpty()){
             return null;
         }
@@ -154,7 +154,7 @@ public class BrowserFactory {
      * @param testIn Bbrowsers which should be transformed to list of Browser
      * @return all matching browser, if browser do not exists, this is ignored and run is silently continued
      */
-    public List<Browser> translateAnnotationSilently(Browsers[] testIn) {
+    private List<Browser> translateAnnotationSilently(Browsers[] testIn) {
         if (testIn==null) {
             return null;
         }

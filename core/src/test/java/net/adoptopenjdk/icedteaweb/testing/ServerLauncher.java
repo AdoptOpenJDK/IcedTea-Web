@@ -63,12 +63,12 @@ public class ServerLauncher implements Runnable {
         this.supportingHeadRequest = supportsHead;
     }
 
-    public boolean isSupportingHeadRequest() {
+    private boolean isSupportingHeadRequest() {
         return supportingHeadRequest;
     }
 
 
-    public String getServerName() {
+    private String getServerName() {
         if (serverNaming == ServerNaming.HOSTNAME) {
             try {
                 return InetAddress.getLocalHost().getHostName();

@@ -68,7 +68,7 @@ public class ProcessWrapper {
         this(toBeExecuted, otherargs, u.toString());
     }
 
-    public ProcessWrapper(String toBeExecuted, List<String> otherargs, String s) {
+    private ProcessWrapper(String toBeExecuted, List<String> otherargs, String s) {
         Assert.assertNotNull(s);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
@@ -99,7 +99,7 @@ public class ProcessWrapper {
     }
 
 
-    public final void addStdOutListener(ContentReaderListener l) {
+    private void addStdOutListener(ContentReaderListener l) {
         if (l == null) {
             return;
         }
@@ -107,7 +107,7 @@ public class ProcessWrapper {
 
     }
 
-    public final void addStdErrListener(ContentReaderListener l) {
+    private void addStdErrListener(ContentReaderListener l) {
         if (l == null) {
             return;
         }

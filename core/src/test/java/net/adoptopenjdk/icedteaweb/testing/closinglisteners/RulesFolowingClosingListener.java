@@ -56,7 +56,7 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
 
     }
 
-    public RulesFolowingClosingListener() {
+    protected RulesFolowingClosingListener() {
     }
 
 

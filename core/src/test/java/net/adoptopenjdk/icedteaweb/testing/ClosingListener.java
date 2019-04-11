@@ -44,7 +44,7 @@ public abstract class ClosingListener implements ContentReaderListener {
         this.assasin = assasin;
     }
 
-    public void terminate() {
+    protected void terminate() {
         assasin.setTimeout();
     }
 }

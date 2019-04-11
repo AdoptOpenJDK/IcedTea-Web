@@ -18,7 +18,7 @@ import java.util.Locale;
 public class DummyJNLPFileWithJar extends JNLPFile {
 
     /* Create a JARDesc for the given URL location */
-    static JARDesc makeJarDesc(URL jarLocation, boolean main) {
+    private static JARDesc makeJarDesc(URL jarLocation, boolean main) {
         return new JARDesc(jarLocation, new Version("1"), null, false,main, false,false);
     }
 
@@ -45,7 +45,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         return r;
     }
     
-    public DummyJNLPFileWithJar(int main, URL codebaseRewritter, URL... jarFiles) {
+    private DummyJNLPFileWithJar(int main, URL codebaseRewritter, URL... jarFiles) {
         codeBase = codebaseRewritter;
         this.jarFiles = jarFiles;
         jarDescs = new JARDesc[jarFiles.length];

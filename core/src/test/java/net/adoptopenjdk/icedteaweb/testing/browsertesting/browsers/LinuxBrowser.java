@@ -44,7 +44,7 @@ public abstract class LinuxBrowser implements Browser{
       public static final String DEFAULT_PLUGIN_NAME="libjavaplugin.so";
       public static final String DEFAULT_BIN_PATH="/usr/bin/";
 
-      protected final String bin;
+      private final String bin;
       protected String fsdir="unknown";
 
     public LinuxBrowser(String bin) {

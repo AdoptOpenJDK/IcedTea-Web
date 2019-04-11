@@ -54,12 +54,12 @@ import java.util.List;
  */
 public class ThreadedProcess extends Thread {
 
-    Process p = null;
-    final List<String> args;
-    Integer exitCode;
-    Boolean running;
-    String[] variables;
-    File dir;
+    private Process p = null;
+    private final List<String> args;
+    private Integer exitCode;
+    private Boolean running;
+    private String[] variables;
+    private File dir;
     Throwable deadlyException = null;
     /*
      * before removing this "useless" variable
@@ -94,11 +94,11 @@ public class ThreadedProcess extends Thread {
     
 
 
-    public ThreadedProcess(List<String> args) {
+    private ThreadedProcess(List<String> args) {
         this.args = args;
     }
 
-    public ThreadedProcess(List<String> args, File dir) {
+    private ThreadedProcess(List<String> args, File dir) {
         this(args);
         this.dir = dir;
     }

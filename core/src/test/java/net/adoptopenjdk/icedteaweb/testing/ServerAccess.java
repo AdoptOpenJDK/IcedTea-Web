@@ -36,7 +36,6 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.testing;
 
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
@@ -72,20 +71,15 @@ import java.util.List;
  */
 public class ServerAccess {
 
-    public enum AutoClose {
-
-        CLOSE_ON_EXCEPTION, CLOSE_ON_CORRECT_END, CLOSE_ON_BOTH
-    }
-
     public static final long NANO_TIME_DELIMITER=1000000l;
     /**
      * java property which value containing path to default (makefile by) directory with deployed resources
      */
-    public static final String TEST_SERVER_DIR = "test.server.dir";
+    private static final String TEST_SERVER_DIR = "test.server.dir";
     /**
      * java property which value containing path to installed (makefile by) javaws binary
      */
-    public static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
+    private static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
     /** property to set the different then default browser
      */
     public static final String USED_BROWSERS = "used.browsers";
@@ -98,14 +92,10 @@ public class ServerAccess {
      */
     private static ServerLauncher server;
     /**
-     * inner version of engine
-     */
-    private static final String version = "5";
-    /**
      * timeout to read 'remote' resources
      * This can be changed in runtime, but will affect all following tasks
      */
-    public static final int READ_TIMEOUT = 1000;
+    private static final int READ_TIMEOUT = 1000;
     /**
      * timeout in ms to let process to finish, before assassin will kill it.
      * This can be changed in runtime, but will affect all following tasks
@@ -115,10 +105,10 @@ public class ServerAccess {
      * this flag is indicating whether output of executeProcess should be logged. By default true.
      */
     public static final boolean PROCESS_LOG = true;
-    public static final boolean LOGS_REPRINT = false;
+    private static final boolean LOGS_REPRINT = false;
 
     private Browser currentBrowser;
-    public static final String UNSET_BROWSER="unset_browser";
+    private static final String UNSET_BROWSER="unset_browser";
 
     /**
      * main method of this class prints out random free port
@@ -162,8 +152,6 @@ public class ServerAccess {
         findPortTestingSocket.close();
         return port;
     }
-    public static final  String HEADLES_OPTION= CommandLineOptions.HEADLESS.getOption();
-    public static final  String VERBOSE_OPTION= CommandLineOptions.VERBOSE.getOption();
 
     /**
      * we would like to have an singleton instance ASAP
@@ -191,10 +179,10 @@ public class ServerAccess {
      * @return new not cached iserver instance on random port,
      * useful for testing application loading from different url then base
      */
-    public static ServerLauncher getIndependentInstance() {
+    private static ServerLauncher getIndependentInstance() {
         return getIndependentInstance(true);
     }
-    public static ServerLauncher getIndependentInstance(boolean daemon) {
+    private static ServerLauncher getIndependentInstance(boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
         try{
             return getIndependentInstance(dir, findFreePort(),daemon);
@@ -211,10 +199,10 @@ public class ServerAccess {
      * useful for testing application loading from different url then base
      */
     
-    public static ServerLauncher getIndependentInstance(int port) {
+    private static ServerLauncher getIndependentInstance(int port) {
         return getIndependentInstance(port, true);
     }
-    public static ServerLauncher getIndependentInstance(int port,boolean daemon) {
+    private static ServerLauncher getIndependentInstance(int port, boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
         return getIndependentInstance(dir,port,daemon);
     }
@@ -232,7 +220,7 @@ public class ServerAccess {
     }
 
 
-    public static ServerLauncher getIndependentInstance(String dir, int port, boolean daemon) {
+    private static ServerLauncher getIndependentInstance(String dir, int port, boolean daemon) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
@@ -262,15 +250,15 @@ public class ServerAccess {
      *
      * @return - bianry from where to lunch current browser
      */
-    public String getBrowserLocation() {
+      private String getBrowserLocation() {
        if (this.currentBrowser==null) return UNSET_BROWSER;
        return this.currentBrowser.getBin();
     }
 
-    public List<String> getBrowserParams() {
+    private List<String> getBrowserParams() {
        if (this.currentBrowser==null) return null;
        List<String> l1=this.currentBrowser.getComaptibilitySwitches();
-       List<String> l2=this.currentBrowser.getDefaultSwitches();
+       List<String> l2=null;
        List<String> l= new ArrayList<>();
        if (l1!=null)l.addAll(l1);
        if (l2!=null)l.addAll(l2);
@@ -333,7 +321,7 @@ public class ServerAccess {
      * @return complete url for this resource on this server
      * @param resource relative path  pointing to server resource. If non singleton instance is running, new is created.
      */
-    public URL getUrl(String resource) throws MalformedURLException {
+    private URL getUrl(String resource) throws MalformedURLException {
         if (server == null) {
             getInstance();
         }
@@ -371,7 +359,7 @@ public class ServerAccess {
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static ByteArrayOutputStream getBytesFromStream(InputStream is) throws IOException {
+    private static ByteArrayOutputStream getBytesFromStream(InputStream is) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int nRead;
         byte[] data = new byte[16384];
@@ -412,7 +400,7 @@ public class ServerAccess {
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static ByteArrayOutputStream getResourceAsBytes(URL u) throws IOException {
+    private static ByteArrayOutputStream getResourceAsBytes(URL u) throws IOException {
         URLConnection connection = null;
         try {
             connection = u.openConnection();
@@ -439,7 +427,7 @@ public class ServerAccess {
      * @throws IOException if connection can't be established or resource does
      * not exist
      */
-    public static String getResourceAsString(URL u) throws IOException {
+    private static String getResourceAsString(URL u) throws IOException {
         URLConnection connection = null;
         try {
             connection = (HttpURLConnection) u.openConnection();
@@ -492,17 +480,17 @@ public class ServerAccess {
     }
 
 
-    public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
+    private ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
         return executeBrowser(otherargs, getUrlUponThisInstance(resource));        
     }
     
-     public ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
+     private ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
     }
 
-    public ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+    private ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
@@ -526,7 +514,7 @@ public class ServerAccess {
      * @return the absolute url
      * @throws MalformedURLException
      */
-    public static URL getUrlUponInstance(ServerLauncher instance,String resource) throws MalformedURLException {
+    private static URL getUrlUponInstance(ServerLauncher instance, String resource) throws MalformedURLException {
        return instance.getUrl(resource);
     }
 
@@ -551,7 +539,7 @@ public class ServerAccess {
      * @return what left from process - process itself, its stdout, stderr and return value and whether it was terminated by assassin.
      * @throws Exception
      */
-    public static ProcessResult executeProcess(final List<String> args,File dir) throws Exception {
+    private static ProcessResult executeProcess(final List<String> args, File dir) throws Exception {
         return executeProcess(args, dir, null, null);
     }
 
@@ -672,11 +660,11 @@ public class ServerAccess {
         return result;
     }
 
-    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+    private static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
         return executeProcess(args, dir, stdoutl, stderrl,null);
 
     }
-    public static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
+    private static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
         return new ProcessWrapper(args, dir, stdoutl, stderrl, vars).execute();
     }
 

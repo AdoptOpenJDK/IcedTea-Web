@@ -48,9 +48,9 @@ import java.util.List;
  */
 class ContentReader implements Runnable {
 
-    final StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb = new StringBuilder();
     private final InputStream is;
-    final List<ContentReaderListener> listeners = new ArrayList<>(1);
+    private final List<ContentReaderListener> listeners = new ArrayList<>(1);
 
     public String getContent() {
         return sb.toString();

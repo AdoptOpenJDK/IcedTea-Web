@@ -48,7 +48,7 @@ import java.util.List;
  */
 public class ProcessAssasin extends Thread {
 
-    long timeout;
+    private long timeout;
     private final ThreadedProcess p;
     //false == is disabled:(
     private boolean canRun = true;
@@ -154,10 +154,10 @@ public class ProcessAssasin extends Thread {
         }
     }
 
-    public void destroyProcess() {
+    private void destroyProcess() {
         try {
             killing = true;
-            destroyProcess(p, reactingProcess, isUseKill());
+            destroyProcess(p, reactingProcess, false);
         } finally {
             killed = true;
         }
@@ -171,12 +171,9 @@ public class ProcessAssasin extends Thread {
         return killing;
     }
 
-    public boolean isUseKill() {
-        return false;
-    }
 
 
-    public static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess, boolean mercielessKill) {
+    private static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess, boolean mercielessKill) {
         Process p = pp.getP();
         try {
             Field f = p.getClass().getDeclaredField("pid");
@@ -198,15 +195,15 @@ public class ProcessAssasin extends Thread {
         }
     }
 
-    public static void sigKill(String pid) throws Exception {
+    private static void sigKill(String pid) throws Exception {
         kill(pid, "SIGKILL");
     }
 
-    public static void sigTerm(String pid) throws Exception {
+    private static void sigTerm(String pid) throws Exception {
         kill(pid, "SIGTERM");
     }
 
-    public static void kill(String pid, String signal) throws Exception {
+    private static void kill(String pid, String signal) throws Exception {
         List<String> ll = new ArrayList<String>(4);
         ll.add("kill");
         ll.add("-s");
