@@ -133,7 +133,7 @@ public class CodeSignerCreator {
             throws Exception {
         X509Certificate jarEntryCert = createCert(domainName, notBefore, validity);
 
-        ArrayList<X509Certificate> certs = new ArrayList<X509Certificate>(1);
+        ArrayList<X509Certificate> certs = new ArrayList<>(1);
         certs.add(jarEntryCert);
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");

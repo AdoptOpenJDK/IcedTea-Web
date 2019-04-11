@@ -38,7 +38,6 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.tools;
 
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 
 import java.io.IOException;
@@ -58,10 +57,6 @@ public class DeploymentPropertiesModifier {
         public final InfrastructureFileDescriptor src;
         private final AbstractMap.SimpleEntry<String, String>[] keyValue;
         private List<DeploymentPropertiesModifier> modifications;
-
-        public MultipleDeploymentPropertiesModifier(AbstractMap.SimpleEntry<String, String>... keyValue) {
-            this(PathsAndFiles.USER_DEPLOYMENT_FILE, keyValue);
-        }
 
         public MultipleDeploymentPropertiesModifier(InfrastructureFileDescriptor src, HashMap.SimpleEntry<String, String>... keyValue) {
             this.src = src;
@@ -91,10 +86,6 @@ public class DeploymentPropertiesModifier {
     private String requestedProperty;
     private String requestedValue;
     private boolean isPropertiesSet;
-
-    public DeploymentPropertiesModifier() {
-        this(PathsAndFiles.USER_DEPLOYMENT_FILE);
-    }
 
     public DeploymentPropertiesModifier(InfrastructureFileDescriptor src) {
         this.src = src;

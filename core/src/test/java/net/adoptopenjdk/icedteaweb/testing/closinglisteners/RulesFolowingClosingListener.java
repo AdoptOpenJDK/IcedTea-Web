@@ -41,7 +41,7 @@ import java.util.List;
 
 public class RulesFolowingClosingListener extends CountingClosingListener {
 
-    private final List<Rule<?,String>> rules = new ArrayList<Rule<?,String>>();
+    private final List<Rule<?,String>> rules = new ArrayList<>();
 
     public static class ContainsRule extends StringRule<String> {
 
@@ -63,7 +63,7 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
 
     @Override
     protected boolean isAlowedToFinish(String content) {
-        if (rules == null || rules.size() < 1) {
+        if (rules.size() < 1) {
             throw new IllegalStateException("No rules specified");
         }
         for (Rule<?,String> rule : rules) {

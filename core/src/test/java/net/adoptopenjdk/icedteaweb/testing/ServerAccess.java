@@ -55,23 +55,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * This class provides access to virtual server and stuff around.
  * It can find unoccupied port, start server, provides its singleton instantiation, launch parallel instantiations,
  * read location of installed (tested javaws) see javaws.build.bin java property,
  * location of server www root on file system (see test.server.dir java property),
  * stubs for launching javaws and for locating resources and read resources.
- *
+ * <p>
  * It can also execute processes with timeout (@see PROCESS_TIMEOUT) (used during launching javaws)
  * Some protected apis are exported because public classes in this package are put to be tested by makefile.
- *
+ * <p>
  * There are included test cases which show some basic usages.
- *
- *
  */
 public class ServerAccess {
 
-    public static final long NANO_TIME_DELIMITER=1000000l;
+    public static final long NANO_TIME_DELIMITER = 1000000L;
     /**
      * java property which value containing path to default (makefile by) directory with deployed resources
      */
@@ -80,13 +77,14 @@ public class ServerAccess {
      * java property which value containing path to installed (makefile by) javaws binary
      */
     private static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
-    /** property to set the different then default browser
+    /**
+     * property to set the different then default browser
      */
     public static final String USED_BROWSERS = "used.browsers";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     public static final String DEFAULT_LOCALHOST_IP = "127.0.0.1";
     public static final String DEFAULT_LOCALHOST_PROTOCOL = "http";
-    
+
     /**
      * server instance singleton
      */
@@ -108,7 +106,7 @@ public class ServerAccess {
     private static final boolean LOGS_REPRINT = false;
 
     private Browser currentBrowser;
-    private static final String UNSET_BROWSER="unset_browser";
+    private static final String UNSET_BROWSER = "unset_browser";
 
     /**
      * main method of this class prints out random free port
@@ -116,7 +114,8 @@ public class ServerAccess {
      * param "port" prints out the port
      * nothing or number will run server on random(or on number specified)
      * port in -Dtest.server.dir
-     * @param args params from commandline. recognized params are port and randomport 
+     *
+     * @param args params from commandline. recognized params are port and randomport
      * @throws java.lang.Exception if anything happens
      */
     public static void main(String[] args) throws Exception {
@@ -164,7 +163,6 @@ public class ServerAccess {
     }
 
     /**
-     *
      * @return cached instance. If none, then creates new
      */
     public static ServerLauncher getInstance() {
@@ -175,41 +173,32 @@ public class ServerAccess {
     }
 
     /**
-     *
      * @return new not cached iserver instance on random port,
      * useful for testing application loading from different url then base
      */
     private static ServerLauncher getIndependentInstance() {
-        return getIndependentInstance(true);
-    }
-    private static ServerLauncher getIndependentInstance(boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
-        try{
-            return getIndependentInstance(dir, findFreePort(),daemon);
-        }catch (Exception ex){
-            throw  new RuntimeException(ex);
+        try {
+            return getIndependentInstance(dir, findFreePort(), true);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
 
     /**
-     *
      * @param port specific port on which this server is accepting requests
      * @return new not cached iserver instance on random port,
      * useful for testing application loading from different url then base
      */
-    
+
     private static ServerLauncher getIndependentInstance(int port) {
-        return getIndependentInstance(port, true);
-    }
-    private static ServerLauncher getIndependentInstance(int port, boolean daemon) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
-        return getIndependentInstance(dir,port,daemon);
+        return getIndependentInstance(dir, port, true);
     }
 
     /**
-     *
-     * @param dir directory from which server returns resources
+     * @param dir  directory from which server returns resources
      * @param port specific port on which this server is accepting requests
      * @return new not cached iserver instance on random port upon custom www root directory,
      * useful for testing application loading from different url then base
@@ -228,7 +217,7 @@ public class ServerAccess {
         }
         try {
             ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
-            Thread r=new Thread(lServerLuncher);
+            Thread r = new Thread(lServerLuncher);
             r.setDaemon(daemon);
             r.start();
             return lServerLuncher;
@@ -239,37 +228,37 @@ public class ServerAccess {
     }
 
     /**
-     *
      * @return - value passed inside as javaws binary location. See JAVAWS_BUILD_BIN
      */
     public String getJavawsLocation() {
         return System.getProperty(JAVAWS_BUILD_BIN);
     }
 
-      /**
-     *
+    /**
      * @return - bianry from where to lunch current browser
      */
-      private String getBrowserLocation() {
-       if (this.currentBrowser==null) return UNSET_BROWSER;
-       return this.currentBrowser.getBin();
+    private String getBrowserLocation() {
+        if (this.currentBrowser == null) return UNSET_BROWSER;
+        return this.currentBrowser.getBin();
     }
 
     private List<String> getBrowserParams() {
-       if (this.currentBrowser==null) return null;
-       List<String> l1=this.currentBrowser.getComaptibilitySwitches();
-       List<String> l2=null;
-       List<String> l= new ArrayList<>();
-       if (l1!=null)l.addAll(l1);
-       if (l2!=null)l.addAll(l2);
-       return l;
+        if (this.currentBrowser == null) {
+            return null;
+        }
+
+        final List<String> l1 = this.currentBrowser.getComaptibilitySwitches();
+        final List<String> l = new ArrayList<>();
+        if (l1 != null) l.addAll(l1);
+        return l;
 
     }
 
     public Browsers getCurrentBrowsers() {
-        if (currentBrowser==null) return null;
+        if (currentBrowser == null) return null;
         return currentBrowser.getID();
     }
+
     public Browser getCurrentBrowser() {
         return currentBrowser;
     }
@@ -277,13 +266,13 @@ public class ServerAccess {
     public void setCurrentBrowser(Browsers currentBrowser) {
         this.currentBrowser = BrowserFactory.getFactory().getBrowser(currentBrowser);
         if (this.currentBrowser == null) {
-           LoggingBottleneck.getDefaultLoggingBottleneck().setLoggedBrowser(UNSET_BROWSER);
+            LoggingBottleneck.getDefaultLoggingBottleneck().setLoggedBrowser(UNSET_BROWSER);
         } else {
             LoggingBottleneck.getDefaultLoggingBottleneck().setLoggedBrowser(this.currentBrowser.getID().toString());
         }
     }
+
     /**
-     *
      * @return - value passed inside as javaws binary location as file. See JAVAWS_BUILD_BIN
      */
     public File getJavawsFile() {
@@ -291,7 +280,6 @@ public class ServerAccess {
     }
 
     /**
-     *
      * @return port on which is running cached server. If non singleton instance is running, new is created.
      */
     public int getPort() {
@@ -304,7 +292,6 @@ public class ServerAccess {
     }
 
     /**
-     *
      * @return directory upon which is running cached server. If non singleton instance is running, new is created.
      */
     public File getDir() {
@@ -316,10 +303,9 @@ public class ServerAccess {
     }
 
     /**
-     *
-     * @throws java.net.MalformedURLException if url for this resource can not be constructed
-     * @return complete url for this resource on this server
      * @param resource relative path  pointing to server resource. If non singleton instance is running, new is created.
+     * @return complete url for this resource on this server
+     * @throws java.net.MalformedURLException if url for this resource can not be constructed
      */
     private URL getUrl(String resource) throws MalformedURLException {
         if (server == null) {
@@ -332,7 +318,7 @@ public class ServerAccess {
 
     /**
      * Return resource from cached server
-     * 
+     *
      * @param resource to be located on cached server
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
@@ -343,7 +329,7 @@ public class ServerAccess {
 
     /**
      * Return resource from cached server
-     * 
+     *
      * @param resource to be located on cached server
      * @return string constructed from  resource
      * @throws IOException if connection can't be established or resource does not exist
@@ -354,7 +340,7 @@ public class ServerAccess {
 
     /**
      * utility method which can read bytes of any stream
-     * 
+     *
      * @param is stream to be read
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
@@ -372,8 +358,8 @@ public class ServerAccess {
 
     /**
      * utility method which can read from any stream as one long String
-     * 
-     * @param is stream to be read
+     *
+     * @param is       stream to be read
      * @param encoding encoding of this stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
@@ -395,7 +381,7 @@ public class ServerAccess {
 
     /**
      * utility method which can read bytes of resource from any url
-     * 
+     *
      * @param u full url to read from
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
@@ -425,12 +411,12 @@ public class ServerAccess {
      * @param u full url to read from
      * @return resource as string
      * @throws IOException if connection can't be established or resource does
-     * not exist
+     *                     not exist
      */
     private static String getResourceAsString(URL u) throws IOException {
         URLConnection connection = null;
         try {
-            connection = (HttpURLConnection) u.openConnection();
+            connection = u.openConnection();
             if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).setRequestMethod("GET");
             }
@@ -447,9 +433,9 @@ public class ServerAccess {
 
     /**
      * helping dummy  method to save String as file in UTF-8 encoding.
-     * 
+     *
      * @param content which will be saved as it is saved in this String
-     * @param f file to be saved. No warnings provided
+     * @param f       file to be saved. No warnings provided
      * @throws IOException
      */
     public static void saveFile(String content, File f) throws IOException {
@@ -458,33 +444,29 @@ public class ServerAccess {
 
 
     /**
-     *
      * @param resource relative resource to be opened in browser for current server instance.
      * @return result of browser run
-     *
      */
     public ProcessResult executeBrowser(String resource) throws Exception {
         return executeBrowser(getBrowserParams(), resource);
     }
 
     /**
-     *
      * @param resource relative resource to be opened in browser for current server instance.
-     * @param stdoutl listener for stdout
-     * @param stderrl listener for stderr
+     * @param stdoutl  listener for stdout
+     * @param stderrl  listener for stderr
      * @return result of browser run
-     *
      */
-    public ProcessResult executeBrowser(String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
+    public ProcessResult executeBrowser(String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
 
     private ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
-        return executeBrowser(otherargs, getUrlUponThisInstance(resource));        
+        return executeBrowser(otherargs, getUrlUponThisInstance(resource));
     }
-    
-     private ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
+
+    private ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
         rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
@@ -498,6 +480,7 @@ public class ServerAccess {
 
     /**
      * Create resource on http, on 'localhost' on port on which this cached instance is running
+     *
      * @param resource
      * @return
      * @throws MalformedURLException
@@ -509,42 +492,24 @@ public class ServerAccess {
 
     /**
      * Create resource on http, on 'localhost' on port on which this instance is running
+     *
      * @param instance of server to return the resource
      * @param resource relative path to resource to be loaded from specified instance
      * @return the absolute url
      * @throws MalformedURLException
      */
     private static URL getUrlUponInstance(ServerLauncher instance, String resource) throws MalformedURLException {
-       return instance.getUrl(resource);
+        return instance.getUrl(resource);
     }
 
 
-     public static ProcessResult executeProcess(final List<String> args) throws Exception {
-         return  executeProcess(args, null);
-     }
-
-    /**
-     * utility method to lunch process, get its stdout/stderr, its return value and to kill it if running to long (@see PROCESS_TIMEOUT)
-     *
-     *
-     * Small background:
-     * This method creates thread inside which exec will be executed. Then creates assassin thread with given timeout to kill the previously created thread if necessary.
-     * Starts assassin thread, starts process thread. Wait until process is running, then starts content readers.
-     * Closes input of process.
-     * Wait until process is running (no matter if it terminate itself (correctly or badly), or is terminated by its assassin.
-     * Construct result from read stdout, stderr, process return value, assassin successfully
-     *
-     * @param args binary with args to be executed
-     * @param dir optional, directory where this process will run
-     * @return what left from process - process itself, its stdout, stderr and return value and whether it was terminated by assassin.
-     * @throws Exception
-     */
-    private static ProcessResult executeProcess(final List<String> args, File dir) throws Exception {
-        return executeProcess(args, dir, null, null);
+    public static ProcessResult executeProcess(final List<String> args) throws Exception {
+        return executeProcess(args, null, null, null);
     }
 
     /**
      * Proceed message s to logging with request to reprint to System.err
+     *
      * @param s
      */
     public static void logErrorReprint(String s) {
@@ -553,6 +518,7 @@ public class ServerAccess {
 
     /**
      * Proceed message s to logging with request to reprint to System.out
+     *
      * @param s
      */
     public static void logOutputReprint(String s) {
@@ -561,6 +527,7 @@ public class ServerAccess {
 
     /**
      * Proceed message s to logging withhout request to reprint
+     *
      * @param s
      */
     public static void logNoReprint(String s) {
@@ -585,14 +552,15 @@ public class ServerAccess {
                 System.err.println(idded);
             }
         }
-        LoggingBottleneck.getDefaultLoggingBottleneck().logIntoPlaintextLog(idded, printToOut,printToErr);
-        LoggingBottleneck.getDefaultLoggingBottleneck().addToXmlLog(message,printToOut,printToErr,ste);
+        LoggingBottleneck.getDefaultLoggingBottleneck().logIntoPlaintextLog(idded, printToOut, printToErr);
+        LoggingBottleneck.getDefaultLoggingBottleneck().addToXmlLog(message, printToOut, printToErr, ste);
     }
 
-    public static void logException(Throwable t){
+    public static void logException(Throwable t) {
         logException(t, true);
     }
-    public static void logException(Throwable t, boolean print){
+
+    public static void logException(Throwable t, boolean print) {
         log(OutputController.exceptionToString(t), false, print);
     }
 
@@ -648,7 +616,7 @@ public class ServerAccess {
         //method we need (the test)  is highest from following class
         baseClass = stack[i].getClassName();
         for (; i < stack.length; i++) {
-            if(stack[i].getClassName().contains("$")){
+            if (stack[i].getClassName().contains("$")) {
                 continue;
             }
             if (!baseClass.equals(stack[i].getClassName())) {
@@ -661,11 +629,7 @@ public class ServerAccess {
     }
 
     private static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
-        return executeProcess(args, dir, stdoutl, stderrl,null);
-
-    }
-    private static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
-        return new ProcessWrapper(args, dir, stdoutl, stderrl, vars).execute();
+        return new ProcessWrapper(args, dir, stdoutl, stderrl, null).execute();
     }
 
 }

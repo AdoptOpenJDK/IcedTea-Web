@@ -103,11 +103,6 @@ public class ServerLauncher implements Runnable {
     }
 
     /**
-     * When redirect is set, the requests to this server will just redirect to
-     * the underlying ServerLauncher
-     */
-    private final ServerLauncher redirect = null;
-    /**
      * one of: 301, 302,303, 307, 308,
      */
     private final int redirectCode = 302;
@@ -119,7 +114,7 @@ public class ServerLauncher implements Runnable {
             serverSocket = new ServerSocket(port);
             while (running) {
                 TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
-                server.setRedirect(redirect);
+                server.setRedirect(null);
                 server.setRedirectCode(redirectCode);
                 server.setRequestsCounter(null);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
@@ -167,11 +162,7 @@ public class ServerLauncher implements Runnable {
     @Override
     public String toString() {
         try {
-            if (redirect != null) {
-                return getUrl() + " - " + super.toString() + "; redirecting via: " + redirectCode + " to " + redirect.toString();
-            } else {
-                return getUrl() + " - " + super.toString();
-            }
+            return getUrl() + " - " + super.toString();
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         }

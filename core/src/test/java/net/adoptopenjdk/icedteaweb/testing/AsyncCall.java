@@ -38,7 +38,7 @@ public class AsyncCall<T> {
 
     /* Chains construction + start for convenience */
     public static <T> AsyncCall<T> startWithTimeOut(Callable<T> callable, long timeout) {
-        AsyncCall<T> asyncCall = new AsyncCall<T>(callable, timeout);
+        AsyncCall<T> asyncCall = new AsyncCall<>(callable, timeout);
         asyncCall.start();
         return asyncCall;
     }

@@ -67,33 +67,33 @@ public class BrowserFactory {
      */
     public BrowserFactory(String browsers) {
         if (browsers == null) {
-            configuredBrowsers = new ArrayList<Browser>(0);
+            configuredBrowsers = new ArrayList<>(0);
         } else {
             String[] s = browsers.split(File.pathSeparator);
-            configuredBrowsers = new ArrayList<Browser>(s.length);
-            for (int i = 0; i < s.length; i++) {
-                String string = s[i];
+            configuredBrowsers = new ArrayList<>(s.length);
+            for (final String value : s) {
+                String string = value;
                 String[] p = string.split("/");
                 if (p.length > 1) {
                     string = p[p.length - 1];
                 }
                 if (string.equals(Browsers.chromiumBrowser.toString())) {
-                    configuredBrowsers.add(new Chromium(s[i]));
+                    configuredBrowsers.add(new Chromium(value));
                 }
                 if (string.equals(Browsers.googleChrome.toString())) {
-                    configuredBrowsers.add(new Chrome(s[i]));
+                    configuredBrowsers.add(new Chrome(value));
                 }
                 if (string.equals(Browsers.opera.toString())) {
-                    configuredBrowsers.add(new Opera(s[i]));
+                    configuredBrowsers.add(new Opera(value));
                 }
                 if (string.equals(Browsers.firefox.toString())) {
-                    configuredBrowsers.add(new Firefox(s[i]));
+                    configuredBrowsers.add(new Firefox(value));
                 }
                 if (string.equals(Browsers.epiphany.toString())) {
-                    configuredBrowsers.add(new Epiphany(s[i]));
+                    configuredBrowsers.add(new Epiphany(value));
                 }
                 if (string.equals(Browsers.midori.toString())) {
-                    configuredBrowsers.add(new Midory(s[i]));
+                    configuredBrowsers.add(new Midory(value));
                 }
             }
         }
@@ -101,8 +101,7 @@ public class BrowserFactory {
     }
 
     public Browser getBrowser(Browsers id) {
-        for (int i = 0; i < configuredBrowsers.size(); i++) {
-            Browser browser = configuredBrowsers.get(i);
+        for (Browser browser : configuredBrowsers) {
             if (browser.getID() == id) {
                 return browser;
             }
@@ -113,8 +112,8 @@ public class BrowserFactory {
     }
 
     public Browser getFirst() {
-        for (int i = 0; i < configuredBrowsers.size(); i++) {
-            return configuredBrowsers.get(i);
+        for (Browser configuredBrowser : configuredBrowsers) {
+            return configuredBrowser;
 
         }
         return null;
@@ -138,11 +137,11 @@ public class BrowserFactory {
      public List<Browsers> getBrowsers(Browsers[] testIn) {
         List<Browser> q = translateAnnotationSilently(testIn);
          if (q==null || q.isEmpty()){
-            List<Browsers> qq = new ArrayList<Browsers>(0);
+            List<Browsers> qq = new ArrayList<>(0);
                qq.add(Browsers.none);
                return qq;
             }
-        List<Browsers> qq = new ArrayList<Browsers>(q.size());
+        List<Browsers> qq = new ArrayList<>(q.size());
          for (Browser browser : q) {
              qq.add(browser.getID());
          }
@@ -158,7 +157,7 @@ public class BrowserFactory {
         if (testIn==null) {
             return null;
         }
-        List<Browser> r = new ArrayList<Browser>(configuredBrowsers.size());
+        List<Browser> r = new ArrayList<>(configuredBrowsers.size());
         for (Browsers b : testIn) {
             if (b == Browsers.all) {
                 if (getAllBrowsers().isEmpty()) {

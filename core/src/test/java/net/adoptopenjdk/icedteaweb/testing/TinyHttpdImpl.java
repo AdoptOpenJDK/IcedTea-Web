@@ -105,8 +105,7 @@ public class TinyHttpdImpl extends Thread {
             BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             DataOutputStream writer = new DataOutputStream(this.socket.getOutputStream());
             try {
-                final boolean canRun = true;
-                while (canRun) {
+                while (true) {
                     String line = reader.readLine();
                     if (line.length() < 1) {
                         break;

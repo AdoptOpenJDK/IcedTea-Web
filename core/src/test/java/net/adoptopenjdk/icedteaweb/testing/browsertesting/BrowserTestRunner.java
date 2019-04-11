@@ -81,7 +81,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                         // namely enumerated concrete browsers, so we want to pick up
                         // random one from those already enumerated
                         if (isBrowsersNoneSet(tib)) {
-                            testableBrowsers = Arrays.asList(new Browsers[]{testableBrowsers.get(new Random().nextInt(testableBrowsers.size()))});
+                            testableBrowsers = Arrays.asList(testableBrowsers.get(new Random().nextInt(testableBrowsers.size())));
                         }
                     } else if (mbr.equalsIgnoreCase("ignore")) {
                         testableBrowsers = BrowserFactory.getFactory().getBrowsers(new Browsers[]{Browsers.none});

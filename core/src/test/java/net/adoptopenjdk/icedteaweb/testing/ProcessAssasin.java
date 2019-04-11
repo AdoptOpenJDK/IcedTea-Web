@@ -157,7 +157,7 @@ public class ProcessAssasin extends Thread {
     private void destroyProcess() {
         try {
             killing = true;
-            destroyProcess(p, reactingProcess, false);
+            destroyProcess(p, reactingProcess);
         } finally {
             killed = true;
         }
@@ -173,19 +173,14 @@ public class ProcessAssasin extends Thread {
 
 
 
-    private static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess, boolean mercielessKill) {
+    private static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess) {
         Process p = pp.getP();
         try {
             Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
             String pid = (f.get(p)).toString();
 //            sigInt(pid);
-            if (!mercielessKill) {
                 sigTerm(pid);
-            } else {
-                sigKill(pid);
-                ServerAccess.log("Mercieless -9 kil was used!", true, true);
-            }
         } catch (Exception ex) {
             ServerAccess.logException(ex);
         } finally {
@@ -195,16 +190,12 @@ public class ProcessAssasin extends Thread {
         }
     }
 
-    private static void sigKill(String pid) throws Exception {
-        kill(pid, "SIGKILL");
-    }
-
     private static void sigTerm(String pid) throws Exception {
         kill(pid, "SIGTERM");
     }
 
     private static void kill(String pid, String signal) throws Exception {
-        List<String> ll = new ArrayList<String>(4);
+        List<String> ll = new ArrayList<>(4);
         ll.add("kill");
         ll.add("-s");
         ll.add(signal);

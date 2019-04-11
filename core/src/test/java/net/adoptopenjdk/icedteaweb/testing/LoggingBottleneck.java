@@ -131,7 +131,7 @@ public class LoggingBottleneck {
     synchronized  void addToXmlLog(String message, boolean printToOut, boolean printToErr, StackTraceElement ste) {
         Map<String, TestsLogs> classLog = processLogs.get(ste.getClassName());
         if (classLog == null) {
-            classLog = new HashMap<String, TestsLogs>(50);
+            classLog = new HashMap<>(50);
             processLogs.put(ste.getClassName(), classLog);
         }
         String methodBrowseredName = ste.getMethodName();
