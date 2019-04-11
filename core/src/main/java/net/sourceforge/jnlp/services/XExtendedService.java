@@ -16,12 +16,11 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-
-import javax.jnlp.ExtendedService;
-import javax.jnlp.FileContents;
 import java.io.File;
 import java.io.IOException;
+import javax.jnlp.ExtendedService;
+import javax.jnlp.FileContents;
+import net.sourceforge.jnlp.security.AccessType;
 
 /**
  * Implementation of ExtendedService

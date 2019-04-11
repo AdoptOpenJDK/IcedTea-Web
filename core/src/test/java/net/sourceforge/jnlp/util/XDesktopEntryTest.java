@@ -36,22 +36,6 @@
  */
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridgeTest;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.annotations.WindowsIssue;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +49,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.InformationDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridgeTest;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.WindowsIssue;
+import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class XDesktopEntryTest {
 

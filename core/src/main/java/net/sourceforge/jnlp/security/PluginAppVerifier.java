@@ -41,6 +41,7 @@ import java.security.cert.CertPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;

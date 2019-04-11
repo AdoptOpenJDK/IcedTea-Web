@@ -35,22 +35,6 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
-import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -59,6 +43,21 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
+import net.sourceforge.jnlp.InformationDesc;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

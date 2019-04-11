@@ -36,13 +36,13 @@ import javax.jnlp.ServiceManager;
 import javax.jnlp.SingleInstanceService;
 import javax.jnlp.UnavailableServiceException;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.SecurityDialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
