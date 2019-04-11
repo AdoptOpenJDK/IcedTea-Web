@@ -5,14 +5,12 @@
  * most complex was found:
 http://web.archive.org/web/20150523152453/https://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
  */
-package net.sourceforge.swing;
+package net.adoptopenjdk.icedteaweb.ui.swing;
 
-import javax.swing.JComponent;
-import javax.swing.RepaintManager;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
-import static net.sourceforge.swing.SwingUtils.trace;
+import javax.swing.JComponent;
+import javax.swing.RepaintManager;
 
 /**
  * For usage of this class, please refer to http://weblogs.java.net/blog/alexfromsun/archive/2006/02/debugging_swing.html
@@ -39,7 +37,7 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
      *
      * @param checkIsShowing true to only check showing components.
      */
-    public ThreadCheckingRepaintManager(boolean checkIsShowing) {
+    public ThreadCheckingRepaintManager(final boolean checkIsShowing) {
         super();
         this.checkIsShowing = checkIsShowing;
     }
@@ -62,29 +60,29 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
      *
      * @see #isCompleteCheck()
      */
-    public void setCompleteCheck(boolean completeCheck) {
+    public void setCompleteCheck(final boolean completeCheck) {
         this.completeCheck = completeCheck;
     }
 
     @Override
-    public synchronized void addInvalidComponent(JComponent jComponent) {
+    public synchronized void addInvalidComponent(final JComponent jComponent) {
         checkThreadViolations(jComponent);
         super.addInvalidComponent(jComponent);
     }
 
     @Override
-    public synchronized void addDirtyRegion(JComponent jComponent, int i, int i1, int i2, int i3) {
+    public synchronized void addDirtyRegion(final JComponent jComponent, final int x, final int y, final int width, final int height) {
         checkThreadViolations(jComponent);
-        super.addDirtyRegion(jComponent, i, i1, i2, i3);
+        super.addDirtyRegion(jComponent, x, y, width, height);
     }
 
-    private void checkThreadViolations(JComponent c) {
+    private void checkThreadViolations(final JComponent c) {
         if (!SwingUtils.isEventDispatchThread() && (completeCheck || checkIsShowing(c))) {
-            Exception exception = new Exception();
+            final Exception exception = new Exception();
             boolean repaint = false;
             boolean fromSwing = false;
-            StackTraceElement[] stackTrace = exception.getStackTrace();
-            for (StackTraceElement st : stackTrace) {
+            final StackTraceElement[] stackTrace = exception.getStackTrace();
+            for (final StackTraceElement st : stackTrace) {
                 if (repaint && st.getClassName().startsWith("javax.swing.")) {
                     fromSwing = true;
                 }
@@ -96,14 +94,14 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
                 //no problems here, since repaint() is thread safe
                 return;
             }
-            trace("----------Wrong Thread START");
-            trace(getStrackTraceAsString(exception));
-            trace("----------Wrong Thread END");
+            SwingUtils.trace("----------Wrong Thread START");
+            SwingUtils.trace(getStrackTraceAsString(exception));
+            SwingUtils.trace("----------Wrong Thread END");
         }
     }
 
     @SuppressWarnings({"SimplifiableIfStatement"})
-    private boolean checkIsShowing(JComponent c) {
+    private boolean checkIsShowing(final JComponent c) {
         if (this.checkIsShowing) {
             return c.isShowing();
         } else {
@@ -111,9 +109,9 @@ public final class ThreadCheckingRepaintManager extends RepaintManager {
         }
     }
 
-    private String getStrackTraceAsString(Exception e) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(byteArrayOutputStream);
+    private String getStrackTraceAsString(final Exception e) {
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final PrintStream printStream = new PrintStream(byteArrayOutputStream);
         e.printStackTrace(printStream);
         printStream.flush();
         return byteArrayOutputStream.toString();

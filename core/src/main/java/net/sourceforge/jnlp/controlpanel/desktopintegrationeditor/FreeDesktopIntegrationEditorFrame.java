@@ -39,7 +39,7 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.logging.ConsoleOutputPaneModel;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

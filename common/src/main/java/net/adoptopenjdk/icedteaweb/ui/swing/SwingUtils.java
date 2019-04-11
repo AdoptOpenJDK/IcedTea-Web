@@ -34,20 +34,19 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
-package net.sourceforge.swing;
+package net.adoptopenjdk.icedteaweb.ui.swing;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.JWindow;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.JWindow;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Swing / AWT utility class
