@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.awt.imagesearch;
 
+import net.adoptopenjdk.icedteaweb.testing.awt.ComponentFinder;
 import org.junit.Assert;
 import org.junit.Test;
 

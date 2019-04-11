@@ -38,7 +38,7 @@
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

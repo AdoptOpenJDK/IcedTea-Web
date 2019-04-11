@@ -37,9 +37,9 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.sourceforge.jnlp.PluginBridgeTest;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.annotations.Remote;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;

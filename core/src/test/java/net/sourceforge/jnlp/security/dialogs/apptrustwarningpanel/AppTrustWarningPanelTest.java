@@ -2,7 +2,7 @@ package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import org.junit.AfterClass;

@@ -1,4 +1,4 @@
-/* KeyboardActions.java
+/* MouseActions.java
 Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -36,76 +36,69 @@ exception statement from your version.
  */
 
 
-package net.sourceforge.jnlp.awt.awtactions;
+package net.adoptopenjdk.icedteaweb.testing.awt;
 
+import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
-public class KeyboardActions {
-    
+/**
+ * class MouseActions 
+ * 
+ * static methods for manipulating the mouse via AWT robot
+ */
+public class MouseActions {
     private static final int defaultDelay = 250;
+    
+    /**
+     * method click presses and releases given mouse keys
+     * with reasonable delay before the event
+     * 
+     * @param mouseKeyMask
+     * @param robot
+     * @param delayMs
+     */
+    public static void click(int mouseKeyMask, Robot robot, int delayMs){
+        robot.delay(delayMs);
+        robot.mousePress(mouseKeyMask);
+        robot.delay(delayMs);
+        robot.mouseRelease(mouseKeyMask);
+    }
 
     /**
-     * method writeText for simulating typing the 
-     * given String text by a user with delays 
-     * allowed characters in the text: 0-9, a-z, the space
-     * between the keystrokes
-     *  
-     * @param robot
-     * @param text
-     * @param delayMs
-     */
-    public static void writeText(Robot robot, String text, int delayMs){
-        for (int i = 0; i < text.length(); i++){
-            char c = text.charAt(i);        
-            typeKey(robot, keyFromChar(c), delayMs);    
-        }
-    }
-    
-    public static void writeText(Robot robot, String text){
-        writeText(robot,text, defaultDelay);
-    }
-    
-    /**
-     * method typeKey for pressing and releasing given key
-     * with a reasonable delay 
-     *
-     * @param robot
-     * @param key
-     * @param delayMs
-     */
-     
-    public static void typeKey(Robot robot, int key, int delayMs){
-        robot.delay(delayMs);
-        robot.keyPress(key);
-        robot.delay(delayMs);
-        robot.keyRelease(key);
-    }
-    
-    public static void typeKey(Robot robot, int key){
-        typeKey(robot, key, defaultDelay);
-    }
-    
-    /**
-     * method returning the KeyInput event int
-     * if the character is not from a-b, 0-9, the returned value is
-     * KeyEvent.VK_SPACE
      * 
-     * @param ch
-     * @return
+     * @param rectangle
+     * @param robot
+     * @param delayMs
      */
-    public static int keyFromChar(char ch){
-        int key;
-        
-        if( ('0' <= ch) && ('9' >= ch) ){
-            key = (ch - '0') + KeyEvent.VK_0; 
-        }else if( ( 'a' <= ch) && ('z' >= ch) ){
-            key = (ch - 'a') + KeyEvent.VK_A;
-        }else{
-            key = KeyEvent.VK_SPACE;
-        }
-        
-        return key;
+    public static void moveMouseToMiddle(Rectangle rectangle, Robot robot, int delayMs){
+        robot.delay(delayMs);
+        int x = rectangle.x + (rectangle.width/2);
+        int y = rectangle.y + (rectangle.height/2);
+        robot.mouseMove(x,y);
     }
     
+    /**
+      * method clickInside moves the mouse in the middle point
+     * of a given rectangle and clicks with reasonable delay
+
+     * 
+     * @param rectangle
+     * @param robot
+     * @param delayMs
+     */
+    public static void clickInside(int mouseKey, Rectangle rectangle, Robot robot, int delayMs){
+        moveMouseToMiddle(rectangle, robot, delayMs);
+        robot.delay(delayMs);
+        click(mouseKey, robot, delayMs);
+    }
+
+    
+    public static void clickInside(Rectangle rectangle, Robot robot, int delayMs){
+        clickInside(InputEvent.BUTTON1_MASK, rectangle, robot, delayMs);
+    }
+    
+    public static void clickInside(Rectangle rectangle, Robot robot){
+        clickInside(rectangle, robot, defaultDelay);
+    }
 }

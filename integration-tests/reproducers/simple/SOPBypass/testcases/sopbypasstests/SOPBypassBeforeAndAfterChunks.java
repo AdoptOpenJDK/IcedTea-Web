@@ -38,7 +38,7 @@ package sopbypasstests;
 
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;

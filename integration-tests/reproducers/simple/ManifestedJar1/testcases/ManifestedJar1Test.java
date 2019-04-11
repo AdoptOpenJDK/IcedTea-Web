@@ -37,7 +37,7 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.sourceforge.jnlp.runtime.Translator;
 import org.junit.Assert;
 import org.junit.Test;

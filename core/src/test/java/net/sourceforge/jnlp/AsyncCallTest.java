@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.testing.AsyncCall;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;

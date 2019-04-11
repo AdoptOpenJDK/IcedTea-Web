@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

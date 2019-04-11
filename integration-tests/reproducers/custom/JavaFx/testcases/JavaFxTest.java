@@ -38,8 +38,8 @@ exception statement from your version.
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
-import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 

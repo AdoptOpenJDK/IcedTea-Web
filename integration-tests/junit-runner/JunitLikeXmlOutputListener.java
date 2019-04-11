@@ -6,10 +6,10 @@
  * http://www.eclipse.org/legal/cpl-v10.html
  */
 
-import net.sourceforge.jnlp.annotations.Bug;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.annotations.Remote;
-import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import org.junit.internal.JUnitSystem;
 import org.junit.runner.Description;
 import org.junit.runner.Result;

@@ -37,9 +37,9 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.Bug;
-import net.sourceforge.jnlp.annotations.KnownToFail;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
 import org.junit.Test;
 
 import java.util.Arrays;
