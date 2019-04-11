@@ -37,8 +37,8 @@
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.Remote;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

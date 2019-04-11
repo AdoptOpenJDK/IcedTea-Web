@@ -35,21 +35,6 @@
  */
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.sourceforge.jnlp.JNLPSplashScreen;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.runtime.html.AppletExtractor;
-import net.sourceforge.jnlp.runtime.html.AppletParser;
-import net.sourceforge.jnlp.runtime.html.AppletsFilter;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.JFrame;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -59,6 +44,20 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JFrame;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.runtime.html.AppletExtractor;
+import net.sourceforge.jnlp.runtime.html.AppletParser;
+import net.sourceforge.jnlp.runtime.html.AppletsFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

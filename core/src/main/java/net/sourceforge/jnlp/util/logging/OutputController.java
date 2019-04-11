@@ -35,14 +35,6 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
-import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,6 +43,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.headers.Header;
+import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
+import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -287,7 +287,7 @@ public class OutputController {
         log(new JavaMessage(new Header(level, false), s));
     }
 
-    synchronized void log(MessageWithHeader l){
+    public synchronized void log(MessageWithHeader l){
         messageQue.add(l);
         this.notifyAll();
     }

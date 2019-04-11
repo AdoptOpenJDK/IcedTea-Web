@@ -38,15 +38,15 @@
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
-import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoErrorClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.Browser;
+import net.sourceforge.jnlp.browsertesting.BrowserFactory;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -61,7 +61,7 @@ import java.net.MalformedURLException;
 import java.util.AbstractMap;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest.server;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
 
 /**
  *

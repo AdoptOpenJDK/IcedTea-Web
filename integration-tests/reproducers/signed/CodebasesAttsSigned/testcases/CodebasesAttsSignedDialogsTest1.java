@@ -40,13 +40,13 @@ import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
-import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoErrorClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -72,7 +72,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import static net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest.server;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
 
 /**
  *

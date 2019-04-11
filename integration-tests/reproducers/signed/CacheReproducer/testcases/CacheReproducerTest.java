@@ -37,7 +37,7 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.tools.MessageProperties;
 import org.junit.AfterClass;

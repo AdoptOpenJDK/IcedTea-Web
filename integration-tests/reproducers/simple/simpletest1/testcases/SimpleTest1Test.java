@@ -38,7 +38,7 @@
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.StringBasedClosingListener;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;

@@ -40,9 +40,9 @@ import net.sourceforge.jnlp.ClosingListener;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.ServerLauncher;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 

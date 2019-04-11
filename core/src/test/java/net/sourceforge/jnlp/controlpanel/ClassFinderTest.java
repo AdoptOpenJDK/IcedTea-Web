@@ -35,13 +35,13 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
-import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.ClassFinder;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ClassFinderTest {
 
@@ -61,7 +61,7 @@ public class ClassFinderTest {
         List<Class<? extends RememberableDialog>> l = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
         Assert.assertTrue(l.size() == 7);
         for (Class<? extends RememberableDialog> l1 : l) {
-            Assert.assertTrue(l1.getName().startsWith("net.sourceforge.jnlp.security.dialogs."));
+            Assert.assertTrue(l1.getName().startsWith("net.adoptopenjdk.icedteaweb.client.parts.dialogs.security."));
         }
         for (int i = 0; i < kknown.size(); i++) {
             for (int j = 0; j < l.size(); j++) {

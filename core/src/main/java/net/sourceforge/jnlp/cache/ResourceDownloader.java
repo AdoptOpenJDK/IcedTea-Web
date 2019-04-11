@@ -1,20 +1,5 @@
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.adoptopenjdk.icedteaweb.http.HttpUtils;
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.runtime.Boot;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.ConnectionFactory;
-import net.sourceforge.jnlp.security.SecurityDialogs;
-import net.sourceforge.jnlp.security.dialogs.InetSecurity511Panel;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -34,6 +19,20 @@ import java.util.Map;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;

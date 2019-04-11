@@ -36,14 +36,14 @@ exception statement from your version.
  */
 
 import net.sourceforge.jnlp.ProcessResult;
-import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
-import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
 import net.sourceforge.jnlp.awt.AWTFrameworkException;
 import net.sourceforge.jnlp.awt.AWTHelper;
 import net.sourceforge.jnlp.awt.imagesearch.ComponentNotFoundException;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.Rule;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.Rule;
 import org.junit.Assert;
 import org.junit.Test;
 

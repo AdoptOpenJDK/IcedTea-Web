@@ -36,14 +36,14 @@
  */
 
 import net.sourceforge.jnlp.ProcessResult;
-import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.StringBasedClosingListener;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest.server;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
 
 public class jsengineSignedTest extends BrowserTest{
 

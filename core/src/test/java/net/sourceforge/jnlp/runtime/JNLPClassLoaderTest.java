@@ -35,22 +35,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime;
 
-import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.LaunchException;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
-import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -58,6 +42,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.sourceforge.jnlp.JARDesc;
+import net.sourceforge.jnlp.LaunchException;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import static net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils.assertNoFileLeak;
 import static org.junit.Assert.assertEquals;

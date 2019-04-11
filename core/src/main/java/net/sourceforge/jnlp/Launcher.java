@@ -16,24 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.AppletInstance;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.services.InstanceExistsException;
-import net.sourceforge.jnlp.services.ServiceUtil;
-import net.sourceforge.jnlp.splashscreen.SplashUtils;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.awt.SunToolkit;
-
-import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
 import java.applet.AppletStub;
 import java.awt.Container;
@@ -45,6 +27,23 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.swing.text.html.parser.ParserDelegator;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.AppletInstance;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.services.InstanceExistsException;
+import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.StreamUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.awt.SunToolkit;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -68,7 +67,7 @@ public class Launcher {
     // defines class Launcher.BgRunner, Launcher.TgThread
 
     /** shared thread group */
-    /*package*/static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
+    public static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
     /** the handler */
     private LaunchHandler handler = null;

@@ -37,12 +37,12 @@
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
-import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.sourceforge.jnlp.annotations.TestInBrowsers;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.tools.DeploymentPropertiesModifier;

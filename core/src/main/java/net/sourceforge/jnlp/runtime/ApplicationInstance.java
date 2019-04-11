@@ -16,26 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PropertyDesc;
-import net.sourceforge.jnlp.SecurityDesc;
-import net.sourceforge.jnlp.ShortcutDesc;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.event.ApplicationEvent;
-import net.sourceforge.jnlp.event.ApplicationListener;
-import net.sourceforge.jnlp.security.SecurityDialogs;
-import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.util.GenericDesktopEntry;
-import net.sourceforge.jnlp.util.WeakList;
-import net.sourceforge.jnlp.util.XDesktopEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.awt.AppContext;
-
-import javax.swing.event.EventListenerList;
 import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -46,6 +26,25 @@ import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import javax.swing.event.EventListenerList;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PropertyDesc;
+import net.sourceforge.jnlp.SecurityDesc;
+import net.sourceforge.jnlp.ShortcutDesc;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.event.ApplicationEvent;
+import net.sourceforge.jnlp.event.ApplicationListener;
+import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.util.GenericDesktopEntry;
+import net.sourceforge.jnlp.util.WeakList;
+import net.sourceforge.jnlp.util.XDesktopEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.awt.AppContext;
 
 /**
  * Represents a running instance of an application described in a

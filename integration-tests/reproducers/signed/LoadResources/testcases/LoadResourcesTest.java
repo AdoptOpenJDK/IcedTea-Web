@@ -38,8 +38,8 @@
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.annotations.Bug;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 

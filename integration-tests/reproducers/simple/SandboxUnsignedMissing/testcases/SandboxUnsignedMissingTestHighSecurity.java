@@ -2,10 +2,10 @@
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoErrorClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.AutoOkClosingListener;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.StringBasedClosingListener;
+import net.sourceforge.jnlp.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.closinglisteners.AutoErrorClosingListener;
+import net.sourceforge.jnlp.closinglisteners.AutoOkClosingListener;
+import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
@@ -18,7 +18,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest.server;
+import static net.sourceforge.jnlp.browsertesting.BrowserTest.server;
 
 /* AppletTest.java
  Copyright (C) 2011 Red Hat, Inc.
