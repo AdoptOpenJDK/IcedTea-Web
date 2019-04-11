@@ -9,7 +9,7 @@ public enum NumberOfArguments {
     NONE_OR_ONE("NOAnonorone"),
     EVEN_NUMBER_SUPPORTS_EQUALS_CHAR("NOAevennumber");
 
-    String messageKey;
+    final String messageKey;
 
     NumberOfArguments(String messageKey) {
         this.messageKey = messageKey;

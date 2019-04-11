@@ -41,29 +41,29 @@ import java.util.EnumSet;
 public class YesCancel extends Yes {
 
     public static YesCancel yes() {
-        return new YesCancel(BasicDialogValue.Primitive.YES);
+        return new YesCancel(Primitive.YES);
     }
  
     public static YesCancel cancel() {
-        return new YesCancel(BasicDialogValue.Primitive.CANCEL);
+        return new YesCancel(Primitive.CANCEL);
     }
 
     public static YesCancel readValue(String s) {
-        return new YesCancel(BasicDialogValue.Primitive.valueOf(s));
+        return new YesCancel(Primitive.valueOf(s));
     }
 
-    protected YesCancel(BasicDialogValue.Primitive valueOf) {
+    protected YesCancel(Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
     public int getButtonIndex() {
         //use rather NO, however nonsense it seems?
-        return BasicDialogValue.Primitive.CANCEL.getLegacyButton();
+        return Primitive.CANCEL.getLegacyButton();
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.YesCancel;
     }
 

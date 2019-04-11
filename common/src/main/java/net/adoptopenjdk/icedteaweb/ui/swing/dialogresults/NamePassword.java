@@ -38,8 +38,8 @@ package net.adoptopenjdk.icedteaweb.ui.swing.dialogresults;
 
 public class NamePassword implements DialogResult {
 
-    String name;
-    char[] password;
+    private final String name;
+    private final char[] password;
 
     public NamePassword(String name, char[] password) {
         this.name = name;
@@ -48,7 +48,7 @@ public class NamePassword implements DialogResult {
 
     @Override
     public int getButtonIndex() {
-        return BasicDialogValue.Primitive.NO.getLegacyButton();
+        return Primitive.NO.getLegacyButton();
 
     }
 

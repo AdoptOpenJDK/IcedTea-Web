@@ -37,6 +37,19 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.awt.AppContext;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -44,19 +57,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.awt.AppContext;
 
 /**
  * Handles {@link SecurityDialogMessage}s and shows appropriate security
@@ -206,7 +206,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                     message.userResponse = dialog.readFromStdIn(s);
                     keepGoing = false;
                     try {
-                        String value = BasicDialogValue.writeNUll();
+                        String value = "";
                         if (message.userResponse != null) {
                             value = message.userResponse.writeValue();
                         }

@@ -71,17 +71,6 @@ public class ImageInputStreamIco {
     public List<BufferedImage> getImages() {
         return Collections.unmodifiableList(images);
     }
-    
-    
-
-    private static void readMask(IcoHeaderEntry e, ImageInputStream src1) throws IOException {
-        //acording to spec, behind img bytes, should be another bytes, with AND bitmap.Hoewer, I had not found them.
-        //however, that means, that transaprency is lost... But bit offsets mathces.. so...
-        //IcoHeader.IcoHeaderEntry q = e.provideMonochromeHeader();
-        //src1.getStreamPosition();
-        //byte[] mask = new byte[q.sizeInBytes];
-        //src1.readFully(mask);
-    }
 
     private static BufferedImage readImage(IcoHeaderEntry e, ImageInputStream src1) throws IOException {
         BufferedImage image;
@@ -97,7 +86,7 @@ public class ImageInputStreamIco {
         } catch (EOFException ex) {
             //some icons do not honour that 0 is 256. Retrying
             if (e.getColorCount() != 0) {
-                e.setColorCount(0);
+                e.resetColorCount();
                 image = parse(img, e);
                 //readMask(e, src1);
             } else {

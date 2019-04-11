@@ -69,20 +69,15 @@ public class IcoHeaderEntry {
         fileOffset = src.readInt();
     }
 
-    private IcoHeaderEntry(int width, int height, int colorCount, int planes, int bitCount, int sizeInBytes, int fileOffset) {
+    private IcoHeaderEntry(int width, int height, int planes, int sizeInBytes, int fileOffset) {
         this.width = width;
         this.height = height;
-        this.colorCount = colorCount;
+        this.colorCount = 1;
         this.reserved = 0;
         this.planes = planes;
-        this.bitCount = bitCount;
+        this.bitCount = 1;
         this.sizeInBytes = sizeInBytes;
         this.fileOffset = fileOffset;
-    }
-
-    private IcoHeaderEntry provideMonochromeHeader() {
-        //each bit in byte stores 8 pixels values
-        return new IcoHeaderEntry(width, height, 1, planes, 1, width * height / 8, fileOffset + sizeInBytes);
     }
 
     private void isIcoHeader() throws IcoException {
@@ -99,10 +94,9 @@ public class IcoHeaderEntry {
     }
 
     /**
-     * @param colorCount the colorCount to set
      */
-    void setColorCount(int colorCount) {
-        this.colorCount = colorCount;
+    void resetColorCount() {
+        this.colorCount = 0;
     }
 
     /**

@@ -41,8 +41,8 @@ import java.util.EnumSet;
 public class Yes extends BasicDialogValue.PrimitivesSubset {
 
     public static Yes readValue(String s) {
-        BasicDialogValue.Primitive x = BasicDialogValue.Primitive.valueOf(s);
-        if (x == BasicDialogValue.Primitive.YES) {
+        Primitive x = Primitive.valueOf(s);
+        if (x == Primitive.YES) {
             return new Yes();
         }
         throw new RuntimeException("Expected YES and only YES. Got" + x);
@@ -51,7 +51,7 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
 
 
     public Yes() {
-        super(BasicDialogValue.Primitive.YES);
+        super(Primitive.YES);
     }
     
     /**
@@ -59,17 +59,17 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
      * Overriders have to override getAllowedValues to work.
      * This one fails with anything else then Yes
      */
-    protected Yes(BasicDialogValue.Primitive p) {
+    protected Yes(Primitive p) {
         super(p);
     }
 
     @Override
     public int getButtonIndex() {
-        return BasicDialogValue.Primitive.YES.getLegacyButton();
+        return Primitive.YES.getLegacyButton();
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.Yes;
     }
 

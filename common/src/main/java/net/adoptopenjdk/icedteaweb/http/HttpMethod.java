@@ -11,5 +11,5 @@ public enum HttpMethod {
     PUT,
     OPTIONS,
     DELETE,
-    TRACE;
+    TRACE
 }

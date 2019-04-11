@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.ShortcutDesc;
@@ -47,7 +48,6 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
@@ -286,7 +286,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(BasicDialogValue.Primitive.YES));
+                parent.setValue(getModifier(Primitive.YES));
                 parent.getViwableDialog().dispose();
             }
         });
@@ -294,7 +294,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(BasicDialogValue.Primitive.NO));
+                parent.setValue(getModifier(Primitive.NO));
                 parent.getViwableDialog().dispose();
             }
         });
@@ -315,7 +315,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
 
     }
 
-    private AccessWarningPaneComplexReturn getModifier(BasicDialogValue.Primitive button) {
+    private AccessWarningPaneComplexReturn getModifier(Primitive button) {
         AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(button);
         if (desktopCheck != null) {
             if (htmlPanelDesktop != null) {
@@ -418,13 +418,13 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             r.setBrowser((String) browsers.getSelectedItem());
             r.setFixHref(fix.isSelected());
             if (browser.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
             } else if (jnlpGen.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP);
+                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP);
             } else if (jnlpHref.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF);
+                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF);
             } else if (javawsHtml.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML);
+                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML);
             }
             return r;
         }
@@ -514,7 +514,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT){
             return Translator.R("AWPstdoutHint1") + PlainTextFormatter.getLineSeparator()
                     + Translator.R("AWPstdoutHint2") + PlainTextFormatter.getLineSeparator()
-                    + Translator.R("AWPstdoutHint3", AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.allValues()) + PlainTextFormatter.getLineSeparator()
+                    + Translator.R("AWPstdoutHint3", AccessWarningPaneComplexReturn.Shortcut.allValues()) + PlainTextFormatter.getLineSeparator()
                     + Translator.R("AWPstdoutHint1") + PlainTextFormatter.getLineSeparator();
         } else {
             return YesNo.yes().getAllowedValues().toString();

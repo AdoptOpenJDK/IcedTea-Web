@@ -259,12 +259,12 @@ public class ApplicationInstance {
                 if (sd.onDesktop()){
                     r.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
                     r.getDekstop().setBrowser(XDesktopEntry.getBrowserBin());
-                    r.getDekstop().setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+                    r.getDekstop().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
                 if (sd.getMenu() != null){
                     r.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(true));
                     r.getMenu().setBrowser(XDesktopEntry.getBrowserBin());
-                    r.getMenu().setShortcutType(AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER);
+                    r.getMenu().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
             }
             return r;

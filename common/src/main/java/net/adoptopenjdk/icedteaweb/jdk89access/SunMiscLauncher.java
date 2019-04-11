@@ -49,6 +49,7 @@ public class SunMiscLauncher {
     private static final String CLASS_SUN_MISC_LAUNCHER = "sun.misc.Launcher";
     private static final String METHOD_GET_CLASS_LOADER = "getClassLoader";
 
+    @SuppressWarnings("unchecked")
     public static ImageIcon getSecureImageIcon(final String resource) {
         try {
             final Class clazz = Class.forName(CLASS_SUN_MISC_LAUNCHER);

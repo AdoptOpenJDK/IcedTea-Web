@@ -318,7 +318,7 @@ public class XDesktopEntryTest {
         Assert.assertEquals(r,commonResult);
     }
 
-    private void testHtmlOccurences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.ShortcutResult.Shortcut type, int occurences) throws Exception {
+    private void testHtmlOccurences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.Shortcut type, int occurences) throws Exception {
         JNLPRuntime.setHtml(html);
         setIsWebstart(javaws);
         JNLPFile jnlpf = new DummyJnlpWithTitle();
@@ -334,10 +334,10 @@ public class XDesktopEntryTest {
 
     @Test
     public void htmlSwitchCorrectAccordingToJnlpRuntimeAndShortcutType() throws Exception {
-        AccessWarningPaneComplexReturn.ShortcutResult.Shortcut[] v = AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.values();
-        for (AccessWarningPaneComplexReturn.ShortcutResult.Shortcut w : v) {
+        AccessWarningPaneComplexReturn.Shortcut[] v = AccessWarningPaneComplexReturn.Shortcut.values();
+        for (AccessWarningPaneComplexReturn.Shortcut w : v) {
             int var1 = 0;
-            if (w == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
+            if (w == AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML) {
                 var1 = 1;
             }
             testHtmlOccurences(true, true, true, w, 1);

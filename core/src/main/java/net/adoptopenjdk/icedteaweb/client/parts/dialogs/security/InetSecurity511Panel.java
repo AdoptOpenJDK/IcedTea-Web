@@ -38,10 +38,10 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancelSkip;
 import org.slf4j.Logger;
@@ -159,7 +159,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
     //skip is only for commandline to pass skip to the static field
     public DialogResult readFromStdIn(String what) {
         YesCancelSkip l = YesCancelSkip.readValue(what);
-        if (l.compareValue(BasicDialogValue.Primitive.SKIP)) {
+        if (l.compareValue(Primitive.SKIP)) {
             skip = true;
             l = YesCancelSkip.yes();
         }

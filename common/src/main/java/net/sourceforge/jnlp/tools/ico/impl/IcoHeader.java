@@ -51,10 +51,9 @@ public class IcoHeader {
     private final int type; //should be 1 (0 is for cusrsor?)
     final int countOfIcons;
     final List<IcoHeaderEntry> entries; //size 16*countOfIcons bytes
-    private final ByteOrder originalOrder;
 
     public IcoHeader(ImageInputStream src) throws IOException, IcoException {
-        originalOrder = src.getByteOrder();
+        final ByteOrder originalOrder = src.getByteOrder();
         try {
             src.setByteOrder(ByteOrder.LITTLE_ENDIAN);
             reserved = src.readUnsignedShort();

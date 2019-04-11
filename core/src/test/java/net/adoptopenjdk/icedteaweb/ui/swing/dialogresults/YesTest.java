@@ -36,8 +36,6 @@
  */
 package net.adoptopenjdk.icedteaweb.ui.swing.dialogresults;
 
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,7 +52,7 @@ public class YesTest {
     }
 
     public void yesReadOk() {
-        Yes yy = Yes.readValue(BasicDialogValue.Primitive.YES.toString());
+        Yes yy = Yes.readValue(Primitive.YES.toString());
 
     }
 
@@ -65,17 +63,17 @@ public class YesTest {
     }
       @Test(expected = Exception.class)
     public void yesReadNonsense2() {
-        Yes yy = Yes.readValue(BasicDialogValue.Primitive.CANCEL.toString());
+        Yes yy = Yes.readValue(Primitive.CANCEL.toString());
 
     }
     @Test(expected = Exception.class)
     public void yesReadNonsense3() {
-        Yes yy = Yes.readValue(BasicDialogValue.Primitive.NO.toString());
+        Yes yy = Yes.readValue(Primitive.NO.toString());
     }
     
     @Test(expected = Exception.class)
     public void yesReadNonsense4() {
-        Yes yy = Yes.readValue(BasicDialogValue.Primitive.SANDBOX.toString());
+        Yes yy = Yes.readValue(Primitive.SANDBOX.toString());
 
     }
 }
