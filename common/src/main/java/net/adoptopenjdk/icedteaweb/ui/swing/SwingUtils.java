@@ -44,7 +44,7 @@ import javax.swing.JWindow;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
