@@ -41,7 +41,7 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 public class Chrome extends MozillaFamilyLinuxBrowser {
 
-    public Chrome(String bin) {
+    public Chrome(final String bin) {
         super(bin);
     }
 

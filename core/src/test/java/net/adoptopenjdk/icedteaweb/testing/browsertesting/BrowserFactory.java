@@ -65,11 +65,11 @@ public class BrowserFactory {
     /**
      * This is public just for testing purposes!
      */
-    public BrowserFactory(String browsers) {
+    public BrowserFactory(final String browsers) {
         if (browsers == null) {
             configuredBrowsers = new ArrayList<>(0);
         } else {
-            String[] s = browsers.split(File.pathSeparator);
+            final String[] s = browsers.split(File.pathSeparator);
             configuredBrowsers = new ArrayList<>(s.length);
             for (final String value : s) {
                 String string = value;
@@ -100,8 +100,8 @@ public class BrowserFactory {
 
     }
 
-    public Browser getBrowser(Browsers id) {
-        for (Browser browser : configuredBrowsers) {
+    public Browser getBrowser(final Browsers id) {
+        for (final Browser browser : configuredBrowsers) {
             if (browser.getID() == id) {
                 return browser;
             }
@@ -112,7 +112,7 @@ public class BrowserFactory {
     }
 
     public Browser getFirst() {
-        for (Browser configuredBrowser : configuredBrowsers) {
+        for (final Browser configuredBrowser : configuredBrowsers) {
             return configuredBrowser;
 
         }
@@ -135,14 +135,14 @@ public class BrowserFactory {
         return getBrowsers(tib.testIn());
     }
      public List<Browsers> getBrowsers(Browsers[] testIn) {
-        List<Browser> q = translateAnnotationSilently(testIn);
+         final List<Browser> q = translateAnnotationSilently(testIn);
          if (q==null || q.isEmpty()){
-            List<Browsers> qq = new ArrayList<>(0);
+             final List<Browsers> qq = new ArrayList<>(0);
                qq.add(Browsers.none);
                return qq;
             }
-        List<Browsers> qq = new ArrayList<>(q.size());
-         for (Browser browser : q) {
+         final List<Browsers> qq = new ArrayList<>(q.size());
+         for (final Browser browser : q) {
              qq.add(browser.getID());
          }
          return qq;
@@ -153,12 +153,12 @@ public class BrowserFactory {
      * @param testIn Bbrowsers which should be transformed to list of Browser
      * @return all matching browser, if browser do not exists, this is ignored and run is silently continued
      */
-    private List<Browser> translateAnnotationSilently(Browsers[] testIn) {
+    private List<Browser> translateAnnotationSilently(final Browsers[] testIn) {
         if (testIn==null) {
             return null;
         }
-        List<Browser> r = new ArrayList<>(configuredBrowsers.size());
-        for (Browsers b : testIn) {
+        final List<Browser> r = new ArrayList<>(configuredBrowsers.size());
+        for (final Browsers b : testIn) {
             if (b == Browsers.all) {
                 if (getAllBrowsers().isEmpty()) {
                     ServerAccess.logErrorReprint("You try to add all browsers, but there is none");
@@ -166,14 +166,14 @@ public class BrowserFactory {
                     r.addAll(getAllBrowsers());
                 }
             } else if (b == Browsers.one) {
-                Browser bb = getRandom();
+                final Browser bb = getRandom();
                 if (bb == null) {
                     ServerAccess.logErrorReprint("You try to add random browser, but there is none");
                 } else {
                     r.add(bb);
                 }
             } else {
-                Browser bb = getBrowser(b);
+                final Browser bb = getBrowser(b);
                 if (bb == null) {
                     ServerAccess.logErrorReprint("You try to add " + b.toString() + " browser, but it do not exists");
                 } else {

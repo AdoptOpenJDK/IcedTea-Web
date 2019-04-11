@@ -18,34 +18,34 @@ import java.util.Locale;
 public class DummyJNLPFileWithJar extends JNLPFile {
 
     /* Create a JARDesc for the given URL location */
-    private static JARDesc makeJarDesc(URL jarLocation, boolean main) {
+    private static JARDesc makeJarDesc(final URL jarLocation, final boolean main) {
         return new JARDesc(jarLocation, new Version("1"), null, false,main, false,false);
     }
 
     private final JARDesc[] jarDescs;
     private final URL[] jarFiles;
 
-    public DummyJNLPFileWithJar(File... jarFiles) throws MalformedURLException {
+    public DummyJNLPFileWithJar(final File... jarFiles) throws MalformedURLException {
         this(-1, jarFiles);
     }
     
-    public DummyJNLPFileWithJar(URL codebaseRewritter, URL... jarFiles) {
+    public DummyJNLPFileWithJar(final URL codebaseRewritter, final URL... jarFiles) {
         this(-1, codebaseRewritter, jarFiles);
     }
-    public DummyJNLPFileWithJar(int main, File... jarFiles) throws MalformedURLException {
+    public DummyJNLPFileWithJar(final int main, final File... jarFiles) throws MalformedURLException {
         this(main, jarFiles[0].getParentFile().toURI().toURL(), filesToUrls(jarFiles));
 
     }
     
-    private static URL[] filesToUrls(File[] f) throws MalformedURLException{
-        URL[] r = new URL[f.length];
+    private static URL[] filesToUrls(final File[] f) throws MalformedURLException{
+        final URL[] r = new URL[f.length];
         for (int i = 0; i < f.length; i++) {
             r[i]=f[i].toURI().toURL();
         }
         return r;
     }
     
-    private DummyJNLPFileWithJar(int main, URL codebaseRewritter, URL... jarFiles) {
+    private DummyJNLPFileWithJar(final int main, final URL codebaseRewritter, final URL... jarFiles) {
         codeBase = codebaseRewritter;
         this.jarFiles = jarFiles;
         jarDescs = new JARDesc[jarFiles.length];
@@ -73,8 +73,8 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
     @Override
     public ResourcesDesc getResources() {
-        ResourcesDesc localResources = new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
-        for (JARDesc j : jarDescs) {
+        final ResourcesDesc localResources = new ResourcesDesc(null, new Locale[0], new String[0], new String[0]);
+        for (final JARDesc j : jarDescs) {
             localResources.addResource(j);            
         }
         return localResources;
@@ -89,7 +89,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         return codeBase;
     }
 
-    public void setInfo(List<InformationDesc> info) {
+    public void setInfo(final List<InformationDesc> info) {
         this.info = info;
     }
     

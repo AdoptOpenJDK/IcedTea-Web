@@ -41,7 +41,7 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 public class Midory extends MozillaFamilyLinuxBrowser {
 
-    public Midory(String bin) {
+    public Midory(final String bin) {
         super(bin);
     }
 

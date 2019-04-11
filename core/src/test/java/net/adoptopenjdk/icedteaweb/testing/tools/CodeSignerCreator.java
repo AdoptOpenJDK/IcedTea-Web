@@ -58,11 +58,11 @@ public class CodeSignerCreator {
      * @return An X509 certificate setup with properties using the specified parameters.
      * @throws Exception
      */
-    private static X509Certificate createCert(String dname, Date notBefore, int validity)
+    private static X509Certificate createCert(final String dname, final Date notBefore, final int validity)
             throws Exception {
-        int keysize = 2048;
-        String keyAlgName = "RSA";
-        String sigAlgName = "SHA1withRSA";
+        final int keysize = 2048;
+        final String keyAlgName = "RSA";
+        final String sigAlgName = "SHA1withRSA";
 
         if (dname == null)
             throw new Exception("Required DN is null. Please specify cert Domain Name via dname");
@@ -72,22 +72,22 @@ public class CodeSignerCreator {
             throw new Exception("Required validity is negative. Please specify the number of days for which the cert is valid after the start date.");
 
         // KeyTool#doGenKeyPair
-        X500Name x500Name = new X500Name(dname);
+        final X500Name x500Name = new X500Name(dname);
 
-        KeyPair keyPair = new KeyPair(keyAlgName, sigAlgName, keysize);
-        PrivateKey privKey = keyPair.getPrivateKey();
+        final KeyPair keyPair = new KeyPair(keyAlgName, sigAlgName, keysize);
+        final PrivateKey privKey = keyPair.getPrivateKey();
 
-        X509Certificate oldCert = keyPair.getSelfCertificate(x500Name, notBefore, validity);
+        final X509Certificate oldCert = keyPair.getSelfCertificate(x500Name, notBefore, validity);
 
         // KeyTool#doSelfCert
-        byte[] encoded = oldCert.getEncoded();
+        final byte[] encoded = oldCert.getEncoded();
         X509CertImpl certImpl = new X509CertImpl(encoded);
         X509CertInfo certInfo = (X509CertInfo) certImpl.get(X509CertImpl.NAME
                 + "." + X509CertImpl.INFO);
 
-        Date notAfter = new Date(notBefore.getTime() + validity*1000L*24L*60L*60L);
+        final Date notAfter = new Date(notBefore.getTime() + validity*1000L*24L*60L*60L);
 
-        CertificateValidity interval = new CertificateValidity(notBefore,
+        final CertificateValidity interval = new CertificateValidity(notBefore,
                 notAfter);
 
         certInfo.set(X509CertInfo.VALIDITY, interval);
@@ -102,7 +102,7 @@ public class CodeSignerCreator {
         // outer sigalg and use it to set the inner sigalg
         X509CertImpl newCert = new X509CertImpl(certInfo);
         newCert.sign(privKey, sigAlgName);
-        AlgorithmId sigAlgid = (AlgorithmId)newCert.get(X509CertImpl.SIG_ALG);
+        final AlgorithmId sigAlgid = (AlgorithmId)newCert.get(X509CertImpl.SIG_ALG);
         certInfo.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, sigAlgid);
 
         certInfo.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
@@ -129,16 +129,16 @@ public class CodeSignerCreator {
      * @param validity The number of days the certificate is valid after notBefore.
      * @return A code signer with the properties passed through its parameters.
      */
-    public static CodeSigner getOneCodeSigner(String domainName, Date notBefore, int validity)
+    public static CodeSigner getOneCodeSigner(final String domainName, final Date notBefore, final int validity)
             throws Exception {
-        X509Certificate jarEntryCert = createCert(domainName, notBefore, validity);
+        final X509Certificate jarEntryCert = createCert(domainName, notBefore, validity);
 
-        ArrayList<X509Certificate> certs = new ArrayList<>(1);
+        final ArrayList<X509Certificate> certs = new ArrayList<>(1);
         certs.add(jarEntryCert);
 
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        CertPath certPath = cf.generateCertPath(certs);
-        Timestamp certTimestamp = new Timestamp(jarEntryCert.getNotBefore(), certPath);
+        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final CertPath certPath = cf.generateCertPath(certs);
+        final Timestamp certTimestamp = new Timestamp(jarEntryCert.getNotBefore(), certPath);
         return new CodeSigner(certPath, certTimestamp);
     }
 
@@ -152,17 +152,17 @@ public class CodeSignerCreator {
 
         private /* CertAndKeyGen */ Object keyPair;
 
-        public KeyPair(String keyAlgName, String sigAlgName, int keySize) {
+        public KeyPair(final String keyAlgName, final String sigAlgName, final int keySize) {
             try {
                 // keyPair = new CertAndKeyGen(keyAlgName, sigAlgName);
-                Class<?> certAndKeyGenClass = Class.forName(getCertAndKeyGenClass());
-                Constructor<?> constructor = certAndKeyGenClass.getDeclaredConstructor(String.class, String.class);
+                final Class<?> certAndKeyGenClass = Class.forName(getCertAndKeyGenClass());
+                final Constructor<?> constructor = certAndKeyGenClass.getDeclaredConstructor(String.class, String.class);
                 keyPair = constructor.newInstance(keyAlgName, sigAlgName);
 
                 // keyPair.generate(keySize);
-                Method generate = certAndKeyGenClass.getMethod("generate", int.class);
+                final Method generate = certAndKeyGenClass.getMethod("generate", int.class);
                 generate.invoke(keyPair, keySize);
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException |
+            } catch (final ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException |
                     IllegalAccessException | IllegalArgumentException | InvocationTargetException certAndKeyGenClassError) {
                 throw new AssertionError("Unable to use CertAndKeyGen class", certAndKeyGenClassError);
             }
@@ -171,38 +171,36 @@ public class CodeSignerCreator {
         public PrivateKey getPrivateKey() {
             try {
                 // return keyPair.getPrivateKey();
-                Class<?> klass = keyPair.getClass();
-                Method method = klass.getMethod("getPrivateKey");
+                final Class<?> klass = keyPair.getClass();
+                final Method method = klass.getMethod("getPrivateKey");
                 return (PrivateKey) method.invoke(keyPair);
-            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException error) {
+            } catch (final NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException error) {
                 throw new AssertionError(error);
             }
         }
 
-        public X509Certificate getSelfCertificate(X500Name name, Date notBefore, long validityInDays) {
+        public X509Certificate getSelfCertificate(final X500Name name, final Date notBefore, final long validityInDays) {
             try {
                 // return keyPair.getSelfCertificate(name, notBefore, validityInDays * 24L * 60L * 60L);
-                Class<?> klass = keyPair.getClass();
-                Method method = klass.getMethod("getSelfCertificate", X500Name.class, Date.class, long.class);
+                final Class<?> klass = keyPair.getClass();
+                final Method method = klass.getMethod("getSelfCertificate", X500Name.class, Date.class, long.class);
                 return (X509Certificate) method.invoke(keyPair, name, notBefore, validityInDays * 24L * 60L * 60L);
-            } catch (InvocationTargetException ite) {
+            } catch (final InvocationTargetException ite) {
                 throw new RuntimeException(ite.getCause());
-            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException error) {
+            } catch (final NoSuchMethodException | IllegalAccessException | IllegalArgumentException error) {
                 throw new AssertionError(error);
             }
         }
 
         private String getCertAndKeyGenClass() {
-            String javaVersion = System.getProperty("java.version");
-            String className = null;
+            final String javaVersion = System.getProperty("java.version");
             if (javaVersion.startsWith("1.7")) {
-                className = "sun.security.x509.CertAndKeyGen";
+                return  "sun.security.x509.CertAndKeyGen";
             } else if (javaVersion.startsWith("1.8") || javaVersion.startsWith("1.9")) {
-                className = "sun.security.tools.keytool.CertAndKeyGen";
+                return  "sun.security.tools.keytool.CertAndKeyGen";
             } else {
                 throw new AssertionError("Unrecognized Java Version");
             }
-            return className;
         }
     }
 }

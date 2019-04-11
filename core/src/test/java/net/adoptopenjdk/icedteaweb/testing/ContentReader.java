@@ -56,7 +56,7 @@ class ContentReader implements Runnable {
         return sb.toString();
     }
 
-    public ContentReader(InputStream is, List<ContentReaderListener> l) {
+    public ContentReader(final InputStream is, final List<ContentReaderListener> l) {
         this.is = is;
         if (l != null) {
             this.listeners.addAll(l);
@@ -67,13 +67,13 @@ class ContentReader implements Runnable {
     @Override
     public void run() {
         try {
-            Reader br = new InputStreamReader(is, "UTF-8");
+            final Reader br = new InputStreamReader(is, "UTF-8");
             StringBuilder line = new StringBuilder();
             while (true) {
                 int s = br.read();
                 if (s < 0) {
                     if (line.length() > 0 && listeners != null) {
-                        for (ContentReaderListener listener : listeners) {
+                        for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
                                 listener.lineReaded(line.toString());
                             }
@@ -86,7 +86,7 @@ class ContentReader implements Runnable {
                 line.append(ch);
                 if (ch == '\n') {
                     if (listeners != null) {
-                        for (ContentReaderListener listener : listeners) {
+                        for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
                                 listener.lineReaded(line.toString());
                             }
@@ -95,25 +95,25 @@ class ContentReader implements Runnable {
                     line = new StringBuilder();
                 }
                 if (listeners != null) {
-                    for (ContentReaderListener listener : listeners) {
+                    for (final ContentReaderListener listener : listeners) {
                         if (listener != null) {
                             listener.charReaded(ch);
                         }
                     }
                 }
             }
-        } catch (NullPointerException ex) {
+        } catch (final NullPointerException ex) {
             ex.printStackTrace();
         }
         //do not want to bother output with terminations
         //mostly compaling when assassin kill the process about StreamClosed
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // logException(ex);
             //ex.printStackTrace();
         } finally {
             try {
                 is.close();
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 // ex.printStackTrace();
             }
         }

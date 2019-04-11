@@ -39,11 +39,11 @@ package net.adoptopenjdk.icedteaweb.testing.util;
 
 public class CacheTestUtils {
     //Check if input string contains only one instance of given substring
-    public static boolean stringContainsOnlySingleInstance(String in, String substr) {
-        int firstIndex = in.indexOf(substr);
-        int lastIndex = in.lastIndexOf(substr);
-        boolean containsString = firstIndex != -1;
-        boolean onlyOneInstance = firstIndex == lastIndex;
+    public static boolean stringContainsOnlySingleInstance(final String in, final String substr) {
+        final int firstIndex = in.indexOf(substr);
+        final int lastIndex = in.lastIndexOf(substr);
+        final boolean containsString = firstIndex != -1;
+        final boolean onlyOneInstance = firstIndex == lastIndex;
         return containsString && onlyOneInstance;
     }
 }

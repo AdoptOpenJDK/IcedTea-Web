@@ -144,25 +144,21 @@ public class ThreadedProcess extends Thread {
             }
             try {
                 if (writer != null){
-                    Thread t = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try (
-                                    BufferedReader br = new BufferedReader(new InputStreamReader(writer, "utf-8"));
-                                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "utf-8"))) {
-                                while (true) {
-                                    String s = br.readLine();
-                                    if (s == null) {
-                                        break;
-                                    }
-                                    bw.write(s + System.lineSeparator());
-                                    bw.flush();
-
+                    Thread t = new Thread(() -> {
+                        try (
+                                BufferedReader br = new BufferedReader(new InputStreamReader(writer, "utf-8"));
+                                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "utf-8"))) {
+                            while (true) {
+                                String s = br.readLine();
+                                if (s == null) {
+                                    break;
                                 }
-                            } catch (Exception ex) {
-                                ServerAccess.logException(ex);
+                                bw.write(s + System.lineSeparator());
+                                bw.flush();
+
                             }
+                        } catch (Exception ex) {
+                            ServerAccess.logException(ex);
                         }
                     });
                     t.start();

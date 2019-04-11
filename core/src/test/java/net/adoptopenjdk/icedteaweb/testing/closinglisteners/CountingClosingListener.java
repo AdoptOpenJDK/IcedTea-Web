@@ -43,7 +43,7 @@ public abstract class CountingClosingListener extends ClosingListener {
     private final StringBuilder sb = new StringBuilder();
 
     @Override
-    public void charReaded(char ch) {
+    public void charReaded(final char ch) {
         sb.append(ch);
         if (isAlowedToFinish(sb.toString())) {
             terminate();
@@ -52,7 +52,7 @@ public abstract class CountingClosingListener extends ClosingListener {
     }
 
     @Override
-    public void lineReaded(String s) {
+    public void lineReaded(final String s) {
         //nothing to do
     }
 

@@ -58,15 +58,16 @@ public class DeploymentPropertiesModifier {
         private final AbstractMap.SimpleEntry<String, String>[] keyValue;
         private List<DeploymentPropertiesModifier> modifications;
 
-        public MultipleDeploymentPropertiesModifier(InfrastructureFileDescriptor src, HashMap.SimpleEntry<String, String>... keyValue) {
+        @SafeVarargs
+        public MultipleDeploymentPropertiesModifier(final InfrastructureFileDescriptor src, final HashMap.SimpleEntry<String, String>... keyValue) {
             this.src = src;
             this.keyValue = keyValue;
         }
 
         public void setProperties() throws IOException {
             modifications = new ArrayList<>(keyValue.length);
-            for (AbstractMap.SimpleEntry<String, String> keyValue1 : keyValue) {
-                DeploymentPropertiesModifier dm = new DeploymentPropertiesModifier(src);
+            for (final AbstractMap.SimpleEntry<String, String> keyValue1 : keyValue) {
+                final DeploymentPropertiesModifier dm = new DeploymentPropertiesModifier(src);
                 dm.setProperties(keyValue1.getKey(), keyValue1.getValue());
                 //adding to beggining, soe restoring goes from last. Not necessary, but nice.
                 modifications.add(0, dm);
@@ -74,7 +75,7 @@ public class DeploymentPropertiesModifier {
         }
 
         public void restoreProperties() throws IOException {
-            for (DeploymentPropertiesModifier dm : modifications) {
+            for (final DeploymentPropertiesModifier dm : modifications) {
                 dm.restoreProperties();
             }
         }
@@ -87,12 +88,12 @@ public class DeploymentPropertiesModifier {
     private String requestedValue;
     private boolean isPropertiesSet;
 
-    public DeploymentPropertiesModifier(InfrastructureFileDescriptor src) {
+    public DeploymentPropertiesModifier(final InfrastructureFileDescriptor src) {
         this.src = src;
         isPropertiesSet = false;
     }
 
-    public void setProperties(String property, String value) throws IOException {
+    public void setProperties(final String property, final String value) throws IOException {
         if (isPropertiesSet) {
             throw new IllegalStateException("Properties can be set only once. Revert and use naother instance.");            
         }
@@ -112,10 +113,10 @@ public class DeploymentPropertiesModifier {
         restoreDeploymentProperties();
     }
 
-    private void setDeploymentProperties(String property, String value) throws IOException {
+    private void setDeploymentProperties(final String property, final String value) throws IOException {
         String properties = FileUtils.loadFileAsString(src.getFile());
 
-        for (String line : properties.split("\n")) {
+        for (final String line : properties.split("\n")) {
             if (line.contains(property)) {
                 savedValue = line;
                 properties = properties.replace(line, property + "=" + value + "\n");

@@ -41,7 +41,7 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 public class Chromium extends MozillaFamilyLinuxBrowser {
 
-    public Chromium(String bin) {
+    public Chromium(final String bin) {
         super(bin);
     }
 

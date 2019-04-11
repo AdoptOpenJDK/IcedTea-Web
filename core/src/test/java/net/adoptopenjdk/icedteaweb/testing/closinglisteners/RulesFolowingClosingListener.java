@@ -45,12 +45,12 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
 
     public static class ContainsRule extends StringRule<String> {
 
-        public ContainsRule(String s) {
+        public ContainsRule(final String s) {
             super(s);
         }
 
         @Override
-        public boolean evaluate(String upon) {
+        public boolean evaluate(final String upon) {
             return (upon.contains(rule));
         }
 
@@ -62,11 +62,11 @@ public class RulesFolowingClosingListener extends CountingClosingListener {
 
 
     @Override
-    protected boolean isAlowedToFinish(String content) {
+    protected boolean isAlowedToFinish(final String content) {
         if (rules.size() < 1) {
             throw new IllegalStateException("No rules specified");
         }
-        for (Rule<?,String> rule : rules) {
+        for (final Rule<?,String> rule : rules) {
             if (!rule.evaluate(content)) {
                 return false;
             }

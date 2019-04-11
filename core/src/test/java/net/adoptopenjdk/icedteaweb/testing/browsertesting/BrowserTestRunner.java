@@ -57,20 +57,20 @@ import java.util.Random;
 
 public class BrowserTestRunner extends BlockJUnit4ClassRunner {
 
-    public BrowserTestRunner(java.lang.Class<?> testClass) throws InitializationError {
+    public BrowserTestRunner(final java.lang.Class<?> testClass) throws InitializationError {
         super(testClass);
     }
 
     @Override
-    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        Method mm = method.getMethod();
-        TestInBrowsers tib = mm.getAnnotation(TestInBrowsers.class);
+    protected void runChild(final FrameworkMethod method, final RunNotifier notifier) {
+        final Method mm = method.getMethod();
+        final TestInBrowsers tib = mm.getAnnotation(TestInBrowsers.class);
         injectBrowserCatched(method);
         boolean browserIgnoration = false;
         if (tib != null) {
             try {
                 List<Browsers> testableBrowsers = BrowserFactory.getFactory().getBrowsers(tib);
-                String mbr = System.getProperty("modified.browsers.run");
+                final String mbr = System.getProperty("modified.browsers.run");
                 if (mbr != null) {
                     if (mbr.equalsIgnoreCase("all")) {
                         if (!isBrowsersNoneSet(tib)) {
@@ -90,7 +90,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                         ServerAccess.logErrorReprint("unrecognized value of modified.browsers.run - " + mbr);
                     }
                 }
-                for (Browsers browser : testableBrowsers) {
+                for (final Browsers browser : testableBrowsers) {
                     try {
                         injcetBrowser(method, browser);
                         runChildX(method, notifier, browser, browserIgnoration);
@@ -107,26 +107,26 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    private boolean isBrowsersNoneSet(TestInBrowsers tib) {
+    private boolean isBrowsersNoneSet(final TestInBrowsers tib) {
         return tib.testIn().length == 1 && tib.testIn()[0] == Browsers.none;
     }
 
-    private void injectBrowserCatched(FrameworkMethod method) {
+    private void injectBrowserCatched(final FrameworkMethod method) {
         try {
             injcetBrowser(method, Browsers.none);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             //throw new RuntimeException("unabled to inject browser", ex);
             ServerAccess.logException(ex, true);
         }
     }
 
-    private void injcetBrowser(FrameworkMethod method, Browsers browser) throws IllegalAccessException, SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-        Method ff = method.getMethod().getDeclaringClass().getMethod("setBrowser", Browsers.class);
+    private void injcetBrowser(final FrameworkMethod method, Browsers browser) throws IllegalAccessException, SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+        final Method ff = method.getMethod().getDeclaringClass().getMethod("setBrowser", Browsers.class);
         ff.invoke(null, browser);
     }
 
-    private void runChildX(final FrameworkMethod method, RunNotifier notifier, Browsers browser, boolean browserIgnoration) {
-        Description description = describeChild(method, browser);
+    private void runChildX(final FrameworkMethod method, final RunNotifier notifier, final Browsers browser, final boolean browserIgnoration) {
+        final Description description = describeChild(method, browser);
         if (method.getAnnotation(Ignore.class) != null) {
             notifier.fireTestIgnored(description);
         } else {
@@ -137,7 +137,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
 //                m.setAccessible(true);
 //                m.invoke(this, methodBlock(method), description, notifier);
 //                ServerAccess.logOutputReprint("leaf invoked");
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 //throw new RuntimeException("unabled to lunch test on leaf", ex);
                 ServerAccess.logException(ex, true);
             }
@@ -147,9 +147,9 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
     /**
      * Runs a {@link Statement} that represents a leaf (aka atomic) test.
      */
-    private void runLeaf(Statement statement, Description description,
-                         RunNotifier notifier, boolean ignore) {
-        EachTestNotifier eachNotifier = new EachTestNotifier(notifier, description);
+    private void runLeaf(final Statement statement, final Description description,
+                         final RunNotifier notifier, final boolean ignore) {
+        final EachTestNotifier eachNotifier = new EachTestNotifier(notifier, description);
         eachNotifier.fireTestStarted();
           if (ignore) {
                 eachNotifier.fireTestIgnored();
@@ -157,23 +157,23 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
             }
         try {
           statement.evaluate();
-        } catch (AssumptionViolatedException e) {
+        } catch (final AssumptionViolatedException e) {
             eachNotifier.addFailedAssumption(e);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             eachNotifier.addFailure(e);
         } finally {
             eachNotifier.fireTestFinished();
         }
     }
 
-    private Description describeChild(FrameworkMethod method, Browsers browser) {
+    private Description describeChild(final FrameworkMethod method, final Browsers browser) {
         if (browser == null) {
             return super.describeChild(method);
         } else {
             try {
                 return Description.createTestDescription(getTestClass().getJavaClass(),
                         testName(method) + " - " + browser.toString(), method.getAnnotations());
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 ServerAccess.logException(ex, true);
                 return super.describeChild(method);
             }

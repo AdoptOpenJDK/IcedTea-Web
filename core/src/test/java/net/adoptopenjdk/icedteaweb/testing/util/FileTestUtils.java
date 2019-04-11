@@ -60,12 +60,12 @@ public class FileTestUtils {
     /* Get the open file-descriptor count for the process. Note that this is
      * specific to Unix-like operating systems. */
     private static long getOpenFileDescriptorCount() {
-        MBeanServer beanServer = ManagementFactory.getPlatformMBeanServer();
+        final MBeanServer beanServer = ManagementFactory.getPlatformMBeanServer();
         try {
             return (Long) beanServer.getAttribute(new ObjectName(
                     "java.lang:type=OperatingSystem"),
                     "OpenFileDescriptorCount");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // Effectively disables leak tests
             ServerAccess.logErrorReprint("Warning: Cannot get file descriptors for this platform!");
             return 0;
@@ -73,12 +73,12 @@ public class FileTestUtils {
     }
 
     /* Check the amount of file descriptors before and after a Runnable */
-    static public void assertNoFileLeak(Runnable runnable) throws InterruptedException {
+    static public void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
         Thread.sleep(10);
-        long filesOpenBefore = getOpenFileDescriptorCount();
+        final long filesOpenBefore = getOpenFileDescriptorCount();
         runnable.run();
         Thread.sleep(10);
-        long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
+        final long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
         //how come? Appearently can...
         if (filesLeaked<0){
             return;
@@ -87,20 +87,20 @@ public class FileTestUtils {
     }
 
     /* Creates a file with the given contents */
-    static public void createFileWithContents(File file, String contents)
+    static public void createFileWithContents(final File file, final String contents)
             throws IOException {
-        PrintWriter out = new PrintWriter(file);
+        final PrintWriter out = new PrintWriter(file);
         out.write(contents);
         out.close();
     }
 
     /* Creates a jar in a temporary directory, with the given name & file contents */
-    static public void createJarWithoutManifestContents(File jarFile, File... fileContents) throws Exception{
+    static public void createJarWithoutManifestContents(final File jarFile, final File... fileContents) throws Exception{
         createJarWithContents(jarFile, null, fileContents);
     }
     
     /* Creates a jar in a temporary directory, with the given name & file contents */
-    static public void createJarWithContents(File jarFile, Manifest manifestContents, File... fileContents)
+    static public void createJarWithContents(final File jarFile, final Manifest manifestContents, final File... fileContents)
             throws Exception {
         /* Manifest quite evilly ignores all attributes if we don't specify a version! 
          * Make sure it's set here. */
@@ -108,15 +108,15 @@ public class FileTestUtils {
             manifestContents.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
         }
 
-        JarOutputStream jarWriter;
+        final JarOutputStream jarWriter;
         if (manifestContents == null){
             jarWriter = new JarOutputStream(new FileOutputStream(jarFile));
         } else {
             jarWriter = new JarOutputStream(new FileOutputStream(jarFile), manifestContents);
         }
-        for (File file : fileContents) {
+        for (final File file : fileContents) {
             jarWriter.putNextEntry(new JarEntry(file.getName()));
-            FileInputStream fileReader = new FileInputStream(file);
+            final FileInputStream fileReader = new FileInputStream(file);
             StreamUtils.copyStream(fileReader, jarWriter);
             fileReader.close();
             jarWriter.closeEntry();
@@ -125,7 +125,7 @@ public class FileTestUtils {
     }
 
     /* Creates a jar in a temporary directory, with the given name, manifest & file contents */
-    static public void createJarWithContents(File jarFile, File... fileContents) throws Exception {
+    static public void createJarWithContents(final File jarFile, final File... fileContents) throws Exception {
         /* Note that we always specify a manifest, to avoid empty jars.
          * Empty jars are not allowed by icedtea-web during the zip-file header check. */
         createJarWithContents(jarFile, new Manifest(), fileContents);
@@ -134,7 +134,7 @@ public class FileTestUtils {
     /* Creates a temporary directory. Note that Java 7 has a method for this,
      * but we want to remain 6-compatible. */
     static public File createTempDirectory() throws IOException {
-        File file = File.createTempFile("temp",
+        final File file = File.createTempFile("temp",
                 Long.toString(System.nanoTime()));
         file.delete();
         if (!file.mkdir()) {

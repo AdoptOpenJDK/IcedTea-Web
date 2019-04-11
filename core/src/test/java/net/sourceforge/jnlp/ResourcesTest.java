@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
 import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browser.BrowserTest;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
 import org.junit.Assert;

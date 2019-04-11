@@ -48,7 +48,7 @@ package net.adoptopenjdk.icedteaweb.testing.awt;
 
 public class AWTFrameworkException extends Exception {
 
-    public AWTFrameworkException(String s) { 
+    public AWTFrameworkException(final String s) {
         super(s); 
     }
 }

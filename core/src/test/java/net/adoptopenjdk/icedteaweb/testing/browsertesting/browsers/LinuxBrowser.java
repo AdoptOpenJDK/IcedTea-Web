@@ -47,7 +47,7 @@ public abstract class LinuxBrowser implements Browser{
       private final String bin;
       protected String fsdir="unknown";
 
-    public LinuxBrowser(String bin) {
+    public LinuxBrowser(final String bin) {
         this.bin = bin;
     }
 
@@ -60,9 +60,9 @@ public abstract class LinuxBrowser implements Browser{
 
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof Browser)) return false;
-        Browser b=(Browser) obj;
+        final Browser b=(Browser) obj;
         return b.getBin().equals(getBin());
     }
 

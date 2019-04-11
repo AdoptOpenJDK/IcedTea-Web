@@ -186,10 +186,9 @@ public class TinyHttpdImpl extends Thread {
                     if (isGetRequest) {
                         if (slowSend) {
                             byte[][] bb = splitArray(buff, 10);
-                            for (int j = 0; j < bb.length; j++) {
+                            for (final byte[] aBb : bb) {
                                 Thread.sleep(2000);
-                                byte[] bs = bb[j];
-                                writer.write(bs, 0, bs.length);
+                                writer.write(aBb, 0, aBb.length);
                             }
                         } else {
                             writer.write(buff, 0, resourceLength);

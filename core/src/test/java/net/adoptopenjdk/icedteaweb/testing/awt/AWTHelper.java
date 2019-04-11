@@ -50,7 +50,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     //other 
     private final StringBuilder sb = new StringBuilder();
     private boolean actionStarted = false;
-    private Robot robot;
+    private final Robot robot;
 
    
     
@@ -80,7 +80,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      *  - less effective, deprecated (better bound the area first) 
      */
     @Deprecated
-    public AWTHelper(String initStr){
+    public AWTHelper(final String initStr){
         this();
         
         this.initStr = initStr;
@@ -97,7 +97,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @param ch 
      */
     @Override
-    public void charReaded(char ch) {
+    public void charReaded(final char ch) {
         sb.append(ch);
         //is applet ready to start clicking?
         //check and run applet only if initStr is not null
@@ -106,7 +106,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
                 actionStarted = true; 
                 this.findAndActivateApplet();
                 this.run();
-            } catch (AWTFrameworkException e2){
+            } catch (final AWTFrameworkException e2){
                 throw new RuntimeException("AWTHelper problems with unset attributes.",e2);
             }
         }

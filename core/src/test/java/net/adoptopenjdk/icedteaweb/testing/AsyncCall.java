@@ -25,26 +25,26 @@ public class AsyncCall<T> {
     private Exception asyncException = null;
 
     /* Create an AsyncCall with a given time-out */
-    public AsyncCall(Callable<T> callable, long timeout) {
+    public AsyncCall(final Callable<T> callable, final long timeout) {
         this.callable = callable;
         this.timeout = timeout;
         this.handler = new HandlerThread();
     }
 
     /* Create an AsyncCall with (effectively) no time-out */
-    public AsyncCall(Callable<T> call) {
+    public AsyncCall(final Callable<T> call) {
         this(call, Long.MAX_VALUE);
     }
 
     /* Chains construction + start for convenience */
-    public static <T> AsyncCall<T> startWithTimeOut(Callable<T> callable, long timeout) {
-        AsyncCall<T> asyncCall = new AsyncCall<>(callable, timeout);
+    public static <T> AsyncCall<T> startWithTimeOut(final Callable<T> callable, final long timeout) {
+        final AsyncCall<T> asyncCall = new AsyncCall<>(callable, timeout);
         asyncCall.start();
         return asyncCall;
     }
 
     /* Chains construction + start for convenience */
-    public static <T> AsyncCall<T> startWithTimeOut(Callable<T> callable) {
+    public static <T> AsyncCall<T> startWithTimeOut(final Callable<T> callable) {
         return startWithTimeOut(callable, 1000); // Default timeout of 1 second
     }
 
@@ -66,25 +66,22 @@ public class AsyncCall<T> {
     private class HandlerThread extends Thread {
         @Override
         public void run() {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        /* Capture result of the call */
-                        callResult = callable.call();
-                    } catch (Exception e) {
-                        /* In case of exception, capture for re-throw */
-                        asyncException = e;
-                    }
-                    handler.interrupt(); // Finish early
+            final Thread thread = new Thread(() -> {
+                try {
+                    /* Capture result of the call */
+                    callResult = callable.call();
+                } catch (Exception e) {
+                    /* In case of exception, capture for re-throw */
+                    asyncException = e;
                 }
-            };
+                handler.interrupt(); // Finish early
+            });
 
             thread.start();
 
             try {
                 Thread.sleep(timeout);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // Finish early
                 return;
             }

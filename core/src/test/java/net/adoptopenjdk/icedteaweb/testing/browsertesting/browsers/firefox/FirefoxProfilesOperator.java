@@ -55,13 +55,7 @@ public class FirefoxProfilesOperator {
     private File backupDir;
     private File sourceDir;
     private boolean backuped = false;
-    private final FilenameFilter firefoxProfilesFilter = new FilenameFilter() {
-
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".default") || name.equals("profiles.ini");
-        }
-    };
+    private final FilenameFilter firefoxProfilesFilter = (dir, name) -> name.endsWith(".default") || name.equals("profiles.ini");
 
 
     public void backupProfiles() throws IOException {
@@ -69,11 +63,11 @@ public class FirefoxProfilesOperator {
             return;
         }
         sourceDir = new File(System.getProperty("user.home") + "/.mozilla/firefox/");
-        File f = File.createTempFile("backupedFirefox_", "_profiles.default");
+        final File f = File.createTempFile("backupedFirefox_", "_profiles.default");
         f.delete();
         f.mkdir();
         backupDir = f;
-        String message = "Backuping firefox profiles from " + sourceDir.getAbsolutePath() + " to " + backupDir.getAbsolutePath();
+        final String message = "Backuping firefox profiles from " + sourceDir.getAbsolutePath() + " to " + backupDir.getAbsolutePath();
         ServerAccess.logOutputReprint(message);
         copyDirs(sourceDir, backupDir, firefoxProfilesFilter);
         backuped = true;
@@ -82,7 +76,7 @@ public class FirefoxProfilesOperator {
             public void run() {
                 try {
                     restoreProfiles();
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ServerAccess.logException(ex);
                 }
             }
@@ -96,10 +90,10 @@ public class FirefoxProfilesOperator {
         }
         try {
             removeProfiles();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ServerAccess.logException(ex);
         }
-        String message = ("Restoring all firefox profiles in " + sourceDir.getAbsolutePath() + " from in " + backupDir.getAbsolutePath());
+        final String message = ("Restoring all firefox profiles in " + sourceDir.getAbsolutePath() + " from in " + backupDir.getAbsolutePath());
         ServerAccess.logOutputReprint(message);
         copyDirs(backupDir, sourceDir, firefoxProfilesFilter);
 
@@ -109,52 +103,51 @@ public class FirefoxProfilesOperator {
         if (!backuped) {
             return;
         }
-        String message = ("Removing all firefox profiles from " + sourceDir.getAbsolutePath() + " backup avaiable in " + backupDir.getAbsolutePath());
+        final String message = ("Removing all firefox profiles from " + sourceDir.getAbsolutePath() + " backup avaiable in " + backupDir.getAbsolutePath());
         ServerAccess.logOutputReprint(message);
-        File[] oldProfiles = sourceDir.listFiles(firefoxProfilesFilter);
-        for (File file : oldProfiles) {
+        final File[] oldProfiles = sourceDir.listFiles(firefoxProfilesFilter);
+        for (final File file : oldProfiles) {
             deleteRecursively(file);
 
         }
 
     }
 
-    private void copyDirs(File sourceDir, File backupDir, FilenameFilter firefoxProfilesFilter) throws IOException {
-        File[] profiles = sourceDir.listFiles(firefoxProfilesFilter);
-        for (File file : profiles) {
+    private void copyDirs(final File sourceDir, final File backupDir, final FilenameFilter firefoxProfilesFilter) throws IOException {
+        final File[] profiles = sourceDir.listFiles(firefoxProfilesFilter);
+        for (final File file : profiles) {
             copyRecursively(file, backupDir);
         }
     }
 
-    public static void copyFile(File from, File to) throws IOException {
-        FileInputStream is = new FileInputStream(from);
-        FileOutputStream fos = new FileOutputStream(to);
-        FileChannel f = is.getChannel();
-        try (FileChannel f2 = fos.getChannel()) {
+    public static void copyFile(final File from, final File to) throws IOException {
+        final FileInputStream is = new FileInputStream(from);
+        final FileOutputStream fos = new FileOutputStream(to);
+        final FileChannel f = is.getChannel();
+        try (final FileChannel f2 = fos.getChannel()) {
             f.transferTo(0, f.size(), f2);
         } finally {
             f.close();
         }
     }
 
-    private static void deleteRecursively(File f) throws IOException {
+    private static void deleteRecursively(final File f) throws IOException {
         if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
+            for (final File c : f.listFiles()) {
                 deleteRecursively(c);
             }
         }
-        boolean d = true;
-        d = f.delete();
+        boolean d = f.delete();
         if (!d) {
             throw new IOException("Failed to delete file: " + f);
         }
     }
 
-    private static void copyRecursively(File srcFileDir, File destDir) throws IOException {
+    private static void copyRecursively(final File srcFileDir, final File destDir) throws IOException {
         if (srcFileDir.isDirectory()) {
-            File nwDest = new File(destDir, srcFileDir.getName());
+            final File nwDest = new File(destDir, srcFileDir.getName());
             nwDest.mkdir();
-            for (File c : srcFileDir.listFiles()) {
+            for (final File c : srcFileDir.listFiles()) {
                 copyRecursively(c, nwDest);
             }
         } else {
@@ -163,8 +156,8 @@ public class FirefoxProfilesOperator {
 
     }
 
-    public static void main(String[] args) throws IOException {
-        FirefoxProfilesOperator ff = new FirefoxProfilesOperator();
+    public static void main(final String[] args) throws IOException {
+        final FirefoxProfilesOperator ff = new FirefoxProfilesOperator();
         ff.restoreProfiles();
         ff.backupProfiles();
         ff.restoreProfiles();

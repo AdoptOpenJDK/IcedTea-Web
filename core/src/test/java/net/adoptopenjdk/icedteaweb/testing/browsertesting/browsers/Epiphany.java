@@ -46,7 +46,7 @@ public class Epiphany extends MozillaFamilyLinuxBrowser {
     
     private final String[] cs = {};
 
-    public Epiphany(String bin) {
+    public Epiphany(final String bin) {
         super(bin);
     }
 

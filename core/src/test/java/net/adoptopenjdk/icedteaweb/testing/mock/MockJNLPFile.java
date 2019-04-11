@@ -45,11 +45,11 @@ import java.util.Locale;
 
 public class MockJNLPFile extends JNLPFile {
 
-    public MockJNLPFile(Locale locale) {
+    public MockJNLPFile(final Locale locale) {
         defaultLocale = locale;
     }
 
-    public void setInfo(List<InformationDesc> infoList) {
+    public void setInfo(final List<InformationDesc> infoList) {
         info = infoList;
     }
 }

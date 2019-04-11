@@ -35,9 +35,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.adoptopenjdk.icedteaweb.testing.browsertesting;
+package net.sourceforge.jnlp.browser;
 
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTestRunner;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import org.junit.runner.RunWith;
 
 

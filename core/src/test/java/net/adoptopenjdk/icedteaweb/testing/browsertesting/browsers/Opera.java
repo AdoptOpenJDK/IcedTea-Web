@@ -43,7 +43,7 @@ import java.util.List;
 
 public class Opera extends LinuxBrowser {
 
-    public Opera(String bin) {
+    public Opera(final String bin) {
         super(bin);
         fsdir="opera";
     }

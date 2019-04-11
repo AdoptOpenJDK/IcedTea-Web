@@ -46,7 +46,7 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
 
     private static final FirefoxProfilesOperator firefoxProfilesOperatorSingleton = new FirefoxProfilesOperator();
 
-    public Firefox(String bin) {
+    public Firefox(final String bin) {
         super(bin);
     }
     private final String[] cs = {"-new-tab"};
@@ -62,19 +62,19 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
     }
 
     @Override
-    public void beforeProcess(String s) {
+    public void beforeProcess(final String s) {
         try {
             firefoxProfilesOperatorSingleton.backupProfiles(); //assuming firefox is not in  safemode already
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException("Firefox profile backup failed", ex);
         }
     }
 
     @Override
-    public void afterKill(String s) {
+    public void afterKill(final String s) {
         try {
             firefoxProfilesOperatorSingleton.restoreProfiles();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException("Firefox profile restoration failed", ex);
         }
 

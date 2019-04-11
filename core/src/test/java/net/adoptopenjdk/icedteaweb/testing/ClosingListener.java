@@ -40,7 +40,7 @@ public abstract class ClosingListener implements ContentReaderListener {
 
     private ProcessAssasin assasin;
 
-    void setAssasin(ProcessAssasin assasin) {
+    void setAssasin(final ProcessAssasin assasin) {
         this.assasin = assasin;
     }
 

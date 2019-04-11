@@ -38,7 +38,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing;
 
 import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
+import net.sourceforge.jnlp.browser.BrowserTest;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 import java.io.BufferedWriter;
@@ -142,17 +142,13 @@ public class LoggingBottleneck {
             classLog.put(methodBrowseredName, methodLog);
         }
         if (!added) {
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-
-                @Override
-                public void run() {
-                    try {
-                        LoggingBottleneck.getDefaultLoggingBottleneck().writeXmlLog();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    LoggingBottleneck.getDefaultLoggingBottleneck().writeXmlLog();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            });
+            }));
             added = true;
         }
         methodLog.add(printToErr, printToOut, message);

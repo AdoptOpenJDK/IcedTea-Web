@@ -41,7 +41,7 @@ import java.util.List;
 
 public  abstract class MozillaFamilyLinuxBrowser  extends LinuxBrowser{
 
-    public MozillaFamilyLinuxBrowser(String bin) {
+    public MozillaFamilyLinuxBrowser(final String bin) {
         super(bin);
         fsdir="mozilla";
     }

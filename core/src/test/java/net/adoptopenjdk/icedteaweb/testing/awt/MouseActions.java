@@ -53,52 +53,33 @@ public class MouseActions {
     /**
      * method click presses and releases given mouse keys
      * with reasonable delay before the event
-     * 
-     * @param mouseKeyMask
+     *
      * @param robot
-     * @param delayMs
      */
-    private static void click(int mouseKeyMask, Robot robot, int delayMs){
-        robot.delay(delayMs);
-        robot.mousePress(mouseKeyMask);
-        robot.delay(delayMs);
-        robot.mouseRelease(mouseKeyMask);
+    private static void click(final Robot robot){
+        robot.delay(defaultDelay);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+        robot.delay(defaultDelay);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
     }
 
     /**
      * 
      * @param rectangle
      * @param robot
-     * @param delayMs
      */
-    private static void moveMouseToMiddle(Rectangle rectangle, Robot robot, int delayMs){
-        robot.delay(delayMs);
-        int x = rectangle.x + (rectangle.width/2);
-        int y = rectangle.y + (rectangle.height/2);
+    private static void moveMouseToMiddle(final Rectangle rectangle, final Robot robot){
+        robot.delay(defaultDelay);
+        final int x = rectangle.x + (rectangle.width/2);
+        final int y = rectangle.y + (rectangle.height/2);
         robot.mouseMove(x,y);
     }
-    
-    /**
-      * method clickInside moves the mouse in the middle point
-     * of a given rectangle and clicks with reasonable delay
 
-     * 
-     * @param rectangle
-     * @param robot
-     * @param delayMs
-     */
-    private static void clickInside(int mouseKey, Rectangle rectangle, Robot robot, int delayMs){
-        moveMouseToMiddle(rectangle, robot, delayMs);
-        robot.delay(delayMs);
-        click(mouseKey, robot, delayMs);
-    }
 
-    
-    private static void clickInside(Rectangle rectangle, Robot robot, int delayMs){
-        clickInside(InputEvent.BUTTON1_MASK, rectangle, robot, delayMs);
-    }
-    
-    public static void clickInside(Rectangle rectangle, Robot robot){
-        clickInside(rectangle, robot, defaultDelay);
+    public static void clickInside(final Rectangle rectangle, final Robot robot){
+        moveMouseToMiddle(rectangle, robot);
+        robot.delay(defaultDelay);
+        click(robot);
+
     }
 }
