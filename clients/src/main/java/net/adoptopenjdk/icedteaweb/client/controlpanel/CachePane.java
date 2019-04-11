@@ -17,37 +17,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.cache.CacheDirectory;
-import net.sourceforge.jnlp.cache.CacheEntry;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.DirectoryNode;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
-import net.sourceforge.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -70,9 +39,38 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.cache.CacheDirectory;
+import net.sourceforge.jnlp.cache.CacheEntry;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.DirectoryNode;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
+import net.sourceforge.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CachePane extends JPanel {
 
@@ -436,7 +434,7 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            for (Object[] v : generateData()) {
+            for (Object[] v : CacheUtil.generateData()) {
                 tableModel.addRow(v);
             }
         } catch (Exception exception) {
@@ -445,45 +443,6 @@ public class CachePane extends JPanel {
             // Reset cursor
             parent.getContentPane().setCursor(Cursor.getDefaultCursor());
         }
-    }
-
-   
-    /**
-     * This creates the data for the table.
-     *
-     * @return ArrayList containing an Object array of data for each row in the
-     * table.
-     */
-    public static ArrayList<Object[]> generateData() {
-        DirectoryNode root = new DirectoryNode("Root", PathsAndFiles.CACHE_DIR.getFile(), null);
-        CacheDirectory.getDirStructure(root);
-        ArrayList<Object[]> data = new ArrayList<>();
-
-        for (DirectoryNode identifier : root.getChildren()) {
-            for (DirectoryNode type : identifier.getChildren()) {
-                for (DirectoryNode domain : type.getChildren()) {
-                    //after domain, there is optional port dir. It is skipped here (as is skipped path on domain)
-                    for (DirectoryNode leaf : CacheDirectory.getLeafData(domain)) {
-                        final File f = leaf.getFile();
-                        PropertiesFile pf = new PropertiesFile(new File(f.toString() + CacheDirectory.INFO_SUFFIX));
-                        // if jnlp-path in .info equals path of app to delete mark to delete
-                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                        Object[] o = {
-                            leaf,
-                            f.getParentFile(),
-                            type,
-                            domain,
-                            f.length(),
-                            new Date(f.lastModified()),
-                            jnlpPath
-                        };
-                        data.add(o);
-                    }
-                }
-            }
-        }
-
-        return data;
     }
 
     /**

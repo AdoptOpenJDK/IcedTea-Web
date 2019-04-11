@@ -19,7 +19,7 @@ import mslinks.ShellLink;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheLRUWrapper;
-import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

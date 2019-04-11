@@ -39,8 +39,8 @@ package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
-import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandbox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.util.HostnameChecker;

@@ -44,7 +44,7 @@ import net.sourceforge.jnlp.annotations.KnownToFail;
 import net.sourceforge.jnlp.annotations.WindowsIssue;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;

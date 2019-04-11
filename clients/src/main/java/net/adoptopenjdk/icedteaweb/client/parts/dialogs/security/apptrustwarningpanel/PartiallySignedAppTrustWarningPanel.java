@@ -39,13 +39,13 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.SecurityDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.TemporaryPermissionsButton;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.tools.CertInformation;

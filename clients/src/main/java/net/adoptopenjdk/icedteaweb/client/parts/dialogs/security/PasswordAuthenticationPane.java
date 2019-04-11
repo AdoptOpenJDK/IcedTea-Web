@@ -38,9 +38,8 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.security.SecurityDialog;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.NamePassword;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.NamePassword;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;

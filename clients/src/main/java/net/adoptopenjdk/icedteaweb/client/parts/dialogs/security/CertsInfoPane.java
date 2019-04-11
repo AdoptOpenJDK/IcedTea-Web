@@ -38,11 +38,10 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.Yes;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.Yes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.x509.CertificateValidity;

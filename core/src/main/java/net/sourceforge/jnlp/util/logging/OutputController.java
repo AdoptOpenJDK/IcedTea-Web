@@ -287,7 +287,7 @@ public class OutputController {
         log(new JavaMessage(new Header(level, false), s));
     }
 
-    synchronized void log(MessageWithHeader l){
+    public synchronized void log(MessageWithHeader l){
         messageQue.add(l);
         this.notifyAll();
     }

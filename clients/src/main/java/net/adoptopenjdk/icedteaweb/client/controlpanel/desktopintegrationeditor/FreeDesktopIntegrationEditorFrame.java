@@ -38,7 +38,7 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.XDesktopEntry;
-import net.sourceforge.jnlp.util.logging.ConsoleOutputPaneModel;
+import net.adoptopenjdk.icedteaweb.client.console.ConsoleOutputPaneModel;
 import net.sourceforge.swing.SwingUtils;
 
 import javax.swing.JButton;

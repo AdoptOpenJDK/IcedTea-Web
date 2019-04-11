@@ -39,7 +39,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
 
 public interface RememberableDialog {
 

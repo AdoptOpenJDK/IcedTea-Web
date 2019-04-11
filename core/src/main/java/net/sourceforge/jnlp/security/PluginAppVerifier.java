@@ -41,8 +41,8 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityDialogs.AccessType;
-import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
-import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 

@@ -38,7 +38,6 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.JTree;

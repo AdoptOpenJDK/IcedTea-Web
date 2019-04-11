@@ -40,11 +40,11 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.security.SecurityDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
-import net.sourceforge.jnlp.security.dialogresults.DialogResult;
-import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
-import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNoSandboxLimited;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
