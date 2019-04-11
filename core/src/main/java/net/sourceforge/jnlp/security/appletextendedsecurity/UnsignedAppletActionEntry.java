@@ -36,7 +36,7 @@
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 
 import java.io.IOException;
 import java.io.Writer;

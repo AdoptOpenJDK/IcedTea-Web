@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
-import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import org.junit.Assert;
 import org.junit.Test;
 

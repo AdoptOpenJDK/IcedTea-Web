@@ -27,7 +27,6 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

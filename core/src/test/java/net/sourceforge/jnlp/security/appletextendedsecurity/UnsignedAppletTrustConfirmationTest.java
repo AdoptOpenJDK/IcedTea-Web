@@ -41,9 +41,9 @@ import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOpera
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
-import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.AfterClass;

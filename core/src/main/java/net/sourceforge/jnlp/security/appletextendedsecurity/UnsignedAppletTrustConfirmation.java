@@ -46,12 +46,11 @@ import net.sourceforge.jnlp.security.SecurityDialogs;
 import net.sourceforge.jnlp.security.dialogresults.BasicDialogValue;
 import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
-import net.sourceforge.jnlp.security.dialogs.remember.SavedRememberAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

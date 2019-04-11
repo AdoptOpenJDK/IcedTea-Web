@@ -37,8 +37,8 @@ exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
 import net.sourceforge.jnlp.JNLPSplashScreen;
-import net.sourceforge.jnlp.splashscreen.parts.InfoItem;
-import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InfoItem;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

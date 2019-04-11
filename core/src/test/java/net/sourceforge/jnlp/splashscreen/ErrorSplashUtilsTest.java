@@ -36,7 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.splashscreen;
 
-import net.sourceforge.jnlp.splashscreen.impls.DefaultErrorSplashScreen2012;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorSplashScreen2012;
 import org.junit.Assert;
 import org.junit.Test;
 

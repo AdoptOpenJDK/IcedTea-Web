@@ -37,10 +37,10 @@ package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
 import net.sourceforge.jnlp.ServerAccess;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
-import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActionsTest;
-import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActionsTest;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
