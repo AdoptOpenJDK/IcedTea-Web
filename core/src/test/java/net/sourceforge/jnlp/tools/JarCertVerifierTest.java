@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
 import org.junit.Assert;

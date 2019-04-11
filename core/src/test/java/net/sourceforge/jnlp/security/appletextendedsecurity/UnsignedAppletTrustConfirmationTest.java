@@ -36,10 +36,10 @@
 package net.sourceforge.jnlp.security.appletextendedsecurity;
 
 import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;

@@ -36,6 +36,10 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.testing.ProcessResult;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
+import net.adoptopenjdk.icedteaweb.testing.TinyHttpdImpl;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

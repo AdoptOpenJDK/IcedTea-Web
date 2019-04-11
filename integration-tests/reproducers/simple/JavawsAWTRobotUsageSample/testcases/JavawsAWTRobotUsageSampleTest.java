@@ -37,11 +37,11 @@ exception statement from your version.
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
+import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
 import net.sourceforge.jnlp.awt.AWTFrameworkException;
 import net.sourceforge.jnlp.awt.AWTHelper;
 import net.sourceforge.jnlp.awt.imagesearch.ComponentNotFoundException;
-import net.sourceforge.jnlp.closinglisteners.Rule;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.Rule;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
 

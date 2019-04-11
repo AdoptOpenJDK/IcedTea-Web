@@ -36,8 +36,8 @@
  */
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.ServerLauncher;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;

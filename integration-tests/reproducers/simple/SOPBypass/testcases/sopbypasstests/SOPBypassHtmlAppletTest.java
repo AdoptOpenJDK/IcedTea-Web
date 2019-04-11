@@ -38,9 +38,9 @@ package sopbypasstests;
 
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.NeedsDisplay;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.browsertesting.Browsers;
+import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
+import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import org.junit.Test;
 
 import static sopbypasstests.SOPBypassUtil.*;

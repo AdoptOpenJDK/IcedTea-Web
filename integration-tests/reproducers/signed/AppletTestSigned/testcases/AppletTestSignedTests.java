@@ -39,17 +39,17 @@ import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.ProcessResult;
 import net.sourceforge.jnlp.ProcessWrapper;
 import net.sourceforge.jnlp.ServerAccess;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
-import net.sourceforge.jnlp.closinglisteners.StringBasedClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.StringBasedClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener.*;
+import static net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener.*;
 
 public class AppletTestSignedTests extends BrowserTest {
 

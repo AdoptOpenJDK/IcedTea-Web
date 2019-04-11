@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.Assert;
 import org.junit.Test;

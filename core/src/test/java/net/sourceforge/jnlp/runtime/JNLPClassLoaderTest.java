@@ -37,13 +37,13 @@ package net.sourceforge.jnlp.runtime;
 
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.annotations.Bug;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
-import net.sourceforge.jnlp.util.FileTestUtils;
+import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import static net.sourceforge.jnlp.util.FileTestUtils.assertNoFileLeak;
+import static net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils.assertNoFileLeak;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;

@@ -35,7 +35,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.security.appletextendedsecurity.impl;
 
-import net.sourceforge.jnlp.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActionsTest;

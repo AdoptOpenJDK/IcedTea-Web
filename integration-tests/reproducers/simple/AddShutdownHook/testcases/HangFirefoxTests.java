@@ -36,11 +36,11 @@
  */
 
 import net.sourceforge.jnlp.ProcessResult;
-import net.sourceforge.jnlp.annotations.TestInBrowsers;
-import net.sourceforge.jnlp.browsertesting.BrowserTest;
-import net.sourceforge.jnlp.browsertesting.Browsers;
-import net.sourceforge.jnlp.closinglisteners.CountingClosingListener;
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.CountingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 

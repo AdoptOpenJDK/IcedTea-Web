@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.sourceforge.jnlp.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import org.junit.AfterClass;

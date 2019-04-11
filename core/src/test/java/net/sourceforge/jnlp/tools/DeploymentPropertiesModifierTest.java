@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;

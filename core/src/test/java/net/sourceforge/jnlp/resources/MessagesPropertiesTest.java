@@ -35,7 +35,7 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.resources;
 
-import net.sourceforge.jnlp.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
