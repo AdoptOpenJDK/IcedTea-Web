@@ -15,16 +15,26 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import java.io.File;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.UIManager;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.sourceforge.jnlp.LaunchException;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.about.AboutDialog;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
 import net.sourceforge.jnlp.security.viewer.CertificateViewer;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -34,23 +44,11 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
-
-import javax.swing.UIManager;
-import java.io.File;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -124,8 +122,6 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             JNLPRuntime.setHeadless(true);
         }
-
-        DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
 
         if (optionParser.hasOption(CommandLineOptions.VIEWER)) {
             try {
