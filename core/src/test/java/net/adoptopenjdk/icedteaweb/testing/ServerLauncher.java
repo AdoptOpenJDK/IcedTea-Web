@@ -114,8 +114,6 @@ public class ServerLauncher implements Runnable {
             serverSocket = new ServerSocket(port);
             while (running) {
                 TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
-                server.setRedirect(null);
-                server.setRedirectCode(redirectCode);
                 server.setRequestsCounter(null);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
 

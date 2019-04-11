@@ -90,12 +90,12 @@ public class ProcessWrapper {
     
     }
 
-    ProcessWrapper(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) {
+    public ProcessWrapper(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) {
         this.args = args;
         this.dir = dir;
         this.addStdOutListener(stdoutl);
         this.addStdErrListener(stderrl);
-        this.vars = vars;
+        this.vars = null;
     }
 
 

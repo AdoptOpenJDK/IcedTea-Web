@@ -191,14 +191,10 @@ public class ProcessAssasin extends Thread {
     }
 
     private static void sigTerm(String pid) throws Exception {
-        kill(pid, "SIGTERM");
-    }
-
-    private static void kill(String pid, String signal) throws Exception {
         List<String> ll = new ArrayList<>(4);
         ll.add("kill");
         ll.add("-s");
-        ll.add(signal);
+        ll.add("SIGTERM");
         ll.add(pid);
         ServerAccess.executeProcess(ll); //sync, but  acctually release
         //before affected application close

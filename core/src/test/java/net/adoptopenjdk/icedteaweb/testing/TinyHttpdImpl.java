@@ -58,7 +58,7 @@ import java.util.StringTokenizer;
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very
  * small implementation of http return headers for our served resources
  * Originally Licenced under GPLv2.0
- *
+ * <p>
  * When resource starts with XslowX prefix, then resouce (without XslowX) is
  * returned, but its delivery is delayed
  */
@@ -146,64 +146,57 @@ public class TinyHttpdImpl extends Thread {
                         reosurceRecord.put(request, i);
                     }
 
-                    if (redirect != null) {
-                        String where = redirect.getUrl(filePath).toExternalForm();
-                        ServerAccess.logOutputReprint("Redirecting " + request + "as " + redirectCode + " to " + where);
-                        writer.writeBytes("HTTP/1.0 " + redirectCode + " Moved" + CRLF);
-                        writer.writeBytes("Location: " + where + CRLF);
-                        writer.writeBytes(CRLF);
+
+                    if (slowSend) {
+                        filePath = filePath.replace(XSX, "/");
+                    }
+
+                    ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
+                    filePath = urlToFilePath(filePath);
+
+                    File resource = new File(this.testDir, filePath);
+
+                    if (!(resource.isFile() && resource.canRead())) {
+                        ServerAccess.logOutputReprint("Could not open file " + filePath);
+                        writer.writeBytes(HTTP_NOT_FOUND);
+                        continue;
+                    }
+                    ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
+
+                    int resourceLength = (int) resource.length();
+                    byte[] buff = new byte[resourceLength];
+                    FileInputStream fis = new FileInputStream(resource);
+                    fis.read(buff);
+                    fis.close();
+
+                    String contentType = "Content-Type: ";
+                    if (filePath.toLowerCase().endsWith(".jnlp")) {
+                        contentType += "application/x-java-jnlp-file";
+                    } else if (filePath.toLowerCase().endsWith(".jar")) {
+                        contentType += "application/x-jar";
                     } else {
+                        contentType += "text/html";
+                    }
+                    String lastModified = "";
+                    if (supportLastModified) {
+                        lastModified = "Last-Modified: " + new Date(resource.lastModified()) + CRLF;
+                    }
+                    writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + lastModified + contentType + CRLF + CRLF);
 
+                    if (isGetRequest) {
                         if (slowSend) {
-                            filePath = filePath.replace(XSX, "/");
-                        }
-
-                        ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
-                        filePath = urlToFilePath(filePath);
-
-                        File resource = new File(this.testDir, filePath);
-
-                        if (!(resource.isFile() && resource.canRead())) {
-                            ServerAccess.logOutputReprint("Could not open file " + filePath);
-                            writer.writeBytes(HTTP_NOT_FOUND);
-                            continue;
-                        }
-                        ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
-
-                        int resourceLength = (int) resource.length();
-                        byte[] buff = new byte[resourceLength];
-                        FileInputStream fis = new FileInputStream(resource);
-                        fis.read(buff);
-                        fis.close();
-
-                        String contentType = "Content-Type: ";
-                        if (filePath.toLowerCase().endsWith(".jnlp")) {
-                            contentType += "application/x-java-jnlp-file";
-                        } else if (filePath.toLowerCase().endsWith(".jar")) {
-                            contentType += "application/x-jar";
-                        } else {
-                            contentType += "text/html";
-                        }
-                        String lastModified = "";
-                        if (supportLastModified) {
-                            lastModified = "Last-Modified: " + new Date(resource.lastModified()) + CRLF;
-                        }
-                        writer.writeBytes(HTTP_OK + "Content-Length:" + resourceLength + CRLF + lastModified + contentType + CRLF + CRLF);
-
-                        if (isGetRequest) {
-                            if (slowSend) {
-                                byte[][] bb = splitArray(buff, 10);
-                                for (int j = 0; j < bb.length; j++) {
-                                    Thread.sleep(2000);
-                                    byte[] bs = bb[j];
-                                    writer.write(bs, 0, bs.length);
-                                }
-                            } else {
-                                writer.write(buff, 0, resourceLength);
+                            byte[][] bb = splitArray(buff, 10);
+                            for (int j = 0; j < bb.length; j++) {
+                                Thread.sleep(2000);
+                                byte[] bs = bb[j];
+                                writer.write(bs, 0, bs.length);
                             }
+                        } else {
+                            writer.write(buff, 0, resourceLength);
                         }
                     }
                 }
+
             } catch (SocketException e) {
                 ServerAccess.logException(e, false);
             } catch (Exception e) {
@@ -223,7 +216,7 @@ public class TinyHttpdImpl extends Thread {
      * splitt to n pieces s is retrunrd byte[n][length/n], except last piece
      * which contains length%n
      *
-     * @param input - array to be splitted
+     * @param input  - array to be splitted
      * @param pieces - to how many pieces it should be broken
      * @return inidividual pices of original array, which concatet again givs
      * original array
@@ -298,24 +291,6 @@ public class TinyHttpdImpl extends Thread {
         return url;
     }
 
-    /**
-     * When redirect is set, the requests to this server will just redirect to
-     * the underlying ServerLauncher
-     */
-    private ServerLauncher redirect = null;
-
-    void setRedirect(ServerLauncher redirect) {
-        this.redirect = redirect;
-    }
-
-    /**
-     * one of: 301, 302,303, 307, 308,
-     */
-    private int redirectCode = 302;
-
-    void setRedirectCode(int redirectPort) {
-        this.redirectCode = redirectPort;
-    }
 
     //resoource -> request -> number of requests on of this rsource on this server
     // eg   simpletest1.jnlp -> GET -> 3

@@ -179,7 +179,7 @@ public class ServerAccess {
     private static ServerLauncher getIndependentInstance() {
         String dir = (System.getProperty(TEST_SERVER_DIR));
         try {
-            return getIndependentInstance(dir, findFreePort(), true);
+            return getIndependentInstance(dir, findFreePort());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -194,22 +194,12 @@ public class ServerAccess {
 
     private static ServerLauncher getIndependentInstance(int port) {
         String dir = (System.getProperty(TEST_SERVER_DIR));
-        return getIndependentInstance(dir, port, true);
+        return getIndependentInstance(dir, port);
     }
 
-    /**
-     * @param dir  directory from which server returns resources
-     * @param port specific port on which this server is accepting requests
-     * @return new not cached iserver instance on random port upon custom www root directory,
-     * useful for testing application loading from different url then base
-     */
+
 
     public static ServerLauncher getIndependentInstance(String dir, int port) {
-        return getIndependentInstance(dir, port, true);
-    }
-
-
-    private static ServerLauncher getIndependentInstance(String dir, int port, boolean daemon) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
@@ -218,7 +208,7 @@ public class ServerAccess {
         try {
             ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
             Thread r = new Thread(lServerLuncher);
-            r.setDaemon(daemon);
+            r.setDaemon(true);
             r.start();
             return lServerLuncher;
         } catch (Exception ex) {
@@ -503,10 +493,6 @@ public class ServerAccess {
     }
 
 
-    public static ProcessResult executeProcess(final List<String> args) throws Exception {
-        return executeProcess(args, null, null, null);
-    }
-
     /**
      * Proceed message s to logging with request to reprint to System.err
      *
@@ -628,8 +614,8 @@ public class ServerAccess {
         return result;
     }
 
-    private static ProcessResult executeProcess(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
-        return new ProcessWrapper(args, dir, stdoutl, stderrl, null).execute();
+    public static ProcessResult executeProcess(final List<String> args) throws Exception {
+        return new ProcessWrapper(args, null, null, null).execute();
     }
 
 }
