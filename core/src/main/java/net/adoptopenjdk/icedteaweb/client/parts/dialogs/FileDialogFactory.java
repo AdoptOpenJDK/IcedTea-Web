@@ -1,9 +1,10 @@
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
 import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

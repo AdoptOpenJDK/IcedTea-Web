@@ -58,7 +58,7 @@ import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditor
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileDialogFactory;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import org.slf4j.Logger;
