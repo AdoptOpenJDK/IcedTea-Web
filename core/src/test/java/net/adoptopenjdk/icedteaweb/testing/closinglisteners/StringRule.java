@@ -37,20 +37,12 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.closinglisteners;
 
 public abstract class StringRule<T>  implements Rule<String, T>{
-    protected String rule;
+    protected final String rule;
 
     public StringRule(String rule) {
-        setRule(rule);
-    }
-
-    public StringRule() {
-    }
-
-
-    @Override
-    public void setRule(String rule){
         this.rule=rule;
     }
+
     @Override
     public abstract boolean evaluate(T upon);
 

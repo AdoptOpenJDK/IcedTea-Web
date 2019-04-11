@@ -38,7 +38,6 @@ package net.adoptopenjdk.icedteaweb.testing.closinglisteners;
 
 public interface Rule<S,T> {
 
-    void setRule(S rule);
     boolean evaluate(T upon);
 
 }

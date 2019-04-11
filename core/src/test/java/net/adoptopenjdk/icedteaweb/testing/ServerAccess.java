@@ -341,16 +341,6 @@ public class ServerAccess {
         return server.getUrl(resource);
     }
 
-    /**
-     *
-     * @return url pointing to cached server . If non singleton instance is running, new is created.
-     * @throws java.net.MalformedURLException
-     */
-    public URL getUrl() throws MalformedURLException {
-        return getUrl("");
-
-    }
-
 
     /**
      * Return resource from cached server
@@ -477,27 +467,6 @@ public class ServerAccess {
     public static void saveFile(String content, File f) throws IOException {
         FileUtils.saveFile(content, f);
     }
-    
-    /**
-     * helping dummy  method to save String as file in specified encoding/.
-     * 
-     * @param content which will be saved as it is saved in this String
-     * @param f file to be saved. No warnings provided
-     * @param encoding of output byte representation
-     * @throws IOException
-     */
-    public static void saveFile(String content, File f,String encoding) throws IOException {
-        FileUtils.saveFile(content, f, encoding);
-    }
-
-       public ProcessResult executeJavawsHeadless(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
-        if (otherargs == null) {
-            otherargs = new ArrayList<>(1);
-        }
-        List<String> headlesList = new ArrayList<>(otherargs);
-        headlesList.add(0, HEADLES_OPTION);
-        return executeJavaws(headlesList, resource,stdoutl,stderrl,vars);
-    }
 
 
     /**
@@ -522,12 +491,6 @@ public class ServerAccess {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
-    public ProcessResult executeJavaws(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl) throws Exception {
-        return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl);
-    }
-    public ProcessResult executeJavaws(List<String> otherargs, String resource,ContentReaderListener stdoutl,ContentReaderListener stderrl,String[] vars) throws Exception {
-        return executeProcessUponURL(getJavawsLocation(), otherargs, getUrlUponThisInstance(resource),stdoutl,stderrl,vars);
-    }
 
     public ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
         return executeBrowser(otherargs, getUrlUponThisInstance(resource));        
@@ -567,14 +530,6 @@ public class ServerAccess {
        return instance.getUrl(resource);
     }
 
-
-    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
-        return new ProcessWrapper(toBeExecuted, otherargs, u, stdoutl, stderrl, null).execute();
-    }
-
-    public static ProcessResult executeProcessUponURL(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) throws Exception {
-        return new ProcessWrapper(toBeExecuted, otherargs, u, stdoutl, stderrl, vars).execute();
-    }
 
      public static ProcessResult executeProcess(final List<String> args) throws Exception {
          return  executeProcess(args, null);

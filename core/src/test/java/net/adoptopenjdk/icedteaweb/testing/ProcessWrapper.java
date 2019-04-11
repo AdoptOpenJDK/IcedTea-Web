@@ -115,13 +115,6 @@ public class ProcessWrapper {
 
     }
 
-    /**
-     * @return the dir
-     */
-    public File getDir() {
-        return dir;
-    }
-
     public ProcessResult execute() throws Exception {
         if (reactingProcess !=null ){
             reactingProcess.beforeProcess("");

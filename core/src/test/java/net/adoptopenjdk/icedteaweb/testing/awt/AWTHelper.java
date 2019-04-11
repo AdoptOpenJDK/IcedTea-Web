@@ -137,10 +137,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     		return new Rule<String, String>(){
 
 				@Override
-				public void setRule(String rule) {
-				}
-
-				@Override
 				public boolean evaluate(String upon) {
 					return true;
 				}
@@ -168,8 +164,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 4. sets screenCapture indicator to true (after tryKTimes unsuccessfull
      *    tries an exception "ComponentNotFound" will be raised)
      * 
-     * @throws ComponentNotFoundException  
-     * @throws AWTFrameworkException 
+     * @throws AWTFrameworkException
      * @throws AWTFrameworkException 
      */
     public void captureScreenAndFindAppletByIcon() throws AWTFrameworkException {
@@ -180,8 +175,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * method findAndActivateApplet finds the applet by icon 
      * and clicks in the middle of applet area
      * 
-     * @throws ComponentNotFoundException (applet not found) 
-     * @throws AWTFrameworkException 
+     * @throws AWTFrameworkException
      */
     public void findAndActivateApplet() throws AWTFrameworkException
     {

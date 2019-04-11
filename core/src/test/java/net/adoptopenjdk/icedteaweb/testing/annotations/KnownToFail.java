@@ -37,8 +37,6 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.annotations;
 
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -64,5 +62,4 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KnownToFail {
-    Browsers[] failsIn() default {};
 }
