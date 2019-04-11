@@ -42,6 +42,7 @@ public  class AutoAllClosingListener extends ClosingListener {
 
 
     public static final String MAGICAL_OK_CLOSING_STRING = "*** APPLET FINISHED ***";
+    public static final String MAGICAL_ERROR_CLOSING_STRING = "xception";
 
     @Override
     public void charReaded(char ch) {
@@ -50,7 +51,7 @@ public  class AutoAllClosingListener extends ClosingListener {
 
     @Override
     public void lineReaded(String s) {
-       if (s.contains(AutoErrorClosingListener.MAGICAL_ERROR_CLOSING_STRING) || s.contains(MAGICAL_OK_CLOSING_STRING)){
+       if (s.contains(MAGICAL_ERROR_CLOSING_STRING) || s.contains(MAGICAL_OK_CLOSING_STRING)){
            terminate();
        }
     }

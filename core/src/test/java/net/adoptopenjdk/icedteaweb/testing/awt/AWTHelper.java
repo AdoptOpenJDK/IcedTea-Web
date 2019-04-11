@@ -40,11 +40,7 @@ import net.adoptopenjdk.icedteaweb.testing.closinglisteners.Rule;
 import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
 
 import java.awt.AWTException;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 
 public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable{
 
@@ -52,22 +48,12 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     private String initStr = null;
     private int appletHeight;
     private int appletWidth;
-    private final int tryKTimes = DEFAULT_K;
 
     //other 
     protected final StringBuilder sb = new StringBuilder();
     private boolean actionStarted = false;
-    private Rectangle actionArea;
-    private BufferedImage screenshot;
     private Robot robot;
-    private boolean appletFound = false;
-    private boolean markerGiven = false; //impossible to find the applet if marker not given
-    private boolean appletDimensionGiven = false;
-    private final int defaultWaitForApplet = 1000;
-    
-    //default number of times the screen is captured and the applet is searched for
-    //in the screenshot
-    public static final int DEFAULT_K = 3;
+
    
     
     //several constructors
@@ -122,8 +108,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
                 actionStarted = true; 
                 this.findAndActivateApplet();
                 this.run();
-            } catch (ComponentNotFoundException e1) {
-                throw new RuntimeException("AWTHelper problems finding applet.",e1);
             } catch (AWTFrameworkException e2){
                 throw new RuntimeException("AWTHelper problems with unset attributes.",e2);
             }
@@ -188,69 +172,10 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @throws AWTFrameworkException 
      * @throws AWTFrameworkException 
      */
-    public void captureScreenAndFindAppletByIcon() throws ComponentNotFoundException, AWTFrameworkException {
-        if(!appletDimensionGiven || !markerGiven){
-            throw new AWTFrameworkException("AWTFramework cannot find applet without dimension or marker!");
-        }
-        captureScreenAndFindAppletByIconTryKTimes(null, null, appletWidth, appletHeight, tryKTimes);
+    public void captureScreenAndFindAppletByIcon() throws AWTFrameworkException {
+        throw new AWTFrameworkException("AWTFramework cannot find applet without dimension or marker!");
     }
 
-    /**
-     ** method captureScreenAndFindAppletByIcon
-     * 1. captures screen, 
-     * 2. finds the rectangle where applet is and saves it to the attribute
-     *    actionArea 
-     * 3. sets screenCapture indicator to true (after tryKTimes unsuccessfull
-     *    tries an exception "ComponentNotFound" will be raised) 
-     * 
-     * @param icon
-     * @param iconPosition
-     * @param width
-     * @param height
-     * @param K
-     * @throws ComponentNotFoundException
-     */
-    public void captureScreenAndFindAppletByIconTryKTimes(BufferedImage icon, Point iconPosition, int width, int height, int K) throws ComponentNotFoundException {
-  
-        int count = 0;
-        appletFound = false;
-        while ((count < K) && !appletFound) {
-            robot.delay(defaultWaitForApplet);
-            try {
-                screenshot = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-                initialiseOnScreenshot(icon, iconPosition, width, height, screenshot);
-            } catch (ComponentNotFoundException ex) {
-                //keeping silent and try more-times
-            }
-            count++;
-        }
-
-        if (ImageSeeker.isRectangleValid(actionArea)) {
-            appletFound = true;
-        } else {
-            throw new ComponentNotFoundException("Object not found in the screenshot!");
-        }
-
-    }
-    
-    public void initialiseOnScreenshot(BufferedImage icon, Point iconPosition, int width, int height, BufferedImage screenshot) throws ComponentNotFoundException {
-        Rectangle r = ComponentFinder.findWindowByIcon(icon, iconPosition, width, height, screenshot);
-        initialiseOnScreenshotAndArea(screenshot, r);
-        
-    }
-    
-    public void initialiseOnScreenshotAndArea(BufferedImage screenshot, Rectangle actionArea) throws ComponentNotFoundException {
-        this.screenshot = screenshot;
-        this.actionArea = actionArea;
-        if (ImageSeeker.isRectangleValid(actionArea)) {
-            appletFound = true;
-        } else {
-            throw new ComponentNotFoundException("set invalid area!");
-        }
-    }
-
-
-    
     /**
      * method findAndActivateApplet finds the applet by icon 
      * and clicks in the middle of applet area
@@ -258,7 +183,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @throws ComponentNotFoundException (applet not found) 
      * @throws AWTFrameworkException 
      */
-    public void findAndActivateApplet() throws ComponentNotFoundException, AWTFrameworkException
+    public void findAndActivateApplet() throws AWTFrameworkException
     {
         captureScreenAndFindAppletByIcon();
         clickInTheMiddleOfApplet();
@@ -271,7 +196,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * middle of its location rectangle
      */
     public void clickInTheMiddleOfApplet() {
-        MouseActions.clickInside(this.actionArea, this.robot);
+        MouseActions.clickInside(null, this.robot);
     }
     
 

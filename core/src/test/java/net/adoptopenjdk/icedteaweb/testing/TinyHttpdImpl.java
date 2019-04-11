@@ -72,7 +72,6 @@ public class TinyHttpdImpl extends Thread {
 
     private final Socket socket;
     private final File testDir;
-    private final boolean canRun = true;
     private boolean supportingHeadRequest = true;
     private boolean supportLastModified = false;
     private Authentication511Requester authenticationRequester;
@@ -115,6 +114,7 @@ public class TinyHttpdImpl extends Thread {
             BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             DataOutputStream writer = new DataOutputStream(this.socket.getOutputStream());
             try {
+                final boolean canRun = true;
                 while (canRun) {
                     String line = reader.readLine();
                     if (line.length() < 1) {

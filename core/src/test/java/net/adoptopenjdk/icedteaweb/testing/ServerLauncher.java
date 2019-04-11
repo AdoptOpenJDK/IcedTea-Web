@@ -53,12 +53,6 @@ public class ServerLauncher implements Runnable, Authentication511Requester {
         LOCALHOST, LOCALHOST_IP, HOSTNAME
     }
 
-    /**
-     * default url name part. This can be changed in runtime, but will affect
-     * all following tasks upon those server
-     */
-    private final String serverName = ServerAccess.DEFAULT_LOCALHOST_NAME;
-    private final String protocol = ServerAccess.DEFAULT_LOCALHOST_PROTOCOL;
     private boolean running;
     private final Integer port;
     private final File dir;
@@ -87,7 +81,11 @@ public class ServerLauncher implements Runnable, Authentication511Requester {
             return ServerAccess.DEFAULT_LOCALHOST_IP;
 
         }
-        return serverName;
+        /*
+      default url name part. This can be changed in runtime, but will affect
+      all following tasks upon those server
+     */
+        return ServerAccess.DEFAULT_LOCALHOST_NAME;
     }
 
     public ServerLauncher(Integer port, File dir) {
@@ -149,6 +147,7 @@ public class ServerLauncher implements Runnable, Authentication511Requester {
     }
 
     public URL getUrl(String resource) throws MalformedURLException {
+        final String protocol = ServerAccess.DEFAULT_LOCALHOST_PROTOCOL;
         return new URL(protocol, getServerName(), getPort(), sanitizeResource(resource));
     }
 
@@ -182,13 +181,11 @@ public class ServerLauncher implements Runnable, Authentication511Requester {
         return super.toString();
     }
 
-    private boolean needsAuthentication511 = false;
     private boolean wasuthenticated511 = false;
-    private boolean remberLastUrl = false;
 
     @Override
     public boolean isRememberOrigianlUrl() {
-        return remberLastUrl;
+        return false;
     }
 
     @Override
@@ -198,7 +195,7 @@ public class ServerLauncher implements Runnable, Authentication511Requester {
 
     @Override
     public boolean isNeedsAuthentication511() {
-        return needsAuthentication511;
+        return false;
     }
 
     @Override

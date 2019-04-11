@@ -111,11 +111,7 @@ public class ImageSeeker
             for (int x = 0; x < w; x++) {
                 int i = icon.getRGB(x, y);
                 int alpha = (i >> 24) & 0xff;
-                if (alpha == 255) {
-                    r[x][y] = true;
-                } else {
-                    r[x][y] = false;
-                }
+                r[x][y] = alpha == 255;
             }
         }
         return r;

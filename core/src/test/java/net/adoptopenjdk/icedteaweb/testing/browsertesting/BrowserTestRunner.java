@@ -108,10 +108,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
     }
 
     private boolean isBrowsersNoneSet(TestInBrowsers tib) {
-        if (tib.testIn().length == 1 && tib.testIn()[0] == Browsers.none) {
-            return true;
-        }
-        return false;
+        return tib.testIn().length == 1 && tib.testIn()[0] == Browsers.none;
     }
 
     private void injectBrowserCatched(FrameworkMethod method) {

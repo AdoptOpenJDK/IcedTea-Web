@@ -103,11 +103,11 @@ public class LoggingBottleneck {
     }
 
    synchronized void writeXmlLog() throws IOException {
-       writeXmlLog(DEFAULT_LOG_FILE, Collections.unmodifiableMap(processLogs));
+       writeXmlLog(Collections.unmodifiableMap(processLogs));
    }
 
-    synchronized static void writeXmlLog(File f, Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
-        Writer w = new OutputStreamWriter(new FileOutputStream(f));
+    synchronized static void writeXmlLog(Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
+        Writer w = new OutputStreamWriter(new FileOutputStream(DEFAULT_LOG_FILE));
         Set<Entry<String, Map<String, TestsLogs>>> classes = processLogs.entrySet();
         w.write("<" + LOGS_ELEMENT + ">");
         for (Entry<String, Map<String, TestsLogs>> classLog : classes) {

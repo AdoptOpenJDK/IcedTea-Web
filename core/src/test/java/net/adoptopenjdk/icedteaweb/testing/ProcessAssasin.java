@@ -58,15 +58,6 @@ public class ProcessAssasin extends Thread {
     //signifies that assasin have done its job
     private volatile boolean killed = false;
 
-    private final boolean useKill = false;
-    /**
-     * if this is true, then process is not destroyed after timeout, but just
-     * left to its own destiny. Its stdout/err is no longer recorded, and it is
-     * leaking system resources until it dies by itself The contorl is returned
-     * to main thread with all informations recorded untill now. You will be
-     * able to listen to std out from listeners still
-     */
-    private final boolean skipInstedOfDesroy = false;
     private ReactingProcess reactingProcess;
 
     public ProcessAssasin(ThreadedProcess p, long timeout) {
@@ -115,9 +106,14 @@ public class ProcessAssasin extends Thread {
                             wasTerminated = true;
                             if (p.getP() != null) {
                                 try {
-                                    if (!skipInstedOfDesroy) {
+                                    /*
+      if this is true, then process is not destroyed after timeout, but just
+      left to its own destiny. Its stdout/err is no longer recorded, and it is
+      leaking system resources until it dies by itself The contorl is returned
+      to main thread with all informations recorded untill now. You will be
+      able to listen to std out from listeners still
+     */
                                         destroyProcess();
-                                    }
                                 } catch (Throwable ex) {
                                     if (p.deadlyException == null) {
                                         p.deadlyException = ex;
@@ -176,7 +172,7 @@ public class ProcessAssasin extends Thread {
     }
 
     public boolean isUseKill() {
-        return useKill;
+        return false;
     }
 
 
