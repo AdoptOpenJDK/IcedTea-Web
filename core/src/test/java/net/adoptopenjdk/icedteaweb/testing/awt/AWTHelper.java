@@ -161,15 +161,6 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
 					return true;
 				}
 
-				@Override
-				public String toPassingString() {
-					return "nothing to check, initStr is null";
-				}
-
-				@Override
-				public String toFailingString() {
-					return "nothing to check, initStr is null";
-				}
     			
     		} ;
     	}
