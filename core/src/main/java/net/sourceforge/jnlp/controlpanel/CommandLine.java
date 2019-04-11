@@ -18,9 +18,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.sourceforge.jnlp.controlpanel;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.naming.ConfigurationException;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.jnlp.config.ConfiguratonValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
@@ -29,17 +36,9 @@ import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.naming.ConfigurationException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -511,7 +510,6 @@ public class CommandLine {
             if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
                 JNLPRuntime.setHeadless(true);
             }
-            DeploymentConfiguration.move14AndOlderFilesTo15StructureCatched();
             if (args.length == 0) {
                 ControlPanel.main(new String[] {});
             } else {
