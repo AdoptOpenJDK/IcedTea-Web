@@ -82,7 +82,7 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS

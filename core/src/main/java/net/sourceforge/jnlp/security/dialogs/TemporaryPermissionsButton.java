@@ -43,7 +43,6 @@ import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
 import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
@@ -66,7 +65,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class TemporaryPermissionsButton extends JButton {
 

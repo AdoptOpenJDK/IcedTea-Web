@@ -23,11 +23,10 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.CachePane;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Provides static methods to interact with the cache, download

@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UrlRegEx;
 import net.sourceforge.jnlp.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;

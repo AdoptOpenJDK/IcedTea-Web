@@ -59,7 +59,7 @@ import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public final class AboutDialog extends JPanel implements Runnable, ActionListener {
 

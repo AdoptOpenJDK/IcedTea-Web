@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security.dialogs;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;

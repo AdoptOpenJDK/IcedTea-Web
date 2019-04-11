@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.security.dialogs.remember;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 public enum ExecuteAppletAction {
 

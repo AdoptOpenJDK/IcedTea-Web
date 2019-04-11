@@ -2,7 +2,7 @@ package net.adoptopenjdk.icedteaweb.commandline;
 
 import java.util.Objects;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public enum CommandLineOptions {
     //javaws undocummented swithces

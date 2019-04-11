@@ -54,7 +54,6 @@ import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ import java.util.List;
 import java.util.Set;
 
 import static net.sourceforge.jnlp.config.BasicValueValidators.splitCombination;
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class ManifestAttributesChecker {
 

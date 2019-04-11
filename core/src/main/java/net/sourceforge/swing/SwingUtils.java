@@ -37,8 +37,7 @@ exception statement from your version. */
 package net.sourceforge.swing;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

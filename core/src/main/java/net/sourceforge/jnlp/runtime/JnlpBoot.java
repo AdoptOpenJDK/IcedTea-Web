@@ -39,7 +39,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import static net.sourceforge.jnlp.runtime.Boot.init;
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public final class JnlpBoot {
 

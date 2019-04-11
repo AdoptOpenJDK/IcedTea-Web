@@ -38,7 +38,7 @@ package net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -55,7 +55,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library

@@ -36,7 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util.docprovider;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;

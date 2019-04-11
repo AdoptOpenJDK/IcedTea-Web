@@ -38,7 +38,7 @@ package net.sourceforge.jnlp.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.SecurityDialog;
 import net.sourceforge.jnlp.security.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.dialogresults.SetValueHandler;
@@ -46,7 +46,6 @@ import net.sourceforge.jnlp.security.dialogresults.YesNo;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanel;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberPanelResult;
 import net.sourceforge.jnlp.security.dialogs.remember.RememberableDialog;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

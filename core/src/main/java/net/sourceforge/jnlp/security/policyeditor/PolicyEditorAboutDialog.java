@@ -1,7 +1,6 @@
 package net.sourceforge.jnlp.security.policyeditor;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class PolicyEditorAboutDialog extends JFrame {
 

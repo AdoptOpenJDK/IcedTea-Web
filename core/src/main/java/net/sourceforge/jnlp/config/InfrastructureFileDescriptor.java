@@ -38,7 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import java.io.File;
 import java.net.MalformedURLException;

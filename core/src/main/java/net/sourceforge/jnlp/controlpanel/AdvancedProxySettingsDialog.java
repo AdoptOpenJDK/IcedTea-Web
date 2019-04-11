@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.sourceforge.jnlp.controlpanel;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.swing.SwingUtils;

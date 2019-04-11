@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Maintains information about a CertPath that has signed at least one of the

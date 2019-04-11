@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This is the main entry point for the JNLP client. The main method parses the

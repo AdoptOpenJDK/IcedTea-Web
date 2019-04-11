@@ -14,17 +14,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.i18n;
 
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static java.lang.String.format;
+
 /**
- * Utility class to provide simple methods to help localize messages
+ * Utility class to provide simple methods to help localize messages.
  */
 public class Translator {
+    static final String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = "net.adoptopenjdk.icedteaweb.i18n.Messages";
+    static final String MISSING_RESOURCE_PLACEHOLDER = "RNoResource";
 
     private static class TranslatorHolder {
 
@@ -32,26 +37,25 @@ public class Translator {
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
         private static final Translator INSTANCE = new Translator();
 
-        private static Translator getTransaltor() {
+        private static Translator getTranslator() {
             return TranslatorHolder.INSTANCE;
         }
     }
 
-    /**
-     * the localized resource strings
-     */
     private final ResourceBundle resources;
 
     Translator() {
-        this("net.sourceforge.jnlp.resources.Messages");
+        this(DEFAULT_RESOURCE_BUNDLE_BASE_NAME);
     }
 
-    Translator(String s) {
+    Translator(final String fullyQualifiedBundleBaseName) {
         try {
-            resources = ResourceBundle.getBundle(s);
+            resources = ResourceBundle.getBundle(fullyQualifiedBundleBaseName);
         } catch (Exception ex) {
-            throw new IllegalStateException("No bundles found for Locale: " + Locale.getDefault().toString()
-                    + "and missing base resource bundle in javaws.jar:net/sourceforge/jnlp/resource/Messages.properties");
+            throw new IllegalStateException(
+                    format("No bundle found for locale '%s' and missing base resource bundle '%s'.",
+                    Locale.getDefault().toString(), DEFAULT_RESOURCE_BUNDLE_BASE_NAME)
+            );
         }
     }
 
@@ -60,7 +64,7 @@ public class Translator {
     }
 
     public static Translator getInstance() {
-        return TranslatorHolder.getTransaltor();
+        return TranslatorHolder.getTranslator();
     }
 
     /**
@@ -77,8 +81,8 @@ public class Translator {
      * @param params params to be expanded to message
      * @return the localized string for the message
      */
-    public static String R(String message, Object... params) {
-        return getInstance().getMessage(message, params);
+    public static String R(final String message, final Object... params) {
+        return getInstance().translate(message, params);
     }
    
     /**
@@ -86,8 +90,8 @@ public class Translator {
      * @param key key to be found in properties
      * @param args params to be expanded to message
      */
-    protected String getMessage(String key, Object... args) {
-        return MessageFormat.format(getMessage(key), args);
+    protected String translate(final String key, final Object... args) {
+        return MessageFormat.format(translate(key), args);
     }
 
     /**
@@ -95,20 +99,22 @@ public class Translator {
      * specified key. If the message is empty, a null is
      * returned.
      */
-    private String getMessage(String key) {
+    private String translate(final String key) {
         try {
-            String result = resources.getString(key);
-            if (result.length() == 0)
-                return "";
-            else
-                return result;
-        } catch (NullPointerException e) {
-            return getMessage("RNoResource", new Object[]{key});
-        } catch (MissingResourceException | ClassCastException e) {
-            if (key == "RNoResource") {
-                return "No localized text found";
+            return resources.getString(key);
+        }
+        catch (NullPointerException e) {
+            throw new IllegalArgumentException(format("Key '%s' to lookup resource bundle text must not be null.", key));
+        }
+        catch (MissingResourceException | ClassCastException e) {
+            if (Objects.equals(key, MISSING_RESOURCE_PLACEHOLDER)) {
+                throw new IllegalStateException(
+
+                        format("No missing resource placeholder key '%s' found in resource bundles.", key));
             } else {
-                return getMessage("RNoResource", new Object[]{key});
+                // try with custom fallback placeholder that should be included in the bundle
+                final String languageCode = Locale.getDefault().getLanguage();
+                return translate(MISSING_RESOURCE_PLACEHOLDER, new Object[]{key, languageCode});
             }
         }
     }

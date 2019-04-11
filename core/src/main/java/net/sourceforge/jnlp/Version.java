@@ -17,8 +17,7 @@
 package net.sourceforge.jnlp;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
