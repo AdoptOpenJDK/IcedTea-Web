@@ -38,7 +38,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.YesNo;

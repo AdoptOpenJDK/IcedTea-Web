@@ -39,7 +39,7 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.adoptopenjdk.icedteaweb.client.console.ConsoleOutputPaneModel;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -64,7 +64,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class FreeDesktopIntegrationEditorFrame extends JFrame {
 

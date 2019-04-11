@@ -39,8 +39,8 @@ package net.adoptopenjdk.icedteaweb.client.certificateviewer;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.ScreenFinder;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -48,7 +48,7 @@ import java.awt.Container;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class CertificateViewer extends JFrame {
 

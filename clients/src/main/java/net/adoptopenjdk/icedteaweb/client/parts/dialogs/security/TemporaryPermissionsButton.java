@@ -36,6 +36,22 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.sourceforge.jnlp.security.policyeditor.PolicyEditorPermissions;
+import net.sourceforge.jnlp.security.policyeditor.PolicyIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.security.provider.PolicyParser;
+
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
@@ -63,7 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class TemporaryPermissionsButton extends JButton {
 

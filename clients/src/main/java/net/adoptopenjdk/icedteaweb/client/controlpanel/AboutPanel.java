@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.sourceforge.jnlp.about.AboutDialog;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import javax.swing.Box;

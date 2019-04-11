@@ -37,7 +37,7 @@ exception statement from your version. */
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.NamePassword;
 
@@ -54,7 +54,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials

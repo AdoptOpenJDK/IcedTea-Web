@@ -37,7 +37,7 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
 import net.sourceforge.jnlp.InformationDesc;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 /**
  * The optional kind="splash" attribute may be used in an icon element to

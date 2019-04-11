@@ -37,8 +37,8 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.ScreenFinder;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.JDialog;
 import java.awt.Component;

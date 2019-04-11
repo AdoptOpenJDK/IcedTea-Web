@@ -37,7 +37,7 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.extensions.ExtensionManager;

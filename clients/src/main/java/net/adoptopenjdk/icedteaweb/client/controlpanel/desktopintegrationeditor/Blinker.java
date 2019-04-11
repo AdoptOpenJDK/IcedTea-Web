@@ -35,7 +35,7 @@
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor;
 
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;

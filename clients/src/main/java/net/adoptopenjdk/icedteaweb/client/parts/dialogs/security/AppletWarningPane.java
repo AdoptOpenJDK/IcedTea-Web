@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.SetValueHandler;

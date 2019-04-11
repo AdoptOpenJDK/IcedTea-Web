@@ -43,7 +43,7 @@ import net.sourceforge.jnlp.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.BasicDialogValue;
@@ -78,7 +78,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are

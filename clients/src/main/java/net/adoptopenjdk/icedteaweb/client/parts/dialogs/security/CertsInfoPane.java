@@ -76,7 +76,7 @@ import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Do not remove this two unused imports, nor expands its "*" call.

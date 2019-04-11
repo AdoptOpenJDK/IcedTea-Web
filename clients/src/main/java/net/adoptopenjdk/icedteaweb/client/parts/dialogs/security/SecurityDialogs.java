@@ -36,6 +36,22 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.cache.Resource;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.security.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.dialogresults.NamePassword;
+import net.sourceforge.jnlp.security.dialogresults.YesCancel;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandbox;
+import net.sourceforge.jnlp.security.dialogresults.YesNoSandboxLimited;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.JDialog;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;

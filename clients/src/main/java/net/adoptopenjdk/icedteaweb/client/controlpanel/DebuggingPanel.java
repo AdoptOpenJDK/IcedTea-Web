@@ -20,7 +20,7 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 
 import javax.swing.Box;

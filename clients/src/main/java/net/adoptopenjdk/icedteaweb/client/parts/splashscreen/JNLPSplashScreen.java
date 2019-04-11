@@ -37,6 +37,18 @@ exception statement from your version. */
 
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.splashscreen.SplashPanel;
+import net.sourceforge.jnlp.splashscreen.SplashUtils;
+import net.sourceforge.jnlp.splashscreen.parts.InformationElement;
+import net.sourceforge.jnlp.util.ImageResources;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;

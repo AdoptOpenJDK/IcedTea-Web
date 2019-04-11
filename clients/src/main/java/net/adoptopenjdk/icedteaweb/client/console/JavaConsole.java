@@ -45,7 +45,7 @@ import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
-import net.sourceforge.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS

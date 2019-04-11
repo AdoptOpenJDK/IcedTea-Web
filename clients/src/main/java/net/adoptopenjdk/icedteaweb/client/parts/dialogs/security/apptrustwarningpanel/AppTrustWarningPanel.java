@@ -49,7 +49,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogP
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
-import net.sourceforge.jnlp.util.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /*
  * This class is meant to provide a common layout and functionality for warning dialogs

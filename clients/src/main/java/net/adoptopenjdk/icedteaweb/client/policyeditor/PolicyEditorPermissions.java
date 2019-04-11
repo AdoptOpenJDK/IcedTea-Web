@@ -42,7 +42,7 @@ import javax.swing.JCheckBox;
 import java.io.Serializable;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 
 /**

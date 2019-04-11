@@ -42,7 +42,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.Translator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -46,13 +46,13 @@ import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import javax.swing.JDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs.DialogType;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs.DialogType;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.dialogresults.DialogResult;
-import net.sourceforge.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
