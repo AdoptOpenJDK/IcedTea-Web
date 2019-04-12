@@ -55,18 +55,16 @@ public class PathsAndFiles {
 
     private final static Logger LOG = LoggerFactory.getLogger(PathsAndFiles.class);
 
-    public static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
+    private static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
 
     private static final String CONFIG_HOME;
     private static final String CACHE_HOME;
     private static final String DATA_HOME;
     private static final String RUNTIME_HOME;
-    public static final String USER_CONFIG_HOME;
-    public static final String USER_CACHE_HOME;
-    public static final String USER_DEFAULT_SECURITY_DIR;
-    public static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
-    public static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
-    public static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
+    private static final String USER_CONFIG_HOME;
+private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
+    private static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
+    private static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
     private static final String XDG_DATA_HOME = "XDG_DATA_HOME";
     private static final String WINDIR = "WINDIR";
     private static final String TMP_PROP = "java.io.tmpdir";
@@ -108,16 +106,9 @@ public class PathsAndFiles {
             DATA_HOME = dataHome;
         }
         USER_CONFIG_HOME = CONFIG_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
-        USER_CACHE_HOME = CACHE_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
-        USER_DEFAULT_SECURITY_DIR = USER_CONFIG_HOME + File.separator + securityWord;
     }
 
-    /**
-     * PIPES_DIR and both Plugin Dirs  are not instatiated to be used. Do exists  only for documentation purposes.
-     * Maintained by native part of ITW. Or outside ITW.
-     */
-    public static final InfrastructureFileDescriptor PIPES_DIR = new RuntimeFileDescriptor("icedteaplugin-user-*", "FILEpipe", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(ICEDTEA_SO, ".mozilla/plugins", "FILEmozillauser", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(Target.PLUGIN);
     public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
     public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
     public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
@@ -169,7 +160,7 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor ICONS_DIR = new ItwConfigFileDescriptor("icons", "FILEicons", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor GEN_JNLPS_DIR = new ItwConfigFileDescriptor("generated_jnlps", "FILEjnlps", Target.PLUGIN, Target.ITWEB_SETTINGS);
     //javaws is saving here, itweb-settings may modify them
-    public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor("javaws", "FILEmenus", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
@@ -181,7 +172,7 @@ public class PathsAndFiles {
         }
         
     };
-    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir", Target.JAVAWS) {
+    public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir") {
 
         @Override
         public String getPropertiesKey() {
@@ -189,7 +180,7 @@ public class PathsAndFiles {
         }
         
     };
-    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock", Target.JAVAWS) {
+    public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock") {
 
         @Override
         public String getPropertiesKey() {
@@ -208,12 +199,6 @@ public class PathsAndFiles {
         public File getFile() {
             throw new IllegalStateException("Only getFullPath should be used. This is returning URL String.");
         }
-        
-        @Override
-        public File getDefaultFile() {
-            throw new IllegalStateException("Only getDefaultFullPath should be used. This is returning URL String.");
-        }
-        
     };
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
         @Override
@@ -288,7 +273,7 @@ public class PathsAndFiles {
         }
 
     };
-    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEjavadp", Target.JAVAWS, Target.ITWEB_SETTINGS) {
+    public static final InfrastructureFileDescriptor JAVA_DEPLOYMENT_PROP_FILE = new SystemJavaLibFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS) {
 
         @Override
         public String getDescription() {
@@ -298,17 +283,10 @@ public class PathsAndFiles {
     };
     public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
-    static enum Target {
-        JAVAWS, PLUGIN, ITWEB_SETTINGS, POLICY_EDITOR;
-    }
-
     public static List<InfrastructureFileDescriptor> getAllFiles() {
         return getAllFiles(null);
     }
-    
-    public static List<InfrastructureFileDescriptor> getAllSecurityFiles() {
-        return getAllFiles(null, UserSecurityConfigFileDescriptor.class);
-    }
+
 
     private static List<InfrastructureFileDescriptor> getAllFiles(Target desired) {
         return getAllFiles(desired, InfrastructureFileDescriptor.class);
@@ -356,8 +334,8 @@ public class PathsAndFiles {
 
     private static class HomeFileDescriptor extends InfrastructureFileDescriptor {
 
-        private HomeFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, System.getProperty(HOME_PROP), description, target);
+        private HomeFileDescriptor(Target... target) {
+            super(PathsAndFiles.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(HOME_PROP), "FILEmozillauser", target);
         }
               @Override
         public String getSystemPathStubAcronym() {
@@ -386,8 +364,8 @@ public class PathsAndFiles {
             return "{" + "%" + WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
         }
 
-        private SystemCofigFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, getSystemConfigDir(), description, target);
+        private SystemCofigFileDescriptor(String fileName, String description, Target... target) {
+            super(fileName, "deployment", getSystemConfigDir(), description, target);
         }
 
     }
@@ -395,7 +373,7 @@ public class PathsAndFiles {
     private static class SystemDeploymentCofigFileDescriptor extends SystemCofigFileDescriptor {
 
         private SystemDeploymentCofigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, "deployment", description, target);
+            super(fileName, description, target);
         }
 
     }
@@ -415,12 +393,12 @@ public class PathsAndFiles {
 
     private static class SystemJavaLibFileDescriptor extends SystemJavaFileDescriptor {
 
-        private SystemJavaLibFileDescriptor(String fileName, String desc, Target... target) {
-            super(fileName, "lib", desc, target);
+        private SystemJavaLibFileDescriptor(Target... target) {
+            super(DeploymentConfiguration.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
         }
 
-        private SystemJavaLibFileDescriptor(String fileName, String subpath, String description, Target... target) {
-            super(fileName, "lib" + File.separator + subpath, description, target);
+        private SystemJavaLibFileDescriptor(String fileName, Target... target) {
+            super(fileName, "lib" + File.separator + PathsAndFiles.securityWord, "FILEjavacerts", target);
         }
 
     }
@@ -428,15 +406,15 @@ public class PathsAndFiles {
     private static class SystemJavaSecurityFileDescriptor extends SystemJavaLibFileDescriptor {
 
         private SystemJavaSecurityFileDescriptor(String fileName) {
-            super(fileName, securityWord, "FILEjavacerts", Target.JAVAWS);
+            super(fileName, Target.JAVAWS);
         }
 
     }
     
     private static class DataFileDescriptor extends InfrastructureFileDescriptor {
 
-        private DataFileDescriptor(String fileName, String sp, String description, Target... target) {
-            super(fileName, sp, DATA_HOME, description, target);
+        private DataFileDescriptor(String fileName, Target... target) {
+            super(fileName, "applications", DATA_HOME, "FILEmenus", target);
         }
 
         @Override
@@ -451,16 +429,16 @@ public class PathsAndFiles {
      */
     private static class MenuFileDescriptor extends DataFileDescriptor {
 
-        private MenuFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, "applications", description, target);
+        private MenuFileDescriptor(Target... target) {
+            super("javaws", target);
         }
     }
 
 
     private static class RuntimeFileDescriptor extends InfrastructureFileDescriptor {
 
-        private RuntimeFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, RUNTIME_HOME, "", description, target);
+        private RuntimeFileDescriptor(Target... target) {
+            super("icedteaplugin-user-*", RUNTIME_HOME, "", "FILEpipe", target);
         }
 
         @Override
@@ -537,8 +515,8 @@ public class PathsAndFiles {
 
     private static class TmpUsrFileDescriptor extends InfrastructureFileDescriptor {
 
-        private TmpUsrFileDescriptor(String fileName, String pathStub, String description, Target... target) {
-            super(fileName, pathStub, System.getProperty(TMP_PROP) + File.separator + System.getProperty(USER_PROP), description, target);
+        private TmpUsrFileDescriptor(String fileName, String pathStub, String description) {
+            super(fileName, pathStub, System.getProperty(TMP_PROP) + File.separator + System.getProperty(USER_PROP), description, Target.JAVAWS);
         }
 
         @Override
@@ -546,6 +524,6 @@ public class PathsAndFiles {
             return VARIABLE + "TMP" + File.separator + VARIABLE + "USER";
         }
 
-    };
-    
+    }
+
 }

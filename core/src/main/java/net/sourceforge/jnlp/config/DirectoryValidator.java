@@ -225,7 +225,7 @@ public class DirectoryValidator {
      *     <li>{@link DeploymentConfiguration#KEY_USER_LOCKS_DIR}</li>
      * </ul>
      */
-    public DirectoryValidator() {
+    private DirectoryValidator() {
         dirsToCheck = new ArrayList<>(6);
         DeploymentConfiguration dc = JNLPRuntime.getConfiguration();
         String[] keys = new String[]{
@@ -269,7 +269,7 @@ public class DirectoryValidator {
         return ensureDirs(dirsToCheck);
     }
 
-    static DirectoryCheckResults ensureDirs(List<File> dirs) {
+    private static DirectoryCheckResults ensureDirs(List<File> dirs) {
         List<DirectoryCheckResult> result = new ArrayList<>(dirs.size());
         for (File f : dirs) {
             if (f.exists()) {

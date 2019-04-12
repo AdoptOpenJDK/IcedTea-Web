@@ -66,8 +66,8 @@ public class ConfiguratonValidator {
      * get the list of incorrect or unrecognized settings.
      */
     public void validate() {
-        incorrectEntries = new ArrayList<Setting<String>>();
-        unrecognizedEntries = new ArrayList<Setting<String>>();
+        incorrectEntries = new ArrayList<>();
+        unrecognizedEntries = new ArrayList<>();
 
         Map<String, Setting<String>> knownGood = Defaults.getDefaults();
 
@@ -81,14 +81,14 @@ public class ConfiguratonValidator {
                     try {
                         checker.validate(unknown.getValue());
                     } catch (IllegalArgumentException e) {
-                        Setting<String> strange = new Setting<String>(unknown);
+                        Setting<String> strange = new Setting<>(unknown);
                         strange.setValue(unknown.getValue());
                         incorrectEntries.add(strange);
                     }
                 }
             } else {
                 // check for unknown settings
-                Setting<String> strange = new Setting<String>(toValidate.get(key));
+                Setting<String> strange = new Setting<>(toValidate.get(key));
                 unrecognizedEntries.add(strange);
             }
         }
@@ -104,7 +104,7 @@ public class ConfiguratonValidator {
             throw new IllegalStateException();
         }
 
-        return new ArrayList<Setting<String>>(incorrectEntries);
+        return new ArrayList<>(incorrectEntries);
     }
 
     /**
@@ -114,7 +114,7 @@ public class ConfiguratonValidator {
         if (!validated) {
             throw new IllegalStateException();
         }
-        return new ArrayList<Setting<String>>(unrecognizedEntries);
+        return new ArrayList<>(unrecognizedEntries);
     }
 
 }

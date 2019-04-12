@@ -328,7 +328,7 @@ public class Defaults {
                 {
                         "deployment.cache.max.size",
                         BasicValueValidators.getRangedIntegerValidator(-1, Integer.MAX_VALUE),
-                        String.valueOf("-1")
+                        "-1"
                 },
                 {
                         "deployment.cache.jarcompression",
