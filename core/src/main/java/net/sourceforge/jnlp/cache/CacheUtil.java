@@ -49,6 +49,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.jnlp.DownloadServiceListener;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.Version;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -769,7 +770,7 @@ public class CacheUtil {
             }
             URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
 
-            listener = indicator.getListener(app, title, undownloaded);
+            listener = indicator.getListener(title, undownloaded);
 
             do {
                 long read = 0;

@@ -14,12 +14,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.client.parts.downloadindicator;
 
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-
-import javax.jnlp.DownloadServiceListener;
 import java.net.URL;
+import javax.jnlp.DownloadServiceListener;
 
 /**
  * A DownloadIndicator creates DownloadServiceListeners that are
@@ -41,14 +39,11 @@ public interface DownloadIndicator {
      * download.
      * </p>
      *
-     * @param app JNLP application downloading the files, or null if not applicable
      * @param downloadName name identifying the download to the user
      * @param resources initial urls to display, empty if none known at start
      * @return dedicated listener
      */
-    public DownloadServiceListener getListener(ApplicationInstance app,
-                                               String downloadName,
-                                               URL resources[]);
+    DownloadServiceListener getListener(String downloadName, URL[] resources);
 
     /**
      * Indicates that a download service listener that was obtained
@@ -58,17 +53,17 @@ public interface DownloadIndicator {
      *
      * @param listener the listener that is no longer in use
      */
-    public void disposeListener(DownloadServiceListener listener);
+    void disposeListener(DownloadServiceListener listener);
 
     /**
      * Return the desired time in milliseconds between updates.
-     * Updates are not guarenteed to occur based on this value; for
+     * Updates are not guaranteed to occur based on this value; for
      * example, they may occur based on the download percent or some
      * other factor.
      *
      * @return rate in milliseconds, must be &gt;= 0
      */
-    public int getUpdateRate();
+    int getUpdateRate();
 
     /**
      * Return a time in milliseconds to wait for a download to
@@ -80,6 +75,6 @@ public interface DownloadIndicator {
      *
      * @return delay in milliseconds, must be &gt;= 0
      */
-    public int getInitialDelay();
+    int getInitialDelay();
 
 }
