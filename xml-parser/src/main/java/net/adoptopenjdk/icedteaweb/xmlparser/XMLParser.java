@@ -102,15 +102,12 @@ public class XMLParser {
             final InputStreamReader isr = new InputStreamReader(bs, getEncoding(bs));
             // Clean the jnlp xml file of all comments before passing it to the parser.
             new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            (new XMLElement()).sanitizeInput(isr, pout);
-                            try {
-                                pout.close();
-                            } catch (IOException ioe) {
-                                LOG.error("Error in XML parser", ioe);
-                            }
+                    () -> {
+                        (new XMLElement()).sanitizeInput(isr, pout);
+                        try {
+                            pout.close();
+                        } catch (IOException ioe) {
+                            LOG.error("Error in XML parser", ioe);
                         }
                     }).start();
             xml.parseFromReader(new InputStreamReader(pin));

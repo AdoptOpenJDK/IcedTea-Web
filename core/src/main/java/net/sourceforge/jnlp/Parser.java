@@ -189,8 +189,6 @@ public final class Parser {
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
 
-        // normalize the text nodes
-        root.normalize();
     }
 
     /**
