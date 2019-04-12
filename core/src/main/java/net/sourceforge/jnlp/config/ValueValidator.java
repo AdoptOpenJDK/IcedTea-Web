@@ -53,7 +53,7 @@ public interface ValueValidator {
      * @param value The object to validate
      * @throws IllegalArgumentException if the value is invalid
      */
-    public void validate(Object value) throws IllegalArgumentException;
+    void validate(Object value) throws IllegalArgumentException;
 
     /**
      * Returns a string describing possible values in human-readable form that
@@ -62,5 +62,5 @@ public interface ValueValidator {
      * @return a string describing possible values that this
      * {@link ValueValidator} accepts
      */
-    public String getPossibleValues();
+    String getPossibleValues();
 }

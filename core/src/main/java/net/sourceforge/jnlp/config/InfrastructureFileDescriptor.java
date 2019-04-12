@@ -50,7 +50,7 @@ public class InfrastructureFileDescriptor {
     private final String pathStub;
     private final String systemPathStub;
     private final String descriptionKey;
-    final PathsAndFiles.Target[] target;
+    final Target[] target;
 
 
     //simple constructor to allow testing instances based on overrides
@@ -58,7 +58,7 @@ public class InfrastructureFileDescriptor {
         this("undef", "undef", "undef", "undef");
     }
     
-    InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, PathsAndFiles.Target... target) {
+    InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, Target... target) {
         this.fileName = fileName;
         this.pathStub = pathStub;
         this.systemPathStub = systemPathStub;
@@ -119,14 +119,6 @@ public class InfrastructureFileDescriptor {
         } else {
             return config.getProperty(key);
         }
-    }
-
-    public File getDefaultFile() {
-        return new File(getDefaultFullPath());
-    }
-
-    public String getDefaultDir() {
-        return clean(systemPathStub + File.separator + pathStub);
     }
 
     public String getDefaultFullPath() {

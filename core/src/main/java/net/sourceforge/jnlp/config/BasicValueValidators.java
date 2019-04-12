@@ -83,7 +83,7 @@ public class BasicValueValidators {
         public String getPossibleValues() {
             return R("VVPossibleBooleanValues", Boolean.TRUE.toString(), Boolean.FALSE.toString());
         }
-    };
+    }
 
     /**
      * Checks if a value is a valid file path (not a valid file!). The actual
@@ -98,13 +98,11 @@ public class BasicValueValidators {
                 return;
             }
 
-            Object possibleValue = value;
-
-            if (!(possibleValue instanceof String)) {
+            if (!(value instanceof String)) {
                 throw new IllegalArgumentException("Value should be string!");
             }
 
-            String possibleFile = (String) possibleValue;
+            String possibleFile = (String) value;
             
                 boolean absolute = new File(possibleFile).isAbsolute();
                 if (!absolute) {
@@ -135,16 +133,15 @@ public class BasicValueValidators {
 
         @Override
         public void validate(Object value) throws IllegalArgumentException {
-            Object possibleValue = value;
 
             long actualValue = 0;
             try {
-                if (possibleValue instanceof String) {
-                    actualValue = Long.valueOf((String) possibleValue);
-                } else if (possibleValue instanceof Integer) {
-                    actualValue = (Integer) possibleValue;
-                } else if (possibleValue instanceof Long) {
-                    actualValue = (Long) possibleValue;
+                if (value instanceof String) {
+                    actualValue = Long.valueOf((String) value);
+                } else if (value instanceof Integer) {
+                    actualValue = (Integer) value;
+                } else if (value instanceof Long) {
+                    actualValue = (Long) value;
                 } else {
                     throw new IllegalArgumentException("Must be an integer");
                 }
@@ -163,7 +160,7 @@ public class BasicValueValidators {
             return R("VVPossibleRangedIntegerValues", low, high);
         }
 
-    };
+    }
 
     /**
      * Checks that the value is one of the acceptable String values
@@ -177,12 +174,11 @@ public class BasicValueValidators {
 
         @Override
         public void validate(Object value) throws IllegalArgumentException {
-            Object possibleValue = value;
-            if (!(possibleValue instanceof String)) {
+            if (!(value instanceof String)) {
                 throw new IllegalArgumentException("Must be a string");
             }
 
-            String stringVal = (String) possibleValue;
+            String stringVal = (String) value;
             boolean found = false;
             for (String knownVal : options) {
                 if (knownVal.equals(stringVal)) {
@@ -218,12 +214,11 @@ public class BasicValueValidators {
 
         @Override
         public void validate(Object value) throws IllegalArgumentException {
-            Object possibleValue = value;
-            if (!(possibleValue instanceof String)) {
+            if (!(value instanceof String)) {
                 throw new IllegalArgumentException("Must be a string");
             }
 
-            String stringVal = (String) possibleValue;
+            String stringVal = (String) value;
             boolean found = false;
             for (String knownVal : singleOptions) {
                 if (knownVal.equals(stringVal)) {
@@ -259,10 +254,9 @@ public class BasicValueValidators {
 
         @Override
         public String getPossibleValues() {
-            String message = "(Values that can be used alone only): " + Arrays.toString(singleOptions) +
+            return "(Values that can be used alone only): " + Arrays.toString(singleOptions) +
                     " (Values that can be used in combination separated by the delimiter \""
                     + DELIMITER + "\" with no space expected ): " + Arrays.toString(comboOptions);
-            return message;
         }
 
     }

@@ -16,6 +16,14 @@
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.tools.ico.IcoSpi;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.spi.IIORegistry;
+import javax.naming.ConfigurationException;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,19 +37,13 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.imageio.spi.IIORegistry;
-import javax.naming.ConfigurationException;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.tools.ico.IcoSpi;
-import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -60,11 +62,9 @@ public final class DeploymentConfiguration {
     public static final String APPLET_TRUST_SETTINGS = ".appletTrustSettings";
 
     public static final String DEPLOYMENT_COMMENT = "Netx deployment configuration";
-    public String userComments;
-    public String systemComments;
+    private String userComments;
 
     public static final int JNLP_ASSOCIATION_NEVER = 0;
-    public static final int JNLP_ASSOCIATION_NEW_ONLY = 1;
     public static final int JNLP_ASSOCIATION_ASK_USER = 2;
     public static final int JNLP_ASSOCIATION_REPLACE_ASK = 3;
 
@@ -148,8 +148,6 @@ public final class DeploymentConfiguration {
     /** Boolean. Only prompt user for granting any JNLP permissions if true */
     public static final String KEY_SECURITY_PROMPT_USER_FOR_JNLP = "deployment.security.sandbox.jnlp.enhanced";
 
-    /** Boolean. Only install the custom authenticator if true */
-    public static final String KEY_SECURITY_INSTALL_AUTHENTICATOR = "deployment.security.authenticator";
 
     /** Boolean. Only install the custom authenticator if true */
     public static final String KEY_SECURITY_ITW_IGNORECERTISSUES = "deployment.security.itw.ignorecertissues";
@@ -227,7 +225,7 @@ public final class DeploymentConfiguration {
     // both browser.path and BROWSER can ave those for-fun keys:
     public static final String ALWAYS_ASK="ALWAYS-ASK";
     public static final String INTERNAL_HTML="INTERNAL-HTML";
-    public static final String LEGACY_WIN32_URL__HANDLER="rundll32 url.dll,FileProtocolHandler ";
+    private static final String LEGACY_WIN32_URL__HANDLER="rundll32 url.dll,FileProtocolHandler ";
     
     public static final String KEY_UPDATE_TIMEOUT = "deployment.javaws.update.timeout";
     
@@ -250,8 +248,7 @@ public final class DeploymentConfiguration {
     public static final String KEY_SMALL_SIZE_OVERRIDE_TRESHOLD = "deployment.small.size.treshold";
     public static final String KEY_SMALL_SIZE_OVERRIDE_WIDTH = "deployment.small.size.override.width";
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
-    
-    public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
+
 
     private static final String VV_POSSIBLE_BROWSER_VALUES = "VVPossibleBrowserValues";
 
@@ -348,7 +345,7 @@ public final class DeploymentConfiguration {
         load(systemConfigFile, userDeploymentFileDescriptor.getFile(), fixIssues);
     }
 
-    void load(URL systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException, MalformedURLException {
+    private void load(URL systemConfigFile, File userFile, boolean fixIssues) throws ConfigurationException, MalformedURLException {
         Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
 
         Map<String, Setting<String>> systemProperties = null;
@@ -364,7 +361,6 @@ public final class DeploymentConfiguration {
                 /* Second, read the System level deployment.properties file */
                 systemProperties = loadProperties(ConfigType.System, systemPropertiesFile,
                         systemPropertiesMandatory);
-                systemComments=loadComments(systemPropertiesFile);
             }
             if (systemProperties != null) {
                 mergeMaps(initialProperties, systemProperties);
@@ -494,7 +490,7 @@ public final class DeploymentConfiguration {
      *
      * @param initial a map representing the initial configuration
      */
-    public void checkAndFixConfiguration(Map<String, Setting<String>> initial) {
+    private void checkAndFixConfiguration(Map<String, Setting<String>> initial) {
 
         Map<String, Setting<String>> defaults = Defaults.getDefaults();
 
@@ -585,8 +581,7 @@ public final class DeploymentConfiguration {
             Setting<String> mandatory = systemConfiguration.get(KEY_SYSTEM_CONFIG_MANDATORY);
             systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
             LOG.info("System level settings {} are mandatory: {}", DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
-            URL url = new URL(urlString);
-            systemPropertiesFile = url;
+            systemPropertiesFile = new URL(urlString);
             LOG.info("Using System level {} : {}", DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (MalformedURLException e) {
@@ -691,7 +686,7 @@ public final class DeploymentConfiguration {
             if (userComments.length() > 0) {
                 comments = comments + System.lineSeparator() + userComments;
             }
-            toSave.store(out, comments); ;
+            toSave.store(out, comments);
         }
     }
 
@@ -706,7 +701,7 @@ public final class DeploymentConfiguration {
 
         Properties properties = new Properties();
 
-        try (Reader reader = new BufferedReader(new InputStreamReader(propertiesFile.openStream(), "UTF-8"))) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(propertiesFile.openStream(), StandardCharsets.UTF_8))) {
             properties.load(reader);
         }
 
@@ -780,11 +775,11 @@ public final class DeploymentConfiguration {
     }
     
     //standard date.toString format
-    public static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    private static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     
     private static String loadComments(URL path) {
         StringBuilder r = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(path.openStream(), "UTF-8"))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(path.openStream(), StandardCharsets.UTF_8))) {
             while (true) {
                 String s = br.readLine();
                 if (s == null) {
