@@ -107,7 +107,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         OutputController.getLogger().log(jm);
     }
 
-    public boolean isError() {
+    private boolean isError() {
         return isError;
     }
 

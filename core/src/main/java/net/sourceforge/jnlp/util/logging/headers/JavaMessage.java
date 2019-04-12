@@ -41,8 +41,8 @@ package net.sourceforge.jnlp.util.logging.headers;
 
 public class JavaMessage  implements MessageWithHeader{
 
-    public Header header;
-    public String message;
+    private final Header header;
+    private final String message;
 
     public JavaMessage(Header header, String message) {
         this.header = header;

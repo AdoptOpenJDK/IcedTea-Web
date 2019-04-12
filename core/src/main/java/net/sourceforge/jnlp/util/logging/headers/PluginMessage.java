@@ -48,7 +48,7 @@ public class PluginMessage  implements MessageWithHeader{
 
     private final static Logger LOG = LoggerFactory.getLogger(PluginMessage.class);
 
-    public PluginHeader header;
+    public final PluginHeader header;
     public String restOfMessage;
     public boolean wasError = false;
 

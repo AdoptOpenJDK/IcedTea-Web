@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class writes log information to file.
@@ -54,16 +55,12 @@ public final class WriterBasedFileLog implements SingleStreamLogger {
     private final BufferedWriter bw;
 
     public WriterBasedFileLog(String fileName, boolean append) {
-        this(fileName, fileName, append);
-    }
-
-    public WriterBasedFileLog(String loggerName, String fileName, boolean append) {
         try {
             File futureFile = new File(fileName);
             if (!futureFile.exists()) {
                 FileUtils.createRestrictedFile(futureFile, true);
             }
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName), append), "UTF-8"));
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName), append), StandardCharsets.UTF_8));
             log(FileLog.getHeadlineHeader().toString() + " writer-based impl.");
         } catch (IOException e) {
             throw new RuntimeException(e);

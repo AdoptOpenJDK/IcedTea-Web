@@ -41,6 +41,6 @@ import java.util.Observable;
 
 public interface ObservableMessagesProvider {
      
-    public List<MessageWithHeader> getData();
-    public Observable getObservable();
+    List<MessageWithHeader> getData();
+    Observable getObservable();
 }

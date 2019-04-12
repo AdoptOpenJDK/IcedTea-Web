@@ -83,10 +83,10 @@ public final class FileLog  {
         }
     }
 
-    public static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH" + getColon() + "mm" + getColon() + "ss.S");
+    private static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH" + getColon() + "mm" + getColon() + "ss.S");
     /**"Tue Nov 19 09:43:50 CET 2013"*/
-    public static final SimpleDateFormat pluginSharedFormatter = new SimpleDateFormat("EEE MMM dd HH" + getColon() + "mm" + getColon() + "ss ZZZ yyyy");
-    public static final String defaultloggerName = TextsProvider.ITW + " file-logger";
+
+    private static final String defaultloggerName = TextsProvider.ITW + " file-logger";
 
 
     public static SingleStreamLogger createFileLog() {
@@ -103,7 +103,7 @@ public final class FileLog  {
             if (LogConfig.getLogConfig().isLegacyLogBasedFileLog()) {
                 s = new LogBasedFileLog(defaultloggerName, getFileName(id), false);
             } else {
-                s = new WriterBasedFileLog(defaultloggerName, getFileName(id), false);
+                s = new WriterBasedFileLog(getFileName(id), false);
             }
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -120,16 +120,8 @@ public final class FileLog  {
     }
     
   
-    public static String getStamp() {
+    private static String getStamp() {
         return fileLogNameFormatter.format(new Date());
-    }
-
-    public static SimpleDateFormat getFileLogNameFormatter() {
-        return fileLogNameFormatter;
-    }
-
-    public static SimpleDateFormat getPluginSharedFormatter() {
-        return pluginSharedFormatter;
     }
 
 }
