@@ -105,4 +105,8 @@ public abstract class ReplacingTextFormatter implements Formatter {
         return s;
     }
 
+    @Override
+    public String replaceLtGtCharacters(final String s) {
+        return s;
+    }
 }
