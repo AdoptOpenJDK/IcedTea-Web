@@ -50,7 +50,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
 
     private final Map<String, Integer> LongestKeys = new TreeMap<>();
     private String currentSection = "none";
-    public  static final String SUFFIX = "txt";
+    private static final String SUFFIX = "txt";
     
     public static String getLineSeparator() {
         return java.security.AccessController.doPrivileged(
@@ -67,14 +67,6 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
         this.maxLineLength = maxLineLength;
     }
 
-    public PlainTextFormatter(String pargraohIndentation) {
-        this(pargraohIndentation, Integer.MAX_VALUE);
-    }
-    
-    public PlainTextFormatter(int maxLineLength) {
-        this(DEFAULT_INDENT, maxLineLength);
-    }
-    
     public PlainTextFormatter() {
         this.pargraohIndentation = DEFAULT_INDENT;
         this.maxLineLength = Integer.MAX_VALUE;
@@ -127,7 +119,8 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
 
     }
 
-    static String wrapParagraph(String input, int maxWidth, String indent) {
+    @SuppressWarnings("unchecked")
+    private static String wrapParagraph(String input, int maxWidth, String indent) {
         List<String> l = new ArrayList(Arrays.asList(input.split(getLineSeparator())));
         for (int i = 0; i < l.size(); i++) {
             String s = indent + l.get(i).trim();
@@ -150,7 +143,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
         return listToString(l);
     }
 
-    static String listToString(List<String> l) {
+    private static String listToString(List<String> l) {
         StringBuilder sb = new StringBuilder();
         for (String string : l) {
             sb.append(string).append(getLineSeparator());
@@ -163,10 +156,6 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
         return getNewLine();
     }
 
-    @Override
-    public String getCloseBoldAndBreak() {
-        return getNewLine();
-    }
 
     @Override
     public String getBoldCloseNwlineBoldOpen() {

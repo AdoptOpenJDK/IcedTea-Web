@@ -52,8 +52,6 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -133,12 +131,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
     private String getProperties() {
         StringBuilder sb = new StringBuilder();
         List<Map.Entry<String, Setting<String>>> defaults = new ArrayList<>(Defaults.getDefaults().entrySet());
-        Collections.sort(defaults, new Comparator<Map.Entry<String, Setting<String>>>() {
-            @Override
-            public int compare(Map.Entry<String, Setting<String>> o1, Map.Entry<String, Setting<String>> o2) {
-                return o1.getKey().compareTo(o2.getKey());
-            }
-        });
+        defaults.sort((o1, o2) -> o1.getKey().compareTo(o2.getKey()));
         List<InfrastructureFileDescriptor> files = PathsAndFiles.getAllFiles();
         for (Map.Entry<String, Setting<String>> entry : defaults) {
             String defaultValue = entry.getValue().getDefaultValue();
@@ -179,7 +172,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
         return sb.toString();
     }
 
-    public String getKpMinorTitle() {
+    private String getKpMinorTitle() {
         if (expandVariables) {
             return getFormatter().getBold(Translator.R("IWSexampleL3") + " " + Translator.R("IWSexampleL31"));
         } else {

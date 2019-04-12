@@ -46,8 +46,8 @@ import java.util.regex.Pattern;
 public abstract class ReplacingTextFormatter implements Formatter {
 
     public static String backupVersion;
-    public static final Pattern BOLD_OPEN_PATTERN = Pattern.compile("<\\s*[Bb]\\s*>");
-    public static final Pattern BOLD_CLOSE_PATTERN = Pattern.compile("<\\s*/\\s*[Bb]\\s*>");
+    private static final Pattern BOLD_OPEN_PATTERN = Pattern.compile("<\\s*[Bb]\\s*>");
+    private static final Pattern BOLD_CLOSE_PATTERN = Pattern.compile("<\\s*/\\s*[Bb]\\s*>");
 
     @Override
     public String process(String s1) {
@@ -104,12 +104,5 @@ public abstract class ReplacingTextFormatter implements Formatter {
     public String getAdressLink(String s) {
         return s;
     }
-    
-    @Override
-    public String replaceLtGtCharacters(String s) {
-        return s;
-    }
- 
-    
 
 }

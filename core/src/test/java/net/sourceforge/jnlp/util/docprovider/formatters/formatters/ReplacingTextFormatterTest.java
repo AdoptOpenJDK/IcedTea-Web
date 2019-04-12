@@ -73,10 +73,6 @@ public class ReplacingTextFormatterTest {
                 throw new UnsupportedOperationException("Not supported yet."); 
             }
 
-            @Override
-            public String getCloseBoldAndBreak() {
-                throw new UnsupportedOperationException("Not supported yet."); 
-            }
 
             @Override
             public String getBoldCloseNwlineBoldOpen() {
