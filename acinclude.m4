@@ -1072,6 +1072,13 @@ AC_DEFUN_ONCE([IT_SET_VERSION],
   FULL_VERSION="${PACKAGE_VERSION}${ICEDTEA_REV}${ICEDTEA_PKG}"
   AC_MSG_RESULT([${FULL_VERSION}])
   AC_SUBST([FULL_VERSION])
+
+  MAJOR_VERSION=`echo $PACKAGE_VERSION | sed 's/^\([[0-9]][[0-9]]*\)[[.]].*$/\1/g'`
+  MINOR_VERSION=`echo $PACKAGE_VERSION | sed 's/^[[^.]]*[[.]]\([[0-9]][[0-9]]*\).*$/\1/g'`
+  MICRO_VERSION=`echo $PACKAGE_VERSION | sed 's/^[[^.]]*[[.]][[^.]]*[[.]]\([[0-9]][[0-9]]*\).*$/\1/g'`
+  AC_SUBST([MAJOR_VERSION])
+  AC_SUBST([MINOR_VERSION])
+  AC_SUBST([MICRO_VERSION])
 ])
 
 dnl Allows you to configure (enable/disable/set path to) the browser
