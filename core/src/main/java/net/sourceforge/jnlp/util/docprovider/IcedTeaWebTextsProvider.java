@@ -78,17 +78,14 @@ public class IcedTeaWebTextsProvider extends TextsProvider {
         }
         p1.append(getFormatter().getNewLine());
 
-        StringBuilder p2 = new StringBuilder();
-
-        p2.append(Translator.R("ITWdescL1",
-                getFormatter().getUrl(IT_MAIN, Translator.R("ITWdescWikiUrlTitle")),
-                getFormatter().getUrl(ITW_HOME, Translator.R("ITWdescItwWikiUrlTitle"))));
-        p2.append(getFormatter().getNewLine());
-        p2.append(Translator.R("ITWdescL2", getFormatter().getUrl(ITW_ISSUES, Translator.R("ITWdescIssuesUrlTitle"))));
-        p2.append(getFormatter().getNewLine());
-
         String header = getFormatter().getBold(Translator.R("ITWdescL3") + " ") + getFormatter().getNewLine();
-        return super.getDescription() + getFormatter().wrapParagraph(header) + getFormatter().wrapParagraph(p1.toString()) + getFormatter().getNewLine() + getFormatter().wrapParagraph(p2.toString());
+        final String p2 = Translator.R("ITWdescL1",
+                getFormatter().getUrl(IT_MAIN, Translator.R("ITWdescWikiUrlTitle")),
+                getFormatter().getUrl(ITW_HOME, Translator.R("ITWdescItwWikiUrlTitle"))) +
+                getFormatter().getNewLine() +
+                Translator.R("ITWdescL2", getFormatter().getUrl(ITW_ISSUES, Translator.R("ITWdescIssuesUrlTitle"))) +
+                getFormatter().getNewLine();
+        return super.getDescription() + getFormatter().wrapParagraph(header) + getFormatter().wrapParagraph(p1.toString()) + getFormatter().getNewLine() + getFormatter().wrapParagraph(p2);
     }
 
     @Override

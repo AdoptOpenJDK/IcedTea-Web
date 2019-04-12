@@ -39,44 +39,42 @@ package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 public interface Formatter {
 
-    public String process(String s);
+    String process(String s);
 
-    public String wrapParagraph(String s);
+    String wrapParagraph(String s);
 
-    public String getHeaders(String id, String encoding);
+    String getHeaders(String id, String encoding);
 
-    public String getNewLine();
+    String getNewLine();
     
-    public String getNewLine(int count);
+    String getNewLine(int count);
     
-    public String getBold(String s);
+    String getBold(String s);
 
-    public String getBoldOpening();
+    String getBoldOpening();
 
-    public String getBoldClosing();
+    String getBoldClosing();
     
-    public String getBreakAndBold();
+    String getBreakAndBold();
+
+    String getBoldCloseNwlineBoldOpen();
+
+    String getTitle(String name);
+
+    String getUrl(String url);
+
+    String getUrl(String url, String appearence);
     
-    public String getCloseBoldAndBreak();
+    String getOption(String key, String value);
+
+    String getSeeAlso(String s);
+
+    String getTail();
+
+    String getFileSuffix();
     
-    public String getBoldCloseNwlineBoldOpen();
-
-    public String getTitle(String name);
-
-    public String getUrl(String url);
-
-    public String getUrl(String url, String  appearence);
+    String getAdressLink(String s);
     
-    public String getOption(String key, String  value);
-
-    public String getSeeAlso(String s);
-
-    public String getTail();
-
-    public String getFileSuffix();
-    
-    public String getAdressLink(String s);
-    
-    public String replaceLtGtCharacters(String s);
+    String replaceLtGtCharacters(String s);
 
 }

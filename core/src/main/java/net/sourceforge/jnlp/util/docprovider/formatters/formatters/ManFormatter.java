@@ -60,8 +60,8 @@ public class ManFormatter extends ReplacingTextFormatter {
         public static final String SEE_ALSO = "SEE_ALSO";
 
     }
-    
-    public  static final String SUFFIX = "1";
+
+    private static final String SUFFIX = "1";
 
     @Override
     public String getNewLine() {
@@ -86,13 +86,6 @@ public class ManFormatter extends ReplacingTextFormatter {
         return PlainTextFormatter.getLineSeparator() + ".br" + PlainTextFormatter.getLineSeparator() + ".B ";
     }
 
-    /**
-     * There is one line break less
-     */
-    @Override
-    public String getCloseBoldAndBreak() {
-        return PlainTextFormatter.getLineSeparator() + ".B " + PlainTextFormatter.getLineSeparator() + ".br" + PlainTextFormatter.getLineSeparator();
-    }
 
     /**
      * There are two lines breaks less
@@ -109,7 +102,7 @@ public class ManFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getHeaders(String id, String encoding) {
-        return ".TH " + id + " 1 \"" + getManPageDate(true) + "\"" + " \"" + TextsProvider.ITW + " " + getVersion() + "\"" + PlainTextFormatter.getLineSeparator();
+        return ".TH " + id + " 1 \"" + getManPageDate() + "\"" + " \"" + TextsProvider.ITW + " " + getVersion() + "\"" + PlainTextFormatter.getLineSeparator();
     }
 
     @Override
@@ -117,52 +110,15 @@ public class ManFormatter extends ReplacingTextFormatter {
         return "";
     }
 
-    private String getManPageDate(boolean localize) {
-        Date now = new Date();
-        Calendar c = Calendar.getInstance();
+    private String getManPageDate() {
+        final Date now = new Date();
+        final Calendar c = Calendar.getInstance();
         c.setTime(now);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int year = c.get(Calendar.YEAR);
-        String month;
-        if (localize) {
-            Format formatter = new SimpleDateFormat("MMM");
-            month = formatter.format(now);
-        } else {
-            month = getUnlocallizedMonth(c.get(Calendar.MONTH));;
-        }
+        final int day = c.get(Calendar.DAY_OF_MONTH);
+        final int year = c.get(Calendar.YEAR);
+        final Format formatter = new SimpleDateFormat("MMM");
+        final String month = formatter.format(now);
         return day + " " + month + " " + year;
-    }
-
-    private String getUnlocallizedMonth(int get) {
-        switch (get) {
-            case Calendar.JANUARY:
-                return "Jan";
-            case Calendar.FEBRUARY:
-                return "Feb";
-            case Calendar.MARCH:
-                return "Mar";
-            case Calendar.APRIL:
-                return "Apr";
-            case Calendar.MAY:
-                return "May";
-            case Calendar.JUNE:
-                return "Jun";
-            case Calendar.JULY:
-                return "Jul";
-            case Calendar.AUGUST:
-                return "Aug";
-            case Calendar.SEPTEMBER:
-                return "Sep";
-            case Calendar.OCTOBER:
-                return "Oct";
-            case Calendar.NOVEMBER:
-                return "Nov";
-            case Calendar.DECEMBER:
-                return "Dec";
-            default:
-                return "Unkw";
-
-        }
     }
 
     @Override
@@ -172,7 +128,7 @@ public class ManFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getFileSuffix() {
-        return "."+SUFFIX;
+        return "." + SUFFIX;
     }
 
     @Override

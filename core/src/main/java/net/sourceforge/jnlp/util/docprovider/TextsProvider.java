@@ -37,11 +37,11 @@ exception statement from your version.
 package net.sourceforge.jnlp.util.docprovider;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.Defaults;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.Setting;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
@@ -60,16 +60,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public abstract class TextsProvider {
-    
+
     private static File authorFileFromUserInput = null;
 
     private final String encoding;
@@ -78,16 +77,7 @@ public abstract class TextsProvider {
     protected final boolean expandVariables;
     private boolean prepared = false;
     private File authorFilePath = null;
-    
-    private boolean introduction = true;
-    private boolean synopsis = true;
-    private boolean description = true;
-    private boolean commands = true;
-    private boolean options = true;
-    private boolean examples = true;
-    private boolean files = true;
-    private boolean bugs = true;
-    private boolean authors = true;
+
     private boolean seeAlso = true;
 
     public TextsProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
@@ -99,11 +89,11 @@ public abstract class TextsProvider {
 
     public abstract String getId();
 
-    public String getHeader() {
+    private String getHeader() {
         return getFormatter().getHeaders(getId(), getEncoding());
     }
 
-    public String getTail() {
+    private String getTail() {
         return getFormatter().getTail();
     }
 
@@ -174,20 +164,14 @@ public abstract class TextsProvider {
     protected String getFiles(List<InfrastructureFileDescriptor> files) {
         StringBuilder sb = new StringBuilder();
         Set<Map.Entry<String, Setting<String>>> defs = Defaults.getDefaults().entrySet();
-        Collections.sort(files, new Comparator<InfrastructureFileDescriptor>() {
-
-            @Override
-            public int compare(InfrastructureFileDescriptor o1, InfrastructureFileDescriptor o2) {
-                return o1.toString().compareTo(o2.toString());
-            }
-        });
+        files.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
         for (InfrastructureFileDescriptor f : files) {
             String path = expandVariables ? f.getFullPath() : f.toString();
             String modified = "";
-            String fGetFullPath=removeFileProtocol(f.getFullPath());
-            String fGetDefaultFullPath=removeFileProtocol(f.getDefaultFullPath());
-            if (!fGetFullPath.equals(fGetDefaultFullPath) && expandVariables){
-                modified=getFormatter().getBold("["+Translator.R("BUTmodified")+"] ");
+            String fGetFullPath = removeFileProtocol(f.getFullPath());
+            String fGetDefaultFullPath = removeFileProtocol(f.getDefaultFullPath());
+            if (!fGetFullPath.equals(fGetDefaultFullPath) && expandVariables) {
+                modified = getFormatter().getBold("[" + Translator.R("BUTmodified") + "] ");
             }
             String controlledBy = "";
             for (Map.Entry<String, Setting<String>> entry : defs) {
@@ -196,7 +180,7 @@ public abstract class TextsProvider {
                     break;
                 }
             }
-            sb.append(getFormatter().getOption(path, modified+f.getDescription() + controlledBy));
+            sb.append(getFormatter().getOption(path, modified + f.getDescription() + controlledBy));
         }
         return formatter.wrapParagraph(sb.toString());
     }
@@ -213,33 +197,27 @@ public abstract class TextsProvider {
         return formatter;
     }
 
-    protected String getEncoding() {
+    private String getEncoding() {
         return encoding;
     }
 
     protected String optionsToString(List<CommandLineOptions> opts) {
-        Collections.sort(opts, new Comparator<CommandLineOptions>() {
-
-            @Override
-            public int compare(CommandLineOptions o1, CommandLineOptions o2) {
-                return o1.getOption().compareToIgnoreCase(o2.getOption());
-            }
-        });
+        opts.sort((o1, o2) -> o1.getOption().compareToIgnoreCase(o2.getOption()));
 
         StringBuilder sb = new StringBuilder();
         for (CommandLineOptions o : opts) {
-            sb.append(getFormatter().getOption(o.getOption() + " " + o.getHelperString(), o.getLocalizedDescription()+"("+o.getArgumentExplanation()+")"));
+            sb.append(getFormatter().getOption(o.getOption() + " " + o.getHelperString(), o.getLocalizedDescription() + "(" + o.getArgumentExplanation() + ")"));
 
         }
         return sb.toString();
     }
 
-    public static final String IT_BASE = "http://icedtea.classpath.org/wiki";
+    private static final String IT_BASE = "http://icedtea.classpath.org/wiki";
     public static final String ITW_HOME = IT_BASE + "/IcedTea-Web";
     public static final String ITW_EAS = IT_BASE + "/Extended_Applets_Security";
     public static final String ITW_STYLE = ITW_HOME + "#Code_style";
     public static final String ITW_ECLIPSE = ITW_HOME + "/DevelopingWithEclipse";
-    public static final String ITW_REPO = "http://icedtea.classpath.org/hg/icedtea-web";
+    private static final String ITW_REPO = "http://icedtea.classpath.org/hg/icedtea-web";
 
     public static final String JAVAWS = "javaws";
     public static final String ITWEB_SETTINGS = "itweb-settings";
@@ -257,10 +235,10 @@ public abstract class TextsProvider {
     public static final String ITW_PLUGIN_URL = ITW_HOME + "#Plugin";
     public static final String ITW_BUGZILLAHOME = "http://icedtea.classpath.org/bugzilla";
 
-    public String getBugs() {
+    private String getBugs() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getFormatter().process(Translator.R("ITWTBbugs")+":"));
+        sb.append(getFormatter().process(Translator.R("ITWTBbugs") + ":"));
         sb.append(getFormatter().getNewLine());
         sb.append(getFormatter().getUrl(ITW_BUGS));
         sb.append(getFormatter().getNewLine());
@@ -276,7 +254,7 @@ public abstract class TextsProvider {
         }
     }
 
-    public String getAuthors() {
+    private String getAuthors() {
         if (forceTitles) {
             return getFormatter().getTitle(ManFormatter.KnownSections.AUTHOR)
                     + generateAuthorsSection(authorFilePath);
@@ -285,7 +263,7 @@ public abstract class TextsProvider {
         }
     }
 
-    public String getSeeAlso() {
+    private String getSeeAlso() {
 
         StringBuilder sb = new StringBuilder();
         sb.append(getFormatter().getSeeAlso(ITW));
@@ -331,42 +309,33 @@ public abstract class TextsProvider {
             sb.append(((HtmlFormatter) getFormatter()).generateIndex());
             sb.append(PlainTextFormatter.getLineSeparator());
         }
-        if (isIntroduction()) {
-            sb.append(getIntroduction());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isSynopsis()) {
-            sb.append(getSynopsis());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isDescription()) {
-            sb.append(getDescription());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isCommands()) {
-            sb.append(getCommands());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isOptions()) {
-            sb.append(getOptions());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isExamples()) {
-            sb.append(getExamples());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isFiles()) {
-            sb.append(getFiles());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isBugs()) {
-            sb.append(getBugs());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
-        if (isAuthors()) {
-            sb.append(getAuthors());
-            sb.append(PlainTextFormatter.getLineSeparator());
-        }
+        sb.append(getIntroduction());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getSynopsis());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getDescription());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getCommands());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getOptions());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getExamples());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getFiles());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getBugs());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
+        sb.append(getAuthors());
+        sb.append(PlainTextFormatter.getLineSeparator());
+
         if (isSeeAlso()) {
             sb.append(getSeeAlso());
             sb.append(PlainTextFormatter.getLineSeparator());
@@ -375,14 +344,14 @@ public abstract class TextsProvider {
         return sb.toString();
     }
 
-    public void writeToWriter(Writer w) throws IOException {
+    private void writeToWriter(Writer w) throws IOException {
         try (BufferedWriter bw = new BufferedWriter(w)) {
             bw.write(writeToString());
         }
 
     }
 
-    public void writeToStream(OutputStream os) throws IOException {
+    private void writeToStream(OutputStream os) throws IOException {
         try (OutputStreamWriter osw = new OutputStreamWriter(os, encoding)) {
             writeToWriter(osw);
         }
@@ -395,7 +364,7 @@ public abstract class TextsProvider {
 
     }
 
-    public void writeToDir(File dir) throws IOException {
+    private void writeToDir(File dir) throws IOException {
         writeToFile(new File(dir, getId() + getFormatter().getFileSuffix()));
 
     }
@@ -403,7 +372,7 @@ public abstract class TextsProvider {
     public static void main(String[] args) throws IOException {
         // Shutdown hook from OutputController was causing hanging build on Windows. It's not used on headless.
         JNLPRuntime.setHeadless(true);
-        
+
         if (args.length == 0) {
             System.out.println(" * IcedTea-Web self documentation tool list of arguments *");
             System.out.println(" * argument version - last parameter of each command, is used when there is no internal versionknown *");
@@ -419,8 +388,7 @@ public abstract class TextsProvider {
             System.out.println("to generate informations about authors from a file, use argument '-authorFile' with path to AUTHORS file located in icedtea-web."
                     + "\n eg. -authorFile=/home/user/icedtea-web/AUTHORS");
         } else {
-            List<String> argsList = new ArrayList<>();
-            argsList.addAll(Arrays.asList(args));
+            List<String> argsList = new ArrayList<>(Arrays.asList(args));
             for (String s : argsList) {
                 if (s.startsWith("-authorFile=")) {
                     authorFileFromUserInput = new File(s.split("=")[1]);
@@ -457,14 +425,14 @@ public abstract class TextsProvider {
         }
     }
 
-    public static void generateItwIntro(File f, boolean expand) throws IOException {
+    private static void generateItwIntro(File f, boolean expand) throws IOException {
         IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider("utf-8", new HtmlFormatter(false, true, false), false, expand);
         //!!AUTHORS FILE IS NOT NEEDED IN THIS METHOD, AUTHORS ARE GENERATED SEPARATELY INTO ANOTHER TAB
         itw.setSeeAlso(false);
         itw.writeToFile(f);
     }
 
-    public static void generateAll(File f, boolean expand) throws IOException {
+    private static void generateAll(File f, boolean expand) throws IOException {
         generateOnlineHtmlHelp(f, expand);
         generateManText("UTF-8", f, expand);
         generatePlainTextDocs(f, 160, expand);
@@ -478,32 +446,32 @@ public abstract class TextsProvider {
         generateHtmlTexts(f, false, true);
     }
 
-    public static void generateOnlineHtmlHelp(File f, boolean expand) throws IOException {
+    private static void generateOnlineHtmlHelp(File f, boolean expand) throws IOException {
         generateHtmlTexts(f, true, expand);
     }
 
-    public static void generateHtmlTexts(File dir, boolean includeXmlHeader, boolean expand) throws IOException {
-        generateHtmlTextsUtf8(dir, true, true, includeXmlHeader, true, expand);
+    private static void generateHtmlTexts(File dir, boolean includeXmlHeader, boolean expand) throws IOException {
+        generateHtmlTextsUtf8(dir, includeXmlHeader, expand);
     }
 
-    public static void generateHtmlTextsUtf8(File dir, boolean allowContext, boolean allowLogo, boolean includeXmlHeader, boolean titles, boolean expand) throws IOException {
-        generateHtmlTexts("UTF-8", dir, allowContext, allowLogo, includeXmlHeader, titles, expand);
+    private static void generateHtmlTextsUtf8(File dir, boolean includeXmlHeader, boolean expand) throws IOException {
+        generateHtmlTexts(dir, true, true, includeXmlHeader, true, expand);
     }
 
-    public static void generateHtmlTexts(String encoding, File dir, boolean allowContext, boolean allowLogo, boolean includeXmlHeader, boolean titles, boolean expand) throws IOException {
+    private static void generateHtmlTexts(File dir, boolean allowContext, boolean allowLogo, boolean includeXmlHeader, boolean titles, boolean expand) throws IOException {
         if (allowLogo) {
             File flogo = new File(dir, logo_name);
             try (InputStream is = TextsProvider.class.getResourceAsStream(logo_url);
-                    OutputStream os = new FileOutputStream(flogo);) {
+                 OutputStream os = new FileOutputStream(flogo)) {
                 copy(is, os);
                 os.flush();
             }
         }
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        JavaWsTextsProvider javaws = new JavaWsTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        ItwebPluginTextProvider pl = new ItwebPluginTextProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
         for (TextsProvider provider : providers) {
             provider.setAuthorFilePath(authorFileFromUserInput);
@@ -512,11 +480,11 @@ public abstract class TextsProvider {
 
     }
 
-    public static void generateManText(String encoding, File dir, boolean expand) throws IOException {
+    private static void generateManText(String encoding, File dir, boolean expand) throws IOException {
         generateManText(encoding, dir, true, expand);
     }
 
-    public static void generateManText(String encoding, File dir, boolean titles, boolean expand) throws IOException {
+    private static void generateManText(String encoding, File dir, boolean titles, boolean expand) throws IOException {
         JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new ManFormatter(), titles, expand);
         ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new ManFormatter(), titles, expand);
         PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new ManFormatter(), titles, expand);
@@ -530,18 +498,18 @@ public abstract class TextsProvider {
 
     }
 
-    public static void generatePlainTextDocs(File dir, int lineWidth, boolean expand) throws IOException {
-        generatePlainTextDocs("UTF-8", dir, PlainTextFormatter.DEFAULT_INDENT, lineWidth, true, expand);
+    private static void generatePlainTextDocs(File dir, int lineWidth, boolean expand) throws IOException {
+        generatePlainTextDocs("UTF-8", dir, lineWidth, expand);
     }
 
-    public static void generatePlainTextDocs(String encoding, File dir, String indent, int lineWidth, boolean titles, boolean expand) throws IOException {
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
+    private static void generatePlainTextDocs(String encoding, File dir, int lineWidth, boolean expand) throws IOException {
+        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
+        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
+        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
+        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
+        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
-        for(TextsProvider provider : providers){
+        for (TextsProvider provider : providers) {
             provider.setAuthorFilePath(authorFileFromUserInput);
             provider.writeToDir(dir);
         }
@@ -564,141 +532,16 @@ public abstract class TextsProvider {
         return total;
     }
 
-    /**
-     * @return the introduction
-     */
-    public boolean isIntroduction() {
-        return introduction;
-    }
 
-    /**
-     * @param introduction the introduction to set
-     */
-    public void setIntroduction(boolean introduction) {
-        this.introduction = introduction;
-    }
-
-    /**
-     * @return the synopsis
-     */
-    public boolean isSynopsis() {
-        return synopsis;
-    }
-
-    /**
-     * @param synopsis the synopsis to set
-     */
-    public void setSynopsis(boolean synopsis) {
-        this.synopsis = synopsis;
-    }
-
-    /**
-     * @return the description
-     */
-    public boolean isDescription() {
-        return description;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(boolean description) {
-        this.description = description;
-    }
-
-    /**
-     * @return the commands
-     */
-    public boolean isCommands() {
-        return commands;
-    }
-
-    /**
-     * @param commands the commands to set
-     */
-    public void setCommands(boolean commands) {
-        this.commands = commands;
-    }
-
-    /**
-     * @return the options
-     */
-    public boolean isOptions() {
-        return options;
-    }
-
-    /**
-     * @param options the options to set
-     */
-    public void setOptions(boolean options) {
-        this.options = options;
-    }
-
-    /**
-     * @return the examples
-     */
-    public boolean isExamples() {
-        return examples;
-    }
-
-    /**
-     * @param examples the examples to set
-     */
-    public void setExamples(boolean examples) {
-        this.examples = examples;
-    }
-
-    /**
-     * @return the files
-     */
-    public boolean isFiles() {
-        return files;
-    }
-
-    /**
-     * @param files the files to set
-     */
-    public void setFiles(boolean files) {
-        this.files = files;
-    }
-
-    /**
-     * @return the bugs
-     */
-    public boolean isBugs() {
-        return bugs;
-    }
-
-    /**
-     * @param bugs the bugs to set
-     */
-    public void setBugs(boolean bugs) {
-        this.bugs = bugs;
-    }
-
-    /**
-     * @return the authors
-     */
-    public boolean isAuthors() {
-        return authors;
-    }
-
-    /**
-     * @param authors the authors to set
-     */
-    public void setAuthors(boolean authors) {
-        this.authors = authors;
-    }
-
-    public void setAuthorFilePath(File authorFilePath) {
+    private void setAuthorFilePath(File authorFilePath) {
         this.authorFilePath = authorFilePath;
     }
-    
+
 
     /**
      * @return the seeAlso
      */
-    public boolean isSeeAlso() {
+    private boolean isSeeAlso() {
         return seeAlso;
     }
 
@@ -710,10 +553,10 @@ public abstract class TextsProvider {
     }
 
     private String removeFileProtocol(String s) {
-        if (s == null){
+        if (s == null) {
             return s;
         }
-        if (s.startsWith("file://")){
+        if (s.startsWith("file://")) {
             s = s.substring(7);
         }
         return s;
@@ -728,7 +571,7 @@ public abstract class TextsProvider {
     }
 
     private String readAuthorsImpl(File authors) throws IOException {
-        return readAuthorsImpl(new InputStreamReader(new FileInputStream(authors), "UTF-8"));
+        return readAuthorsImpl(new InputStreamReader(new FileInputStream(authors), StandardCharsets.UTF_8));
 
     }
 
@@ -745,7 +588,7 @@ public abstract class TextsProvider {
                 areAuthors = !areAuthors;
             }
             sb.append(getFormatter().process(getFormatter().getAdressLink(line)));
-            if (getFormatter() instanceof HtmlFormatter || areAuthors == false) {
+            if (getFormatter() instanceof HtmlFormatter || !areAuthors) {
                 sb.append(getFormatter().getNewLine());
             }
         }
@@ -756,11 +599,11 @@ public abstract class TextsProvider {
         if (filePath == null) {
             return getFormatter().wrapParagraph(
                     getFormatter().process(Translator.R("ITWdocsMissingAuthors"))
-                    + getFormatter().getNewLine());
+                            + getFormatter().getNewLine());
         } else {
             return getFormatter().wrapParagraph(
                     getFormatter().process(readAuthors(filePath))
-                    + getFormatter().getNewLine());
+                            + getFormatter().getNewLine());
         }
     }
 }

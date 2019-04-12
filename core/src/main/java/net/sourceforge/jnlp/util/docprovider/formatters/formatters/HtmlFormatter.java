@@ -49,17 +49,15 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     private final boolean allowContext;
     private final boolean allowLogo;
     private final boolean includeXmlHeader;
-    private final String lT = "&#60";
-    private final String gT = "&#62";
     public static final String SUFFIX = "html";
 
     @Override
-    public String process(String s) {
+    public String process(final String s) {
         //the texts in properties are already using html markup
         return s;
     }
 
-    public HtmlFormatter(boolean allowContext, boolean allowLogo, boolean includeXmlHeader) {
+    public HtmlFormatter(final boolean allowContext, final boolean allowLogo, final boolean includeXmlHeader) {
         this.allowContext = allowContext;
         this.allowLogo = allowLogo;
         this.includeXmlHeader = includeXmlHeader;
@@ -85,12 +83,12 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getTitle(String s) {
+    public String getTitle(final String s) {
         return " <a name=\"" + s + "\"/><H3>" + knownIdToString(s) + "</H3>\n";
     }
 
     @Override
-    public String getHeaders(String id, String encoding) {
+    public String getHeaders(final String id, final String encoding) {
         //jeditorpane dont like <? declaration
         String xml = "";
         if (includeXmlHeader) {
@@ -112,19 +110,18 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getUrl(String url, String visible) {
+    public String getUrl(final String url, final String visible) {
         return "<a href=\"" + url + "\">" + visible + "</a>";
     }
 
-    private String knownIdToString(String s) {
-        String value = localizeTitle(s);
-        String key = s;
-        content.put(key, value);
+    private String knownIdToString(final String s) {
+        final String value = localizeTitle(s);
+        content.put(s, value);
         return value;
     }
 
     @Override
-    public String getSeeAlso(String s) {
+    public String getSeeAlso(final String s) {
         return "<li>" + getUrl(s + getFileSuffix(), s) + "</li>\n";
     }
 
@@ -132,13 +129,13 @@ public class HtmlFormatter extends ReplacingTextFormatter {
         if (!allowContext) {
             return new StringBuilder();
         }
-        Set<Map.Entry<String, String>> set = content.entrySet();
+        final Set<Map.Entry<String, String>> set = content.entrySet();
         if (set.isEmpty()) {
             return new StringBuilder();
         }
-        StringBuilder sb = new StringBuilder("<H4>" + "Context" + "</H4>");
-        for (Map.Entry<String, String> entry : set) {
-            sb.append("<li><a href=\"#" + entry.getKey() + "\">").append(entry.getValue()).append("</a></li>");
+        final StringBuilder sb = new StringBuilder("<H4>" + "Context" + "</H4>");
+        for (final Map.Entry<String, String> entry : set) {
+            sb.append("<li><a href=\"#").append(entry.getKey()).append("\">").append(entry.getValue()).append("</a></li>");
         }
         return sb;
 
@@ -160,11 +157,6 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getCloseBoldAndBreak() {
-        return getBoldClosing() + getNewLine();
-    }
-
-    @Override
     public String getBoldCloseNwlineBoldOpen() {
         return getBoldClosing() + getNewLine() + getBoldOpening();
     }
@@ -178,16 +170,16 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getOption(String key, String value) {
+    public String getOption(final String key, final String value) {
         return "<li><b>" + key + " </b> - " + process(value) + "</li>";
     }
 
     @Override
-    public String getAdressLink(String s) {
-        String emailDelBracket = s.replaceAll(".*<", "");
-        String adress = emailDelBracket.replaceAll(">.*", "");
+    public String getAdressLink(final String s) {
+        final String emailDelBracket = s.replaceAll(".*<", "");
+        final String adress = emailDelBracket.replaceAll(">.*", "");
         if (s.contains("@")) {
-            String name = s.replaceAll("<.*", "").trim();
+            final String name = s.replaceAll("<.*", "").trim();
             return "<a href=\"mailto:" + antiSpam(adress) + "\" target=\"_top\">" + name + "</a>";
         } else {
             return s.replaceAll("<.*>", "<a href=\"" + adress + "\">" + adress + "</a>");
@@ -195,14 +187,15 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String replaceLtGtCharacters(String s) {
-        String replaceLt = s.replaceAll("<", lT);
-        String replaceLtGt = replaceLt.replaceAll(">", gT);
-        return replaceLtGt;
+    public String replaceLtGtCharacters(final String s) {
+        final String lT = "&#60";
+        final String replaceLt = s.replaceAll("<", lT);
+        final String gT = "&#62";
+        return replaceLt.replaceAll(">", gT);
     }
 
-    private static String antiSpam(String adress) {
-        StringBuilder sb = new StringBuilder();
+    private static String antiSpam(final String adress) {
+        final StringBuilder sb = new StringBuilder();
         for (int x = 0; x < adress.length(); x++) {
             sb.append(adress.charAt(x)).append(" ");
         }
