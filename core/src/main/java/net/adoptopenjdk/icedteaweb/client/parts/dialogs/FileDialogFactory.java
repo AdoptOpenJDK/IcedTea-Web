@@ -5,8 +5,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -15,21 +13,13 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 
 public final class FileDialogFactory {
-
-    private final static Logger LOG = LoggerFactory.getLogger(FileDialogFactory.class);
-
     /**
      * Show a dialog informing the user that the file is currently read-only.
      *
      * @param frame a {@link JFrame} to act as parent to this dialog
      */
     public static void showReadOnlyDialog(final Component frame) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE);
-            }
-        });
+        SwingUtils.invokeLater(() -> JOptionPane.showMessageDialog(frame, R("RFileReadOnly"), R("Warning"), JOptionPane.WARNING_MESSAGE));
     }
 
     /**
@@ -75,11 +65,6 @@ public final class FileDialogFactory {
      * @param message a {@link String} giving the specific reason the file could not be opened
      */
     public static void showCouldNotOpenDialog(final Component frame, final String message) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        SwingUtils.invokeLater(() -> JOptionPane.showMessageDialog(frame, message, R("Error"), JOptionPane.ERROR_MESSAGE));
     }
 }
