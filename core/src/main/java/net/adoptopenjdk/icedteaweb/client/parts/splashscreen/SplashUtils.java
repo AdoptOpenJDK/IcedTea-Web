@@ -37,12 +37,10 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
-import net.sourceforge.jnlp.runtime.Boot;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
+import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,32 +72,6 @@ public class SplashUtils {
             }
             return "unknown";
         }
-    }
-
-    public static void showErrorCaught(Throwable ex, AppletInstance appletInstance) {
-        try {
-            showError(ex, appletInstance);
-        } catch (Throwable t) {
-                // prinitng this exception is discutable. I have let it in for case that
-                //some retyping will fail
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
-        }
-    }
-
-    public static void showError(Throwable ex, AppletInstance appletInstance) {
-        if (appletInstance == null) {
-            return;
-        }
-        AppletEnvironment ae = appletInstance.getAppletEnvironment();
-        showError(ex, ae);
-    }
-
-    public static void showError(Throwable ex, AppletEnvironment ae) {
-        if (ae == null) {
-            return;
-        }
-        SplashController p = ae.getSplashController();
-        showError(ex, p);
     }
 
     public static void showError(Throwable ex, SplashController f) {

@@ -36,16 +36,15 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class SplashUtilsTest {
 
@@ -256,8 +255,6 @@ public class SplashUtilsTest {
      
     @Test
     public void assertNulsAreOkInShow() {
-        SplashUtils.showError(null, (AppletEnvironment)null);
-        SplashUtils.showError(null, (AppletInstance)null);
         SplashUtils.showError(null, (SplashController)null);
     }
      

@@ -37,6 +37,17 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
@@ -45,16 +56,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.CertVerifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides methods for showing security warning dialogs for a wide range of
@@ -279,8 +280,6 @@ public class SecurityDialog {
             dialogTitle = "Details - Certificate";
         else if (dtype == SecurityDialogs.DialogType.ACCESS_WARNING)
             dialogTitle = "Security Warning";
-        else if (dtype == SecurityDialogs.DialogType.APPLET_WARNING)
-            dialogTitle = "Applet Warning";
         else if (dtype == SecurityDialogs.DialogType.PARTIALLYSIGNED_WARNING)
             dialogTitle = "Security Warning";
         else if (dtype == SecurityDialogs.DialogType.AUTHENTICATION)
@@ -330,8 +329,6 @@ public class SecurityDialog {
             lpanel = new SingleCertInfoPane(sd, sd.certVerifier);
         } else if (type == SecurityDialogs.DialogType.ACCESS_WARNING) {
             lpanel = new AccessWarningPane(sd, sd.extras, sd.certVerifier);
-        } else if (type == SecurityDialogs.DialogType.APPLET_WARNING) {
-            lpanel = new AppletWarningPane(sd, sd.certVerifier);
         } else if (type == SecurityDialogs.DialogType.PARTIALLYSIGNED_WARNING) {
             lpanel = AppTrustWarningDialog.partiallySigned(sd, sd.file, (SecurityDelegate) sd.extras[0]);
         } else if (type == SecurityDialogs.DialogType.UNSIGNED_WARNING) {

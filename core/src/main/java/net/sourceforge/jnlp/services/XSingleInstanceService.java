@@ -20,7 +20,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +32,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * This class implements SingleInstanceService
@@ -142,17 +139,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
 
             String[] args = null;
             if (jnlpFile.isApplet()) {
-                // FIXME Proprietary plug-in is unclear about how to handle
-                // applets and their parameters. 
-                //Right now better to forward at least something
-                Set<Entry<String, String>> currentParams = jnlpFile.getApplet().getParameters().entrySet();
-                args = new String[currentParams.size() * 2];
-                int i = 0;
-                for (Entry<String, String> entry : currentParams) {
-                    args[i] = entry.getKey();
-                    args[i+1] = entry.getValue();
-                    i += 2;
-                }
+                throw new IllegalStateException("Applet not supported!");
             } else if (jnlpFile.isInstaller()) {
                 // TODO Implement this once installer service is available.
             } else {

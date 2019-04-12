@@ -16,24 +16,10 @@
 
 package net.sourceforge.jnlp;
 
-import java.applet.Applet;
-import java.applet.AppletStub;
-import java.awt.Container;
-import java.awt.SplashScreen;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.swing.text.html.parser.ParserDelegator;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -44,6 +30,18 @@ import net.sourceforge.jnlp.util.StreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.awt.SunToolkit;
+
+import javax.swing.text.html.parser.ParserDelegator;
+import java.applet.Applet;
+import java.awt.Container;
+import java.awt.SplashScreen;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -315,7 +313,7 @@ public class Launcher {
 
         List<String> parameters = extra.get("parameters");
         if (parameters != null && file.isApplet()) {
-            addParameters(file, parameters);
+            throw new IllegalStateException("Applet not supported!");
         }
     }
 
@@ -615,92 +613,6 @@ public class Launcher {
     }
 
     /**
-     * Launches a JNLP applet. This method should be called from a
-     * thread in the application's thread group.
-     * <p>
-     * The enableCodeBase parameter adds the applet's codebase to
-     * the locations searched for resources and classes.  This can
-     * slow down the applet loading but allows browser-style applets
-     * that don't use JAR files exclusively to be run from a applet
-     * JNLP file.  If the applet JNLP file does not specify any
-     * resources then the code base will be enabled regardless of
-     * the specified value.
-     * </p>
-     *
-     * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
-     * @param cont container where to put application
-     * @return application
-     * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
-     */
-    protected ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
-        }
-      
-        if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
-            if (!JNLPRuntime.isHeadless()) {
-                SplashScreen sp = SplashScreen.getSplashScreen();
-                if (sp != null) {
-                    sp.close();
-                }
-            }
-        }
-        if (handler != null) {
-            handler.launchInitialized(file);
-        }
-        
-        AppletInstance applet = null;
-        try {
-            ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, enableCodeBase, cont);
-            applet.initialize();
-            applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
-            return applet;
-        } catch (InstanceExistsException ieex) {
-            LOG.error("Single instance applet is already running.", ieex);
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
-        } catch (LaunchException lex) {
-            throw launchError(lex, applet);
-        } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
-        }finally{
-            if (handler != null) {
-                handler.launchStarting(applet);
-            }
-        }
-    }
-
-    /**
-     * Gets an ApplicationInstance, but does not launch the applet.
-     * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
-     * @param cont container where to put applet
-     * @return applet
-     * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
-     */
-    protected ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
-        }
-        AppletInstance applet = null;
-        try {
-            ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, enableCodeBase, cont);
-            applet.initialize();
-            return applet;
-
-        } catch (InstanceExistsException ieex) {
-            LOG.info("Single instance applet is already running.");
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
-        } catch (LaunchException lex) {
-            throw launchError(lex, applet);
-        } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
-        }
-    }
-
-    /**
      * Launches a JNLP installer.  This method should be called from
      * a thread in the application's thread group.
      * @param file jnlp file to read installer from
@@ -711,68 +623,6 @@ public class Launcher {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
         throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCNotSupported"), R("LNoInstallers"), R("LNoInstallersInfo")));
-    }
-
-    /**
-     * Create an AppletInstance.
-     *
-     * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
-     * @param cont container where to put applet
-     * @return applet
-     * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
-     */
-     //FIXME - when multiple applets are on one page, this method is visited simultaneously
-    //and then appelts creates in little bit strange manner. This issue is visible with
-    //randomly showing/notshowing spalshscreens.
-    //See also PluginAppletViewer.framePanel
-    protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-         AppletInstance appletInstance = null;
-         try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
-
-            if (enableCodeBase) {
-                loader.enableCodeBase();
-            } else if (file.getResources().getJARs().length == 0) {
-                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
-            }
-
-            ThreadGroup group = Thread.currentThread().getThreadGroup();
-
-            // appletInstance is needed by ServiceManager when looking up 
-            // services. This could potentially be done in applet constructor
-            // so initialize appletInstance before creating applet.
-            if (cont == null) {
-                 appletInstance = new AppletInstance(file, group, loader, null);
-             } else {
-                 appletInstance = new AppletInstance(file, group, loader, null, cont);
-             }
-
-             /**
-              * Due to PR2968, moved to earlier phase, so early stages of appelt
-              * can access Thread.currentThread().getContextClassLoader().
-              *
-              * However it is notable, that init and start still do not have access to right classloader.
-              * See LoadResources test.
-              */
-             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
-
-            loader.setApplication(appletInstance);
-
-            // Initialize applet now that ServiceManager has access to its
-            // appletInstance.
-            String appletName = file.getApplet().getMainClass();
-            Class<?> appletClass = loader.loadClass(appletName);
-            Applet applet = (Applet) appletClass.newInstance();
-            applet.setStub((AppletStub)cont);
-            // Finish setting up appletInstance.
-            appletInstance.setApplet(applet);
-            appletInstance.getAppletEnvironment().setApplet(applet);
-            
-            return appletInstance;
-        } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")), appletInstance);
-        }
     }
 
     /**
@@ -849,13 +699,6 @@ public class Launcher {
      * caller.
      */
     private LaunchException launchError(LaunchException ex) {
-        return launchError(ex, null);
-    }
-    
-    private LaunchException launchError(LaunchException ex, AppletInstance applet) {
-        if (applet != null) {
-            SplashUtils.showErrorCaught(ex, applet);
-        }
         if (handler != null) {
             handler.launchError(ex);
         }
@@ -938,15 +781,13 @@ public class Launcher {
                 doPerApplicationAppContextHacks();
 
                 if (isPlugin) {
-                    // Do not display download indicators if we're using gcjwebplugin.
-                    JNLPRuntime.setDefaultDownloadIndicator(null);
-                    application = getApplet(file, ((PluginBridge)file).codeBaseLookup(), cont);
+                    throw new IllegalStateException("Applet not supported!");
                 } else {
                     if (file.isApplication()) {
                         application = launchApplication(file);
                     }
                     else if (file.isApplet()) {
-                        application = launchApplet(file, true, cont);
+                        throw new IllegalStateException("Applet is not supported!");
                     } // enable applet code base
                     else if (file.isInstaller()) {
                         application = launchInstaller(file);

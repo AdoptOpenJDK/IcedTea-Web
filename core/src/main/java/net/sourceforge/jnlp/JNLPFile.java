@@ -688,8 +688,9 @@ public class JNLPFile {
      * @throws UnsupportedOperationException if there is no applet information
      */
     public AppletDesc getApplet() {
-        if (!isApplet())
-            throw new UnsupportedOperationException(R("JNotApplet"));
+        if (!isApplet()) {
+            throw new IllegalStateException("Applet not supported!");
+        }
 
         return (AppletDesc) launchType;
     }

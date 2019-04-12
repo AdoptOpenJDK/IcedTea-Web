@@ -35,8 +35,18 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.JFrame;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -44,20 +54,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JFrame;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.runtime.html.AppletExtractor;
-import net.sourceforge.jnlp.runtime.html.AppletParser;
-import net.sourceforge.jnlp.runtime.html.AppletsFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -114,67 +110,25 @@ public final class HtmlBoot {
     private JNLPSplashScreen splashScreen;
 
     boolean run(Map<String, List<String>> extra) {
-        if (!optionParser.hasOption(CommandLineOptions.HEADLESS)) {
-            SwingUtils.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    splashScreen = new JNLPSplashScreen(null, null);
-                    splashScreen.setSplashImageURL(null);
-                    splashScreen.setVisible(true);
-                }
-            ;
-        }
-        );
-        }
-        List<String> vars = optionParser.getParams(CommandLineOptions.HTML);
-        JNLPRuntime.setForksAllowed(false);//needed?
-        ParserSettings settings = Boot.init(extra);
-        if (settings == null) {
-            return false;
-        }
         try {
-            LOG.info("Proceeding with html");
-            final URL html = Boot.getFileLocation();
-            AppletExtractor axe = new AppletExtractor(html, settings);
-            AppletsFilter filtered = new AppletsFilter(axe.findAppletsOnPage(), html, vars.subList(1, vars.size()));
-            List<AppletParser> applets = filtered.getApplets();
-            // this hack was needed in early phases of the patch.   Now it sees to be not neede. Keeping inside to remove after much more testing
-            // will be replaced by regular JNLPRuntime is initialised
-//                System.setSecurityManager(new SecurityManager() {
-//
-//                    @Override
-//                    public void checkPermission(Permission perm) {
-//                        //
-//                    }
-//
-//                });
-            final int[] move = new int[]{0, 0, 0};
-            for (AppletParser appletParser : applets) {
-                //place the applets correctly over screen
-                changeMovement(move);
-                final PluginBridge pb = appletParser.toPluginBridge();
-                if (splashScreen != null) {
-                    splashScreen.setFile(pb);
-                }
-                final JFrame f = invokePluginMain(pb, html);
-                //close all applets in time
-                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                //f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            if (!optionParser.hasOption(CommandLineOptions.HEADLESS)) {
                 SwingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        Point movement = changeMovementSigns(move);
-                        f.pack();
-                        ScreenFinder.centerWindowsToCurrentScreen(f);
-                        Rectangle r = f.getBounds();
-                        r.x += movement.x;
-                        r.y += movement.y;
-                        f.setBounds(r);
-                        f.setVisible(true);
-                    }
-                });
-                move[0]++;
+
+                                           @Override
+                                           public void run() {
+                                               splashScreen = new JNLPSplashScreen(null, null);
+                                               splashScreen.setSplashImageURL(null);
+                                               splashScreen.setVisible(true);
+                                           }
+
+                                           ;
+                                       }
+                );
+            }
+            JNLPRuntime.setForksAllowed(false);//needed?
+            ParserSettings settings = Boot.init(extra);
+            if (settings == null) {
+                return false;
             }
             if (splashScreen != null) {
                 splashScreen.stopAnimation();

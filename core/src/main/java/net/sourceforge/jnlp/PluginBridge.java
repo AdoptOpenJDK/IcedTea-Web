@@ -150,8 +150,9 @@ public final class PluginBridge extends JNLPFile {
                 LOG.info("Loaded JNLPhref:");
                 LOG.info((debugJnlp == null) ? "null" : debugJnlp);
 
-                if (jnlpFile.isApplet())
-                    main = jnlpFile.getApplet().getMainClass();
+                if (jnlpFile.isApplet()){
+                    throw new IllegalStateException("Applet not supported!");
+                }
 
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
                 info = jnlpFile.info;
