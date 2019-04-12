@@ -31,7 +31,7 @@ public class ElementName {
             return base;
         }
     }
-    public String getPrefix() {
+    private String getPrefix() {
         if (base.contains(":")) {
             return base.split(":")[0];
         } else {

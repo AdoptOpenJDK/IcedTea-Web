@@ -56,7 +56,7 @@ public class Node {
 
     private Node next;
 
-    private Node children[];
+    private Node[] children;
 
     private List <String> attributeNames= null;
 
@@ -79,9 +79,6 @@ public class Node {
 
     public Node getNextSibling() {
         return next;
-    }
-
-    public void normalize() {
     }
 
     public String getNodeValue() {
@@ -110,6 +107,7 @@ public class Node {
      * To retrieve all attribute names
      * @return all attribute names of the Node in ArrayList<String>
      */
+    @SuppressWarnings("unchecked")
     public List<String> getAttributeNames() {
         if (attributeNames == null) {
             attributeNames= new ArrayList<>();
