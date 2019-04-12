@@ -1,7 +1,7 @@
 {
   "appName": "IcedTea-Web @PACKAGE_VERSION@",
-  "versionMajor": "1",
-  "versionMinor": "9",
+  "versionMajor": "2",
+  "versionMinor": "0",
   "versionMicro": "0",
   "versionPatch": "0",
   "vendor": "IcedTea-Web open-source project",
