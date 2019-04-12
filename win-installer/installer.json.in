@@ -1,8 +1,8 @@
 {
   "appName": "IcedTea-Web @PACKAGE_VERSION@",
-  "versionMajor": "1",
-  "versionMinor": "8",
-  "versionMicro": "1",
+  "versionMajor": "@MAJOR_VERSION@",
+  "versionMinor": "@MINOR_VERSION@",
+  "versionMicro": "@MICRO_VERSION@",
   "versionPatch": "0",
   "vendor": "IcedTea-Web open-source project",
   "installDirName": "WebStart",
