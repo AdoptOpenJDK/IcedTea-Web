@@ -46,7 +46,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Applet
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JARDesc;
@@ -218,7 +218,7 @@ public class UnsignedAppletTrustConfirmation {
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
-        if (warningResponse == null || !warningResponse.compareValue(BasicDialogValue.Primitive.YES)) {
+        if (warningResponse == null || !warningResponse.compareValue(Primitive.YES)) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletUserDenied"));
         }
 
@@ -236,7 +236,7 @@ public class UnsignedAppletTrustConfirmation {
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
         
-        if (warningResponse == null || warningResponse.compareValue(BasicDialogValue.Primitive.NO)) {
+        if (warningResponse == null || warningResponse.compareValue(Primitive.NO)) {
             throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LPartiallySignedApplet"), R("LPartiallySignedAppletUserDenied"));
         }
         

@@ -43,7 +43,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
 
     public static AccessWarningPaneComplexReturn readValue(String s) {
         String[] sq = s.split(",");
-        BasicDialogValue.Primitive regularReturn = BasicDialogValue.Primitive.valueOf(sq[0]);
+        Primitive regularReturn = Primitive.valueOf(sq[0]);
         //the replace is fixing case of not existing shortcuts at all
         sq = s.replace("()", "( )").split("[()]");
         ShortcutResult d = null;
@@ -75,6 +75,16 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         return sb.toString();
     }
 
+    public enum Shortcut {
+
+        BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML;
+
+        public static String allValues() {
+            EnumSet<Shortcut> all = EnumSet.of(BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML);
+            return all.toString();
+        }
+    }
+
     public static class ShortcutResult {
 
         public static ShortcutResult readValue(String s) {
@@ -98,16 +108,6 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
                     .append(shortcutType).append(",")
                     .append(create).append(",");
             return sb.toString();
-        }
-
-        public static enum Shortcut {
-
-            BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML;
-            
-            public static String allValues() {
-                EnumSet<Shortcut> all = EnumSet.of(BROWSER, GENERATED_JNLP, JNLP_HREF, JAVAWS_HTML);
-                return all.toString();
-            }
         }
 
         @Override
@@ -188,7 +188,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         }
     }
 
-    public AccessWarningPaneComplexReturn(BasicDialogValue.Primitive regularReturn) {
+    public AccessWarningPaneComplexReturn(Primitive regularReturn) {
         this.regularReturn = new YesNo(regularReturn);
     }
 
@@ -223,7 +223,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
     @Override
     public int getButtonIndex() {
         if (regularReturn == null) {
-            return BasicDialogValue.Primitive.NO.getLegacyButton();
+            return Primitive.NO.getLegacyButton();
         } else {
             return regularReturn.getButtonIndex();
         }

@@ -48,8 +48,8 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
@@ -120,14 +120,14 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 
     private static class ExpectedResults {
 
-        public static ExpectedResults PositiveResults = new ExpectedResults(BasicDialogValue.Primitive.YES, YesNo.yes(), null, true);
-        public static ExpectedResults NegativeResults = new ExpectedResults(BasicDialogValue.Primitive.NO, YesNo.no(), null, false);
-        public final BasicDialogValue.Primitive p;
+        public static ExpectedResults PositiveResults = new ExpectedResults(Primitive.YES, YesNo.yes(), null, true);
+        public static ExpectedResults NegativeResults = new ExpectedResults(Primitive.NO, YesNo.no(), null, false);
+        public final Primitive p;
         public final YesNo ea;
         public final NamePassword np;
         public final boolean b;
 
-        public ExpectedResults(BasicDialogValue.Primitive p, YesNo ea, NamePassword np, boolean b) {
+        public ExpectedResults(Primitive p, YesNo ea, NamePassword np, boolean b) {
             this.p = p;
             this.ea = ea;
             this.np = np;

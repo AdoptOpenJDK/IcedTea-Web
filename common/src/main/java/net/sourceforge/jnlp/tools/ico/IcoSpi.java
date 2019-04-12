@@ -50,11 +50,11 @@ import java.util.Locale;
 
 public class IcoSpi extends ImageReaderSpi {
 
-    static final String readerClassName
+    private static final String readerClassName
             = ImageInputStreamIco.class.getName();
-    static final String[] localNames = {"ico"};
-    static final String[] localSuffixes = {"ico", "Ico", "ICO"};
-    static final String[] localMIMETypes = {
+    private static final String[] localNames = {"ico"};
+    private static final String[] localSuffixes = {"ico", "Ico", "ICO"};
+    private static final String[] localMIMETypes = {
         "image/vnd.microsoft.icon", "image/x-icon"};
 
     public IcoSpi() {
@@ -84,7 +84,7 @@ public class IcoSpi extends ImageReaderSpi {
     }
 
     @Override
-    public boolean canDecodeInput(Object input) throws IOException {
+    public boolean canDecodeInput(Object input) {
         try {
             IcoHeader header = null;
             if (input instanceof ImageInputStream) {

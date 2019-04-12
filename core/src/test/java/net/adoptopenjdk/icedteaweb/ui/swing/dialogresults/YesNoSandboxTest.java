@@ -36,8 +36,6 @@
  */
 package net.adoptopenjdk.icedteaweb.ui.swing.dialogresults;
 
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,7 +71,7 @@ public class YesNoSandboxTest {
 
     @Test(expected = Exception.class)
     public void cancelRead() {
-        YesNoSandbox y = YesNoSandbox.readValue(BasicDialogValue.Primitive.CANCEL.name());
+        YesNoSandbox y = YesNoSandbox.readValue(Primitive.CANCEL.name());
     }
 
     @Test(expected = Exception.class)
@@ -83,17 +81,17 @@ public class YesNoSandboxTest {
    
 
     public void noRead() {
-        YesNoSandbox y = YesNoSandbox.readValue(BasicDialogValue.Primitive.NO.name());
+        YesNoSandbox y = YesNoSandbox.readValue(Primitive.NO.name());
         Assert.assertFalse(y.toBoolean());
     }
 
     public void yesRead() {
-        YesNoSandbox y = YesNoSandbox.readValue(BasicDialogValue.Primitive.YES.name());
+        YesNoSandbox y = YesNoSandbox.readValue(Primitive.YES.name());
         Assert.assertTrue(y.toBoolean());
     }
     
     public void sandboxRead() {
-        YesNoSandbox y = YesNoSandbox.readValue(BasicDialogValue.Primitive.SANDBOX.name());
+        YesNoSandbox y = YesNoSandbox.readValue(Primitive.SANDBOX.name());
         Assert.assertTrue(y.toBoolean());
     }
 }

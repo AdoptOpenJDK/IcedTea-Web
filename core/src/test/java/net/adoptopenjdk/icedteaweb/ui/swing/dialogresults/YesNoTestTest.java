@@ -36,8 +36,6 @@
  */
 package net.adoptopenjdk.icedteaweb.ui.swing.dialogresults;
 
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,12 +62,12 @@ public class YesNoTestTest {
 
     @Test(expected = Exception.class)
     public void cancelRead() {
-        YesNo y = YesNo.readValue(BasicDialogValue.Primitive.CANCEL.name());
+        YesNo y = YesNo.readValue(Primitive.CANCEL.name());
     }
 
     @Test(expected = Exception.class)
     public void sandboxRead() {
-        YesNo y = YesNo.readValue(BasicDialogValue.Primitive.SANDBOX.name());
+        YesNo y = YesNo.readValue(Primitive.SANDBOX.name());
     }
 
     @Test(expected = Exception.class)
@@ -78,12 +76,12 @@ public class YesNoTestTest {
     }
 
     public void noRead() {
-        YesNo y = YesNo.readValue(BasicDialogValue.Primitive.NO.name());
+        YesNo y = YesNo.readValue(Primitive.NO.name());
         Assert.assertFalse(y.toBoolean());
     }
 
     public void yesRead() {
-        YesNo y = YesNo.readValue(BasicDialogValue.Primitive.YES.name());
+        YesNo y = YesNo.readValue(Primitive.YES.name());
         Assert.assertTrue(y.toBoolean());
     }
 

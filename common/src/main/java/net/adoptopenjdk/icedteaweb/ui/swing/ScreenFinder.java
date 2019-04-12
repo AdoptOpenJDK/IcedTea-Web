@@ -76,7 +76,7 @@ public class ScreenFinder {
                 bounds.y + (bounds.height - w.getHeight())/2);
     }
 
-    public static GraphicsDevice getScreenOnCoords(final Point point) {
+    private static GraphicsDevice getScreenOnCoords(final Point point) {
         final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final GraphicsDevice[] devices = e.getScreenDevices();
         GraphicsDevice result = null;
@@ -99,7 +99,7 @@ public class ScreenFinder {
         return result;
     }
 
-    public static Rectangle getScreenOnCoordsWithoutBounds(final Point p) {
+    private static Rectangle getScreenOnCoordsWithoutBounds(final Point p) {
         try {
             final GraphicsDevice device = getScreenOnCoords(p);
             final Rectangle screenSize = device.getDefaultConfiguration().getBounds();

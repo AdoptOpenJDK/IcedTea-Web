@@ -38,7 +38,6 @@ package net.sourceforge.jnlp.tools.ico;
 
 import net.sourceforge.jnlp.tools.ico.impl.ImageInputStreamIco;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
@@ -47,7 +46,6 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +53,7 @@ import java.util.Vector;
 
 public class IcoReader extends ImageReader {
 
-    ImageInputStreamIco cheat;
+    private ImageInputStreamIco cheat;
 
     private void loadIcon() {
         if (cheat == null) {
@@ -78,12 +76,7 @@ public class IcoReader extends ImageReader {
     }
 
     @Override
-    public void setInput(Object input, boolean isStreamable) {
-        super.setInput(input, isStreamable);
-    }
-
-    @Override
-    public int getNumImages(boolean allowSearch) throws IIOException {
+    public int getNumImages(boolean allowSearch) {
         loadIcon();
         return cheat.getHeader().getCountOfIcons();
     }
@@ -96,20 +89,21 @@ public class IcoReader extends ImageReader {
     }
 
     @Override
-    public int getWidth(int imageIndex) throws IIOException {
+    public int getWidth(int imageIndex) {
         checkIndex(imageIndex);
         return cheat.getHeader().getEntries().get(imageIndex).getWidth();
     }
 
     @Override
-    public int getHeight(int imageIndex) throws IIOException {
+    public int getHeight(int imageIndex) {
         checkIndex(imageIndex);
         return cheat.getHeader().getEntries().get(imageIndex).getHeight();
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Iterator<ImageTypeSpecifier> getImageTypes(int imageIndex) throws IOException {
+    public Iterator<ImageTypeSpecifier> getImageTypes(int imageIndex) {
         checkIndex(imageIndex);
         List l = new ArrayList();
         Vector<RenderedImage> q = cheat.getImage(imageIndex).getSources();
@@ -121,18 +115,18 @@ public class IcoReader extends ImageReader {
     }
 
     @Override
-    public IIOMetadata getStreamMetadata() throws IOException {
+    public IIOMetadata getStreamMetadata() {
         return null;
     }
 
     @Override
-    public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
+    public IIOMetadata getImageMetadata(int imageIndex) {
         checkIndex(imageIndex);
         return null;
     }
 
     @Override
-    public BufferedImage read(int imageIndex, ImageReadParam param) throws IOException {
+    public BufferedImage read(int imageIndex, ImageReadParam param) {
         checkIndex(imageIndex);
         return cheat.getImage(imageIndex);
     }

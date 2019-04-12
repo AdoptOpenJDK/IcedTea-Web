@@ -41,27 +41,27 @@ import java.util.EnumSet;
 public class YesCancelSkip extends YesCancel {
 
     public static YesCancelSkip yes() {
-        return new YesCancelSkip(BasicDialogValue.Primitive.YES);
+        return new YesCancelSkip(Primitive.YES);
     }
 
     public static YesCancelSkip cancel() {
-        return new YesCancelSkip(BasicDialogValue.Primitive.CANCEL);
+        return new YesCancelSkip(Primitive.CANCEL);
     }
 
     public static YesCancelSkip skip() {
-        return new YesCancelSkip(BasicDialogValue.Primitive.SKIP);
+        return new YesCancelSkip(Primitive.SKIP);
     }
 
     public static YesCancelSkip readValue(String s) {
-        return new YesCancelSkip(BasicDialogValue.Primitive.valueOf(s));
+        return new YesCancelSkip(Primitive.valueOf(s));
     }
 
-    private  YesCancelSkip(BasicDialogValue.Primitive valueOf) {
+    private  YesCancelSkip(Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.YesCancelSkip;
     }
 

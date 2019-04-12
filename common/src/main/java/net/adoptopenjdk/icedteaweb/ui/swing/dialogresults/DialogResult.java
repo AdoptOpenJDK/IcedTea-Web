@@ -49,14 +49,14 @@ public interface DialogResult {
      *
      * @return button to be preselected in dialogue
      */
-    abstract public int getButtonIndex();
+    int getButtonIndex();
 
     /**
      * Simplified decision model whether dialog was approved or not.
      * @return true only and only if dialog was approved
      */
-    abstract public boolean toBoolean();
+    boolean toBoolean();
 
-    abstract public String writeValue();
+    String writeValue();
 
 }

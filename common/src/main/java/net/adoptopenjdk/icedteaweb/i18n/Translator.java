@@ -44,7 +44,7 @@ public class Translator {
 
     private final ResourceBundle resources;
 
-    Translator() {
+    private Translator() {
         this(DEFAULT_RESOURCE_BUNDLE_BASE_NAME);
     }
 
@@ -63,7 +63,7 @@ public class Translator {
         this.resources = resources;
     }
 
-    public static Translator getInstance() {
+    private static Translator getInstance() {
         return TranslatorHolder.getTranslator();
     }
 

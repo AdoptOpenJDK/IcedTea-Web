@@ -86,7 +86,7 @@ import java.nio.ByteBuffer;
 public abstract class CharacterDecoder {
     
     /** This exception is thrown when EOF is reached */
-    protected static class CEStreamExhausted extends IOException { };
+    protected static class CEStreamExhausted extends IOException { }
 
     /** Return the number of bytes per atom of decoding */
     abstract protected int bytesPerAtom();
@@ -94,29 +94,15 @@ public abstract class CharacterDecoder {
     /** Return the maximum number of bytes that can be encoded per line */
     abstract protected int bytesPerLine();
 
-    /** decode the beginning of the buffer, by default this is a NOP. */
-    protected void decodeBufferPrefix(PushbackInputStream aStream, OutputStream bStream) throws IOException { }
-
-    /** decode the buffer suffix, again by default it is a NOP. */
-    protected void decodeBufferSuffix(PushbackInputStream aStream, OutputStream bStream) throws IOException { }
-
     /**
      * This method should return, if it knows, the number of bytes
      * that will be decoded. Many formats such as uuencoding provide
      * this information. By default we return the maximum bytes that
      * could have been encoded on the line.
      */
-    protected int decodeLinePrefix(PushbackInputStream aStream, OutputStream bStream) throws IOException {
+    private int decodeLinePrefix() {
         return (bytesPerLine());
     }
-
-    /**
-     * This method post processes the line, if there are error detection
-     * or correction codes in a line, they are generally processed by
-     * this method. The simplest version of this method looks for the
-     * (newline) character.
-     */
-    protected void decodeLineSuffix(PushbackInputStream aStream, OutputStream bStream) throws IOException { }
 
     /**
      * This method does an actual decode. It takes the decoded bytes and
@@ -131,14 +117,14 @@ public abstract class CharacterDecoder {
      * This method works around the bizarre semantics of BufferedInputStream's
      * read method.
      */
-    protected int readFully(InputStream in, byte buffer[], int offset, int len)
+    protected int readFully(InputStream in, byte[] buffer, int len)
         throws java.io.IOException {
         for (int i = 0; i < len; i++) {
             int q = in.read();
             if (q == -1) {
                 return ((i == 0) ? -1 : i);
             }
-            buffer[i+offset] = (byte)q;
+            buffer[i+ 1] = (byte)q;
         }
         return len;
     }
@@ -154,12 +140,11 @@ public abstract class CharacterDecoder {
         int     totalBytes = 0;
 
         PushbackInputStream ps = new PushbackInputStream (aStream);
-        decodeBufferPrefix(ps, bStream);
         while (true) {
             int length;
 
             try {
-                length = decodeLinePrefix(ps, bStream);
+                length = decodeLinePrefix();
                 for (i = 0; (i+bytesPerAtom()) < length; i += bytesPerAtom()) {
                     decodeAtom(ps, bStream, bytesPerAtom());
                     totalBytes += bytesPerAtom();
@@ -171,12 +156,10 @@ public abstract class CharacterDecoder {
                     decodeAtom(ps, bStream, length - i);
                     totalBytes += (length - i);
                 }
-                decodeLineSuffix(ps, bStream);
             } catch (CEStreamExhausted e) {
                 break;
             }
         }
-        decodeBufferSuffix(ps, bStream);
     }
 
     /**
@@ -199,7 +182,7 @@ public abstract class CharacterDecoder {
     /**
      * Decode the contents of the inputstream into a buffer.
      */
-    public byte decodeBuffer(InputStream in)[] throws IOException {
+    private byte decodeBuffer(InputStream in)[] throws IOException {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         decodeBuffer(in, outStream);
         return (outStream.toByteArray());

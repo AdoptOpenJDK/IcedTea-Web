@@ -105,7 +105,7 @@ public class BASE64Decoder extends CharacterDecoder {
         }
     }
 
-    byte decode_buffer[] = new byte[4];
+    private final byte[] decode_buffer = new byte[4];
 
     /**
      * Decode one BASE64 atom into 1, 2, or 3 bytes of data.
@@ -128,7 +128,7 @@ public class BASE64Decoder extends CharacterDecoder {
         } while (i == '\n' || i == '\r');
         decode_buffer[0] = (byte) i;
 
-        i = readFully(inStream, decode_buffer, 1, rem-1);
+        i = readFully(inStream, decode_buffer, rem-1);
         if (i == -1) {
             throw new CEStreamExhausted();
         }

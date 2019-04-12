@@ -41,23 +41,23 @@ import java.util.EnumSet;
 public class YesNo extends Yes {
 
     public static YesNo yes() {
-        return new YesNo(BasicDialogValue.Primitive.YES);
+        return new YesNo(Primitive.YES);
     }
 
     public static YesNo no() {
-        return new YesNo(BasicDialogValue.Primitive.NO);
+        return new YesNo(Primitive.NO);
     }
 
     public static YesNo readValue(String s) {
-        return new YesNo(BasicDialogValue.Primitive.valueOf(s));
+        return new YesNo(Primitive.valueOf(s));
     }
 
-    YesNo(BasicDialogValue.Primitive valueOf) {
+    YesNo(Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.YesNo;
     }
 

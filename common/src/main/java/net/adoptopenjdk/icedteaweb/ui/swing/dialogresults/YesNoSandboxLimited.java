@@ -48,27 +48,27 @@ import java.util.EnumSet;
 public class YesNoSandboxLimited extends YesNoSandbox {
 
     public static YesNoSandboxLimited yes() {
-        return new YesNoSandboxLimited(BasicDialogValue.Primitive.YES);
+        return new YesNoSandboxLimited(Primitive.YES);
     }
 
     public static YesNoSandboxLimited no() {
-        return new YesNoSandboxLimited(BasicDialogValue.Primitive.NO);
+        return new YesNoSandboxLimited(Primitive.NO);
     }
 
     public static YesNoSandboxLimited sandbox() {
-        return new YesNoSandboxLimited(BasicDialogValue.Primitive.SANDBOX);
+        return new YesNoSandboxLimited(Primitive.SANDBOX);
     }
 
     public static YesNoSandboxLimited readValue(String s) {
-        return new YesNoSandboxLimited(BasicDialogValue.Primitive.valueOf(s));
+        return new YesNoSandboxLimited(Primitive.valueOf(s));
     }
 
-    private YesNoSandboxLimited(BasicDialogValue.Primitive valueOf) {
+    private YesNoSandboxLimited(Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.YesNo;
     }
 

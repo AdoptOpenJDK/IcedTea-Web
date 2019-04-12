@@ -40,29 +40,13 @@ import java.util.EnumSet;
 
 public abstract class BasicDialogValue {
 
-    public static enum Primitive {
-
-        YES(0), NO(1), CANCEL(2), SANDBOX(2), SKIP(0);
-
-        private final int legacyButton;
-
-        private Primitive(int legacyButton) {
-            this.legacyButton = legacyButton;
-        }
-
-        public int getLegacyButton() {
-            return legacyButton;
-        }
-
-    }
-
     static abstract class PrimitivesSubset implements DialogResult {
 
-        protected final BasicDialogValue.Primitive value;
+        protected final Primitive value;
 
         abstract EnumSet<Primitive> getAllowedValues();
 
-        protected PrimitivesSubset(BasicDialogValue.Primitive value) {
+        protected PrimitivesSubset(Primitive value) {
             this.value = value;
             checkValue(value);
         }
@@ -76,21 +60,17 @@ public abstract class BasicDialogValue {
         @Override
         public String writeValue() {
             if (value == null) {
-                return writeNUll();
+                return "";
             }
             return value.name();
         }
 
         @Override
         public boolean toBoolean() {
-            if (value == null || value == BasicDialogValue.Primitive.NO || value == BasicDialogValue.Primitive.CANCEL) {
-                return false;
-            } else {
-                return true;
-            }
+            return value != null && value != Primitive.NO && value != Primitive.CANCEL;
         }
 
-        public BasicDialogValue.Primitive getValue() {
+        public Primitive getValue() {
             return value;
         }
 
@@ -111,7 +91,7 @@ public abstract class BasicDialogValue {
 
         @Override
         public int getButtonIndex() {
-            return BasicDialogValue.Primitive.NO.getLegacyButton();
+            return Primitive.NO.getLegacyButton();
         }
 
         @Override
@@ -135,15 +115,5 @@ public abstract class BasicDialogValue {
     public static final EnumSet<Primitive> YesCancelSkip = EnumSet.of(Primitive.YES, Primitive.CANCEL, Primitive.SKIP);
     public static final EnumSet<Primitive> YesNoCancel = EnumSet.of(Primitive.YES, Primitive.NO, Primitive.CANCEL);
     public static final EnumSet<Primitive> YesNoSandbox = EnumSet.of(Primitive.YES, Primitive.NO, Primitive.SANDBOX);
-
-    /**
-     * Current convention for null is empty string.
-     *
-     * @return ""
-     */
-    public static String writeNUll() {
-        return "";
-
-    }
 
 }

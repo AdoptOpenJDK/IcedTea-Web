@@ -41,27 +41,27 @@ import java.util.EnumSet;
 public class YesNoSandbox extends YesNo {
 
     public static YesNoSandbox yes() {
-        return new YesNoSandbox(BasicDialogValue.Primitive.YES);
+        return new YesNoSandbox(Primitive.YES);
     }
 
     public static YesNoSandbox no() {
-        return new YesNoSandbox(BasicDialogValue.Primitive.NO);
+        return new YesNoSandbox(Primitive.NO);
     }
 
     public static YesNoSandbox sandbox() {
-        return new YesNoSandbox(BasicDialogValue.Primitive.SANDBOX);
+        return new YesNoSandbox(Primitive.SANDBOX);
     }
 
     public static YesNoSandbox readValue(String s) {
-        return new YesNoSandbox(BasicDialogValue.Primitive.valueOf(s));
+        return new YesNoSandbox(Primitive.valueOf(s));
     }
 
-    protected YesNoSandbox(BasicDialogValue.Primitive valueOf) {
+    protected YesNoSandbox(Primitive valueOf) {
         super(valueOf);
     }
 
     @Override
-    public EnumSet<BasicDialogValue.Primitive> getAllowedValues() {
+    public EnumSet<Primitive> getAllowedValues() {
         return BasicDialogValue.YesNoSandbox;
     }
 

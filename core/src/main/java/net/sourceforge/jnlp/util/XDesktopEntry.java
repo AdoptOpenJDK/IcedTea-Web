@@ -130,9 +130,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
 
         File generatedJnlp = null;
-        if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF)) {
+        if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF)) {
             try {
-                String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF, info.isFixHref());
+                String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF, info.isFixHref());
                 generatedJnlp = getGeneratedJnlpFileName();
                 FileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
@@ -178,7 +178,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";
             fileContents += exec;
         } else {
-            if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.BROWSER) {
+            if (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.BROWSER) {
                 String browser = info.getBrowser();
                 if (browser == null) {
                     browser = getBrowserBin();
@@ -186,13 +186,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 exec = "Exec="
                         + browser + " \"" + file.getSourceLocation() + "\"\n";
                 fileContents += exec;
-            } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP
-                    || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF) && generatedJnlp != null) {
+            } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP
+                    || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF) && generatedJnlp != null) {
                 exec =  "Exec="
                         + getJavaWsBin() + " \"" + generatedJnlp.getAbsolutePath() + "\"\n";
                 fileContents += exec;
                 title = title + " (generated jnlp)";
-            } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JAVAWS_HTML) {
+            } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML) {
                 exec =  "Exec="
                         + getJavaWsBin() + " -html  \"" + file.getSourceLocation() + "\"\n";
                 fileContents += exec;

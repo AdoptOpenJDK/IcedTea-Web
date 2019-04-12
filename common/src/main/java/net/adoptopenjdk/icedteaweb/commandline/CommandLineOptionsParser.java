@@ -61,12 +61,10 @@ public class CommandLineOptionsParser {
     //List of all possible main arguments
     private final List<String> mainArgumentList = new ArrayList<>();
 
-    private boolean evenNumberFound;
-
     public CommandLineOptionsParser(final String[] args, final List<CommandLineOptions> options) throws UnevenParameterException {
         this.possibleOptions = options;
 
-        evenNumberFound = false;
+        boolean evenNumberFound = false;
         parsedOptions = new ArrayList<>();
 
         ParsedCommandLineOption lastOption = null;

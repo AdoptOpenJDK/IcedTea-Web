@@ -40,7 +40,7 @@ package net.sourceforge.jnlp.security;
 import java.security.cert.CertPath;
 import java.util.Map;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -123,7 +123,7 @@ public class JNLPAppVerifier implements AppVerifier {
                 YesNoSandbox action = SecurityDialogs.showCertWarningDialog(
                         dialogType, file, jcv, securityDelegate);
                 if (action != null && action.toBoolean()) {
-                    if (action.compareValue(BasicDialogValue.Primitive.SANDBOX)) {
+                    if (action.compareValue(Primitive.SANDBOX)) {
                         securityDelegate.setRunInSandbox();
                     }
                     return;

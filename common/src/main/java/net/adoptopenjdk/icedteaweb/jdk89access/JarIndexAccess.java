@@ -1,12 +1,12 @@
 package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.jar.JarFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class providing jar index access using sun.misc.JarIndex for both jdk8 and jdk9.
@@ -48,7 +48,7 @@ public class JarIndexAccess {
         this.parent = parent;
     }
 
-    public static JarIndexAccess getJarIndex(final JarFile jarFile) throws IOException {
+    public static JarIndexAccess getJarIndex(final JarFile jarFile) {
         try {
             return getJarIndexImpl(jarFile);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -56,7 +56,7 @@ public class JarIndexAccess {
         }
     }
 
-    public static JarIndexAccess getJarIndexImpl(final JarFile jarFile) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private static JarIndexAccess getJarIndexImpl(final JarFile jarFile) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final Method method = jarIndexClass.getMethod(METHOD_GET_JAR_INDEX, JarFile.class);
         final Object o = method.invoke(null, jarFile);
         if (o == null) {
@@ -73,7 +73,8 @@ public class JarIndexAccess {
         }
     }
 
-    public LinkedList<String> getImpl(final String replace) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    @SuppressWarnings("unchecked")
+    private LinkedList<String> getImpl(final String replace) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Method method = jarIndexClass.getMethod(METHOD_GET, String.class);
         final Object o = method.invoke(parent, replace);
         return (LinkedList<String>) o;

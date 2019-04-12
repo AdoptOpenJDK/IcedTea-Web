@@ -39,7 +39,6 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.BasicDialogValue;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 
 import java.awt.Component;
@@ -52,7 +51,7 @@ public class RememberDialog {
         if (found == null) {
             return;
         }
-        String value =  BasicDialogValue.writeNUll();
+        String value =  "";
         if (found.getValue()!=null){
             value = found.getValue().writeValue();
         }

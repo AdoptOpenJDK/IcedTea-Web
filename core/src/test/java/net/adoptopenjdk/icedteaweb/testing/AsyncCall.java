@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
  * it did not finish. Returns the value from the call.
  */
 public class AsyncCall<T> {
+
     static public class TimeOutException extends RuntimeException  {
         public TimeOutException() {
             super("Call did not finish within the allocated time.");

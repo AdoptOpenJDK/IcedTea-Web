@@ -36,17 +36,18 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.ui.swing;
 
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Window;
-import java.lang.reflect.InvocationTargetException;
-import javax.swing.JWindow;
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.JWindow;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Window;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Swing / AWT utility class
@@ -91,7 +92,7 @@ public final class SwingUtils {
         System.err.println(msg);
     }
 
-    static void traceWithStack(final String msg) {
+    private static void traceWithStack(final String msg) {
         trace(msg);
         new Throwable().printStackTrace();
     }
@@ -104,7 +105,7 @@ public final class SwingUtils {
         }
     }
 
-    public static void checkEDT() {
+    private static void checkEDT() {
         if (!isEventDispatchThread()) {
             LOG.error("EDT VIOLATION", new Exception("EDT violation"));
         }
@@ -163,10 +164,8 @@ public final class SwingUtils {
         } else {
             try {
                 callOnAppContext(doRun);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException | InvocationTargetException ie) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ie);
-            } catch (InvocationTargetException ite) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ite);
             }
         }
     }
