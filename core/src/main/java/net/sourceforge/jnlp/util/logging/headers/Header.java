@@ -49,7 +49,7 @@ import java.util.Date;
 public class Header {
 
     private final static Logger LOG = LoggerFactory.getLogger(Header.class);
-    public static String  default_user = System.getProperty("user.name");
+    private static final String  default_user = System.getProperty("user.name");
     
     public String user = default_user;
     public boolean application = true;
@@ -74,7 +74,7 @@ public class Header {
         this(level, stack, thread, new Date(), isC);
     }
 
-    public Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
+    private Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
         this.application = JNLPRuntime.isWebstartApplication();
         this.level = level;
         this.timestamp = d;
@@ -83,7 +83,7 @@ public class Header {
         if (stack != null) {
             this.caller = getCallerClass(stack);
         }
-        this.thread1 = Integer.toHexString(((Object) thread).hashCode());
+        this.thread1 = Integer.toHexString(thread.hashCode());
         this.thread2 = thread.getName();
     }
 
@@ -106,7 +106,7 @@ public class Header {
                 sb.append('[').append(level.toString()).append(']');
             }
             if (dateb){
-                sb.append('[').append(date.toString()).append(']');
+                sb.append('[').append(date).append(']');
             }
             if (callerb && caller != null) {
                 sb.append('[').append(caller).append(']');
@@ -132,7 +132,7 @@ public class Header {
         return "name " + thread2;
     }
 
-    public String threadsToString() {
+    private String threadsToString() {
         return thread1ToString()
                 + ", " + thread2ToString();
     }
@@ -157,7 +157,7 @@ public class Header {
 
     }
 
-    static String getCallerClass(StackTraceElement[] stack) {
+    private static String getCallerClass(StackTraceElement[] stack) {
         try {
             //0 is always thread
             //1..? is OutputController itself
@@ -171,7 +171,6 @@ public class Header {
                         stack[i].getClassName().contains("sun.applet.PluginDebug")
                         || stack[i].getClassName().contains(Header.class.getName())
                         || stack[i].getClassName().contains(TeeOutputStream.class.getName())) {
-                    continue;
                 } else {
                     break;
                 }

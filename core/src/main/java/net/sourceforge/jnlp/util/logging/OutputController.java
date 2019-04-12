@@ -35,14 +35,6 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -51,6 +43,15 @@ import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -69,8 +70,7 @@ public class OutputController {
     private PrintStreamLogger outLog;
     private PrintStreamLogger errLog;
     private final List<MessageWithHeader> messageQue = new LinkedList<>();
-    private final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
-    Thread consumerThread;
+    private Thread consumerThread;
      /*stdin reader for headless dialogues*/
     private BufferedReader br;
 
@@ -83,7 +83,7 @@ public class OutputController {
                 try {
                     synchronized (OutputController.this) {
                         OutputController.this.wait(1000);
-                        if (!(OutputController.this == null || messageQue.isEmpty())) {
+                        if (!messageQue.isEmpty()) {
                             flush();
                         }
                     }
@@ -93,7 +93,7 @@ public class OutputController {
                 }
             }
         }
-    };
+    }
 
     public synchronized void flush() {
 
@@ -146,7 +146,7 @@ public class OutputController {
         //only java messages handled here, plugin is onhis own
         if (LogConfig.getLogConfig().isLogToSysLog() && 
                 (s.getHeader().level.equals(OutputControllerLevel.ERROR_ALL) || s.getHeader().level.equals(OutputControllerLevel.WARNING_ALL)) &&
-                s.getHeader().isC == false) {
+                !s.getHeader().isC) {
             //no headers here
             getSystemLog().log(s.getMessage());
         }
@@ -197,15 +197,11 @@ public class OutputController {
         outLog = new PrintStreamLogger(out);
         errLog = new PrintStreamLogger(err);
         //itw logger have to be fully initialised before start
-        consumerThread = new Thread(messageQueConsumer, "Output controller consumer daemon");
+         final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
+         consumerThread = new Thread(messageQueConsumer, "Output controller consumer daemon");
         consumerThread.setDaemon(true);
         //is started in JNLPRuntime.getConfig() after config is laoded
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                flush();
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> flush()));
     }
      
     public void startConsumer() {
@@ -310,7 +306,7 @@ public class OutputController {
         
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
-        private static volatile SingleStreamLogger INSTANCE = FileLog.createAppFileLog();
+        private static final SingleStreamLogger INSTANCE = FileLog.createAppFileLog();
     }
 
     private SingleStreamLogger getAppFileLog() {
@@ -321,7 +317,7 @@ public class OutputController {
 
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
-        private static volatile SingleStreamLogger INSTANCE = initSystemLogger();
+        private static final SingleStreamLogger INSTANCE = initSystemLogger();
 
         private static SingleStreamLogger initSystemLogger() {
             if (JNLPRuntime.isWindows()) {
@@ -336,7 +332,7 @@ public class OutputController {
         return SystemLogHolder.INSTANCE;
     }
 
-    public void printErrorLn(String e) {
+    private void printErrorLn(String e) {
         getErr().println(e);
 
     }
@@ -351,7 +347,7 @@ public class OutputController {
         printErrorLn(e);
     }
 
-    public void printError(String e) {
+    private void printError(String e) {
         getErr().print(e);
 
     }
@@ -361,33 +357,13 @@ public class OutputController {
 
     }
 
-    public void printWarning(String e) {
-        printOut(e);
-        printError(e);
-    }
-    
-   //package private setters for testing
 
-    void setErrLog(PrintStreamLogger errLog) {
-        this.errLog = errLog;
-    }
+   //package private setters for testing
 
     void setFileLog(SingleStreamLogger fileLog) {
         FileLogHolder.INSTANCE = fileLog;
     }
-    
-    void setAppFileLog(SingleStreamLogger fileLog) {
-        AppFileLogHolder.INSTANCE = fileLog;
-    }
 
-    void setOutLog(PrintStreamLogger outLog) {
-        this.outLog = outLog;
-    }
-
-    void setSysLog(SingleStreamLogger sysLog) {
-        SystemLogHolder.INSTANCE = sysLog;
-    }
-    
     public synchronized String readLine() throws IOException {
         if (br == null) {
             br = new BufferedReader(new InputStreamReader(System.in));

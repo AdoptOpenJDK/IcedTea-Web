@@ -38,9 +38,9 @@ package net.sourceforge.jnlp.util.logging;
 
 public interface SingleStreamLogger extends AutoCloseable {
 
-    public void log(String s);
+    void log(String s);
 
     @Override
-    public void close() throws Exception;
+    void close() throws Exception;
 
 }

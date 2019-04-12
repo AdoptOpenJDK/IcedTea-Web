@@ -36,11 +36,12 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import java.io.File;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
+import java.io.File;
 
 /**
  * This file provides the information required to do logging.
@@ -51,12 +52,12 @@ public class LogConfig {
     // Directory where the logs are stored.
     private String icedteaLogDir;
     private boolean enableLogging;
-    private boolean enableHeaders;
+    private final boolean enableHeaders;
     private boolean logToFile;
-    private boolean logClientAppToFile;
+    private final boolean logClientAppToFile;
     private boolean logToStreams;
     private boolean logToSysLog;
-    private boolean legacyLogaAsedFileLog;
+    private final boolean legacyLogaAsedFileLog;
 
     private LogConfig() {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
@@ -127,17 +128,8 @@ public class LogConfig {
         return enableHeaders;
     }
 
-    //package private setters for testing
-    void setEnableHeaders(boolean enableHeaders) {
-        this.enableHeaders = enableHeaders;
-    }
-
     void setEnableLogging(boolean enableLogging) {
         this.enableLogging = enableLogging;
-    }
-
-    void setIcedteaLogDir(String icedteaLogDir) {
-        this.icedteaLogDir = icedteaLogDir;
     }
 
     void setLogToFile(boolean logToFile) {
@@ -158,14 +150,6 @@ public class LogConfig {
 
     boolean isLegacyLogBasedFileLog() {
         return legacyLogaAsedFileLog;
-    }
-
-    boolean setLegacyLogBasedFileLog(boolean b) {
-        return legacyLogaAsedFileLog = b;
-    }
-
-    void serLogToFileForClientApp(boolean b) {
-        logClientAppToFile = b;
     }
 
     boolean isLogToFileForClientApp() {
