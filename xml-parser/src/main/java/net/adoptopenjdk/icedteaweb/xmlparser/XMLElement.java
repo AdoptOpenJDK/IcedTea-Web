@@ -423,7 +423,7 @@ public class XMLElement {
      * @throws XMLParseException
      *     If an error occured while parsing the read data.
      */
-    private void parseFromReader(final Reader reader)
+    public void parseFromReader(final Reader reader)
             throws IOException, XMLParseException {
         this.charReadTooMuch = '\0';
         this.reader = reader;
@@ -1198,7 +1198,6 @@ public class XMLElement {
                         line.append(ch);
                     }
                 }
-                prev = next;
             }
             isr.close();
         } catch (final Exception e) {
