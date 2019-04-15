@@ -49,7 +49,7 @@ public class Version {
 
     private final static Logger LOG = LoggerFactory.getLogger(Version.class);
 
-    // to do: web start does not isMatchOf versions with a "-" like
+    // to do: web start does not match versions with a "-" like
     // "1.4-beta1" using the + modifier, change to mimic that
     // behavior.
 
@@ -84,7 +84,7 @@ public class Version {
     }
 
     /**
-     * @return true if all of this version's version-ids isMatchOf one
+     * @return true if all of this version's version-ids match one
      * or more of the specifed version's version-id.
      *
      * @param version a version string
@@ -94,7 +94,7 @@ public class Version {
     }
 
     /**
-     * @return true if all of this version's version-ids isMatchOf one
+     * @return true if all of this version's version-ids match one
      * or more of the specifed version's version-id.
      *
      * @param version a Version object
@@ -112,7 +112,7 @@ public class Version {
     }
 
     /**
-     * @return true if any of this version's version-ids isMatchOf one
+     * @return true if any of this version's version-ids match one
      * or more of the specifed version's version-id.
      *
      * @param version a version string
@@ -122,7 +122,7 @@ public class Version {
     }
 
     /**
-     * @return true if any of this version's version-ids isMatchOf one
+     * @return true if any of this version's version-ids match one
      * or more of the specifed version's version-id.
      *
      * @param version a Version object

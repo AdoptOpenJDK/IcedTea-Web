@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is special case of version, used only for checking jre version. If
- * jre do not isMatchOf, in strict not-headless mode the dialog with
- * confirrmation appears If jre do not isMatchOf, in strict headless mode the
- * exception is thrown If jre isMatchOf, or non-strict mode is run, then only
+ * jre do not match, in strict not-headless mode the dialog with
+ * confirmation appears If jre do not match, in strict headless mode the
+ * exception is thrown If jre match, or non-strict mode is run, then only
  * message is printed
  *
  * @deprecated use {@link VersionId} and {@link VersionString} instead
@@ -34,7 +34,7 @@ public class JreVersion extends Version {
         boolean match = matchesJreVersion();
         if (!match) {
             String s = Translator.R("JREversionDontMatch", getJreVersion(), v);
-            String e = "Strict run is  deffined, and your JRE - " + getJreVersion() + " - dont isMatchOf requested JRE(s) - " + v;
+            String e = "Strict run is  deffined, and your JRE - " + getJreVersion() + " - dont match requested JRE(s) - " + v;
             if (strict) {
                 if (!headless) {
                     if (!warned) {
@@ -51,7 +51,7 @@ public class JreVersion extends Version {
                 LOG.warn(s);
             }
         } else {
-            LOG.info("good - your JRE - {} - isMatchOf requested JRE - {}", getJreVersion(), v);
+            LOG.info("good - your JRE - {} - match requested JRE - {}", getJreVersion(), v);
         }
     }
 
