@@ -516,6 +516,7 @@ win-installer: win-only-image $(WIN_INSTALLER_DIR)/itw-installer.json
 	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c $(WIN_INSTALLER_DIR)/itw-installer.json -o $(WIN_INSTALLER_DIR)/itw-installer.wxs
 	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe /nologo itw-installer.wxs
 	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe /nologo -sval -ext WixUIExtension itw-installer.wixobj
+	cd $(WIN_INSTALLER_DIR) && mv itw-installer.msi $(distdir).msi
 endif
 
 # note that this is called only from windows specific target (hidden otherwise)
