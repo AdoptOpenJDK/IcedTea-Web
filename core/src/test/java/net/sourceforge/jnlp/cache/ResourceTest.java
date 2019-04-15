@@ -37,7 +37,7 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import org.junit.Test;
 
 import java.net.MalformedURLException;

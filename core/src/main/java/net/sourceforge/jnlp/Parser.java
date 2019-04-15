@@ -17,6 +17,8 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
@@ -405,7 +407,7 @@ public final class Parser {
         // require version attribute
         getRequiredAttribute(node, "version", null);
 
-        return new JREDesc(new Version.JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(new JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
 import java.net.URL;
@@ -37,7 +38,7 @@ public class JREDesc {
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
     /** the platform version or the product version if location is not null */
-    private final Version.JreVersion version;
+    private final JreVersion version;
 
     /** the location of a JRE product or null */
     private final URL location;
@@ -66,7 +67,7 @@ public class JREDesc {
      * @param resources list of ResourceDesc objects
      * @throws ParseException is something goes wrong
      */
-    public JREDesc(final Version.JreVersion version, final URL location,
+    public JREDesc(final JreVersion version, final URL location,
                    final String vmArgs, final String initialHeapSize,
                    final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
@@ -82,7 +83,7 @@ public class JREDesc {
      * determine if this version corresponds to a platform or
      * product version.
      */
-    public Version.JreVersion getVersion() {
+    public JreVersion getVersion() {
         return version;
     }
 

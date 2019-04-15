@@ -114,7 +114,7 @@ public class RememberPanel extends JPanel implements RemeberActionProvider {
     }
 
   
-    // Toggles whether 'match applet' or 'match codebase' options are greyed out
+    // Toggles whether 'isMatchOf applet' or 'isMatchOf codebase' options are greyed out
     protected ActionListener permanencyListener() {
         return new ActionListener() {
             @Override

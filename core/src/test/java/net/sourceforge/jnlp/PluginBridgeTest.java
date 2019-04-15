@@ -22,29 +22,27 @@
 
 package net.sourceforge.jnlp;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-
+import java.util.Map;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
 
@@ -58,7 +56,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
 
         @Override
         public JNLPFile create(URL location, Version version, ParserSettings settings,
-                UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
+                               UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
             JNLPHref = location;
             return new MockJNLPFile();
         }
