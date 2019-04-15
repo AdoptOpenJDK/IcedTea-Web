@@ -46,8 +46,6 @@ public class VersionId {
     private static final String ZERO_ELEMENT = "0";
 
     private final String versionId;
-    private boolean usePrefixMatch; // asterisk (*) postfix
-    private boolean useGreaterThanOrEqualMatch; // plus (+) greater-than postfix
 
     private VersionId(String versionId) {
         this.versionId = versionId;
