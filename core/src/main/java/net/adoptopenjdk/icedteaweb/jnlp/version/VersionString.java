@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.REGEXP_VERSION_ID;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SPACE;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_STRING;
 
 /**
  * A version string is a list of version ranges separated by spaces. A version range is either a version-id,
@@ -21,12 +22,10 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.REGEXP_VERSION_
  * </pre>
  * <p>
  * See JSR-56 Specification, Appendix A.
+ *
+ * @see JNLPVersionSpecifications
  */
 public class VersionString {
-    private static final String REGEXP_SPACE = "[\\s]";
-    private static final String REGEXP_SIMPLE_RANGE = "(" + REGEXP_VERSION_ID + ")";
-    static final String REGEXP_VERSION_RANGE = "(" + REGEXP_SIMPLE_RANGE + "(&amp;" + REGEXP_SIMPLE_RANGE + ")*)";
-    static final String REGEXP_VERSION_STRING = "(" + REGEXP_VERSION_RANGE + "((" + REGEXP_SPACE + ")" + REGEXP_VERSION_RANGE + ")*)";
 
     private final VersionId[] versionIds;
 
@@ -69,7 +68,7 @@ public class VersionString {
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
     private boolean contains(VersionId versionId) {
-        return Arrays.stream(versionIds).anyMatch(vid -> vid.isMatchOf(versionId));
+        return Arrays.stream(versionIds).anyMatch(vid -> vid.matches(versionId));
     }
 
     /**

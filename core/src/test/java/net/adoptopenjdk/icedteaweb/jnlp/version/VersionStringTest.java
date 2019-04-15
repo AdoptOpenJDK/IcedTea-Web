@@ -1,23 +1,22 @@
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.DOT;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.MINUS;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.REGEXP_SEPARATOR;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.REGEXP_VERSION_ID;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionId.UNDERSCORE;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionString.REGEXP_VERSION_RANGE;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionString.REGEXP_VERSION_STRING;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_RANGE;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_STRING;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.DOT;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.MINUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.UNDERSCORE;
 
 public class VersionStringTest {
-    @Ignore // until compound is implemented
+
     @Test
     public void testSimpleVersions() {
         // legal version-ids (typical)
-        Assert.assertEquals("1.4.0_04 1.4*&amp;1.4.1_02+", VersionString.fromString("1.4.0_04 1.4*&amp;1.4.1_02+").toString());
+        Assert.assertEquals("1.4.0_04 1.4*&1.4.1_02+", VersionString.fromString("1.4.0_04 1.4*&1.4.1_02+").toString());
     }
 
     @Test
@@ -157,8 +156,8 @@ public class VersionStringTest {
      */
     @Test
     public void testVersionIdSpecificationSeparator() {
-        Assert.assertTrue(DOT.matches(REGEXP_SEPARATOR));
-        Assert.assertTrue(MINUS.matches(REGEXP_SEPARATOR));
-        Assert.assertTrue(UNDERSCORE.matches(REGEXP_SEPARATOR));
+        Assert.assertTrue(DOT.symbol().matches(REGEXP_SEPARATOR));
+        Assert.assertTrue(MINUS.symbol().matches(REGEXP_SEPARATOR));
+        Assert.assertTrue(UNDERSCORE.symbol().matches(REGEXP_SEPARATOR));
     }
 }

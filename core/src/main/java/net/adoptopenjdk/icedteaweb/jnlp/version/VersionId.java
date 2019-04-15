@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static java.lang.String.format;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.AMPERSAND;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.ASTERISK;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.PLUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_MODIFIER;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
 
 /**
  * A version-id is an exact version that is associated with a resource, such as a JAR file.
@@ -18,45 +24,26 @@ import static java.lang.String.format;
  * </pre>
  *
  * See JSR-56 Specification, Appendix A.
+ *
+ * @see JNLPVersionSpecifications
  */
 public class VersionId {
-    // separator characters
-    static final String DOT = ".";
-    static final String MINUS = "-";
-    static final String UNDERSCORE = "_";
-
-    // other illegal characters
-    static final String AMPERSAND = "&";
-    static final String SPACE = " ";
-
-    // modifiers
-    static final String PLUS = "+";
-    static final String ASTERISK = "*";
-
-    // regular expressions according to JSR-56, Appendix A
-    // https://regex101.com/
-    private static final String REGEXP_MODIFIER = "[\\*\\+]";
-    static final String REGEXP_SEPARATOR = "[._-]";
-    static final String REGEXP_CHAR = "[^\\s&-._\\*\\+]";
-    static final String REGEXP_STRING = REGEXP_CHAR + "+";
-    static final String REGEXP_VERSION_ID = "(" + REGEXP_STRING
-            + "(" + REGEXP_SEPARATOR + REGEXP_STRING + ")*)"
-            + "(" + REGEXP_MODIFIER +"?)";
-
     private static final String ZERO_ELEMENT = "0";
 
     private final String versionId;
+    private final VersionId compoundVersionId;
 
-    private VersionId(String versionId) {
+    private VersionId(String versionId, VersionId compoundVersionId) {
         this.versionId = versionId;
+        this.compoundVersionId = compoundVersionId;
     }
 
     boolean hasPrefixMatchModifier() {
-        return versionId.endsWith(ASTERISK);
+        return versionId.endsWith(ASTERISK.symbol());
     }
 
     boolean hasGreaterThanOrEqualMatchModifier() {
-        return versionId.endsWith(PLUS);
+        return versionId.endsWith(PLUS.symbol());
     }
 
     /**
@@ -74,20 +61,56 @@ public class VersionId {
      * @return a version-id
      */
     public static VersionId fromString(String versionId) {
-        if (Objects.isNull(versionId) || !versionId.matches(REGEXP_VERSION_ID)) {
+        if (Objects.isNull(versionId)) {
             throw new IllegalArgumentException(format("'%s' is not a valid version id according to JSR-56, Appendix A.", versionId));
         }
-        return new VersionId(versionId);
+
+        if (versionId.contains(AMPERSAND.symbol())) {
+            // As ampersand is a special modifier for compound versions, we need to check the compound parts here
+            final String[] compoundVersions = versionId.split(AMPERSAND.symbol());
+
+            String malformedVersion = null;
+            if (compoundVersions.length < 2) {
+                malformedVersion = versionId;
+            }
+            else {
+                if (!compoundVersions[0].matches(REGEXP_VERSION_ID)) {
+                    malformedVersion = compoundVersions[0];
+                }
+                if (!compoundVersions[1].matches(REGEXP_VERSION_ID)) {
+                    malformedVersion = compoundVersions[1];
+                }
+            }
+            if (malformedVersion != null) {
+                throw new IllegalArgumentException(format("'%s' is not a valid compound version id according to JSR-56, Appendix A.", malformedVersion));
+            }
+
+            return new VersionId(compoundVersions[0], VersionId.fromString(compoundVersions[1]));
+        }
+        else if (!versionId.matches(REGEXP_VERSION_ID)) {
+            throw new IllegalArgumentException(format("'%s' is not a valid version id according to JSR-56, Appendix A.", versionId));
+        }
+
+        return new VersionId(versionId, null);
     }
 
     /**
-     * Provides string representation of this version-id including modifier (if any).
+     * Provides a string representation of this {@link VersionId}.
      *
      * @return a string representation of this version-id
      */
     @Override
     public String toString() {
-        return versionId;
+        return (compoundVersionId != null) ? versionId + AMPERSAND.symbol() + compoundVersionId.toString() : versionId;
+    }
+
+    /**
+     * Provides a string representation of the exact version of this {@link VersionId} (no modifiers and compound versions).
+     *
+     * @return a string representation of this version-id
+     */
+    public String toExactString() {
+        return versionId.replaceAll(REGEXP_MODIFIER + "$", "");
     }
 
     /**
@@ -97,7 +120,7 @@ public class VersionId {
      * For example, "1.3.0-rc2-w" becomes (1,3,0,rc2,w), and "1.2.2-001+" becomes (1,2,2,001).
      */
     String[] asTuple() {
-        return versionId.replaceAll(REGEXP_MODIFIER + "$", "").split(VersionId.REGEXP_SEPARATOR);
+        return versionId.replaceAll(REGEXP_MODIFIER + "$", "").split(REGEXP_SEPARATOR);
     }
 
     /**
@@ -127,6 +150,10 @@ public class VersionId {
         }
         VersionId other = (VersionId) otherVersionId;
 
+        if (compoundVersionId != null) {
+            return this.compoundVersionId.equals(other.compoundVersionId == null? other : other.compoundVersionId);
+        }
+
         final String[] tuple1 = this.asNormalizedTuple(other.asTuple().length);
         final String[] tuple2 = other.asNormalizedTuple(this.asTuple().length);
 
@@ -137,28 +164,33 @@ public class VersionId {
                 return false;
             }
         }
+
         return true;
     }
 
     /**
-     * Match this version-id against {@code otherVersionId} considering
+     * Check if {@code otherVersionId} is a match with this version-id considering $
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isMatchOf(final String otherVersionId) {
-         return isMatchOf(VersionId.fromString(otherVersionId));
+    public boolean matches(final String otherVersionId) {
+         return matches(VersionId.fromString(otherVersionId));
     }
 
     /**
-     * Match this version-id against {@code otherVersionId} considering
+     * Check if {@code otherVersionId} is a match with this version-id considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isMatchOf(final VersionId otherVersionId) {
+    public boolean matches(final VersionId otherVersionId) {
+        if (compoundVersionId != null) {
+            return compoundVersionId.matches(otherVersionId);
+        }
+
         if (this.hasPrefixMatchModifier())
             return this.isPrefixMatchOf(otherVersionId);
         else {
@@ -172,27 +204,27 @@ public class VersionId {
     }
 
     /**
-     * A is an exact isMatchOf of B if, when represented as normalized tuples, the elements of A are
+     * A is an exact matches of B if, when represented as normalized tuples, the elements of A are
      * the same as the elements of B.
      * <p/>
-     * For example, given the above definition "1.2.2-004" will be an exact isMatchOf for "1.2.2.4",
-     * and "1.3" is an exact isMatchOf of "1.3.0".
+     * For example, given the above definition "1.2.2-004" will be an exact matches for "1.2.2.4",
+     * and "1.3" is an exact matches of "1.3.0".
      * <p/>
      * See JSR-56 Specification, Appendix A.2 Exact Match.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this version-id is an exact isMatchOf of {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-id is an exact matches of {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean isExactMatchOf(VersionId otherVersionId) {
         return isEqualTo(otherVersionId);
     }
 
     /**
-     * A is a prefix isMatchOf of B if, when represented as tuples, the elements of A are the same as the
+     * A is a prefix matches of B if, when represented as tuples, the elements of A are the same as the
      * first elements of B. The padding with 0 (zero element) entries ensures that B has at least as
      * many elements as A.
      * <p/>
-     * For example, given the above definition "1.2.1" will be a prefix isMatchOf to "1.2.1-004", but not
+     * For example, given the above definition "1.2.1" will be a prefix matches to "1.2.1-004", but not
      * to "1.2.0" or "1.2.10". The padding step ensures that "1.2.0.0" is a prefix of "1.2". Note that
      * prefix matching and ordering are distinct: "1.3" is greater than "1.2", and less than "1.4",
      * but not a prefix of either.
@@ -200,9 +232,15 @@ public class VersionId {
      * See JSR-56 Specification, Appendix A.2 Prefix Match.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this version-id is a prefix isMatchOf of {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-id is a prefix matches of {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean isPrefixMatchOf(VersionId otherVersionId) {
+        if (compoundVersionId != null) {
+            if (!compoundVersionId.isPrefixMatchOf(otherVersionId)) {
+                return false;
+            }
+        }
+
         final String[] tuple1 = this.asTuple();
         final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple1.length);
 
@@ -214,7 +252,7 @@ public class VersionId {
                 // continue, as elements are equal
             }
             else {
-                return false; // no prefix isMatchOf als elements are different
+                return false; // no prefix matches als elements are different
             }
         }
         return true;
@@ -249,6 +287,10 @@ public class VersionId {
      * @return {@code true} if this version-id is greater than {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean isGreaterThan(VersionId otherVersionId) {
+        if (compoundVersionId != null) {
+            return compoundVersionId.isGreaterThan(otherVersionId);
+        }
+
         final String[] tuple1 = this.asNormalizedTuple(otherVersionId.asTuple().length);
         final String[] tuple2 = otherVersionId.asNormalizedTuple(this.asTuple().length);
 
@@ -262,15 +304,14 @@ public class VersionId {
             }
             else {
                 if (tuple1ElementObject instanceof Integer && tuple2ElementObject instanceof Integer) {
-                    return (Integer) tuple1ElementObject > (Integer) tuple2ElementObject;
+                    return ((Integer) tuple1ElementObject > (Integer) tuple2ElementObject);
                 }
                 else {
                     return tuple1Element.compareTo(tuple2Element) > 0;
                 }
-
             }
         }
-        return false; // equal but not greater
+        return false;
     }
 
     /**
@@ -284,7 +325,10 @@ public class VersionId {
      * @return {@code true} if this version-id is greater than or equal to {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean isGreaterThanOrEqual(VersionId otherVersionId) {
-        return isGreaterThan(otherVersionId) || isEqualTo(otherVersionId);
+        final boolean greaterThan = isGreaterThan(otherVersionId);
+        final boolean equalTo = isEqualTo(otherVersionId);
+
+        return greaterThan || equalTo;
     }
 
     /**
