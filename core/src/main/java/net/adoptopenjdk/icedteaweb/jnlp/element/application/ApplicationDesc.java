@@ -14,11 +14,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
 
 /**
  * The application-desc element.

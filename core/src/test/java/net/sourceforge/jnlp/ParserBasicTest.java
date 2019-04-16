@@ -36,16 +36,28 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import java.io.InputStream;
+import java.util.List;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * Test that the parser works with basic jnlp files

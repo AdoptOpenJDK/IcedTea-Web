@@ -35,9 +35,10 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
@@ -124,7 +125,7 @@ public class InformationDescTest {
     public void testGetIcons() {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
-        assertArrayEquals(new IconDesc[0], info.getIcons(IconDesc.DEFAULT));
+        Assert.assertArrayEquals(new IconDesc[0], info.getIcons(IconDesc.DEFAULT));
 
         IconDesc icon1 = new IconDesc(null, null, -1, -1, -1, -1);
         IconDesc icon2 = new IconDesc(null, null, -1, -1, -1, -1);
@@ -195,7 +196,7 @@ public class InformationDescTest {
     public void testGetAssociation() throws ParseException {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
-        assertArrayEquals(new AssociationDesc[0], info.getAssociations());
+        Assert.assertArrayEquals(new AssociationDesc[0], info.getAssociations());
 
         AssociationDesc association = new AssociationDesc(null, null);
         info.addItem("association", association);
@@ -206,7 +207,7 @@ public class InformationDescTest {
     public void testGetRelatedContents() {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
-        assertArrayEquals(new RelatedContentDesc[0], info.getRelatedContents());
+        Assert.assertArrayEquals(new RelatedContentDesc[0], info.getRelatedContents());
 
         RelatedContentDesc relatedContent = new RelatedContentDesc(null);
         info.addItem("related-content", relatedContent);

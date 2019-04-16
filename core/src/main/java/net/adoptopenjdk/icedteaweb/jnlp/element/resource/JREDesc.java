@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sourceforge.jnlp.Version;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

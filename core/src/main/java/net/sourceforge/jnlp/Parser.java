@@ -16,16 +16,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
-import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
-import net.sourceforge.jnlp.UpdateDesc.Check;
-import net.sourceforge.jnlp.UpdateDesc.Policy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,6 +30,34 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
+import net.adoptopenjdk.icedteaweb.xmlparser.Node;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Check;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Policy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

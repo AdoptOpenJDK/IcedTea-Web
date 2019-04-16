@@ -34,12 +34,11 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp;
-
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
-import org.junit.Test;
+package net.adoptopenjdk.icedteaweb.jnlp.element.security;
 
 import java.net.URI;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

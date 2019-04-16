@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -46,7 +46,7 @@ import javax.imageio.ImageIO;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.PluginBridge;

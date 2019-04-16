@@ -14,14 +14,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import java.net.URL;
 
 public class RelatedContentDesc {
 
     /** title of the content */
-    private String title = null;;
+    private String title = null;
 
     /** the description of the content */
     private String description = null;

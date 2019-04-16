@@ -1,4 +1,4 @@
-// Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2009 Red Hat, Inc.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -14,34 +14,26 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
-/**
- * The installer-desc element.
- *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.6 $
- */
-public class InstallerDesc implements LaunchDesc {
+public class MenuDesc {
 
-    /** the main class name and package. */
-    private final String mainClass;
+    /** the submenu for this menu entry */
+    private final String subMenu;
 
     /**
-     * Creates a installer descriptor.
-     *
-     * @param mainClass main class name and package
+     * Create a new menu descriptor
+     * @param subMenu sub-menu of this menu if any or null.
      */
-    public InstallerDesc(final String mainClass) {
-        this.mainClass = mainClass;
+    public MenuDesc(final String subMenu) {
+        this.subMenu = subMenu;
     }
 
     /**
-     * Returns the main class name and package.
+     * @return the submenu for this menu entry.
      */
-    @Override
-    public String getMainClass() {
-        return mainClass;
+    public String getSubMenu() {
+        return subMenu;
     }
 
 }
