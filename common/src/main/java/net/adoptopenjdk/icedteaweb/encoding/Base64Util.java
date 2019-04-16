@@ -13,8 +13,9 @@ import java.util.Base64;
 public class Base64Util {
 
     public static void decodeBuffer(final InputStream aStream, final OutputStream bStream) throws IOException {
-        final InputStream wrappedStream = Base64.getDecoder().wrap(aStream);
-        IOUtils.copy(wrappedStream, bStream);
+        try(final InputStream wrappedStream = Base64.getDecoder().wrap(aStream)) {
+            IOUtils.copy(wrappedStream, bStream);
+        }
 
     }
 
@@ -27,9 +28,10 @@ public class Base64Util {
     }
 
     private static byte decodeBuffer(InputStream in)[] throws IOException {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        decodeBuffer(in, outStream);
-        return (outStream.toByteArray());
+        try(ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+            decodeBuffer(in, outStream);
+            return (outStream.toByteArray());
+        }
     }
 
     public static ByteBuffer decodeBufferToByteBuffer(final InputStream in) throws IOException {
@@ -47,8 +49,9 @@ public class Base64Util {
     }
 
     public static void encodeBuffer(final byte[] buffer, final OutputStream stream) throws IOException {
-        final OutputStream wrappedStream = Base64.getEncoder().wrap(stream);
-        IOUtils.writeContent(wrappedStream, buffer);
+        try(final OutputStream wrappedStream = Base64.getEncoder().wrap(stream)) {
+            IOUtils.writeContent(wrappedStream, buffer);
+        }
     }
 
     public static String encodeBuffer(final byte[] buffer) {

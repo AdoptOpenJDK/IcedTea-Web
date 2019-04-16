@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.io;
 
-import dev.rico.internal.core.Assert;
+import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
