@@ -82,7 +82,7 @@ import java.nio.ByteBuffer;
  * @see         CharacterEncoder
  * @see         BASE64Decoder
  */
-
+@Deprecated
 public abstract class CharacterDecoder {
     
     /** This exception is thrown when EOF is reached */

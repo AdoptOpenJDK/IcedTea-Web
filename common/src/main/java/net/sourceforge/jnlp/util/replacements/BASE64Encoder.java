@@ -41,7 +41,7 @@ import java.io.OutputStream;
  * @see         CharacterEncoder
  * @see         BASE64Decoder
  */
-
+@Deprecated
 public class BASE64Encoder extends CharacterEncoder {
 
     /** this class encodes three bytes per atom. */

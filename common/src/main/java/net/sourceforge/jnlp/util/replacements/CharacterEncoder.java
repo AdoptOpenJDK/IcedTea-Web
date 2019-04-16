@@ -70,6 +70,7 @@ import java.nio.ByteBuffer;
  * @see         CharacterDecoder
  * @see         BASE64Encoder
  */
+@Deprecated
 public abstract class CharacterEncoder {
 
     /** Stream that understands "printing" */

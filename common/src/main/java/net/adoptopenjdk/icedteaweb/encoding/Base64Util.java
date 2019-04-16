@@ -12,11 +12,10 @@ import java.util.Base64;
 
 public class Base64Util {
 
-    public static void decodeBuffer(final InputStream aStream, final OutputStream bStream) throws IOException {
-        try(final InputStream wrappedStream = Base64.getDecoder().wrap(aStream)) {
-            IOUtils.copy(wrappedStream, bStream);
+    public static void decodeBuffer(final InputStream in, final OutputStream out) throws IOException {
+        try(final InputStream wrappedStream = Base64.getDecoder().wrap(in)) {
+            IOUtils.copy(wrappedStream, out);
         }
-
     }
 
     public static byte[] decodeBuffer(final String inputString) throws IOException {

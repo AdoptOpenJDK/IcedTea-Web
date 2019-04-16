@@ -57,7 +57,7 @@ import java.io.PushbackInputStream;
  * @see         CharacterEncoder
  * @see         BASE64Decoder
  */
-
+@Deprecated
 public class BASE64Decoder extends CharacterDecoder {
 
     private static class CEFormatException extends IOException {
