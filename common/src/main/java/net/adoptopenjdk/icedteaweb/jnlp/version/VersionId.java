@@ -38,11 +38,11 @@ public class VersionId {
         this.compoundVersionId = compoundVersionId;
     }
 
-    boolean hasPrefixMatchModifier() {
+    public boolean hasPrefixMatchModifier() {
         return versionId.endsWith(ASTERISK.symbol());
     }
 
-    boolean hasGreaterThanOrEqualMatchModifier() {
+    public boolean hasGreaterThanOrEqualMatchModifier() {
         return versionId.endsWith(PLUS.symbol());
     }
 
