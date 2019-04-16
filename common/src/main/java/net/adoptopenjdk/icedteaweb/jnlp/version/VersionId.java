@@ -344,9 +344,11 @@ public class VersionId {
     private static Object prepareForNormalizedComparision(final String tupleValue) {
         if (tupleValue.length() > 0 && tupleValue.charAt(0) != '-') {
             try {
-                return Integer.valueOf(tupleValue);
+                return Integer.valueOf(tupleValue); // numeric, so return as integer
             }
-            catch (NumberFormatException ex) { /* not numeric, as not parsable as Java int */ }
+            catch (NumberFormatException ex) {
+                return tupleValue; // not numeric, as not parsable as Java int, so return as string
+            }
         }
         return tupleValue;
     }
