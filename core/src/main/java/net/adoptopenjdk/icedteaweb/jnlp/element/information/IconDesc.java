@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import java.net.URL;
 
@@ -72,7 +72,7 @@ public class IconDesc {
      * @param depth the depth, or -1 if unknown
      * @param size the size, or -1 if unknown
      */
-    IconDesc(final URL location, final Object kind, final int width, final int height, final int depth, final int size) {
+    public IconDesc(final URL location, final Object kind, final int width, final int height, final int depth, final int size) {
         this.location = location;
         this.kind = kind;
         this.width = width;

@@ -14,15 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
-
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package net.adoptopenjdk.icedteaweb.jnlp.element.security;
 
 import java.awt.AWTPermission;
 import java.io.FilePermission;
@@ -44,6 +36,15 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.PropertyPermission;
 import java.util.Set;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The security element.
@@ -68,7 +69,7 @@ public class SecurityDesc {
         public static final String PERMISSIONS_NAME = "permissions";
         private final String jnlpString, htmlString;
 
-        private RequestedPermissionLevel(final String jnlpString, final String htmlString) {
+        RequestedPermissionLevel(final String jnlpString, final String htmlString) {
             this.jnlpString = jnlpString;
             this.htmlString = htmlString;
         }
@@ -183,8 +184,10 @@ public class SecurityDesc {
     // Since this is security sensitive, take a conservative approach:
     // Allow only what is specifically allowed, and deny everything else
 
-    /** basic permissions for restricted mode */
-    private static Permission j2eePermissions[] = {
+    /**
+     * basic permissions for restricted mode
+     */
+    private static final Permission[] j2eePermissions = {
             new AWTPermission("accessClipboard"),
             // disabled because we can't at this time prevent an
             // application from accessing other applications' event
@@ -200,8 +203,10 @@ public class SecurityDesc {
             new PropertyPermission("*", "read"),
     };
 
-    /** basic permissions for restricted mode */
-    private static Permission sandboxPermissions[] = {
+    /**
+     * basic permissions for restricted mode
+     */
+    private static final Permission[] sandboxPermissions = {
             new SocketPermission("localhost:1024-", "listen"),
             // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
             new PropertyPermission("java.util.Arrays.useLegacyMergeSort", "read,write"),
@@ -231,15 +236,17 @@ public class SecurityDesc {
             new PropertyPermission("browser.*", "read"),
             new RuntimePermission("exitVM"),
             new RuntimePermission("stopThread"),
-        // disabled because we can't at this time prevent an
-        // application from accessing other applications' event
-        // queues, or even prevent access to security dialog queues.
-        //
-        // new AWTPermission("accessEventQueue"),
-        };
+            // disabled because we can't at this time prevent an
+            // application from accessing other applications' event
+            // queues, or even prevent access to security dialog queues.
+            //
+            // new AWTPermission("accessEventQueue"),
+    };
 
-    /** basic permissions for restricted mode */
-    private static Permission jnlpRIAPermissions[] = {
+    /**
+     * basic permissions for restricted mode
+     */
+    private static final Permission[] jnlpRIAPermissions = {
             new PropertyPermission("awt.useSystemAAFontSettings", "read,write"),
             new PropertyPermission("http.agent", "read,write"),
             new PropertyPermission("http.keepAlive", "read,write"),

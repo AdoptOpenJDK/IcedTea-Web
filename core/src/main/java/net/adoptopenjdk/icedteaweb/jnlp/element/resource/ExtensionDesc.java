@@ -14,9 +14,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +82,7 @@ public class ExtensionDesc {
      * @param part the part name in the main file
      * @param lazy whether to load the part before launching
      */
-    protected void addPart(String extPart, String part, boolean lazy) {
+    public void addPart(String extPart, String part, boolean lazy) {
         extToPart.put(extPart, part);
 
         if (!lazy || part == null || part.length() == 0)

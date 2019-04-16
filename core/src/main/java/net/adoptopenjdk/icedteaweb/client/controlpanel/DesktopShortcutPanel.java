@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor.FreeDesktopIntegrationEditorFrame;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;

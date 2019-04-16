@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridgeTest;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;

@@ -51,7 +51,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
-import net.sourceforge.jnlp.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;

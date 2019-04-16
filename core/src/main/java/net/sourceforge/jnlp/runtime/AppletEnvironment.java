@@ -41,7 +41,7 @@ import javax.swing.ImageIcon;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;

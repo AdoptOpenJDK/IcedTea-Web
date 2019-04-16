@@ -38,7 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 
-import net.sourceforge.jnlp.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 

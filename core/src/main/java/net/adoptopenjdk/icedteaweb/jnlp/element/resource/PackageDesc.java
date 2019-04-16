@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import java.util.Objects;
 
@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 public class PackageDesc {
 
-    public static final String ASTERIX_SUFFIX = ".*";
+    private static final String ASTERIX_SUFFIX = ".*";
     /** the package name */
     private final String name;
 
@@ -66,8 +66,7 @@ public class PackageDesc {
             final String pkName = name.substring(0, name.length() - 1);
             if (className.startsWith(pkName)) {
                 String postfix = className.substring(pkName.length() + 1);
-                if (recursive || -1 == postfix.indexOf("."))
-                    return true;
+                return recursive || !postfix.contains(".");
             }
         }
         return false;

@@ -14,14 +14,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import net.sourceforge.jnlp.JNLPFile;
+
+import static java.util.Arrays.asList;
 
 /**
  * The resources element.
@@ -31,14 +33,20 @@ import java.util.Map;
  */
 public class ResourcesDesc {
 
-    /** the locales of these resources */
-    private final Locale locales[];
+    /**
+     * the locales of these resources
+     */
+    private final Locale[] locales;
 
-    /** the OS for these resources */
-    private final String os[];
+    /**
+     * the OS for these resources
+     */
+    private final String[] os;
 
-    /** the arch for these resources */
-    private final String arch[];
+    /**
+     * the arch for these resources
+     */
+    private final String[] arch;
 
     /** the JNLPFile this information is for */
     private final JNLPFile jnlpFile;
@@ -57,7 +65,7 @@ public class ResourcesDesc {
      * @param os the os of these resources
      * @param arch the arch of these resources
      */
-    public ResourcesDesc(final JNLPFile jnlpFile, final Locale locales[], final String os[], final String arch[]) {
+    public ResourcesDesc(final JNLPFile jnlpFile, final Locale[] locales, final String[] os, final String[] arch) {
         this.jnlpFile = jnlpFile;
         this.locales = locales;
         this.os = os;
@@ -72,8 +80,8 @@ public class ResourcesDesc {
         return lresources.toArray(new JREDesc[lresources.size()]);
     }
 
-    public static JARDesc getMainJAR(final JARDesc jars[] ) {
-        return getMainJAR(Arrays.asList(jars));
+    public static JARDesc getMainJAR(final JARDesc[] jars) {
+        return getMainJAR(asList(jars));
     }
 
     public static JARDesc getMainJAR(List<JARDesc> jars) {
