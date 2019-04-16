@@ -81,6 +81,17 @@
     },
     {
       "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\JNLPFile\\DefaultIcon",
+      "values": [
+        {
+          "type": "string",
+          "name": "",
+          "value": "[INSTALLDIR]share\\pixmaps\\javaws.ico"
+        }
+      ]
+    },
+    {
+      "root": "HKLM",
       "key": "SOFTWARE\\Classes\\JNLPFile\\shell\\open\\command",
       "values": [
         {
