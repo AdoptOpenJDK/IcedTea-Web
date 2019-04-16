@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

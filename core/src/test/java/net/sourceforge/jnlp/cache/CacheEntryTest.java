@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;
 import org.junit.Before;
 import org.junit.Test;
