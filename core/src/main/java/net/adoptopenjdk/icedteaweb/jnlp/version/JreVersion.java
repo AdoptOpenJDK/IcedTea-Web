@@ -6,6 +6,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.SYSTEM_PROPERTY_JAVA_VERSION;
+
 /**
  * This is special case of version, used only for checking jre version. If
  * jre do not match, in strict not-headless mode the dialog with
@@ -60,7 +62,7 @@ public class JreVersion extends Version {
     }
 
     private String getJreVersion() {
-        return System.getProperty("java.version");
+        return System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION);
     }
 
 }
