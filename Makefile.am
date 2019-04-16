@@ -1,7 +1,9 @@
 if WINDOWS
     export CLASSPATH_SEPARATOR = ;
+    export ICON = javaws.ico
 else
     export CLASSPATH_SEPARATOR = :
+    export ICON = javaws.png
 endif
 
 # Functions to compose path/classpath
@@ -310,7 +312,7 @@ endif
 
 export PLUGIN_VERSION = IcedTea-Web $(FULL_VERSION)
 
-export EXTRA_DIST = $(MODULARJDK_ARGS_FILE) $(top_srcdir)/netx $(top_srcdir)/plugin javaws.png $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
+export EXTRA_DIST = $(MODULARJDK_ARGS_FILE) $(top_srcdir)/netx $(top_srcdir)/plugin ${ICON} $(DESKTOP_IN_FILES) $(top_srcdir)/completion \
   shell-launcher rust-launcher $(top_srcdir)/tests html-gen.sh NEW_LINE_IFS $(top_srcdir)/metadata.in $(top_srcdir)/win-installer
 
 # reproducers `D`shortcuts
@@ -391,7 +393,7 @@ if ENABLE_PLUGINJAR
 endif
 	${INSTALL_DATA} $(NETX_DIR)/lib/classes.jar $(DESTDIR)$(NETX_JAR)
 	${INSTALL_DATA} $(NETX_SRCDIR)/javaws_splash.png $(DESTDIR)$(SPLASH_PNG)
-	${INSTALL_DATA} $(TOP_SRC_DIR)/javaws.png $(ICONS_DEST_DIR)/
+	${INSTALL_DATA} $(TOP_SRC_DIR)/${ICON} $(ICONS_DEST_DIR)/
 	mkdir -p $(DESTDIR)$(MODULARJDK_ARGS_DIR)
 	cp launcher.build/$(MODULARJDK_ARGS_FILE) $(MODULARJDK_ARGS_LOCATION)
 if ENABLE_NATIVE_LAUNCHERS
@@ -562,7 +564,7 @@ uninstall-local: uninstall-linux-only
 	rm -f $(DESTDIR)$(JSOBJECT_JAR)
 	rm -f $(DESTDIR)$(NETX_JAR)
 	rm -r $(DESTDIR)$(SPLASH_PNG)
-	rm -r $(ICONS_DEST_DIR)/javaws.png
+	rm -r $(ICONS_DEST_DIR)/${ICON}
 	rm -rf $(DESTDIR)$(htmldir)
 if WINDOWS_OR_INCLUDE_BATS
 	rm -rf $(WIN_ALL_DEPS)
