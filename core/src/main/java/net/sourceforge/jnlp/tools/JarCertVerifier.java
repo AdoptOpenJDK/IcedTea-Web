@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.ResourceTracker;

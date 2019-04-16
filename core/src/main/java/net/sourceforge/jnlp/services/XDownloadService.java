@@ -16,17 +16,16 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.sourceforge.jnlp.JARDesc;
+import java.io.IOException;
+import java.net.URL;
+import javax.jnlp.DownloadService;
+import javax.jnlp.DownloadServiceListener;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.ManageJnlpResources;
-
-import javax.jnlp.DownloadService;
-import javax.jnlp.DownloadServiceListener;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * The DownloadService JNLP service.

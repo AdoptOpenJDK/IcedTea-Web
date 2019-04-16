@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,25 +49,27 @@ public class InformationDesc {
     /** default description */
     public static final Object DEFAULT = "default";
 
-    /** the locales for the information */
-    final private Locale locales[];
+    /**
+     * the locales for the information
+     */
+    final private Locale[] locales;
 
     /** the data as list of key,value pairs */
     private List<Object> info;
 
-    final boolean strict;
+    public final boolean strict;
     /**
      * Create an information element object.
      *
      * @param locales the locales the information is for
      * @param strict whether parser was strict
      */
-    public InformationDesc(Locale locales[], boolean strict) {
+    public InformationDesc(Locale[] locales, boolean strict) {
         this.locales = locales;
         this.strict = strict;
     }
     
-    InformationDesc(Locale locales[]) {
+    InformationDesc(Locale[] locales) {
         this(locales, false);
     }
 
@@ -145,7 +147,7 @@ public class InformationDesc {
         List<Object> icons = getItems("icon-" + kind);
 
         return icons.toArray(new IconDesc[icons.size()]);
-    };
+    }
 
     /**
      * Returns the URL of the icon closest to the specified size and
@@ -159,7 +161,7 @@ public class InformationDesc {
      * @return the closest icon by size or null if no icons declared
      */
     public URL getIconLocation(Object kind, int width, int height) {
-        IconDesc icons[] = getIcons(kind);
+        IconDesc[] icons = getIcons(kind);
         if (icons.length == 0)
             return null;
 
@@ -253,7 +255,7 @@ public class InformationDesc {
      * @param key key to find item
      * @return all items matching the specified key.
      */
-    protected List<Object> getItems(Object key) {
+    public List<Object> getItems(Object key) {
         if (info == null)
             return Collections.emptyList();
 
@@ -271,7 +273,7 @@ public class InformationDesc {
      * @param key key to place value to
      * @param value value to be placed to key
      */
-    protected void addItem(String key, Object value) {
+    public void addItem(String key, Object value) {
         if (info == null)
             info = new ArrayList<>();
 

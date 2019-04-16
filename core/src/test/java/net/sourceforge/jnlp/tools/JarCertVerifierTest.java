@@ -37,18 +37,17 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
-import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
-import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.security.CodeSigner;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarEntry;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
+import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static org.junit.Assert.assertFalse;

@@ -36,12 +36,11 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.testing.mock;
 
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.ResourcesDesc;
-import net.sourceforge.jnlp.SecurityDesc;
-
 import java.net.URL;
 import java.util.Locale;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 
 
 public class DummyJNLPFile extends JNLPFile {

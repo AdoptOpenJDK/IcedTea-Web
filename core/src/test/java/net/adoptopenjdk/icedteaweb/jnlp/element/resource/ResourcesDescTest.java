@@ -34,16 +34,14 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
-import net.sourceforge.jnlp.JARDesc;
+import java.io.File;
+import java.util.jar.Manifest;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.jar.Manifest;
 
 public class ResourcesDescTest {
 

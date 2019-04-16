@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.mock;
 
-import net.sourceforge.jnlp.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 
 import java.util.List;

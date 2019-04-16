@@ -40,7 +40,7 @@ package net.adoptopenjdk.icedteaweb.client;
 import java.net.URL;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
 import net.sourceforge.jnlp.AbstractLaunchHandler;
-import net.sourceforge.jnlp.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.LaunchHandler;

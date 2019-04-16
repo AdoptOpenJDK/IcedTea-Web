@@ -40,7 +40,7 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;

@@ -14,12 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp;
-
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +22,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -81,7 +81,7 @@ public class ExtensionDesc {
      * @param part the part name in the main file
      * @param lazy whether to load the part before launching
      */
-    protected void addPart(String extPart, String part, boolean lazy) {
+    public void addPart(String extPart, String part, boolean lazy) {
         extToPart.put(extPart, part);
 
         if (!lazy || part == null || part.length() == 0)
