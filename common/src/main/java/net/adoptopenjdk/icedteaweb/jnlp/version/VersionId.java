@@ -249,10 +249,7 @@ public class VersionId {
             final Object tuple1Element = prepareForNormalizedComparision(tuple1[i]);
             final Object tuple2Element = prepareForNormalizedComparision(tuple2[i]);
 
-            if (tuple1Element.equals(tuple2Element)) {
-                // continue, as elements are equal
-            }
-            else {
+            if (!tuple1Element.equals(tuple2Element)) {
                 return false; // no prefix matches als elements are different
             }
         }
@@ -300,10 +297,7 @@ public class VersionId {
             final String tuple2Element = tuple2[i];
             final Object tuple1ElementObject = prepareForNormalizedComparision(tuple1Element);
             final Object tuple2ElementObject = prepareForNormalizedComparision(tuple2Element);
-            if (tuple1ElementObject.equals(tuple2ElementObject)) {
-                // continue, as long as the elements are equal
-            }
-            else {
+            if (!tuple1ElementObject.equals(tuple2ElementObject)) {
                 if (tuple1ElementObject instanceof Integer && tuple2ElementObject instanceof Integer) {
                     return ((Integer) tuple1ElementObject > (Integer) tuple2ElementObject);
                 }
