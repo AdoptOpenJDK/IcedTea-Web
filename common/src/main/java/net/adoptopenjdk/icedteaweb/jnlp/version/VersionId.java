@@ -148,7 +148,7 @@ public class VersionId {
         if (Objects.isNull(otherVersionId) || !(otherVersionId instanceof VersionId)) {
             return false;
         }
-        VersionId other = (VersionId) otherVersionId;
+        final VersionId other = (VersionId) otherVersionId;
 
         if (compoundVersionId != null) {
             return this.compoundVersionId.equals(other.compoundVersionId == null? other : other.compoundVersionId);
