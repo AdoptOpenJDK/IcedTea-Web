@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import java.util.Arrays;
 import java.util.Objects;
+import net.adoptopenjdk.icedteaweb.Assert;
 
 import static java.lang.String.format;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
@@ -61,9 +62,7 @@ public class VersionId {
      * @return a version-id
      */
     public static VersionId fromString(String versionId) {
-        if (Objects.isNull(versionId)) {
-            throw new IllegalArgumentException(format("'%s' is not a valid version id according to JSR-56, Appendix A.", versionId));
-        }
+        Assert.requireNonNull(versionId, "versionId");
 
         if (versionId.contains(AMPERSAND.symbol())) {
             // As ampersand is a special modifier for compound versions, we need to check the compound parts here
@@ -176,7 +175,7 @@ public class VersionId {
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean matches(final String otherVersionId) {
-         return matches(VersionId.fromString(otherVersionId));
+        return matches(VersionId.fromString(otherVersionId));
     }
 
     /**
@@ -187,6 +186,8 @@ public class VersionId {
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean matches(final VersionId otherVersionId) {
+        Assert.requireNonNull(otherVersionId, "otherVersionId");
+
         if (compoundVersionId != null) {
             return compoundVersionId.matches(otherVersionId);
         }

@@ -59,7 +59,7 @@ public class VersionIdTest {
         assertEquals("1.4", VersionId.fromString("1.4+&1.4.1").toExactString());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testNullVersionId() {
         VersionId.fromString(null).toString();
     }
@@ -92,6 +92,16 @@ public class VersionIdTest {
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidPlusModifierChar() {
         VersionId.fromString("1.0.0-buildWithC++").toString();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testMatchesWithNullStringVersionId() {
+        VersionId.fromString("1.0").matches((String) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testMatchesWithNullVersionId() {
+        VersionId.fromString("1.0").matches((VersionId) null);
     }
 
     @Test
