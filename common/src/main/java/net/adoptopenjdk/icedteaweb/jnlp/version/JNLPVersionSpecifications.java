@@ -47,38 +47,4 @@ public interface JNLPVersionSpecifications {
     String REGEXP_VERSION_RANGE = "(" + REGEXP_SIMPLE_RANGE + "(&" + REGEXP_SIMPLE_RANGE + ")*)";
     String REGEXP_VERSION_STRING = "(" + REGEXP_VERSION_RANGE + "((" + REGEXP_SPACE + ")" + REGEXP_VERSION_RANGE + ")*)";
 
-    // Separators
-    enum Separator {
-        DOT("."),
-        MINUS("-"),
-        UNDERSCORE("_"),
-        SPACE(" ");
-
-        private String symbol;
-
-        private Separator(final String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String symbol() {
-            return symbol;
-        }
-    }
-
-    // Modifiers
-    enum Modifier {
-        PLUS("+"),
-        ASTERISK("*"),
-        AMPERSAND("&");
-
-        private String symbol;
-
-        private Modifier(final String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String symbol() {
-            return symbol;
-        }
-    }
 }

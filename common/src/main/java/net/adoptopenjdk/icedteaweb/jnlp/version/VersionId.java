@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.AMPERSAND;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.ASTERISK;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.PLUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_MODIFIER;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;

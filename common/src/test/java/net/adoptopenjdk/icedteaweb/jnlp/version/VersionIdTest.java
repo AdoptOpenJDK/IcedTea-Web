@@ -2,17 +2,17 @@ package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import org.junit.Test;
 
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.AMPERSAND;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.ASTERISK;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Modifier.PLUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_CHAR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_STRING;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.DOT;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.MINUS;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.SPACE;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.UNDERSCORE;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.DOT;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.MINUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.SPACE;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.UNDERSCORE;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

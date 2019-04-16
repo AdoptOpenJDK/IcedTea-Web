@@ -7,9 +7,9 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_RANGE;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_STRING;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.DOT;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.MINUS;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.Separator.UNDERSCORE;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.DOT;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.MINUS;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.UNDERSCORE;
 
 public class VersionStringTest {
 
