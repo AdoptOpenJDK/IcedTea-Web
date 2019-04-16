@@ -44,6 +44,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.AppletUtils;
 import net.sourceforge.jnlp.util.WeakList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,8 +203,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
                 frame.pack(); // cause insets to be calculated
 
                 Insets insets = frame.getInsets();
-                frame.setSize(appletDesc.getWidth() + insets.left + insets.right,
-                              appletDesc.getHeight() + insets.top + insets.bottom);
+                frame.setSize(AppletUtils.getFixedWidth(appletDesc.getWidth(), appletDesc.getParameters()) + insets.left + insets.right,
+                        AppletUtils.getFixedHeight(appletDesc.getHeight(), appletDesc.getParameters()) + insets.top + insets.bottom);
             }
 
             try {

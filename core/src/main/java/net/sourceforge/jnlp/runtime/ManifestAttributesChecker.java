@@ -157,16 +157,16 @@ public class ManifestAttributesChecker {
         if (signing == SigningState.NONE) {
             return; /*when app is not signed at all, then skip this check*/
         }
-        if (file.getLaunchInfo() == null) {
+        if (file.getEntryPointDesc() == null) {
             LOG.debug("Entry-Point can not be checked now, because of not existing launch info.");
             return;
         }
-        if (file.getLaunchInfo().getMainClass() == null) {
+        if (file.getEntryPointDesc().getMainClass() == null) {
             LOG.debug("Entry-Point can not be checked now, because of unknown main class.");
             return;
         }
         final String[] eps = file.getManifestsAttributes().getEntryPoints();
-        String mainClass = file.getLaunchInfo().getMainClass();
+        String mainClass = file.getEntryPointDesc().getMainClass();
         if (eps == null) {
             LOG.debug("Entry-Point manifest attribute for yours '{}' not found. Continuing.", mainClass);
             return;

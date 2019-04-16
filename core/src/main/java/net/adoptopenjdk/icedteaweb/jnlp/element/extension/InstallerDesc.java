@@ -16,7 +16,7 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.extension;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 
 /**
  * The installer-desc element.
@@ -24,7 +24,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.6 $
  */
-public class InstallerDesc implements LaunchDesc {
+public class InstallerDesc implements EntryPoint {
 
     /** the main class name and package. */
     private final String mainClass;

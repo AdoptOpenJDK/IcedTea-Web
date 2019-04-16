@@ -31,9 +31,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
@@ -50,15 +51,14 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -710,17 +710,17 @@ public final class Parser {
         return false;
     }
 
-    //
-    // This section loads the launch descriptor element
-    //
     /**
-     * @return the launch descriptor element, either AppletDesc,
-     * ApplicationDesc, or InstallerDesc.
+     * Load the entry point descriptor element.
      *
+     * @return the entry point descriptor element
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
+     *
+     * @see EntryPoint
+     *
      */
-    public LaunchDesc getLauncher(Node parent) throws ParseException {
+    public EntryPoint getEntryPointDesc(final Node parent) throws ParseException {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length
@@ -731,19 +731,19 @@ public final class Parser {
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            final String name = child.getNodeName().getName();
 
             if ("applet-desc".equals(name)) {
                 return getApplet(child);
             }
             if ("application-desc".equals(name)) {
-                return getApplication(child, false);
+                return getApplication(ApplicationType.JAVA, child);
             }
             if ("installer-desc".equals(name)) {
                 return getInstaller(child);
             }
             if ("javafx-desc".equals(name)) {
-                return getApplication(child, true);
+                return getApplication(ApplicationType.JAVAFX, child);
             }
 
             child = child.getNextSibling();
@@ -752,20 +752,20 @@ public final class Parser {
         // not reached
         return null;
     }
-    
-    
 
     /**
      * @param node
      * @return the applet descriptor.
      *
      * @throws ParseException if the JNLP file is invalid
+     *
+     * TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
-    private AppletDesc getApplet(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
-        String main = getMainClass(node, true);
-        URL docbase = getURL(node, "documentbase", base);
-        Map<String, String> paramMap = new HashMap<>();
+    private AppletDesc getApplet(final Node node) throws ParseException {
+        final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
+        final String main = getMainClass(node, true);
+        final URL docbase = getURL(node, "documentbase", base);
+        final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
         int height = 0;
 
@@ -780,8 +780,8 @@ public final class Parser {
         }
 
         // read params
-        Node params[] = getChildNodes(node, "param");
-        for (Node param : params) {
+        final Node params[] = getChildNodes(node, "param");
+        for (final Node param : params) {
             paramMap.put(getRequiredAttribute(param, "name", null), getRequiredAttribute(param, "value", ""));
         }
 
@@ -793,24 +793,26 @@ public final class Parser {
      *
      * @param node
      * @throws ParseException if the JNLP file is invalid
+     *
+     * TODO: parse and set {@link ApplicationDesc#getProgressClass()}
      */
-    private ApplicationDesc getApplication(Node node, boolean isFx) throws ParseException {
+    private ApplicationDesc getApplication(final ApplicationType applicationType, final Node node) throws ParseException {
         String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
         // read parameters
-        Node args[] = getChildNodes(node, "argument");
+        final Node args[] = getChildNodes(node, "argument");
         for (Node arg : args) {
             //argsList.add( args[i].getNodeValue() );
             //This approach was not finding the argument text
             argsList.add(getSpanText(arg));
         }
 
-        String argStrings[] = argsList.toArray(new String[argsList.size()]);
+        final String argStrings[] = argsList.toArray(new String[argsList.size()]);
 
-        return new ApplicationDesc(main, argStrings, isFx);
+        return new ApplicationDesc(applicationType, main, argStrings);
     }
 
     /**

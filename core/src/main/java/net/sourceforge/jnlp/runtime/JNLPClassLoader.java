@@ -68,7 +68,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
-import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParserSettings;
@@ -562,13 +562,13 @@ public class JNLPClassLoader extends URLClassLoader {
         loaderList.add(this);
 
         if (mainClass == null) {
-            Object obj = file.getLaunchInfo();
+            Object obj = file.getEntryPointDesc();
 
             if (obj instanceof ApplicationDesc) {
-                ApplicationDesc ad = (ApplicationDesc) file.getLaunchInfo();
+                ApplicationDesc ad = (ApplicationDesc) file.getEntryPointDesc();
                 mainClass = ad.getMainClass();
             } else if (obj instanceof AppletDesc) {
-                AppletDesc ad = (AppletDesc) file.getLaunchInfo();
+                AppletDesc ad = (AppletDesc) file.getEntryPointDesc();
                 mainClass = ad.getMainClass();
             }
         }
@@ -757,7 +757,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 // jnlp's resources
                 foundMainJar = foundMainJar || hasMainInExtensions();
 
-                boolean externalAppletMainClass = (file.getLaunchInfo() != null && !foundMainJar
+                boolean externalAppletMainClass = (file.getEntryPointDesc() != null && !foundMainJar
                         && (available == null || available.isEmpty()));
 
                 // We do this check here simply to ensure that if there are no JARs at all,
@@ -935,9 +935,9 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Check launch info
         if (mainClass == null) {
-            LaunchDesc launchDesc = file.getLaunchInfo();
-            if (launchDesc != null) {
-                mainClass = launchDesc.getMainClass();
+            EntryPoint entryPoint = file.getEntryPointDesc();
+            if (entryPoint != null) {
+                mainClass = entryPoint.getMainClass();
             }
         }
 
