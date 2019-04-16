@@ -38,69 +38,34 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.jnlp.element.update;
 
 /**
- * Represents an 'update' element in a JNLP file. This element describes when to
- * check for updates and what actions to take if updates are available
+ * Represents an 'update' element in a JNLP file. The update element is used to indicate the preferences
+ * for how application updates should be handled by the JNLP Client (when to check for updates, what
+ * actions to take if updates are available, etc.).
+ * <p/>
+ * For example:
+ * <pre>
+ *    &lt;update check="always" policy="prompt-update"&gt;
+ * </pre>
+ * <p/>
+ * see JSR-56, Chapter 3.6 Application Update
  *
- * @see Check
- * @see Policy
+ * @see UpdateCheck
+ * @see UpdatePolicy
  */
 public class UpdateDesc {
+    private final UpdateCheck check;
+    private final UpdatePolicy policy;
 
-    /**
-     * Describes when/how long to check for updates.
-     */
-    public enum Check {
-        /** Always check for updates before launching the application */
-        ALWAYS,
-
-        /**
-         * Default. Check for updates until a certain timeout. If the update
-         * check is not completed by timeout, launch the cached application and
-         * continue updating in the background
-         */
-        TIMEOUT,
-
-        /** Check for application updates in the background */
-        BACKGROUND
-    }
-
-    /**
-     * Describes what to do when the Runtime knows there is an applicatFion
-     * update before the application is launched.
-     */
-    public enum Policy {
-        /**
-         * Default. Always download updates without any user prompt and then launch the
-         * application
-         */
-        ALWAYS,
-
-        /**
-         * Prompt the user asking whether the user wants to download and run the
-         * updated application or run the version in the cache
-         */
-        PROMPT_UPDATE,
-
-        /**
-         * Prompts the user asking to download and run the latest version of the
-         * application or abort running
-         */
-        PROMPT_RUN,
-    }
-
-    private final Check check;
-    private final Policy policy;
-
-    public UpdateDesc(final Check check, final Policy policy) {
+    public UpdateDesc(final UpdateCheck check, final UpdatePolicy policy) {
         this.check = check;
         this.policy = policy;
     }
 
-    public Check getCheck() {
+    public UpdateCheck getCheck() {
         return this.check;
     }
 
-    public Policy getPolicy() {
+    public UpdatePolicy getPolicy() {
         return this.policy;
     }
 

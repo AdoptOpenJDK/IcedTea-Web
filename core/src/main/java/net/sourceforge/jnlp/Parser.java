@@ -54,8 +54,8 @@ import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Check;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Policy;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,37 +253,37 @@ public final class Parser {
 
                 Node node = child;
 
-                Check check;
+                UpdateCheck check;
                 String checkValue = getAttribute(node, "check", "timeout");
                 switch (checkValue) {
                     case "always":
-                        check = Check.ALWAYS;
+                        check = UpdateCheck.ALWAYS;
                         break;
                     case "timeout":
-                        check = Check.TIMEOUT;
+                        check = UpdateCheck.TIMEOUT;
                         break;
                     case "background":
-                        check = Check.BACKGROUND;
+                        check = UpdateCheck.BACKGROUND;
                         break;
                     default:
-                        check = Check.TIMEOUT;
+                        check = UpdateCheck.TIMEOUT;
                         break;
                 }
 
                 String policyString = getAttribute(node, "policy", "always");
-                Policy policy;
+                UpdatePolicy policy;
                 switch (policyString) {
                     case "always":
-                        policy = Policy.ALWAYS;
+                        policy = UpdatePolicy.ALWAYS;
                         break;
                     case "prompt-update":
-                        policy = Policy.PROMPT_UPDATE;
+                        policy = UpdatePolicy.PROMPT_UPDATE;
                         break;
                     case "prompt-run":
-                        policy = Policy.PROMPT_RUN;
+                        policy = UpdatePolicy.PROMPT_RUN;
                         break;
                     default:
-                        policy = Policy.ALWAYS;
+                        policy = UpdatePolicy.ALWAYS;
                         break;
                 }
 
@@ -294,7 +294,7 @@ public final class Parser {
         }
 
         if (updateDesc == null) {
-            updateDesc = new UpdateDesc(Check.TIMEOUT, Policy.ALWAYS);
+            updateDesc = new UpdateDesc(UpdateCheck.TIMEOUT, UpdatePolicy.ALWAYS);
         }
         return updateDesc;
     }
