@@ -17,7 +17,7 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import java.net.URL;
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 
 /**
  * The JAR element.

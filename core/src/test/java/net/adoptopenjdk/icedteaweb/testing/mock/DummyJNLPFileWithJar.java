@@ -9,9 +9,9 @@ import java.util.Locale;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.sourceforge.jnlp.JNLPFile;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.JNLPFile;
 
 /* A mocked dummy JNLP file with a single JAR. */
 public class DummyJNLPFileWithJar extends JNLPFile {

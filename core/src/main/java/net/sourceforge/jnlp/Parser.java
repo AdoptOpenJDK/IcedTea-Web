@@ -49,13 +49,15 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Check;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Policy;
+import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Check;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.Policy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -423,7 +425,7 @@ public final class Parser {
         // require version attribute
         getRequiredAttribute(node, "version", null);
 
-        return new JREDesc(new Version.JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(new JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     /**

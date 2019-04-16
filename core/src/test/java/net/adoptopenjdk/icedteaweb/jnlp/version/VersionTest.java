@@ -34,7 +34,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp;
+package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.Assert;
@@ -62,9 +62,11 @@ public class VersionTest {
         true,
         false,
         true};
+
     private static Version jvms[] = {
         new Version("1.1* 1.3*"),
         new Version("1.2+"),};
+
     private static Version versions[] = {
         new Version("1.1"),
         new Version("1.1.8"),
@@ -128,19 +130,19 @@ public class VersionTest {
     public void jreVersionTestOk() {
         //no exception occures
         //head support jdk 7+, so this statements should be always true
-        Version.JreVersion jreVersion = new Version.JreVersion("1.4 1.5+", true, true);
-        Version.JreVersion jreVersion1 = new Version.JreVersion("1.6+", true, true);
+        JreVersion jreVersion = new JreVersion("1.4 1.5+", true, true);
+        JreVersion jreVersion1 = new JreVersion("1.6+", true, true);
     }
 
     @Test(expected = RuntimeException.class)
     public void jreVersionTestFails1() {
         //head support jdk 7+, so this statements should be always false
-        Version.JreVersion jreVersion = new Version.JreVersion("2", true, true);
+        JreVersion jreVersion = new JreVersion("2", true, true);
     }
 
     @Test(expected = RuntimeException.class)
     public void jreVersionTestFails2() {
         //head support jdk 7+, so this statements should be always false
-        Version.JreVersion jreVersion = new Version.JreVersion("1.4", true, true);
+        JreVersion jreVersion = new JreVersion("1.4", true, true);
     }
 }

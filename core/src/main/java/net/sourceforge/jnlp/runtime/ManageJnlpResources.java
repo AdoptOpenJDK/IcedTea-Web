@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.sourceforge.jnlp.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
 
 public class ManageJnlpResources {

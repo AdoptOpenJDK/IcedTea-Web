@@ -76,6 +76,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.SYSTEM_PROPERTY_JAVA_VERSION;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -246,7 +247,7 @@ public class JNLPRuntime {
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
         System.setProperty("javawebstart.version", "javaws-" +
-                System.getProperty("java.version"));
+                System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION));
 
         if (!isHeadless() && indicator == null)
             indicator = new DefaultDownloadIndicator();
@@ -322,7 +323,7 @@ public class JNLPRuntime {
             Class<?> trustManagerClass;
             Constructor<?> tmCtor;
 
-            if (System.getProperty("java.version").startsWith("1.6")) { // Java 6
+            if (System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION).startsWith("1.6")) { // Java 6
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
