@@ -41,6 +41,7 @@ import java.util.List;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
@@ -132,13 +133,13 @@ public class ParserBasicTest extends NoStdOutErrTest {
     public void testInformationIcon() throws ParseException {
         InformationDesc info = parser.getInformationDescs(root).get(0);
 
-        IconDesc[] icons = info.getIcons(IconDesc.DEFAULT);
+        IconDesc[] icons = info.getIcons(IconKind.DEFAULT.getValue());
         Assert.assertNotNull(icons);
         Assert.assertEquals(1, icons.length);
         IconDesc icon = icons[0];
         Assert.assertNotNull(icon);
         Assert.assertEquals("http://localhost/icon.png", icon.getLocation().toString());
-        icons = info.getIcons(IconDesc.SPLASH);
+        icons = info.getIcons(IconKind.SPLASH.getValue());
         Assert.assertNotNull(icons);
         Assert.assertEquals(1, icons.length);
         icon = icons[0];

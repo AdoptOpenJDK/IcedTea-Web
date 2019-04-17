@@ -129,14 +129,14 @@ public class InformationDescTest {
     public void testGetIcons() {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
-        Assert.assertArrayEquals(new IconDesc[0], info.getIcons(IconDesc.DEFAULT));
+        Assert.assertArrayEquals(new IconDesc[0], info.getIcons(IconKind.DEFAULT.getValue()));
 
         IconDesc icon1 = new IconDesc(null, null, -1, -1, -1, -1);
         IconDesc icon2 = new IconDesc(null, null, -1, -1, -1, -1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon2);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon1);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon2);
 
-        assertArrayEquals(new IconDesc[] { icon1, icon2 }, info.getIcons(IconDesc.DEFAULT));
+        assertArrayEquals(new IconDesc[] { icon1, icon2 }, info.getIcons(IconKind.DEFAULT.getValue()));
     }
 
     @Test
@@ -147,19 +147,19 @@ public class InformationDescTest {
         URL location2 = new URL("http://location2.example.org");
         IconDesc icon1 = new IconDesc(location1, null, 10, 10, -1, -1);
         IconDesc icon2 = new IconDesc(location2, null, 20, 20, -1, -1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon2);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon1);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon2);
 
         // exact size matches
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 10, 10));
-        assertEquals(location2, info.getIconLocation(IconDesc.DEFAULT, 20, 20));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT.getValue(), 10, 10));
+        assertEquals(location2, info.getIconLocation(IconKind.DEFAULT.getValue(), 20, 20));
 
         // match a bigger icon
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 1, 1));
-        assertEquals(location2, info.getIconLocation(IconDesc.DEFAULT, 15, 15));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT.getValue(), 1, 1));
+        assertEquals(location2, info.getIconLocation(IconKind.DEFAULT.getValue(), 15, 15));
 
         // match a smaller icon
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 25, 25));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT.getValue(), 25, 25));
     }
 
     @Test
