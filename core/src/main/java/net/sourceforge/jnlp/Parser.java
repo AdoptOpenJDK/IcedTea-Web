@@ -19,7 +19,6 @@ package net.sourceforge.jnlp;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,10 +58,19 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNode;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNodes;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getSpanText;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getURL;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -76,7 +84,6 @@ public final class Parser {
 
     private final static Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static String CODEBASE = "codebase";
     private static String MAINCLASS = "main-class";
     private static final Pattern anyWhiteSpace = Pattern.compile("\\s");
 
@@ -197,7 +204,7 @@ public final class Parser {
         this.spec = getVersion(root, "spec", "1.0+");
 
         try {
-            this.codebase = addSlash(getURL(root, CODEBASE, base));
+            this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
         } catch (ParseException e) {
             //If parsing fails, continue by overriding the codebase with the one passed in
         }
@@ -208,7 +215,7 @@ public final class Parser {
         }
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
-        fileLocation = getURL(root, "href", this.base);
+        fileLocation = getURL(root, "href", this.base, strict);
 
     }
 
@@ -412,7 +419,7 @@ public final class Parser {
      */
     private JREDesc getJRE(Node node) throws ParseException {
         Version version = getVersion(node, "version", null);
-        URL location = getURL(node, "href", base);
+        URL location = getURL(node, "href", base, strict);
         String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
             checkVMArgs(vmArgs);
@@ -424,7 +431,7 @@ public final class Parser {
         List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
-        getRequiredAttribute(node, "version", null);
+        getRequiredAttribute(node, "version", null, strict);
 
         return new JREDesc(new JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
     }
@@ -437,7 +444,7 @@ public final class Parser {
      */
     private JARDesc getJAR(Node node) throws ParseException {
         boolean nativeJar = "nativelib".equals(node.getNodeName().getName());
-        URL location = getRequiredURL(node, "href", base);
+        URL location = getRequiredURL(node, "href", base, strict);
         Version version = getVersion(node, "version", null);
         String part = getAttribute(node, "part", null);
         boolean main = "true".equals(getAttribute(node, "main", "false"));
@@ -462,14 +469,14 @@ public final class Parser {
     private ExtensionDesc getExtension(Node node) throws ParseException {
         String name = getAttribute(node, "name", null);
         Version version = getVersion(node, "version", null);
-        URL location = getRequiredURL(node, "href", base);
+        URL location = getRequiredURL(node, "href", base, strict);
 
         ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
         Node dload[] = getChildNodes(node, "ext-download");
         for (Node dload1 : dload) {
             boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
-            ext.addPart(getRequiredAttribute(dload1, "ext-part", null), getAttribute(dload1, "part", null), lazy);
+            ext.addPart(getRequiredAttribute(dload1, "ext-part", null, strict), getAttribute(dload1, "part", null), lazy);
         }
 
         return ext;
@@ -482,8 +489,8 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private PropertyDesc getProperty(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", null);
-        String value = getRequiredAttribute(node, "value", "");
+        String name = getRequiredAttribute(node, "name", null, strict);
+        String value = getRequiredAttribute(node, "value", "", strict);
 
         return new PropertyDesc(name, value);
     }
@@ -495,8 +502,8 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private PackageDesc getPackage(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", null);
-        String part = getRequiredAttribute(node, "part", "");
+        String name = getRequiredAttribute(node, "name", null, strict);
+        String part = getRequiredAttribute(node, "part", "", strict);
         boolean recursive = getAttribute(node, "recursive", "false").equals("true");
 
         return new PackageDesc(name, part, recursive);
@@ -585,7 +592,7 @@ public final class Parser {
                 addInfo(info, child, kind, getSpanText(child, false));
             }
             if ("homepage".equals(name)) {
-                addInfo(info, child, null, getRequiredURL(child, "href", base));
+                addInfo(info, child, null, getRequiredURL(child, "href", base, strict));
             }
             if ("icon".equals(name)) {
                 addInfo(info, child, getAttribute(child, "kind", "default"), getIcon(child));
@@ -644,7 +651,7 @@ public final class Parser {
         int height = Integer.parseInt(getAttribute(node, "height", "-1"));
         int size = Integer.parseInt(getAttribute(node, "size", "-1"));
         int depth = Integer.parseInt(getAttribute(node, "depth", "-1"));
-        URL location = getRequiredURL(node, "href", base);
+        URL location = getRequiredURL(node, "href", base, strict);
         Object kind = getAttribute(node, "kind", "default");
 
         return new IconDesc(location, kind, width, height, depth, size);
@@ -762,16 +769,16 @@ public final class Parser {
      * TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
     private AppletDesc getApplet(final Node node) throws ParseException {
-        final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"));
+        final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
-        final URL docbase = getURL(node, "documentbase", base);
+        final URL docbase = getURL(node, "documentbase", base, strict);
         final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
         int height = 0;
 
         try {
-            width = Integer.parseInt(getRequiredAttribute(node, "width", "100"));
-            height = Integer.parseInt(getRequiredAttribute(node, "height", "100"));
+            width = Integer.parseInt(getRequiredAttribute(node, "width", "100", strict));
+            height = Integer.parseInt(getRequiredAttribute(node, "height", "100", strict));
         } catch (NumberFormatException nfe) {
             if (width <= 0) {
                 throw new ParseException(R("PBadWidth"));
@@ -782,7 +789,7 @@ public final class Parser {
         // read params
         final Node params[] = getChildNodes(node, "param");
         for (final Node param : params) {
-            paramMap.put(getRequiredAttribute(param, "name", null), getRequiredAttribute(param, "value", ""));
+            paramMap.put(getRequiredAttribute(param, "name", null, strict), getRequiredAttribute(param, "value", "", strict));
         }
 
         return new AppletDesc(name, main, docbase, width, height, paramMap);
@@ -856,8 +863,8 @@ public final class Parser {
      * @throws ParseException
      */
     private AssociationDesc getAssociation(Node node) throws ParseException {
-        String[] extensions = getRequiredAttribute(node, "extensions", null).split(" ");
-        String mimeType = getRequiredAttribute(node, "mime-type", null);
+        String[] extensions = getRequiredAttribute(node, "extensions", null, strict).split(" ");
+        String mimeType = getRequiredAttribute(node, "mime-type", null, strict);
 
         return new AssociationDesc(mimeType, extensions);
     }
@@ -919,8 +926,8 @@ public final class Parser {
      */
     private RelatedContentDesc getRelatedContent(Node node) throws ParseException {
 
-        getRequiredAttribute(node, "href", null);
-        URL location = getURL(node, "href", base);
+        getRequiredAttribute(node, "href", null, strict);
+        URL location = getURL(node, "href", base, strict);
 
         String title = null;
         String description = null;
@@ -1047,184 +1054,6 @@ public final class Parser {
         return new Locale(language, country, variant);
     }
 
-    // XML junk
-    /**
-     * Returns the implied text under a node, for example "text" in
-     * "&lt;description&gt;text&lt;/description&gt;".
-     *
-     * @param node the node with text under it
-     * @return
-     * @throws ParseException if the JNLP file is invalid
-     */
-    private String getSpanText(Node node) throws ParseException {
-        return getSpanText(node, true);
-    }
-
-    /**
-     * Returns the implied text under a node, for example "text" in
-     * "&lt;description&gt;text&lt;/description&gt;". If preserveSpacing is
-     * false, sequences of whitespace characters are turned into a single space
-     * character.
-     *
-     * @param node the node with text under it
-     * @param preserveSpacing if true, preserve whitespace
-     * @throws ParseException if the JNLP file is invalid
-     */
-    private String getSpanText(Node node, boolean preserveSpacing)
-            throws ParseException {
-        if (node == null) {
-            return null;
-        }
-
-        // NANO
-        String val = node.getNodeValue();
-        if (preserveSpacing) {
-            return val;
-        } else if (val == null) {
-            return null;
-        } else {
-            return val.replaceAll("\\s+", " ");
-        }
-
-        /* TINY
-        Node child = node.getFirstChild();
-
-        if (child == null) {
-            if (strict)
-                // not sure if this is an error or whether "" is proper
-                throw new ParseException("No text specified (node="+node.getNodeName().getName()+")");
-            else
-                return "";
-        }
-
-        return child.getNodeValue();
-         */
-    }
-
-    /**
-     * Returns the first child node with the specified name.
-     */
-    private static Node getChildNode(Node node, String name) {
-        Node[] result = getChildNodes(node, name);
-        if (result.length == 0) {
-            return null;
-        } else {
-            return result[0];
-        }
-    }
-
-    /**
-     * Returns all child nodes with the specified name.
-     */
-    private static Node[] getChildNodes(Node node, String name) {
-        List<Node> result = new ArrayList<>();
-
-        Node child = node.getFirstChild();
-        while (child != null) {
-            if (child.getNodeName().getName().equals(name)) {
-                result.add(child);
-            }
-            child = child.getNextSibling();
-        }
-
-        return result.toArray(new Node[result.size()]);
-    }
-
-    /**
-     * Returns a URL with a trailing / appended to it if there is no trailing
-     * slash on the specifed URL.
-     */
-    private URL addSlash(URL source) {
-        if (source == null) {
-            return null;
-        }
-
-        if (!source.toString().endsWith("/")) {
-            try {
-                source = new URL(source.toString() + "/");
-            } catch (MalformedURLException ex) {
-            }
-        }
-
-        return source;
-    }
-
-    /**
-     * @return the same result as getURL except that a ParseException is thrown
-     * if the attribute is null or empty.
-     *
-     * @param node the node
-     * @param name the attribute containing an href
-     * @param base the base URL
-     * @throws ParseException if the JNLP file is invalid
-     */
-    private URL getRequiredURL(Node node, String name, URL base) throws ParseException {
-        // probably should change "" to null so that url is always
-        // required even if !strict
-        getRequiredAttribute(node, name, "");
-
-        return getURL(node, name, base);
-    }
-
-    /**
-     * @return a URL object from a href string relative to the code base. If the
-     * href denotes a relative URL, it must reference a location that is a
-     * subdirectory of the codebase.
-     *
-     * @param node the node
-     * @param name the attribute containing an href
-     * @param base the base URL
-     * @throws ParseException if the JNLP file is invalid
-     */
-    public URL getURL(Node node, String name, URL base) throws ParseException {
-        String href;
-        if (CODEBASE.equals(name)) {
-            href = getCleanAttribute(node, name);
-            //in case of null code can throw an exception later
-            //some bogus jnlps have codebase as "" and expect it behaving as "."
-            if (href != null && href.trim().isEmpty()) {
-                href = ".";
-            }
-        } else {
-            href = getAttribute(node, name, null);
-        }
-        return getURL(href, node.getNodeName().getName(), base, strict);
-    }
-
-    public static URL getURL(String href, String nodeName, URL base, boolean strict) throws ParseException {
-        if (href == null) {
-            return null; // so that code can throw an exception if attribute was required
-        }
-        try {
-            if (base == null) {
-                return new URL(href);
-            } else {
-                try {
-                    return new URL(href);
-                } catch (MalformedURLException ex) {
-                    // is relative
-                }
-
-                URL result = new URL(base, href);
-
-                // check for going above the codebase
-                if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
-                    if (strict) {
-                        throw new ParseException(R("PUrlNotInCodebase", nodeName, href, base));
-                    }
-                }
-                return result;
-            }
-
-        } catch (MalformedURLException ex) {
-            if (base == null) {
-                throw new ParseException(R("PBadNonrelativeUrl", nodeName, href));
-            } else {
-                throw new ParseException(R("PBadRelativeUrl", nodeName, href, base));
-            }
-        }
-    }
-
     /**
      * @return a Version from the specified attribute and default value.
      *
@@ -1347,57 +1176,6 @@ public final class Parser {
             "-XX:MaxDirectMemorySize",};
     }
 
-    /**
-     * @return the same result as getAttribute except that if strict mode is
-     * enabled or the default value is null a parse exception is thrown instead
-     * of returning the default value.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default value
-     * @throws ParseException if the attribute does not exist or is empty
-     */
-    private String getRequiredAttribute(Node node, String name, String defaultValue) throws ParseException {
-        String result = getAttribute(node, name, null);
-
-        if (result == null || result.length() == 0) {
-            if (strict || defaultValue == null) {
-                throw new ParseException(R("PNeedsAttribute", node.getNodeName().getName(), name));
-            }
-        }
-
-        if (result == null) {
-            return defaultValue;
-        } else {
-            return result;
-        }
-    }
-
-    /**
-     * @return an attribute or the specified defaultValue if there is no such
-     * attribute.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default if no such attribute
-     */
-    private String getAttribute(Node node, String name, String defaultValue) {
-        // SAX
-        // String result = ((Element) node).getAttribute(name);
-        String result = getCleanAttribute(node, name);
-
-        if (result == null || result.length() == 0) {
-            return defaultValue;
-        }
-
-        return result;
-    }
-
-    private String getCleanAttribute(Node node, String name) {
-        String result = node.getAttribute(name);
-        return result;
-    }
-
     public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
     public static final String NORMAL_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.XMLParser";
 
@@ -1471,7 +1249,7 @@ public final class Parser {
     private String getMainClass(Node node, boolean required) throws ParseException {
         String main;
         if (required) {
-            main = getRequiredAttribute(node, MAINCLASS, null);
+            main = getRequiredAttribute(node, MAINCLASS, null, strict);
         } else {
             main = getAttribute(node, MAINCLASS, null);
         }
