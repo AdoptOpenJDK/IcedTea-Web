@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
@@ -87,9 +87,6 @@ public class JNLPFile {
     // todo: save the update policy, then if file was not updated
     // then do not check resources for being updated.
     //
-    // todo: make getLaunchInfo return a superclass that all the
-    // launch types implement (can get codebase from it).
-    //
     // todo: currently does not filter resources by jvm version.
     //
 
@@ -125,8 +122,8 @@ public class JNLPFile {
     /** additional resources not in JNLP file (from command line) */
     protected ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
 
-    /** the application description */
-    protected LaunchDesc launchType;
+    /** the application entry point */
+    protected EntryPoint entryPointDesc;
 
     /** the component description */
     protected ComponentDesc component;
@@ -689,8 +686,8 @@ public class JNLPFile {
      * @return an object of one of the following types: AppletDesc,
      * ApplicationDesc and InstallerDesc
      */
-    public LaunchDesc getLaunchInfo() {
-        return launchType;
+    public EntryPoint getEntryPointDesc() {
+        return entryPointDesc;
     }
 
     /**
@@ -702,7 +699,7 @@ public class JNLPFile {
         if (!isApplet())
             throw new UnsupportedOperationException(R("JNotApplet"));
 
-        return (AppletDesc) launchType;
+        return (AppletDesc) entryPointDesc;
     }
 
     /**
@@ -714,7 +711,7 @@ public class JNLPFile {
         if (!isApplication())
             throw new UnsupportedOperationException(R("JNotApplication"));
 
-        return (ApplicationDesc) launchType;
+        return (ApplicationDesc) entryPointDesc;
     }
 
     /**
@@ -738,21 +735,21 @@ public class JNLPFile {
         if (!isInstaller())
             throw new UnsupportedOperationException(R("NotInstaller"));
 
-        return (InstallerDesc) launchType;
+        return (InstallerDesc) entryPointDesc;
     }
 
     /**
      * @return whether the lauch descriptor describes an Applet.
      */
     public boolean isApplet() {
-        return launchType instanceof AppletDesc;
+        return entryPointDesc instanceof AppletDesc;
     }
 
     /**
      * @return whether the lauch descriptor describes an Application.
      */
     public boolean isApplication() {
-        return launchType instanceof ApplicationDesc;
+        return entryPointDesc instanceof ApplicationDesc;
     }
 
     /**
@@ -766,7 +763,7 @@ public class JNLPFile {
      * @return whether the lauch descriptor describes an Installer.
      */
     public boolean isInstaller() {
-        return launchType instanceof InstallerDesc;
+        return entryPointDesc instanceof InstallerDesc;
     }
 
     /**
@@ -891,7 +888,7 @@ public class JNLPFile {
             parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section
-            launchType = parser.getLauncher(root);
+            entryPointDesc = parser.getEntryPointDesc(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
 

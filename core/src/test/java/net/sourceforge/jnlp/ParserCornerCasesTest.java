@@ -142,7 +142,7 @@ public class ParserCornerCasesTest {
         String malformedJnlp = "<?xml?><jnlp><application-desc/><component-desc/></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
         Parser parser = new Parser(null, null, root, defaultParser);
-        Assert.assertNotNull(parser.getLauncher(root));
+        Assert.assertNotNull(parser.getEntryPointDesc(root));
     }
 
     @Test

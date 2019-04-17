@@ -6,7 +6,8 @@ import net.sourceforge.jnlp.Parser;
  * The check attribute indicates the preference for when the JNLP Client should check for updates, and can have
  * one of the three values: "always", "timeout", and "background".
  * <p/>
- * see JSR-56, Chapter 3.6 Application Update
+ * @implSpec See <b>JSR-56, Section 3.6 Application Update</b>
+ * for a detailed specification of this class.
  */
 public enum UpdateCheck {
     /**

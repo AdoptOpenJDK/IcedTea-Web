@@ -305,7 +305,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testApplication() throws ParseException {
-        ApplicationDesc app = (ApplicationDesc) parser.getLauncher(root);
+        ApplicationDesc app = (ApplicationDesc) parser.getEntryPointDesc(root);
         Assert.assertNotNull(app);
         Assert.assertEquals("MainClass", app.getMainClass());
         Assert.assertArrayEquals(new String[]{"arg1", "arg2"}, app.getArguments());

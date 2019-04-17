@@ -47,7 +47,8 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.update;
  *    &lt;update check="always" policy="prompt-update"&gt;
  * </pre>
  * <p/>
- * see JSR-56, Chapter 3.6 Application Update
+ * @implSpec See <b>JSR-56, Section 3.6 Application Update</b>
+ * for a detailed specification of this class.
  *
  * @see UpdateCheck
  * @see UpdatePolicy

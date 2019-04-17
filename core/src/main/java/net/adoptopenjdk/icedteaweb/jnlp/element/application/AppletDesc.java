@@ -16,60 +16,91 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.LaunchDesc;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The applet-desc element.
+ * The applet-desc element contains all information needed to launch an Applet, given the resources described
+ * by the resources elements. A JNLP file is an application descriptor for an Applet if the applet-desc
+ * element is specified.
+ *
+ * @implSpec See <b>JSR-56, Section 3.7.2 Application Descriptor for an Applet</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.8 $
  */
-public class AppletDesc implements LaunchDesc {
+public class AppletDesc implements EntryPoint {
 
     private final static Logger LOG = LoggerFactory.getLogger(AppletDesc.class);
 
-    /** the applet name */
+    /** Name of the Applet. This is available to the Applet through the AppletContext. */
     private final String name;
 
-    /** the main class name and package */
+    /**
+     * This is the fully-qualified name of the main Applet class (e.g., com.mysite.MyApplet),
+     * as opposed to the HTML <applet> tag's code attribute as a filename (e.g., MyApplet.class).
+     */
     private final String mainClass;
 
-    /** the document base */
+    /**
+     * The name of a class containing an implementation of the {@link javax.jnlp.DownloadServiceListener}
+     * interface of applications.
+     */
+    private final String progressClass;
+
+    /**
+     * The document base for the Applet as a URL. This is available to the Applet through the AppletContext.
+     * The documentbase can be provided explicitly since an applet launched with a JNLP Client may not be
+     * embedded in a Web page.
+     */
     private final URL documentBase;
 
-    /** the width */
+    /** Width of the Applet in pixels. */
     private final int width;
 
-    /** the height */
+    /** Height of the Applet in pixels. */
     private final int height;
 
-    /** the parameters */
+    /** Contains parameters to the Applet. The parameters can be retrieved with the Applet.getParameter method. */
     private final Map<String, String> parameters;
 
     /**
      * Create an Applet descriptor.
      *
-     * @param name the applet name
-     * @param mainClass the main class name and package
-     * @param documentBase the document base
-     * @param width the width
-     * @param height the height
+     * @param name the applet name that is available to the Applet through the AppletContext
+     * @param mainClass the fully-qualified name of the main Applet class
+     * @param documentBase the document base for the Applet
+     * @param width the width of the Applet in pixels
+     * @param height the height of the Applet in pixels
      * @param parameters the parameters
      */
-    public AppletDesc(final String name, final String mainClass, final URL documentBase, final int width, final int height,
-                      final Map<String, String> parameters) {
+    public AppletDesc(final String name, final String mainClass, final URL documentBase, final int width,
+                      final int height, final Map<String, String> parameters) {
+        this(name, mainClass, null, documentBase, width, height, parameters);
+    }
+
+    /**
+     * Create an Applet descriptor.
+     *
+     * @param name the applet name that is available to the Applet through the AppletContext
+     * @param mainClass the fully-qualified name of the main Applet class
+     * @param progressClass the fully qualified name of the class containing an implementation of the
+     * {@link javax.jnlp.DownloadServiceListener} interface
+     * @param documentBase the document base for the Applet
+     * @param width the width of the Applet in pixels
+     * @param height the height of the Applet in pixels
+     * @param parameters the parameters
+     */
+    public AppletDesc(final String name, final String mainClass, final String progressClass, final URL documentBase, final int width,
+                       final int height, final Map<String, String> parameters) {
         this.name = name;
         this.mainClass = mainClass;
+        this.progressClass = progressClass;
         this.documentBase = documentBase;
         this.width = width;
         this.height = height;
@@ -77,14 +108,14 @@ public class AppletDesc implements LaunchDesc {
     }
 
     /**
-     * @return the applet name
+     * @return the applet name that is available to the Applet through the AppletContext
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return the main class name in the dot-separated form (eg: foo.bar.Baz)
+     * @return the fully-qualified name of the main Applet class
      */
     @Override
     public String getMainClass() {
@@ -92,97 +123,53 @@ public class AppletDesc implements LaunchDesc {
     }
 
     /**
-     * @return the document base
+     * The name of a class containing an implementation of the {@link javax.jnlp.DownloadServiceListener}
+     * interface.
+     *
+     * @return the fully qualified name of the class containing an implementation of the
+     * {@link javax.jnlp.DownloadServiceListener} interface
+     */
+    public String getProgressClass() {
+        return progressClass;
+    }
+
+    /**
+     * @return the document base for the Applet as a URL
      */
     public URL getDocumentBase() {
         return documentBase;
     }
 
-    private Integer getConfigurationPropertyAsInt(final String name) {
-        return Integer.valueOf(JNLPRuntime.getConfiguration().getProperty(name));
-    }
-
     /**
-     * @return the width
+     * @return the width of the Applet in pixels
      */
     public int getWidth() {
-        if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
-            final Integer nww = fixWidth();
-            if (nww != null) {
-                return nww;
-            }
-        }
         return width;
     }
 
     /**
-     * @return the height
+     * @return the height of the Applet in pixels
      */
     public int getHeight() {
-        if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
-            final Integer nwh = fixHeight();
-            if (nwh != null) {
-                return nwh;
-            }
-        }
         return height;
     }
 
     /**
-     * @return  the applet parameters
+     * @return the Applet parameters
      */
     public Map<String, String> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }
 
     /**
-     * Adds a parameter to the applet.  If the parameter already
-     * exists then it is overwritten with the new value.  Adding a
-     * parameter will have no effect on already-running applets
-     * launched from this JNLP file.
+     * Adds a parameter to the Applet. If the parameter already exists then it is
+     * overwritten with the new value. Adding a parameter will have no effect on
+     * already-running Applets launched from this JNLP file.
+     *
      * @param name key of value
      * @param value value to be added
      */
     public void addParameter(final String name, final String value) {
         parameters.put(name, value);
     }
-
-    private Integer fixHeight() {
-        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_HEIGHT, "Height", "height", "HEIGHT");
-    }
-    private Integer fixWidth() {
-        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH, "Width", "width", "WIDTH");
-    }
-
-    private Integer fixSize(final String depKey, final String... keys) {
-        LOG.info("Found to small applet!");
-        try {
-            final Integer depVal = getConfigurationPropertyAsInt(depKey);
-            if (depVal == 0) {
-                LOG.info("using its size");
-                return null;
-            }
-            if (depVal < 0) {
-                LOG.info("enforcing {}", depVal);
-                return Math.abs(depVal);
-            }
-            for (final String key : keys) {
-                final String sizeFromParam = parameters.get(key);
-                if (sizeFromParam != null) {
-                    try {
-                        LOG.info("using its {}={}", key, sizeFromParam);
-                        return Integer.valueOf(sizeFromParam);
-                    } catch (NumberFormatException ex) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                    }
-                }
-            }
-            LOG.info("defaulting to {}", depVal);
-            return depVal;
-        } catch (final NumberFormatException | NullPointerException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return null;
-        }
-    }
-
 }

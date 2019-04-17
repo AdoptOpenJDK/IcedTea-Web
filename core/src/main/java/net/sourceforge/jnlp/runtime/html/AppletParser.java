@@ -36,18 +36,17 @@
  */
 package net.sourceforge.jnlp.runtime.html;
 
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.Parser;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.PluginParameters;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.PluginParameters;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 public class AppletParser {
 
@@ -97,7 +96,7 @@ public class AppletParser {
         if (inHtmlCodebase != null && inHtmlCodebase.trim().isEmpty()) {
             inHtmlCodebase = ".";
         }
-        URL u = Parser.getURL(inHtmlCodebase, "In html " + source.getNodeName() + "'s codebase", docBase, false);
+        URL u = XMLParser.getURL(inHtmlCodebase, "In html " + source.getNodeName() + "'s codebase", docBase, false);
         if (!u.toExternalForm().endsWith("/")) {
             u = new URL(u.toExternalForm() + "/");
         }
