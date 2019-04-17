@@ -1458,7 +1458,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals(null, main1);
         
         //strict also ok
@@ -1466,7 +1466,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, defaultParser, null);
-        String main2 = parser2.getLauncher(root2).getMainClass();
+        String main2 = parser2.getEntryPointDesc(root2).getMainClass();
         Assert.assertEquals(null, main2);
 
     }
@@ -1483,7 +1483,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals(null, main1);
         
         //strict also ok
@@ -1491,7 +1491,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        String main2 = parser2.getLauncher(root2).getMainClass();
+        String main2 = parser2.getEntryPointDesc(root2).getMainClass();
         Assert.assertEquals(null, main2);
 
     }
@@ -1508,7 +1508,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        parser1.getLauncher(root1).getMainClass();
+        parser1.getEntryPointDesc(root1).getMainClass();
         //both throw
     }
     
@@ -1525,7 +1525,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
         
         //strict also ok
@@ -1533,7 +1533,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        String main2 = parser2.getLauncher(root2).getMainClass();
+        String main2 = parser2.getEntryPointDesc(root2).getMainClass();
         Assert.assertEquals("some.main.class", main2);
 
     }
@@ -1551,7 +1551,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
         
         //strict throws
@@ -1559,7 +1559,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        parser2.getLauncher(root2).getMainClass();
+        parser2.getEntryPointDesc(root2).getMainClass();
 
     }
     
@@ -1575,7 +1575,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
         
         //strict throws
@@ -1583,7 +1583,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        parser2.getLauncher(root2).getMainClass();
+        parser2.getEntryPointDesc(root2).getMainClass();
 
     }
     
@@ -1599,7 +1599,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("som e.main .class", main1);
         
         //strict throws
@@ -1607,7 +1607,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        parser2.getLauncher(root2).getMainClass();
+        parser2.getEntryPointDesc(root2).getMainClass();
     }
     
     @Test(expected = ParseException.class)
@@ -1622,7 +1622,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
-        String main1 = parser1.getLauncher(root1).getMainClass();
+        String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some . another . main .class. here", main1);
         
         //strict throws
@@ -1630,7 +1630,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
-        parser2.getLauncher(root2).getMainClass();
+        parser2.getEntryPointDesc(root2).getMainClass();
     }
 
 }

@@ -45,6 +45,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedP
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.AppletUtils;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
@@ -231,7 +232,7 @@ public final class PluginBridge extends JNLPFile {
 
         // the class name should be of the form foo.bar.Baz not foo/bar/Baz
         String mainClass = main.replace('/', '.');
-        launchType = new AppletDesc(getTitle(), mainClass, documentBase, width,
+        entryPointDesc = new AppletDesc(getTitle(), mainClass, documentBase, width,
                                     height, params.getUnmodifiableMap());
 
         if (main.endsWith(".class")) //single class file only
@@ -499,8 +500,8 @@ public final class PluginBridge extends JNLPFile {
                    + "  <applet-desc\n")
                     .append("    name='").append(getTitle()).append("'\n"
                           + "    main-class='").append(getStrippedMain()).append("'\n"
-                          + "    width='").append(getApplet().getWidth()).append("'\n"
-                          + "    height='").append(getApplet().getHeight()).append("'>\n");
+                          + "    width='").append(AppletUtils.getFixedWidth(getApplet().getWidth(), getApplet().getParameters())).append("'\n"
+                          + "    height='").append(AppletUtils.getFixedHeight(getApplet().getHeight(), getApplet().getParameters())).append("'>\n");
             if (!getApplet().getParameters().isEmpty()) {
                 Set<Map.Entry<String, String>> prms = getApplet().getParameters().entrySet();
                 for (Map.Entry<String, String> entry : prms) {
