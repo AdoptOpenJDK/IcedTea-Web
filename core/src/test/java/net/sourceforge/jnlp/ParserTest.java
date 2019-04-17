@@ -41,6 +41,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -1431,13 +1432,12 @@ public class ParserTest extends NoStdOutErrTest {
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser, null);
         ParseException eex = null;
         //non codebase element is unaffected
-        URL u = parser.getURL(root, "aaa", null);
+        URL u = XMLParser.getURL(root, "aaa", null, defaultParser.isStrict());
         Assert.assertEquals(null, u);
         try {
-            parser.getURL(root, "codebase", null);
+            XMLParser.getURL(root, "codebase", null, defaultParser.isStrict());
         } catch (ParseException ex) {
             eex = ex;
         }
