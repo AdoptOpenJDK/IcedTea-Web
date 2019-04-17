@@ -935,7 +935,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Check launch info
         if (mainClass == null) {
-            EntryPoint entryPoint = file.getEntryPointDesc();
+            final EntryPoint entryPoint = file.getEntryPointDesc();
             if (entryPoint != null) {
                 mainClass = entryPoint.getMainClass();
             }
@@ -946,20 +946,19 @@ public class JNLPClassLoader extends URLClassLoader {
             mainClass = checkForAttributeInJars(jars, Attributes.Name.MAIN_CLASS);
         }
 
-        String desiredJarEntryName = mainClass + ".class";
+        final String desiredJarEntryName = mainClass + ".class";
 
         for (JARDesc jar : jars) {
 
             try {
-                File localFile = tracker
-                        .getCacheFile(jar.getLocation());
+                final File localFile = tracker.getCacheFile(jar.getLocation());
 
                 if (localFile == null) {
                     LOG.warn("JAR {} not found. Continuing.", jar.getLocation());
                     continue; // JAR not found. Keep going.
                 }
 
-                JarFile jarFile = new JarFile(localFile);
+                final JarFile jarFile = new JarFile(localFile);
 
                 for (JarEntry entry : Collections.list(jarFile.entries())) {
                     String jeName = entry.getName().replaceAll("/", ".");

@@ -14,7 +14,7 @@ public class AppletUtils {
     /**
      * @return the width of the Applet in pixels
      */
-    public static int getFixedWidth(int width, final Map<String, String> parameters) {
+    public static int getFixedWidth(final int width, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
         if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
@@ -29,7 +29,7 @@ public class AppletUtils {
     /**
      * @return the height of the Applet in pixels
      */
-    public static int getFixedHeight(int height, final Map<String, String> parameters) {
+    public static int getFixedHeight(final int height, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
         if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
