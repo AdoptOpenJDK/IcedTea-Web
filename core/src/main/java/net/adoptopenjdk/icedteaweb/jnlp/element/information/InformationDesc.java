@@ -38,6 +38,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKi
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
 public class InformationDesc {
+    public static final String LOCALE_ATTRIBUTE = "locale";
 
     // There is an understanding between this class and the parser
     // that description and icon types are keyed by "icon-"+kind and
@@ -45,7 +46,7 @@ public class InformationDesc {
     // specification name.
 
     /**
-     * the locales for the information
+     * The locales for which the information element should be used.
      */
     final private Locale[] locales;
 

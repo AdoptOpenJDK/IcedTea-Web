@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -553,14 +555,11 @@ public final class Parser {
      * @param node the information node
      * @throws ParseException if the JNLP file is invalid
      */
-    InformationDesc getInformationDesc(Node node) throws ParseException {
+    InformationDesc getInformationDesc(final Node node) throws ParseException {
         List<String> descriptionsUsed = new ArrayList<>();
 
-        // locale
-        Locale locales[] = getLocales(node);
-
         // create information
-        InformationDesc info = new InformationDesc(locales, strict);
+        InformationDesc info = new InformationDesc(getLocales(node), strict);
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -1007,17 +1006,21 @@ public final class Parser {
     }
 
     /**
-     * @return the Locale object(s) from a node's locale attribute.
+     * Returns the locales for which the information element should be used. Several locales can be specified,
+     * separated with spaces.
      *
      * @param node the node with a locale attribute
+     * @return the Locale object(s) from a node's locale attribute.
+     *
+     * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+     * for a detailed specification of this functionality.
      */
-    private Locale[] getLocales(Node node) {
-        List<Locale> locales = new ArrayList<>();
-        String localeParts[]
-                = splitString(getAttribute(node, "locale", ""));
+    private Locale[] getLocales(final Node node) throws ParseException {
+        final List<Locale> locales = new ArrayList<>();
+        final String localeParts[] = splitString(getAttribute(node, LOCALE_ATTRIBUTE, ""));
 
-        for (String localePart : localeParts) {
-            Locale l = getLocale(localePart);
+        for (final String localePart : localeParts) {
+            final Locale l = getLocale(localePart);
             if (l != null) {
                 locales.add(l);
             }
@@ -1027,19 +1030,23 @@ public final class Parser {
     }
 
     /**
-     * Returns a {@link Locale} from a single locale.
+     * Returns a {@link Locale} from a locale string. Each locale is specified by a language identifier,
+     * possibly country identifier, and possibly a variant. The syntax is as follows:
+     * <pre>
+     * locale ::= language [ "_" country [ "_" variant ] ]
+     * </pre>
      *
-     * @param localeStr the locale string
+     * @param localeString the locale string
      * @return locale of document
      */
-    public Locale getLocale(String localeStr) {
-        if (localeStr.length() < 2) {
-            return null;
+    private Locale getLocale(final String localeString) throws ParseException {
+        if (Objects.isNull(localeString) || localeString.length() < 2) {
+            throw new ParseException(R("PIllegalLocale", localeString));
         }
 
-        String language = localeStr.substring(0, 2);
-        String country = (localeStr.length() < 5) ? "" : localeStr.substring(3, 5);
-        String variant = (localeStr.length() > 7) ? localeStr.substring(6) : "";
+        final String language = localeString.substring(0, 2);
+        final String country = (localeString.length() < 5) ? "" : localeString.substring(3, 5);
+        final String variant = (localeString.length() > 7) ? localeString.substring(6) : "";
 
         // null is not allowed n locale but "" is
         return new Locale(language, country, variant);
