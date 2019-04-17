@@ -1,5 +1,7 @@
 package net.adoptopenjdk.icedteaweb;
 
+import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+
 public class Assert {
 
     private static final String NOT_NULL_MSG_FORMAT = "Argument '%s' may not be null";
@@ -35,7 +37,7 @@ public class Assert {
      * @throws java.lang.NullPointerException     if {@code str} is null.
      * @throws java.lang.IllegalArgumentException if {@code str} is blank.
      * @see #requireNonNull(Object, String)
-     * @see #isBlank(String)
+     * @see StringUtils#isBlank(String)
      */
 
     public static String requireNonBlank(final String str, final String argumentName) {
@@ -46,25 +48,4 @@ public class Assert {
         return str;
     }
 
-    /**
-     * <p>Determines whether a given string is <code>null</code>, empty,
-     * or only contains whitespace. If it contains anything other than
-     * whitespace then the string is not considered to be blank and the
-     * method returns <code>false</code>.</p>
-     *
-     * @param str The string to test.
-     * @return <code>true</code> if the string is <code>null</code>, or
-     * blank.
-     */
-    public static boolean isBlank(final String str) {
-        if (str == null || str.length() == 0) {
-            return true;
-        }
-        for (final char c : str.toCharArray()) {
-            if (!Character.isWhitespace(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
