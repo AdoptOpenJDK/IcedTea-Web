@@ -44,7 +44,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 
 public class ResourceDownloader implements Runnable {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
     private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
 
@@ -57,7 +57,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     static int getUrlResponseCode(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-        return getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod).result;
+        return getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod).result;
     }
 
     /**
@@ -69,7 +69,7 @@ public class ResourceDownloader implements Runnable {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException
      */
-    static UrlRequestResult getUrlResponseCodeWithRedirectonResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
+    static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
         final UrlRequestResult result = new UrlRequestResult();
         final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
@@ -295,7 +295,7 @@ public class ResourceDownloader implements Runnable {
                     Map<String, String> requestProperties = new HashMap<>();
                     requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
-                    UrlRequestResult response = getUrlResponseCodeWithRedirectonResult(url, requestProperties, requestMethod);
+                    UrlRequestResult response = getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
                     if (response.result == 511) {
                         if (!InetSecurity511Panel.isSkip()) {
 
@@ -396,7 +396,7 @@ public class ResourceDownloader implements Runnable {
     private void downloadPackGzFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
-        uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
+        extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
@@ -405,7 +405,7 @@ public class ResourceDownloader implements Runnable {
     private void downloadGZipFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
-        uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
+        extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
@@ -474,9 +474,9 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void uncompressGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+    private void extractGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
         LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
-        byte buf[] = new byte[1024];
+        byte[] buf = new byte[1024];
         int rlen;
 
         try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
@@ -495,7 +495,7 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void uncompressPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+    private void extractPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
         LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
 
         try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
