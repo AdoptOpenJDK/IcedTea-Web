@@ -39,16 +39,16 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.JNLPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 
 /**
  * This class is wrapper arround the *information* tag element which should
@@ -227,7 +227,7 @@ public class InformationElement {
             ie.setHomepage(homePage);
             ie.setTitle(file.getInformation().getTitle());
             ie.setvendor(file.getInformation().getVendor());
-            ie.addDescription(file.getInformation().getDescriptionStrict((String) (InformationDesc.DEFAULT)));
+            ie.addDescription(file.getInformation().getDescriptionStrict((String) (DEFAULT.getValue())));
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindOneLine), InfoItem.descriptionKindOneLine);
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindShort), InfoItem.descriptionKindShort);
             ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);

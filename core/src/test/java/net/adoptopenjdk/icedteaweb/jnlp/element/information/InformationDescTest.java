@@ -45,6 +45,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -90,35 +94,35 @@ public class InformationDescTest {
     @Test
     public void testDescription() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
         assertEquals("Default Description", info.getDescription());
     }
 
     @Test
     public void testDescriptionFallbackOrder() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.TOOLTIP, "Tooltip Description");
+        info.addItem("description-" + TOOLTIP.getValue(), "Tooltip Description");
         assertEquals("Tooltip Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.SHORT, "Short Description");
+        info.addItem("description-" + SHORT.getValue(), "Short Description");
         assertEquals("Short Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.ONE_LINE, "One-line Description");
+        info.addItem("description-" + ONE_LINE.getValue(), "One-line Description");
         assertEquals("One-line Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
         assertEquals("Default Description", info.getDescription());
     }
 
     @Test
     public void testDescriptionKind() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
-        info.addItem("description-" + InformationDesc.ONE_LINE, "One-line Description");
-        info.addItem("description-" + InformationDesc.SHORT, "Short Description");
-        info.addItem("description-" + InformationDesc.TOOLTIP, "Tooltip Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
+        info.addItem("description-" + ONE_LINE.getValue(), "One-line Description");
+        info.addItem("description-" + SHORT.getValue(), "Short Description");
+        info.addItem("description-" + TOOLTIP.getValue(), "Tooltip Description");
 
-        assertEquals("Default Description", info.getDescription(InformationDesc.DEFAULT));
-        assertEquals("One-line Description", info.getDescription(InformationDesc.ONE_LINE));
-        assertEquals("Short Description", info.getDescription(InformationDesc.SHORT));
-        assertEquals("Tooltip Description", info.getDescription(InformationDesc.TOOLTIP));
+        assertEquals("Default Description", info.getDescription(DEFAULT.getValue()));
+        assertEquals("One-line Description", info.getDescription(ONE_LINE.getValue()));
+        assertEquals("Short Description", info.getDescription(SHORT.getValue()));
+        assertEquals("Tooltip Description", info.getDescription(TOOLTIP.getValue()));
     }
 
     @Test

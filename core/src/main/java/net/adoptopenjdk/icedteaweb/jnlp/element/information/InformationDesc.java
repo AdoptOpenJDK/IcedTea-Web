@@ -23,11 +23,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
+
 /**
- * The information element.
+ * The information element contains information intended to be consumed by the JNLP Client to integrate
+ * the application into the desktop, provide user feedback, etc.
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.9 $
  */
 public class InformationDesc {
 
@@ -35,19 +43,6 @@ public class InformationDesc {
     // that description and icon types are keyed by "icon-"+kind and
     // "description-"+kind, and that other types are keyed by their
     // specification name.
-
-    /** one-line description */
-    /**http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html**/
-    public static final Object ONE_LINE = "one-line";
-
-    /** short description */
-    public static final Object SHORT = "short";
-
-    /** tooltip description */
-    public static final Object TOOLTIP = "tooltip";
-
-    /** default description */
-    public static final Object DEFAULT = "default";
 
     /**
      * the locales for the information
@@ -98,15 +93,15 @@ public class InformationDesc {
      * @return the default description for the application.
      */
     public String getDescription() {
-        String result = getDescription(DEFAULT);
+        String result = getDescription(DEFAULT.getValue());
 
         // try to find any description if default is null
         if (result == null)
-            result = getDescription(ONE_LINE);
+            result = getDescription(ONE_LINE.getValue());
         if (result == null)
-            result = getDescription(SHORT);
+            result = getDescription(SHORT.getValue());
         if (result == null)
-            result = getDescription(TOOLTIP);
+            result = getDescription(TOOLTIP.getValue());
 
         return result;
     }
@@ -120,7 +115,7 @@ public class InformationDesc {
     public String getDescription(Object kind) {
         String result = getDescriptionStrict(kind);
         if (result == null)
-            return (String) getItem("description-" + DEFAULT);
+            return (String) getItem("description-" + DEFAULT.getValue());
         else
             return result;
     }
