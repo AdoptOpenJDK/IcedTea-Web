@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
@@ -39,7 +41,6 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -168,8 +169,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
                 "a Base64 string and then decoded using PluginBridge's" +
                 "decoding method and compared.";
 
-        BASE64Encoder encoder = new BASE64Encoder();
-        String encodedFile = encoder.encodeBuffer(actualFile.getBytes());
+        String encodedFile = IOUtils.toBase64(actualFile.getBytes());
 
         byte[] decodedBytes = PluginBridge.decodeBase64String(encodedFile);
         String decodedString = new String(decodedBytes);

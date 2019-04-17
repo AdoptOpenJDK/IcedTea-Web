@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -46,7 +47,6 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.replacements.BASE64Decoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -458,8 +458,7 @@ public final class PluginBridge extends JNLPFile {
      * Returns the decoded BASE64 string
      */
     static byte[] decodeBase64String(String encodedString) throws IOException {
-        BASE64Decoder base64 = new BASE64Decoder();
-        return base64.decodeBuffer(encodedString);
+        return IOUtils.fromBase64StripWhitespace(encodedString);
     }
 
     public String getDebugJnlp() {

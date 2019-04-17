@@ -5,7 +5,10 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * Copied from RICO (https://github.com/rico-projects/rico)
@@ -13,11 +16,31 @@ import java.util.Base64;
 public class IOUtils {
 
     public static String toBase64(final byte[] bytes) {
-        return Base64.getEncoder().encodeToString(bytes);
+        final byte[] encoded = Base64.getEncoder().encode(bytes);
+        return new String(encoded, StandardCharsets.ISO_8859_1);
+    }
+
+    public static String toBase64splitIntoMultipleLines(final byte[] bytes, final int maxCharsPerLine) {
+        final String encoded = toBase64(bytes);
+        final List<String> lines = new ArrayList<>();
+        String tmp = encoded;
+        while (tmp.length() > maxCharsPerLine) {
+            lines.add(tmp.substring(0, maxCharsPerLine));
+            tmp = tmp.substring(maxCharsPerLine);
+        }
+        lines.add(tmp);
+
+        return String.join(System.lineSeparator(), lines);
     }
 
     public static byte[] fromBase64(final String content) {
-        return Base64.getDecoder().decode(content);
+        final byte[] encoded = content.getBytes(StandardCharsets.ISO_8859_1);
+        return Base64.getDecoder().decode(encoded);
+    }
+
+    public static byte[] fromBase64StripWhitespace(final String content) {
+        final String stripped = content.replaceAll("\\s", "");
+        return fromBase64(stripped);
     }
 
     public static long copy(final InputStream inputStream, final OutputStream outputStream) throws IOException {

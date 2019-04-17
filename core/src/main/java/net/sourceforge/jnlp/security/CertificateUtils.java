@@ -39,7 +39,7 @@ package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.replacements.BASE64Encoder;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,9 +195,9 @@ public class CertificateUtils {
     public static void dump(Certificate cert, PrintStream out) throws IOException,
             CertificateException {
 
-        BASE64Encoder encoder = new BASE64Encoder();
         out.println("-----BEGIN CERTIFICATE-----");
-        encoder.encodeBuffer(cert.getEncoded(), out);
+        final String encoded = IOUtils.toBase64splitIntoMultipleLines(cert.getEncoded(), 76);
+        out.println(encoded);
         out.println("-----END CERTIFICATE-----");
     }
 
