@@ -60,7 +60,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * Used by net.sourceforge.jnlp.Parser
  */
 public class XMLParser {
-    private final static Logger LOG = LoggerFactory.getLogger(XMLParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
     private static final String ENCODING_UNICODE_LITTLE = "UnicodeLittle";
     private static final String ENCODING_UTF_8 = "UTF-8";
@@ -182,8 +182,8 @@ public class XMLParser {
     /**
      * Returns the first child node with the specified name.
      */
-    public static Node getChildNode(Node node, String name) {
-        Node[] result = getChildNodes(node, name);
+    public static Node getChildNode(final Node node, final String name) {
+        final Node[] result = getChildNodes(node, name);
         if (result.length == 0) {
             return null;
         } else {
@@ -194,8 +194,8 @@ public class XMLParser {
     /**
      * Returns all child nodes with the specified name.
      */
-    public static Node[] getChildNodes(Node node, String name) {
-        List<Node> result = new ArrayList<>();
+    public static Node[] getChildNodes(final Node node, final String name) {
+        final List<Node> result = new ArrayList<>();
 
         Node child = node.getFirstChild();
         while (child != null) {
@@ -274,21 +274,15 @@ public class XMLParser {
      * @param defaultValue default if no such attribute
      */
     public static String getAttribute(final Node node, final String name, final String defaultValue) {
-        // SAX
-        // String result = ((Element) node).getAttribute(name);
-        final String result = getCleanAttribute(node, name);
+        Assert.requireNonNull(node, "node");
+
+        final String result = node.getAttribute(name);
 
         if (result == null || result.length() == 0) {
             return defaultValue;
         }
 
         return result;
-    }
-
-    private static String getCleanAttribute(final Node node, final String name) {
-        Assert.requireNonNull(node, "node");
-
-        return node.getAttribute(name);
     }
 
     /**
@@ -345,9 +339,11 @@ public class XMLParser {
      * @throws ParseException if the JNLP file is invalid
      */
     public static URL getURL(final Node node, final String name, final URL base, final boolean strict) throws ParseException {
+        Assert.requireNonNull(node, "node");
+
         String href;
         if (CODEBASE.equals(name)) {
-            href = getCleanAttribute(node, name);
+            href = node.getAttribute(name);
             //in case of null code can throw an exception later
             //some bogus jnlps have codebase as "" and expect it behaving as "."
             if (href != null && href.trim().isEmpty()) {
