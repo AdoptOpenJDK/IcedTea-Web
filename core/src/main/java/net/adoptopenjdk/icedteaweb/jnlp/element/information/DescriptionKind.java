@@ -1,5 +1,7 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
+import net.sourceforge.jnlp.Parser;
+
 /**
  * The kind attribute defines how a description should be used.
  *
@@ -37,6 +39,7 @@ public enum DescriptionKind {
     }
 
     /**
+     * The attribute value name as used in the JSR-56 specification or the {@link Parser}.
      *
      * @return the attribute value name
      */
