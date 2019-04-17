@@ -98,7 +98,7 @@ class XBasicService implements BasicService {
             // else find JAR where main class was defined.
             //
             // JNLPFile file = app.getJNLPFile();
-            // String mainClass = file.getLaunchInfo().getMainClass()+".class";
+            // String mainClass = file.getEntryPointDesc().getMainClass()+".class";
             // URL jarUrl = app.getClassLoader().getResource(mainClass);
             // go through list of JARDesc to find one matching jarUrl
         }

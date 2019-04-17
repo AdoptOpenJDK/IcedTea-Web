@@ -5,7 +5,8 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.update;
  * update when it is known an update is available before the application is launched, and can have
  * one of the following three values: "always", "prompt-update", and "prompt-run".
  * <p/>
- * see JSR-56, Chapter 3.6 Application Update
+ * @implSpec See <b>JSR-56, Section 3.6 Application Update</b>
+ * for a detailed specification of this class.
  */
 public enum UpdatePolicy {
     /**
