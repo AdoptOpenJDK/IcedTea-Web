@@ -65,6 +65,7 @@ import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -251,7 +252,7 @@ public final class Parser {
         UpdateDesc updateDesc = null;
         Node child = parent.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().getName().equals("update")) {
+            if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
                     throw new ParseException(R("PTwoUpdates"));
                 }
@@ -259,7 +260,7 @@ public final class Parser {
                 Node node = child;
 
                 UpdateCheck check;
-                String checkValue = getAttribute(node, "check", UpdateCheck.TIMEOUT.getValue());
+                String checkValue = getAttribute(node, UpdateDesc.CHECK_ATTRIBUTE, UpdateCheck.TIMEOUT.getValue());
                 switch (checkValue) {
                     case "always":
                         check = UpdateCheck.ALWAYS;
@@ -275,7 +276,7 @@ public final class Parser {
                         break;
                 }
 
-                String policyString = getAttribute(node, "policy", UpdatePolicy.ALWAYS.getValue());
+                String policyString = getAttribute(node, UpdateDesc.POLICY_ATTRIBUTE, UpdatePolicy.ALWAYS.getValue());
                 UpdatePolicy policy;
                 switch (policyString) {
                     case "always":
