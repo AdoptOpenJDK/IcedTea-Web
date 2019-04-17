@@ -201,27 +201,27 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
             Resource r2 = Resource.getResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
             Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
             Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
-            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getURL());
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).URL);
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
+            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getRedirectURL());
+            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
 
             fileForServerWithHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).URL);
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
+            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
 
             versionedFileForServerWithHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
             Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).URL);
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
+            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
 
             versionedFileForServerWithoutHeader.delete();
             Assert.assertNull(resourceDownloader.findBestUrl(r1));
             Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).URL);
+            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
             Assert.assertNull(resourceDownloader.findBestUrl(r4));
 
             fileForServerWithoutHeader.delete();

@@ -57,7 +57,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     static int getUrlResponseCode(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-        return getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod).result;
+        return getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod).responseCode;
     }
 
     /**
@@ -70,24 +70,24 @@ public class ResourceDownloader implements Runnable {
      * @throws IOException
      */
     static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-        final UrlRequestResult result = new UrlRequestResult();
         final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
         for (final Map.Entry<String, String> property : requestProperties.entrySet()) {
             connection.addRequestProperty(property.getKey(), property.getValue());
         }
 
+        final int responseCode;
         if (connection instanceof HttpURLConnection) {
             final HttpURLConnection httpConnection = (HttpURLConnection) connection;
             httpConnection.setRequestMethod(requestMethod.name());
 
-            final int responseCode = httpConnection.getResponseCode();
+             responseCode = httpConnection.getResponseCode();
 
             /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(httpConnection);
-
-            result.result = responseCode;
+        } else {
+            responseCode = HttpURLConnection.HTTP_OK;
         }
 
         final Map<String, List<String>> header = connection.getHeaderFields();
@@ -99,15 +99,20 @@ public class ResourceDownloader implements Runnable {
          * Now setting value for all, and lets upper stack to handle it
          */
         final String possibleRedirect = connection.getHeaderField("Location");
+
+        final URL redirectUrl;
         if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
-            result.URL = new URL(possibleRedirect);
+            redirectUrl = new URL(possibleRedirect);
+        } else {
+            redirectUrl = null;
         }
+
         ConnectionFactory.getConnectionFactory().disconnect(connection);
 
-        result.lastModified = connection.getLastModified();
-        result.length = connection.getContentLengthLong();
+        final long lastModified = connection.getLastModified();
+        final long length = connection.getContentLengthLong();
 
-        return result;
+        return new UrlRequestResult(responseCode, redirectUrl, lastModified, length);
 
     }
 
@@ -155,8 +160,8 @@ public class ResourceDownloader implements Runnable {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
         try {
-            resource.setDownloadLocation(location.URL);
-            final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.URL); // this won't change so should be okay not-synchronized
+            resource.setDownloadLocation(location.redirectUrl);
+            final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.redirectUrl); // this won't change so should be okay not-synchronized
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
@@ -296,7 +301,7 @@ public class ResourceDownloader implements Runnable {
                     requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
 
                     UrlRequestResult response = getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
-                    if (response.result == 511) {
+                    if (response.responseCode == 511) {
                         if (!InetSecurity511Panel.isSkip()) {
 
                             boolean result511 = SecurityDialogs.show511Dialogue(resource);
@@ -309,21 +314,21 @@ public class ResourceDownloader implements Runnable {
                         }
                     }
                     if (response.shouldRedirect()) {
-                        if (response.URL == null) {
-                            LOG.debug("Although {} got redirect {} code for {} request for {} the target was null. Not following", resource.toString(), response.result, requestMethod, url.toExternalForm());
+                        if (response.redirectUrl == null) {
+                            LOG.debug("Although {} got redirect {} code for {} request for {} the target was null. Not following", resource.toString(), response.responseCode, requestMethod, url.toExternalForm());
                         } else {
-                            LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.result, requestMethod, url.toExternalForm(), response.URL.toExternalForm());
+                            LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.responseCode, requestMethod, url.toExternalForm(), response.redirectUrl.toExternalForm());
                             if (!JNLPRuntime.isAllowRedirect()) {
-                                throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.result + ") to " + response.URL.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
+                                throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.responseCode + ") to " + response.redirectUrl.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
                             }
-                            urls.add(response.URL);
+                            urls.add(response.redirectUrl);
                         }
                     } else if (response.isInvalid()) {
-                        LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.result, requestMethod, url.toExternalForm());
+                        LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.responseCode, requestMethod, url.toExternalForm());
                     } else {
                         LOG.debug("best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
-                        if (response.URL == null) {
-                            response.URL = url;
+                        if (response.redirectUrl == null) {
+                            return response.withRedirectUrl(url);
                         }
                         return response; /* This is the best URL */
 
@@ -526,63 +531,59 @@ public class ResourceDownloader implements Runnable {
      */
     static class UrlRequestResult {
 
-        //http response code
-        int result = HttpURLConnection.HTTP_OK;
-        URL URL;
+        private final int responseCode;
+        private final URL redirectUrl;
 
-        Long lastModified;
-        Long length;
+        private final long lastModified;
+        private final long length;
 
-        public UrlRequestResult() {
+        UrlRequestResult(int responseCode, URL redirectUrl, long lastModified, long length) {
+            this.responseCode = responseCode;
+            this.redirectUrl = redirectUrl;
+            this.lastModified = lastModified;
+            this.length = length;
         }
 
-        public UrlRequestResult(URL URL) {
-            this.URL = URL;
+        UrlRequestResult withRedirectUrl(URL url) {
+            return new UrlRequestResult(responseCode, url, lastModified, length);
         }
 
-        URL getURL() {
-            return URL;
+        URL getRedirectURL() {
+            return redirectUrl;
         }
 
         /**
-         * @return whether the result code is redirect one. Rigth now 301-303
-         * and 307-308
+         * @return whether the result code is redirect one. Right now 301-303 and 307-308
          */
-        public boolean shouldRedirect() {
-            return (result == 301
-                    || result == 302
-                    || result == 303/*?*/
-                    || result == 307
-                    || result == 308);
+        boolean shouldRedirect() {
+            return (responseCode == 301
+                    || responseCode == 302
+                    || responseCode == 303 /*?*/
+                    || responseCode == 307
+                    || responseCode == 308);
         }
 
         /**
-         * @return whether the return code is OK one - anything except <200,300)
+         * @return whether the return code is not a OK one - anything except <200 or >=300
          */
         public boolean isInvalid() {
-            return (result < 200 || result >= 300);
+            return (responseCode < 200 || responseCode >= 300);
         }
 
         @Override
         public String toString() {
             return ""
-                    + "url: " + (URL == null ? "null" : URL.toExternalForm()) + "; "
-                    + "result:" + result + "; "
-                    + "lastModified: " + (lastModified == null ? "null" : lastModified.toString()) + "; "
-                    + "length: " + length == null ? "null" : length.toString() + "; ";
+                    + "url: " + (redirectUrl == null ? "null" : redirectUrl.toExternalForm()) + "; "
+                    + "result:" + responseCode + "; "
+                    + "lastModified: " + lastModified + "; "
+                    + "length: " + length + "; ";
         }
     }
 
     private static class RedirectionException extends RuntimeException {
-
-        public RedirectionException(String string) {
+        RedirectionException(String string) {
             super(string);
         }
-
-        public RedirectionException(Throwable cause) {
-            super(cause);
-        }
-
     }
 
 }
