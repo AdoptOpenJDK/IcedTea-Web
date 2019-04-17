@@ -37,6 +37,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
@@ -50,15 +51,14 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
-import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,7 +257,7 @@ public final class Parser {
                 Node node = child;
 
                 UpdateCheck check;
-                String checkValue = getAttribute(node, "check", "timeout");
+                String checkValue = getAttribute(node, "check", UpdateCheck.TIMEOUT.getValue());
                 switch (checkValue) {
                     case "always":
                         check = UpdateCheck.ALWAYS;
@@ -273,7 +273,7 @@ public final class Parser {
                         break;
                 }
 
-                String policyString = getAttribute(node, "policy", "always");
+                String policyString = getAttribute(node, "policy", UpdatePolicy.ALWAYS.getValue());
                 UpdatePolicy policy;
                 switch (policyString) {
                     case "always":
@@ -574,7 +574,7 @@ public final class Parser {
                 addInfo(info, child, null, getSpanText(child, false));
             }
             if ("description".equals(name)) {
-                String kind = getAttribute(child, "kind", "default");
+                String kind = getAttribute(child, "kind", DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
                         throw new ParseException(R("PTwoDescriptions", kind));
