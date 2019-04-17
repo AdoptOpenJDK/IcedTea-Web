@@ -37,13 +37,19 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKi
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
+// There is an understanding between this class and the parser
+// that description and icon types are keyed by "icon-"+kind and
+// "description-"+kind, and that other types are keyed by their
+// specification name.
 public class InformationDesc {
+    public static final String INFORMATION_ELEMENT = "information";
     public static final String LOCALE_ATTRIBUTE = "locale";
 
-    // There is an understanding between this class and the parser
-    // that description and icon types are keyed by "icon-"+kind and
-    // "description-"+kind, and that other types are keyed by their
-    // specification name.
+    public static final String TITLE_ELEMENT = "title";
+    public static final String VENDOR_ELEMENT = "vendor";
+    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String HOMEPAGE_ELEMENT = "homepage";
+    public static final String OFFLINE_ALLOWED_ELEMENT = "offline-allowed";
 
     /**
      * The locales for which the information element should be used.

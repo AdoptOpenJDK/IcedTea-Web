@@ -19,6 +19,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
 public final class AssociationDesc {
+    public static final String ASSOCIATION_ELEMENT = "association";
 
     /** the extensions this application wants to register with */
     private final String[] extensions;

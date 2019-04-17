@@ -45,4 +45,5 @@ public enum DescriptionKind {
      */
     public String getValue() {
         return value;
-    }}
+    }
+}

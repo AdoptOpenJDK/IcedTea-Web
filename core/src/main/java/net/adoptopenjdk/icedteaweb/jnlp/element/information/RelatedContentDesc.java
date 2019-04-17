@@ -19,6 +19,11 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 import java.net.URL;
 
 public class RelatedContentDesc {
+    public static final String RELATED_CONTENT_ELEMENT = "related-content";
+
+    public static final String TITLE_ELEMENT = "title";
+    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String ICON_ELEMENT = "icon";
 
     /** title of the content */
     private String title = null;

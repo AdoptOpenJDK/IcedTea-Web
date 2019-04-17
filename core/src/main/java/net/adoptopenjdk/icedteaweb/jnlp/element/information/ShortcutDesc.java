@@ -20,6 +20,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 public final class ShortcutDesc {
+    public static final String SHORTCUT_ELEMENT = "shortcut";
 
     /** Never create a shortcut */
     public static final String CREATE_NEVER = "NEVER";

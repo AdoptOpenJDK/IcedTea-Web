@@ -25,29 +25,13 @@ import java.net.URL;
  * @version $Revision: 1.8 $
  */
 public class IconDesc {
-
-    /** default icon */
-    public static final Object DEFAULT = "default";
-
-    /** selected icon */
-    public static final Object SELECTED = "selected";
-
-    /** disabled icon */
-    public static final Object DISABLED = "disabled";
-
-    /** rollover icon */
-    public static final Object ROLLOVER = "rollover";
-
-    /** splash icon */
-    public static final Object SPLASH = "splash";
-
-    /** destop shortcut icon */
-    public static final Object SHORTCUT = "shortcut";
+    public static final String ICON_ELEMENT = "icon";
+    public static final String KIND_ATTRIBUTE = "kind";
 
     /** the location of the icon */
     private final URL location;
 
-    /** the type of icon*/
+    /** Used to indicate the use of the icon, such as default, selected, disabled, rollover, splash, and shortcut. */
     private final Object kind;
 
     /** the width, or -1 if unknown*/

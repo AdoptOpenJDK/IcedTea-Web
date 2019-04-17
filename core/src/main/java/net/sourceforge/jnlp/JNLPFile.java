@@ -887,7 +887,7 @@ public class JNLPFile {
             fileVersion = parser.getFileVersion();
             codeBase = parser.getCodeBase();
             sourceLocation = parser.getFileLocation() != null ? parser.getFileLocation() : location;
-            info = parser.getInfo(root);
+            info = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section

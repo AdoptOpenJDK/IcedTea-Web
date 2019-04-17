@@ -88,7 +88,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformation() throws ParseException {
-        List<InformationDesc> infos = parser.getInfo(root);
+        List<InformationDesc> infos = parser.getInformationDescs(root);
         Assert.assertNotNull(infos);
         Assert.assertEquals(1, infos.size());
         InformationDesc info = infos.get(0);
@@ -97,25 +97,25 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformationTitle() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         Assert.assertEquals("Large JNLP", info.getTitle());
     }
 
     @Test
     public void testInformationVendor() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         Assert.assertEquals("The IcedTea Project", info.getVendor());
     }
 
     @Test
     public void testInformationHomePage() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         Assert.assertEquals("http://homepage/", info.getHomepage().toString());
     }
 
     @Test
     public void testInformationDescription() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         Assert.assertEquals("one-line", info.getDescription("one-line"));
         Assert.assertEquals("short", info.getDescription("short"));
         Assert.assertEquals("tooltip", info.getDescription("tooltip"));
@@ -123,14 +123,14 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformationOfflineAllowed() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         Assert.assertEquals(true, info.isOfflineAllowed());
 
     }
 
     @Test
     public void testInformationIcon() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
 
         IconDesc[] icons = info.getIcons(IconDesc.DEFAULT);
         Assert.assertNotNull(icons);
@@ -149,7 +149,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformationShortcut() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
 
         ShortcutDesc shortcut = info.getShortcut();
         Assert.assertNotNull(shortcut);
@@ -162,7 +162,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformationAssociation() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
         AssociationDesc[] associations = info.getAssociations();
         Assert.assertNotNull(associations);
         Assert.assertEquals(1, associations.length);
@@ -181,7 +181,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
     @Test
     public void testInformationRelatedContent() throws ParseException {
-        InformationDesc info = parser.getInfo(root).get(0);
+        InformationDesc info = parser.getInformationDescs(root).get(0);
 
         RelatedContentDesc[] relatedContents = info.getRelatedContents();
         Assert.assertNotNull(relatedContents);
