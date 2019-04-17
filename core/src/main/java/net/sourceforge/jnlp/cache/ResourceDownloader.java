@@ -200,7 +200,7 @@ public class ResourceDownloader implements Runnable {
                 entry.setLastModified(lm);
             }
             entry.setLastUpdated(System.currentTimeMillis());
-            try { 
+            try {
                 //do not die here no metter of cost. Just metadata
                 //is the path from user best to store? He can run some jnlp from temp which then be stored
                 //on contrary, this downloads the jnlp, we actually do not have jnlp parsed during first interaction
@@ -223,7 +223,7 @@ public class ResourceDownloader implements Runnable {
                 } else {
                     entry.setJnlpPath(jnlpPath);
                 }
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             entry.store();
@@ -449,10 +449,9 @@ public class ResourceDownloader implements Runnable {
             entry.unlock();
         }
     }
-    
+
     private void markForDelete(URL location) {
-        CacheEntry entry = new CacheEntry(location, 
-                                          resource.getDownloadVersion());
+        CacheEntry entry = new CacheEntry(location, resource.getDownloadVersion());
         entry.lock();
         try {
             entry.markForDelete();
@@ -461,7 +460,7 @@ public class ResourceDownloader implements Runnable {
             entry.unlock();
         }
     }
-    
+
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
         byte buf[] = new byte[1024];
         int rlen;
