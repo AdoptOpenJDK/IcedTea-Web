@@ -189,12 +189,9 @@ public class CertificateUtils {
      * See http://tools.ietf.org/html/rfc4945#section-6.1 for more information
      * @param cert sertifcate to export
      * @param out stream to print it to
-     * @throws java.io.IOException if io fails
      * @throws java.security.cert.CertificateException if certificate fails
      */
-    public static void dump(Certificate cert, PrintStream out) throws IOException,
-            CertificateException {
-
+    public static void dump(Certificate cert, PrintStream out) throws CertificateException {
         out.println("-----BEGIN CERTIFICATE-----");
         final String encoded = IOUtils.toBase64splitIntoMultipleLines(cert.getEncoded(), 76);
         out.println(encoded);

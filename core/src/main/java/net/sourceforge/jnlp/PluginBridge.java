@@ -457,7 +457,7 @@ public final class PluginBridge extends JNLPFile {
     /**
      * Returns the decoded BASE64 string
      */
-    static byte[] decodeBase64String(String encodedString) throws IOException {
+    static byte[] decodeBase64String(String encodedString) {
         return IOUtils.fromBase64StripWhitespace(encodedString);
     }
 
