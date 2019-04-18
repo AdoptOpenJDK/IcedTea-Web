@@ -57,7 +57,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     /**
-     * Connects to the given URL, and grabs a response code and redirecton if
+     * Connects to the given URL, and grabs a response code and redirection if
      * the URL uses the HTTP protocol, or returns an arbitrary valid HTTP
      * response code.
      *
@@ -302,7 +302,7 @@ public class ResourceDownloader implements Runnable {
 
                             boolean result511 = SecurityDialogs.show511Dialogue(resource);
                             if (!result511) {
-                                throw new RuntimeException("Terminated on users request after encauntering 'http 511 authentication'.");
+                                throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
                             }
                             //try again, what to do with original resource was nowhere specified
                             i--;
@@ -463,7 +463,7 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
-        byte buf[] = new byte[1024];
+        byte[] buf = new byte[1024];
         int rlen;
         try (OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
             while (-1 != (rlen = in.read(buf))) {
@@ -519,9 +519,9 @@ public class ResourceDownloader implements Runnable {
      * HTTP_OK), length and last modified
      *
      * The storing of redirect target is quite obvious The storing length and
-     * last modified may be not, but appearently
+     * last modified may be not, but apparently
      * (http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2591) the url
-     * conenction is not always chaced as expected, and so another request may
+     * connection is not always cached as expected, and so another request may
      * be sent when length and lastmodified are checked
      *
      */
