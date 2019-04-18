@@ -52,11 +52,6 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 public class InfoItem {
 
     public static final String SPLASH = "SPLASH";
-    public static final String title = "title";
-    public static final String vendor = "vendor";
-    public static final String homepage = "homepage";
-    public static final String homepageHref = "href";
-    public static final String description = "description";
     protected String type;
     protected String value;
 

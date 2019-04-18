@@ -45,6 +45,8 @@ import java.util.List;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,21 +70,21 @@ public class InformationElement {
         if (title == null) {
             return;
         }
-        this.title = new InfoItem(InfoItem.title, title);
+        this.title = new InfoItem(InformationDesc.TITLE_ELEMENT, title);
     }
 
     public void setvendor(String vendor) {
         if (vendor == null) {
             return;
         }
-        this.vendor = new InfoItem(InfoItem.vendor, vendor);
+        this.vendor = new InfoItem(InformationDesc.VENDOR_ELEMENT, vendor);
     }
 
     public void setHomepage(String homepage) {
         if (homepage == null) {
             return;
         }
-        this.homepage = new InfoItem(InfoItem.homepage, homepage);
+        this.homepage = new InfoItem(HomepageDesc.HOMEPAGE_ELEMENT, homepage);
     }
 
     public void addDescription(String description) {

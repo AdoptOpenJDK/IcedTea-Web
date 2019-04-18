@@ -38,6 +38,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc.DESCRIPTION_ELEMENT;
+
 /**
  *description element: A short statement about the application. Description 
  * elements are optional. The kind attribute defines how the description should
@@ -63,7 +65,7 @@ public class DescriptionInfoItem extends InfoItem {
     protected DescriptionKind kind;
 
     public DescriptionInfoItem(String value, DescriptionKind kind) {
-        super(InfoItem.description, value);
+        super(DESCRIPTION_ELEMENT, value);
         this.kind = kind;
     }
 

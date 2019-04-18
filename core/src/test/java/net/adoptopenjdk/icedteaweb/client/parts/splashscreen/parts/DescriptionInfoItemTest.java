@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.Assert;
@@ -55,7 +56,7 @@ public class DescriptionInfoItemTest {
         DescriptionInfoItem di = new DescriptionInfoItem("a", DescriptionKind.TOOLTIP);
         Assert.assertEquals("a", di.getValue());
         Assert.assertEquals(DescriptionKind.TOOLTIP, di.getKind());
-        Assert.assertEquals(InfoItem.description, di.getType());
+        Assert.assertEquals(DescriptionDesc.DESCRIPTION_ELEMENT, di.getType());
         di.setKind(DescriptionKind.SHORT);
         Assert.assertEquals(DescriptionKind.SHORT, di.getKind());
 

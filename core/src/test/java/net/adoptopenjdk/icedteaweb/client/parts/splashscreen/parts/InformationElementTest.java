@@ -42,6 +42,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
@@ -75,14 +77,14 @@ public class InformationElementTest {
 
         public String toXml() {
             if (type.equals(homepage)) {
-                return "<" + type + " " + homepageHref + "=\"" + value + "\"/>";
+                return "<" + type + " " + HomepageDesc.HREF_ATTRIBUTE + "=\"" + value + "\"/>";
             }
             return "<" + type + ">" + value + "</" + type + ">";
         }
     }
-    private final static TestInfoItem title = new TestInfoItem(InfoItem.title, "title exp");
-    private final static TestInfoItem vendor = new TestInfoItem(InfoItem.vendor, "vendor exp");
-    private final static TestInfoItem homepage = new TestInfoItem(InfoItem.homepage, "http://homepage.exp");
+    private final static TestInfoItem title = new TestInfoItem(InformationDesc.TITLE_ELEMENT, "title exp");
+    private final static TestInfoItem vendor = new TestInfoItem(InformationDesc.VENDOR_ELEMENT, "vendor exp");
+    private final static TestInfoItem homepage = new TestInfoItem(HomepageDesc.HOMEPAGE_ELEMENT, "http://homepage.exp");
     private final static TestDescriptionInfoItem oneLineD = new TestDescriptionInfoItem("One Line", DescriptionKind.ONE_LINE);
     private final static TestDescriptionInfoItem toolTipD = new TestDescriptionInfoItem("Tooltip", DescriptionKind.TOOLTIP);
     private final static TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionKind.SHORT);
