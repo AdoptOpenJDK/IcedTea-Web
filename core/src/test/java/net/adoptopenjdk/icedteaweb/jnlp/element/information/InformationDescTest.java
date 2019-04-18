@@ -119,10 +119,10 @@ public class InformationDescTest {
         info.addItem("description-" + SHORT.getValue(), "Short Description");
         info.addItem("description-" + TOOLTIP.getValue(), "Tooltip Description");
 
-        assertEquals("Default Description", info.getDescription(DEFAULT.getValue()));
-        assertEquals("One-line Description", info.getDescription(ONE_LINE.getValue()));
-        assertEquals("Short Description", info.getDescription(SHORT.getValue()));
-        assertEquals("Tooltip Description", info.getDescription(TOOLTIP.getValue()));
+        assertEquals("Default Description", info.getDescription(DEFAULT));
+        assertEquals("One-line Description", info.getDescription(ONE_LINE));
+        assertEquals("Short Description", info.getDescription(SHORT));
+        assertEquals("Tooltip Description", info.getDescription(TOOLTIP));
     }
 
     @Test

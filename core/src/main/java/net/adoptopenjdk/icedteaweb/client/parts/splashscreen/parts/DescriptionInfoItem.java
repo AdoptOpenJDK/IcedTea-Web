@@ -36,6 +36,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+
 /**
  *description element: A short statement about the application. Description 
  * elements are optional. The kind attribute defines how the description should
@@ -58,18 +60,18 @@ package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
  */
 public class DescriptionInfoItem extends InfoItem {
 
-    protected String kind;
+    protected DescriptionKind kind;
 
-    public DescriptionInfoItem(String value, String kind) {
+    public DescriptionInfoItem(String value, DescriptionKind kind) {
         super(InfoItem.description, value);
         this.kind = kind;
     }
 
-    public String getKind() {
+    public DescriptionKind getKind() {
         return kind;
     }
 
-    public void setKind(String kind) {
+    public void setKind(DescriptionKind kind) {
         this.kind = kind;
     }
 
@@ -113,7 +115,7 @@ public class DescriptionInfoItem extends InfoItem {
 
     @Override
     public String toString() {
-        return super.toString() + " (" + getKind() + ")";
+        return super.toString() + " (" + (getKind()== null? null : getKind().getValue()) + ")";
     }
 
   

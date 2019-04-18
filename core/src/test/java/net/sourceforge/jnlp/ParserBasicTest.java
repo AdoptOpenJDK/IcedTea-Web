@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -117,9 +118,9 @@ public class ParserBasicTest extends NoStdOutErrTest {
     @Test
     public void testInformationDescription() throws ParseException {
         InformationDesc info = parser.getInformationDescs(root).get(0);
-        Assert.assertEquals("one-line", info.getDescription("one-line"));
-        Assert.assertEquals("short", info.getDescription("short"));
-        Assert.assertEquals("tooltip", info.getDescription("tooltip"));
+        Assert.assertEquals("one-line", info.getDescription(DescriptionKind.ONE_LINE));
+        Assert.assertEquals("short", info.getDescription(DescriptionKind.SHORT));
+        Assert.assertEquals("tooltip", info.getDescription(DescriptionKind.TOOLTIP));
     }
 
     @Test
