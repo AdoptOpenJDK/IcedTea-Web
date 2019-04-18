@@ -48,7 +48,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.JNLPFile.Match;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,61 +55,6 @@ import org.junit.Test;
 public class JNLPFileTest extends NoStdOutErrTest{
     Locale jvmLocale = new Locale("en", "CA", "utf8");
     MockJNLPFile file = new MockJNLPFile(jvmLocale);
-
-    @Test
-    public void testCompareAll() {
-        Locale[] correctAvailable = { new Locale("en", "CA", "utf8") };
-        Assert.assertTrue("Entire locale should match but did not.",
-                file.localeMatches(jvmLocale, correctAvailable, Match.LANG_COUNTRY_VARIANT));
-
-        Locale[] mismatchedAvailable = { new Locale("en", "CA", "utf16") };
-        Assert.assertFalse("Should not match variant but did.",
-                file.localeMatches(jvmLocale, mismatchedAvailable, Match.LANG_COUNTRY_VARIANT));
-    }
-
-    @Test
-    public void testLangAndCountry() {
-        Locale[] correctAvailable = { new Locale("en", "CA") };
-        Assert.assertTrue("Should match language and country, ignoring variant but did not.",
-                file.localeMatches(jvmLocale, correctAvailable, Match.LANG_COUNTRY));
-
-        Locale[] mismatchedAvailable = { new Locale("en", "EN") };
-        Assert.assertFalse("Should not match country but did.",
-                file.localeMatches(jvmLocale, mismatchedAvailable, Match.LANG_COUNTRY));
-
-        Locale[] extraMismatched = { new Locale("en", "CA", "utf16") };
-        Assert.assertFalse("Should not match because of extra variant but did.",
-                file.localeMatches(jvmLocale, extraMismatched, Match.LANG_COUNTRY));
-    }
-
-    @Test
-    public void testLangOnly() {
-        Locale[] correctAvailable = { new Locale("en") };
-        Assert.assertTrue("Should match only language but did not.",
-                file.localeMatches(jvmLocale, correctAvailable, Match.LANG));
-
-        Locale[] mismatchedAvailable = { new Locale("fr", "CA", "utf8") };
-        Assert.assertFalse("Should not match language but did.",
-                file.localeMatches(jvmLocale, mismatchedAvailable, Match.LANG));
-
-        Locale[] extraMismatched = { new Locale("en", "EN") };
-        Assert.assertFalse("Should not match because of extra country but did.",
-                file.localeMatches(jvmLocale, extraMismatched, Match.LANG));
-    }
-
-    @Test
-    public void testNoLocalAvailable() {
-        Assert.assertTrue("Null locales should match but did not.",
-                file.localeMatches(jvmLocale, null, Match.GENERALIZED));
-
-        Locale[] emptyAvailable = {};
-        Assert.assertTrue("Empty locales list should match but did not.",
-                file.localeMatches(jvmLocale, emptyAvailable, Match.GENERALIZED));
-
-        Locale[] mismatchAvailable = { new Locale("fr", "FR", "utf16") };
-        Assert.assertFalse("Locales list should not match generalized case but did.",
-                file.localeMatches(jvmLocale, mismatchAvailable, Match.GENERALIZED));
-    }
 
     @Test
     public void testCodebaseConstructorWithInputstreamAndCodebase() throws Exception {

@@ -49,6 +49,8 @@ import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
+import net.sourceforge.jnlp.util.LocaleUtils;
+import net.sourceforge.jnlp.util.LocaleUtils.Match;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,8 +171,6 @@ public class JNLPFile {
             // null values will still work, and app can set defaults later
         }
     }
-
-    static enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
 
     /**
      * Empty stub, allowing child classes to override the constructor
@@ -538,7 +538,7 @@ public class JNLPFile {
 
                 for (Match precision : Match.values()) {
                     for (InformationDesc infoDesc : JNLPFile.this.info) {
-                        if (localeMatches(locale, infoDesc.getLocales(), precision)) {
+                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
                             result.addAll(infoDesc.getItems(key));
                         }
                     }
@@ -555,7 +555,7 @@ public class JNLPFile {
                 for (Match precision : Match.values()) {
                     for (InformationDesc infoDesc : JNLPFile.this.info) {
                         String title = infoDesc.getTitle();
-                        if (localeMatches(locale, infoDesc.getLocales(), precision)
+                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
                                 && title != null && !"".equals(title)) {
                             return title;
                         }
@@ -570,7 +570,7 @@ public class JNLPFile {
                 for (Match precision : Match.values()) {
                     for (InformationDesc infoDesc : JNLPFile.this.info) {
                         String vendor = infoDesc.getVendor();
-                        if (localeMatches(locale, infoDesc.getLocales(), precision)
+                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
                                 && vendor != null && !"".equals(vendor)) {
                             return vendor;
                         }
@@ -626,7 +626,7 @@ public class JNLPFile {
                 for (ResourcesDesc rescDesc : resources) {
                     boolean hasUsableLocale = false;
                     for (Match match : Match.values()) {
-                        hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
+                        hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
                     }
                     if (hasUsableLocale
                             && stringMatches(os, rescDesc.getOS())
@@ -674,7 +674,7 @@ public class JNLPFile {
         for (ResourcesDesc rescDesc: resources) {
             boolean hasUsableLocale = false;
             for (Match match : Match.values()) {
-                hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
+                hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
             }
             if (hasUsableLocale
                     && stringMatches(os, rescDesc.getOS())
@@ -782,59 +782,6 @@ public class JNLPFile {
         defaultOS = os;
         defaultArch = arch;
         defaultLocale = locale;
-    }
-
-    /**
-     * Returns whether a locale is matched by one of more other
-     * locales. Only the non-empty language, country, and variant
-     * codes are compared; for example, a requested locale of
-     * Locale("","","") would always return true.
-     *
-     * @param requested the requested locale
-     * @param available the available locales
-     * @param matchLevel the depth with which to match locales.
-     * @return {@code true} if {@code requested} matches any of {@code available}, or if
-     * {@code available} is empty or {@code null}.
-     * @see Locale
-     * @see Match
-     */
-    public static boolean localeMatches(Locale requested, Locale[] available, Match matchLevel) {
-
-        if (matchLevel == Match.GENERALIZED)
-            return available == null || available.length == 0;
-
-        String language = requested.getLanguage(); // "" but never null
-        String country = requested.getCountry();
-        String variant = requested.getVariant();
-
-        for (Locale locale : available) {
-            switch (matchLevel) {
-                case LANG:
-                    if (!language.isEmpty()
-                            && language.equals(locale.getLanguage())
-                            && locale.getCountry().isEmpty()
-                            && locale.getVariant().isEmpty())
-                        return true;
-                    break;
-                case LANG_COUNTRY:
-                    if (!language.isEmpty()
-                            && language.equals(locale.getLanguage())
-                            && !country.isEmpty()
-                            && country.equals(locale.getCountry())
-                            && locale.getVariant().isEmpty())
-                        return true;
-                    break;
-                case LANG_COUNTRY_VARIANT:
-                    if (language.equals(locale.getLanguage())
-                            && country.equals(locale.getCountry())
-                            && variant.equals(locale.getVariant()))
-                        return true;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return false;
     }
 
     /**

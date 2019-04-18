@@ -63,12 +63,12 @@ public class TinyHttpdImplTest {
             String newUrl = TinyHttpdImpl.urlToFilePath(url);
 
             Assert.assertFalse("File path should not contain query string: " + newUrl, newUrl.contains("?"));
-            Assert.assertTrue("File path should be relative: " + newUrl, newUrl.startsWith("./"));
+            Assert.assertTrue("File path should be relative: " + newUrl, newUrl.startsWith("." + File.separator));
             Assert.assertFalse("File path should not contain \"/XslowX\":" + newUrl,
                     newUrl.toLowerCase().contains("/XslowX".toLowerCase()));
 
             if (url.endsWith("/")) {
-                Assert.assertTrue(newUrl.endsWith("/index.html"));
+                Assert.assertTrue(newUrl.endsWith(File.separator + "index.html"));
             }
         }
     }

@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+
+import static net.adoptopenjdk.icedteaweb.StringUtils.splitIntoMultipleLines;
 
 /**
  * Copied from RICO (https://github.com/rico-projects/rico)
@@ -22,14 +23,7 @@ public class IOUtils {
 
     public static String toBase64splitIntoMultipleLines(final byte[] bytes, final int maxCharsPerLine) {
         final String encoded = toBase64(bytes);
-        final List<String> lines = new ArrayList<>();
-        String tmp = encoded;
-        while (tmp.length() > maxCharsPerLine) {
-            lines.add(tmp.substring(0, maxCharsPerLine));
-            tmp = tmp.substring(maxCharsPerLine);
-        }
-        lines.add(tmp);
-
+        final List<String> lines = splitIntoMultipleLines(encoded, maxCharsPerLine);
         return String.join(System.lineSeparator(), lines);
     }
 

@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,10 +59,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jvm.JVMUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -435,7 +436,7 @@ public final class Parser {
         URL location = getURL(node, "href", base, strict);
         String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
-            checkVMArgs(vmArgs);
+            JVMUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }
@@ -1059,7 +1060,7 @@ public final class Parser {
         final String localeParts[] = splitString(getAttribute(node, LOCALE_ATTRIBUTE, ""));
 
         for (final String localePart : localeParts) {
-            final Locale l = getLocale(localePart);
+            final Locale l = LocaleUtils.getLocale(localePart);
             if (l != null) {
                 locales.add(l);
             }
@@ -1068,28 +1069,6 @@ public final class Parser {
         return locales.toArray(new Locale[locales.size()]);
     }
 
-    /**
-     * Returns a {@link Locale} from a locale string. Each locale is specified by a language identifier,
-     * possibly country identifier, and possibly a variant. The syntax is as follows:
-     * <pre>
-     * locale ::= language [ "_" country [ "_" variant ] ]
-     * </pre>
-     *
-     * @param localeString the locale string
-     * @return locale of document
-     */
-    private static Locale getLocale(final String localeString) throws ParseException {
-        if (Objects.isNull(localeString) || localeString.length() < 2) {
-            throw new ParseException(R("PIllegalLocale", localeString));
-        }
-
-        final String language = localeString.substring(0, 2);
-        final String country = (localeString.length() < 5) ? "" : localeString.substring(3, 5);
-        final String variant = (localeString.length() > 7) ? localeString.substring(6) : "";
-
-        // null is not allowed n locale but "" is
-        return new Locale(language, country, variant);
-    }
 
     /**
      * @return a Version from the specified attribute and default value.
@@ -1106,111 +1085,6 @@ public final class Parser {
         } else {
             return new Version(version);
         }
-    }
-
-    /**
-     * Check that the VM args are valid and safe
-     *
-     * @param vmArgs a string containing the args
-     * @throws ParseException if the VM arguments are invalid or dangerous
-     */
-    private void checkVMArgs(String vmArgs) throws IllegalArgumentException {
-        if (vmArgs == null) {
-            return;
-        }
-
-        List<String> validArguments = Arrays.asList(getValidVMArguments());
-        List<String> validStartingArguments = Arrays.asList(getValidStartingVMArguments());
-
-        String[] arguments = vmArgs.split(" ");
-        boolean argumentIsValid;
-        for (String argument : arguments) {
-            argumentIsValid = false;
-
-            if (validArguments.contains(argument)) {
-                argumentIsValid = true;
-            } else {
-                for (String validStartingArgument : validStartingArguments) {
-                    if (argument.startsWith(validStartingArgument)) {
-                        argumentIsValid = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!argumentIsValid) {
-                throw new IllegalArgumentException(argument);
-            }
-        }
-
-    }
-
-    /**
-     * Returns an array of valid (ie safe and supported) arguments for the JVM
-     *
-     * Based on
-     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
-     */
-    private String[] getValidVMArguments() {
-        return new String[]{
-            "-d32", /* use a 32-bit data model if available */
-            "-client", /* to select the client VM */
-            "-server", /* to select the server VM */
-            "-verbose", /* enable verbose output */
-            "-version", /* print product version and exit */
-            "-showversion", /* print product version and continue */
-            "-help", /* print this help message */
-            "-X", /* print help on non-standard options */
-            "-ea", /* enable assertions */
-            "-enableassertions", /* enable assertions */
-            "-da", /* disable assertions */
-            "-disableassertions", /* disable assertions */
-            "-esa", /* enable system assertions */
-            "-enablesystemassertions", /* enable system assertions */
-            "-dsa", /* disable system assertione */
-            "-disablesystemassertions", /* disable system assertione */
-            "-Xmixed", /* mixed mode execution (default) */
-            "-Xint", /* interpreted mode execution only */
-            "-Xnoclassgc", /* disable class garbage collection */
-            "-Xincgc", /* enable incremental garbage collection */
-            "-Xbatch", /* disable background compilation */
-            "-Xprof", /* output cpu profiling data */
-            "-Xdebug", /* enable remote debugging */
-            "-Xfuture", /* enable strictest checks, anticipating future default */
-            "-Xrs", /* reduce use of OS signals by Java/VM (see documentation) */
-            "-XX:+ForceTimeHighResolution", /* use high resolution timer */
-            "-XX:-ForceTimeHighResolution", /* use low resolution (default) */};
-    }
-
-    /**
-     * Returns an array containing the starts of valid (ie safe and supported)
-     * arguments for the JVM
-     *
-     * Based on
-     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
-     */
-    private String[] getValidStartingVMArguments() {
-        return new String[]{
-            "-ea", /* enable assertions for classes */
-            "-enableassertions", /* enable assertions for classes */
-            "-da", /* disable assertions for classes */
-            "-disableassertions", /* disable assertions for classes */
-            "-verbose", /* enable verbose output */
-            "-Xms", /* set initial Java heap size */
-            "-Xmx", /* set maximum Java heap size */
-            "-Xss", /* set java thread stack size */
-            "-XX:NewRatio", /* set Ratio of new/old gen sizes */
-            "-XX:NewSize", /* set initial size of new generation */
-            "-XX:MaxNewSize", /* set max size of new generation */
-            "-XX:PermSize", /* set initial size of permanent gen */
-            "-XX:MaxPermSize", /* set max size of permanent gen */
-            "-XX:MaxHeapFreeRatio", /* heap free percentage (default 70) */
-            "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
-            "-XX:UseSerialGC", /* use serial garbage collection */
-            "-XX:ThreadStackSize", /* thread stack size (in KB) */
-            "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
-            "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
-            "-XX:MaxDirectMemorySize",};
     }
 
     public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
