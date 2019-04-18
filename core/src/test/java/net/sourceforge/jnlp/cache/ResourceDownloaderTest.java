@@ -129,10 +129,10 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD);
+            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD);
+            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();
@@ -144,10 +144,10 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD);
+            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
             f.delete();
-            i = ResourceDownloader.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD);
+            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
         } finally {
             redirectErrBack();
@@ -159,10 +159,10 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET);
+            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceDownloader.getUrlResponseCode(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET);
+            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();
@@ -174,10 +174,10 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErr();
         try {
             File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET);
+            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
             f.delete();
-            i = ResourceDownloader.getUrlResponseCode(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET);
+            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
             Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
         } finally {
             redirectErrBack();

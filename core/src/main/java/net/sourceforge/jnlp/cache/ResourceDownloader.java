@@ -56,10 +56,6 @@ public class ResourceDownloader implements Runnable {
         this.lock = lock;
     }
 
-    static int getUrlResponseCode(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-        return getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod).responseCode;
-    }
-
     /**
      * Connects to the given URL, and grabs a response code and redirecton if
      * the URL uses the HTTP protocol, or returns an arbitrary valid HTTP
@@ -550,6 +546,10 @@ public class ResourceDownloader implements Runnable {
 
         URL getRedirectURL() {
             return redirectUrl;
+        }
+
+        int getResponseCode() {
+            return responseCode;
         }
 
         /**
