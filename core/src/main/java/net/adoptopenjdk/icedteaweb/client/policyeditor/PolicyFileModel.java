@@ -36,10 +36,15 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.channels.Channels;
 import java.nio.channels.FileLock;
 import java.util.Collection;
 import java.util.Collections;
@@ -110,7 +115,7 @@ public class PolicyFileModel {
         clearPermissions();
         final FileLock fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);
         try {
-            parser.read(new FileReader(file));
+            parser.read(new BufferedReader(new InputStreamReader(Channels.newInputStream(fileLock.channel()))));
             keystoreInfo = new KeystoreInfo(parser.getKeyStoreUrl(), parser.getKeyStoreType(), parser.getKeyStoreProvider(), parser.getStorePassURL());
             final Set<PolicyParser.GrantEntry> grantEntries = new HashSet<>(Collections.list(parser.grantElements()));
             synchronized (permissionsMap) {
@@ -183,7 +188,7 @@ public class PolicyFileModel {
                     parser.add(grantEntry);
                 }
             }
-            parser.write(new FileWriter(file));
+            parser.write(new BufferedWriter(new OutputStreamWriter(Channels.newOutputStream(fileLock.channel()))));
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } finally {
