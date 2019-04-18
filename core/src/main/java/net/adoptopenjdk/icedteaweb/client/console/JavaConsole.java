@@ -265,7 +265,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         c.weighty = 0;
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2, 0, 0, 0));
+        buttonPanel.setLayout(new GridLayout(2, 0, 10, 10));
         contentPanel.add(buttonPanel, c);
 
         JButton gcButton = new JButton(R("CONSOLErungc"));
