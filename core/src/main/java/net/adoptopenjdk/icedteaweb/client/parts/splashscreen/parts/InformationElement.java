@@ -39,16 +39,19 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 
 /**
  * This class is wrapper arround the *information* tag element which should
@@ -67,21 +70,21 @@ public class InformationElement {
         if (title == null) {
             return;
         }
-        this.title = new InfoItem(InfoItem.title, title);
+        this.title = new InfoItem(InformationDesc.TITLE_ELEMENT, title);
     }
 
     public void setvendor(String vendor) {
         if (vendor == null) {
             return;
         }
-        this.vendor = new InfoItem(InfoItem.vendor, vendor);
+        this.vendor = new InfoItem(InformationDesc.VENDOR_ELEMENT, vendor);
     }
 
     public void setHomepage(String homepage) {
         if (homepage == null) {
             return;
         }
-        this.homepage = new InfoItem(InfoItem.homepage, homepage);
+        this.homepage = new InfoItem(HomepageDesc.HOMEPAGE_ELEMENT, homepage);
     }
 
     public void addDescription(String description) {
@@ -94,7 +97,7 @@ public class InformationElement {
      * But I do not consider it as good idea to force this behaviour for somesing like psalsh screen,
      * so I jsut replace the previous one with new one. without any warning
      */
-    public void addDescription(String description, String kind) {
+    public void addDescription(String description, DescriptionKind kind) {
         if (description == null) {
             return;
         }
@@ -112,7 +115,7 @@ public class InformationElement {
 
     public InfoItem getBestMatchingDescriptionForSplash() {
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindOneLine.equals(d.getKind())) {
+            if (DescriptionKind.ONE_LINE.equals(d.getKind())) {
                 return d;
             }
         }
@@ -126,7 +129,7 @@ public class InformationElement {
 
     public InfoItem getLongestDescriptionForSplash() {
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindShort.equals(d.getKind())) {
+            if (DescriptionKind.SHORT.equals(d.getKind())) {
                 return d;
             }
         }
@@ -136,12 +139,12 @@ public class InformationElement {
             }
         }
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindOneLine.equals(d.getKind())) {
+            if (DescriptionKind.ONE_LINE.equals(d.getKind())) {
                 return d;
             }
         }
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindToolTip.equals(d.getKind())) {
+            if (DescriptionKind.TOOLTIP.equals(d.getKind())) {
                 return d;
             }
         }
@@ -227,10 +230,10 @@ public class InformationElement {
             ie.setHomepage(homePage);
             ie.setTitle(file.getInformation().getTitle());
             ie.setvendor(file.getInformation().getVendor());
-            ie.addDescription(file.getInformation().getDescriptionStrict((String) (InformationDesc.DEFAULT)));
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindOneLine), InfoItem.descriptionKindOneLine);
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindShort), InfoItem.descriptionKindShort);
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DEFAULT));
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.ONE_LINE), DescriptionKind.ONE_LINE);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.SHORT), DescriptionKind.SHORT);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.TOOLTIP), DescriptionKind.TOOLTIP);
             return ie;
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

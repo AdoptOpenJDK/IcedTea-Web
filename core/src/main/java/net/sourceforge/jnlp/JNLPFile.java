@@ -78,8 +78,11 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
-
     private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
+
+    public static final String JNLP_ROOT_ELEMENT = "jnlp";
+    public static final String SPEC_ATTRIBUTE = "spec";
+    public static final String VERSION_ATTRIBUTE = "version";
 
     public static enum ManifestBoolean {
         TRUE, FALSE, UNDEFINED;
@@ -831,7 +834,7 @@ public class JNLPFile {
             fileVersion = parser.getFileVersion();
             codeBase = parser.getCodeBase();
             sourceLocation = parser.getFileLocation() != null ? parser.getFileLocation() : location;
-            info = parser.getInfo(root);
+            info = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section

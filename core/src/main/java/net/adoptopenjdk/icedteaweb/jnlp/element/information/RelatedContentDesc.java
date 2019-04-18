@@ -1,4 +1,5 @@
 // Copyright (C) 2009 Red Hat, Inc.
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,31 +18,50 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import java.net.URL;
+import net.adoptopenjdk.icedteaweb.Assert;
 
+/**
+ * The optional related-content element describes an additional piece of related content, such as a
+ * readme file, help pages, or links to registration pages, as a hint to the JNLP Client.
+ * The application is asking that this content be included in its desktop integration.
+ * The related-content element has a manditory href attribute.
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
+ */
 public class RelatedContentDesc {
+    public static final String RELATED_CONTENT_ELEMENT = "related-content";
+    public static final String HREF_ATTRIBUTE = "href";
 
-    /** title of the content */
+    public static final String TITLE_ELEMENT = "title";
+    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String ICON_ELEMENT = "icon";
+
+    /** The name of the related content. */
     private String title = null;
 
-    /** the description of the content */
+    /** A short discription of the related content. */
     private String description = null;
 
-    /** the location of the content */
+    /** The mandatory location of the content. */
     private final URL location;
 
-    /** the icon for this related content */
+    /** The icon can be used by the JNLP Client to identify the related content to the user. */
     private IconDesc icon = null;
 
     /**
-     * Create a related-content descriptor
-     * @param href the url of the related content
+     * Create a related-content descriptor.
+     *
+     * @param location the location of the related content
      */
-    public RelatedContentDesc(final URL href) {
-        this.location = href;
+    public RelatedContentDesc(final URL location) {
+        Assert.requireNonNull(location, "location");
+
+        this.location = location;
     }
 
     /**
-     * Set the title of this content
+     * Set the title of this content.
      * @param title the title of this content
      */
     public void setTitle(final String title) {
@@ -49,14 +69,15 @@ public class RelatedContentDesc {
     }
 
     /**
-     * @return the title of this content..
+     * @return the title of this content.
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Set the description of this related content
+     * Set the description of this related content.
+     *
      * @param description to be set
      */
     public void setDescription(final String description) {
@@ -71,7 +92,7 @@ public class RelatedContentDesc {
     }
 
     /**
-     * @return the location of the related content. Not null
+     * @return the mandatory location of the related content.
      */
     public URL getLocation() {
         return location;
@@ -86,10 +107,9 @@ public class RelatedContentDesc {
     }
 
     /**
-     * @return the icon descriptor for the realted content
+     * @return the icon descriptor for the related content
      */
     public IconDesc getIcon() {
         return icon;
     }
-
 }

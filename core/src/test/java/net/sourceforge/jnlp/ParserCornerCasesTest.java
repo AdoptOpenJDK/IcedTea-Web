@@ -162,7 +162,7 @@ public class ParserCornerCasesTest {
                 "</description></information></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
         Parser p = new Parser(null, null, root, defaultParser);
-        Assert.assertEquals(" -->", p.getInfo(root).get(0).getDescription());
+        Assert.assertEquals(" -->", p.getInformationDescs(root).get(0).getDescription());
     }
 
     @Test

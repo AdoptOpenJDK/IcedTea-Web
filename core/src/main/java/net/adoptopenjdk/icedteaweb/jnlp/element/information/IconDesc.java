@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,32 +24,25 @@ import java.net.URL;
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.8 $
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
  */
 public class IconDesc {
+    public static final String ICON_ELEMENT = "icon";
 
-    /** default icon */
-    public static final Object DEFAULT = "default";
-
-    /** selected icon */
-    public static final Object SELECTED = "selected";
-
-    /** disabled icon */
-    public static final Object DISABLED = "disabled";
-
-    /** rollover icon */
-    public static final Object ROLLOVER = "rollover";
-
-    /** splash icon */
-    public static final Object SPLASH = "splash";
-
-    /** destop shortcut icon */
-    public static final Object SHORTCUT = "shortcut";
+    public static final String KIND_ATTRIBUTE = "kind";
+    public static final String WIDTH_ATTRIBUTE = "width";
+    public static final String HEIGHT_ATTRIBUTE = "height";
+    public static final String SIZE_ATTRIBUTE = "size";
+    public static final String DEPTH_ATTRIBUTE = "depth";
+    public static final String HREF_ATTRIBUTE = "href";
 
     /** the location of the icon */
     private final URL location;
 
-    /** the type of icon*/
-    private final Object kind;
+    /** Used to indicate the use of the icon, such as default, selected, disabled, rollover, splash, and shortcut. */
+    private final IconKind kind;
 
     /** the width, or -1 if unknown*/
     private final int width;
@@ -72,7 +66,7 @@ public class IconDesc {
      * @param depth the depth, or -1 if unknown
      * @param size the size, or -1 if unknown
      */
-    public IconDesc(final URL location, final Object kind, final int width, final int height, final int depth, final int size) {
+    public IconDesc(final URL location, final IconKind kind, final int width, final int height, final int depth, final int size) {
         this.location = location;
         this.kind = kind;
         this.width = width;
@@ -91,7 +85,7 @@ public class IconDesc {
     /**
      * @return the icon type.
      */
-    public Object getKind() {
+    public IconKind getKind() {
         return kind;
     }
 

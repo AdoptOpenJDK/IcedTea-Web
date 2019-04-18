@@ -16,9 +16,20 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
+/**
+ * The optional menu element can be used to indicate an application's preference for putting a menu item
+ * in the users start menus. The menu element can have a sub-menu attribute.
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
+ */
 public class MenuDesc {
+    public static final String SUBMENU_ATTRIBUTE = "submenu";
 
-    /** the submenu for this menu entry */
+    /**
+     * The optional submenu attribute can be used to indicate an application's preference for where to
+     * place the menu item, and can contain any string value.
+     */
     private final String subMenu;
 
     /**
@@ -35,5 +46,4 @@ public class MenuDesc {
     public String getSubMenu() {
         return subMenu;
     }
-
 }

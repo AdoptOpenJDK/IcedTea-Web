@@ -25,9 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -36,7 +38,10 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
@@ -64,6 +69,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HREF_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNode;
@@ -170,7 +183,7 @@ public final class Parser {
      * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
+    public Parser(final JNLPFile file, final URL base, final Node root, final ParserSettings settings) throws ParseException {
         this(file, base, root, settings, null);
     }
 
@@ -190,19 +203,19 @@ public final class Parser {
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
+    public Parser(final JNLPFile file, final URL base, final Node root, final ParserSettings settings, final URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
         this.strict = settings.isStrict();
         this.allowExtensions = settings.isExtensionAllowed();
 
         // ensure it's a JNLP node
-        if (root == null || !root.getNodeName().getName().equals("jnlp")) {
+        if (root == null || !root.getNodeName().getName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
             throw new ParseException(R("PInvalidRoot"));
         }
 
         // JNLP tag information
-        this.spec = getVersion(root, "spec", "1.0+");
+        this.spec = getVersion(root, JNLPFile.SPEC_ATTRIBUTE, "1.0+");
 
         try {
             this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
@@ -226,7 +239,7 @@ public final class Parser {
      * @return version of file
      */
     public Version getFileVersion() {
-        return getVersion(root, "version", null);
+        return getVersion(root, JNLPFile.VERSION_ATTRIBUTE, null);
     }
 
     /**
@@ -253,19 +266,19 @@ public final class Parser {
         return spec;
     }
 
-    UpdateDesc getUpdate(Node parent) throws ParseException {
+    UpdateDesc getUpdate(final Node parent) throws ParseException {
         UpdateDesc updateDesc = null;
         Node child = parent.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().getName().equals("update")) {
+            if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
                     throw new ParseException(R("PTwoUpdates"));
                 }
 
-                Node node = child;
+                final Node node = child;
 
-                UpdateCheck check;
-                String checkValue = getAttribute(node, "check", "timeout");
+                final UpdateCheck check;
+                final String checkValue = getAttribute(node, UpdateDesc.CHECK_ATTRIBUTE, UpdateCheck.TIMEOUT.getValue());
                 switch (checkValue) {
                     case "always":
                         check = UpdateCheck.ALWAYS;
@@ -281,8 +294,8 @@ public final class Parser {
                         break;
                 }
 
-                String policyString = getAttribute(node, "policy", "always");
-                UpdatePolicy policy;
+                final  String policyString = getAttribute(node, UpdateDesc.POLICY_ATTRIBUTE, UpdatePolicy.ALWAYS.getValue());
+                final UpdatePolicy policy;
                 switch (policyString) {
                     case "always":
                         policy = UpdatePolicy.ALWAYS;
@@ -321,16 +334,16 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    public List<ResourcesDesc> getResources(Node parent, boolean j2se)
+    public List<ResourcesDesc> getResources(final Node parent, final boolean j2se)
             throws ParseException {
-        List<ResourcesDesc> result = new ArrayList<>();
-        Node resources[] = getChildNodes(parent, "resources");
+        final List<ResourcesDesc> result = new ArrayList<>();
+        final Node resources[] = getChildNodes(parent, ResourcesDesc.RESOURCES_ELEMENT);
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
             throw new ParseException(R("PNoResources"));
         }
-        for (Node resource : resources) {
+        for (final Node resource : resources) {
             result.add(getResourcesDesc(resource, j2se));
         }
         return result;
@@ -350,8 +363,8 @@ public final class Parser {
         ResourcesDesc resources
                 = new ResourcesDesc(file,
                         getLocales(node),
-                        splitString(getAttribute(node, "os", null)),
-                        splitString(getAttribute(node, "arch", null)));
+                        splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
+                        splitString(getAttribute(node, ResourcesDesc.ARCH_ATTRIBUTE, null)));
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -532,95 +545,103 @@ public final class Parser {
     }
 
     /**
-     * @return all of the information elements under the specified node.
+     * Search through the information elements in the order specified in the JNLP file (resp. the specified node).
+     * <p/>
+     * For each information element, it checks if the value specified in the locale attribute matches the current
+     * locale. If a match is found, the values specified in that information element will be used, possibly
+     * overriding values found in previous information elements. Thus, the locale-independent information
+     * needs only to be specified once, in the information element without the locale attribute.
      *
-     * @param parent the parent node (jnlp)
+     * @param parent the parent node containing the information elements in the order specified in the JNLP file
+     * @return all of the information elements under the specified node.
      * @throws ParseException if the JNLP file is invalid
+     *
+     * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+     * for a detailed specification of this functionality.
      */
-    public List<InformationDesc> getInfo(Node parent)
-            throws ParseException {
-        List<InformationDesc> result = new ArrayList<>();
-        Node info[] = getChildNodes(parent, "information");
+    public List<InformationDesc> getInformationDescs(final Node parent) throws ParseException {
+        final List<InformationDesc> result = new ArrayList<>();
+        final Node informationElements[] = getChildNodes(parent, INFORMATION_ELEMENT);
 
-        // ensure that there are at least one information section present
-        if (info.length == 0) {
+        // ensure that there is at least one information element present in the JNLP file
+        if (informationElements.length == 0) {
             throw new MissingInformationException();
         }
 
-        // create objects from the info sections
-        for (Node infoNode : info) {
-            result.add(getInformationDesc(infoNode));
+        // create an information descriptor for each information element
+        for (final Node informationElement : informationElements) {
+            result.add(getInformationDesc(informationElement));
         }
 
         return result;
     }
 
     /**
-     * @return the information element at the specified node.
+     * Returns the information element at the specified node.
      *
-     * @param node the information node
+     * @param node the node containing the information element as specified in the JNLP file
+     * @return the information element at the specified node.
      * @throws ParseException if the JNLP file is invalid
+     *
+     * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+     * for a detailed specification of this functionality.
      */
-    InformationDesc getInformationDesc(Node node) throws ParseException {
-        List<String> descriptionsUsed = new ArrayList<>();
-
-        // locale
-        Locale locales[] = getLocales(node);
+    private InformationDesc getInformationDesc(final Node node) throws ParseException {
+        final List<String> descriptionsUsed = new ArrayList<>();
 
         // create information
-        InformationDesc info = new InformationDesc(locales, strict);
+        InformationDesc informationDesc = new InformationDesc(getLocales(node), strict);
 
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
             String name = child.getNodeName().getName();
 
-            if ("title".equals(name)) {
-                addInfo(info, child, null, getSpanText(child, false));
+            if (InformationDesc.TITLE_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getSpanText(child, false));
             }
-            if ("vendor".equals(name)) {
-                addInfo(info, child, null, getSpanText(child, false));
+            if (InformationDesc.VENDOR_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getSpanText(child, false));
             }
-            if ("description".equals(name)) {
-                String kind = getAttribute(child, "kind", "default");
+            if (DescriptionDesc.DESCRIPTION_ELEMENT.equals(name)) {
+                String kind = getAttribute(child, DescriptionDesc.KIND_ATTRIBUTE, DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
                         throw new ParseException(R("PTwoDescriptions", kind));
                     }
                 }
-
                 descriptionsUsed.add(kind);
-                addInfo(info, child, kind, getSpanText(child, false));
+                addInfo(informationDesc, child, kind, getSpanText(child, false));
             }
-            if ("homepage".equals(name)) {
-                addInfo(info, child, null, getRequiredURL(child, "href", base, strict));
+            if (HOMEPAGE_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getRequiredURL(child, HREF_ATTRIBUTE, base, strict));
             }
-            if ("icon".equals(name)) {
-                addInfo(info, child, getAttribute(child, "kind", "default"), getIcon(child));
+            if (IconDesc.ICON_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, getAttribute(child, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()), getIcon(child));
             }
-            if ("offline-allowed".equals(name)) {
-                addInfo(info, child, null, Boolean.TRUE);
+            if (InformationDesc.OFFLINE_ALLOWED_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, Boolean.TRUE);
             }
             if ("sharing-allowed".equals(name)) {
                 if (strict && !allowExtensions) {
                     throw new ParseException(R("PSharing"));
                 }
-                addInfo(info, child, null, Boolean.TRUE);
+                addInfo(informationDesc, child, null, Boolean.TRUE);
             }
-            if ("association".equals(name)) {
-                addInfo(info, child, null, getAssociation(child));
+            if (AssociationDesc.ASSOCIATION_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getAssociation(child));
             }
-            if ("shortcut".equals(name)) {
-                addInfo(info, child, null, getShortcut(child));
+            if (ShortcutDesc.SHORTCUT_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getShortcut(child));
             }
-            if ("related-content".equals(name)) {
-                addInfo(info, child, null, getRelatedContent(child));
+            if (RELATED_CONTENT_ELEMENT.equals(name)) {
+                addInfo(informationDesc, child, null, getRelatedContent(child));
             }
 
             child = child.getNextSibling();
         }
 
-        return info;
+        return informationDesc;
     }
 
     /**
@@ -648,14 +669,18 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private IconDesc getIcon(Node node) throws ParseException {
-        int width = Integer.parseInt(getAttribute(node, "width", "-1"));
-        int height = Integer.parseInt(getAttribute(node, "height", "-1"));
-        int size = Integer.parseInt(getAttribute(node, "size", "-1"));
-        int depth = Integer.parseInt(getAttribute(node, "depth", "-1"));
-        URL location = getRequiredURL(node, "href", base, strict);
-        Object kind = getAttribute(node, "kind", "default");
+        int width = Integer.parseInt(getAttribute(node, IconDesc.WIDTH_ATTRIBUTE, "-1"));
+        int height = Integer.parseInt(getAttribute(node, IconDesc.HEIGHT_ATTRIBUTE, "-1"));
+        int size = Integer.parseInt(getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1"));
+        int depth = Integer.parseInt(getAttribute(node, IconDesc.DEPTH_ATTRIBUTE, "-1"));
+        URL location = getRequiredURL(node, IconDesc.HREF_ATTRIBUTE, base, strict);
 
-        return new IconDesc(location, kind, width, height, depth, size);
+        return new IconDesc(location, getIconKind(node), width, height, depth, size);
+    }
+
+    private static IconKind getIconKind(final Node node) {
+        Assert.requireNonNull(node, "node");
+        return IconKind.fromString(getAttribute(node, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()));
     }
 
     //
@@ -863,9 +888,14 @@ public final class Parser {
      * @param node
      * @throws ParseException
      */
-    private AssociationDesc getAssociation(Node node) throws ParseException {
-        String[] extensions = getRequiredAttribute(node, "extensions", null, strict).split(" ");
-        String mimeType = getRequiredAttribute(node, "mime-type", null, strict);
+    private AssociationDesc getAssociation(final Node node) throws ParseException {
+        Assert.requireNonNull(node, "node");
+
+        final String[] extensions = getRequiredAttribute(node, EXTENSIONS_ATTRIBUTE, null, strict).split(" ");
+        final String mimeType = getRequiredAttribute(node, MIME_TYPE_ATTRIBUTE, null, strict);
+
+        // TODO: optional description element according to JSR
+        // TODO: optional icon element according to JSR
 
         return new AssociationDesc(mimeType, extensions);
     }
@@ -914,21 +944,21 @@ public final class Parser {
     }
 
     /**
-     * @return the menu descriptor.
+     * Returns the menu element at the specified node.
+     *
+     * @return the menu element at the specified node
      */
-    private MenuDesc getMenu(Node node) {
-        String subMenu = getAttribute(node, "submenu", null);
-
-        return new MenuDesc(subMenu);
+    private MenuDesc getMenu(final Node node) {
+        return new MenuDesc(getAttribute(node, MenuDesc.SUBMENU_ATTRIBUTE, null));
     }
 
     /**
      * @return the related-content descriptor.
      */
-    private RelatedContentDesc getRelatedContent(Node node) throws ParseException {
+    private RelatedContentDesc getRelatedContent(final Node node) throws ParseException {
 
-        getRequiredAttribute(node, "href", null, strict);
-        URL location = getURL(node, "href", base, strict);
+        getRequiredAttribute(node, RelatedContentDesc.HREF_ATTRIBUTE, null, strict);
+        URL location = getURL(node, RelatedContentDesc.HREF_ATTRIBUTE, base, strict);
 
         String title = null;
         String description = null;
@@ -941,19 +971,19 @@ public final class Parser {
 
             if (null != name) {
                 switch (name) {
-                    case "title":
+                    case RelatedContentDesc.TITLE_ELEMENT:
                         if (title != null && strict) {
                             throw new ParseException(R("PTwoTitles"));
                         }
                         title = getSpanText(child, false);
                         break;
-                    case "description":
+                    case RelatedContentDesc.DESCRIPTION_ELEMENT:
                         if (description != null && strict) {
                             throw new ParseException(R("PTwoDescriptions"));
                         }
                         description = getSpanText(child, false);
                         break;
-                    case "icon":
+                    case RelatedContentDesc.ICON_ELEMENT:
                         if (icon != null && strict) {
                             throw new ParseException(R("PTwoIcons"));
                         }
@@ -971,7 +1001,6 @@ public final class Parser {
         relatedContent.setTitle(title);
 
         return relatedContent;
-
     }
 
     // other methods
@@ -1028,7 +1057,7 @@ public final class Parser {
      */
     private Locale[] getLocales(final Node node) throws ParseException {
         final List<Locale> locales = new ArrayList<>();
-        final String localeParts[] = splitString(getAttribute(node, "locale", ""));
+        final String localeParts[] = splitString(getAttribute(node, LOCALE_ATTRIBUTE, ""));
 
         for (final String localePart : localeParts) {
             final Locale l = LocaleUtils.getLocale(localePart);

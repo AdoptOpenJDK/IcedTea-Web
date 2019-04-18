@@ -36,6 +36,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -68,8 +70,8 @@ public class InfoItemTest {
         Assert.assertFalse(i1.isofSameType(i3));
         Assert.assertFalse(i2.isofSameType(i3));
 
-        DescriptionInfoItem d1 = new DescriptionInfoItem("a", InfoItem.descriptionKindToolTip);
-        InfoItem id1 = new InfoItem(InfoItem.description, "a");
+        DescriptionInfoItem d1 = new DescriptionInfoItem("a", DescriptionKind.TOOLTIP);
+        InfoItem id1 = new InfoItem(DescriptionDesc.DESCRIPTION_ELEMENT, "a");
         Assert.assertTrue(id1.isofSameType(d1));
 
     }
@@ -84,8 +86,8 @@ public class InfoItemTest {
         Assert.assertFalse(i1.equals(i3));
         Assert.assertFalse(i2.equals(i3));
         Assert.assertTrue(i1.equals(i11));
-        DescriptionInfoItem d1 = new DescriptionInfoItem("a", InfoItem.descriptionKindToolTip);
-        InfoItem id1 = new InfoItem(InfoItem.description, "a");
+        DescriptionInfoItem d1 = new DescriptionInfoItem("a", DescriptionKind.TOOLTIP);
+        InfoItem id1 = new InfoItem(DescriptionDesc.DESCRIPTION_ELEMENT, "a");
         Assert.assertTrue(id1.equals(d1));
 
 

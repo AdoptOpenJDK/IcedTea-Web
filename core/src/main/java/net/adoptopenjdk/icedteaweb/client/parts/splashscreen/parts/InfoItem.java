@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 /**
@@ -53,16 +52,6 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 public class InfoItem {
 
     public static final String SPLASH = "SPLASH";
-    public static final String title = "title";
-    public static final String vendor = "vendor";
-    public static final String homepage = "homepage";
-    public static final String homepageHref = "href";
-    public static final String description = "description";
-    public static final String descriptionKind = "kind";
-    public static final String descriptionKindOneLine = (String) InformationDesc.ONE_LINE;
-    //when no kind is specified, then it should behave as short
-    public static final String descriptionKindShort = (String) InformationDesc.SHORT;
-    public static final String descriptionKindToolTip = (String) InformationDesc.TOOLTIP;
     protected String type;
     protected String value;
 

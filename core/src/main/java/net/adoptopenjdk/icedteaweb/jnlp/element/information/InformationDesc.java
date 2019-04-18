@@ -1,5 +1,6 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
 // Copyright (C) 2009 Red Hat, Inc.
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,35 +23,39 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import net.adoptopenjdk.icedteaweb.Assert;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
 
 /**
- * The information element.
+ * The information element contains information intended to be consumed by the JNLP Client to integrate
+ * the application into the desktop, provide user feedback, etc.
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.9 $
  */
+
+// There is an understanding between this class and the parser
+// that description and icon types are keyed by "icon-"+kind and
+// "description-"+kind, and that other types are keyed by their
+// specification name.
+
 public class InformationDesc {
-
-    // There is an understanding between this class and the parser
-    // that description and icon types are keyed by "icon-"+kind and
-    // "description-"+kind, and that other types are keyed by their
-    // specification name.
-
-    /** one-line description */
-    /**http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html**/
-    public static final Object ONE_LINE = "one-line";
-
-    /** short description */
-    public static final Object SHORT = "short";
-
-    /** tooltip description */
-    public static final Object TOOLTIP = "tooltip";
-
-    /** default description */
-    public static final Object DEFAULT = "default";
+    public static final String INFORMATION_ELEMENT = "information";
+    public static final String LOCALE_ATTRIBUTE = "locale";
+    public static final String TITLE_ELEMENT = "title";
+    public static final String VENDOR_ELEMENT = "vendor";
+    public static final String OFFLINE_ALLOWED_ELEMENT = "offline-allowed";
 
     /**
-     * the locales for the information
+     * The locales for which the information element should be used.
      */
     final private Locale[] locales;
 
@@ -58,43 +63,52 @@ public class InformationDesc {
     private List<Object> info;
 
     public final boolean strict;
+
     /**
      * Create an information element object.
      *
-     * @param locales the locales the information is for
+     * @param locales the locales for which the information element should be used
+     */
+    InformationDesc(final Locale[] locales) {
+        this(locales, false);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
      * @param strict whether parser was strict
      */
-    public InformationDesc(Locale[] locales, boolean strict) {
+    public InformationDesc(final Locale[] locales, final boolean strict) {
         this.locales = locales;
         this.strict = strict;
-    }
-    
-    InformationDesc(Locale[] locales) {
-        this(locales, false);
     }
 
     /**
      * @return the application's title.
      */
     public String getTitle() {
-        return (String) getItem("title");
+        return (String) getItem(InformationDesc.TITLE_ELEMENT);
     }
 
     /**
      * @return the application's vendor.
      */
     public String getVendor() {
-        return (String) getItem("vendor");
+        return (String) getItem(VENDOR_ELEMENT);
     }
 
     /**
      * @return the application's homepage.
      */
     public URL getHomepage() {
-        return (URL) getItem("homepage");
+        return (URL) getItem(HOMEPAGE_ELEMENT);
     }
 
     /**
+     * A short statement about the application. Longer descriptions should be put on a separate web page
+     * and referred to using the homepage element.
+     *
      * @return the default description for the application.
      */
     public String getDescription() {
@@ -114,13 +128,12 @@ public class InformationDesc {
     /**
      * @return the application's description of the specified type.
      *
-     * @param kind one of Information.SHORT, Information.ONE_LINE,
-     * Information.TOOLTIP, Information.DEFAULT
+     * @param kind one of {@link DescriptionKind}
      */
-    public String getDescription(Object kind) {
-        String result = getDescriptionStrict(kind);
+    public String getDescription(final DescriptionKind kind) {
+        final String result = getDescriptionStrict(kind);
         if (result == null)
-            return (String) getItem("description-" + DEFAULT);
+            return (String) getItem("description-" + DEFAULT.getValue());
         else
             return result;
     }
@@ -128,23 +141,21 @@ public class InformationDesc {
       /**
      * @return the application's description of the specified type.
      *
-     * @param kind one of Information.SHORT, Information.ONE_LINE,
-     * Information.TOOLTIP, Information.DEFAULT
+     * @param kind one of {@link DescriptionKind}
      */
-    public String getDescriptionStrict(Object kind) {
-        return (String) getItem("description-" + kind);
+    public String getDescriptionStrict(DescriptionKind kind) {
+        return (String) getItem("description-" + kind.getValue());
         
     }
 
     /**
      * Returns the icons specified by the JNLP file.
      *
-     * @param kind one of IconDesc.SELECTED, IconDesc.DISABLED,
-     * IconDesc.ROLLOVER, IconDesc.SPLASH, IconDesc.DEFAULT
+     * @param kind one of {@link IconKind}
      * @return an array of zero of more IconDescs of the specified icon type
      */
-    public IconDesc[] getIcons(Object kind) {
-        List<Object> icons = getItems("icon-" + kind);
+    public IconDesc[] getIcons(IconKind kind) {
+        List<Object> icons = getItems("icon-" + kind.getValue());
 
         return icons.toArray(new IconDesc[icons.size()]);
     }
@@ -160,7 +171,7 @@ public class InformationDesc {
      * @param height desired height of icon
      * @return the closest icon by size or null if no icons declared
      */
-    public URL getIconLocation(Object kind, int width, int height) {
+    public URL getIconLocation(IconKind kind, int width, int height) {
         IconDesc[] icons = getIcons(kind);
         if (icons.length == 0)
             return null;
@@ -197,7 +208,7 @@ public class InformationDesc {
      */
     public boolean isOfflineAllowed() {
         if (strict) {
-            return null != getItem("offline-allowed");
+            return null != getItem(OFFLINE_ALLOWED_ELEMENT);
         } else {
             // by deault itw ignore this switch. Most applications are missusing it
             return true;
@@ -218,7 +229,7 @@ public class InformationDesc {
      * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List<Object> associations = getItems("association");
+        List<Object> associations = getItems(ASSOCIATION_ELEMENT);
 
         return associations.toArray(new AssociationDesc[associations.size()]);
     }
@@ -227,14 +238,14 @@ public class InformationDesc {
      * @return the shortcut specified by this JNLP file
      */
     public ShortcutDesc getShortcut() {
-        return (ShortcutDesc) getItem("shortcut");
+        return (ShortcutDesc) getItem(ShortcutDesc.SHORTCUT_ELEMENT);
     }
 
     /**
      * @return the related-contents specified by this JNLP file
      */
     public RelatedContentDesc[] getRelatedContents() {
-        List<Object> relatedContents = getItems("related-content");
+        List<Object> relatedContents = getItems(RelatedContentDesc.RELATED_CONTENT_ELEMENT);
 
         return relatedContents.toArray(new RelatedContentDesc[relatedContents.size()]);
     }
@@ -243,8 +254,8 @@ public class InformationDesc {
      * @param key key to find item
      * @return the last item matching the specified key.
      */
-    protected Object getItem(Object key) {
-        List<Object> items = getItems(key);
+    private Object getItem(final String key) {
+        final List<Object> items = getItems(key);
         if (items.isEmpty())
             return null;
         else
@@ -255,11 +266,11 @@ public class InformationDesc {
      * @param key key to find item
      * @return all items matching the specified key.
      */
-    public List<Object> getItems(Object key) {
+    public List<Object> getItems(final Object key) {
         if (info == null)
             return Collections.emptyList();
 
-        List<Object> result = new ArrayList<>();
+        final List<Object> result = new ArrayList<>();
         for (int i = 0; i < info.size(); i += 2)
             if (info.get(i).equals(key))
                 result.add(info.get(i + 1));
@@ -273,7 +284,9 @@ public class InformationDesc {
      * @param key key to place value to
      * @param value value to be placed to key
      */
-    public void addItem(String key, Object value) {
+    public void addItem(final String key, final Object value) {
+        Assert.requireNonNull(key, "key");
+
         if (info == null)
             info = new ArrayList<>();
 

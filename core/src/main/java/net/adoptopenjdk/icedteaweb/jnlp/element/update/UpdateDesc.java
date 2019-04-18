@@ -54,6 +54,10 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.update;
  * @see UpdatePolicy
  */
 public class UpdateDesc {
+    public static final String UPDATE_ELEMENT = "update";
+    public static final String CHECK_ATTRIBUTE = "check";
+    public static final String POLICY_ATTRIBUTE = "policy";
+
     private final UpdateCheck check;
     private final UpdatePolicy policy;
 

@@ -39,14 +39,16 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.sourceforge.jnlp.JNLPFile;
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -55,7 +57,7 @@ public class InformationElementTest {
 
     private static class TestDescriptionInfoItem extends DescriptionInfoItem {
 
-        public TestDescriptionInfoItem(String value, String kind) {
+        public TestDescriptionInfoItem(String value, DescriptionKind kind) {
             super(value, kind);
         }
 
@@ -63,7 +65,7 @@ public class InformationElementTest {
             if (kind == null) {
                 return new TestInfoItem(type, value).toXml();
             }
-            return "<" + type + " kind=\"" + kind + "\">" + value + "</" + type + ">";
+            return "<" + type + " kind=\"" + kind.getValue() + "\">" + value + "</" + type + ">";
         }
     }
 
@@ -75,18 +77,18 @@ public class InformationElementTest {
 
         public String toXml() {
             if (type.equals(homepage)) {
-                return "<" + type + " " + homepageHref + "=\"" + value + "\"/>";
+                return "<" + type + " " + HomepageDesc.HREF_ATTRIBUTE + "=\"" + value + "\"/>";
             }
             return "<" + type + ">" + value + "</" + type + ">";
         }
     }
-    private final static TestInfoItem title = new TestInfoItem(InfoItem.title, "title exp");
-    private final static TestInfoItem vendor = new TestInfoItem(InfoItem.vendor, "vendor exp");
-    private final static TestInfoItem homepage = new TestInfoItem(InfoItem.homepage, "http://homepage.exp");
-    private final static TestDescriptionInfoItem oneLineD = new TestDescriptionInfoItem("One Line", DescriptionInfoItem.descriptionKindOneLine);
-    private final static TestDescriptionInfoItem toolTipD = new TestDescriptionInfoItem("Tooltip", DescriptionInfoItem.descriptionKindToolTip);
-    private final static TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionInfoItem.descriptionKindShort);
-    private final static TestDescriptionInfoItem short2D = new TestDescriptionInfoItem("short2", DescriptionInfoItem.descriptionKindShort);
+    private final static TestInfoItem title = new TestInfoItem(InformationDesc.TITLE_ELEMENT, "title exp");
+    private final static TestInfoItem vendor = new TestInfoItem(InformationDesc.VENDOR_ELEMENT, "vendor exp");
+    private final static TestInfoItem homepage = new TestInfoItem(HomepageDesc.HOMEPAGE_ELEMENT, "http://homepage.exp");
+    private final static TestDescriptionInfoItem oneLineD = new TestDescriptionInfoItem("One Line", DescriptionKind.ONE_LINE);
+    private final static TestDescriptionInfoItem toolTipD = new TestDescriptionInfoItem("Tooltip", DescriptionKind.TOOLTIP);
+    private final static TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionKind.SHORT);
+    private final static TestDescriptionInfoItem short2D = new TestDescriptionInfoItem("short2", DescriptionKind.SHORT);
     private final static TestDescriptionInfoItem noKindD = new TestDescriptionInfoItem("noKind", null);
     private static final String testJnlpheader =
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"

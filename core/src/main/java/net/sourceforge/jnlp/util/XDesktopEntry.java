@@ -45,8 +45,8 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.PluginBridge;
@@ -451,11 +451,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
      */
     private void cacheIcon() throws IOException, NonFileProtocolException {
 
-        URL uiconLocation = file.getInformation().getIconLocation(IconDesc.SHORTCUT, iconSize,
+        URL uiconLocation = file.getInformation().getIconLocation(IconKind.SHORTCUT, iconSize,
                 iconSize);
 
         if (uiconLocation == null) {
-            uiconLocation = file.getInformation().getIconLocation(IconDesc.DEFAULT, iconSize,
+            uiconLocation = file.getInformation().getIconLocation(IconKind.DEFAULT, iconSize,
                     iconSize);
         }
 

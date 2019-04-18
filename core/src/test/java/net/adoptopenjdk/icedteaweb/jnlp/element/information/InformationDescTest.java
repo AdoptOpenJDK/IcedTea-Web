@@ -45,6 +45,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -90,49 +94,49 @@ public class InformationDescTest {
     @Test
     public void testDescription() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
         assertEquals("Default Description", info.getDescription());
     }
 
     @Test
     public void testDescriptionFallbackOrder() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.TOOLTIP, "Tooltip Description");
+        info.addItem("description-" + TOOLTIP.getValue(), "Tooltip Description");
         assertEquals("Tooltip Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.SHORT, "Short Description");
+        info.addItem("description-" + SHORT.getValue(), "Short Description");
         assertEquals("Short Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.ONE_LINE, "One-line Description");
+        info.addItem("description-" + ONE_LINE.getValue(), "One-line Description");
         assertEquals("One-line Description", info.getDescription());
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
         assertEquals("Default Description", info.getDescription());
     }
 
     @Test
     public void testDescriptionKind() {
         InformationDesc info = new InformationDesc(new Locale[0]);
-        info.addItem("description-" + InformationDesc.DEFAULT, "Default Description");
-        info.addItem("description-" + InformationDesc.ONE_LINE, "One-line Description");
-        info.addItem("description-" + InformationDesc.SHORT, "Short Description");
-        info.addItem("description-" + InformationDesc.TOOLTIP, "Tooltip Description");
+        info.addItem("description-" + DEFAULT.getValue(), "Default Description");
+        info.addItem("description-" + ONE_LINE.getValue(), "One-line Description");
+        info.addItem("description-" + SHORT.getValue(), "Short Description");
+        info.addItem("description-" + TOOLTIP.getValue(), "Tooltip Description");
 
-        assertEquals("Default Description", info.getDescription(InformationDesc.DEFAULT));
-        assertEquals("One-line Description", info.getDescription(InformationDesc.ONE_LINE));
-        assertEquals("Short Description", info.getDescription(InformationDesc.SHORT));
-        assertEquals("Tooltip Description", info.getDescription(InformationDesc.TOOLTIP));
+        assertEquals("Default Description", info.getDescription(DEFAULT));
+        assertEquals("One-line Description", info.getDescription(ONE_LINE));
+        assertEquals("Short Description", info.getDescription(SHORT));
+        assertEquals("Tooltip Description", info.getDescription(TOOLTIP));
     }
 
     @Test
     public void testGetIcons() {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
-        Assert.assertArrayEquals(new IconDesc[0], info.getIcons(IconDesc.DEFAULT));
+        Assert.assertArrayEquals(new IconDesc[0], info.getIcons(IconKind.DEFAULT));
 
         IconDesc icon1 = new IconDesc(null, null, -1, -1, -1, -1);
         IconDesc icon2 = new IconDesc(null, null, -1, -1, -1, -1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon2);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon1);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon2);
 
-        assertArrayEquals(new IconDesc[] { icon1, icon2 }, info.getIcons(IconDesc.DEFAULT));
+        assertArrayEquals(new IconDesc[] { icon1, icon2 }, info.getIcons(IconKind.DEFAULT));
     }
 
     @Test
@@ -143,19 +147,19 @@ public class InformationDescTest {
         URL location2 = new URL("http://location2.example.org");
         IconDesc icon1 = new IconDesc(location1, null, 10, 10, -1, -1);
         IconDesc icon2 = new IconDesc(location2, null, 20, 20, -1, -1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon1);
-        info.addItem("icon-" + IconDesc.DEFAULT, icon2);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon1);
+        info.addItem("icon-" + IconKind.DEFAULT.getValue(), icon2);
 
         // exact size matches
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 10, 10));
-        assertEquals(location2, info.getIconLocation(IconDesc.DEFAULT, 20, 20));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT, 10, 10));
+        assertEquals(location2, info.getIconLocation(IconKind.DEFAULT, 20, 20));
 
         // match a bigger icon
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 1, 1));
-        assertEquals(location2, info.getIconLocation(IconDesc.DEFAULT, 15, 15));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT, 1, 1));
+        assertEquals(location2, info.getIconLocation(IconKind.DEFAULT, 15, 15));
 
         // match a smaller icon
-        assertEquals(location1, info.getIconLocation(IconDesc.DEFAULT, 25, 25));
+        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT, 25, 25));
     }
 
     @Test
@@ -198,19 +202,19 @@ public class InformationDescTest {
 
         Assert.assertArrayEquals(new AssociationDesc[0], info.getAssociations());
 
-        AssociationDesc association = new AssociationDesc(null, null);
+        AssociationDesc association = new AssociationDesc("application/java-archive", new String[0]);
         info.addItem("association", association);
         assertArrayEquals(new AssociationDesc[] { association }, info.getAssociations());
     }
 
     @Test
-    public void testGetRelatedContents() {
+    public void testGetRelatedContents() throws MalformedURLException {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
         Assert.assertArrayEquals(new RelatedContentDesc[0], info.getRelatedContents());
 
-        RelatedContentDesc relatedContent = new RelatedContentDesc(null);
-        info.addItem("related-content", relatedContent);
+        RelatedContentDesc relatedContent = new RelatedContentDesc(new URL("http://example.com:80"));
+        info.addItem(RelatedContentDesc.RELATED_CONTENT_ELEMENT, relatedContent);
 
         assertArrayEquals(new RelatedContentDesc[] { relatedContent }, info.getRelatedContents());
     }

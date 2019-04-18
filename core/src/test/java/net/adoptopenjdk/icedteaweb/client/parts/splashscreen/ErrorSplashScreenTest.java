@@ -43,8 +43,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InfoItem;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -71,7 +71,7 @@ public class ErrorSplashScreenTest extends JDialog {
         ie.setTitle("Testing information title");
         ie.setvendor("IcedTea-Web team");
         ie.addDescription("Testing null description");
-        ie.addDescription("tsting twoline des ...break\ncription of kind short", InfoItem.descriptionKindShort);
+        ie.addDescription("tsting twoline des ...break\ncription of kind short", DescriptionKind.SHORT);
         panel.setInformationElement(ie);
         panel.setVersion("1.2-re45fdg");
         setLayout(new BorderLayout());

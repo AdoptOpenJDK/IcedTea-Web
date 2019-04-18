@@ -26,12 +26,17 @@ import net.sourceforge.jnlp.JNLPFile;
 import static java.util.Arrays.asList;
 
 /**
- * The resources element.
+ * The resources element specifies all the resources that are part of the application, such as
+ * Java class files, native libraries, and system properties.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.7 $
  */
 public class ResourcesDesc {
+
+    public static final String RESOURCES_ELEMENT = "resources";
+    public static final String OS_ATTRIBUTE = "os";
+    public static final String ARCH_ATTRIBUTE = "arch";
 
     /**
      * the locales of these resources
