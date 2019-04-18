@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public

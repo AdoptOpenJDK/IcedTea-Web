@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.sourceforge.jnlp.JNLPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class InformationElement {
      * But I do not consider it as good idea to force this behaviour for somesing like psalsh screen,
      * so I jsut replace the previous one with new one. without any warning
      */
-    public void addDescription(String description, String kind) {
+    public void addDescription(String description, DescriptionKind kind) {
         if (description == null) {
             return;
         }
@@ -112,7 +113,7 @@ public class InformationElement {
 
     public InfoItem getBestMatchingDescriptionForSplash() {
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindOneLine.equals(d.getKind())) {
+            if (DescriptionKind.ONE_LINE.equals(d.getKind())) {
                 return d;
             }
         }
@@ -126,7 +127,7 @@ public class InformationElement {
 
     public InfoItem getLongestDescriptionForSplash() {
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindShort.equals(d.getKind())) {
+            if (DescriptionKind.SHORT.equals(d.getKind())) {
                 return d;
             }
         }
@@ -136,12 +137,12 @@ public class InformationElement {
             }
         }
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindOneLine.equals(d.getKind())) {
+            if (DescriptionKind.ONE_LINE.equals(d.getKind())) {
                 return d;
             }
         }
         for (DescriptionInfoItem d : descriptions) {
-            if (InfoItem.descriptionKindToolTip.equals(d.getKind())) {
+            if (DescriptionKind.TOOLTIP.equals(d.getKind())) {
                 return d;
             }
         }
@@ -227,10 +228,10 @@ public class InformationElement {
             ie.setHomepage(homePage);
             ie.setTitle(file.getInformation().getTitle());
             ie.setvendor(file.getInformation().getVendor());
-            ie.addDescription(file.getInformation().getDescriptionStrict((String) (DEFAULT.getValue())));
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindOneLine), InfoItem.descriptionKindOneLine);
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindShort), InfoItem.descriptionKindShort);
-            ie.addDescription(file.getInformation().getDescriptionStrict(InfoItem.descriptionKindToolTip), InfoItem.descriptionKindToolTip);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DEFAULT));
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.ONE_LINE), DescriptionKind.ONE_LINE);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.SHORT), DescriptionKind.SHORT);
+            ie.addDescription(file.getInformation().getDescriptionStrict(DescriptionKind.TOOLTIP), DescriptionKind.TOOLTIP);
             return ie;
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

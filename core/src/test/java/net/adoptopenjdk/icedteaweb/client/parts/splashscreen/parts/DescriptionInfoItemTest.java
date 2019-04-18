@@ -36,26 +36,28 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class DescriptionInfoItemTest {
 
-    private static final DescriptionInfoItem[] d = {new DescriptionInfoItem("Firm 1", null),
-        new DescriptionInfoItem("Firm 2", null),
-        new DescriptionInfoItem("Firm 3", "k1"),
-        new DescriptionInfoItem("Firm 4", "k2"),
-        new DescriptionInfoItem("Firm 6", "k1")};
+    private static final DescriptionInfoItem[] d = {
+            new DescriptionInfoItem("Firm 1", null),
+            new DescriptionInfoItem("Firm 2", null),
+            new DescriptionInfoItem("Firm 3", DescriptionKind.DEFAULT),
+            new DescriptionInfoItem("Firm 4", DescriptionKind.TOOLTIP),
+            new DescriptionInfoItem("Firm 6", DescriptionKind.DEFAULT)};
 
     @Test
     public void setGetTest() {
-        DescriptionInfoItem di = new DescriptionInfoItem("a", "b");
+        DescriptionInfoItem di = new DescriptionInfoItem("a", DescriptionKind.TOOLTIP);
         Assert.assertEquals("a", di.getValue());
-        Assert.assertEquals("b", di.getKind());
+        Assert.assertEquals(DescriptionKind.TOOLTIP, di.getKind());
         Assert.assertEquals(InfoItem.description, di.getType());
-        di.setKind("q");
-        Assert.assertEquals("q", di.getKind());
+        di.setKind(DescriptionKind.SHORT);
+        Assert.assertEquals(DescriptionKind.SHORT, di.getKind());
 
     }
 
@@ -118,10 +120,10 @@ public class DescriptionInfoItemTest {
         Assert.assertTrue(d1.toString().contains(d1.getValue()));
         Assert.assertTrue(d1.toString().contains(d1.getType()));
         Assert.assertTrue(d1.toString().contains("null"));
-        DescriptionInfoItem dd = new DescriptionInfoItem("Firm 3", "k1");
+        DescriptionInfoItem dd = new DescriptionInfoItem("Firm 3", DescriptionKind.DEFAULT);
         Assert.assertTrue(dd.toString().contains(dd.getValue()));
         Assert.assertTrue(dd.toString().contains(dd.getType()));
-        Assert.assertTrue(dd.toString().contains(dd.getKind()));
+        Assert.assertTrue(dd.toString().contains(dd.getKind().getValue()));
 
     }
 
@@ -130,9 +132,8 @@ public class DescriptionInfoItemTest {
         DescriptionInfoItem d1 = new DescriptionInfoItem("Firm 3", null);
         Assert.assertTrue(d1.toNiceString().contains(d1.getValue()));
         Assert.assertTrue(d1.toNiceString().contains(InfoItem.SPLASH + d1.getType()) || !d1.toNiceString().contains(InfoItem.SPLASH));
-        DescriptionInfoItem dd = new DescriptionInfoItem("Firm 3", "k1");
+        DescriptionInfoItem dd = new DescriptionInfoItem("Firm 3", DescriptionKind.SHORT);
         Assert.assertTrue(dd.toNiceString().contains(dd.getValue()));
         Assert.assertTrue(dd.toNiceString().contains(InfoItem.SPLASH + dd.getType()) || !d1.toNiceString().contains(InfoItem.SPLASH));
-
     }
 }

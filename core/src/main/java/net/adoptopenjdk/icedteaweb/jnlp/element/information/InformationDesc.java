@@ -1,5 +1,6 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
 // Copyright (C) 2009 Red Hat, Inc.
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -110,15 +111,15 @@ public class InformationDesc {
      * @return the default description for the application.
      */
     public String getDescription() {
-        String result = getDescription(DEFAULT.getValue());
+        String result = getDescription(DEFAULT);
 
         // try to find any description if default is null
         if (result == null)
-            result = getDescription(ONE_LINE.getValue());
+            result = getDescription(ONE_LINE);
         if (result == null)
-            result = getDescription(SHORT.getValue());
+            result = getDescription(SHORT);
         if (result == null)
-            result = getDescription(TOOLTIP.getValue());
+            result = getDescription(TOOLTIP);
 
         return result;
     }
@@ -126,10 +127,9 @@ public class InformationDesc {
     /**
      * @return the application's description of the specified type.
      *
-     * @param kind one of Information.SHORT, Information.ONE_LINE,
-     * Information.TOOLTIP, Information.DEFAULT
+     * @param kind one of {@link DescriptionKind}
      */
-    public String getDescription(final Object kind) {
+    public String getDescription(final DescriptionKind kind) {
         final String result = getDescriptionStrict(kind);
         if (result == null)
             return (String) getItem("description-" + DEFAULT.getValue());
@@ -140,19 +140,17 @@ public class InformationDesc {
       /**
      * @return the application's description of the specified type.
      *
-     * @param kind one of Information.SHORT, Information.ONE_LINE,
-     * Information.TOOLTIP, Information.DEFAULT
+     * @param kind one of {@link DescriptionKind}
      */
-    public String getDescriptionStrict(Object kind) {
-        return (String) getItem("description-" + kind);
+    public String getDescriptionStrict(DescriptionKind kind) {
+        return (String) getItem("description-" + kind.getValue());
         
     }
 
     /**
      * Returns the icons specified by the JNLP file.
      *
-     * @param kind one of IconDesc.SELECTED, IconDesc.DISABLED,
-     * IconDesc.ROLLOVER, IconDesc.SPLASH, IconDesc.DEFAULT
+     * @param kind one of {@link IconKind}
      * @return an array of zero of more IconDescs of the specified icon type
      */
     public IconDesc[] getIcons(IconKind kind) {

@@ -37,10 +37,6 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
-
-import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
 
 /**
  * The optional kind="splash" attribute may be used in an icon element to
@@ -62,10 +58,6 @@ public class InfoItem {
     public static final String homepageHref = "href";
     public static final String description = "description";
     public static final String descriptionKind = "kind";
-    public static final String descriptionKindOneLine = DescriptionKind.ONE_LINE.getValue();
-    //when no kind is specified, then it should behave as short
-    public static final String descriptionKindShort = SHORT.getValue();
-    public static final String descriptionKindToolTip = TOOLTIP.getValue();
     protected String type;
     protected String value;
 
