@@ -32,7 +32,7 @@ public enum DescriptionKind {
     DEFAULT("default");
 
 
-    private String value;
+    private final String value;
 
     DescriptionKind(final String value) {
         this.value = value;

@@ -18,7 +18,7 @@ public enum IconKind {
     SPLASH("splash"),
     SHORTCUT("shortcut");
 
-    private String value;
+    private final String value;
 
     IconKind(final String value) {
         this.value = value;

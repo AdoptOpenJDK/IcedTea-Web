@@ -255,8 +255,8 @@ public class InformationDesc {
      * @param key key to find item
      * @return the last item matching the specified key.
      */
-    protected Object getItem(Object key) {
-        List<Object> items = getItems(key);
+    Object getItem(final Object key) {
+        final List<Object> items = getItems(key);
         if (items.isEmpty())
             return null;
         else
@@ -267,11 +267,11 @@ public class InformationDesc {
      * @param key key to find item
      * @return all items matching the specified key.
      */
-    public List<Object> getItems(Object key) {
+    public List<Object> getItems(final Object key) {
         if (info == null)
             return Collections.emptyList();
 
-        List<Object> result = new ArrayList<>();
+        final List<Object> result = new ArrayList<>();
         for (int i = 0; i < info.size(); i += 2)
             if (info.get(i).equals(key))
                 result.add(info.get(i + 1));
@@ -285,7 +285,7 @@ public class InformationDesc {
      * @param key key to place value to
      * @param value value to be placed to key
      */
-    public void addItem(String key, Object value) {
+    public void addItem(final String key, final Object value) {
         if (info == null)
             info = new ArrayList<>();
 
