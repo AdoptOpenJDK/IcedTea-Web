@@ -2,11 +2,14 @@ package net.sourceforge.jnlp.util;
 
 import java.util.Locale;
 import java.util.Objects;
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class LocaleUtils {
+
+    public static final String EMPTY_STRING = "";
 
     public enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
 
@@ -26,11 +29,17 @@ public class LocaleUtils {
         }
 
         final String language = localeString.substring(0, 2);
-        final String country = (localeString.length() < 5) ? "" : localeString.substring(3, 5);
-        final String variant = (localeString.length() > 7) ? localeString.substring(6) : "";
+        final String country = (localeString.length() < 5) ? EMPTY_STRING : localeString.substring(3, 5);
+        final String variant = (localeString.length() > 7) ? localeString.substring(6) : EMPTY_STRING;
 
-        // null is not allowed n locale but "" is
         return new Locale(language, country, variant);
+    }
+
+    /**
+     * @deprecated use {@link #localMatches(Locale, Match, Locale[])}
+     */
+    public static boolean localeMatches(final Locale requested, Locale[] available, final Match matchLevel) {
+        return localMatches(requested, matchLevel, available == null ? new Locale[0] : available);
     }
 
     /**
@@ -40,19 +49,23 @@ public class LocaleUtils {
      * Locale("","","") would always return true.
      *
      * @param requested the requested locale
-     * @param available the available locales
      * @param matchLevel the depth with which to match locales.
+     * @param available the available locales
      * @return {@code true} if {@code requested} matches any of {@code available}, or if
      * {@code available} is empty or {@code null}.
      * @see Locale
      * @see Match
      */
-    public static boolean localeMatches(Locale requested, Locale[] available, Match matchLevel) {
+    public static boolean localMatches(Locale requested, Match matchLevel, Locale[] available) {
+        Assert.requireNonNull(requested, "requested");
+        Assert.requireNonNull(matchLevel, "matchLevel");
+        Assert.requireNonNull(available, "available");
 
-        if (matchLevel == Match.GENERALIZED)
-            return available == null || available.length == 0;
+        if (matchLevel == Match.GENERALIZED) {
+            return available.length == 0;
+        }
 
-        String language = requested.getLanguage(); // "" but never null
+        String language = requested.getLanguage();
         String country = requested.getCountry();
         String variant = requested.getVariant();
 
@@ -62,24 +75,25 @@ public class LocaleUtils {
                     if (!language.isEmpty()
                             && language.equals(locale.getLanguage())
                             && locale.getCountry().isEmpty()
-                            && locale.getVariant().isEmpty())
+                            && locale.getVariant().isEmpty()) {
                         return true;
+                    }
                     break;
                 case LANG_COUNTRY:
                     if (!language.isEmpty()
                             && language.equals(locale.getLanguage())
                             && !country.isEmpty()
                             && country.equals(locale.getCountry())
-                            && locale.getVariant().isEmpty())
+                            && locale.getVariant().isEmpty()) {
                         return true;
+                    }
                     break;
                 case LANG_COUNTRY_VARIANT:
                     if (language.equals(locale.getLanguage())
                             && country.equals(locale.getCountry())
-                            && variant.equals(locale.getVariant()))
+                            && variant.equals(locale.getVariant())) {
                         return true;
-                    break;
-                default:
+                    }
                     break;
             }
         }

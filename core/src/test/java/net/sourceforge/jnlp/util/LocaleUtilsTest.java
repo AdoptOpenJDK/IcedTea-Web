@@ -52,6 +52,7 @@ public class LocaleUtilsTest {
 
     @Test
     public void testNoLocalAvailable() {
+        // TODO we should rethink this decision, should always hand in an empty array of locales
         Assert.assertTrue("Null locales should match but did not.",
                 localeMatches(jvmLocale, null, Match.GENERALIZED));
 
