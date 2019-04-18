@@ -59,6 +59,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1016,17 +1017,21 @@ public final class Parser {
     }
 
     /**
-     * @return the Locale object(s) from a node's locale attribute.
+     * Returns the locales for which the information element should be used. Several locales can be specified,
+     * separated with spaces.
      *
      * @param node the node with a locale attribute
+     * @return the Locale object(s) from a node's locale attribute.
+     *
+     * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+     * for a detailed specification of this functionality.
      */
-    private Locale[] getLocales(Node node) {
-        List<Locale> locales = new ArrayList<>();
-        String localeParts[]
-                = splitString(getAttribute(node, "locale", ""));
+    private Locale[] getLocales(final Node node) throws ParseException {
+        final List<Locale> locales = new ArrayList<>();
+        final String localeParts[] = splitString(getAttribute(node, "locale", ""));
 
-        for (String localePart : localeParts) {
-            Locale l = getLocale(localePart);
+        for (final String localePart : localeParts) {
+            final Locale l = LocaleUtils.getLocale(localePart);
             if (l != null) {
                 locales.add(l);
             }
@@ -1035,24 +1040,6 @@ public final class Parser {
         return locales.toArray(new Locale[locales.size()]);
     }
 
-    /**
-     * Returns a {@link Locale} from a single locale.
-     *
-     * @param localeStr the locale string
-     * @return locale of document
-     */
-    public Locale getLocale(String localeStr) {
-        if (localeStr.length() < 2) {
-            return null;
-        }
-
-        String language = localeStr.substring(0, 2);
-        String country = (localeStr.length() < 5) ? "" : localeStr.substring(3, 5);
-        String variant = (localeStr.length() > 7) ? localeStr.substring(6) : "";
-
-        // null is not allowed n locale but "" is
-        return new Locale(language, country, variant);
-    }
 
     /**
      * @return a Version from the specified attribute and default value.
