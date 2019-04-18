@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import net.adoptopenjdk.icedteaweb.Assert;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
@@ -284,6 +285,8 @@ public class InformationDesc {
      * @param value value to be placed to key
      */
     public void addItem(final String key, final Object value) {
+        Assert.requireNonNull(key, "key");
+
         if (info == null)
             info = new ArrayList<>();
 
