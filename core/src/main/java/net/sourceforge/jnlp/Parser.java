@@ -54,7 +54,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.jvm.JVMUtils;
+import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
@@ -423,7 +423,7 @@ public final class Parser {
         URL location = getURL(node, "href", base, strict);
         String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
-            JVMUtils.checkVMArgs(vmArgs);
+            JvmUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }

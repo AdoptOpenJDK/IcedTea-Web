@@ -1,9 +1,19 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class JVMUtils {
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+
+public class JvmUtils {
+
+    private static final Set<String> VALID_VM_ARGUMENTS = unmodifiableSet(new HashSet<>(asList(getValidVMArguments())));
+    private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
+
     /**
      * Check that the VM args are valid and safe.
      *
@@ -14,33 +24,29 @@ public class JVMUtils {
      * @throws IllegalArgumentException if the VM arguments are invalid or dangerous
      */
     public static void checkVMArgs(final String vmArgs) throws IllegalArgumentException {
-        if (vmArgs == null) {
+        if (isBlank(vmArgs)) {
             return;
         }
 
-        final List<String> validArguments = Arrays.asList(getValidVMArguments());
-        final String[] validStartingArguments = getValidStartingVMArguments();
-
         final String[] arguments = vmArgs.split(" ");
-        boolean argumentIsValid;
         for (String argument : arguments) {
-            argumentIsValid = false;
-
-            if (validArguments.contains(argument)) {
-                argumentIsValid = true;
-            } else {
-                for (String validStartingArgument : validStartingArguments) {
-                    if (argument.startsWith(validStartingArgument)) {
-                        argumentIsValid = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!argumentIsValid) {
+            if (isInvalidValidArgument(argument)) {
                 throw new IllegalArgumentException(argument);
             }
         }
+    }
+
+    private static boolean isInvalidValidArgument(final String argument) {
+        return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument);
+    }
+
+    private static boolean isValidStartingArgument(final String argument) {
+        for (String validStartingArgument : VALID_STARTING_ARGUMENTS) {
+            if (argument.startsWith(validStartingArgument)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
