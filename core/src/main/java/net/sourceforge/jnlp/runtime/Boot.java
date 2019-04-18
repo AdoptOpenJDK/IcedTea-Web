@@ -347,7 +347,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     private static String stripDoubleQuote(String path) {
-        if (path.length() >= 2 && path.charAt(0) == '"' && path.charAt(path.length() - 1) == '"')
+        if (path.length() >= 2 && IcedTeaWebConstants.DOUBLE_QUOTE.equals(path.charAt(0)) && IcedTeaWebConstants.DOUBLE_QUOTE.equals(path.charAt(path.length() - 1)));
         {
             path = path.substring(1, path.length() - 1);
         }

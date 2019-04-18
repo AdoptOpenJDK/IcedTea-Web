@@ -63,7 +63,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     public void createShortcutOnWindowsDesktop() throws IOException {
         String path = getDesktopLnkPath();
         String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs('"' + file.getSourceLocation().toString() + '"');
+        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
         }
@@ -94,9 +94,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             menuDir.mkdir();
         }
         final String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs('"' + file.getSourceLocation().toString() + '"');
+        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         // setup uninstall shortcut
-        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + '"' + file.getFileLocation().toString() + '"');
+        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + quoted(file.getFileLocation()));
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
             ul.setIconLocation(iconLocation);
@@ -167,6 +167,10 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private static enum ManageMode {
         //appned?
         A
+    }
+
+    private String quoted(URL url) {
+        return IcedTeaWebConstants.DOUBLE_QUOTE + url + IcedTeaWebConstants.DOUBLE_QUOTE;
     }
 
 }
