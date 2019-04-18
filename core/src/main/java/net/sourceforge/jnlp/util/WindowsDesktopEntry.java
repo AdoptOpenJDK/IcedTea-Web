@@ -17,6 +17,7 @@ package net.sourceforge.jnlp.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -29,6 +30,8 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
 
 /**
  * Based on https://github.com/DmitriiShamrikov/mslinks
@@ -63,7 +66,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     public void createShortcutOnWindowsDesktop() throws IOException {
         String path = getDesktopLnkPath();
         String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
+        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
         }
@@ -94,9 +97,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             menuDir.mkdir();
         }
         final String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(file.getSourceLocation().toString());
+        final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         // setup uninstall shortcut
-        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + file.getFileLocation().toString());
+        final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + quoted(file.getFileLocation()));
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
             ul.setIconLocation(iconLocation);
@@ -167,6 +170,10 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private static enum ManageMode {
         //appned?
         A
+    }
+
+    private String quoted(URL url) {
+        return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
 
 }
