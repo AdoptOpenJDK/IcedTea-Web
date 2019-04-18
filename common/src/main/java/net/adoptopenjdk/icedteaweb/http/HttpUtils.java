@@ -41,36 +41,41 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 
 public class HttpUtils {
 
-    private final static Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
+
+    private HttpUtils() {
+        // do not instantiate.
+    }
+
     /**
-     * Ensure a HttpURLConnection is fully read, required for correct behavior.
-     * Captured IOException is consumed and printed
+     * Ensure a CloseableHttpConnection is fully read, required for correct behavior.
+     * Any thrown IOException is consumed and logged
      * @param c the connection to be closed silently
      */
-    public static void consumeAndCloseConnectionSilently(final HttpURLConnection c) {
+    public static void consumeAndCloseConnectionSilently(final CloseableConnection c) {
         try {
             consumeAndCloseConnection(c);
         } catch (final IOException ex) {
-            LOG.error("Following exception should be harmless, but may help in finding root cause.", ex);
+            LOG.warn("Following exception should be harmless, but may help in finding root cause.", ex);
         }
     }
 
     /**
-     * Ensure a HttpURLConnection is fully read, required for correct behavior.
+     * Ensure a CloseableHttpConnection is fully read, required for correct behavior.
      * 
      * @param c connection to be closed
-     * @throws IOException if connection fade
+     * @throws IOException if an I/O exception occurs.
      */
-    public static void consumeAndCloseConnection(final HttpURLConnection c) throws IOException {
-        try (InputStream in = c.getInputStream()) {
-            final byte[] throwAwayBuffer = new byte[256];
-            while (in.read(throwAwayBuffer) > 0) {
-                /* ignore contents */
+    public static void consumeAndCloseConnection(final CloseableConnection c) throws IOException {
+        try (final InputStream in = c.getInputStream()) {
+            if (c instanceof CloseableHttpConnection) {
+                final byte[] throwAwayBuffer = new byte[256];
+                while (in.read(throwAwayBuffer) > 0) {
+                    /* ignore contents */
+                }
             }
         }
     }
