@@ -112,7 +112,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
         int preferredHeight = 400;
 
         final URL splashImageURL = file.getInformation().getIconLocation(
-                IconKind.SPLASH.getValue(), preferredWidth, preferredHeight);
+                IconKind.SPLASH, preferredWidth, preferredHeight);
 
         final ResourceTracker resourceTracker = new ResourceTracker(true);
         if (splashImageURL != null) {

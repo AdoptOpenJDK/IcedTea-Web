@@ -155,8 +155,8 @@ public class InformationDesc {
      * IconDesc.ROLLOVER, IconDesc.SPLASH, IconDesc.DEFAULT
      * @return an array of zero of more IconDescs of the specified icon type
      */
-    public IconDesc[] getIcons(Object kind) {
-        List<Object> icons = getItems("icon-" + kind);
+    public IconDesc[] getIcons(IconKind kind) {
+        List<Object> icons = getItems("icon-" + kind.getValue());
 
         return icons.toArray(new IconDesc[icons.size()]);
     }
@@ -172,7 +172,7 @@ public class InformationDesc {
      * @param height desired height of icon
      * @return the closest icon by size or null if no icons declared
      */
-    public URL getIconLocation(Object kind, int width, int height) {
+    public URL getIconLocation(IconKind kind, int width, int height) {
         IconDesc[] icons = getIcons(kind);
         if (icons.length == 0)
             return null;

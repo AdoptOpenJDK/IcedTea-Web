@@ -451,11 +451,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
      */
     private void cacheIcon() throws IOException, NonFileProtocolException {
 
-        URL uiconLocation = file.getInformation().getIconLocation(IconKind.SHORTCUT.getValue(), iconSize,
+        URL uiconLocation = file.getInformation().getIconLocation(IconKind.SHORTCUT, iconSize,
                 iconSize);
 
         if (uiconLocation == null) {
-            uiconLocation = file.getInformation().getIconLocation(IconKind.DEFAULT.getValue(), iconSize,
+            uiconLocation = file.getInformation().getIconLocation(IconKind.DEFAULT, iconSize,
                     iconSize);
         }
 

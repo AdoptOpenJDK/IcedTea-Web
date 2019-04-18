@@ -133,13 +133,13 @@ public class ParserBasicTest extends NoStdOutErrTest {
     public void testInformationIcon() throws ParseException {
         InformationDesc info = parser.getInformationDescs(root).get(0);
 
-        IconDesc[] icons = info.getIcons(IconKind.DEFAULT.getValue());
+        IconDesc[] icons = info.getIcons(IconKind.DEFAULT);
         Assert.assertNotNull(icons);
         Assert.assertEquals(1, icons.length);
         IconDesc icon = icons[0];
         Assert.assertNotNull(icon);
         Assert.assertEquals("http://localhost/icon.png", icon.getLocation().toString());
-        icons = info.getIcons(IconKind.SPLASH.getValue());
+        icons = info.getIcons(IconKind.SPLASH);
         Assert.assertNotNull(icons);
         Assert.assertEquals(1, icons.length);
         icon = icons[0];

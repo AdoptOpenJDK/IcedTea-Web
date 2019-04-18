@@ -41,7 +41,7 @@ public class IconDesc {
     private final URL location;
 
     /** Used to indicate the use of the icon, such as default, selected, disabled, rollover, splash, and shortcut. */
-    private final Object kind;
+    private final IconKind kind;
 
     /** the width, or -1 if unknown*/
     private final int width;
@@ -65,7 +65,7 @@ public class IconDesc {
      * @param depth the depth, or -1 if unknown
      * @param size the size, or -1 if unknown
      */
-    public IconDesc(final URL location, final Object kind, final int width, final int height, final int depth, final int size) {
+    public IconDesc(final URL location, final IconKind kind, final int width, final int height, final int depth, final int size) {
         this.location = location;
         this.kind = kind;
         this.width = width;
@@ -84,7 +84,7 @@ public class IconDesc {
     /**
      * @return the icon type.
      */
-    public Object getKind() {
+    public IconKind getKind() {
         return kind;
     }
 

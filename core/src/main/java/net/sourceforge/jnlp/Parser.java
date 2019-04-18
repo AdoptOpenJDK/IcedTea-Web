@@ -673,9 +673,13 @@ public final class Parser {
         int size = Integer.parseInt(getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1"));
         int depth = Integer.parseInt(getAttribute(node, IconDesc.DEPTH_ATTRIBUTE, "-1"));
         URL location = getRequiredURL(node, IconDesc.HREF_ATTRIBUTE, base, strict);
-        Object kind = getAttribute(node, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue());
 
-        return new IconDesc(location, kind, width, height, depth, size);
+        return new IconDesc(location, getIconKind(node), width, height, depth, size);
+    }
+
+    private static IconKind getIconKind(final Node node) {
+        Assert.requireNonNull(node, "node");
+        return IconKind.fromString(getAttribute(node, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()));
     }
 
     //
