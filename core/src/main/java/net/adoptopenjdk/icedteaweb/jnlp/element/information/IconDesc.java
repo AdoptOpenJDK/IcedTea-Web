@@ -23,10 +23,19 @@ import java.net.URL;
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.8 $
+ *
+ * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
+ * for a detailed specification of this class.
  */
 public class IconDesc {
     public static final String ICON_ELEMENT = "icon";
+
     public static final String KIND_ATTRIBUTE = "kind";
+    public static final String WIDTH_ATTRIBUTE = "width";
+    public static final String HEIGHT_ATTRIBUTE = "height";
+    public static final String SIZE_ATTRIBUTE = "size";
+    public static final String DEPTH_ATTRIBUTE = "depth";
+    public static final String HREF_ATTRIBUTE = "href";
 
     /** the location of the icon */
     private final URL location;

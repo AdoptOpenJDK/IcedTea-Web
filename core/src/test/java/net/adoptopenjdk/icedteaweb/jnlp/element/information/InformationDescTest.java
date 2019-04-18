@@ -202,19 +202,19 @@ public class InformationDescTest {
 
         Assert.assertArrayEquals(new AssociationDesc[0], info.getAssociations());
 
-        AssociationDesc association = new AssociationDesc(null, null);
+        AssociationDesc association = new AssociationDesc("application/java-archive", new String[0]);
         info.addItem("association", association);
         assertArrayEquals(new AssociationDesc[] { association }, info.getAssociations());
     }
 
     @Test
-    public void testGetRelatedContents() {
+    public void testGetRelatedContents() throws MalformedURLException {
         InformationDesc info = new InformationDesc(new Locale[0]);
 
         Assert.assertArrayEquals(new RelatedContentDesc[0], info.getRelatedContents());
 
-        RelatedContentDesc relatedContent = new RelatedContentDesc(null);
-        info.addItem("related-content", relatedContent);
+        RelatedContentDesc relatedContent = new RelatedContentDesc(new URL("http://example.com:80"));
+        info.addItem(RelatedContentDesc.RELATED_CONTENT_ELEMENT, relatedContent);
 
         assertArrayEquals(new RelatedContentDesc[] { relatedContent }, info.getRelatedContents());
     }

@@ -23,10 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.SHORT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.TOOLTIP;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
 
 /**
  * The information element contains information intended to be consumed by the JNLP Client to integrate
@@ -37,18 +39,17 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKi
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
+
 // There is an understanding between this class and the parser
 // that description and icon types are keyed by "icon-"+kind and
 // "description-"+kind, and that other types are keyed by their
 // specification name.
+
 public class InformationDesc {
     public static final String INFORMATION_ELEMENT = "information";
     public static final String LOCALE_ATTRIBUTE = "locale";
-
     public static final String TITLE_ELEMENT = "title";
     public static final String VENDOR_ELEMENT = "vendor";
-    public static final String DESCRIPTION_ELEMENT = "description";
-    public static final String HOMEPAGE_ELEMENT = "homepage";
     public static final String OFFLINE_ALLOWED_ELEMENT = "offline-allowed";
 
     /**
@@ -60,43 +61,52 @@ public class InformationDesc {
     private List<Object> info;
 
     public final boolean strict;
+
     /**
      * Create an information element object.
      *
-     * @param locales the locales the information is for
+     * @param locales the locales for which the information element should be used
+     */
+    InformationDesc(final Locale[] locales) {
+        this(locales, false);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
      * @param strict whether parser was strict
      */
-    public InformationDesc(Locale[] locales, boolean strict) {
+    public InformationDesc(final Locale[] locales, final boolean strict) {
         this.locales = locales;
         this.strict = strict;
-    }
-    
-    InformationDesc(Locale[] locales) {
-        this(locales, false);
     }
 
     /**
      * @return the application's title.
      */
     public String getTitle() {
-        return (String) getItem("title");
+        return (String) getItem(InformationDesc.TITLE_ELEMENT);
     }
 
     /**
      * @return the application's vendor.
      */
     public String getVendor() {
-        return (String) getItem("vendor");
+        return (String) getItem(VENDOR_ELEMENT);
     }
 
     /**
      * @return the application's homepage.
      */
     public URL getHomepage() {
-        return (URL) getItem("homepage");
+        return (URL) getItem(HOMEPAGE_ELEMENT);
     }
 
     /**
+     * A short statement about the application. Longer descriptions should be put on a separate web page
+     * and referred to using the homepage element.
+     *
      * @return the default description for the application.
      */
     public String getDescription() {
@@ -119,8 +129,8 @@ public class InformationDesc {
      * @param kind one of Information.SHORT, Information.ONE_LINE,
      * Information.TOOLTIP, Information.DEFAULT
      */
-    public String getDescription(Object kind) {
-        String result = getDescriptionStrict(kind);
+    public String getDescription(final Object kind) {
+        final String result = getDescriptionStrict(kind);
         if (result == null)
             return (String) getItem("description-" + DEFAULT.getValue());
         else
@@ -199,7 +209,7 @@ public class InformationDesc {
      */
     public boolean isOfflineAllowed() {
         if (strict) {
-            return null != getItem("offline-allowed");
+            return null != getItem(OFFLINE_ALLOWED_ELEMENT);
         } else {
             // by deault itw ignore this switch. Most applications are missusing it
             return true;
@@ -220,7 +230,7 @@ public class InformationDesc {
      * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List<Object> associations = getItems("association");
+        List<Object> associations = getItems(ASSOCIATION_ELEMENT);
 
         return associations.toArray(new AssociationDesc[associations.size()]);
     }
@@ -229,14 +239,14 @@ public class InformationDesc {
      * @return the shortcut specified by this JNLP file
      */
     public ShortcutDesc getShortcut() {
-        return (ShortcutDesc) getItem("shortcut");
+        return (ShortcutDesc) getItem(ShortcutDesc.SHORTCUT_ELEMENT);
     }
 
     /**
      * @return the related-contents specified by this JNLP file
      */
     public RelatedContentDesc[] getRelatedContents() {
-        List<Object> relatedContents = getItems("related-content");
+        List<Object> relatedContents = getItems(RelatedContentDesc.RELATED_CONTENT_ELEMENT);
 
         return relatedContents.toArray(new RelatedContentDesc[relatedContents.size()]);
     }

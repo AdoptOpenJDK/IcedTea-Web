@@ -76,8 +76,11 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
-
     private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
+
+    public static final String JNLP_ROOT_ELEMENT = "jnlp";
+    public static final String SPEC_ATTRIBUTE = "spec";
+    public static final String VERSION_ATTRIBUTE = "version";
 
     public static enum ManifestBoolean {
         TRUE, FALSE, UNDEFINED;
@@ -795,7 +798,7 @@ public class JNLPFile {
      * @see Locale
      * @see Match
      */
-    public boolean localeMatches(Locale requested, Locale[] available, Match matchLevel) {
+    public static boolean localeMatches(Locale requested, Locale[] available, Match matchLevel) {
 
         if (matchLevel == Match.GENERALIZED)
             return available == null || available.length == 0;
