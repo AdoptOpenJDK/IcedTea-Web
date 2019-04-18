@@ -38,7 +38,7 @@ public class LocaleUtils {
     /**
      * @deprecated use {@link #localMatches(Locale, Match, Locale[])}
      */
-    public static boolean localeMatches(final Locale requested, Locale[] available, final Match matchLevel) {
+    public static boolean localeMatches(final Locale requested, final Locale[] available, final Match matchLevel) {
         return localMatches(requested, matchLevel, available == null ? new Locale[0] : available);
     }
 
@@ -56,7 +56,7 @@ public class LocaleUtils {
      * @see Locale
      * @see Match
      */
-    public static boolean localMatches(Locale requested, Match matchLevel, Locale[] available) {
+    public static boolean localMatches(final Locale requested, final Match matchLevel, final Locale[] available) {
         Assert.requireNonNull(requested, "requested");
         Assert.requireNonNull(matchLevel, "matchLevel");
         Assert.requireNonNull(available, "available");
