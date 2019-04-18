@@ -254,7 +254,7 @@ public class InformationDesc {
      * @param key key to find item
      * @return the last item matching the specified key.
      */
-    Object getItem(final Object key) {
+    private Object getItem(final String key) {
         final List<Object> items = getItems(key);
         if (items.isEmpty())
             return null;
