@@ -138,8 +138,8 @@ public class UrlUtilsTest {
             File testFile = new File(testPath);
             URL notEncodedUrl = testFile.toURI().toURL();
             URL encodedUrl = testFile.toURI().toURL();
-            assertEquals(testFile, UrlUtils.decodeUrlAsFile(notEncodedUrl));
-            assertEquals(testFile, UrlUtils.decodeUrlAsFile(encodedUrl));
+            assertEquals("Not encoded url as file", testFile.getAbsoluteFile(), UrlUtils.decodeUrlAsFile(notEncodedUrl));
+            assertEquals("Encoded url as file", testFile.getAbsoluteFile(), UrlUtils.decodeUrlAsFile(encodedUrl));
         }
     }
     
