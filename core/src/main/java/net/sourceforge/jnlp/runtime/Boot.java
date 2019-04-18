@@ -346,6 +346,14 @@ public final class Boot implements PrivilegedAction<Void> {
         return null;
     }
 
+    private static String stripDoubleQuote(String path) {
+        if (path.length() >= 2 && path.charAt(0) == '"' && path.charAt(path.length() - 1) == '"')
+        {
+            path = path.substring(1, path.length() - 1);
+        }
+        return path;
+    }
+
     static ParserSettings init(Map<String, List<String>> extra) {
         JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(CommandLineOptions.NOSEC));
         JNLPRuntime.setOfflineForced(optionParser.hasOption(CommandLineOptions.OFFLINE));
@@ -373,7 +381,7 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app 
-                CacheUtil.clearCache(optionArgs.get(0), true, true);
+                CacheUtil.clearCache(stripDoubleQuote(optionArgs.get(0)), true, true);
             } else {
                 // clear all cache
                 CacheUtil.clearCache();

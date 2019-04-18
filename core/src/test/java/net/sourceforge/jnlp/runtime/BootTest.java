@@ -52,4 +52,10 @@ public class BootTest extends NoStdOutErrTest {
         Assert.assertEquals("https://www.com/file.jnlp", Boot.fixJnlpProtocol("jnlps:https://www.com/file.jnlp"));
     }
 
+    @Test
+    public void stripDoubleQuoteTest() throws Exception {
+        Assert.assertEquals("\"jnlpfile (1).jnlp\"", Boot.stripDoubleQuote("jnlpfile (1).jnlp")); // with space
+        Assert.assertEquals("\"jnlpfile.jnlp\"", Boot.stripDoubleQuote("jnlpfile.jnlp")); // without space
+        Assert.assertEquals("jnlpfile.jnlp", Boot.stripDoubleQuote("jnlpfile.jnlp")); // without ""
+    }
 }
