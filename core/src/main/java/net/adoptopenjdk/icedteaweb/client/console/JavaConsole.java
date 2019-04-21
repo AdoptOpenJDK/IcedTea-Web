@@ -121,9 +121,7 @@ public class JavaConsole implements ObservableMessagesProvider {
             observable.addObserver(c1);
             outputs.add(c1);
         }
-        if (count == 0) {
-            pane.add(new JPanel());
-        } else if (outputs.size() == 1) {
+        if (outputs.size() == 1) {
             pane.add(outputs.get(0));
         } else {
             JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, outputs.get(outputs.size() - 2), outputs.get(outputs.size() - 1));
@@ -344,7 +342,7 @@ public class JavaConsole implements ObservableMessagesProvider {
 
         JLabel numberOfOutputsL = new JLabel("  Number of outputs: ");
         buttonPanel.add(numberOfOutputsL);
-        numberOfOutputs = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        numberOfOutputs = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         JComponent comp = numberOfOutputs.getEditor();
         JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
         DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
