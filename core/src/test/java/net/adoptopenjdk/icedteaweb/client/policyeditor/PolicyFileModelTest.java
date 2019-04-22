@@ -112,6 +112,19 @@ public class PolicyFileModelTest {
     }
 
     @Test
+    public void testSavePolicyFile() throws Exception {
+        File file = new File(tempFilePath);
+        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        assertEquals("policy file size", EXAMPLE_POLICY_1.length(), file.length());
+        
+        model.setFile(file);
+        model.openAndParsePolicyFile();
+        model.savePolicyFile();
+
+        assertTrue("policy file size isn't at least " + EXAMPLE_POLICY_1.length() + " bytes", file.length() >= EXAMPLE_POLICY_1.length());
+    }
+
+    @Test
     public void testHasChangedIsFalseInitially() throws Exception {
         assertFalse("Model should not report changes made initially", model.hasChanged());
     }
