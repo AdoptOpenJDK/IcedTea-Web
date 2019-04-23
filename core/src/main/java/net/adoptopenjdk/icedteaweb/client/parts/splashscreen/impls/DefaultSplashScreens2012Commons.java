@@ -67,7 +67,7 @@ public final class DefaultSplashScreens2012Commons {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getY() < painter.getAboutOfset().y && e.getX() > (painter.getAboutOfset().x)) {
+                if (e.getY() < painter.getAboutOffset().y && e.getX() > (painter.getAboutOffset().x)) {
                     AboutDialog.display(TextsProvider.ITW_PLUGIN);
                 }
             }

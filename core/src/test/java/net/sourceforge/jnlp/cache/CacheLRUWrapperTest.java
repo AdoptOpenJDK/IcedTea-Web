@@ -68,7 +68,7 @@ public class CacheLRUWrapperTest {
             tmpCache.mkdir();
             tmpCache.deleteOnExit();
             if (!tmpCache.isDirectory()) {
-                throw new IOException("Unsuccess to create tmpfile, remove it and createsame directory");
+                throw new IOException("Unsuccessful to create tmpfile, remove it and create same directory");
             }
             tmpIndexFile = new File(tmpCache, cacheIndexFileName);
         } catch (IOException ex) {

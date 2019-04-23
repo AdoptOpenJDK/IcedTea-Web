@@ -83,7 +83,7 @@ public class XMLParser {
      * @throws ParseException if parsing fails
      */
     public Node getRootNode(final InputStream input) throws ParseException {
-        // A BufferedInputStream is used to allow marking and reseting of a stream.
+        // A BufferedInputStream is used to allow marking and resetting of a stream.
         try(final BufferedInputStream bs = new BufferedInputStream(input)) {
             /* SAX
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

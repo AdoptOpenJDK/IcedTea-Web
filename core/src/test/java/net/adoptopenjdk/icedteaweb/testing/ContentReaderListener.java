@@ -39,7 +39,7 @@ package net.adoptopenjdk.icedteaweb.testing;
 
 public interface ContentReaderListener {
 
-   void charReaded(char ch);
-   void lineReaded(String s);
+   void charRead(char ch);
+   void lineRead(String s);
 
 }

@@ -21,7 +21,7 @@
     <association extensions='*.foo' mime-type='foo/bar'/>
     <related-content href='http://related-content/'>
       <title>related-content <!-- or something -->title</title>
-      <description>decription of related-content</description>
+      <description>description of related-content</description>
       <icon href='related-content-icon.png' />
     </related-content>
   </information>

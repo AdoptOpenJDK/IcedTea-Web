@@ -72,7 +72,7 @@ public enum ExecuteAppletAction {
 
     public static ExecuteAppletAction fromString(String s) {
         if (s.length() == 0) {
-            throw new RuntimeException("Undefined zero-length ExecuteAppletAction String representatio");
+            throw new RuntimeException("Undefined zero-length ExecuteAppletAction String representation");
         }
         return fromChar(s.charAt(0));
 

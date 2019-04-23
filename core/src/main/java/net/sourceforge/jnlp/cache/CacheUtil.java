@@ -89,7 +89,7 @@ public class CacheUtil {
     public static URL getCachedResourceURL(URL location, Version version, UpdatePolicy policy) {
         try {
             File f = getCachedResourceFile(location, version, policy);
-            //url was ponting to nowhere eg 404
+            //url was pointing to nowhere eg 404
             if (f == null) {
                 //originally  f.toUrl was throwing NPE
                 return null;
@@ -147,7 +147,7 @@ public class CacheUtil {
      * Clears the cache by deleting all the Netx cache files
      * <p>
      * Note: Because of how our caching system works, deleting jars of another javaws
-     * process is using them can be quite disasterous. Hence why Launcher creates lock files
+     * process is using them can be quite disastrous. Hence why Launcher creates lock files
      * and we check for those by calling {@link #okToClearCache()}
      *
      * @return true if the cache could be cleared and was cleared
@@ -283,7 +283,7 @@ public class CacheUtil {
                 //delete shortcut list file
                 Files.deleteIfExists(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath());
             } else {
-                //write file after application scuts have been removed
+                //write file after application shortcuts have been removed
                 Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, Charset.forName("UTF-8"));
             }
         }
@@ -349,10 +349,10 @@ public class CacheUtil {
                         if (domain) {
                             String domain = getDomain(path);
                             if (domain != null && domain.matches(filter)) {
-                                CacheId doaminId = new CacheDomainId(domain);
-                                if (!r.contains(doaminId)) {
-                                    r.add(doaminId);
-                                    doaminId.populate();
+                                CacheId domainId = new CacheDomainId(domain);
+                                if (!r.contains(domainId)) {
+                                    r.add(domainId);
+                                    domainId.populate();
 
                                 }
                             }
@@ -413,18 +413,18 @@ public class CacheUtil {
      *
      * @param source      the source {@link URL}
      * @param version     the versions to check for
-     * @param lastModifed time in milis since epoch of last modfication
+     * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(URL source, Version version, long lastModifed) {
+    public static boolean isCurrent(URL source, Version version, long lastModified) {
 
         if (!isCacheable(source, version))
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
         try {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
-            boolean result = entry.isCurrent(lastModifed);
+            boolean result = entry.isCurrent(lastModified);
 
             LOG.info("isCurrent: {} = {}", source, result);
 
@@ -703,8 +703,8 @@ public class CacheUtil {
         if (candidate.getName().length() > 255) {
             /**
              * When filename is longer then 255 chars, then then various
-             * filesytems have issues to save it. By saving the file by its
-             * summ, we are trying to prevent collision of two files differs in
+             * filesystems have issues to save it. By saving the file by its
+             * sum, we are trying to prevent collision of two files differs in
              * suffixes (general suffix of name, not only 'filetype suffix')
              * only. It is also preventing bug when truncate (files with 1000
              * chars hash in query) cuts to much.
@@ -727,8 +727,8 @@ public class CacheUtil {
                 }
                 candidate = new File(candidate.getParentFile(), hexString.toString());
             } catch (NoSuchAlgorithmException ex) {
-                // should not occure, cite from javadoc:
-                // every java iomplementation should support
+                // should not occur, cite from javadoc:
+                // every java implementation should support
                 // MD5 SHA-1 SHA-256
                 throw new RuntimeException(ex);
             }
@@ -921,7 +921,7 @@ public class CacheUtil {
         }
 
         @Override
-        //hascode in super is ok
+        //hashcode in super is ok
         public boolean equals(Object obj) {
             if (obj instanceof CacheJnlpId) {
                 return super.equals(obj);
@@ -954,7 +954,7 @@ public class CacheUtil {
         }
 
         @Override
-        //hascode in super is ok
+        //hashcode in super is ok
         public boolean equals(Object obj) {
             if (obj instanceof CacheDomainId) {
                 return super.equals(obj);

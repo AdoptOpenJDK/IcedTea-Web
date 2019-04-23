@@ -49,9 +49,9 @@ public class AccessWarningPaneComplexReturnTest {
         String s1 = aw1.writeValue();
         AccessWarningPaneComplexReturn aw11 = AccessWarningPaneComplexReturn.readValue(s1);
         Assert.assertEquals(aw1.getRegularReturn().getValue(), aw11.getRegularReturn().getValue());
-        Assert.assertEquals(aw1.getDekstop(), aw11.getDekstop());
+        Assert.assertEquals(aw1.getDesktop(), aw11.getDesktop());
         Assert.assertEquals(aw1.getMenu(), aw11.getMenu());
-        Assert.assertEquals(null, aw11.getDekstop());
+        Assert.assertEquals(null, aw11.getDesktop());
         Assert.assertEquals(null, aw11.getMenu());
     }
 
@@ -62,9 +62,9 @@ public class AccessWarningPaneComplexReturnTest {
         String s2 = aw2.writeValue();
         AccessWarningPaneComplexReturn aw22 = AccessWarningPaneComplexReturn.readValue(s2);
         Assert.assertEquals(aw2.getRegularReturn().getValue(), aw22.getRegularReturn().getValue());
-        Assert.assertEquals(aw2.getDekstop(), aw22.getDekstop());
+        Assert.assertEquals(aw2.getDesktop(), aw22.getDesktop());
         Assert.assertEquals(aw2.getMenu(), aw22.getMenu());
-        Assert.assertEquals(null, aw22.getDekstop());
+        Assert.assertEquals(null, aw22.getDesktop());
         Assert.assertEquals(null, aw22.getMenu());
 
     }
@@ -81,38 +81,38 @@ public class AccessWarningPaneComplexReturnTest {
     @Test
     public void AccessWarningPaneComplexReturnTestReadWrite3() {
         AccessWarningPaneComplexReturn aw1 = new AccessWarningPaneComplexReturn(true);
-        aw1.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+        aw1.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
         aw1.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(false));
         String s1 = aw1.writeValue();
         AccessWarningPaneComplexReturn aw11 = AccessWarningPaneComplexReturn.readValue(s1);
         Assert.assertEquals(aw1.getRegularReturn().getValue(), aw11.getRegularReturn().getValue());
-        Assert.assertEquals(aw1.getDekstop(), aw11.getDekstop());
+        Assert.assertEquals(aw1.getDesktop(), aw11.getDesktop());
         Assert.assertEquals(aw1.getMenu(), aw11.getMenu());
-        Assert.assertNotEquals(null, aw11.getDekstop());
+        Assert.assertNotEquals(null, aw11.getDesktop());
         Assert.assertNotEquals(null, aw11.getMenu());
-        Assert.assertEquals(true, aw11.getDekstop().isCreate());
+        Assert.assertEquals(true, aw11.getDesktop().isCreate());
         Assert.assertEquals(false, aw11.getMenu().isCreate());
     }
     
      @Test
     public void AccessWarningPaneComplexReturnTestReadWrite4() {
         AccessWarningPaneComplexReturn aw1 = new AccessWarningPaneComplexReturn(true);
-        aw1.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult("b1",true, AccessWarningPaneComplexReturn.Shortcut.BROWSER, false));
+        aw1.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult("b1", true, AccessWarningPaneComplexReturn.Shortcut.BROWSER, false));
         aw1.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult("b2",false, AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML, true));
         String s1 = aw1.writeValue();
         AccessWarningPaneComplexReturn aw11 = AccessWarningPaneComplexReturn.readValue(s1);
         Assert.assertEquals(aw1.getRegularReturn().getValue(), aw11.getRegularReturn().getValue());
-        Assert.assertEquals(aw1.getDekstop(), aw11.getDekstop());
+        Assert.assertEquals(aw1.getDesktop(), aw11.getDesktop());
         Assert.assertEquals(aw1.getMenu(), aw11.getMenu());
-        Assert.assertNotEquals(null, aw11.getDekstop());
+        Assert.assertNotEquals(null, aw11.getDesktop());
         Assert.assertNotEquals(null, aw11.getMenu());
-        Assert.assertEquals(false, aw11.getDekstop().isCreate());
+        Assert.assertEquals(false, aw11.getDesktop().isCreate());
         Assert.assertEquals(true, aw11.getMenu().isCreate());
-        Assert.assertEquals("b1", aw11.getDekstop().getBrowser());
+        Assert.assertEquals("b1", aw11.getDesktop().getBrowser());
         Assert.assertEquals("b2", aw11.getMenu().getBrowser());
-        Assert.assertEquals(AccessWarningPaneComplexReturn.Shortcut.BROWSER, aw11.getDekstop().getShortcutType());
+        Assert.assertEquals(AccessWarningPaneComplexReturn.Shortcut.BROWSER, aw11.getDesktop().getShortcutType());
         Assert.assertEquals(AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML, aw11.getMenu().getShortcutType());
-        Assert.assertEquals(true, aw11.getDekstop().isFixHref());
+        Assert.assertEquals(true, aw11.getDesktop().isFixHref());
         Assert.assertEquals(false, aw11.getMenu().isFixHref());
     }
 }

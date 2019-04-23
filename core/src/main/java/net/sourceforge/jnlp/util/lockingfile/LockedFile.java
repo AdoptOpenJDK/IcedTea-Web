@@ -68,7 +68,7 @@ public class LockedFile {
             //just try to create
             this.file.createNewFile();
         } catch (Exception ex) {
-            //intentionaly silent
+            //intentionally silent
         }
         if (!this.file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
             readOnly = true;
@@ -177,7 +177,7 @@ public class LockedFile {
                 if (this.randomAccessFile != null){
                     this.randomAccessFile.close();
                 }
-                //necessary for not existing parent direcotry
+                //necessary for not existing parent directory
                 if (this.fileChannel != null){
                     this.fileChannel.close();
                 }
@@ -197,7 +197,7 @@ public class LockedFile {
             super(file);
         }
 
-        /*Comment why itis different*/
+        /*Comment why it is different*/
         @Override
         public void lock() throws IOException {
             if (!isReadOnly()) {
@@ -206,7 +206,7 @@ public class LockedFile {
             super.threadLock.lock();
         }
 
-        /*Comment why itis different*/
+        /*Comment why it is different*/
         @Override
         public void unlock() throws IOException {
             if (!super.threadLock.isHeldByCurrentThread()) {

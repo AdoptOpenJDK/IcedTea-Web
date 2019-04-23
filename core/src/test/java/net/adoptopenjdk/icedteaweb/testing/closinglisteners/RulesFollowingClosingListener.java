@@ -1,5 +1,5 @@
-/* 
-   Copyright (C) 2012 Red Hat, Inc.
+/* RulesFollowingClosingListener.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -33,16 +33,46 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
+ */
+package net.adoptopenjdk.icedteaweb.testing.closinglisteners;
 
-package net.adoptopenjdk.icedteaweb.client.parts.browser;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.net.URL;
+public class RulesFollowingClosingListener extends CountingClosingListener {
 
-public interface DocumentChangededListener {
+    private final List<Rule<?,String>> rules = new ArrayList<>();
 
-    public void documentChangeded(String current);
-    public void addressChangeded(String url);
-    public void addressChangeded(URL url);
+    public static class ContainsRule extends StringRule<String> {
 
+        public ContainsRule(final String s) {
+            super(s);
+        }
+
+        @Override
+        public boolean evaluate(final String upon) {
+            return (upon.contains(rule));
+        }
+
+    }
+
+    protected RulesFollowingClosingListener() {
+    }
+
+
+
+    @Override
+    protected boolean isAllowedToFinish(final String content) {
+        if (rules.size() < 1) {
+            throw new IllegalStateException("No rules specified");
+        }
+        for (final Rule<?,String> rule : rules) {
+            if (!rule.evaluate(content)) {
+                return false;
+            }
+        }
+        return true;
+
+
+    }
 }

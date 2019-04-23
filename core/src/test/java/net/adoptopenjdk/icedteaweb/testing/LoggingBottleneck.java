@@ -78,7 +78,7 @@ public class LoggingBottleneck {
      */
     private String loggedBrowser = Browsers.none.toString();
     /**
-     * map of classes, each have map of methods, each have errorlist, outLIst, and allList (allist contains also not std or err messages)
+     * map of classes, each have map of methods, each have errorlist, outLIst, and allList (allList contains also not std or err messages)
      * class.testMethod.logs
      */
     private final Map<String, Map<String, TestsLogs>> processLogs = Collections.synchronizedMap(new HashMap<String, Map<String, TestsLogs>>(1000));
@@ -158,8 +158,8 @@ public class LoggingBottleneck {
         try {
             Class<?> clazz = Class.forName(className);
             /*
-             * By using this isAssignable to ensure corect class before invocation,
-             * then we lost possibility to track manualy set browsers, but it is correct,
+             * By using this isAssignable to ensure correct class before invocation,
+             * then we lost possibility to track manually set browsers, but it is correct,
              * as method description is set only when annotation is used
              */
             if (clazz != null && BrowserTest.class.isAssignableFrom(clazz)) {

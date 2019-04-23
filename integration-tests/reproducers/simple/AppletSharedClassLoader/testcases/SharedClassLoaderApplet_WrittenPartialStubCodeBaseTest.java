@@ -67,7 +67,7 @@ public class SharedClassLoaderApplet_WrittenPartialStubCodeBaseTest extends Brow
     private static final ServerLauncher secondServer = ServerAccess.getIndependentInstance();
     private static final String writtenCodeBaseSuffix = "_WCB2";
     private static final String writtenCodeBaseFileSuffix = writtenCodeBaseSuffix + ".html";
-    private static final String subFolderName = "SharedClassLaoderSubCodebaseFolder";
+    private static final String subFolderName = "SharedClassLoaderSubCodebaseFolder";
     private static final File root = server.getDir();
     private static final File subRoot = new File(root, subFolderName);
     private static final File origJar1 = new File(server.getDir(), X.jar1);

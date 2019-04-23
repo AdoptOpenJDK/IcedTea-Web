@@ -41,7 +41,7 @@ public interface LaunchHandler {
      * is not strictly correct yet does not necessarily prohibit the
      * system from attempting to launch the application.
      *
-     * @param warning exception to be consummed as warning
+     * @param warning exception to be consumed as warning
      * @return true if the launch should continue, false to abort
      */
     public boolean launchWarning(LaunchException warning);

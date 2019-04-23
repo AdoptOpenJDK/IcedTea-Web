@@ -81,7 +81,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
     @Test
     public void newSecurityAttributesTestNotSet() throws Exception {
-        //oreder is tested in removeTitle
+        //order is tested in removeTitle
         //here we go with pure loading and parsing of them
         File tempDirectory = FileTestUtils.createTempDirectory();
         tempDirectory.deleteOnExit();
@@ -117,8 +117,8 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
     @Test
     public void newSecurityAttributesTest() throws Exception {
-        //oreder is tested in removeTitle
-        //here we go with pure loading and aprsing of them
+        //order is tested in removeTitle
+        //here we go with pure loading and parsing of them
         File tempDirectory = FileTestUtils.createTempDirectory();
         tempDirectory.deleteOnExit();
         File jarLocation6 = new File(tempDirectory, "test6.jar");
@@ -149,14 +149,14 @@ public class JNLPFileTest extends NoStdOutErrTest {
         /*
          *  "sandbox" or "all-permissions"
          */
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS), "erroronous one");
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY), "erroronous one");
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY), "erroronous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS), "erroneous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY), "erroneous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY), "erroneous one");
 
         FileTestUtils.createJarWithContents(jarLocation6, manifest6);
         FileTestUtils.createJarWithContents(jarLocation7, manifest7);
 
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(1, jarLocation7, jarLocation6); //jar 6 should be main. Jar 7 have wrong items, but they are never laoded as in main jar are the correct one
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(1, jarLocation7, jarLocation6); //jar 6 should be main. Jar 7 have wrong items, but they are never loaded as in main jar are the correct one
         final DummyJNLPFileWithJar errorJnlpFile = new DummyJNLPFileWithJar(0, jarLocation7); //jar 7 should be main
         Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
         Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT)));
@@ -204,9 +204,9 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
         Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
         Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertEquals("erroronous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
-        Assert.assertEquals("erroronous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
-        Assert.assertEquals("erroronous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
 
         Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestsAttributes().getApplicationName());
         Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase().matches(new URL("http://aa.com")));
@@ -235,14 +235,14 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertNotNull(ex);
         ex = null;
         try {
-            Assert.assertEquals("erroronous one", errorJnlpFile.getManifestsAttributes().isTrustedLibrary());
+            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().isTrustedLibrary());
         } catch (Exception e) {
             ex = e;
         }
         Assert.assertNotNull(ex);
         ex = null;
         try {
-            Assert.assertEquals("erroronous one", errorJnlpFile.getManifestsAttributes().isTrustedOnly());
+            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().isTrustedOnly());
         } catch (Exception e) {
             ex = e;
         }
@@ -270,7 +270,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
         manifest2.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh1"); //two times, both in not main jar, see DummyJNLPFileWithJar constructor with int
 
         Manifest manifest3 = new Manifest();
-        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it"); //jsut once in not main jar, see DummyJNLPFileWithJar constructor with int
+        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it"); //just once in not main jar, see DummyJNLPFileWithJar constructor with int
         manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh2");
 
         Manifest manifest4 = new Manifest();
@@ -317,10 +317,10 @@ public class JNLPFileTest extends NoStdOutErrTest {
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader);
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getMainClass());
-        Assert.assertNull("defined twice, shoud be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
+        Assert.assertNull("defined twice, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.MAIN_CLASS));
-        Assert.assertNull("not deffined, should benull", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
+        Assert.assertNull("not defined, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
         //correct values are also tested in JnlpClassloaderTest

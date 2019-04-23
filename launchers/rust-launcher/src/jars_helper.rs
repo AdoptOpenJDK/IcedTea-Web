@@ -227,7 +227,7 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn compose_class_path_test_emty() {
+    fn compose_class_path_test_empty() {
         assert_eq!("", super::compose_class_path(vec![], &tu::TestLogger::create_new()));
     }
 

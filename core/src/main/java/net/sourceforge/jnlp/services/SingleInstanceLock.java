@@ -50,7 +50,7 @@ class SingleInstanceLock {
     /**
      * Create an object to manage the instance lock for the specified JNLP file.
      *
-     * @param jnlpFile the jnlpfile to create the lock for
+     * @param jnlpFile the jnlp file to create the lock for
      */
     public SingleInstanceLock(JNLPFile jnlpFile) {
         this.jnlpFile = jnlpFile;

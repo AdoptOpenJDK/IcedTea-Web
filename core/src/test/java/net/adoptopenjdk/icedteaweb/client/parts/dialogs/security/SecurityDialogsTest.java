@@ -173,8 +173,8 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     public static void saveJnlpRuntime() {
         wasHeadless = JNLPRuntime.isHeadless();
         wasTrustAll = JNLPRuntime.isTrustAll();
-        //trutNone is not used in dialogues, its considered as default
-        //but is ussed in Unsigned... dialogs family
+        //trustNone is not used in dialogues, its considered as default
+        //but is used in Unsigned... dialogs family
         wasTrustNone = JNLPRuntime.isTrustNone();
         prompt = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER);
         seclevel = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL);
@@ -211,7 +211,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setTrustNone(false); //ignored
-        setPrompt(true); //should not metter becasue is headless
+        setPrompt(true); //should not matter because is headless
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         try {
             fakeQueue();
@@ -233,14 +233,14 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setHeadless(true);
         JNLPRuntime.setTrustAll(false);
         JNLPRuntime.setTrustNone(false); //used by Unsigne
-        setPrompt(true); //should not metter becasue is headless
+        setPrompt(true); //should not matter because is headless
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
         fakeQueue();
         InputStream backup = System.in;
         try {
             fakeQueue();
             System.setIn(new ByteArrayInputStream(new byte[0]));
-            testAllDialogsNullResaults();
+            testAllDialogsNullResults();
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
             checkUnsignedActing(false, null);
@@ -256,7 +256,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 
     @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustAllDontPrompt() throws Exception {
-        JNLPRuntime.setHeadless(false); //should not metter as is nto asking
+        JNLPRuntime.setHeadless(false); //should not matter as is not asking
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(false);
@@ -278,7 +278,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 
     @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustNoneDontPrompt() throws Exception {
-        JNLPRuntime.setHeadless(false); //should not metter as is nto asking
+        JNLPRuntime.setHeadless(false); //should not matter as is nto asking
         JNLPRuntime.setTrustAll(false);
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(false);
@@ -299,20 +299,20 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     private void testAllDialogs(ExpectedResults r) throws MalformedURLException {
-        //anything but  shoertcut
+        //anything but shortcut
         AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(r.p, r1.getRegularReturn().getValue());
         //shortcut
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
         YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
         Assert.assertEquals(r.ea, r3);
-        //cant emualte security delegate now
+        //cant emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
         //Assert.assertEquals(r.ea, r5);
-        NamePassword r6 = SecurityDialogs.showAuthenicationPrompt(null, 123456, null, null);
+        NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(r.np, r6);
         boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(r.b, r7);
@@ -322,21 +322,21 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(r.b, r9);
     }
 
-    private void testAllDialogsNullResaults() throws MalformedURLException {
-        //anything but  shoertcut
+    private void testAllDialogsNullResults() throws MalformedURLException {
+        //anything but  shortcut
         AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(null, r1);
         //shortcut
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(null, r2);
         YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
         Assert.assertEquals(null, r3);
-        //cant emualte security delegate now
+        //cant emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
         //Assert.assertEquals(r.ea, r5);
-        NamePassword r6 = SecurityDialogs.showAuthenicationPrompt(null, 123456, null, null);
+        NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(null, r6);
         boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(false, r7);
@@ -351,7 +351,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     /*
-     *  testPartiallySignedBehaviour(); needs security delegate to set sandbox, so somtetimes results are strange
+     *  testPartiallySignedBehaviour(); needs security delegate to set sandbox, so sometimes results are strange
      */
     private void checkUnsignedActing(Boolean b1, Boolean b2) throws MalformedURLException {
         if (b1 != null) {
@@ -383,11 +383,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
     //SPOILER ALERT
     //all test below, are executing gui mode
-    //however, they should never popup becasue jnlpruntime should never be initialized in this test
+    //however, they should never popup because jnlpruntime should never be initialized in this test
     //so posting to non existing queue leads to  NPE
-    //if this logic will ever be  changed, the testswill need fixing
-    //msot terrible thing which may happen is, that gui will be really shown
-    //then each test must check if it have X, if odnt, pass with message "nothing tested|
+    //if this logic will ever be  changed, the tests will need fixing
+    //most terrible thing which may happen is, that gui will be really shown
+    //then each test must check if it have X, if don't, pass with message "nothing tested|
     //if it have X, it have to show gui, terminate itself, and then verify that gui was really running
 
     private void countNPES() throws MalformedURLException {
@@ -399,7 +399,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         int metcounter = 0;
         try {
             metcounter++;
-            //anything but  shoertcut
+            //anything but  shortcut
             SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         } catch (NullPointerException ex) {
             npecounter++;
@@ -407,7 +407,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         try {
             metcounter++;
             //shortcut
-            SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
+            SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
@@ -431,7 +431,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         }
         try {
             metcounter++;
-            SecurityDialogs.showAuthenicationPrompt(null, 123456, null, null);
+            SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
@@ -461,7 +461,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     /*
-     testPartiallySignedBehaviour(); needs security delegate to set sandbox, so somtetimes results are strange
+     testPartiallySignedBehaviour(); needs security delegate to set sandbox, so sometimes results are strange
      */
     private void checkUnsignedNPE(Boolean b1, Boolean b2) throws MalformedURLException {
         int metcounter = 0;
@@ -498,7 +498,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     @Test(timeout = 10000)//if gui pops up
     public void testDialogsNotHeadlessTrustNonePrompt() throws Exception {
         JNLPRuntime.setHeadless(false);
-        JNLPRuntime.setTrustAll(false);//should notmetter
+        JNLPRuntime.setTrustAll(false);//should not matter
         JNLPRuntime.setTrustNone(false); //ignored
         setPrompt(true);
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
@@ -614,10 +614,10 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         checkUnsignedNPE(true, false);
     }
 
-    //ending/mising spaces are important separators!
+    //ending/missing spaces are important separators!
     //if new rememberable interface implementation is added, then tests using this sentence should start to fail, 
     //and so this sentence should be updated for it
-    private static final String versionLine= UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
+    private static final String versionLine= UnsignedAppletActionStorageImpl.versionPrefix +UnsignedAppletActionStorageImpl.currentVersion+"\n";
      
     private static final String appletSecurityContent=versionLine+
             "MissingALACAttributePanel:A{YES};"
@@ -636,20 +636,20 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(r.b, r8);
         boolean r9 = testUnsignedBehaviour();
         Assert.assertEquals(r.b, r9);
-        //skiping this one, ahrd to mock certVerifier
+        //skipping this one, ahrd to mock certVerifier
         // boolean r5 = testPartiallySignedBehaviour();
         //Assert.assertEquals(r.b, r5);
         boolean r6 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(r.b, r6);
         AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(r.p, r1.getRegularReturn().getValue());
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
 
     }
 
     @Test(timeout = 10000)//if gui pops up
-    public void testRemeberBehaviour() throws Exception {
+    public void testRememberBehaviour() throws Exception {
         File f = PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile();
         try {
             JNLPRuntime.setHeadless(false);

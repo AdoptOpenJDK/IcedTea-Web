@@ -63,7 +63,7 @@ import java.util.List;
 
 /**
  * This class is taking HTML document url as input, try to sanitize with
- * tagsoup, if availale - and then finds and applet declarations here. Then it
+ * tagsoup, if available - and then finds and applet declarations here. Then it
  * returns first, selected or last one as PluginBridge instance. See parse
  * method.
  */

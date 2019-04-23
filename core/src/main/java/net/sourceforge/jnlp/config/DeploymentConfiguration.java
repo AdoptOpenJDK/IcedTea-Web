@@ -154,7 +154,7 @@ public final class DeploymentConfiguration {
     
     public static final String KEY_STRICT_JNLP_CLASSLOADER = "deployment.jnlpclassloader.strict";
     
-    /** Boolean. Do not prefere https over http */
+    /** Boolean. Do not prefer https over http */
     public static final String KEY_HTTPS_DONT_ENFORCE = "deployment.https.noenforce";
     /*
      * Networking
@@ -245,7 +245,7 @@ public final class DeploymentConfiguration {
     /**
      * Possibility to control hack which resizes very small applets
      */
-    public static final String KEY_SMALL_SIZE_OVERRIDE_TRESHOLD = "deployment.small.size.treshold";
+    public static final String KEY_SMALL_SIZE_OVERRIDE_THRESHOLD = "deployment.small.size.threshold";
     public static final String KEY_SMALL_SIZE_OVERRIDE_WIDTH = "deployment.small.size.override.width";
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
 
@@ -352,7 +352,7 @@ public final class DeploymentConfiguration {
 
         /*
          * First, try to read the system's subdirResult deployment.config file to find if
-         * there is a system-level deployment.poperties file
+         * there is a system-level deployment.properties file
          */
 
         if (systemConfigFile != null) {
@@ -485,7 +485,7 @@ public final class DeploymentConfiguration {
     /**
      * Check that the configuration is valid. If there are invalid values,set
      * those values to the default values. This is done by using check()
-     * method of the ValueCheker for each setting on the actual value. Fixes
+     * method of the ValueChecker for each setting on the actual value. Fixes
      * are made in-place.
      *
      * @param initial a map representing the initial configuration
@@ -556,7 +556,7 @@ public final class DeploymentConfiguration {
      */
     private boolean loadSystemConfiguration(URL configFile) throws ConfigurationException {
 
-        LOG.info("Loading system configuation from: {}", configFile);
+        LOG.info("Loading system configuration from: {}", configFile);
 
         Map<String, Setting<String>> systemConfiguration = new HashMap<>();
         try {
@@ -799,7 +799,7 @@ public final class DeploymentConfiguration {
                     try {
                         dd = pattern.parse(decommented);
                     } catch (Exception ex) {
-                        //we really dont care, failure is our decision point
+                        //we really don't care, failure is our decision point
                     }
                     if (dd == null){
                         r.append(decommented).append("\n");

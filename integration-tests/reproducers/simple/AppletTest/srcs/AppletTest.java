@@ -47,7 +47,7 @@ public class AppletTest extends Applet {
         public void run() {
             try {
                 Thread.sleep(n);
-                System.out.println("Aplet killing himself after " + n + " ms of life");
+                System.out.println("Applet killing himself after " + n + " ms of life");
                 System.exit(0);
             } catch (Exception ex) {
             }

@@ -54,14 +54,14 @@ public class ControlCurveTest {
         ControlCurve cc = new ControlCurve();
         Assert.assertNotNull(cc.getSourcePolygon());
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         Assert.assertTrue(cc.isWithPoints());
         cc.setSourcePolygon(p1);
         Assert.assertNotNull(cc.getSourcePolygon());
         Assert.assertEquals(p1, cc.getSourcePolygon());
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         Assert.assertTrue(cc.isWithPoints());
         cc.setWithPoints(false);
@@ -71,7 +71,7 @@ public class ControlCurveTest {
         Assert.assertNotNull(cc.getSourcePolygon());
         Assert.assertEquals(p2, cc.getSourcePolygon());
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setWithPoints(false);
         Assert.assertFalse(cc.isWithPoints());
@@ -79,7 +79,7 @@ public class ControlCurveTest {
         Assert.assertNotNull(cc.getSourcePolygon());
         Assert.assertEquals(p3, cc.getSourcePolygon());
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setWithPoints(false);
         Assert.assertFalse(cc.isWithPoints());
@@ -123,22 +123,22 @@ public class ControlCurveTest {
         ControlCurve cc = new ControlCurve();
         Assert.assertEquals(0, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.addPoint(10, 10);
         Assert.assertEquals(1, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.addPoint(10, 10);
         Assert.assertEquals(2, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.addPoint(100, 100);
         Assert.assertEquals(3, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
     }
 
@@ -151,7 +151,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setSelection(-1);
         cc.setPoint(10, 10);
@@ -177,7 +177,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         Assert.assertEquals(20, cc.getSourcePolygon().ypoints[3]);
         Assert.assertEquals(10, cc.getSourcePolygon().xpoints[3]);
@@ -192,7 +192,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setPoint(-1, 10, 10);
         Assert.assertEquals(4, cc.getSourcePolygon().npoints);
@@ -215,7 +215,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         Assert.assertEquals(20, cc.getSourcePolygon().ypoints[3]);
         Assert.assertEquals(10, cc.getSourcePolygon().xpoints[3]);
@@ -231,7 +231,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.removePoint(-1);
         Assert.assertEquals(4, cc.getSourcePolygon().npoints);
@@ -240,7 +240,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.removePoint(4);
         Assert.assertEquals(4, cc.getSourcePolygon().npoints);
@@ -249,7 +249,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.removePoint(3);
         Assert.assertEquals(3, cc.getSourcePolygon().npoints);
@@ -258,7 +258,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
 
     }
@@ -271,7 +271,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setSelection(-1);
         cc.removePoint();
@@ -281,7 +281,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setSelection(4);
         cc.removePoint();
@@ -291,7 +291,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
         cc.setSelection(0);
         cc.removePoint();
@@ -301,7 +301,7 @@ public class ControlCurveTest {
             Assert.assertEquals(xs[i + 1], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNull(cc.getResult());
 
     }

@@ -59,7 +59,7 @@ public class BasicValueValidatorsTests {
     private final String linuxLegal = "/aaa/bb/cc";
 
     @Test
-    public void testWindowsDetction() {
+    public void testWindowsDetection() {
         Assert.assertTrue(canBeWindows("blah windows blah"));
         Assert.assertTrue(canBeWindows("blah Windows blah"));
         Assert.assertTrue(canBeWindows("  WINDOWS 7"));

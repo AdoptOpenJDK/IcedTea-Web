@@ -137,7 +137,7 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
 
     let mut bin_name = String::from("-Dicedtea-web.bin.name=");
     let mut bin_location = String::from("-Dicedtea-web.bin.location=");
-    //no metter what ITW_LIBS are saying, imho using current pgm is always correct comapred to hardcoded values
+    //no matter what ITW_LIBS are saying, imho using current pgm is always correct comapred to hardcoded values
     bin_name.push_str(&current_name);
     bin_location.push_str(&dirs_paths_helper::path_to_string(&current_bin));
 

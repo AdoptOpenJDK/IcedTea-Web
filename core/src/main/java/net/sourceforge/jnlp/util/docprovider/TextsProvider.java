@@ -175,7 +175,7 @@ public abstract class TextsProvider {
             }
             String controlledBy = "";
             for (Map.Entry<String, Setting<String>> entry : defs) {
-                if (matchSttingsValueWithInfrastrucutreFile(entry.getValue(), f)) {
+                if (matchStringsValueWithInfrastructureFile(entry.getValue(), f)) {
                     controlledBy = " " + Translator.R("BUTControlledBy", getFormatter().getBold(entry.getKey()));
                     break;
                 }
@@ -185,7 +185,7 @@ public abstract class TextsProvider {
         return formatter.wrapParagraph(sb.toString());
     }
 
-    protected boolean matchSttingsValueWithInfrastrucutreFile(Setting<String> entry, InfrastructureFileDescriptor f) {
+    protected boolean matchStringsValueWithInfrastructureFile(Setting<String> entry, InfrastructureFileDescriptor f) {
         if (entry == null || entry.getDefaultValue() == null) {
             return false;
         }
@@ -295,7 +295,7 @@ public abstract class TextsProvider {
     }
 
     public String writeToString() {
-        //first walktrhough builds index (html), set longest options(textt)
+        //first walk through builds index (html), set longest options(textt)
         return prepare().writeToStringReal();
     }
 
@@ -587,7 +587,7 @@ public abstract class TextsProvider {
             if (line.trim().isEmpty()) {
                 areAuthors = !areAuthors;
             }
-            sb.append(getFormatter().process(getFormatter().getAdressLink(line)));
+            sb.append(getFormatter().process(getFormatter().getAddressLink(line)));
             if (getFormatter() instanceof HtmlFormatter || !areAuthors) {
                 sb.append(getFormatter().getNewLine());
             }

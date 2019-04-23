@@ -480,9 +480,9 @@ public class Defaults {
                         String.valueOf(600)//0 is disabling it; negative is enforcing it
                 },
                 {
-                        DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD,
+                        DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD,
                         BasicValueValidators.getRangedIntegerValidator(0, 1000),
-                        String.valueOf(10)// treshold when applet is considered as too small
+                        String.valueOf(10)// threshold when applet is considered as too small
                 },
                 //**************
                 //* Native (rust) only - beggin

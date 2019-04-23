@@ -85,7 +85,7 @@ public class ImageInputStreamIcoTest {
     }
 
     @Test
-    public void twhoPlanesDifferentSizesDifferentTransaprencies() throws IOException, IcoException {
+    public void twhoPlanesDifferentSizesDifferentTransparencies() throws IOException, IcoException {
         ImageInputStreamIco i = loadIco("favicon1.ico");
         Assert.assertEquals(2, i.getImages().size());
         int ii = 0;
@@ -139,7 +139,7 @@ public class ImageInputStreamIcoTest {
     }
 
     @Test
-    public void bmpsMixedWithPngAndTransaprencyAndLAyersFromBiggestToSmallest() throws IOException, IcoException {
+    public void bmpsMixedWithPngAndTransparencyAndLAyersFromBiggestToSmallest() throws IOException, IcoException {
         ImageInputStreamIco i = loadIco("favicon4.ico");
         Assert.assertEquals(4, i.getImages().size());
         int index = 0;
@@ -213,11 +213,11 @@ public class ImageInputStreamIcoTest {
     }
 
     @Test
-    public void allPalletesFormats() throws IOException, IcoException {
-        String[] bitesPalletes = new String[]{"1", "4", "8", "24", "32"};
+    public void allPalettesFormats() throws IOException, IcoException {
+        String[] bitsPalettes = new String[]{"1", "4", "8", "24", "32"};
         String[] compressions = new String[]{"bmp", "png"};
         String[] trans = new String[]{"noTrans", "trans"};
-        for (String palette : bitesPalletes) {
+        for (String palette : bitsPalettes) {
             for (String comp : compressions) {
                 for (String tran : trans) {
                     String name = "ico" + palette + "-" + comp + "-" + tran + ".ico";
@@ -241,10 +241,10 @@ public class ImageInputStreamIcoTest {
                                 checkColors(Color.black, new Color(0, 0, 0, 255), i.getImage(0));
                             }
                         } else {
-                            throw new RuntimeException("Invlaid compression: " + comp);
+                            throw new RuntimeException("Invalid compression: " + comp);
                         }
                     } else {
-                        throw new RuntimeException("Invlaid transaprency: " + tran);
+                        throw new RuntimeException("Invalid transparency: " + tran);
                     }
                 }
             }

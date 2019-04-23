@@ -150,7 +150,7 @@ public class SecurityDialog {
     }
 
     /**
-     * Create a SecurityWarningDailog to display information about a single
+     * Create a SecurityWarningDialog to display information about a single
      * certificate
      */
     private SecurityDialog(SecurityDialogs.DialogType dialogType, X509Certificate c) {
@@ -217,13 +217,13 @@ public class SecurityDialog {
     private void initDialog() {
         String dialogTitle = createTitle();
 
-        // Note: ViwableDialog methods are defered until show():
+        // Note: ViwableDialog methods are deferred until show():
         getViwableDialog().setTitle(dialogTitle);
         getViwableDialog().setModalityType(ModalityType.MODELESS);
 
         getViwableDialog().setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        // Initialize panel now as its constructor may call getViwableDialog() defered methods
+        // Initialize panel now as its constructor may call getViwableDialog() deferred methods
         // to modify dialog state:  
         SwingUtils.invokeAndWait(new Runnable() {
             @Override
@@ -281,7 +281,7 @@ public class SecurityDialog {
             dialogTitle = "Security Warning";
         else if (dtype == SecurityDialogs.DialogType.APPLET_WARNING)
             dialogTitle = "Applet Warning";
-        else if (dtype == SecurityDialogs.DialogType.PARTIALLYSIGNED_WARNING)
+        else if (dtype == SecurityDialogs.DialogType.PARTIALLY_SIGNED_WARNING)
             dialogTitle = "Security Warning";
         else if (dtype == SecurityDialogs.DialogType.AUTHENTICATION)
             dialogTitle = "Authentication Required";
@@ -332,14 +332,14 @@ public class SecurityDialog {
             lpanel = new AccessWarningPane(sd, sd.extras, sd.certVerifier);
         } else if (type == SecurityDialogs.DialogType.APPLET_WARNING) {
             lpanel = new AppletWarningPane(sd, sd.certVerifier);
-        } else if (type == SecurityDialogs.DialogType.PARTIALLYSIGNED_WARNING) {
+        } else if (type == SecurityDialogs.DialogType.PARTIALLY_SIGNED_WARNING) {
             lpanel = AppTrustWarningDialog.partiallySigned(sd, sd.file, (SecurityDelegate) sd.extras[0]);
         } else if (type == SecurityDialogs.DialogType.UNSIGNED_WARNING) {
             lpanel = AppTrustWarningDialog.unsigned(sd, sd.file); // Only necessary for applets on 'high security' or above
         } else if (type == SecurityDialogs.DialogType.AUTHENTICATION) {
             lpanel = new PasswordAuthenticationPane(sd, sd.extras);
         } else if (type == SecurityDialogs.DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
-            lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getNotNullProbalbeCodeBase().toExternalForm());
+            lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getNotNullProbableCodeBase().toExternalForm());
         } else if (type == SecurityDialogs.DialogType.MISSING_ALACA) {
             lpanel = new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
         } else if (type == SecurityDialogs.DialogType.MATCHING_ALACA) {
@@ -347,7 +347,7 @@ public class SecurityDialog {
         } else if (type == SecurityDialogs.DialogType.SECURITY_511) {
             lpanel = new InetSecurity511Panel(sd, (URL) sd.extras[0]);
         } else {
-            throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. Tahts not allowed.");
+            throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. That's not allowed.");
         }
         return lpanel;
     }

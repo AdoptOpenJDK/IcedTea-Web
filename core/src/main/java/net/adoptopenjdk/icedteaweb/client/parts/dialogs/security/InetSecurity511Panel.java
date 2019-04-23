@@ -140,7 +140,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
         });
         this.add(title, BorderLayout.NORTH);
         if (sd != null) {
-            //for testing pusposes
+            //for testing purposes
             sd.getViwableDialog().pack();
         }
     }

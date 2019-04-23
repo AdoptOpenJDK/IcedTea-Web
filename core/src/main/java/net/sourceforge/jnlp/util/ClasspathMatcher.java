@@ -223,7 +223,7 @@ public class ClasspathMatcher {
         }
         /*
          * Here is small trap
-         * We do not know, if protocol is specifed
+         * We do not know, if protocol is specified
          * if so, the protocol://blah.blah/blah is already recognized
          * but we must ensure that we have not found eg:
          * blah.blah/blah://in/path - which is perfectly valid url...
@@ -246,17 +246,17 @@ public class ClasspathMatcher {
     }
 
     private static String[] extractProtocolImpl(String source) {
-        //we must know it have protocoll;
+        //we must know it have protocol;
         return splitOnFirst(source, PROTOCOL_DELIMITER);
     }
 
     static String extractProtocol(String source) {
-        //we must know it have protocoll;
+        //we must know it have protocol;
         return extractProtocolImpl(source)[0];
     }
 
     static String removeProtocol(String source) {
-        //we must know it have protocoll;
+        //we must know it have protocol;
         return extractProtocolImpl(source)[1];
     }
 
@@ -335,19 +335,19 @@ public class ClasspathMatcher {
 
     static Parts splitToParts(String source) {
         Parts parts = new Parts();
-        String urlWithoutprotocol = source;
+        String urlWithoutProtocol = source;
         boolean haveProtocol = hasProtocol(source);
         if (haveProtocol) {
             parts.protocol = extractProtocol(source);
-            urlWithoutprotocol = removeProtocol(source);
+            urlWithoutProtocol = removeProtocol(source);
         } else {
             parts.protocol = "*";
         }
-        boolean havePath = hasPath(urlWithoutprotocol);
-        String remianedUrl = urlWithoutprotocol;
+        boolean havePath = hasPath(urlWithoutProtocol);
+        String remianedUrl = urlWithoutProtocol;
         if (havePath) {
-            parts.path = extractPath(urlWithoutprotocol);
-            remianedUrl = removePath(urlWithoutprotocol);
+            parts.path = extractPath(urlWithoutProtocol);
+            remianedUrl = removePath(urlWithoutProtocol);
         } else {
             parts.path = "*";
         }

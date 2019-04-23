@@ -76,9 +76,9 @@ public class JEditorPaneBasedExceptionDialogTest {
 
     private void assertAI(String s, boolean b) {
         if (b) {
-            Assert.assertTrue("result of getText must contains annother info", s.contains(ai));
+            Assert.assertTrue("result of getText must contains another info", s.contains(ai));
         } else {
-            Assert.assertFalse("result of getText must NOT contains annother info", s.contains(ai));
+            Assert.assertFalse("result of getText must NOT contains another info", s.contains(ai));
         }
     }
 
@@ -178,12 +178,12 @@ public class JEditorPaneBasedExceptionDialogTest {
     }
 
     @Test
-    public void infoElementToListTets() {
+    public void infoElementToListTest() {
 
         List<String> tl = JEditorPaneBasedExceptionDialog.infoElementToList(ec);
-        Assert.assertTrue("Transformed elemetn must contains all items ", tl.contains(l.get(0)));
-        Assert.assertTrue("Transformed elemetn must contains all items ", tl.contains(l.get(1)));
-        Assert.assertTrue("Transformed elemetn must contains all items ", tl.contains(l.get(2)));
-        Assert.assertTrue("Transformed elemetn must contains all items ", tl.contains(l.get(3)));
+        Assert.assertTrue("Transformed element must contains all items ", tl.contains(l.get(0)));
+        Assert.assertTrue("Transformed element must contains all items ", tl.contains(l.get(1)));
+        Assert.assertTrue("Transformed element must contains all items ", tl.contains(l.get(2)));
+        Assert.assertTrue("Transformed element must contains all items ", tl.contains(l.get(3)));
     }
 }

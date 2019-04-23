@@ -75,7 +75,7 @@ class ContentReader implements Runnable {
                     if (line.length() > 0 && listeners != null) {
                         for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
-                                listener.lineReaded(line.toString());
+                                listener.lineRead(line.toString());
                             }
                         }
                     }
@@ -88,7 +88,7 @@ class ContentReader implements Runnable {
                     if (listeners != null) {
                         for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
-                                listener.lineReaded(line.toString());
+                                listener.lineRead(line.toString());
                             }
                         }
                     }
@@ -97,7 +97,7 @@ class ContentReader implements Runnable {
                 if (listeners != null) {
                     for (final ContentReaderListener listener : listeners) {
                         if (listener != null) {
-                            listener.charReaded(ch);
+                            listener.charRead(ch);
                         }
                     }
                 }

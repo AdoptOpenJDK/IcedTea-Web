@@ -62,8 +62,8 @@ public final class SecurityDialogMessage {
 
     public SecurityDialogs.DialogType dialogType;
     public AccessType accessType;
-    //all informations dilaogs needs are in file. 
-    //The only known exception is, and should remain, showAuthenicationPrompt
+    //all information dialogs needs are in file. 
+    //The only known exception is, and should remain, showAuthenticationPrompt
     public final JNLPFile file;
     public CertVerifier certVerifier;
     public X509Certificate certificate;

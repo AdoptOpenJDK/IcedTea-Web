@@ -196,7 +196,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void getCustomAtributes() throws Exception {
+    public void getCustomAttributes() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "testX.jar");
 
@@ -221,7 +221,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void getCustomAtributesEmpty() throws Exception {
+    public void getCustomAttributesEmpty() throws Exception {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "testX.jar");
 
@@ -258,7 +258,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         manifest2.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh1"); //two times, both in not main jar, see DummyJNLPFileWithJar constructor with int
 
         Manifest manifest3 = new Manifest();
-        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it"); //jsut once in not main jar, see DummyJNLPFileWithJar constructor with int
+        manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_TITLE, "it"); //just once in not main jar, see DummyJNLPFileWithJar constructor with int
         manifest3.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "rh2");
 
         Manifest manifest4 = new Manifest();
@@ -287,9 +287,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
                 assertEquals("DummyClass1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.MAIN_CLASS));
                 //defined not in main jar 
                 assertEquals("it", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_TITLE));
-                //not deffined
+                //not defined
                 assertEquals(null, classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_VENDOR_ID));
-                //deffined in first jar
+                //defined in first jar
                 assertEquals("some url1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_URL));
             }
         });
@@ -338,7 +338,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
      * one item of this size, for same reason
      */
     public void testNameClashInNestedJars() throws Exception {
-        //for this test is enought to not crash jvm
+        //for this test is enough to not crash jvm
         boolean verifyBackup = JNLPRuntime.isVerifying();
         File dirHolder = File.createTempFile("pf-", ".jar");
         dirHolder.deleteOnExit();

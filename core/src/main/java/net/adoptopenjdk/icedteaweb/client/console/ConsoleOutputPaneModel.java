@@ -47,7 +47,7 @@ public class ConsoleOutputPaneModel {
         abstract int body(MessageWithHeader o1, MessageWithHeader o2);
     }
 
-    //testign data provider
+    //testing data provider
     static class TestMessagesProvider extends Observable implements ObservableMessagesProvider {
 
         List<MessageWithHeader> data = new ArrayList<MessageWithHeader>();
@@ -104,9 +104,9 @@ public class ConsoleOutputPaneModel {
             origData.add(m1);
             origData.add(m2);
             origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 0 - multilined \n"
-                    + "since beggining\n"
+                    + "since beginning\n"
                     + "         later\n"
-                    + "again from beggingin\n"
+                    + "again from beginning\n"
                     + "               even later"));
             data.addAll(origData);
         }
@@ -230,7 +230,7 @@ public class ConsoleOutputPaneModel {
         line = line.replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;")
                 .replaceAll("\n", "<br/>\n")
-                .replaceAll("  ", "&nbsp; ")//small trick, html is reducting row of spaces to single space. This handles it and stimm allow line wrap
+                .replaceAll("  ", "&nbsp; ")//small trick, html is reducing row of spaces to single space. This handles it and still allow line wrap
                 .replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
         return line;
     }

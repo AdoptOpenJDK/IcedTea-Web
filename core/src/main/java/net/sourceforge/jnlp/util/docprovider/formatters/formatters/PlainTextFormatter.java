@@ -57,18 +57,18 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
                 new sun.security.action.GetPropertyAction("line.separator"));
     }
 
-    private final String pargraohIndentation;
+    private final String paragraphIndentation;
     private final int maxLineLength;
     public static final String DEFAULT_INDENT = "    ";
     
 
-    public PlainTextFormatter(String pargraohIndentation, int maxLineLength) {
-        this.pargraohIndentation = pargraohIndentation;
+    public PlainTextFormatter(String paragraphIndentation, int maxLineLength) {
+        this.paragraphIndentation = paragraphIndentation;
         this.maxLineLength = maxLineLength;
     }
 
     public PlainTextFormatter() {
-        this.pargraohIndentation = DEFAULT_INDENT;
+        this.paragraphIndentation = DEFAULT_INDENT;
         this.maxLineLength = Integer.MAX_VALUE;
     }
 
@@ -115,7 +115,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
 
     @Override
     public String wrapParagraph(String s) {
-        return wrapParagraph(s, maxLineLength, pargraohIndentation);
+        return wrapParagraph(s, maxLineLength, paragraphIndentation);
 
     }
 

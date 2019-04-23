@@ -73,8 +73,8 @@ public final class ErrorPainter extends BasePainter {
     private int errorFlyPercentage = 100;
 
     /**
-     * Interpolation is root ratior is r= (currentSize / origSize)
-     * then value to-from is interpolaed from to to from accroding to ratio
+     * Interpolation is root ratio is r= (currentSize / origSize)
+     * then value to-from is interpolated from to to from according to ratio
      *
      * @param origSize
      * @param currentSize
@@ -89,7 +89,7 @@ public final class ErrorPainter extends BasePainter {
     /**
      * is interpolating one color to another based on ration current/orig
      * Each (r,g,b,a) part of color is interpolated separately
-     * resturned is new color composed form new r,g,b,a
+     * returned is new color composed form new r,g,b,a
      * @param origSize
      * @param currentSize
      * @param from

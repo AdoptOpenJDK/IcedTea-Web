@@ -141,7 +141,7 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     // Reminder: Relax visibility in sun.applet.AppletPanel
     @Override
     protected synchronized void createAppletThread() {
-        // initialize JNLPRuntime in the main threadgroup
+        // initialize JNLPRuntime in the main thread group
         synchronized (JNLPRuntime.initMutex) {
             //The custom NetX Policy and SecurityManager are set here.
             if (!JNLPRuntime.isInitialized()) {
@@ -206,8 +206,8 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
     }
 
     @Override
-    public int getSplashHeigth() {
-        return splashController.getSplashHeigth();
+    public int getSplashHeight() {
+        return splashController.getSplashHeight();
     }
 
     public void init(PluginBridge bridge) throws LaunchException {

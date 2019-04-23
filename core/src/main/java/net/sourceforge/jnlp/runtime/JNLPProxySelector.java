@@ -144,7 +144,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
     }
 
     /**
-     * Uses the given key to get a host from the configuraion
+     * Uses the given key to get a host from the configuration
      */
     private String getHost(DeploymentConfiguration config, String key) {
         String proxyHost = config.getProperty(key);

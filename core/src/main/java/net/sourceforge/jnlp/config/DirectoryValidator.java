@@ -21,8 +21,8 @@ public class DirectoryValidator {
     
     /**
      * This class is holding results of directory validation.
-     * Various errors like can not read, write create dir can apeear
-     * For sumaries of results are here getPasses, getFailures methods
+     * Various errors like can not read, write create dir can appear
+     * For summaries of results are here getPasses, getFailures methods
      * <p>
      * Individual results can be read from results field, or converted to string
      * </p>
@@ -61,7 +61,7 @@ public class DirectoryValidator {
         }
         
         /**
-         * The result have one reuslt per line, separated by \n 
+         * The result have one result per line, separated by \n 
          * as is inherited from result.getMessage() method.
          *
          * @return all results connected. 
@@ -107,8 +107,8 @@ public class DirectoryValidator {
         public boolean isDir = true;
         //can be read, written to?
         public boolean correctPermissions = true;
-        //have correct subdir? - this implies soe rules, when subdirecotry of some
-        //particular directory have weeker permissions
+        //have correct subdir? - this implies soe rules, when subdirectory of some
+        //particular directory have weaker permissions
         public DirectoryCheckResult subDir = null;
         //actual tested directory
         private final File testedDir;
@@ -297,7 +297,7 @@ public class DirectoryValidator {
      * </p>
      * <p>
      * Some steps may looks like redundant, but some permission settings really
-     * alow to create file but not directory and vice versa. Also some settings
+     * allow to create file but not directory and vice versa. Also some settings
      * can allow to create file or directory which can not be written into. (eg
      * ACL or network disks)
      * </p>

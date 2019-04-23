@@ -67,9 +67,9 @@ public class ChristmasExtension implements SplashExtension {
         this(0, 0);
     }
     private static final Random seed = new Random();
-    private static final int avarege_star_width = 10; //stars will be 5-15
-    private final int avarege_fall_speed = 4; //2-6
-    private final int avarege_rotation_speed = 2; //1-3
+    private static final int average_star_width = 10; //stars will be 5-15
+    private final int average_fall_speed = 4; //2-6
+    private final int average_rotation_speed = 2; //1-3
 
     private class Star {
 
@@ -91,9 +91,9 @@ public class ChristmasExtension implements SplashExtension {
             haveEight = seed.nextBoolean();
             this.centerX = seed.nextInt(w + 1);
             this.centerY = seed.nextInt(h + 1);
-            this.fallSpeed = avarege_fall_speed / 2 + seed.nextInt(avarege_fall_speed / 2);
+            this.fallSpeed = average_fall_speed / 2 + seed.nextInt(average_fall_speed / 2);
             this.orientation = seed.nextBoolean();
-            this.direction = -(avarege_rotation_speed / 2 + seed.nextInt(avarege_rotation_speed / 2));
+            this.direction = -(average_rotation_speed / 2 + seed.nextInt(average_rotation_speed / 2));
             if (seed.nextInt(4) == 0) {
                 originalColor[0] = Color.yellow.getRed();
                 originalColor[1] = Color.yellow.getGreen();
@@ -155,7 +155,7 @@ public class ChristmasExtension implements SplashExtension {
         }
 
         private int createRadius() {
-            return avarege_star_width / 2 + seed.nextInt(avarege_star_width);
+            return average_star_width / 2 + seed.nextInt(average_star_width);
         }
 
         private Polygon createPolygon() {
@@ -245,7 +245,7 @@ public class ChristmasExtension implements SplashExtension {
     public final void adjustForSize(int w, int h) {
         this.w = w;
         this.h = h;
-        int count = w / (2 * (avarege_star_width + 1));
+        int count = w / (2 * (average_star_width + 1));
         while (stars.size() > count) {
             stars.remove(stars.size() - 1);
         }

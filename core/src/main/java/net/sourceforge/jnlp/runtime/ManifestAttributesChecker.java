@@ -173,11 +173,11 @@ public class ManifestAttributesChecker {
         }
         for (String ep : eps) {
             if (ep.equals(mainClass)) {
-                LOG.debug("Entry-Point of {} mathches {} continuing.", ep, mainClass);
+                LOG.debug("Entry-Point of {} matches {} continuing.", ep, mainClass);
                 return;
             }
         }
-        throw new LaunchException("None of the entry points specified: '" + file.getManifestsAttributes().getEntryPointString() + "' matched the main class " + mainClass + " and apelt is signed. This is a security error and the app will not be launched.");
+        throw new LaunchException("None of the entry points specified: '" + file.getManifestsAttributes().getEntryPointString() + "' matched the main class " + mainClass + " and applet is signed. This is a security error and the app will not be launched.");
     }
 
     /**
@@ -396,14 +396,14 @@ public class ManifestAttributesChecker {
             }
         }
         if (allOk) {
-            //all resoources are from codebase or document base. it is ok to proceeed.
+            //all resources are from codebase or document base. it is ok to proceed.
             LOG.debug("All applications resources ({}) are from codebase/documentbase {}/{}, skipping Application-Library-Allowable-Codebase Attribute check.", usedUrls.toArray(new URL[0])[0], codebase, documentBase);
             return;
         }
         
         ClasspathMatchers att = null;
         if (signing == SigningState.NONE) {
-            //for unsigned app we are ignoring value in manifesdt (may be faked)
+            //for unsigned app we are ignoring value in manifest (may be faked)
         } else {
             att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
         }
@@ -433,7 +433,7 @@ public class ManifestAttributesChecker {
     }
     
     //package private for testing
-    //not perfect but ok for usecase
+    //not perfect but ok for use case
     static URL stripDocbase(URL documentBase) {
         String s = documentBase.toExternalForm();
         if (s.endsWith("/") || s.endsWith("\\")) {

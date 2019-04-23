@@ -87,7 +87,7 @@ public class PropertyDescTest {
     }
     
     @Test
-    public void allStarngeEmpty() throws LaunchException{
+    public void allStrangeEmpty() throws LaunchException{
         PropertyDesc p = PropertyDesc.fromString("  =    ");
         Assert.assertEquals("  ", p.getKey());
         Assert.assertEquals("    ", p.getValue());

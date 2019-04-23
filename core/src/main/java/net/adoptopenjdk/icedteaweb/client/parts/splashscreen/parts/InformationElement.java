@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 
 /**
- * This class is wrapper arround the *information* tag element which should
+ * This class is wrapper around the *information* tag element which should
  * javaws provide from source jnlp file
  */
 public class InformationElement {
@@ -94,8 +94,8 @@ public class InformationElement {
     /**
      * Just one description of each kind (4 including null)  are  allowed in information element.
      * This method should throw exception when trying to add second description of same kind
-     * But I do not consider it as good idea to force this behaviour for somesing like psalsh screen,
-     * so I jsut replace the previous one with new one. without any warning
+     * But I do not consider it as good idea to force this behaviour for something like splash screen,
+     * so I just replace the previous one with new one. without any warning
      */
     public void addDescription(String description, DescriptionKind kind) {
         if (description == null) {

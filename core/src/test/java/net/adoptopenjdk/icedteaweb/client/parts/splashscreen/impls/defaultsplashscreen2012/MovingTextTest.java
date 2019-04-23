@@ -140,7 +140,7 @@ public class MovingTextTest {
         assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.firstLetterMiddleWidth), (int) (h * TextWithWaterLevelTest.firstLetterUpperHeight))));
         assertNotEquals(cc, new Color(bic.getRGB((int) (w * TextWithWaterLevelTest.secondLetterRightWidth), (int) (h * TextWithWaterLevelTest.secondLetterUpperHeight))));
 
-        //well this should be acctually rgba 0,0,0,0 but somehow this was no passig
+        //well this should be actually rgba 0,0,0,0 but somehow this was no passing
         //you can confirm with:
         //ImageFontCutterTest.save(bic, "halfFiledOus")
         Assert.assertEquals(cc, new Color(bic.getRGB(137, 127)));

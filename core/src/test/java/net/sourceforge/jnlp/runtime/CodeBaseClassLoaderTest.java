@@ -152,7 +152,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         int level = 10;
         if (shouldExists) {
             //for found the "caching" is by internal logic.Always faster, but who knows how...
-            //to keep the test stabile keep the difference minimal
+            //to keep the test stable keep the difference minimal
             level = 1;
         }
         long startTime, stopTime;

@@ -190,12 +190,12 @@ public class ResourceDownloader implements Runnable {
             }
             entry.setLastUpdated(System.currentTimeMillis());
             try {
-                //do not die here no metter of cost. Just metadata
+                //do not die here no matter of cost. Just metadata
                 //is the path from user best to store? He can run some jnlp from temp which then be stored
                 //on contrary, this downloads the jnlp, we actually do not have jnlp parsed during first interaction
                 //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
-                //anjother issue is forking. If this (eg local) jnlp starts its second isntance, the url *can* be different
-                //in contrary, usally si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
+                //another issue is forking. If this (eg local) jnlp starts its second instance, the url *can* be different
+                //in contrary, usually si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
                 String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed 
                 if (jnlpPath == null || jnlpPath.equals("")) {
                     jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);

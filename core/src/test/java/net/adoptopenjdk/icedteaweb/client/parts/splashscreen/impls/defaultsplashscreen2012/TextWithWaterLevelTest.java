@@ -128,7 +128,7 @@ public class TextWithWaterLevelTest {
         Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * firstLetterMiddleWidth), (int) (h * firstLetterUpperHeight))));
         Assert.assertEquals(Color.white, new Color(bic.getRGB((int) (w * secondLetterRightWidth), (int) (h * secondLetterUpperHeight))));
 
-        //well this should be acctually rgba 0,0,0,0 but somehow this was no passig
+        //well this should be actually rgba 0,0,0,0 but somehow this was no passing
         //you can confirm with:
         //ImageFontCutterTest.save(bic, "halfFiledOus")
         Assert.assertEquals(new Color(0, 0, 0), new Color(bic.getRGB(137, 127)));

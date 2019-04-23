@@ -24,7 +24,7 @@ import net.adoptopenjdk.icedteaweb.Assert;
  * The optional related-content element describes an additional piece of related content, such as a
  * readme file, help pages, or links to registration pages, as a hint to the JNLP Client.
  * The application is asking that this content be included in its desktop integration.
- * The related-content element has a manditory href attribute.
+ * The related-content element has a mandatory href attribute.
  *
  * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
  * for a detailed specification of this class.
@@ -40,7 +40,7 @@ public class RelatedContentDesc {
     /** The name of the related content. */
     private String title = null;
 
-    /** A short discription of the related content. */
+    /** A short description of the related content. */
     private String description = null;
 
     /** The mandatory location of the content. */

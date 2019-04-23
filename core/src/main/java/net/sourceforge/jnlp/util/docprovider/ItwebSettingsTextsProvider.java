@@ -137,7 +137,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
             String defaultValue = entry.getValue().getDefaultValue();
             String fileAcronom = null;
             for (InfrastructureFileDescriptor f : files) {
-                if (matchSttingsValueWithInfrastrucutreFile(entry.getValue(), f)) {
+                if (matchStringsValueWithInfrastructureFile(entry.getValue(), f)) {
                     fileAcronom = f.toString();
                     break;
                 }

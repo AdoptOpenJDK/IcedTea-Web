@@ -67,7 +67,7 @@ public class JNLPSplashScreen extends JDialog {
     private JNLPFile file;
     public static final  int DEF_WIDTH=635;
     public static final  int DEF_HEIGHT=480;
-    private SplashPanel componetSplash;
+    private SplashPanel componentSplash;
     private boolean splashImageLoaded=false;
     private SplashPanel splash;
 
@@ -113,7 +113,7 @@ public class JNLPSplashScreen extends JDialog {
                     splash.startAnimation();
                     splash.setInformationElement(InformationElement.createFromJNLP(file));
                     this.add(splash.getSplashComponent());
-                    this.componetSplash = splash;
+                    this.componentSplash = splash;
                 }
             }
             correctSize();
@@ -137,7 +137,7 @@ public class JNLPSplashScreen extends JDialog {
 
 
     public boolean isSplashScreenValid() {
-        return (splashImage != null) || (componetSplash != null);
+        return (splashImage != null) || (componentSplash != null);
     }
 
     private void correctSize() {
@@ -171,11 +171,11 @@ public class JNLPSplashScreen extends JDialog {
     }
 
     public boolean isCustomSplashscreen() {
-       return (componetSplash!=null);
+       return (componentSplash !=null);
     }
 
     public void stopAnimation() {
-        if (isCustomSplashscreen()) componetSplash.stopAnimation();
+        if (isCustomSplashscreen()) componentSplash.stopAnimation();
     }
 
     public void setErrorSplash(Throwable ex) {
@@ -183,7 +183,7 @@ public class JNLPSplashScreen extends JDialog {
             this.remove(splash.getSplashComponent());
             splash = SplashUtils.getErrorSplashScreen(splash.getSplashWidth(), splash.getSplashHeight(), ex);
             this.add(splash.getSplashComponent());
-            this.componetSplash = splash;
+            this.componentSplash = splash;
             this.validate();
     }
     }

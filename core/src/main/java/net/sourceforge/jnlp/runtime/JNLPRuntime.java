@@ -106,7 +106,7 @@ public class JNLPRuntime {
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
      * For javaws we can read the destination jnlp from commandline
      * However for plugin (url arrive via pipes). Also for plugin we can not be sure which opened tab/window
-     * have caused the crash. Thats why the individual urls are added, not replaced.
+     * have caused the crash. That's why the individual urls are added, not replaced.
      */
     private static String history = "";
 
@@ -196,7 +196,7 @@ public class JNLPRuntime {
      * Returns whether the JNLP runtime environment has been
      * initialized. Once initialized, some properties such as the
      * base directory cannot be changed. Before
-     * @return whether this runtime was already initialilsed
+     * @return whether this runtime was already initialized
      */
     public static boolean isInitialized() {
         return initialized;
@@ -382,7 +382,7 @@ public class JNLPRuntime {
 
         /*
          * With OpenJDK6 (but not with 7) a per-AppContext dtd is maintained.
-         * This dtd is created by the ParserDelgate. However, the code in
+         * This dtd is created by the ParserDelegate. However, the code in
          * HTMLEditorKit (used to render HTML in labels and textpanes) creates
          * the ParserDelegate only if there are no existing ParserDelegates. The
          * result is that all other AppContexts see a null dtd.
@@ -408,7 +408,7 @@ public class JNLPRuntime {
     public static boolean isOnlineDetected() {
         if (onlineDetected == null) {
             //"file" protocol do not do online check
-            //sugest online for this case
+            //suggest online for this case
             return true;
         }
         return onlineDetected;
@@ -566,7 +566,7 @@ public class JNLPRuntime {
      * <p>
      * Disabling security is not recommended and should only be
      * used if the JNLP files opened are trusted. This method can
-     * only be called before initalizing the runtime.
+     * only be called before initializing the runtime.
      * </p>
      *
      * @param enabled whether security should be enabled
@@ -745,7 +745,7 @@ public class JNLPRuntime {
                 boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.IGNORE_HEADLESS_CHECK));
                 if (noCheck) {
                     headless = false;
-                    LOG.debug("{} set to {}. Avoding headless check.", DeploymentConfiguration.IGNORE_HEADLESS_CHECK, noCheck);
+                    LOG.debug("{} set to {}. Avoiding headless check.", DeploymentConfiguration.IGNORE_HEADLESS_CHECK, noCheck);
                 } else {
                     try {
                         if (GraphicsEnvironment.isHeadless()) {
@@ -753,7 +753,7 @@ public class JNLPRuntime {
                         }
                     } catch (HeadlessException ex) {
                         headless = true;
-                        LOG.error(Translator.R("HEADLESS_MISSCONFIGURED"), ex);
+                        LOG.error(Translator.R("HEADLESS_MISCONFIGURED"), ex);
                     }
                 }
             }
@@ -781,7 +781,7 @@ public class JNLPRuntime {
         return (sep != null && sep.equals("/"));
     }
 
-    public static void setInitialArgments(List<String> args) {
+    public static void setInitialArguments(List<String> args) {
         checkInitialized();
         SecurityManager securityManager = System.getSecurityManager();
         if (securityManager != null)
@@ -894,7 +894,7 @@ public class JNLPRuntime {
         if (pluginDebug == null) {
             try {
                 //there are cases when this itself is not allowed by security manager, and so
-                //throws exception. Under some conditions it can couse deadlock
+                //throws exception. Under some conditions it can cause deadlock
                 pluginDebug = System.getenv().containsKey("ICEDTEAPLUGIN_DEBUG");
             } catch (Exception ex) {
                 pluginDebug = false;

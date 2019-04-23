@@ -49,9 +49,9 @@ public class AppletInstance extends ApplicationInstance {
 
     /**
      * Create a New Task based on the Specified URL
-     * @param file pluginbrifge to build instance on
+     * @param file pluginbridge to build instance on
      * @param group thread group of this instance
-     * @param loader classlaoder for this instance
+     * @param loader classloader for this instance
      * @param applet applet of this instance
      */
     public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet) {
@@ -76,9 +76,9 @@ public class AppletInstance extends ApplicationInstance {
 
     /**
      * Create a New Task based on the Specified URL
-     * @param file pluginbrifge to build instance on
+     * @param file pluginbridge to build instance on
      * @param group thread group of this instance
-     * @param loader classlaoder for this instance
+     * @param loader classloader for this instance
      * @param applet applet of this instance
      * @param cont Container where to place applet
      */
@@ -91,7 +91,7 @@ public class AppletInstance extends ApplicationInstance {
     /**
      * Sets whether the applet is resizable or not.  Applets default
      * to being not resizable.
-     * @param resizable boolean to allwo resizing
+     * @param resizable boolean to allow resizing
      */
     public void setResizable(boolean resizable) {
         Container c = environment.getAppletFrame();

@@ -102,7 +102,7 @@ public interface SplashPanel {
 
     /**
      * how mny percentage loaded  is shown in progress bar (if any)
-     * @param done - should be in 0-100 inclusinve
+     * @param done - should be in 0-100 inclusive
      */
     public void setPercentage(int done);
 

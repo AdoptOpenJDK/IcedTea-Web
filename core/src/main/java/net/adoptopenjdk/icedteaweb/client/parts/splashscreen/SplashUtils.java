@@ -80,7 +80,7 @@ public class SplashUtils {
         try {
             showError(ex, appletInstance);
         } catch (Throwable t) {
-                // prinitng this exception is discutable. I have let it in for case that
+                // printing this exception is discutable. I have let it in for case that
                 //some retyping will fail
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
         }
@@ -107,7 +107,7 @@ public class SplashUtils {
             return;
         }
 
-        f.replaceSplash(getErrorSplashScreen(f.getSplashWidth(), f.getSplashHeigth(), ex));
+        f.replaceSplash(getErrorSplashScreen(f.getSplashWidth(), f.getSplashHeight(), ex));
     }
 
     
@@ -121,9 +121,9 @@ public class SplashUtils {
     
 
     /**
-     * Warning - splash should have recieve width and height without borders.
+     * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must 
-     * be calcualted prior calling this method
+     * be calculated prior calling this method
      * @param width
      * @param height
      */
@@ -132,9 +132,9 @@ public class SplashUtils {
     }
 
     /**
-     * Warning - splash should have recieve width and height without borders.
+     * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calcualted prior calling this method
+     * be calculated prior calling this method
      * @param width
      * @param height
      * @param ex exception to be shown if any
@@ -144,9 +144,9 @@ public class SplashUtils {
     }
 
     /**
-     * Warning - splash should have recieve width and height without borders.
+     * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calcualted prior calling this method
+     * be calculated prior calling this method
      * @param width
      * @param height
      * @param splashReason
@@ -156,9 +156,9 @@ public class SplashUtils {
     }
 
     /**
-     * Warning - splash should have recieve width and height without borders.
+     * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calcualted prior calling this method
+     * be calculated prior calling this method
      * @param width
      * @param height
      * @param splashReason
@@ -176,20 +176,20 @@ public class SplashUtils {
      * @param isError
      */
     public static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable loadingException, boolean isError) {
-        String splashEnvironmetVar = null;
-        String pluginSplashEnvironmetVar = null;
+        String splashEnvironmentVar = null;
+        String pluginSplashEnvironmentVar = null;
         try {
-            pluginSplashEnvironmetVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
-            splashEnvironmetVar = System.getenv(ICEDTEA_WEB_SPLASH);
+            pluginSplashEnvironmentVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
+            splashEnvironmentVar = System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         SplashPanel sp = null;
         if (SplashReason.JAVAWS.equals(splashReason)) {
-            if (NONE.equals(splashEnvironmetVar)) {
+            if (NONE.equals(splashEnvironmentVar)) {
                 return null;
             }
-            if (DEFAULT.equals(splashEnvironmetVar)) {
+            if (DEFAULT.equals(splashEnvironmentVar)) {
                 if (isError) {
                     sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
                 } else {
@@ -198,10 +198,10 @@ public class SplashUtils {
             }
         }
         if (SplashReason.APPLET.equals(splashReason)) {
-            if (NONE.equals(pluginSplashEnvironmetVar)) {
+            if (NONE.equals(pluginSplashEnvironmentVar)) {
                 return null;
             }
-            if (DEFAULT.equals(pluginSplashEnvironmetVar)) {
+            if (DEFAULT.equals(pluginSplashEnvironmentVar)) {
                 if (isError) {
                     sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
                 } else {

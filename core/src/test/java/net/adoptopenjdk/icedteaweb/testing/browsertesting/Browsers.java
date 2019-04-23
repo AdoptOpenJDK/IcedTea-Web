@@ -42,8 +42,8 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
 import java.io.File;
 
 /**
- * When all represent all configured browser, one represens one random
- * (the first found) configured browser. Each other represents inidivdual browsers
+ * When all represent all configured browser, one represents one random
+ * (the first found) configured browser. Each other represents individual browsers
  * 
  */
 public enum Browsers {

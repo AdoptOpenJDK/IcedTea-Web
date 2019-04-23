@@ -59,7 +59,7 @@ public class ManifestAttributesCheckerTest {
     private static void tryTest(String src, String expected) throws MalformedURLException {
         URL s = new URL(src);
         URL q = ManifestAttributesChecker.stripDocbase(s);
-        //junit is failing for me on url.equls(url)...
+        //junit is failing for me on url.equals(url)...
         Assert.assertEquals(expected, q.toExternalForm());
     }
 

@@ -56,7 +56,7 @@ import java.util.List;
 
 /**
  * 
- * OutputController class (thread) must NOT call JNLPRuntime.getConfiguraion()
+ * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
  * 
  */
 public class OutputController {
@@ -127,7 +127,7 @@ public class OutputController {
                 || s.getHeader().level == OutputControllerLevel.WARNING_DEBUG
                 || s.getHeader().level == OutputControllerLevel.ERROR_DEBUG)) {
             //filter out debug messages
-            //must be here to prevent deadlock, casued by exception form jnlpruntime, loggers or configs themselves
+            //must be here to prevent deadlock, caused by exception form jnlpruntime, loggers or configs themselves
             return;
         }
         String message = proceedHeader(s);
@@ -143,7 +143,7 @@ public class OutputController {
             getFileLog().log(message);
         }
         //only crucial stuff is going to system log
-        //only java messages handled here, plugin is onhis own
+        //only java messages handled here, plugin is on his own
         if (LogConfig.getLogConfig().isLogToSysLog() && 
                 (s.getHeader().level.equals(OutputControllerLevel.ERROR_ALL) || s.getHeader().level.equals(OutputControllerLevel.WARNING_ALL)) &&
                 !s.getHeader().isC) {
@@ -200,7 +200,7 @@ public class OutputController {
          final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
          consumerThread = new Thread(messageQueConsumer, "Output controller consumer daemon");
         consumerThread.setDaemon(true);
-        //is started in JNLPRuntime.getConfig() after config is laoded
+        //is started in JNLPRuntime.getConfig() after config is loaded
         Runtime.getRuntime().addShutdownHook(new Thread(() -> flush()));
     }
      

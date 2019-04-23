@@ -57,7 +57,8 @@ public class ParserCornerCasesTest {
 
     @Test
     public void testCdata() throws ParseException, XMLParseException, IOException {
-        String data = "<argument><![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\"> <properties> <entry key=\"key\">value</entry> </properties> ]]></argument>";
+        String data = "<argument><![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <!DOCT" +
+                "YPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\"> <properties> <entry key=\"key\">value</entry> </properties> ]]></argument>";
         XMLElement elem = new XMLElement();
         elem.parseFromReader(new StringReader(data));
         XMLElement target = elem;
@@ -185,7 +186,7 @@ public class ParserCornerCasesTest {
         String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,true));
         Parser p = new Parser(null, null, root, defaultParser);
-        //defaultis used
+        //default is used
         Assert.assertEquals("1.0+", p.getSpecVersion().toString());
     }
 
@@ -210,13 +211,13 @@ public class ParserCornerCasesTest {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
         Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,false));
         Parser p = new Parser(null, null, root, defaultParser);
-        //defaultis used
+        //default is used
         Assert.assertEquals("1.0+", p.getSpecVersion().toString());
     }
     
     @Test
     public void testCommentInElements3_malformedOff() throws JNLPMatcherException, IOException, ParseException {
-        //heving comment inside element declaration is invalid but internal parser can handle it
+        //having comment inside element declaration is invalid but internal parser can handle it
          try (InputStream fileStream = ClassLoader.getSystemClassLoader()
                  .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
              Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, false));
@@ -230,7 +231,7 @@ public class ParserCornerCasesTest {
       @Ignore
       @KnownToFail
     public void testCommentInElements3_malformedOn() throws JNLPMatcherException, IOException, ParseException {
-        //heving comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
+        //having comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
          try (InputStream fileStream = ClassLoader.getSystemClassLoader()
                  .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
              Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, true));

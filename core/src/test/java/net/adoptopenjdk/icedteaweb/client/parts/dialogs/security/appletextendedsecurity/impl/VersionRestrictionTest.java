@@ -68,7 +68,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
     };
 
     @Before
-    public void preapreNewTestFile() throws IOException {
+    public void prepareNewTestFile() throws IOException {
         testFile = File.createTempFile("itwAES", "testFile");
         testFile.deleteOnExit();
     }
@@ -112,7 +112,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
             int hc = 0;
             for (String string : l) {
                 string = string.trim();
-                if (string.startsWith(UnsignedAppletActionStorageImpl.versionPreffix)) {
+                if (string.startsWith(UnsignedAppletActionStorageImpl.versionPrefix)) {
                     hc++;
                     if (hc == 1) {
                         Assert.assertTrue("first header must contains warning", string.contains("!WARNING!"));

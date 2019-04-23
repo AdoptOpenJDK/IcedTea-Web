@@ -130,7 +130,7 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
     //remaining stub of unpatched jdk
     protected synchronized void createAppletThread() {
         throw new RuntimeException("Not yet implemented");
-        //no need to call super, is overriden, and not used in  upstream
+        //no need to call super, is overridden, and not used in  upstream
         //AppletViewerPanel or AppletPanel
     }
 
@@ -153,7 +153,7 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
                     fs = c.getDeclaredField("doInit");
                     break;
                 }
-                //known location is NetxPanel->AppeltViwerPannelAccess->AppletViwerPanel->AppletPanel
+                //known location is NetxPanel->AppletViewerPanelAccess->AppletViewerPanel->AppletPanel
                 c = c.getSuperclass();
             }
             if (fs == null) {
@@ -162,7 +162,7 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
             fs.setAccessible(true);
             fs.set(this, a);
         } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
-            LOG.error("Can't get/set doInit. Runing on JDK9 or higher?", ex);
+            LOG.error("Can't get/set doInit. Running on JDK9 or higher?", ex);
         }
 
     }

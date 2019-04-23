@@ -57,7 +57,7 @@ public class JNLPAuthenticator extends Authenticator {
         int port = getRequestingPort();
         String prompt = getRequestingPrompt();
 
-        NamePassword response = SecurityDialogs.showAuthenicationPrompt(host, port, prompt, type);
+        NamePassword response = SecurityDialogs.showAuthenticationPrompt(host, port, prompt, type);
         if (response == null) {
             return null;
         } else {

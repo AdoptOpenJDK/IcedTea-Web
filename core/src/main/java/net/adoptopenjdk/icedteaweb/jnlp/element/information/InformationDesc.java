@@ -210,7 +210,7 @@ public class InformationDesc {
         if (strict) {
             return null != getItem(OFFLINE_ALLOWED_ELEMENT);
         } else {
-            // by deault itw ignore this switch. Most applications are missusing it
+            // by default itw ignore this switch. Most applications are misusing it
             return true;
         }
     }

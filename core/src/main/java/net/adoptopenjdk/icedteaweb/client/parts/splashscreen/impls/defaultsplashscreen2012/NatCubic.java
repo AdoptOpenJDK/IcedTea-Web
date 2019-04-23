@@ -48,7 +48,7 @@ public class NatCubic extends ControlCurve {
      *
      */
     /*
-    NatCubic calcualtion
+    NatCubic calculation
     calculates the natural cubic spline that interpolates
     y[0], y[1], ... y[n]
     The first segment is returned as
@@ -68,7 +68,7 @@ public class NatCubic extends ControlCurve {
         [       1 2] [D[n]]   [3(x[n] - x[n-1])]
 
         by using row operations to convert the matrix to upper triangular
-        and then back sustitution.  The D[i] are the derivatives at the knots.
+        and then back substitution.  The D[i] are the derivatives at the knots.
          */
 
         gamma[0] = 1.0f / 2.0f;
@@ -104,14 +104,14 @@ public class NatCubic extends ControlCurve {
         super.paint(g);
         if (pts.npoints >= 2) {
             if (getResult() == null) {
-                calcualteAndSaveResult();
+                calculateAndSaveResult();
             }
             g.drawPolyline(result.xpoints, result.ypoints, result.npoints);
         }
     }
 
     @Override
-    public Polygon calcualteResult() {
+    public Polygon calculateResult() {
         Cubic[] X = calcNaturalCubic(pts.npoints - 1, pts.xpoints);
         Cubic[] Y = calcNaturalCubic(pts.npoints - 1, pts.ypoints);
         /* very crude technique - just break each segment up into steps lines */

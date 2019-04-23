@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import org.junit.AfterClass;
@@ -53,9 +53,9 @@ public class WriterBasedFileLogTest {
     private static final String line1 = "I'm logged line one";
     private static final String line2 = "I'm logged line two";
     private static final String line3 = "I'm logged line three";
-    private static final RulesFolowingClosingListener.ContainsRule r1 = new RulesFolowingClosingListener.ContainsRule(line1);
-    private static final RulesFolowingClosingListener.ContainsRule r2 = new RulesFolowingClosingListener.ContainsRule(line2);
-    private static final RulesFolowingClosingListener.ContainsRule r3 = new RulesFolowingClosingListener.ContainsRule(line3);
+    private static final RulesFollowingClosingListener.ContainsRule r1 = new RulesFollowingClosingListener.ContainsRule(line1);
+    private static final RulesFollowingClosingListener.ContainsRule r2 = new RulesFollowingClosingListener.ContainsRule(line2);
+    private static final RulesFollowingClosingListener.ContainsRule r3 = new RulesFollowingClosingListener.ContainsRule(line3);
 
     @BeforeClass
     public static void prepareTmpFiles() throws IOException {
@@ -63,7 +63,7 @@ public class WriterBasedFileLogTest {
             loggingTargets[i] = File.createTempFile("WriterBasedFileLogger", "iteTest");
             loggingTargets[i].deleteOnExit();
         }
-        //delete first half of the files, logger should handle both casses
+        //delete first half of the files, logger should handle both cases
         for (int i = 0; i < loggingTargets.length / 2; i++) {
             loggingTargets[i].delete();
         }
@@ -78,7 +78,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isAppendingLoggerLoggingOnNotExisitngFile() throws Exception {
+    public void isAppendingLoggerLoggingOnNotExistingFile() throws Exception {
         int i = 0;
         WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l.log(line1);
@@ -87,7 +87,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isRewritingLoggerLoggingOnNotExisitngFile() throws Exception {
+    public void isRewritingLoggerLoggingOnNotExistingFile() throws Exception {
         int i = 1;
         WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l.log(line1);
@@ -96,7 +96,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isRewritingLoggerRewritingOnNotExisitngFile() throws Exception {
+    public void isRewritingLoggerRewritingOnNotExistingFile() throws Exception {
         int i = 2;
         WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l1.log(line2);
@@ -112,7 +112,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isAppendingLoggerAppendingOnNotExisitngFile() throws Exception {
+    public void isAppendingLoggerAppendingOnNotExistingFile() throws Exception {
         int i = 4;
         WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l1.log(line2);
@@ -129,7 +129,7 @@ public class WriterBasedFileLogTest {
 
     //************
     @Test
-    public void isAppendingLoggerLoggingOnExisitngFile() throws Exception {
+    public void isAppendingLoggerLoggingOnExistingFile() throws Exception {
         int i = 6;
         WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l.log(line1);
@@ -138,7 +138,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isRewritingLoggerLoggingOnExisitngFile() throws Exception {
+    public void isRewritingLoggerLoggingOnExistingFile() throws Exception {
         int i = 7;
         WriterBasedFileLog l = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l.log(line1);
@@ -147,7 +147,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isRewritingLoggerRewritingOnExisitngFile() throws Exception {
+    public void isRewritingLoggerRewritingOnExistingFile() throws Exception {
         int i = 8;
         WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), false);
         l1.log(line2);
@@ -163,7 +163,7 @@ public class WriterBasedFileLogTest {
     }
 
     @Test
-    public void isAppendingLoggerAppendingOnExisitngFile() throws Exception {
+    public void isAppendingLoggerAppendingOnExistingFile() throws Exception {
         int i = 10;
         WriterBasedFileLog l1 = new WriterBasedFileLog(loggingTargets[i].getAbsolutePath(), true);
         l1.log(line2);

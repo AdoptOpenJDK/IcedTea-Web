@@ -146,7 +146,7 @@ public class MessagesPropertiesTest {
     private static LocalesIdentifier[] secondary;
 
     @BeforeClass
-    public static void loadResourceBoundels() {
+    public static void loadResourceBundles() {
         //get default by non existing language and country
         main = LocalesIdentifier.DEFAULT;
         assertNotNull(main);
@@ -222,7 +222,7 @@ public class MessagesPropertiesTest {
     @Test
     @Ignore
     //it is not critical that some localisations are missing, however good to know    
-    //and actually this test sis covered by allResourcesAreReallyDifferent, because fallback is geting default value for unknnow localisation
+    //and actually this test sis covered by allResourcesAreReallyDifferent, because fallback is getting default value for unknown localisation
     public void warnForNotLocalisedStrings() {
         int errors = 0;
         Enumeration<String> keys = main.getBundle().getKeys();
@@ -272,7 +272,7 @@ public class MessagesPropertiesTest {
                 if (val.trim().isEmpty()) {
                     errors++;
                     localErrors++;
-                    errLog("Error! Key: " + key + " have no vlue");
+                    errLog("Error! Key: " + key + " have no value");
                 }
                 
             }

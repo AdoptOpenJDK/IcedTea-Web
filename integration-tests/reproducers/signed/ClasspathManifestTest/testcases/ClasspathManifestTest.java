@@ -126,7 +126,7 @@ public class ClasspathManifestTest extends BrowserTest {
      * ./jnlp or ./html (calling to jar.jar) + ./jar.jar +
      * ./Codebase/../second.jar are all on classapth but ./jnlp or ./html
      * (calling to someDir/jar.jar)+ ./someDir/jar.jar +
-     * ./Codebase/../second.jar Is making the jar.jar laodable for startup, but
+     * ./Codebase/../second.jar Is making the jar.jar loadable for startup, but
      * diapearing after encauntering Class-Path: in Manifest.mf
      *
      * @throws Exception

@@ -185,14 +185,14 @@ public class UrlUtils {
     /**
      * This function i striping part behind last path delimiter.
      *
-     * Expected is input like protcol://som.url/some/path/file.suff Then output
-     * will bee protcol://som.url/some/path
+     * Expected is input like protocol://som.url/some/path/file.suff Then output
+     * will bee protocol://som.url/some/path
      *
-     * Be aware of input like protcol://som.url/some/path/ then input will be
-     * just protcol://som.url/some/path
+     * Be aware of input like protocol://som.url/some/path/ then input will be
+     * just protocol://som.url/some/path
      *
-     * You can use sanitizeLastSlash and see also unittests Both unix and
-     * windows salshes are supported
+     * You can use sanitizeLastSlash and see also unit tests Both unix and
+     * windows slashes are supported
      *
      * @param src src to be stripped
      * @return src without file
@@ -239,11 +239,11 @@ public class UrlUtils {
 
     /**
      * This function is removing all tailing slashes of url and both unix and
-     * windows salshes are supported. See tests for valid and invalid
-     * inputs/outputs Shortly protcol://som.url/some/path/ or
-     * protcol://som.url/some/path//// (and same for windows
-     * protcol://som.url/some\path\\) will become protcol://som.url/some/path
-     * Even protcol://som.url/ is reduced to protcol://som.url
+     * windows slashes are supported. See tests for valid and invalid
+     * inputs/outputs Shortly protocol://som.url/some/path/ or
+     * protocol://som.url/some/path//// (and same for windows
+     * protocol://som.url/some\path\\) will become protocol://som.url/some/path
+     * Even protocol://som.url/ is reduced to protocol://som.url
      *
      *
      * When input is like
@@ -273,10 +273,10 @@ public class UrlUtils {
 
     /**
      * both urls are processed by sanitizeLastSlash before actual equals. So
-     * protcol://som.url/some/path/ is same as protcol://som.url/some/path. Even
-     * protcol://som.url/some/path\ is same as protcol://som.url/some/path/
+     * protocol://som.url/some/path/ is same as protocol://som.url/some/path. Even
+     * protocol://som.url/some/path\ is same as protocol://som.url/some/path/
      *
-     * @param u1 first url to comapre
+     * @param u1 first url to compare
      * @param u2 second
      * @return true if urls are equals no matter of trailing slash
      */
@@ -349,7 +349,7 @@ public class UrlUtils {
                 && compareNullableStrings(u1.getPath(), u2.getPath(), false)
                 && compareNullableStrings(u1.getQuery(), u2.getQuery(), false)
                 && compareNullableStrings(u1.getRef(), u2.getRef(), false);
-        // && u1.getPort() ==  u2.getPort(); errornous?
+        // && u1.getPort() ==  u2.getPort(); erroneous?
     }
 
     /**
@@ -420,7 +420,7 @@ public class UrlUtils {
     }
 
     public static String stripFile(final URL documentbase) {
-        //whenused in generation of regec, the trailing slash is very important
+        //when used in generation of regec, the trailing slash is very important
         //see the result between http:/some.url/path.* and http:/some.url/path/.*
         return UrlUtils.ensureSlashTail(stripFileImp(documentbase));
     }
@@ -457,8 +457,8 @@ public class UrlUtils {
         while (true) {
             URLConnection connection = url.openConnection();
             //from time to time we get
-            //java.io.IOException: Invalid Http response, which kleads to null is
-            //maybe this is happening onloy with test server, but trying few more times should not harm
+            //java.io.IOException: Invalid Http response, which leads to null is
+            //maybe this is happening only with test server, but trying few more times should not harm
             tries++;
             try {
                 is = connection.getInputStream();

@@ -44,5 +44,5 @@ public interface SplashController {
 
     public int getSplashWidth();
 
-    public int getSplashHeigth();
+    public int getSplashHeight();
 }

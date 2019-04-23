@@ -69,7 +69,7 @@ public class InfrastructureFileDescriptor {
     /** setup-able files have to override this
      * if they don't, they are read only, and set value will fail
      * if it is desired to write value of property, then override and use known key.
-     * @return null by default. Should return key to configuration if overriden.
+     * @return null by default. Should return key to configuration if overridden.
      */
     protected String getPropertiesKey() {
         return null;
@@ -108,7 +108,7 @@ public class InfrastructureFileDescriptor {
     
     /**
      * overload version for control panel, which is saving to internal copy.
-     * @param config config from where to readthis value (note, usually JNLPRuntime.getConfiguration()
+     * @param config config from where to read this value (note, usually JNLPRuntime.getConfiguration()
      * so you don't need it, but our config gui tool is using two sets to allow undo.
      * @return configured property or default
      */
@@ -169,7 +169,7 @@ public class InfrastructureFileDescriptor {
      * Currently this methods unify all multiple occurrences of separators
      * to single one. Eg /path/to//file will become /path/to/file.
      *
-     * Those artifacts maybe spread during various s=path+deparator+subdir+separator
+     * Those artifacts maybe spread during various s=path+separator+subdir+separator
      * file=s+separator+filename
      *
      * @param s string to be cleaned

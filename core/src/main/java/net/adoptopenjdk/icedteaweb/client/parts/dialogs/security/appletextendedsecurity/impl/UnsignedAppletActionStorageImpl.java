@@ -61,7 +61,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
 
     protected List<UnsignedAppletActionEntry> items;
     private String readVersion = null;
-    public static final String versionPreffix="#VERSION ";
+    public static final String versionPrefix ="#VERSION ";
     public static final String BACKUP_SUFFIX = "-backup";
     public static final int currentVersion = 2;
     private int lineCounter = 0;
@@ -95,7 +95,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     protected void readLine(String line) {
         if (line.trim().length() != 0) {
             lineCounter++;
-            if (line.startsWith(versionPreffix) && line.trim().split("\\s+").length > 1) {
+            if (line.startsWith(versionPrefix) && line.trim().split("\\s+").length > 1) {
                 if (readVersion == null) {
                     readVersion = line.trim();
                     actOnVersionLoad();
@@ -115,7 +115,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     public void writeContent(BufferedWriter bw) throws IOException {
         lineCounter = 0;
         readVersion = null;
-        bw.write(versionPreffix + currentVersion + " - note, do not edit or modify this line. It may cause removal of this file.");
+        bw.write(versionPrefix + currentVersion + " - note, do not edit or modify this line. It may cause removal of this file.");
         bw.newLine();
         for (UnsignedAppletActionEntry item : items) {
             try{
@@ -169,7 +169,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
         if (results == null || results.isEmpty()) {
             return null;
         }
-        //no comaprsion id provided
+        //no comparison id provided
         if (id  == null){
             return results.get(0);    
         }
@@ -293,7 +293,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         if (version < 2){
-            LOG.debug("Stoping laoding of vulnereable {}. Will be replaced", getBackingFile().getAbsolutePath());
+            LOG.debug("Stopping loading of vulnerable {}. Will be replaced", getBackingFile().getAbsolutePath());
             loadingDisabled = true;
             backupOldFile(version, getBackingFile());
         } else {
@@ -302,7 +302,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
     }
 
     private void actOnNoVersionLoad() {
-        readVersion=versionPreffix+"0";
+        readVersion= versionPrefix +"0";
         actOnVersionLoad();
     }
 
@@ -313,7 +313,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             String warning = "- !WARNING! this is automated copy of old " + backingFile.getName() + " which was removed/replaced. Before you blindly copy those items back, please note, that this file might be modified without your approval by evil attacker. It is advised to not return below lines, or verify them before returning";
             String s = FileUtils.loadFileAsString(backingFile);
             s.replaceFirst("\\s*", "");
-            if (s.startsWith(versionPreffix)) {
+            if (s.startsWith(versionPrefix)) {
                 s = s.replaceFirst("\n", " " + warning + "\n");
             } else {
                 s = readVersion + " " + warning + "\n" + s;

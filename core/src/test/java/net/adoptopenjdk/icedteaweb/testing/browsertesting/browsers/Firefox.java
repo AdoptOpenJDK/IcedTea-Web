@@ -57,7 +57,7 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
     }
 
     @Override
-    public List<String> getComaptibilitySwitches() {
+    public List<String> getCompatibilitySwitches() {
         return Arrays.asList(cs);
     }
 

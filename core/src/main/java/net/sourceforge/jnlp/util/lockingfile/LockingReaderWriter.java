@@ -152,7 +152,7 @@ public abstract class LockingReaderWriter {
     }
 
     /**
-     * Reads contents from the file, first acquring a lock.
+     * Reads contents from the file, first acquiring a lock.
      * @throws IOException
      */
     protected synchronized void readContentsLocked() throws IOException {
@@ -170,7 +170,7 @@ public abstract class LockingReaderWriter {
     }
 
     /**
-     * Write contents to the file, first acquring a lock.
+     * Write contents to the file, first acquiring a lock.
      * @throws IOException
      */
     protected synchronized void writeContentsLocked() throws IOException {

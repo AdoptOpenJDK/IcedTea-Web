@@ -53,7 +53,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
     private Color bgColor;
     private int percentageOfWater;
     private Random sea = new Random();
-    //set to null befor getBackground if waving is needed
+    //set to null before getBackground if waving is needed
     //or create new TWL ;)
     private Polygon cachedPolygon;
 
@@ -95,7 +95,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
                     line.addPoint(x, h - level - waveHeight / 2 - sea.nextInt(waveHeight));
                     x = x + waveLength;
                 }
-                cachedPolygon = line.calcualteResult();
+                cachedPolygon = line.calculateResult();
                 cachedPolygon.addPoint(w, h);
                 cachedPolygon.addPoint(0, h);
             }
@@ -105,7 +105,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
             g2d.fillPolygon(cachedPolygon);
         }
         //line.paint(g2d);
-        //FlodFill.floodFill(bi, waterColor, new Point(1, h - 1));
+        //FloodFill.floodFill(bi, waterColor, new Point(1, h - 1));
         return bi;
     }
 
@@ -132,7 +132,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
         g2.drawString(getText(), x, y + 2);
         g2.drawString(getText(), x - 2, y);
         g2.drawString(getText(), x + 2, y);
-        //sorry, cuted text have disturbed borders
+        //sorry, cut text have disturbed borders
         return super.cutTo(g2, x, y);
     }
 

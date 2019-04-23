@@ -74,7 +74,7 @@ public class ParserMalformedXmlTest {
     }
 
     @Test
-    public void testMissingXmlDecleration() throws ParseException {
+    public void testMissingXmlDeclaration() throws ParseException {
         String malformedJnlp = originalJnlp.replaceFirst("<\\?xml.*\\?>", "");
         Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), lenientParserSettings);
     }

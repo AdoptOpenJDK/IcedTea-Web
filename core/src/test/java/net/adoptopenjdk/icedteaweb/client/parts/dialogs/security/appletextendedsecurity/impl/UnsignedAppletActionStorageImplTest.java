@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class UnsignedAppletActionStorageImplTest {
 
-    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
+    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPrefix +UnsignedAppletActionStorageImpl.currentVersion+"\n";
     
     private static File f1;
     private static File f2;
@@ -81,7 +81,7 @@ public class UnsignedAppletActionStorageImplTest {
     };
 
     @BeforeClass
-    public static void preapreTestFiles() throws IOException {
+    public static void prepareTestFiles() throws IOException {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");

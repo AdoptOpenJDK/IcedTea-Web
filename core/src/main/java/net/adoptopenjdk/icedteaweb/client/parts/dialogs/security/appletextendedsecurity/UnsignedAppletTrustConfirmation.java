@@ -117,8 +117,8 @@ public class UnsignedAppletTrustConfirmation {
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, JNLPFile file, Class<? extends RememberableDialog> id) {
         return actionStorage.getMatchingItem(
                 UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(), 
-                UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */).toString(), 
-                toRelativePaths(getJars(file), file.getNotNullProbalbeCodeBase().toExternalForm()), id);
+                UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbableCodeBase(), true /* encode local files */).toString(), 
+                toRelativePaths(getJars(file), file.getNotNullProbableCodeBase().toExternalForm()), id);
     }
 
     /* Extract the archives as relative paths */
@@ -141,7 +141,7 @@ public class UnsignedAppletTrustConfirmation {
         try {
             UnsignedAppletActionEntry oldEntry = getMatchingItem(userActionStorage, file, id);
 
-            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */);
+            URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbableCodeBase(), true /* encode local files */);
             URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */);
 
             UrlRegEx codebaseRegex = null;
@@ -154,7 +154,7 @@ public class UnsignedAppletTrustConfirmation {
 
                 if (!rememberForCodeBase) {
                     documentbaseRegex = UrlRegEx.quote(documentbase.toExternalForm()); // Match only this applet
-                    archiveMatches = toRelativePaths(getJars(file), file.getNotNullProbalbeCodeBase().toString()); // Match only this applet
+                    archiveMatches = toRelativePaths(getJars(file), file.getNotNullProbableCodeBase().toString()); // Match only this applet
                 } else {
                     documentbaseRegex = UrlRegEx.quoteAndStar(UrlUtils.stripFile(documentbase)); // Match any from codebase and sourceFile "base"
                 }
@@ -173,7 +173,7 @@ public class UnsignedAppletTrustConfirmation {
                 return;
             }
               if (rememberForCodeBase == null){
-                  throw new RuntimeException("Trying to create new entry without codebase. Thats forbidden.");
+                  throw new RuntimeException("Trying to create new entry without codebase. That's forbidden.");
               } 
                               /* Else, create a new entry */
             UnsignedAppletActionEntry entry = new UnsignedAppletActionEntry(

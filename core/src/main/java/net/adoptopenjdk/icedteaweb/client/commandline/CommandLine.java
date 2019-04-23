@@ -28,7 +28,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.sourceforge.jnlp.config.ConfiguratonValidator;
+import net.sourceforge.jnlp.config.ConfigurationValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
@@ -407,7 +407,7 @@ public class CommandLine {
 
         Map<String, Setting<String>> all = config.getRaw();
 
-        ConfiguratonValidator validator = new ConfiguratonValidator(all);
+        ConfigurationValidator validator = new ConfigurationValidator(all);
         validator.validate();
 
         boolean allValid = true;
@@ -431,7 +431,7 @@ public class CommandLine {
 
     /**
      * Handles overall command line arguments. The argument array is split
-     * into two pieces: the first element is assumend to be the command, and
+     * into two pieces: the first element is assumed to be the command, and
      * everything after is taken to be the argument to the command.
      *
      * @return an integer representing an error code or SUCCESS if no problems

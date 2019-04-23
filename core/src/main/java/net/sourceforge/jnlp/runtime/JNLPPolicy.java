@@ -117,7 +117,7 @@ public class JNLPPolicy extends Policy {
                     }
                 }
 
-                // and permissiosn from jnlp-specific user policy too
+                // and permissions from jnlp-specific user policy too
                 if (userJnlpPolicy != null) {
                     e = userJnlpPolicy.getPermissions(appletCS).elements();
                     while (e.hasMoreElements()) {

@@ -61,7 +61,7 @@ public class JNLPFileTest extends NoStdOutErrTest{
         String jnlpContext = "<?xml version=\"1.0\"?>\n" +
                 "<jnlp spec=\"1.5+\"\n" +
                 "href=\"EmbeddedJnlpFile.jnlp\"\n" +
-                "codebase=\"http://icedtea.claspath.org\"\n" +
+                "codebase=\"http://icedtea.classpath.org\"\n" +
                 ">\n" +
                 "" +
                 "<information>\n" +
@@ -91,7 +91,7 @@ public class JNLPFileTest extends NoStdOutErrTest{
 
         JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
 
-        Assert.assertEquals("http://icedtea.claspath.org/", jnlpFile.getCodeBase().toExternalForm());
+        Assert.assertEquals("http://icedtea.classpath.org/", jnlpFile.getCodeBase().toExternalForm());
         Assert.assertEquals("redhat.embeddedjnlp", jnlpFile.getApplet().getMainClass());
         Assert.assertEquals("Sample Test", jnlpFile.getTitle());
         Assert.assertEquals(2, jnlpFile.getResources().getJARs().length);

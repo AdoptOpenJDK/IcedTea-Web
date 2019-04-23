@@ -203,7 +203,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
 
         exceptionLabel.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         exceptionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        exceptionLabel.setText(Translator.R(InfoItem.SPLASH + "exOccured"));
+        exceptionLabel.setText(Translator.R(InfoItem.SPLASH + "exOccurred"));
 
         bottomPanel.setBorder(BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         bottomPanel.setLayout(new java.awt.BorderLayout());

@@ -160,7 +160,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
     }
     
     @Override
-    public RememberPanelResult getRemeberAction() {
+    public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();
     }
 

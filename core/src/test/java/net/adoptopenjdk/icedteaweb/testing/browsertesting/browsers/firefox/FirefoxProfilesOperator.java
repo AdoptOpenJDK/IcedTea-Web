@@ -103,7 +103,7 @@ public class FirefoxProfilesOperator {
         if (!backuped) {
             return;
         }
-        final String message = ("Removing all firefox profiles from " + sourceDir.getAbsolutePath() + " backup avaiable in " + backupDir.getAbsolutePath());
+        final String message = ("Removing all firefox profiles from " + sourceDir.getAbsolutePath() + " backup available in " + backupDir.getAbsolutePath());
         ServerAccess.logOutputReprint(message);
         final File[] oldProfiles = sourceDir.listFiles(firefoxProfilesFilter);
         for (final File file : oldProfiles) {

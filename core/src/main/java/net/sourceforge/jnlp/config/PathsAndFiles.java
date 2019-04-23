@@ -124,7 +124,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     };
     
 
-    // this one is depnding on CACHE_DIR, so initialize it lazily
+    // this one is depending on CACHE_DIR, so initialize it lazily
     public static InfrastructureFileDescriptor getRecentlyUsedFile() {
         return RECENTLY_USED_FILE_HOLDER.RECENTLY_USED_FILE;
     }
@@ -162,8 +162,8 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentCofigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentCofigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
         
         @Override
@@ -299,8 +299,8 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
                 Object o = field.get(null);
                 if (c.isInstance(o)) {
                     InfrastructureFileDescriptor i = (InfrastructureFileDescriptor) o;
-                    for (Target targe : i.target) {
-                        if (desired == null || targe == desired) {
+                    for (Target target : i.target) {
+                        if (desired == null || target == desired) {
                             r.add(i);
                             break;
                         }
@@ -345,7 +345,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
     }
 
-    private static class SystemCofigFileDescriptor extends InfrastructureFileDescriptor {
+    private static class SystemConfigFileDescriptor extends InfrastructureFileDescriptor {
 
         private static final String windowsPathSuffix = File.separator + "Sun" + File.separator + "Java";
         private static final String unixPathSuffix = File.separator + "etc" + File.separator + ".java";
@@ -360,19 +360,19 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getSystemPathStubAcronym() {
-            //note the hardcoded % instead of VARIABLE (actuall leading to idea, that docs, when generated on windows may not make sense)
+            //note the hardcoded % instead of VARIABLE (actually leading to idea, that docs, when generated on windows may not make sense)
             return "{" + "%" + WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
         }
 
-        private SystemCofigFileDescriptor(String fileName, String description, Target... target) {
+        private SystemConfigFileDescriptor(String fileName, String description, Target... target) {
             super(fileName, "deployment", getSystemConfigDir(), description, target);
         }
 
     }
 
-    private static class SystemDeploymentCofigFileDescriptor extends SystemCofigFileDescriptor {
+    private static class SystemDeploymentConfigFileDescriptor extends SystemConfigFileDescriptor {
 
-        private SystemDeploymentCofigFileDescriptor(String fileName, String description, Target... target) {
+        private SystemDeploymentConfigFileDescriptor(String fileName, String description, Target... target) {
             super(fileName, description, target);
         }
 
@@ -480,8 +480,8 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
             super(fileName, DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
-        private ItwConfigFileDescriptor(String fileName, String folowingPath, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + folowingPath, description, target);
+        private ItwConfigFileDescriptor(String fileName, String followingPath, String description, Target... target) {
+            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
 
     }
@@ -508,8 +508,8 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
             super(fileName, DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
-        private ItwCacheFileDescriptor(String fileName, String folowingPath, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + folowingPath, description, target);
+        private ItwCacheFileDescriptor(String fileName, String followingPath, String description, Target... target) {
+            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
     }
 

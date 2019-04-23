@@ -116,7 +116,7 @@ public class XDesktopEntryTest {
     }
 
     @BeforeClass
-    public static void ensureHomeVaribale() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
+    public static void ensureHomeVariable() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
         ServerAccess.logOutputReprint("Environment");
         envToString();
         Map<String, String> env = System.getenv();
@@ -133,7 +133,7 @@ public class XDesktopEntryTest {
     }
 
     @AfterClass
-    public static void restoreHomeVaribale() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
+    public static void restoreHomeVariable() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
         Map<String, String> env = System.getenv();
         if (backupedEnv != null) {
             fakeEnvironment(backupedEnv);
@@ -158,7 +158,7 @@ public class XDesktopEntryTest {
     @Ignore
     public void testHomeVariable() {
         Assert.assertTrue("Variable home must be in environment of this run, is not", System.getenv().containsKey(HOME));
-        Assert.assertNull("Variable home should be declared  before test run, but was not and so is faked. This should be ok and is thrown just for record. See output of ensureHomeVaribale and restoreHomeVaribale", backupedEnv);
+        Assert.assertNull("Variable home should be declared  before test run, but was not and so is faked. This should be ok and is thrown just for record. See output of ensureHomeVariable and restoreHomeVariable", backupedEnv);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class XDesktopEntryTest {
     }
 
     @Test
-    public void testPosibleFavIConPathparents() throws IOException {
+    public void testPossibleFavIConPathparents() throws IOException {
         List<String> commonResult = new ArrayList<>();
         commonResult.add("/best/path/file");
         commonResult.add("/best/path");
@@ -318,7 +318,7 @@ public class XDesktopEntryTest {
         Assert.assertEquals(r,commonResult);
     }
 
-    private void testHtmlOccurences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.Shortcut type, int occurences) throws Exception {
+    private void testHtmlOccurrences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.Shortcut type, int occurrences) throws Exception {
         JNLPRuntime.setHtml(html);
         setIsWebstart(javaws);
         JNLPFile jnlpf = new DummyJnlpWithTitle();
@@ -329,7 +329,7 @@ public class XDesktopEntryTest {
         a.setShortcutType(type);
         Reader r = xde.getContentsAsReader(menu, a, true);
         String s = FileUtils.getContentOfReader(r);
-        Assert.assertEquals(occurences, PluginBridgeTest.countOccurences(s, "-html"));
+        Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
     }
 
     @Test
@@ -340,14 +340,14 @@ public class XDesktopEntryTest {
             if (w == AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML) {
                 var1 = 1;
             }
-            testHtmlOccurences(true, true, true, w, 1);
-            testHtmlOccurences(true, false, false, w, var1);
-            testHtmlOccurences(true, false, true, w, var1);
-            testHtmlOccurences(true, true, false, w, 1);
-            testHtmlOccurences(false, true, true, w, 0);
-            testHtmlOccurences(false, false, false, w, var1);
-            testHtmlOccurences(false, true, false, w, 0);
-            testHtmlOccurences(false, false, true, w, var1);
+            testHtmlOccurrences(true, true, true, w, 1);
+            testHtmlOccurrences(true, false, false, w, var1);
+            testHtmlOccurrences(true, false, true, w, var1);
+            testHtmlOccurrences(true, true, false, w, 1);
+            testHtmlOccurrences(false, true, true, w, 0);
+            testHtmlOccurrences(false, false, false, w, var1);
+            testHtmlOccurrences(false, true, false, w, 0);
+            testHtmlOccurrences(false, false, true, w, var1);
         }
     }
 

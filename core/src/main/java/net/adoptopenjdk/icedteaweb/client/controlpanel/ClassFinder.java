@@ -108,18 +108,18 @@ public class ClassFinder extends JDialog {
     }
 
     static private Set<String> getClassPathRoots() {
-        String classapth1 = System.getProperty(CUSTOM_CLASS_PATH_PROPERTY);
-        String classapth2 = System.getProperty(JAVA_CLASS_PATH_PROPERTY);
-        String classapth3 = System.getProperty(BOOT_CLASS_PATH_PROPERTY);
+        String classpath1 = System.getProperty(CUSTOM_CLASS_PATH_PROPERTY);
+        String classpath2 = System.getProperty(JAVA_CLASS_PATH_PROPERTY);
+        String classpath3 = System.getProperty(BOOT_CLASS_PATH_PROPERTY);
         String classpath = "";
-        if (classapth1 != null) {
-            classpath = classpath + classapth1 + File.pathSeparator;
+        if (classpath1 != null) {
+            classpath = classpath + classpath1 + File.pathSeparator;
         }
-        if (classapth2 != null) {
-            classpath = classpath + classapth2 + File.pathSeparator;
+        if (classpath2 != null) {
+            classpath = classpath + classpath2 + File.pathSeparator;
         }
-        if (classapth3 != null) {
-            classpath = classpath + classapth3 + File.pathSeparator;
+        if (classpath3 != null) {
+            classpath = classpath + classpath3 + File.pathSeparator;
         }
         String[] pathElements = classpath.split(File.pathSeparator);
         Set<String> s = new HashSet<>(Arrays.asList(pathElements));

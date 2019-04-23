@@ -85,7 +85,7 @@ public class ReplacingTextFormatterTest {
             }
 
             @Override
-            public String getUrl(String url, String appearence) {
+            public String getUrl(String url, String appearance) {
                 throw new UnsupportedOperationException("Not supported yet."); 
             }
 

@@ -69,7 +69,7 @@ public class DeploymentPropertiesModifier {
             for (final AbstractMap.SimpleEntry<String, String> keyValue1 : keyValue) {
                 final DeploymentPropertiesModifier dm = new DeploymentPropertiesModifier(src);
                 dm.setProperties(keyValue1.getKey(), keyValue1.getValue());
-                //adding to beggining, soe restoring goes from last. Not necessary, but nice.
+                //adding to beginning, so restoring goes from last. Not necessary, but nice.
                 modifications.add(0, dm);
             }
         }
@@ -95,7 +95,7 @@ public class DeploymentPropertiesModifier {
 
     public void setProperties(final String property, final String value) throws IOException {
         if (isPropertiesSet) {
-            throw new IllegalStateException("Properties can be set only once. Revert and use naother instance.");            
+            throw new IllegalStateException("Properties can be set only once. Revert and use another instance.");            
         }
         isPropertiesSet = true;
         requestedProperty = property;
@@ -106,7 +106,7 @@ public class DeploymentPropertiesModifier {
 
     public void restoreProperties() throws IOException {
         if (!isPropertiesSet) {
-            throw new IllegalStateException("Prperties must be set before they can be reverted");
+            throw new IllegalStateException("Properties must be set before they can be reverted");
         }
         isPropertiesSet = false;
 

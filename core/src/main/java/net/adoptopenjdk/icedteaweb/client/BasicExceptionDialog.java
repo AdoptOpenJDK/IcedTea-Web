@@ -73,7 +73,7 @@ public class BasicExceptionDialog {
 
     private final static Logger LOG = LoggerFactory.getLogger(BasicExceptionDialog.class);
 
-    private static final AtomicInteger dialogInstancess = new AtomicInteger();
+    private static final AtomicInteger dialogInstances = new AtomicInteger();
 
     /**
      * Must be invoked from the Swing EDT.
@@ -206,15 +206,15 @@ public class BasicExceptionDialog {
     }
 
     private synchronized static int willBeHidden() {
-        return dialogInstancess.decrementAndGet();
+        return dialogInstances.decrementAndGet();
     }
 
-    //must be called out of EDT, otherise -- will happen before ++
+    //must be called out of EDT, otherwise -- will happen before ++
     public synchronized static int  willBeShown() {
-        return dialogInstancess.incrementAndGet();
+        return dialogInstances.incrementAndGet();
     }
     
     public synchronized static boolean areShown() {
-        return dialogInstancess.intValue() > 0;
+        return dialogInstances.intValue() > 0;
     }
 }

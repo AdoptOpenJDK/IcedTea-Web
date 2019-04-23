@@ -149,26 +149,26 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
-        throw new UnsupportedOperationException("not suported on windows like systems");
+        throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
     @Override
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
-        throw new UnsupportedOperationException("not suported on windows like systems");
+        throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
     @Override
     public File getGeneratedJnlpFileName() {
-        throw new UnsupportedOperationException("not suported on windows like systems");
+        throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
     @Override
     public File getLinuxMenuIconFile() {
-        throw new UnsupportedOperationException("not suported on windows like systems");
+        throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
     private static enum ManageMode {
-        //appned?
+        //append?
         A
     }
 

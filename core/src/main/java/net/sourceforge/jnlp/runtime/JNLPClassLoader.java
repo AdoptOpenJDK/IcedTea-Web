@@ -435,7 +435,7 @@ public class JNLPClassLoader extends URLClassLoader {
             UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired((PluginBridge) file);
         }
 
-        // New loader init may have caused extentions to create a
+        // New loader init may have caused extensions to create a
         // loader for this unique key. Check.
         JNLPClassLoader extLoader = uniqueKeyToLoader.get(uniqueKey);
 
@@ -528,7 +528,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      * @param enableCodeBase whether to enable codebase search or not
-     * @return classlaoder of this appp
+     * @return classloader of this appp
      * @throws java.io.IOException when IO fails
      * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
@@ -1070,7 +1070,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     if (jeName.equals(TEMPLATE) || jeName.equals(APPLICATION)) {
                         LOG.debug("Creating Jar InputStream from JarEntry");
                         InputStream inStream = jarFile.getInputStream(je);
-                        LOG.debug("Creating File InputStream from lauching JNLP file");
+                        LOG.debug("Creating File InputStream from launching JNLP file");
                         JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
@@ -1083,10 +1083,10 @@ public class JNLPClassLoader extends URLClassLoader {
                         InputStream jnlpStream = new FileInputStream(jn);
                         JNLPMatcher matcher;
                         if (jeName.equals(APPLICATION)) { // If signed application was found
-                            LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verification...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, false, jnlp.getParserSettings());
                         } else { // Otherwise template was found
-                            LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verfication...");
+                            LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
                             matcher = new JNLPMatcher(inStream, jnlpStream, true, jnlp.getParserSettings());
                         }
                         // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
@@ -2243,7 +2243,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         if (foundLoader != null) {
             approved = true;
-        } else if (ref.toString().startsWith(file.getNotNullProbalbeCodeBase().toString())) {
+        } else if (ref.toString().startsWith(file.getNotNullProbableCodeBase().toString())) {
             approved = true;
         } else if (SecurityDesc.ALL_PERMISSIONS.equals(security.getSecurityType())) {
             approved = true;

@@ -85,8 +85,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     }
 
     private final ConsoleOutputPaneModel model;
-    private int lastPostion; //index of search
-    private final DefaultHighlighter.DefaultHighlightPainter searchHighligh = new DefaultHighlighter.DefaultHighlightPainter(Color.blue);
+    private int lastPosition; //index of search
+    private final DefaultHighlighter.DefaultHighlightPainter searchHighlight = new DefaultHighlighter.DefaultHighlightPainter(Color.blue);
     private Object lastSearchTag;
 
     public ConsoleOutputPane(final ObservableMessagesProvider dataProvider) {
@@ -329,7 +329,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     }
 
     private final void initComponents() {
-        //this is crucial, otherwie PlainDocument implementatin is repalcing all \n by space
+        //this is crucial, otherwise PlainDocument implementation is replacing all \n by space
         ((PlainDocument)regExFilter.getDocument()).getDocumentProperties().remove("filterNewlines");
 
         sortCopyAll.setSelected(true);
@@ -813,23 +813,23 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             final Document document = jEditorPane1.getDocument();
             final String find = search.getText();
             if (find.length() == 0) {
-                lastPostion = document.getLength() - find.length() - 1;
+                lastPosition = document.getLength() - find.length() - 1;
                 return;
             }
-            for (int index = lastPostion; index >= 0; index--) {
+            for (int index = lastPosition; index >= 0; index--) {
                 final String subMatch = document.getText(index, find.length());
                 if ((caseSensitive.isSelected() && find.equals(subMatch)) || (!caseSensitive.isSelected() && find.equalsIgnoreCase(subMatch))) {
                     if (lastSearchTag != null) {
                         jEditorPane1.getHighlighter().removeHighlight(lastSearchTag);
                     }
-                    lastSearchTag = jEditorPane1.getHighlighter().addHighlight(index, index + find.length(), searchHighligh);
+                    lastSearchTag = jEditorPane1.getHighlighter().addHighlight(index, index + find.length(), searchHighlight);
                     jEditorPane1.setCaretPosition(index);
 
-                    lastPostion = index - find.length() - 1;
+                    lastPosition = index - find.length() - 1;
                     return;
                 }
             }
-            lastPostion = document.getLength() - find.length() - 1;
+            lastPosition = document.getLength() - find.length() - 1;
         } catch (BadLocationException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
@@ -840,23 +840,23 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             final Document document = jEditorPane1.getDocument();
             final String find = search.getText();
             if (find.length() == 0) {
-                lastPostion = 0;
+                lastPosition = 0;
                 return;
             }
-            for (int index = lastPostion; index + find.length() < document.getLength(); index++) {
+            for (int index = lastPosition; index + find.length() < document.getLength(); index++) {
                 final String subMatch = document.getText(index, find.length());
                 if ((caseSensitive.isSelected() && find.equals(subMatch)) || (!caseSensitive.isSelected() && find.equalsIgnoreCase(subMatch))) {
                     if (lastSearchTag != null) {
                         jEditorPane1.getHighlighter().removeHighlight(lastSearchTag);
                     }
-                    lastSearchTag = jEditorPane1.getHighlighter().addHighlight(index, index + find.length(), searchHighligh);
+                    lastSearchTag = jEditorPane1.getHighlighter().addHighlight(index, index + find.length(), searchHighlight);
                     jEditorPane1.setCaretPosition(index);
 
-                    lastPostion = index + 1;
+                    lastPosition = index + 1;
                     return;
                 }
             }
-            lastPostion = 0;
+            lastPosition = 0;
         } catch (BadLocationException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }

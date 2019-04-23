@@ -139,7 +139,7 @@ public class ServiceUtil {
     }
 
     /**
-     * Checks that this application (represented by the jnlp) isnt already running
+     * Checks that this application (represented by the jnlp) isn't already running
      * @param jnlpFile the {@link JNLPFile} that specifies the application
      *
      * @throws InstanceExistsException if an instance of this application already exists

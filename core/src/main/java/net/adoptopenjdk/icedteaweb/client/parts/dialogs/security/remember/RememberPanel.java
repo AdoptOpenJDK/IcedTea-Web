@@ -56,7 +56,7 @@ import java.net.URL;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
-public class RememberPanel extends JPanel implements RemeberActionProvider {
+public class RememberPanel extends JPanel implements RememberActionProvider {
 
     private final static Logger LOG = LoggerFactory.getLogger(RememberPanel.class);
 

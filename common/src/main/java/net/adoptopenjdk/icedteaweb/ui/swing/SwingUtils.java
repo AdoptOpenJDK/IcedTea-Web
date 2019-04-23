@@ -88,7 +88,7 @@ public final class SwingUtils {
     }
 
     static void trace(final String msg) {
-        // Use System.err directly for debuging EDT without any conflict with console / logging system
+        // Use System.err directly for debugging EDT without any conflict with console / logging system
         System.err.println(msg);
     }
 
@@ -179,7 +179,7 @@ public final class SwingUtils {
                         window = new JWindow().getOwner();
                         window.setName("getOrCreateWindowOwner");
                     } catch (Exception ex) {
-                        LOG.error(Translator.R("HEADLESS_MISSCONFIGURED"), ex);
+                        LOG.error(Translator.R("HEADLESS_MISCONFIGURED"), ex);
                     }
                 }
             });

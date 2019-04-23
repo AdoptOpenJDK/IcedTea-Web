@@ -157,7 +157,7 @@ public class ApplicationInstance {
     private void addMenuAndDesktopEntries() {
         ShortcutDesc sd = file.getInformation().getShortcut();
         if (JNLPRuntime.isWindows()) {
-            LOG.debug("Generating windows desktop shorcut");
+            LOG.debug("Generating windows desktop shortcut");
             try {
                 Object instance = null;
                 try {
@@ -174,15 +174,15 @@ public class ApplicationInstance {
                     AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
                     if (ics != null && ics.toBoolean()) {
                         boolean isDesktop = false;
-                        if (ics.getDekstop() != null && ics.getDekstop().isCreate()) {
+                        if (ics.getDesktop() != null && ics.getDesktop().isCreate()) {
                             isDesktop = true;
                         }
                         boolean isMenu = false;
                         if (ics.getMenu() != null && ics.getMenu().isCreate()) {
                             isMenu = true;
                         }
-                        // if setting is always create theen ics will be true but "get" properties will be null, so set to create
-                        if (ics.getDekstop() == null && ics.toBoolean()) {
+                        // if setting is always create then ics will be true but "get" properties will be null, so set to create
+                        if (ics.getDesktop() == null && ics.toBoolean()) {
                             isDesktop = true;
                         };
                         if (ics.getMenu() == null && ics.toBoolean()) {
@@ -239,7 +239,7 @@ public class ApplicationInstance {
 	        }
 	        AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
 	        if (ics !=null && ics.toBoolean()) {
-	            entry.createDesktopShortcuts(ics.getMenu(), ics.getDekstop(), isSigned());
+	            entry.createDesktopShortcuts(ics.getMenu(), ics.getDesktop(), isSigned());
 	        }
         }
     }
@@ -257,9 +257,9 @@ public class ApplicationInstance {
             AccessWarningPaneComplexReturn r = new AccessWarningPaneComplexReturn(mainResult);
             if (mainResult){
                 if (sd.onDesktop()){
-                    r.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
-                    r.getDekstop().setBrowser(XDesktopEntry.getBrowserBin());
-                    r.getDekstop().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
+                    r.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.getDesktop().setBrowser(XDesktopEntry.getBrowserBin());
+                    r.getDesktop().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
                 if (sd.getMenu() != null){
                     r.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(true));
@@ -282,10 +282,10 @@ public class ApplicationInstance {
             case ShortcutDesc.CREATE_ALWAYS:
                 return new AccessWarningPaneComplexReturn(true);
             case ShortcutDesc.CREATE_ASK_USER:
-                return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file, null);
+                return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
             case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
-                    return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESTKOP_SHORTCUT, file, null);
+                    return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
                 }
             case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {

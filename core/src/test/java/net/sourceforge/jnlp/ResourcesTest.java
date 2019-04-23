@@ -66,7 +66,7 @@ public class ResourcesTest extends  BrowserTest{
 
     @Test
     @NeedsDisplay
-    public void testNonExisitngBrowserWillNotDeadlock() throws Exception {
+    public void testNonExistingBrowserWillNotDeadlock() throws Exception {
         server.setCurrentBrowser(Browsers.none);
         ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
@@ -80,7 +80,7 @@ public class ResourcesTest extends  BrowserTest{
     @Test
     public void testUnexistingProcessWillFailRecognizedly() throws Exception {
         server.setCurrentBrowser(Browsers.none);
-        List<String> al=Arrays.asList(new String[] {"definietly_not_Existing_process"});
+        List<String> al=Arrays.asList(new String[] {"definitely_not_Existing_process"});
         ProcessResult pr = server.executeProcess(al);
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
@@ -99,7 +99,7 @@ public class ResourcesTest extends  BrowserTest{
 
     @Test
     @TestInBrowsers(testIn=Browsers.none)
-    public void testNonExisitngBrowserWillNotCauseMess() throws Exception {
+    public void testNonExistingBrowserWillNotCauseMess() throws Exception {
         ProcessResult pr = server.executeBrowser("not_existing_url.html");
         Assert.assertNull(pr.process);
         Assert.assertEquals(pr.stderr, "");
@@ -238,7 +238,7 @@ public class ResourcesTest extends  BrowserTest{
             File file = simpleContent[i];
             ServerAccess.logOutputReprint(file.getName());
             //server port have in fact no usage in converting filename to uri-like-filename.
-            //But if there is null, instead if some number, then nullpointer exception is thrown (Integer->int).
+            //But if there is null, instead if some number, then null pointer exception is thrown (Integer->int).
             //So I'm using "real" currently used port, instead of some random value.
             URI u = new URI((String) null, (String) null, (String) null, server.getPort(), file.getName(), (String) null, null);
             ServerAccess.logOutputReprint(" ("+u.toString()+")");
@@ -271,24 +271,24 @@ public class ResourcesTest extends  BrowserTest{
         final ContentReaderListener lo = new ContentReaderListener() {
 
             @Override
-            public void charReaded(char ch) {
+            public void charRead(char ch) {
                 o1.append(ch);
             }
 
             @Override
-            public void lineReaded(String s) {
+            public void lineRead(String s) {
                 o2.append(s).append("\n");
             }
         };
         ContentReaderListener le = new ContentReaderListener() {
 
             @Override
-            public void charReaded(char ch) {
+            public void charRead(char ch) {
                 e1.append(ch);
             }
 
             @Override
-            public void lineReaded(String s) {
+            public void lineRead(String s) {
                 e2.append(s).append("\n");
             }
         };
@@ -298,7 +298,7 @@ public class ResourcesTest extends  BrowserTest{
        Assert.assertNotNull(server.getCurrentBrowser());
        Assert.assertEquals(pr.stdout, o1.toString());
        Assert.assertEquals(pr.stderr, e1.toString());
-       //the last \n is mandatory as las tline is flushed also when proces dies
+       //the last \n is mandatory as las tline is flushed also when process dies
        Assert.assertEquals(pr.stdout.replace("\n", ""), o2.toString().replace("\n", ""));
        Assert.assertEquals(pr.stderr.replace("\n", ""), e2.toString().replace("\n", ""));
     }
@@ -361,7 +361,7 @@ public class ResourcesTest extends  BrowserTest{
             });
         }
 
-        Assert.assertTrue("browser's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didnt for " + browser.getID().toString(),
+        Assert.assertTrue("browser's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didn't for " + browser.getID().toString(),
                 defaultPlugins.length + userPlugins.length == 1);
         String currentPath = server.getJavawsFile().getParentFile().getParentFile().getAbsolutePath();
 
@@ -372,7 +372,7 @@ public class ResourcesTest extends  BrowserTest{
             plugins = userPlugins;
         }
         String s = ServerAccess.getContentOfStream(new FileInputStream(plugins[0]), "ASCII");
-        Assert.assertTrue("browser's plugins  shoud points to" + currentPath + ", but  didnt",
+        Assert.assertTrue("browser's plugins  should points to" + currentPath + ", but didn't",
                 s.contains(s));
     }
 }

@@ -114,7 +114,7 @@ public class LoadResourcesPackaged extends Applet {
     private static void checkStaticOnly(String clType, String resource) {
         title(clType, resource);
         try {
-            //we need catch exception both in classlaoder check and resource check
+            //we need catch exception both in classloader check and resource check
             ClassLoader cl = getStaticClassLoader(clType);
             String res = read(getResource(cl, resource));
             pass(res);
@@ -141,7 +141,7 @@ public class LoadResourcesPackaged extends Applet {
     private void checkInstance(String clType, String resource) {
         title(clType, resource);
         try {
-            //we need catch exception both in classlaoder check and resource check
+            //we need catch exception both in classloader check and resource check
             ClassLoader cl = getInstanceClassLoader(clType);
             String res = read(getResource(cl, resource));
             pass(res);

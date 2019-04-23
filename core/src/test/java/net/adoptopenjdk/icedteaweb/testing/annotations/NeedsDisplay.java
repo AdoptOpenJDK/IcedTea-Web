@@ -44,7 +44,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation should be declared for each test which requires DISPALY defined.
+ * This annotation should be declared for each test which requires DISPLAY defined.
  * If no display is defined, then those test will not be run
  *
  */

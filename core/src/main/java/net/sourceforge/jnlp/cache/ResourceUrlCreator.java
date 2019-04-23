@@ -102,9 +102,9 @@ public class ResourceUrlCreator {
 
         urls.add(resource.getLocation());
 
-        boolean noHttpsPreffered = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE));
-        if (!noHttpsPreffered) {
-            //preffering https and  owerriding case, when applciation was moved to https, but the jnlp stayed intacted
+        boolean noHttpsPreferred = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE));
+        if (!noHttpsPreferred) {
+            //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
             List<URL> urlsCopy = new LinkedList<>(urls);
             for (URL u : urlsCopy) {
                 if (u.getProtocol().equals("http") && u.getPort() < 0) {

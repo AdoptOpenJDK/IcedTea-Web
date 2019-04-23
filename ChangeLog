@@ -35,7 +35,7 @@
 	* rust-launcher/Cargo.toml: added dunce crate for windows target
 	* rust-launcher/src/dirs_paths_helper.rs: declared canonicalize methods, one for windows, second for not-windows.
 	The windows one is using dunce, other is on PathBuf.
-	* rust-launcher/src/utils.rs:used above method insted PathBuf::canonicalize
+	* rust-launcher/src/utils.rs:used above method instead PathBuf::canonicalize
 
 2019-03-05  Jiri Vanek <jvanek@redhat.com>
             Lars Herschke <lhersch@dssgmbh.de>
@@ -53,7 +53,7 @@
 2019-03-05  Lars Herschke <lhersch@dssgmbh.de>
             
 	* Makefile.am: removed dual slash between destdir and modularjdk, included CPPUNIT_FRAMEWORK_CLEAN_IMPL with
-	clean-unittest++-impl/plaeholder to avoid fail of unknown target when native plugin is gone. Cleaning up rust_test_tmp 
+	clean-unittest++-impl/placeholder to avoid fail of unknown target when native plugin is gone. Cleaning up rust_test_tmp 
 
 2019-02-28  Jiri Vanek <jvanek@redhat.com>
             Michal Vala <mvala@redhat.com>
@@ -92,7 +92,7 @@
 	Implemented way how to modify cp/bootcp in native launchers
 	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java: added (RustCpValidator) as provider for help for new
 	properties
-	* netx/net/sourceforge/jnlp/config/Defaults.java: declared for properties to control native lanchers cp/bootcp
+	* netx/net/sourceforge/jnlp/config/Defaults.java: declared for properties to control native launchers cp/bootcp
 	deployment.launcher.rust.{cp,bootcp}.{add,remove}
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added help message for new properties
 	* rust-launcher/src/jars_helper.rs: (get_{bootcp,cp}_members) method nw filter items in and from based on properties
@@ -104,7 +104,7 @@
 2019-02-18  Jiri Vanek <jvanek@redhat.com>
 
 	Implemented forgotten support for mslinks.jar library in rust launchers
-	* Makefile.am: MSLINKS_JAR are now eported in rust launchers build
+	* Makefile.am: MSLINKS_JAR are now exported in rust launchers build
 	* rust-launcher/src/hardcoded_paths.rs: MSLINKS_JAR is being captured here and exported as optional
 	* rust-launcher/src/jars_helper.rs: (get_bootcp_members) now append_if_exists also get_mslinks
 
@@ -117,7 +117,7 @@
 	For linux, implemented and used system logging
 	* rust-launcher/src/hardcoded_paths.rs: call to info moved to important
 	* rust-launcher/src/jars_helper.rs: same
-	* rust-launcher/src/log_helper.rs: if log_to_system is true(defoult) log_impl logs important messages also to system log
+	* rust-launcher/src/log_helper.rs: if log_to_system is true(default) log_impl logs important messages also to system log
 	* rust-launcher/src/os_access.rs: added trait methods of important and system_log. Implemented for Linux
 	* rust-launcher/src/utils.rs:call to info moved to important. TestLogger got implemented and important and system_log
 	declared as panicking
@@ -127,8 +127,8 @@
 	Implemented proper file logging
 	* rust-launcher/src/dirs_paths_helper.rs: AdvancedLogging moved to log_helper;
 	Linux::new(false) redeclared new to Linux::new(false, false);
-	* rust-launcher/src/log_helper.rs: now harbor AdvancedLogging as it should since beggining
-	log_impl now logs to fille only if log_to_file is true, logs to correct file,
+	* rust-launcher/src/log_helper.rs: now harbor AdvancedLogging as it should since beginning
+	log_impl now logs to file only if log_to_file is true, logs to correct file,
 	format time-stamp a bit better, creates a parent directory
 	* rust-launcher/src/main.rs: get_os functions redeclared to (debug: bool, al: bool) and now calls new(debug, al)
 	main no longer creates AdvancedLogging but calls proper get_os
@@ -137,7 +137,7 @@
 	* rust-launcher/src/property_from_files_resolver.rs: adapted to log_to_file -> log_to_file refactoring
 	* rust-launcher/src/utils.rs: try_custom_logdir_from_properties renamed to 
 	try_logtarget_from_properties and now returns final log file. New method of
-	(logfile_name) whic compses itw-like name for new log file. TestLogger
+	(logfile_name) which compses itw-like name for new log file. TestLogger
 	implements (unimplemented) advanced_logging function
 
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
@@ -145,7 +145,7 @@
 	Implemented basic stub for file logging
 	* rust-launcher/src/log_helper.rs: extracted log_impl from os.
 	Implemented (always on for now) call to log to file
-	* rust-launcher/src/main.rs: made aware of new log_hlper module
+	* rust-launcher/src/main.rs: made aware of new log_helper module
 	* rust-launcher/src/os_access.rs: adapted to log_helper. Added forgotten is_verbose
 	to windows os impl.
 
@@ -166,7 +166,7 @@
 
 2019-02-16  Jiri Vanek <jvanek@redhat.com>
 
-	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installded as executable
+	* Makefile.am: fixed issue with MODULARJDK_ARGS_FILE being installed as executable
 
 2019-02-15  Jiri Vanek <jvanek@redhat.com>
 
@@ -198,18 +198,18 @@
 	* tests/reproducers/simple/DownloadService2/resources/DownloadService2.jnlp:jnlp to call DownloadService2
 	* tests/reproducers/simple/DownloadService2/srcs/DownloadService.java: app to call DownloadService
 	* tests/reproducers/simple/DownloadService2/srcs/DownloadService2.java: app to call DownloadService2 
-	* tests/reproducers/simple/DownloadService2/testcases/DownloadService2Test.java: test to laounch DownloadService2
+	* tests/reproducers/simple/DownloadService2/testcases/DownloadService2Test.java: test to launch DownloadService2
 	and DownloadService
 
 2019-02-12  Jim Douglas <jimdouglas@mac.com>
 
 	Fixed typo in DownloadService2
-	* netx/javax/jnlp/DownloadService2.java: getUpdateAvailableResources repalced incorrect getUpdateAvaiableReosurces
+	* netx/javax/jnlp/DownloadService2.java: getUpdateAvailableResources replaced incorrect getUpdateAvaiableReosurces
 
 2019-02-11  Laurent Bourgès <bourges.laurent@gmail.com>
             Jiri Vanek <jvanek@redhat.com>
 
-	Rewritten bat launcher and introduced file to keep modular JDK swithces
+	Rewritten bat launcher and introduced file to keep modular JDK switches
 	* .Makefile: introduced MODULARJDK_ARGS_FILE=itw-modularjdk.args; built to launcher-build, handled as separate file.
 	MODULARJDK_ARGS_LOCATION is sedded into shell scripts. bat files are now cleaned to windows line-endings.
 	* acinclude.m4: Introduced new switch to allow to set switch file target location
@@ -228,17 +228,17 @@
 2019-02-07  Jiri Vanek <jvanek@redhat.com>
 
 	Added protection against to small applets. Enhanced understanding of properties like width/height
-	* netx/net/sourceforge/jnlp/AppletDesc.java: (getWidth) and (getHeight) now query proeprties for new keys
-	and resize acodringly to them and/
-	* netx/net/sourceforge/jnlp/config/Defaults.java: new keys made validated by integer. Treshold must be positive
-	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added keys of deployment.small.size.treshold to allow
+	* netx/net/sourceforge/jnlp/AppletDesc.java: (getWidth) and (getHeight) now query properties for new keys
+	and resize accordingly to them and/
+	* netx/net/sourceforge/jnlp/config/Defaults.java: new keys made validated by integer. Threshold must be positive
+	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: added keys of deployment.small.size.threshold to allow
 	value since which applet is to small (default 10), deployment.small.size.override.{width,height} to set new size
-	negative values to enforce it, positive to be used as fallback, if no width/heigh (lower/upper/cammel) parameter found
+	negative values to enforce it, positive to be used as fallback, if no width/height (lower/upper/camel) parameter found
 	default is set to search for width/height param and enforce 800x600 if not present
 
 2019-02-07  Jiri Vanek <jvanek@redhat.com>
 
-	Desktop sortcuts name is now based on title. And only if missing, then on file
+	Desktop shortcuts name is now based on title. And only if missing, then on file
 	* netx/net/sourceforge/jnlp/JNLPFile.java: new method of createNameForDesktopFile, which
 	returns title if it is present, jnlp file name otherwise.
 	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: getGeneratedJnlpFileName and getDesktopIconName now uses 
@@ -248,7 +248,7 @@
 
 	Delete-by app dialogue split keys to two groups instead of mixing them
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: clearCache(String) changed to (String,bool,bool) to allow by-key access.
-	(listCacheIds) - same. (getCacheIds) - same plus used those two booleasn to select what keys to include in filtering
+	(listCacheIds) - same. (getCacheIds) - same plus used those two booleans to select what keys to include in filtering
 	* netx/net/sourceforge/jnlp/controlpanel/CacheAppViewer.java: the deleteByApp dialog enhanced by TabView. Each tab holds
 	one family of keys.
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: adapted to new signature of (CacheUtil.listCacheIds)
@@ -264,8 +264,8 @@
 
 	Relaxed vendor and title to be no longer mandatory - based on oracle javaws behavior
 	* netx/net/sourceforge/jnlp/JNLPFile.java: getVendor/Title refactored to work without values. In strict mode,
-	they keep throwing MisisngElement exception/
-	* netx/net/sourceforge/jnlp/Parser.java: delegating logic to check title/vendor to JNLPfile. Jsut calling it with possibility of fail.
+	they keep throwing MissingElement exception/
+	* netx/net/sourceforge/jnlp/Parser.java: delegating logic to check title/vendor to JNLPfile. Just calling it with possibility of fail.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added PMissingMandatoryWarning and PMissingMandatorySubstitution
 	to inform about missing title/vendor
 	* tests/netx/unit/net/sourceforge/jnlp/ParserTest.java: adapted to new behavior
@@ -304,7 +304,7 @@
 	listing of ids and deleting via those grouping.	New file.
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: added logic to show .info details for each file shown by cache viewer.
 	(generateData) made jnlp-path aware, made public and reused several times
-	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: added button to show dilog which is deleting by id
+	* netx/net/sourceforge/jnlp/controlpanel/TemporaryInternetFilesPanel.java: added button to show dialog which is deleting by id
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added BXclearcache BXSingleCacheCleared BXSingleCacheClearNotFound
 	BXSingleCacheMoreThenOneId BXSingleCacheFileCount BXcacheids NOAnonorone WinDesktopError. Modified BXclearcache. Improved
 	EXAWdesktopWants EXAWdesktopDontWants EXAWsubmenu EXAWmenuWants EXAWmenuDontWants EXAWrememberByApp EXAWrememberByPage
@@ -314,13 +314,13 @@
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: now offer getter for optionParser (so it van be reused in ResourceDownloader)
 	Added understanding to Xcacheids. Understanding to Xclearcache adapted to its new optional argument
 	* netx/net/sourceforge/jnlp/util/GenericDesktopEntry.java: interface for (future) WindowsDesktopEntry and XDesktopEntry unification
-	* netx/net/sourceforge/jnlp/util/WindowsDesktopEntry.java: new file, implementation fo windos desktop integration
+	* netx/net/sourceforge/jnlp/util/WindowsDesktopEntry.java: new file, implementation fo windows desktop integration
 	via lnk files generated by mslinks.jar. Unlike XDesktop integration, it swarms also uninstall shortcuts.
 	* netx/net/sourceforge/jnlp/util/XDesktopEntry.java: Mostly adapted to refactorings. Extracted extraction of favicon to method,
 	reused, and improved to try more locations on server.
 	* netx/net/sourceforge/jnlp/util/optionparser/OptionParser.java: adapted to refactorings
 	* shell-launcher/launchers.bat.in: mslinks included in bootclasspath
-	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: addd tests for CacheId
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: add tests for CacheId
 	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java: Added tests for favicon extraction
 
 2019-01-14  Jiri Vanek <jvanek@redhat.com>
@@ -347,7 +347,7 @@
 
 	Added support for -J options
 	* rust-launcher/src/main.rs: arguments are now copied to sub-process in two steps
-	First those with -J prefix are having it stripped and are given to JVM. Those withou J are
+	First those with -J prefix are having it stripped and are given to JVM. Those without J are
 	suffixed to the itw itself
 
 2019-01-14  Jiri Vanek <jvanek@redhat.com>
@@ -359,9 +359,9 @@
 
 2019-01-09  Jiri Vanek <jvanek@redhat.com>
 
-	Made rust launchers to resovle jars, compose classpath and this run itw
-	* Makefile: renamed netx.jar to javaws.jar; properly ued variabels for NETX_JAR and SPLASH_PNG and all other .jar and.png resources
-	* configure.a: added check for --with-itw-libs which determines wheter build is for distribution, self or portable usage
+	Made rust launchers to resolve jars, compose classpath and this run itw
+	* Makefile: renamed netx.jar to javaws.jar; properly used variables for NETX_JAR and SPLASH_PNG and all other .jar and.png resources
+	* configure.a: added check for --with-itw-libs which determines whether build is for distribution, self or portable usage
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: adapted netx->javaws renaming
 	* netx/net/sourceforge/jnlp/controlpanel/ClassFinder.java:  adapted netx->javaws renaming
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:  adapted netx->javaws renaming
@@ -384,14 +384,14 @@
             jtesdall <jtesdall@mapcon.com>
 
 	Replaced hardcoded BOM character with utf representation (PR3671)
-	* netx/net/sourceforge/nanoxml/XMLElement.java: (scanLeadingWhitespace) resolved PR3671, relaced ' ' by \\ufeff
+	* netx/net/sourceforge/nanoxml/XMLElement.java: (scanLeadingWhitespace) resolved PR3671, replaced ' ' by \\ufeff
 
 2018-12-10  Jiri Vanek <jvanek@redhat.com>
 
 	Made get_home os dependent.
 	* rust-launcher/src/dirs_paths_helper.rs: removed get_home; used os.get_home where appropriate.
 	Introduced is_dir, and moved is_file here and theirs tests.
-	* rust-launcher/src/os_access.rs: prescribed get_home and implemeted for Linux, solemnly on HOME variable
+	* rust-launcher/src/os_access.rs: prescribed get_home and implemented for Linux, solemnly on HOME variable
 	* rust-launcher/src/property_from_file.rs: adapted to new location of is_file
 	* rust-launcher/src/property_from_files_resolver.rs: implemented get_home doing nothing for testing stub
 
@@ -435,7 +435,7 @@
 
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
 
-	https is preffered only on default port
+	https is preferred only on default port
 	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: (getUrls) when http protocol-ed  url have set port
 	its https clone is not put to the list of possible urls
 
@@ -444,14 +444,14 @@
 	PR3645, second part - following windows system paths correctly
 	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: following 
 	https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
-	(SystemCofigFileDescriptor) now honor WINDIR on windows
+	(SystemConfigFileDescriptor) now honor WINDIR on windows
 
 2018-11-27  Jiri Vanek <jvanek@redhat.com>
             Lars Herschke <lhersch@dssgmbh.de>
 
 	Fixed PR3637 - making cache work with jdk9+ #runtime jar url anchor
 	* netx/net/sourceforge/jnlp/runtime/CachedJarFileCallback.java: (retrieve) if jar is not found in cache, ale url without anchor is attempted
-	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: usinf localFile.toURI().toURL() instead of direct localFile.toURL()
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: using localFile.toURI().toURL() instead of direct localFile.toURL()
 
 2018-11-23  Lars Herschke <lhersch@dssgmbh.de>
             Jiri Vanek <jvanek@redhat.com>
@@ -473,7 +473,7 @@
 2018-11-07  Olesya Gerasimenko <gammaray@basealt.ru>
 
 	Added Russian translation
-	* netx/net/sourceforge/jnlp/resources/Messages_ru.propertie: new file with Russian strings
+	* netx/net/sourceforge/jnlp/resources/Messages_ru.properties: new file with Russian strings
 	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java: added RU to iterated sets.
 	* AUTHORS: added Olesya
 
@@ -611,7 +611,7 @@
 	* rust-launcher/src/jvm_from_properties.rs: logic to parse properties file, and to read JDK value from here
 	* rust-launcher/src/jvm_from_properties_resolver.rs: logic to waterfall all usable properties files and try
 	locate JDK here.
-	* rust-launcher/src/main.rs: now trying various JDKS: proeprties->JAVA_HOME->registry->default (from build)
+	* rust-launcher/src/main.rs: now trying various JDKs: properties->JAVA_HOME->registry->default (from build)
 	* rust-launcher/src/os_access.rs: set of classes serving to bridge few details where win and Linux may differ
 	* rust-launcher/src/property.rs: class to read generic properties file
 	* rust-launcher/src/utils.rs: class for various utility methods. Including testing subclass
@@ -628,7 +628,7 @@
 
 2018-06-20  Jiri Vanek <jvanek@redhat.com>
 
-	Enhanced itw-settngs' certificate viewer to show what file is backing showed certificate store.
+	Enhanced itw-settings' certificate viewer to show what file is backing showed certificate store.
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: adapted to refactoring of KeyStores
 	* netx/net/sourceforge/jnlp/security/KeyStores.java: getKeyStore now returns wrapper with path alongside with ks itself
 	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java: adapted to refactoring of KeyStores
@@ -656,7 +656,7 @@
 2018-05-24  Jiri Vanek <jvanek@redhat.com>
 
 	Made headless detection softer
-	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: JWindow().getOwner() repalced by GraphicsEnvironment.isHeadless()
+	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: JWindow().getOwner() replaced by GraphicsEnvironment.isHeadless()
 	JWindow().getOwner() was failing on headfull systems after headless check itself, on NPE.
 
 2018-05-14  Jiri Vanek <jvanek@redhat.com>
@@ -667,14 +667,14 @@
 
 2018-02-15  Jiri Vanek <jvanek at redhat.com>
 
-	Build of rust lunchers moved to cargo 
+	Build of rust launchers moved to cargo 
 	* configure.ac: added check for cargo
 	* .hgignore: added target and Cargo.lock
-	* .Makefile.am: dropped all launcher.in/libhardoced_paths_*.rs targets and rustc targets.
+	* .Makefile.am: dropped all launcher.in/libhardcoded_paths_*.rs targets and rustc targets.
 	(launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor))
 	adapted to use cargo. Variables handled in switch. (clean) now cleans all launcher.in*
 	* rust-launcher/Cargo.toml: primitive declaration of package
-	* rust-launcher/src/hardcoded_paths.rs: copied from rust-launcher/hardoced_paths.rs.in
+	* rust-launcher/src/hardcoded_paths.rs: copied from rust-launcher/hardcoded_paths.rs.in
 	adapted to get substitution via cargo rather then by sed.  Added test and wrapping getters
 	* rust-launcher/src/main.rs: copied from rust-launcher/launchers.rs. Adapted imports to new 
 	infrastructure,s till just reprinting hardcoded stuff
@@ -700,7 +700,7 @@
 2018-02-05  Jiri Vanek <jvanek@redhat.com>
 
 	Added basic support for javafx desc
-	* netx/net/sourceforge/jnlp/ApplicationDesc.java: added flag fx to rember what was initiator
+	* netx/net/sourceforge/jnlp/ApplicationDesc.java: added flag fx to remember what was initiator
 	* netx/net/sourceforge/jnlp/Node.java: Added abstraction ElementName over string of element name to hold namespace
 	and separate it for name if present
 	* netx/net/sourceforge/jnlp/Parser.java: for javafx-desc ApplicationDesc is instantiated. Adapted to ElementName
@@ -751,7 +751,7 @@
 2017-11-02  Jiri Vanek <jvanek@redhat.com>
 
 	Added linux binary dist target
-	* Makefile.am: (uninstall-linux-only) fixed suffixes of removed lunchers
+	* Makefile.am: (uninstall-linux-only) fixed suffixes of removed launchers
 	added new target (linux-bin-dist) creating binary javaws static distribute-able image
 
 2017-11-09  Jiri Vanek <jvanek@redhat.com>
@@ -784,7 +784,7 @@
             Tomáš Votava <tomcacolca@gmail.com>
 
 	Authors made as links in html docs
-	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: isntanceof replaced by correct interface method
+	* netx/net/sourceforge/jnlp/util/docprovider/TextsProvider.java: instanceof replaced by correct interface method
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/Formatter.java: added getAdressLink and replaceLtGtCharacters methods
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/HtmlFormatter.java: implemented newmethods. Added dummy antispam protection
 	* netx/net/sourceforge/jnlp/util/docprovider/formatters/formatters/ReplacingTextFormatter.java: dummy impl of new methods
@@ -874,7 +874,7 @@
             Alexandr Kolouch  <skolnag@gmail.com>
 
 	Added Czech translation for 1.7.
-	* netx/net/sourceforge/jnlp/resources/Messages_cs.propertie: added missing
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: added missing
 	properties, adapted changed ones.
 	* tests/netx/unit/net/sourceforge/jnlp/resources/MessagesPropertiesTest.java: added shift f2
 	to blacklisted items
@@ -910,7 +910,7 @@
 	* netx/javaws_splash.png: adapted to new leaves
 	* netx/net/sourceforge/jnlp/resources/itw_logo.png: same
 	* netx/net/sourceforge/jnlp/resources/netx-icon.png: added frozen lines around to 
-	be less environment-settings vulnereable
+	be less environment-settings vulnerable
 	* win-installer/greetings_banner.bmp: aligned to more blue color schema
 	* win-installer/icon.ico: adapted to frozen leaves
 	* win-installer/top_banner.bmp: added a bit of ice
@@ -976,9 +976,9 @@
 2017-05-19  Jiri Vanek <jvanek@redhat.com>
             Alex Kashchenko <akashche@redhat.com>
 
-	added support for reading java home from regsitry
+	added support for reading java home from registry
 	* launcher/launchers.bat.in: registry support(Alex),
-	fixed issue with ITW_WIN_SPECIALS, fixed issue with returnvlaue,
+	fixed issue with ITW_WIN_SPECIALS, fixed issue with return value,
 	user-in-file java path proffered over all.
 
 2017-12-19  Alex Kashchenko <akashche@redhat.com>
@@ -991,7 +991,7 @@
             Tomáš Votava <tomcacolca@gmail.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/splashscreen/impls/defaultsplashscreen2012/TextWithWaterLevelTest.java:
-	cutToTest get rid of hardcoded siezes, ad follows relative placement of testing points
+	cutToTest get rid of hardcoded sizes, ad follows relative placement of testing points
 	(used font is different on windows)
 
 2017-05-18  Jiri Vanek <jvanek@redhat.com>
@@ -1000,7 +1000,7 @@
 	* tests/netx/unit/net/sourceforge/jnlp/util/logging/TeeOutputStreamTest.java: testPrint and testWriteByteArrayString
 	made dual for linux and windows. Those tests are charset specific. testWriteByteArrayString2 is new test, showing
 	strange issue when strange characters are going into and from byte array. On windows, this test fails, showing, that somewhere
-	in the stack, there is bad encoding or bad offset/lenght used.
+	in the stack, there is bad encoding or bad offset/length used.
 
 2017-05-18  Jiri Vanek <jvanek@redhat.com>
             Tomáš Votava <tomcacolca@gmail.com>
@@ -1040,8 +1040,8 @@
 	introduced WIN_INSTALLER_SRC_DIR to put win-installer to abs src dir. clean-win-installer, new target,
 	cleaning  installer. installer.json and win-installer targets now using correct path macros. All work done
 	done in special dir
-	* acinclude.m4: WIX_TOOLSET_DIR is now striped only once, so it wrks well for both bin(msi) and no  bin(zip)
-	WiX isntallations
+	* acinclude.m4: WIX_TOOLSET_DIR is now striped only once, so it works well for both bin(msi) and no bin(zip)
+	WiX installations
 	* configure.ac: wixgen.jar added more defaults to try
 	* win-installer/installer.json.in: adapted to work in different subdirectory (hot candidate for sed)
 
@@ -1076,8 +1076,8 @@
 
 	fixed windows headless detection problems
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: as (mostly) first initialized class
-	on windows, enforced headless check and initialized logging. This is WORKAROUND and shoudl get FIXED.
-	There is strange behavior in AWT windows impelmentation, which is causing awt queue to get corrupted
+	on windows, enforced headless check and initialized logging. This is WORKAROUND and should get FIXED.
+	There is strange behavior in AWT windows implementation, which is causing awt queue to get corrupted
 	when called from "bad" thread.  This hack is enforcing to be called from "correct" thread. This is 
 	likely bug in JDK and have to be investigated. Btw see patch from 2017.04.10 about awt hooks. That is 
 	same issue.
@@ -1131,7 +1131,7 @@
             Ville Skyttä <ville.skytta@iki.fi>
 
 	PR3366 - Install bash completion to configured dynamic load location (3/4)
-	* Makefile.am: BASH_CMPL_DEST_DIR subsituted from bashcompdir
+	* Makefile.am: BASH_CMPL_DEST_DIR substituted from bashcompdir
 	* configure.ac: added PKG_CHECK_VAR on bashcompdir and bash-completion
 
 2017-05-04  Jiri Vanek <jvanek@redhat.com>
@@ -1157,7 +1157,7 @@
 	to deal with absolute X:\ windows path and keep filtering any other colons.
 	* tests/netx/unit/net/sourceforge/jnlp/util/FileUtilsTest.java: test
 	adapted to new logic. Added tests for new cases,added tests for some
-	cornercases
+	corner cases
 
 2017-05-03  Jiri Vanek <jvanek@redhat.com>
 
@@ -1183,14 +1183,14 @@
 2017-04-28  Jiri Vanek <jvanek@redhat.com>
 
 	* Makefile.am: removed quoting about UNIFIED_BOOTCLASSPATH in LAUNCHER_BOOTCLASSPATH
-	to get more freedom. Intentionallynot added quoting about LAUNCHER_BOOTCLASSPATH 
+	to get more freedom. Intentionally not added quoting about LAUNCHER_BOOTCLASSPATH 
 	in run-reproducers-test-code-coverage-jacoco.stamp, as imho their sed was error
 	passing just by luck
 	* launcher/launchers.in: in consequence, added quotes about @LAUNCHER_BOOTCLASSPATH@
 
 2017-04-28  Jiri Vanek <jvanek@redhat.com>
 
-	Hopefully fixed codecoverage, which failed with 8u131 update
+	Hopefully fixed code coverage, which failed with 8u131 update
 	* Makefile.am: JACOCO_ADVANCED_EXCLUDE added javax.swing.*
 
 2017-04-27  Jiri Vanek <jvanek@redhat.com>
@@ -1216,12 +1216,12 @@
 	I found to extract jars from configure in without manual enumeration.
 	(uninstall-local) on windows, removes copied dependence. (install-data-local)
 	on windows, copy all used jars. Some selected jars are duplicated in runtime
-	dependeces
+	dependencies
 
 2017-04-26  Jiri Vanek <jvanek@redhat.com>
 
-	* netx/net/sourceforge/jnlp/runtime/Boot.java: added support for jnlp:other_protocol:// handlig
-	* tests/netx/unit/net/sourceforge/jnlp/runtime/BootTest.java: added unitt tests for various jnlp protocol cases
+	* netx/net/sourceforge/jnlp/runtime/Boot.java: added support for jnlp:other_protocol:// handling
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/BootTest.java: added unit tests for various jnlp protocol cases
 
 2017-04-25  Jiri Vanek <jvanek@redhat.com>
 
@@ -1231,7 +1231,7 @@
 2017-04-25  Jiri Vanek <jvanek@redhat.com>
 
 	* Makefile.am: cp -a got extracted -a switch to variable, disabled on win,
-	which may fail on certain combinations ow wndows x cygwin.
+	which may fail on certain combinations ow windows x cygwin.
 
 2017-04-25  Jiri Vanek <jvanek@redhat.com>
 
@@ -1240,14 +1240,14 @@
 
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
-	javaws made to understand jnlp "network protokol"
+	javaws made to understand jnlp "network protocol"
 	* NEWS: mentioned jnlp protocol
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: when main or jnlp argument starts with
 	jnlp(s): then it is substituted by http(s)
 
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
-	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: https preffered over http
+	* netx/net/sourceforge/jnlp/cache/ResourceUrlCreator.java: https preferred over http
 
 2017-04-24  Jiri Vanek <jvanek@redhat.com>
 
@@ -1286,7 +1286,7 @@
 	check for WEmbeddedFrame/XEmbeddedFrame done by windows/linux recognition
 	removed checks on SUN_AWT_X11_XEMBEDDEDFRAME and SUN_AWT_WEMBEDDEDFRAME
 	* Makefile.am: sed in PluginAppletViewer.java conditioned
-	by WINDOWS variable isntead of SUN_AWT_WEMBEDDEDFRAME one
+	by WINDOWS variable instead of SUN_AWT_WEMBEDDEDFRAME one
 
 2017-04-10  Michal Vala <mvala@redhat.com>
             Jiri Vanek  <jvanek@redhat.com>
@@ -1387,17 +1387,17 @@
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: added default locations of
 	appletviewer_default_jfxrtjar and appletviewer_default_nashonrjar. Added methods
 	get_plugin_jfx_jar and get_plugin_nashorn_jar to get dynamically resolved nashorn/javafx
-	(command_line.push_back) for jdk8, on classapth added javafx,
+	(command_line.push_back) for jdk8, on classpath added javafx,
 	for jdk9 added classpath attribute with javafx (unknown behavior), for both jdks appended
 	nashorn.jar to bootclassapth
 	* tests/reproducers/simple/jsengine/resources/jsengineApplet.html: testcase html
-	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test for apelt in html
+	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test for applet in html
 
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
 
 	Added test for javaws-applet and nashorn
-	* tests/reproducers/simple/jsengine/resources/jsengineApplet.jnlp: new file, aplet definition
-	* tests/reproducers/simple/jsengine/srcs/jsengineApplet.java: new file, applet impelmentation
+	* tests/reproducers/simple/jsengine/resources/jsengineApplet.jnlp: new file, applet definition
+	* tests/reproducers/simple/jsengine/srcs/jsengineApplet.java: new file, applet implementation
 	* tests/reproducers/simple/jsengine/testcases/jsengineTest.java: added test calling jsengineApplet.jnlp
 
 2017-01-04  Jiri Vanek <jvanek@redhat.com>
@@ -1468,7 +1468,7 @@
 	* tests/reproducers/signed/LoadResources/srcs/LoadResourcesPackaged.java:
 	reproducer in some.pkg package calling various getClassLoader
 	* tests/reproducers/signed/LoadResources/srcs/some.file:
-	testabel resource
+	testable resource
 	* tests/reproducers/signed/LoadResources/testcases/LoadResourcesTest.java:
 	testcase of reproducer
 	* NEWS: mentioned PR2968
@@ -1564,7 +1564,7 @@
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
 	Using JarIndexAccess instead of JarInde
 	* netx/net/sourceforge/jnlp/security/dialogs/AccessWarningPane.java:
-	Using SunMiscLauncher isntead of sun.misc.Launcher
+	Using SunMiscLauncher instead of sun.misc.Launcher
 	* netx/net/sourceforge/jnlp/security/dialogs/CertWarningPane.java:
 	same
 	* netx/net/sourceforge/jnlp/security/dialogs/MoreInfoPane.java:
@@ -1592,7 +1592,7 @@
 	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
 	If headless, is printing downloading message to console
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
-	Added key HEADLESS_MISSCONFIGURED warning user that he do not have X
+	Added key HEADLESS_MISCONFIGURED warning user that he do not have X
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
 	checkHeadless made lazy in first call to isHeadless
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java:
@@ -1674,7 +1674,7 @@
 	added EPE group for RemmeberableDialogueEditor
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
 	highlighted some copying whew one would expect instance
-	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java: made deamon
+	* plugin/icedteanp/java/sun/applet/PluginMessageConsumer.java: made daemon
 	* tests/netx/unit/net/sourceforge/jnlp/controlpanel/ClassFinderTest.java:
 	adapted to ignorance of interface
 
@@ -1700,8 +1700,8 @@
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added resource regarding
 	to integrated browser and http 511 dialog messages
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: added reaction to -browser; refactored
-	* netx/net/sourceforge/jnlp/runtime/html/browser/DocumentChangededListener.java:
-	new file, used to notify LinksPannel that Browser changed
+	* netx/net/sourceforge/jnlp/runtime/html/browser/DocumentChangedListener.java:
+	new file, used to notify LinksPanel that Browser changed
 	* netx/net/sourceforge/jnlp/runtime/html/browser/HtmlBrowserPanel.java: dummy
 	implementation of browser based on jeditorpane, to resolve http 511 messages and forms
 	* netx/net/sourceforge/jnlp/runtime/html/browser/LinkingBrowser.java: connected
@@ -1723,7 +1723,7 @@
 	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java:
 	removed unused import
 	* netx/net/sourceforge/jnlp/util/UrlUtils.java: added loadUrl and loadUrlWithInvalidHeader
-	to load content of url negotination. First for URLconection, second for Socket connection
+	to load content of url negotiation. First for URLConnection, second for Socket connection
 	* tests/reproducers/simple/Http511/testcases/Http511Test.java: huge reproducer
 	for various http 511 cases
 	* tests/reproducers/simple/Http511/resources/Http511.html:
@@ -1732,10 +1732,10 @@
 	* tests/reproducers/simple/Http511/resources/Http511_href.html:
 	* tests/reproducers/simple/Http511/srcs/Http511.java:
 	* tests/test-extensions/net/sourceforge/jnlp/Authentication511Requester.java:
-	interface to summary necessary methods for http 511 authentification
-	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java: assasin made
+	interface to summary necessary methods for http 511 authentication
+	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java: assassin made
 	accessible
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java: kill -9
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java: kill -9
 	again enabled on demand
 	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java: now implements
 	Authentication511Requester
@@ -1785,14 +1785,14 @@
 
 	Fixed various cosmetic NPEs when codebase is null (+tests)
 	* NEWS: mentioned PR2489
-	* netx/net/sourceforge/jnlp/JNLPFile.java: added method getNotNullProbalbeCodeBase
+	* netx/net/sourceforge/jnlp/JNLPFile.java: added method getNotNullProbableCodeBase
 	workaround cases when codebase is null (for various output reasons)
-	* netx/net/sourceforge/jnlp/PluginBridge.java: using getNotNullProbalbeCodeBase
+	* netx/net/sourceforge/jnlp/PluginBridge.java: using getNotNullProbableCodeBase
 	when fixing codebase during generation of jnlp stub.
 	* netx/net/sourceforge/jnlp/SecurityDesc.java: same for generating uri for policies
 	record
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: (manageExternalJars)
-	same for ref string comparsion
+	same for ref string comparison
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: same for visible form of
 	codebase
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: same
@@ -1860,7 +1860,7 @@
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: (exit) now waits for 
 	BasicExceptionDialog.
 	* netx/net/sourceforge/jnlp/runtime/html/AppletExtractor.java: (cleanStreamIfPossible)
-	now uses Parser.getParserInstance ratehr then its own.
+	now uses Parser.getParserInstance rathrr then its own.
 	* netx/net/sourceforge/jnlp/util/BasicExceptionDialog.java: Is now capable of
 	publishing number of shown instances.
 
@@ -1888,7 +1888,7 @@
 	Included maven artifacts and appstream metadata
 	* .Makefile: (clean-local) and (.PHONY) now depends on clean-metadata.
 	($(abs_top_builddir)/metadata) new target, copy metadata-in to metadata and
-	replace name, vendor and version check-meatdata, new stand alone target, checks
+	replace name, vendor and version check-metadata, new stand alone target, checks
 	correctness of poms and xmls in	metadata folder. (stamps/netx-dist.stamp) now
 	depends on $(abs_top_builddir)/metadata. clean-metadata, new target, removes
 	built metadata folder
@@ -1906,7 +1906,7 @@
 
 2016-01-14  Jiri Vanek  <jvanek@redhat.com>
 
-	Added reprodcuer for NoClassDeffFoundError behavior
+	Added reproducer for NoClassDefFoundError behavior
 	* tests/reproducers/custom/NoClassDeff/srcs/NoClassDeff.java: small app including
 	inner class, which is missing in deployed jar. Then calling this class on demand
 	* tests/reproducers/custom/NoClassDeff/srcs/.Makefile: responsible for removing
@@ -1956,7 +1956,7 @@
 	* tests/netx/unit/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmationTest.java:
 	adapted to moved methods
 	* tests/netx/unit/net/sourceforge/jnlp/util/UrlUtilsTest.java: added more tests
-	to removeFileName and enabled accidentlay disabled  getHostAndPortTest and
+	to removeFileName and enabled accidentally disabled  getHostAndPortTest and
 	getPortTest
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
 	ensured manifest attributes are off for this test
@@ -1965,12 +1965,12 @@
 
 2016-01-07  Jiri Vanek  <jvanek@redhat.com>
 
-	BOM character now dont cause error
+	BOM character now don't cause error
 	* netx/net/sourceforge/nanoxml/XMLElement.java: duplicated whitespace recognition
-	code moved to isRegularWhiteSpace.  First call to scanWhitespace repalced by
+	code moved to isRegularWhiteSpace.  First call to scanWhitespace replaced by
 	call to scanLeadingWhitespace. New field BOM introduced. (scanWhitespace)
 	made private, and uses isRegularWhiteSpace. (scanLeadingWhitespace) new method,
-	same as scanWhitespacebut also skipps BOM and marks it.
+	same as scanWhitespacebut also skips BOM and marks it.
 	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java: Added tests to
 	issue
 	* tests/netx/unit/net/sourceforge/jnlp/templates/EFBBBF.jnlp: new file. jnlp
@@ -1984,7 +1984,7 @@
 
 2016-01-06  Jiri Vanek  <jvanek@redhat.com>
 
-	Fixed PR2591 - IcedTea-Web request resources twice for meta informations and
+	Fixed PR2591 - IcedTea-Web request resources twice for meta information and
 	causes ClientAbortException on tomcat in conjunction with JnlpDownloadServlet 
 	* NEWS: mentioned PR2591
 	* netx/net/sourceforge/jnlp/cache/ResourceDownloader.java: CodeWithRedirect renamed
@@ -2076,7 +2076,7 @@
 	* tests/reproducers/simple/IcoAccess/resources/IcoAccess.jnlp: jnlp for javaws app
 	* tests/reproducers/simple/IcoAccess/srcs/IcoAccess.java: main class
 	* tests/reproducers/simple/IcoAccess/testcases/IcoAccessTest.java: tests
-	applet, appelt via -html and javaws can access ico normaly. javaws -headless
+	applet, applet via -html and javaws can access ico normally. javaws -headless
 	can not. Strange.
 
 
@@ -2123,7 +2123,7 @@
 	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/Panels.java:
 	new class, provides various encapsulated parts of FreeDesktopIntegrationEditorFrame
 	* netx/net/sourceforge/jnlp/controlpanel/desktopintegrationeditor/PreviewSelectionJTextPane.java:
-	new class, impelmetation of preview for FreeDesktopIntegrationEditorFrame
+	new class, implementation of preview for FreeDesktopIntegrationEditorFrame
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added  Control 
 	Panel - desktop integration manager DIM family
 	* netx/net/sourceforge/jnlp/security/dialogs/SecurityDialogPanel.java: htmlWrap
@@ -2158,7 +2158,7 @@
 	itweb-settings, debugging panel made aware about legacy log and client apps log
 	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: added checboxes for
 	KEY_ENABLE_APPLICATION_LOGGING_TOFILE and KEY_ENABLE_LEGACY_LOGBASEDFILELOG
-	Cusotm config directory place was a bit repacked to be more compact and more useful.
+	Custom config directory place was a bit repacked to be more compact and more useful.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added labels
 	and tooltips for new checkboxes
 
@@ -2197,7 +2197,7 @@
 	* netx/net/sourceforge/jnlp/util/logging/SingleStreamLogger.java: this interface
 	now extends	AutoCloseable
 	* netx/net/sourceforge/jnlp/util/logging/filelogs/LogBasedFileLog.java: copy 
-	of original FileLog. Writing to file is done via java.util.loggiing engine
+	of original FileLog. Writing to file is done via java.util.logging engine
 	* netx/net/sourceforge/jnlp/util/logging/filelogs/WriterBasedFileLog.java:
 	writing to file is done by simple buffered writer
 	* tests/netx/unit/net/sourceforge/jnlp/util/logging/FileLogTest.java: now tests
@@ -2209,7 +2209,7 @@
 
 2015-10-15  Jiri Vanek  <jvanek@redhat.com>
 
-	Broken file logging now dont crash itw
+	Broken file logging now don't crash itw
 	* NEWS: mentioned
 	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: Instance now acquired
 	from factory method  (createFileLog) which defaults new SingleStreamLoggerImpl
@@ -2234,7 +2234,7 @@
 	* .Makefile: added target (run-test-server-on-itwtestsport) which lunches
 	testserver on $ITWTESTSPORT port
 	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java:
-	addapted to support resource's location
+	adapted to support resource's location
 	* tests/reproducers/simple/SOPBypass/srcs/SOPBypass.java: same
 	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassBeforeAndAfterChunks.java:
 	extracted @before and @after hunks from other testcases to avoid duplicated code.
@@ -2316,7 +2316,7 @@
 
 2015-09-24  Jiri Vanek  <jvanek@redhat.com>
 
-	SOPBypass reprodcuer addapted to use instance of internal server as unrleated url
+	SOPBypass reproducer addpted to use instance of internal server as unrelated url
 	Improved for real reading from all tested urls.
 	* tests/reproducers/signed/SOPBypassSigned/srcs/SOPBypassSigned.java:
 	* tests/reproducers/simple/SOPBypass/resources/SOPBypass.jnlp:
@@ -2345,7 +2345,7 @@
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnlyPackage/MixedSigningAndTrustedOnlyFSSU.java:
 	same
 	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassHtmlAppletTest.java:
-	moved to correct dir to follow package name delcared in file
+	moved to correct dir to follow package name declared in file
 	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTest.java:
 	same
 	* tests/reproducers/simple/SOPBypass/testcases/sopbypasstests/SOPBypassJnlpAppletTestWithHtmlSwitch.java:
@@ -2405,7 +2405,7 @@
 2015-09-10  Jiri Vanek  <jvanek@redhat.com>
 
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
- 	(stripFileImp) fixed typo on variable of normlaized to normalized
+ 	(stripFileImp) fixed typo on variable of normalized to normalized
 
 
 2015-09-09  Jacob Wisor  <gitne@icedtea.classpath.org>
@@ -2452,7 +2452,7 @@
 
 	Added identifier to .appletTrustSettings to specify version of file
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageImpl.java:
-	added handling of version - readVersion, versionPreffix, backup, currentVersion.
+	added handling of version - readVersion, versionPrefix, backup, currentVersion.
 	(readLine) when first line is read, it is checked for version and acted. If
 	loaded version is missing or older then current 2, then file is  not loaded.
 	otherwise normal loading. (writeContent) now inserts  header with version.
@@ -2537,7 +2537,7 @@
 	application-library-allowable-codebase dialog made available for unsigned apps
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: (ALACAMissingMainTitle)
 	added warning about possible consequences of  resources out of docbase.
-	(ALACAMatchingMainTitle) the red higlights changed to green and added calming
+	(ALACAMatchingMainTitle) the red highlights changed to green and added calming
 	words about it.
 	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: same
 	* netx/net/sourceforge/jnlp/resources/Messages_de.properties: same
@@ -2571,7 +2571,7 @@
 	generated icedteaweb-completion. (clean-local) (.PHONY) added clean-icedteaweb-completion
 	(install-exec-local) now creates BASH_CMPL_DEST_DIR and copy icedteaweb-completion to it
 	(uninstall-local) now removes also  BASH_CMPL_DEST_DIR/icedteaweb-completion
-	(icedteaweb-completion), new target, substiture real values from javacode
+	(icedteaweb-completion), new target, substitute real values from java code
 	via icedteaweb-completion.in to icedteaweb-completion
 	(stamps/netx-dist.stamp) now depends also on icedteaweb-completion
 	(clean-icedteaweb-completion) new target to remove generated file
@@ -2588,7 +2588,7 @@
 
 	Added more tests MixedSigningAndTrustedOnly
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass1.java
-	modified to suite more compelx tests
+	modified to suite more complex tests
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MixedSigningAndTrustedOnlyClass2.java
 	same
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/testcases/MixedSigningAndTrustedOnly.java
@@ -2690,11 +2690,11 @@
 
 	Initial push for big trusted-only/mixed-permissions reproducer
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnly.html.in:
-	template for javaws html and browser test (substitute archives and mainclass and commnad)
+	template for javaws html and browser test (substitute archives and mainclass and command)
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnlyApp.jnlp.in:
-	template for javaws (substitute security, archives and mainclass  and commnads)
+	template for javaws (substitute security, archives and mainclass  and commands)
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/resources/MixedSigningAndTrustedOnlyApplet.jnlp.in:
-	template for javaws applet (substitute security, archives and mainclass and commnads)
+	template for javaws applet (substitute security, archives and mainclass and commands)
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/MANIFEST.MF:
 	manifest with Trusted-only: true to be potentially used in jars
 	* tests/reproducers/custom/MixedSigningAndTrustedOnly/srcs/Makefile:
@@ -3506,7 +3506,7 @@
 	add -html if jnlpruntime.isHtml. Partially reworked logging of this method.
 	* tests/netx/unit/net/sourceforge/jnlp/util/XDesktopEntryTest.java: added tests for new
 	functionality
-	* Changelog: occurence of tab asterix slash replaced by tab asterix space in file
+	* Changelog: occurrence of tab asterix slash replaced by tab asterix space in file
 	declarations
 
 2015-06-09  Jiri Vanek  <jvanek@redhat.com>
@@ -3533,7 +3533,7 @@
 	userResponse, class made public
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java: removed redundant
 	AppletAction and all to/from int/boolean conversion methods. All Object returns
-	repalced by proper class/interface. Removed redundant showAppletWarning
+	replaced by proper class/interface. Removed redundant showAppletWarning
 	* netx/net/sourceforge/jnlp/security/VariableX509TrustManager.java: adapted
 	to removed AppletAction and new BasicDialogValue
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
@@ -3640,7 +3640,7 @@
 	DEPLOYMENT_COMMENT. (load) This method is called before every load, and read lines
 	are stored. (save) Saved comments are inserted to other comments before call to 
 	store.
-	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: (countOccurences)
+	* tests/netx/unit/net/sourceforge/jnlp/PluginBridgeTest.java: (countOccurrences)
 	made public so it can be reused
 	* tests/netx/unit/net/sourceforge/jnlp/config/DeploymentConfigurationTest.java:
 	added tests to verify preserving of comments and non-multiplying date and
@@ -3698,7 +3698,7 @@
 2015-04-24  Alexandr Kolouch  <skolnag@gmail.com>
 
 	Added Czech translation for 1.6.
-	* netx/net/sourceforge/jnlp/resources/Messages_cs.propertie: added missing
+	* netx/net/sourceforge/jnlp/resources/Messages_cs.properties: added missing
 	properties, adapted changed ones.
 
 2015-04-24  Jiri Vanek  <jvanek@redhat.com>
@@ -3778,7 +3778,7 @@
 2015-04-15  Jiri Vanek  <jvanek@redhat.com>
 
 	jnlp-signing mechanism now uses general parser (and so also tagsoup if enabled)
-	* netx/net/sourceforge/jnlp/JNLPMatcher.java: removed redundant code to laod xmls
+	* netx/net/sourceforge/jnlp/JNLPMatcher.java: removed redundant code to load xmls
 	and used Parser.getRootNode rather. Added same brackets to if statements. Added
 	parameter of ParserSettings to 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: same.
@@ -3828,7 +3828,7 @@
 	Kill processes in Integration Tests more cleanly; revised
     * Makefile.am:
     remove all instances of softkiller (softkiller no longer works)
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	use SIGTERM instead of SIGINT, don't destroy process after sending signal
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	reduce timeout from 20 seconds to 10
@@ -3894,7 +3894,7 @@
 
 2015-04-10  Jie Kang  <jkang@redhat.com>
 	Kill processes in Integration Tests more cleanly
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	use SIGUSR1 instead of SIGINT, don't destroy process after sending signal
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	reduce timeout from 20 seconds to 10
@@ -4054,15 +4054,15 @@
 
 	PathsAndFiles definitions made aware of deployment.properties which can change them
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: (CacheLRUWrapper) used
-	gette rinstead of field for RECENTLY_USED_FILE
+	getter instead of field for RECENTLY_USED_FILE
 	* netx/net/sourceforge/jnlp/config/Defaults.java: all getFullPath replaced 
 	by getDefaultFullPath.
 	* netx/net/sourceforge/jnlp/config/DeploymentConfiguration.java: removed read
-	from properties and repalced by getters from PathsAndFiles.
+	from properties and replaced by getters from PathsAndFiles.
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java: same
 	* tests/reproducers/signed/CacheReproducer/testcases/CacheReproducerTest.java: same
 	* netx/net/sourceforge/jnlp/config/PathsAndFiles.java: Or setup-able InfrastructureFileDescriptor
-	now can return their non-default value by overriden getFullPath and reading
+	now can return their non-default value by overridden getFullPath and reading
 	from properties.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added BUTControlledBy
 	of Controlled by and BUTmodified of modified
@@ -4157,8 +4157,8 @@
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: Added logic
 	to check real main class against manifest attribute.
 	* tests/netx/unit/net/sourceforge/jnlp/JNLPFileTest.java: Existing tests made
-	aware about Entry-Point. Added tests for splitEntryPoints. All occurences of
-	claslaoder repalced by classloader.
+	aware about Entry-Point. Added tests for splitEntryPoints. All occurrences of
+	classloader replaced by classloader.
 
 2015-03-17  Jie Kang  <jkang@redhat.com>
 
@@ -4192,8 +4192,8 @@
 	public - DEPLOYMENT_SUBDIR_DIR and XDG*VAR
 	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java:
 	fixed issues with permissions attribute dialogue (faked deployment.properties
-	everywhere), fixed issues with same key in set copmmand everywhere, added 
-	test for duplicated key in set, fixed issue with remianing icons and generated
+	everywhere), fixed issues with same key in set command everywhere, added 
+	test for duplicated key in set, fixed issue with remaining icons and generated
 	jnlps
 
 2015-03-13  Jiri Vanek  <jvanek@redhat.com>
@@ -4201,13 +4201,13 @@
 	Docs now include possible options for each property
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added key of IWSpossible
 	* netx/net/sourceforge/jnlp/util/docprovider/ItwebSettingsTextsProvider.java:
-	added hunk adding posibilites behainf each property
+	added hunk adding possibilities behind each property
 
 2015-03-13  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/reproducers/signed/GifarBase/resources/gifar_application.jnlp: removed
 	dangling element
-	* tests/reproducers/signed/GifarBase/srcs/GifarMain.java: formating
+	* tests/reproducers/signed/GifarBase/srcs/GifarMain.java: formatting
 	* tests/reproducers/signed/GifarBase/testcases/GifarTestcases.java: used
 	constants instead of hardcoded values
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: same
@@ -4216,7 +4216,7 @@
 
 	Fixed locale tests
 	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java :
-	not existing BOHelp replaced by BOHelp1. (getProperties) if used classlaoder
+	not existing BOHelp replaced by BOHelp1. (getProperties) if used classloader
 	is null then system one is used.
 
 2015-03-10  Jiri Vanek  <jvanek@redhat.com>
@@ -5043,7 +5043,7 @@
 2014-09-22  Jiri Vanek  <jvanek@redhat.com>
 
 	Preventing rare class cast exception in erroneous detached applets
-	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getSplashControler
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: getSplashController
 	renamed to getSplashController. (getSplashController) added check for 
 	SplashController instance. Returning null if not so.
 	* netx/net/sourceforge/jnlp/splashscreen/SplashUtils.java: adapted to renaming
@@ -5315,14 +5315,14 @@
 	of http/https dirs in cache
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: misleading 
 	(getInputStream) method removed (initializeResource) check for connection
-	before downlaodin (unless Xforceoffline specified). If environment is offline
+	before downloading (unless Xforceoffline specified). If environment is offline
 	it do not attempt any url connections or writing to cache
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: added (BXoffline)
 	description
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: added help and read for Xoffline
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: added flags of (offlineForced)
 	and (onlineDetected) with getters and setters. Added utility method (detectOnline)
-	to recognize whether environment is onliune by resovling inet addres of	host
+	to recognize whether environment is online by resolving inet address of	host
 	of not file url.
 	* netx/net/sourceforge/jnlp/services/XBasicService.java: (isOffline) now uses 
 	above implemented mechanism.
@@ -5587,14 +5587,14 @@
 2014-07-28  Jie Kang  <jkang@redhat.com>
 
 	Fix to Java ConsoleOutputPane for lower resolutions. Addresses bug
-	PR1859 where part of the pane is hidden and unnaccessible when
+	PR1859 where part of the pane is hidden and inaccessible when
 	clicking "Show Details".
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java:
 
 2014-07-28  Jie Kang  <jkang@redhat.com>
 
 	Fix to Control Panel UI for lower resolutions. Addresses bug
-	PR1856 where part of the dialog is hidden and unaccessible
+	PR1856 where part of the dialog is hidden and inaccessible
 	on lower resolutions such as 800 x 600.
 	* netx/net/sourceforge/jnlp/controlpanel/ControlPanel.java:
 	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel.java:
@@ -5802,14 +5802,14 @@
 
 2014-06-19  Kurt Miller  <kurt@intricatesoftware.com>
 
-	Fixed PR1743 - Intermittant deadlock in PluginRequestProcessor
+	Fixed PR1743 - Intermittent deadlock in PluginRequestProcessor
 	* NEWS: added PR1743
 	* plugin/icedteanp/IcedTeaNPPlugin.cc:  declaration of cond_message_available
 	moved to PluginRequestProcessor class
 	* plugin/icedteanp/IcedTeaNPPlugin.h: removed external cond_message_available search
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: message_queue_mutex,
-	syn_write_mutex and message_queue moved to PluginRequestProcessor clas. 
-	Constructor, destructor and newMessageOnBus declarationmoved to end of class.
+	syn_write_mutex and message_queue moved to PluginRequestProcessor class. 
+	Constructor, destructor and newMessageOnBus declaration moved to end of class.
 	declared queueProcessorThread method.
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.cc: Removed declaration of
 	static message_queue_mutex, syn_write_mutex, message_queue. (PluginRequestProcessor)
@@ -6095,13 +6095,13 @@
 	ones location, version and properties made final. (isCurrent) rewritten
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (urlEquals) and (notNullUrlEquals)
 	and (compare) moved to UrlUtils. (getReadPermission) got javadoc. urlList, keep,
-	remove colelctions redeclared to diamond
+	remove collections redeclared to diamond
 	* netx/net/sourceforge/jnlp/cache/Resource.java: adapted imports and calls to
 	CacheUtil UrlUtils change.
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: (requestMethods) hidden into
 	public inner enum of RequestMethods. prefetchTrackers, queue, downloadOptions, active,
 	resources, listeners marked final and redeclared with diamond. (getUrlResponseCode)
-	adapted to new enum, removed javadoc. (getUrlResponseCodeWithRedirectonResult) adapted
+	adapted to new enum, removed javadoc. (getUrlResponseCodeWithRedirectionResult) adapted
 	to new enum
 	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java: file group loader
 	appContext weakWindows weakWindows made final and redeclared with diamond. Added
@@ -6153,27 +6153,27 @@
 
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
-	Fixed slipped test classlaoder fix
+	Fixed slipped test classloader fix
 	* sts/reproducers/simple/JavawsAWTRobotFindsButton/testcases/JavawsAWTRobotFindsButtonTest.java
-	(static init) used system classlaoder to laod image
+	(static init) used system classloader to load image
 
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
-	* netx/sun/applet/AppletViewerPanelAccess.java: addedd accidentally skipped
+	* netx/sun/applet/AppletViewerPanelAccess.java: added accidentally skipped
 	createAppletThread method
 
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
-	Making the previous chnage actualy take an effect.
-	* Makefile.am: All tests runs using CLASSPATH varibale on line, separated by
+	Making the previous change actually take an effect.
+	* Makefile.am: All tests runs using CLASSPATH variable on line, separated by
 	semicolon. I have no idea wy this was needing.
 
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
-	All tests adapted to run from XBootclaspath (forced by extending package private
+	All tests adapted to run from XBootclasspath (forced by extending package private
 	rt.jar class)
 	* Makefile.am: all sets of call of -Xbootclasspath in tests and coverage
-	are now adding $CLASSPATH to boot classapth. Where CLASSPATH was not deffined,
+	are now adding $CLASSPATH to boot classpath. Where CLASSPATH was not defined,
 	was added.
 	* tests/netx/unit/net/sourceforge/jnlp/JNLPMatcherTest.java: and
 	* tests/test-extensions/net/sourceforge/jnlp/awt/imagesearch/ComponentFinder.java:
@@ -6181,13 +6181,13 @@
 
 2014-05-21  Jiri Vanek  <jvanek@redhat.com>
 
-	Made it works (basicaly) on any JDK
+	Made it works (basically) on any JDK
 	* Makefile.am: (NETX_PKGS) sun.applet added to recognized netx packages
 	(netx-dist.stamp) sun directory included into packed list
 	* acinclude.m4: removed (IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE) check. Added 
 	IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY, which test existence of 
 	classes sun.applet.AppletPanel, sun.applet.AppletViewerPanel
-	fields applet, documentURL, baseURL and methods run and runLoader. Addapted messge
+	fields applet, documentURL, baseURL and methods run and runLoader. Adapted message
 	* configure.ac:  call to IT_CHECK_FOR_APPLETVIEWERPANEL_HOLE replaced by call
 	to IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
 	* /netx/net/sourceforge/jnlp/NetxPanel.java: now extends AppletViewerPanelAccess
@@ -6196,10 +6196,10 @@
 	* netx/sun/applet/AppletViewerPanelAccess.java: new class extending AppletViewerPanel
 	and enabling access to applet, documentURL and baseURL. Backed by reflection.
 	Also overriding run by usage of short copypasted code.
-	* netx/sun/applet/package-info.java: new file with worning about usage of this
+	* netx/sun/applet/package-info.java: new file with warning about usage of this
 	package in itw
 	* plugin/icedteanp/java/sun/applet/PluginAppletPanelFactory.java: only call
-	to super debug repalced by ITW's debugging call
+	to super debug replaced by ITW's debugging call
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: used getters as in 
 	NetxPanel
 
@@ -6348,7 +6348,7 @@
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletActionStorage.java:
 	Whole getMatchingItem family of methods get Integer id parameter, to recognize
 	which record is the one they care about. If id is null, then they return first
-	match, no meter of whether is "strong"(pernament) or week (just hint)
+	match, no meter of whether is "strong"(permanent) or week (just hint)
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
 	adapted to id in interface. Fixed bug with saving the entry.
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/impl/UnsignedAppletActionStorageExtendedImpl.java:
@@ -6463,7 +6463,7 @@
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java: Closed http
 	connections.
 	* tests/test-extensions-tests/net/sourceforge/jnlp/ServerAccessTest.java:
-	Adapted to URLconnection -> long signature changes.
+	Adapted to URLConnection -> long signature changes.
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java: Closed http
 	connections.
 
@@ -6683,7 +6683,7 @@
 	Refactored check of heap space. Now recognize g/G and is based on regex
 	* netx/net/sourceforge/jnlp/JREDesc.java: Added (heapPattern) constant.
 	(checkHeapSize) now returns trimmed string and its logic is matching the
-	heapPattern instead compelx structure. (init) set result of checkHeapSize
+	heapPattern instead complex structure. (init) set result of checkHeapSize
 	as initialHeapSize and maximumHeapSize.
 	* tests/netx/unit/net/sourceforge/jnlp/JREDescTest.java: tests for (checkHeapSize)
 	and (init) of JREDesc.
@@ -6717,7 +6717,7 @@
 	* netx/net/sourceforge/jnlp/security/SecurityDialog.java: (installPanel)
 	pass SecurityDelegate to partially signed dialog
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java:
-	(showPartiallySignedWarningDialog) added SecutityDelegate param for
+	(showPartiallySignedWarningDialog) added SecurityDelegate param for
 	message extras
 	* netx/net/sourceforge/jnlp/security/appletextendedsecurity/UnsignedAppletTrustConfirmation.java:
 	(checkPartiallySignedWithUserIfRequired) added SecurityDelegate param
@@ -6763,7 +6763,7 @@
 
 2014-03-26  Jiri Vanek  <jvanek@redhat.com>
 
-	* netx/net/sourceforge/jnlp/resources/Messages.propertie: new keys (STOAsignedMsgFully)
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: new keys (STOAsignedMsgFully)
 	(STOAsignedMsgAndSandbox) (STOAsignedMsgPartiall) added
 	* netx/net/sourceforge/jnlp/runtime/ManifestAttributesChecker.java: extracted
 	hardocded values of (signedMsg)
@@ -6776,7 +6776,7 @@
 	added grouping panels and checkboxes. (JcheckBoxWithGroup) New inner class to work
 	with groups.
 	netx/net/sourceforge/jnlp/security/policyeditor/PolicyEditorPermissions.java:
-	Added inner class (Groups) and deffinied (ReadFileSystem) (WriteFileSystem)
+	Added inner class (Groups) and defined (ReadFileSystem) (WriteFileSystem)
 	(AccesUnowenedCode) (MediaAccess)
 
 2014-03-26  Andrew Azores  <aazores@redhat.com>
@@ -7129,7 +7129,7 @@
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPane.java: (update)
 	method enhanced for possibility to force refresh
 	* netx/net/sourceforge/jnlp/util/logging/JavaConsole.java: added ButClean
-	button. (updateModel) overlaoded with force attribute.
+	button. (updateModel) overloaded with force attribute.
 
 2014-03-11  Jiri Vanek  <jvanek@redhat.com>
 
@@ -7140,7 +7140,7 @@
 	Implemented Permissions manifest entry handling.
 	* NEWS: mentioned Permissions attribute
 	* netx/net/sourceforge/jnlp/JNLPFile.java: new enum (ManifestBoolean) introduced
-	to replace true/false/null by TRUE/FALSE/UNDEFFINED. (isTrustedOnly), 
+	to replace true/false/null by TRUE/FALSE/UNDEFINED. (isTrustedOnly), 
 	(isTrustedLibrary), (isSandboxForced) and (processBooleanAttribute) moved 
 	to use ManifestBoolean.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added (ButYes) (ButNo)
@@ -7495,7 +7495,7 @@
 
 	Get rid of ConcurrentModificationException in Console output.
 	* netx/net/sourceforge/jnlp/util/logging/ConsoleOutputPaneModel.java: (importList)
-	now	synchronise over original data, instead of (somtimes by) copy as, wrongly, before.
+	now	synchronise over original data, instead of (sometimes by) copy as, wrongly, before.
 
 2014-02-13  Jiri Vanek  <jvanek@redhat.com>
 
@@ -7503,7 +7503,7 @@
 	-allowredirect switch.
 	* netx/net/sourceforge/jnlp/cache/ResourceTracker.java: added inner class
 	(CodeWithRedirect), which stores server result and possible redirection target
-	(getUrlResponseCode) is only wrapper around new (getUrlResponseCodeWithRedirectonResult)
+	(getUrlResponseCode) is only wrapper around new (getUrlResponseCodeWithRedirectionResult)
 	which returns (CodeWithRedirect). It fills url form Location header field if
 	any. (findBestUrl) now follow 301,302,303,307,308 redirects if enabled
 	and valid - otherwise new (RedirectionException) is thrown.
@@ -7935,10 +7935,10 @@
 	by method (plugin_send_message_to_appletviewer_console).
 	* plugin/icedteanp/IcedTeaNPPlugin.h: (debug_pipe_name) and (jvvm_up) declared
 	extern. Utility methods (plugin_send_message_to_appletviewer_console) and
-	(flush_plugin_send_message_to_appletviewer_console) declared and impelmented
+	(flush_plugin_send_message_to_appletviewer_console) declared and implemented
 	* plugin/icedteanp/IcedTeaPluginUtils.cc: print debug info enhanced for 
 	debug pipe
-	* plugin/icedteanp/IcedTeaPluginUtils.h:  (PLUGIN_MESSAGE) and (PLIGIN_ERROR)
+	* plugin/icedteanp/IcedTeaPluginUtils.h:  (PLUGIN_MESSAGE) and (PLUGIN_ERROR)
 	now log to debug pipe if enabled.
 	* plugin/icedteanp/java/sun/applet/PluginMain.java: args reprinted, checked
 	third  parameter debug pipe if should. Started debug_pipe reader if should
@@ -8095,14 +8095,14 @@
 	Enabled file logging in plugin, user enabled to choose logs dir.
 	* netx/net/sourceforge/jnlp/controlpanel/DebuggingPanel.java: added
 	text-field to show/edit logs' destination. Added reset to default button.
-	* netx/net/sourceforge/jnlp/resources/Messages.propertie: added proper
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: added proper
 	keys for new controls (CPFilesLogsDestDir) and (CPFilesLogsDestDirResert).
 	(DPEnableLogging) changed to "Enable debugging", as it is better.
 	* netx/net/sourceforge/jnlp/util/logging/FileLog.java: Filename of logs
 	changed to be human readable and to distinguish between c/java
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: made aware of console (plugin_debug_to_console)
 	added stream to log into file (plugin_file_log) and holder of name (plugin_file_log_name)
-	Added various new lines to end of erorr/debug messages. Stream flushed,
+	Added various new lines to end of error/debug messages. Stream flushed,
 	not closed on plugin shutdown.
 	* plugin/icedteanp/IcedTeaNPPlugin.h: extern above three fields.
 	* plugin/icedteanp/IcedTeaParseProperties.cc: added functionality to provide
@@ -8110,7 +8110,7 @@
 	to determine logging to console
 	* plugin/icedteanp/IcedTeaParseProperties.h: used glib.h, declared above functions
 	* plugin/icedteanp/IcedTeaPluginUtils.cc: added (initFileLog) function to open 
-	correctly named, in proper palce and with correct permissions file for logging
+	correctly named, in proper place and with correct permissions file for logging
 	(generateLogFileName) generate human readable file name, as java do.
 	(printDebugStatus)  to debug status of logging
 	* plugin/icedteanp/IcedTeaPluginUtils.h: headers generated once, and reused
@@ -8136,7 +8136,7 @@
 	added srtict test
 	* netx/net/sourceforge/jnlp/Parser.java: added indentation, fixes
 	condition in strict base check
-	* netx/net/sourceforge/jnlp/ResourcesDesc.java: revertedt recently added throw
+	* netx/net/sourceforge/jnlp/ResourcesDesc.java: reverted recently added throw
 	* tests/reproducers/simple/ManifestedJar1/testcases/ManifestedJar1Test.java:
 	(manifestedJar1main2mainNoAppDesc) adapted and 
 	(manifestedJar1main2mainNoAppDescStrict) added
@@ -8156,8 +8156,8 @@
 	holding the no title found string to be reused. (getTitleFromManifest)
 	Now using that constant.
 	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java: adding window
-	erro message moved to be debug only.
-	* ests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java: 
+	error message moved to be debug only.
+	* tests/reproducers/custom/remote/testcases/RemoteApplicationSettings.java: 
 	Added (clean) mechanism to filter out TITLE_NOT_FOUND
 	* tests/reproducers/signed/ReadPropertiesBySignedHack/testcases/ReadPropertiesBySignedHackTest.java:
 	* tests/reproducers/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java:
@@ -8170,7 +8170,7 @@
 	* tests/reproducers/simple/ReplaceSecurityManager/testcases/ReplaceSecurityManagerTest.java
 	* tests/reproducers/simple/SetContextClassLoader/testcases/SetContextClassLoaderTest.java
 	* tests/reproducers/simple/simpletest2/testcases/SimpleTest2Test.java
-	Removed checks for emty outputs
+	Removed checks for empty outputs
 
 2013-11-25  Jiri Vanek  <jvanek@redhat.com>
 
@@ -8189,7 +8189,7 @@
 2013-11-13  Andrew Azores  <aazores@redhat.com>
 
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: add
-	parameterized type information to several return types and local
+	parametrized type information to several return types and local
 	variables. Refactor for-loops and Enumeration iterations into
 	for-each-loops.
 
@@ -8251,21 +8251,21 @@
 	ProcessResult, and junit.framework.Assert in favour of org.junit.Assert.
 	Other notable changes below.
 	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java:
-	(removeXdgValues, setXdgValues) list 'rr' uses parameterized type.
-	(getContentOfDirectory) list 'result' uses parameterized type
+	(removeXdgValues, setXdgValues) list 'rr' uses parametrized type.
+	(getContentOfDirectory) list 'result' uses parametrized type
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	(ProcessResult) inner class removed. (getBrowserParams) list 'l' uses
-	parameterized type
+	parametrized type
 	* tests/reproducers/simple/LocalesTest/testcases/LocalesTestTest.java:
-	(getChangedLocalesForSubproces) list 'rr' uses parameterized type
+	(getChangedLocalesForSubproces) list 'rr' uses parametrized type
 	* tests/reproducers/simple/LocalisedInformationElement/testcases/LocalisedInformationElementTest.java:
 	same
 	* tests/test-extensions/net/sourceforge/jnlp/ProcessWrapper.java:
 	constructor for (String, List<String>, String) lists 'urledArgs' and
-	'otherArgs' use parameterized type. (stdoutl, stderrl) use parameterized
+	'otherArgs' use parametrized type. (stdoutl, stderrl) use parametrized
 	type.
 	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
-	(listeners) use parameterized type
+	(listeners) use parametrized type
 
 2013-11-05  Jiri Vanek  <jvanek@redhat.com>
 
@@ -8317,7 +8317,7 @@
 2013-11-01  Jiri Vanek  <jvanek@redhat.com>
 
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:
-	added tests for custom attributes (getCustomAtributes), (getCustomAtributesEmpty) and test to ensure order during searching for
+	added tests for custom attributes (getCustomAttributes), (getCustomAttributesEmpty) and test to ensure order during searching for
 	attributes in manifests (checkOrderWhenReadingAttributes).
 	* tests/test-extensions/net/sourceforge/jnlp/mock/DummyJNLPFileWithJar.java:
 	can now handle multiple source jars, and set main jar (new constructors),
@@ -8420,7 +8420,7 @@
 	* plugin/icedteanp/IcedTeaNPPlugin.cc: all occurrences of  PLUGIN_ERROR_TWO
 	and  PLUGIN_ERROR_THREE replaced by PLUGIN_ERROR.  PLUGIN_ERROR itself moved 
 	to 
-	* plugin/icedteanp/IcedTeaPluginUtils.h: (PLUGIN_ERROR) new fuction, 
+	* plugin/icedteanp/IcedTeaPluginUtils.h: (PLUGIN_ERROR) new function, 
 	now uses ... arguments and printf with __VA_ARGS__ instead of g_printerr
 	(PLUGIN_DEBUG) now prints to stdout, instead of stderr which is used by
 	(PLUGIN_ERROR).
@@ -8520,10 +8520,10 @@
 	* netx/net/sourceforge/jnlp/controlpanel/CachePane.java:
 	Moved JButtons to members.
 	(addComponents): Modified to make use of new NonEditableTableModel.
-	Added ListSelectionListener to propertly handle enabling and disabling of
+	Added ListSelectionListener to properly handle enabling and disabling of
 	operational	JButtons when selecting a resource from the cache table.
-	Moved inital populating of the cache table to CacheViewer's constructor
-	until after the	CachePane has been instatiated.
+	Moved initial populating of the cache table to CacheViewer's constructor
+	until after the	CachePane has been instantiated.
 	Added a general purpose Comparator for all non-String columns in the table
 	model.
 	Added a TableCellRenderer with proper localized rendering of "Size" and
@@ -8559,7 +8559,7 @@
 	Added a new table model that in effect is a
 	javax.swing.table.DefaultTableModel	except for no cell being editable.
 	* netx/net/sourceforge/jnlp/util/ui/package-info.java:
-	Added new package for UI common and recurrung UI tasks with documentation
+	Added new package for UI common and recurring UI tasks with documentation
 
 2013-10-01  Omair Majid  <omajid@redhat.com>
 
@@ -8731,13 +8731,13 @@
 	* netx/net/sourceforge/jnlp/util/logging/OutputController.java: new bottleneck for logging
 	* netx/net/sourceforge/jnlp/util/logging/PrintStreamLogger.java: logger to std.streams
 	* netx/net/sourceforge/jnlp/util/logging/SingleStreamLogger.java: interface common to all new loggers
-	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: not yet implemented  susytem log
-	* netx/net/sourceforge/jnlp/util/logging/WinSystemLog.java: not yet implemented  susytem log
+	* netx/net/sourceforge/jnlp/util/logging/UnixSystemLog.java: not yet implemented system log
+	* netx/net/sourceforge/jnlp/util/logging/WinSystemLog.java: not yet implemented system log
 	* tests/netx/unit/net/sourceforge/jnlp/util/logging/FileLogTest.java: new set of tests
 	* tests/netx/unit/net/sourceforge/jnlp/util/logging/OutputControllerTest.java: new set of tests
 	* tests/netx/unit/net/sourceforge/jnlp/util/logging/PrintStreamLoggerTest.java: new set of tests
 	* netx/net/sourceforge/jnlp/AppletLog.java: removed
-	* netx/net/sourceforge/jnlp/Log.java: rmeoved
+	* netx/net/sourceforge/jnlp/Log.java: removed
 	
 
 2013-09-24  Omair Majid  <omajid@redhat.com>
@@ -9049,7 +9049,7 @@
 
 	* tests/reproducers/simple/simpletest1/resources/favicon.ico: new file
 	should be served by test server in reproducers run and so prevent FNF exception
-	* ChangeLog: fixed few entries below (added emty line between author and body)
+	* ChangeLog: fixed few entries below (added empty line between author and body)
 
 2013-07-25  Andrew Azores  <aazores@redhat.com>
 
@@ -9076,15 +9076,15 @@
 	* tests/reproducers/simple/simpletest1/testcases/XDGspecificationTests.java
 	new file, test if XDG specification and trasnfer to it are followed correctly, 
 	* NEWS: mentioned new feature
-	* Makefile.am: (PUBLIC_KEYSTORE) repalced by (PUBLIC_KEYSTORE_STUB) which
+	* Makefile.am: (PUBLIC_KEYSTORE) replaced by (PUBLIC_KEYSTORE_STUB) which
 	is now holding only internal part of path.(exported-test-certs)
 	(netx-dist-tests-import-cert-to-public) (netx-dist-tests-remove-cert-from-public)
 	are now resolving XDG variable and setting real path of PUBLIC_KEYSTORE
 	by resolved value and (PUBLIC_KEYSTORE)	
 	* netx/net/sourceforge/jnlp/cache/CacheLRUWrapper.java: changed to be public
 	and recently_used strign extracted to (CACHE_INDEX_FILE_NAME) constant
-	* netx/net/sourceforge/jnlp/config/Defaults.java: is now resovling and 
-	propagating XDG_CONFIG/CACHE_HOME  specification. (USER_HOME) repalced by 
+	* netx/net/sourceforge/jnlp/config/Defaults.java: is now resolving and 
+	propagating XDG_CONFIG/CACHE_HOME  specification. (USER_HOME) replaced by 
 	(USER_CACHE_HOME) and (USER_CONFIG_HOME).
 	(move14AndOlderFilesTo15Structure) new method responsible for moving
 	of old data to new locations. 	(move14AndOlderFilesTo15StructureCatched) 
@@ -9126,7 +9126,7 @@
 	about dialogue now available from itw-settings
 	* netx/net/sourceforge/jnlp/controlpanel/AboutPanel.java:
 	added button to launch about dialogue
-	* netx/net/sourceforge/jnlp/resources/Messages.propertie: (CPAboutInfo)
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (CPAboutInfo)
 	Adapted to be more accurate to select-able JVM
 
 2013-07-17  Jiri Vanek  <jvanek@redhat.com>
@@ -9268,7 +9268,7 @@
 	* tests/netx/unit/net/sourceforge/jnlp/ParserBasic.java:
 	* netx/net/sourceforge/jnlp/JNLPCreator.java: (create)
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java:
-	* /netx/net/sourceforge/jnlp/JNLPFile.java:  (JNLPFile) construcotrs
+	* /netx/net/sourceforge/jnlp/JNLPFile.java:  (JNLPFile) constructors
 	* netx/net/sourceforge/jnlp/PluginBridge.java
 	* netx/net/sourceforge/jnlp/Launcher.java: (main)
 	all adapted to take ParserSettings instead of individual parameters
@@ -9278,7 +9278,7 @@
 	* netx/net/sourceforge/jnlp/Parser.java: refactored to be able both with
 	* netx/net/sourceforge/jnlp/ParserSettings.java: reworked to serve as 
 	gatherer for various individual parser flags
-	* netx/net/sourceforge/jnlp/resources/Messages.propertie: (BOXml)
+	* netx/net/sourceforge/jnlp/resources/Messages.properties: (BOXml)
 	new key describing -xml  switch
 	* tests/netx/unit/net/sourceforge/jnlp/ParserCornerCases.java:
 	* tests/netx/unit/net/sourceforge/jnlp/ParserMalformedXml.java:
@@ -9507,7 +9507,7 @@
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
 	* plugin/icedteanp/IcedTeaNPPlugin.cc:
-	Remove only occurence of LEGACY_XULRUNNERAPI
+	Remove only occurrence of LEGACY_XULRUNNERAPI
 
 2013-05-02  Adam Domurad  <adomurad@redhat.com>
 
@@ -9572,8 +9572,8 @@
 	* tests/test-extensions/net/sourceforge/jnlp/awt/AWTHelper.java:
 	refactoring - removing initStrGiven variable - now it only
 	matters if the initStr is null or not. Modifying the following
-	two methods: (charReaded) - if initStr is null the run method
-	can not be started from charReaded and the presence of initStr
+	two methods: (charRead) - if initStr is null the run method
+	can not be started from charRead and the presence of initStr
 	is not checked in stdout. Method (getInitStrAsRule) returns rule
 	that is always true if initStr is null.
 
@@ -10032,7 +10032,7 @@
 	Added help for extended applets security and settings
 	* netx/net/sourceforge/jnlp/controlpanel/UnsignedAppletsTrustingListPanel:
 	(helpButtonActionPerformed) added code to open dialogue with help
-	* netx/net/sourceforge/jnlp/resources/Messages.propertie:
+	* netx/net/sourceforge/jnlp/resources/Messages.properties:
 	Included html help message
 	* netx/net/sourceforge/jnlp/security/UnsignedAppletTrustWarningPanel.java:
 	added help button and logic to open help dialogue
@@ -10337,12 +10337,12 @@
 
 2013-03-20  Jiri Vanek <jvanek@redhat.com>
 
-	All occurences of hardcoded paths to java repalced by call of functions
+	All occurrences of hardcoded paths to java replaced by call of functions
 	* plugin/icedteanp/IcedTeaNPPlugin.cc:  (appletviewer_executable) renamed
 	to (appletviewer_default_executable). (appletviewer_default_rtjar) new
 	variable to keep default rt.jar path.
 	(get_plugin_executable) and (string get_plugin_rt_jar) new functions, 
-	returniong the default variables for now.
+	returning the default variables for now.
 
 2013-03-19  Adam Domurad  <adomurad@redhat.com>
 
@@ -11055,7 +11055,7 @@
 2012-12-04  Adam Domurad  <adomurad@redhat.com>
 
 	* netx/net/sourceforge/jnlp/resources/Messages.properties:
-	"An serious exception have occured" -> "A serious exception occurred"
+	"An serious exception have occurred" -> "A serious exception occurred"
 
 2012-12-04  Adam Domurad  <adomurad@redhat.com>
 
@@ -11172,7 +11172,7 @@
 	Removed unwanted assert on termination
 	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
 	Added support for multiple listeners.
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	(destroyProcess()), non static wrapper around  former (destroyProcess
 	(process)), introducing marks that process is being killed, added setter 
 	for reactigProcess.
@@ -11183,7 +11183,7 @@
 	around ProcessWrapper.
 	(executeProcess) main method moved to ProcessWrapper.execute.
 	* tests/test-extensions/net/sourceforge/jnlp/ThreadedProcess.java:
-	made public and synchronized with ProcessAssasin's (destroyProcess)
+	made public and synchronized with ProcessAssassin's (destroyProcess)
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/Browser.java
 	is now implementing ReactingProcess
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/ReactingProcess.java:
@@ -11191,7 +11191,7 @@
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/Firefox.java:
 	is containing singleton of FirefoxProfilesOperator (FPO) and is responding to  
 	(beforeProcess) by FPO's (backupingProfiles), to (beforeKill) by calling
-	ProcessAssasin's (closeWindows), and to (afterKill) by FPO's (restoreProfiles)
+	ProcessAssassin's (closeWindows), and to (afterKill) by FPO's (restoreProfiles)
 	* tests/test-extensions/net/sourceforge/jnlp/browsertesting/browsers/firefox/FirefoxProfilesOperator.java:
 	New class to backup and restore firefox profiles.	
 
@@ -11755,7 +11755,7 @@
 	used auto*closing listeners
 	* tests/test-extensions/net/sourceforge/jnlp/ClosingListener.java:
 	interface for identifying closing listeners
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	added possibility to set timeout n the fly
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	(executeBrowser) added shortcut for autoclosing listeners,
@@ -12031,7 +12031,7 @@
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/CodeBaseClassLoaderTest.java:
 	(testResourceLoadSuccessCaching) (testResourceLoadFailureCaching)
 	(testParentClassLoaderIsAskedForClasses) - internal JNLPFile's
-	(getSecurity) null in SecurityDesc constructorrepalced by this.
+	(getSecurity) null in SecurityDesc constructorreplaced by this.
 	(testNullFileSecurityDesc) new test to ensure NPE in null JNLPFile case. 
 
 2012-08-22  Jiri Vanek  <jvanek@redhat.com>
@@ -12063,7 +12063,7 @@
 
 2012-08-21  Jiri Vanek  <jvanek@redhat.com>
 
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	(sigInt), (sigKill), (sigTerm) new methods for various killing of
 	processes by kill.
 	(kill) new method, launching kill process.
@@ -12206,7 +12206,7 @@
 
 	Added splashscreen implementation
 	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: calling JNLPSplashScreen
-	constructor with file ratehr then null.
+	constructor with file rather than null.
 	* netx/net/sourceforge/jnlp/InformationDesc.java:  ONE_LINE changed from
 	"oneline" to "one-line", added citation why. (getDescriptionStrict) new
 	method returning exact value or null without fall-back.
@@ -12214,12 +12214,12 @@
 	values and useless string replaced by JnlpFile.
 	* netx/net/sourceforge/jnlp/resources/Messages.properties: Added SPLASH
 	family of keys.
-	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: (getSplashControler)
-	new method returning its SplashControler.
+	* netx/net/sourceforge/jnlp/runtime/AppletEnvironment.java: (getSplashController)
+	new method returning its SplashController.
 	* netx/net/sourceforge/jnlp/runtime/Boot.java: Constants (name) and
 	(version) made public.
 	* netx/net/sourceforge/jnlp/splashscreen/SplashController.java: New interface
-	for each class which wants its splasshcreen controlled by SplashUtils.
+	for each class which wants its splashcreen controlled by SplashUtils.
 	* netx/net/sourceforge/jnlp/splashscreen/SplashErrorPanel.java: New interface
 	for each class which wants to serve as error-showing splashscreen.
 	* netx/net/sourceforge/jnlp/splashscreen/SplashPanel.java:  New interface
@@ -12471,11 +12471,11 @@
 	* tests/reproducers/signed/AppletTestSigned/testcases/AppletTestSignedTests.java:
 	* tests/reproducers/simple/AppletTest/testcases/AppletTestTests.java:
 	* tests/reproducers/simple/CheckServices/testcases/CheckServicesTests.java
-	(evaluateSignedApplet) addapted to properly closed browser
+	(evaluateSignedApplet) adapted to properly closed browser
 	* tests/reproducers/simple/CheckServices/srcs/CheckServices.java:
-	removed fixme section as it shuld work now	
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java
-	(destroyProcess) new method, launching kill with SIGTERM before clasical
+	removed fixme section as it should work now	
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java
+	(destroyProcess) new method, launching kill with SIGTERM before classical
 	process.destroy()
 	* tests/test-extensions/net/sourceforge/jnlp/ServerAccess.java:
 	removed Set<Thread> terminated, should be removed long ago
@@ -12494,7 +12494,7 @@
 	* netx/net/sourceforge/jnlp/Parser.java
 	(getLauncher): Return type changed to LaunchDesc
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: Replace
-	occurences of instanceof with respect to launchType.
+	occurrences of instanceof with respect to launchType.
 
 2012-07-09  Deepak Bhole <dbhole@redhat.com>
 
@@ -12639,7 +12639,7 @@
 	* tests/test-extensions/net/sourceforge/jnlp/ContentReader.java:
 	* tests/test-extensions/net/sourceforge/jnlp/LogItem.java:
 	* tests/test-extensions/net/sourceforge/jnlp/LoggingBottleneck.java:
-	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssasin.java:
+	* tests/test-extensions/net/sourceforge/jnlp/ProcessAssassin.java:
 	* tests/test-extensions/net/sourceforge/jnlp/ProcessResult.java:
 	* tests/test-extensions/net/sourceforge/jnlp/ServerLauncher.java:
 	* tests/test-extensions/net/sourceforge/jnlp/TestsLogs.java:
@@ -12754,17 +12754,17 @@
 
 	Reproducer for classes which should be loaded before verification but are not
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-applet-hack.jnlp
-	jnlp launcher of applet variant with injecting new url to classlaoder
+	jnlp launcher of applet variant with injecting new url to classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-applet-new.jnlp
-	jnlp launcher of applet variant with custom classlaoder
+	jnlp launcher of applet variant with custom classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-hack.html
-	html launcher of applet variant with injecting new url to classlaoder
+	html launcher of applet variant with injecting new url to classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-hack.jnlp
-	jnlp launcher of application variant with injecting new url to classlaoder
+	jnlp launcher of application variant with injecting new url to classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-new.html
-	html launcher of applet variant with custom classlaoder
+	html launcher of applet variant with custom classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/resources/InternalClassloaderWithDownloadedResource-new.jnlp
-	jnlp launcher of application variant with custom classlaoder
+	jnlp launcher of application variant with custom classloader
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/srcs/InternalClassloaderWithDownloadedResource.java:
 	Both application and applet reproducing behavior of this bug
 	* tests/jnlp_tests/signed/InternalClassloaderWithDownloadedResource/testcases/InternalClassloaderWithDownloadedResourceTest.java:
@@ -12978,7 +12978,7 @@
 	* tests/jnlp_tests/simple/deadlocktest/testcases/DeadLockTestTest.java:
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
-	Tests', server's and ProcessAssasin's logs are now redirected to bottleneck
+	Tests', server's and ProcessAssassin's logs are now redirected to bottleneck
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
 	(LOGS_REPRINT) flag for debugging purposes, will enable reprinting to 
 	stdout/err again
@@ -12987,11 +12987,11 @@
 	values of plain text output files
 	(*ELEMENT) and( (*ATTRIBUTE) variables keeping repeated names of xml 
 	output parts
-	(writeXmlLog) method called from Sytsem.hook to save xml log
+	(writeXmlLog) method called from System.hook to save xml log
 	(addToXmlLog) method to record item to xml structure
 	(TestsLogs) and (LogItem) inner classes to keep logging information
 	(log) is now reprinting message with id to std out/err dependently on
-	(LOGS_REPRINT) but always to internal streams, possilbe exception is thrown
+	(LOGS_REPRINT) but always to internal streams, possible exception is thrown
 	(logException) new method, shortcut to log exception in same way as message
 	(getTestMethod) now can handle methods inside ServerAccess class too 
 
@@ -13381,7 +13381,7 @@
 2012-05-22  Adam Domurad  <adomurad@redhat.com>
 
 	Changed allocation of small, fixed-size buffers to stack-based 
-	allocations. Changed occurences of sprintf to the safer function
+	allocations. Changed occurrences of sprintf to the safer function
 	snprintf, added buffer information. While unlikely to change
 	functionality, snprintf adds an extra check to prevent buffer
 	overflows.
@@ -13522,7 +13522,7 @@
 
 	* Makefile.am
 	(RUNTIME): Add resources.jar.
-	(stamps/run-unit-test-code-coverage.stamp) [WITH_EMMA]: Add resouces.jar
+	(stamps/run-unit-test-code-coverage.stamp) [WITH_EMMA]: Add resources.jar
 	to classpath.
 	(stamps/run-reproducers-test-code-coverage.stamp) [WITH_EMMA]: Include
 	resources.jar in classpath.
@@ -13531,7 +13531,7 @@
 
 2012-04-19  Omair Majid  <omajid@redhat.com>
 
-	PR918: java applet windows uses a low resulution black/white icon
+	PR918: java applet windows uses a low resolution black/white icon
 	* NEWS: Update with fix.
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java: Remove windowIcon.
 	(initialize): Do not call loadWindowIcon.
@@ -13630,7 +13630,7 @@
 	relevant to the purpose of the file.
 	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java
 	* netx/net/sourceforge/jnlp/tools/KeyStoreUtil.java:
-	Replace all instances, paramaters and references of JarSigner
+	Replace all instances, parameters and references of JarSigner
 	by JarCertVerifier.
 	* netx/net/sourceforge/jnlp/security/CertWarningPane.java
 	* netx/net/sourceforge/jnlp/security/CertsInfoPane.java
@@ -13656,7 +13656,7 @@
 	caused by impassibility of launching the process. And so process have
 	been null without any sign why.
 	(TinyHttpdImpl) now correctly returns known mime types
-	(ProcessAssasin) can now skip or smoothly (and finally correctly)
+	(ProcessAssassin) can now skip or smoothly (and finally correctly)
 	destroy its process, and all his logging messages were done null-proof
 	(as deadlyException now allows)
 	Asynchronous (ContentReader) have been silenced when complaining about 
@@ -13868,21 +13868,21 @@
 	(printMessage): Moved to parent class.
 	* netx/net/sourceforge/jnlp/GuiLaunchHandler.java: Extend
 	AbstractLaunchHandler.
-	(GuiLauchHandler): New method.
+	(GuiLaunchHandler): New method.
 	(launchError): Print the error too.
 	(launchWarning,validationError): Call parent's printMessage.
 	* netx/net/sourceforge/jnlp/LaunchException.java: Use standard java
 	exception chaining. This removes compatibility with pre-java 1.3 class
 	libraries.
 	(LaunchException(JNLPFile,Exception,String,String,String,String)): Pass
-	cause to parent so exceptions are chanined properly.
+	cause to parent so exceptions are chained properly.
 	(LaunchException(String,Throwable),LaunchException(Throwable)): Call
 	parent's constructor.
 	(printStackTrace(PrintStream),printStackTrace(PrintWriter),getCause):
 	Removed. Use parent's implementation instead.
 	(getCauses): Removed.
 	* netx/net/sourceforge/jnlp/LaunchHandler.java
-	(validationError): Rename argument to clarify meaing.
+	(validationError): Rename argument to clarify meaning.
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
 	(initialize): Redirect output of all handlers to System.err.
 	* plugin/icedteanp/java/sun/applet/PluginAppletSecurityContext.java
@@ -13960,7 +13960,7 @@
 	* tests/jnlp_tests/simple/AccessClassInPackage/resources/AccessClassInPackage.jnlp:
 	removed
 	* tests/jnlp_tests/signed/AccessClassInPackageSigned/srcs/AccessClassInPackageSigned.java
-	signed variation of AccessClassInPackage, tescase is also in AccessClassInPackage
+	signed variation of AccessClassInPackage, testcase is also in AccessClassInPackage
 	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSELF.jnlp
 	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedNETSF.jnlp
 	* tests/jnlp_tests/signed/AccessClassInPackageSigned/resources/AccessClassInPackageSignedSUNSEC.jnlp
@@ -14061,8 +14061,8 @@
 	(clearCache) now return true if cache was cleared, false otherwise 
 	(or exception)
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: (getCacheFileIfExist) 
-	does three tires to load cache. If ifrst fails, then recently_used file
-	is emptied both in memory and on disc. When second attemmpt fails, then
+	does three tires to load cache. If first fails, then recently_used file
+	is emptied both in memory and on disc. When second attempt fails, then
 	LRU cache is forcibly cleared. if clearing fails, then error is thrown.
 	If it pass, then one more try to load entries is allowed. When third
 	attempt fails, then error is  thrown.
@@ -14070,8 +14070,8 @@
 	new file, for purpose of catching this particular exception
 	* netx/net/sourceforge/jnlp/util/PropertiesFile.java: (store) tries to 
 	mkdirs to its path. It is better then to fail when no cache directory exists.
-	* tests/jnlp_tests/signed/CacheReproducer: new  reproducr trying severals 
-	way of corupted cache on several types of jnlp files. Is signed because
+	* tests/jnlp_tests/signed/CacheReproducer: new  reproducr trying several 
+	way of corrupted cache on several types of jnlp files. Is signed because
 	of reflection used.
 	* tests/jnlp_tests/signed/SimpletestSigned1: signed hello world to be
 	used in  CacheReproducer tests.
@@ -14198,21 +14198,21 @@
 	Added code-coverage generation targets
 	* configure.ac: added search for optional emma.jar
 	* makefile.am: added UNIT_CLASS_NAMES and REPRODUCERS_CLASS_NAMES variables
-	to store tests clases for reuse in emmarun. Both also moved to separate target
+	to store tests classes for reuse in emmarun. Both also moved to separate target
 	(run-netx-unit-tests): made dependent on reused stamped version
 	(run-netx-dist-tests): made dependent on reused stamped version
-	(stamps/run-netx-dist-tests): stamped rusable version of run-netx-dist-tests
+	(stamps/run-netx-dist-tests): stamped reusable version of run-netx-dist-tests
 	(run-unit-test-code-coverage) targets to generate report from unit-tests. 
 	 Result binary and xml file and html report in tests.build/netx/unit
 	(run-reproducers-test-code-coverage) targets to generate report from
 	 reproducers-test. Result binary file, xml and html report in
 	 tests.build/netx/jnlp_testsengine
 	(run-test-code-coverage): merges binary results from unit and reproducers
-	(clean-unit-test-code-coverage) conditionaly removes html,xml report
+	(clean-unit-test-code-coverage) conditionally removes html,xml report
 	 and es and ec files from tests.build/netx/unit
-	(clean-reproducers-test-code-coverage) condtionlay removes html and xml 
+	(clean-reproducers-test-code-coverage) conditionally removes html and xml 
 	 report and es file from tests.build/netx/jnlp_testsengine
-	(clean-test-code-coverage) conditionlay removes merged html, xml es and em 
+	(clean-test-code-coverage) conditionally removes merged html, xml es and em 
 	files from tests.build
 	(clean-netx-tests) now depends also on clean-test-code-coverage
 
@@ -14227,7 +14227,7 @@
 	* tests/jnlp_tests/simple/Spaces can be everywhere/resources/SpacesCanBeEverywhere1.jnlp:
 	jnlp file without space in name but with jar in resources which name contains spaces
 	* tests/jnlp_tests/simple/Spaces can be everywhere/srcs/SpacesCanBeEverywhere.java:
-	new file containig simple main method of "Spaces can be everywhere.jar" jar
+	new file containing simple main method of "Spaces can be everywhere.jar" jar
 	* tests/jnlp_tests/simple/Spaces can be everywhere/testcases/SpacesCanBeEverywhereTests.java
 	testcase for this reproducer. It is lunching  each of this jnlp once locally from filesystem and
 	once remotely from server. Please note that except it's own jar, this reproducer is also
@@ -14239,16 +14239,16 @@
 	* Makefile.am: (stamps/netx-dist-tests-prepare-reproducers.stamp)
 	(stamps/netx-dist-tests-sign-some-reproducers.stamp)
 	(stamps/netx-dist-tests-compile-testcases.stamp):
-	added call to NEW_LINE_IFS to use line breake temporarily as parameter
+	added call to NEW_LINE_IFS to use line break temporarily as parameter
 	separator while loading files from list and correct quoting
 	* NEW_LINE_IFS: new file, small separate script used in makefile as inline script
 	which backup original IFS variable and then set it to pure new line. It is in
 	separate file because it is reused and I do not know another way how to save a new
-	line variable in makefile. Restore to original vlaue is handled in Makefile
+	line variable in makefile. Restore to original value is handled in Makefile
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ResourcesTest.java:
 	(testResourcesExists) filename is encoded to correct URL before requested from server
 	* tests/netx/jnlp_testsengine/net/sourceforge/jnlp/ServerAccess.java:
-	"-headless" string extracted to variable HEADLES_OPTION
+	"-headless" string extracted to variable HEADLESS_OPTION
 	(executeProcess) and (ThreadedProcess) enhanced for variable dir to specify working
 	directory. Backward compatibility kept
 	(TinyHttpdImpl) now expects url on requests, so all requests are now decoded by
@@ -14258,7 +14258,7 @@
 	
 	Added tests which covers corner cases or rhino support function dateRange
 	Enabled testWeekdayRange test
-	* tests/netx/pac/pac-funcs-test.js: (testWeekdayRange) - added mising
+	* tests/netx/pac/pac-funcs-test.js: (testWeekdayRange) - added missing
 	runTests call
 	(incDate) (decDate) (monthToStr) moved level up from function scope
 	to be shareable
@@ -14307,11 +14307,11 @@
 	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar2.jnlp
 	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar3.jnlp
 	* tests/jnlp_tests/signed/MissingJar/resources/MissingJar4.jnlp
-	four testcases's jnlp files. Differs by order and by used resoure tags
+	four testcases's jnlp files. Differs by order and by used resource tags
 	* tests/jnlp_tests/signed/MissingJar/srcs/MissingJar.java
 	very simple main jar, just printing message when initialized
 	* tests/jnlp_tests/signed/MissingJar/testcases/MissingJarTest.java
-	testing file of reproducer, launchiing above four jnlp files, each in individual test
+	testing file of reproducer, launching above four jnlp files, each in individual test
 
 2011-10-17  Jiri Vanek <jvanek@redhat.com>
 
@@ -14336,7 +14336,7 @@
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/resources/ReadPropertiesSigned2.jnlp
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/testcases/ReadPropertiesSignedTest.java
-	Direcory signed was somehow missing from my commit from 2011-09-22. 
+	Directory signed was somehow missing from my commit from 2011-09-22. 
 	Now it  have been added with all its original files
 
 2011-09-29  Omair Majid  <omajid@redhat.com>
@@ -14428,7 +14428,7 @@
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
 
 	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/resources/ReadPropertiesBySignedHack.jnlp: 
-	jnlp file to lunch ReadPropertiesBySignedHack, notice please dependenci 
+	jnlp file to launch ReadPropertiesBySignedHack, notice please dependency 
 	on ReadProperties.jar from simple reproducers
 	* tests/jnlp_tests/signed/ReadPropertiesBySignedHack/srcs/ReadPropertiesBySignedHack.java: 
 	this reproducers verify, that even reflection-by enabled 
@@ -14444,7 +14444,7 @@
 	* tests/jnlp_tests/signed/ReadPropertiesSigned/srcs/ReadPropertiesSigned.java: 
 	those four files are  example of signed reproducer
 	* tests/jnlp_tests/simple/ReadProperties/srcs/ReadProperties.java: now prints out got 
-	variable for comparsion with above created signed example
+	variable for comparison with above created signed example
 
 2011-09-22  Jiri Vanek <jvanek@redhat.com>
 
@@ -14463,7 +14463,7 @@
 	signed and simple
 	(stamps/bootstrap-directory.stamp): creates symlinks/stubs to 
 	jarsigner and keytool
-	(clean-netx-dist-tests):remove new stamps, signed and simple list and keysstore
+	(clean-netx-dist-tests):remove new stamps, signed and simple list and keystore
 	* acinclude.m4: declared to proceed IT_FIND_KEYTOOL and IT_FIND_JARSIGNER macro
 	* configure.ac: declared macros to check for keytool and jarsigner
 	* tests/jnlp_tests/README: mentioned signed directory 
@@ -14607,7 +14607,7 @@
 
 2011-08-11  Danesh Dadachanji <ddadacha@redhat.com>
 
-	PR742: IcedTea-Web checks certs only upto 1 level deep before declaring 
+	PR742: IcedTea-Web checks certs only up to 1 level deep before declaring 
 	them untrusted.
 	* NEWS: Updated.
 	* netx/net/sourceforge/jnlp/tools/JarSigner.java:
@@ -14667,7 +14667,7 @@
 	(saveFile()) is now public.
 	Added identification for ThreadedProcess based on commandlineArgs and its
 	 run is now slowed by Thread.sleep
-	(ServerLuncher) inner class is now public (it was bug to not be as we have
+	(ServerLauncher) inner class is now public (it was bug to not be as we have
 	 getIndependentInstance of it method ) and renamed to ServerLauncher
 	Enchanted wrapping of executeProcess
 
@@ -14773,11 +14773,11 @@
 
 	* tests/jnlp_tests: directory for reproducers
 	* tests/jnlp_tests/advanced: reproducers which must care about
-	 deploying and compiling thmselves
+	 deploying and compiling themselves
 	* tests/jnlp_tests/simple: reproducers compiled, jared and deployed
 	automatically 
 	* tests/jnlp_tests/simple/name/srcs|testcases|resources/: sourcefiles,
-	resources and testaces for simple reproducers
+	resources and testcases for simple reproducers
 	* tests/jnlp_tests/simple/deadlocktest: test for tracing not-killable
 	javaws
 	* tests/jnlp_tests/simple/simpletest1: tutorial test
@@ -14789,7 +14789,7 @@
 	of helpers to run javaws process.
 	* Makefile.am: new variables pointing to structure above; 
 	(junit-jnlp-dist-dirs.txt): prepare destination directory structure
-	(stamps/netx-dist-tests-prepare-reproducers.stamp):compile tescascases of simple reproducers
+	(stamps/netx-dist-tests-prepare-reproducers.stamp):compile testcases of simple reproducers
 	(netx-dist-tests-source-files.txt): lookup for server and helping classes
 	(stamps/netx-dist-tests-compile.stamp): compile server and helping classes
 	(stamps/netx-dist-tests-compile-testcases.stamp): compile, jar and deploy all simple testcases and their resources
@@ -14994,7 +14994,7 @@
 	(queue_processor): Process the LoadURL command.
 	(_loadURL): New async callback function to handle LoadURL commands.
 	* plugin/icedteanp/IcedTeaPluginRequestProcessor.h: Add _loadURL and
-	loadURL method declerations.
+	loadURL method declarations.
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (showDocument):
 	Send the url load command in the standard "instance X reference Y
 	<command> <args>" format.
@@ -15035,7 +15035,7 @@
 
 	* tests/junit-runner/JunitLikeXmlOutputListener: This listener exports
 	results of junit in xml which "follows junit-output schema". Extended
-	for date, duration and some statististics for future purpose
+	for date, duration and some statistics for future purpose
 	* Makefile.am (run-netx-unit-tests): backuping stdout/stderr of tests 
 	* tests/junit-runner/CommandLine.java: registered 
 	JunitLikeXmlOutputListener
@@ -15284,7 +15284,7 @@
 2011-04-13  Deepak Bhole <dbhole@redhat.com>
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (createPanel):
-	use Object.wait() to wait, rather than pariodic sleep.
+	use Object.wait() to wait, rather than periodic sleep.
 	(APPLET_TIMEOUT): Updated to be in nanoseconds.
 	(framePanel): Synchronize put and notify threads waiting on the applets
 	map instance.
@@ -15304,7 +15304,7 @@
 
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
 	Remove unused imports, added various SuppressWarnings annotations.
-	(createPanel): Return NetxPanel from doPriviledged. Remove dead code.
+	(createPanel): Return NetxPanel from doPrivileged. Remove dead code.
 	(PluginParseRequest): Remove - unused.
 	(defaultSaveFile, label, statusMsgStream, requests, handle): Remove unused.
 	(panel): Make NetxPanel.
@@ -15841,7 +15841,7 @@
 	* netx/net/sourceforge/jnlp/runtime/JNLPProxySelector.java: Add
 	pacEvaluator.
 	(parseConfiguration): Initialize pacEvaluator if needed.
-	(getFromPAC): Use pacEvaulator to find proxies.
+	(getFromPAC): Use pacEvaluator to find proxies.
 	(getProxiesFromPacResult): New method. Converts a proxy string to a list
 	or proxies.
 	* netx/net/sourceforge/jnlp/runtime/PacEvaluator.java: New file. Defines a
@@ -15851,7 +15851,7 @@
 	* netx/net/sourceforge/jnlp/runtime/RhinoBasedPacEvaluator.java: New file.
 	A rhino-based PAC evaluator.
 	* netx/net/sourceforge/jnlp/runtime/PacEvaluatorFactory.java: New file. A
-	factory for creating the right PAC evaulator.
+	factory for creating the right PAC evaluator.
 	* netx/net/sourceforge/jnlp/runtime/pac-funcs.js: New file. Defines helper
 	functions needed while evaluating PAC files.
 	* tests/netx/pac/pac-funcs-test.js: New file. Tests the PAC helper
@@ -15940,7 +15940,7 @@
 	(CodeBaseClassLoader): New inner class. Extends URLClassLoader to expose
 	its protected methods like addURL.
 	* netx/net/sourceforge/jnlp/runtime/JNLPSecurityManager.java
-	(getApplication): Accomodate the fact that the classloader for a class may
+	(getApplication): Accommodate the fact that the classloader for a class may
 	be a CodeBaseClassLoader.
 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java (run):
 	Likewise.
@@ -16040,7 +16040,7 @@
 	(installPanel): Likewise.
 	* netx/net/sourceforge/jnlp/security/SecurityDialogs.java
 	(DialogType): Add AUTHENTICATION.
-	(showAuthenicationPrompt): New method. Shows a password authentication
+	(showAuthenticationPrompt): New method. Shows a password authentication
 	prompt.
 
 2011-02-28  Omair Majid  <omajid@redhat.com>
@@ -16234,7 +16234,7 @@
 	(addResource(URL,Version,DownloadOptions,UpdatePolicy)): New method.
 	(downloadResource): Add support for explicit downloading of packed jars as
 	well as content-encoded packed jars.
-	(initializeResource): Invokde findBestUrl to find the best url. Set that
+	(initializeResource): Invoke findBestUrl to find the best url. Set that
 	as the download location for the resource.
 	(getVersionedResourceURL): Remove.
 	(findBestUrl): New method. Use ResourceUrlCreator to get a list of all
@@ -16330,7 +16330,7 @@
 	file. This class extends JNLPProxySelector and searches the browser's
 	configuration to load additional proxy settings from.
 	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesFinder.java: New
-	file. This class looks into the browser configration to find the
+	file. This class looks into the browser configuration to find the
 	preferences file for the default firefox profile.
 	* netx/net/sourceforge/jnlp/browser/FirefoxPreferencesParser.java: New
 	file. Parses the browser's preferences and makes it available through a
@@ -16698,7 +16698,7 @@
 	* netx/net/sourceforge/jnlp/config/ValueValidator.java: New file.
 	* netx/net/sourceforge/jnlp/config/BasicValueValidators.java: New
 	file. Provides methods to get some common validators.
-	* netx/net/sourceforge/jnlp/config/ConfiguratonValidator.java: New
+	* netx/net/sourceforge/jnlp/config/ConfigurationValidator.java: New
 	file. Provides methods to validate a configuration.
 	* netx/net/sourceforge/jnlp/runtime/DeploymentConfiguration.java:
 	Moved to config subpackage instead and split off into Setting.java,
@@ -17216,7 +17216,7 @@
 
 2010-11-24  Matthias Klose  <doko@ubuntu.com>
 
-	* Makefile.am (LAUNCHER_LINK): Don't explicitely link with -lc,
+	* Makefile.am (LAUNCHER_LINK): Don't explicitly link with -lc,
 	link with -pthread instead of -lpthread.
 	(LAUNCHER_FLAGS): Add -pthread.
 
@@ -17597,7 +17597,7 @@
 
 	* plugin/docs: Added new docs folder that contains plugin documentation.
 	* plugin/docs/MessageBusArchitecture.png: Diagram of the JS <-> Java 
-	message handling architectrure.
+	message handling architecture.
 	* plugin/docs/OverallArchitecture.png: Diagram of the overall plugin
 	architecture.
 	* plugin/docs/java-js-wf.png: Sequence diagram showing an example
@@ -17645,7 +17645,7 @@
 
 	* netx/net/sourceforge/jnlp/Launcher.java
 	(doPerApplicationAppContextHacks): New method. Create a new ParserDelegate
-	to intialize the per AppContext dtd used by Swing HTML controls.
+	to initialize the per AppContext dtd used by Swing HTML controls.
 	(TgThread.run): Call doPerApplicationAppContextHacks.
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java
 	(initialize): Call doMainAppContextHacks.
@@ -17794,7 +17794,7 @@
 
 	* netx/net/sourceforge/jnlp/NetxPanel.java
 	(runLoader): Do not initialize JNLPRuntime here.
-	(createAppletThreads): Initialize JNLPRuntim here.
+	(createAppletThreads): Initialize JNLPRuntime here.
 	* netx/net/sourceforge/jnlp/runtime/ApplicationInstance.java:
 	Switch from SecurityWarningDialog.AccessType to
 	SecurityWarning.AccessType.
@@ -17803,7 +17803,7 @@
 	(initializeResources): Likewise.
 	(checkTrustWithUser): Likewise.
 	* netx/net/sourceforge/jnlp/runtime/JNLPRuntime.java:
-	Add securityDialogMesasgeHandler.
+	Add securityDialogMessageHandler.
 	(initialize): Set System look and feel. Start security thread.
 	(startSecurityThread): New method. Starts a thread to show security
 	dialogs.
@@ -17812,7 +17812,7 @@
 	Switch from SecurityWarningDialog.AccessType to
 	SecurityWarning.AccessType.
 	(checkAwtEventQueueAccess): New method. Skeleton code for allowing
-	EventQueue acccess to applets.
+	EventQueue access to applets.
 	* netx/net/sourceforge/jnlp/security/AccessWarningPane.java:
 	Switch from SecurityWarningDialog.AccessType to
 	SecurityWarning.AccessType.
@@ -17858,7 +17858,7 @@
 	(run): New method. Runs the security message loop.
 	(handleMessage): New method. Handles a SecurityDialogMessage to show a
 	security warning.
-	(postMessage): New method. Posts a message to sthe security message
+	(postMessage): New method. Posts a message to the security message
 	queue.
 	* netx/net/sourceforge/jnlp/security/SecurityWarning.java: New class.
 	Move AccessType and DialogType from SecurityWarningDialog to here.
@@ -17869,7 +17869,7 @@
 	(showNotAllSignedWarningDialog): Likewise.
 	(showCertWarningDialog): Likewise.
 	(showAppletWarning): Likewise.
-	(getUserReponse): New method. Posts a message to the security thread and
+	(getUserResponse): New method. Posts a message to the security thread and
 	blocks until it gets a response from the user.
 
 2010-10-20  Andrew John Hughes  <ahughes@redhat.com>
@@ -17953,7 +17953,7 @@
 	(waitForResources(ApplicationInstance,ResourceTracker,
 	URL,String)): Likewise.
 	* netx/net/sourceforge/jnlp/cache/DefaultDownloadIndicator.java:
-	(getListener(ApplicatonInstance,String,URL)): Use setVisible instead
+	(getListener(ApplicationInstance,String,URL)): Use setVisible instead
 	of show().
 	(disposeListener(DownloadServiceListener)): Use setVisible instead
 	of hide().

@@ -51,7 +51,7 @@ import java.lang.reflect.Method;
 /**
  * It is crucial that BeforeClass inits logging subsystem.
  * If  logging subsytem of itw is enabled from itw, then junit's classloader do not
- * see it. And so when is junit manipualting with logging, then it creates new (second!)
+ * see it. And so when is junit manipulating with logging, then it creates new (second!)
  * static instance. On opposite, if junit creates the instance, then itw see this one.
  *
  * Explanation is that junit classloader (fresh for each test-class)  is creating
@@ -63,7 +63,7 @@ public class NoStdOutErrTest {
 
     private final static Logger LOG = LoggerFactory.getLogger(NoStdOutErrTest.class);
 
-    private static boolean origialStds;
+    private static boolean originalStds;
     private static final String setLogToStreams = "setLogToStreams";
     /*
      * "printed" exceptions are otherwise  consumed via junit if thrown :-/
@@ -88,7 +88,7 @@ public class NoStdOutErrTest {
             //then when junit can not access this class, and creates its own for its purposes
             //when junit creates this class, then also TESTED class have access to it and so it behaves as expected
             OutputController.getLogger().flush();
-            origialStds = LogConfig.getLogConfig().isLogToStreams();
+            originalStds = LogConfig.getLogConfig().isLogToStreams();
             invokeSetLogToStreams(false);
             removeStreams();
         } catch (Exception ex) {
@@ -100,7 +100,7 @@ public class NoStdOutErrTest {
     public static synchronized void restoreStds() {
         try {
             OutputController.getLogger().flush();
-            invokeSetLogToStreams(origialStds);
+            invokeSetLogToStreams(originalStds);
             resetStreams();
         } catch (Exception ex) {
             ServerAccess.logException(ex);

@@ -345,7 +345,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * Install this XDesktopEntry into the user's menu.
      */
     private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
-        //TODO add itweb-settings tab which alows to remove inidividual items/icons
+        //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f),
@@ -398,7 +398,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Execing: " + Arrays.toString(execString));
+            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Executing: " + Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
             Process installer = pb.start();
@@ -421,10 +421,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
         //TODO TODO TODO TODO TODO TODO TODO TODO 
         //check existing jnlp files
-        //check luncher 
-        //get where it poiints
+        //check launcher 
+        //get where it points
         //try all supported  shortcuts methods
-        //choose the one which have most similar result to exisitng ones
+        //choose the one which have most similar result to existing ones
 
     }
 
@@ -484,14 +484,14 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (location != null) {
             String origLocation = location.substring("file:".length());
             this.iconLocation = origLocation;
-            // icons are never unisntalled by itw. however, system clears them on its own.. soemtimes.
-            // once the -Xcelarcache is run, system MAY clean it later, and so image wil be lost.
+            // icons are never uninstalled by itw. however, system clears them on its own.. sometimes.
+            // once the -Xclearcache is run, system MAY clean it later, and so image wil be lost.
             // copy icon somewhere where -Xclearcache can not
             PathsAndFiles.ICONS_DIR.getFile().mkdirs();
             File source = new File(origLocation);
             String targetName = source.getName();
             if (targetName.equals(FAVICON)) {
-                targetName = file.getNotNullProbalbeCodeBase().getHost() + ".ico";
+                targetName = file.getNotNullProbableCodeBase().getHost() + ".ico";
             }
             File target = null;
             if (JNLPRuntime.isWindows() &&
@@ -617,15 +617,15 @@ public class XDesktopEntry implements GenericDesktopEntry {
     
     private static URL favUrl(String delimiter, String path, JNLPFile file) throws MalformedURLException {
         return new URL(
-                file.getNotNullProbalbeCodeBase().getProtocol(),
-                file.getNotNullProbalbeCodeBase().getHost(),
-                file.getNotNullProbalbeCodeBase().getPort(),
+                file.getNotNullProbableCodeBase().getProtocol(),
+                file.getNotNullProbableCodeBase().getHost(),
+                file.getNotNullProbableCodeBase().getPort(),
                 path + delimiter + FAVICON);
     }
 
     private static URL getFavIconUrl(JNLPFile file) {
         try {
-            for (String path : possibleFavIconLocations(file.getNotNullProbalbeCodeBase().getPath())) {
+            for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("/", path, file);
                 //JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
                 //this MAY throw npe, if url (specified in jnlp) points to 404
@@ -635,9 +635,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     return urlLocation;
                 }
             }
-            //the icon is much more likely to be found behind / then behinf \/ 
+            //the icon is much more likely to be found behind / then behind \/ 
             //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
-            for (String path : possibleFavIconLocations(file.getNotNullProbalbeCodeBase().getPath())) {
+            for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("\\", path, file);
                 URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
                 if (urlLocation != null) {
@@ -683,11 +683,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
 
     private static String findAndVerifyGeneratedJnlpDir() {
-        return findAndVerifyBasicDir(PathsAndFiles.GEN_JNLPS_DIR.getFile(), " directroy for stroing generated jnlps cannot be created. You may expect failure");
+        return findAndVerifyBasicDir(PathsAndFiles.GEN_JNLPS_DIR.getFile(), " directory for storing generated jnlps cannot be created. You may expect failure");
     }
 
     private static String findAndVerifyJavawsMenuDir() {
-        return findAndVerifyBasicDir(PathsAndFiles.MENUS_DIR.getFile(), " directroy for stroing menu entry cannot be created. You may expect failure");
+        return findAndVerifyBasicDir(PathsAndFiles.MENUS_DIR.getFile(), " directory for storing menu entry cannot be created. You may expect failure");
     }
 
     private static String findAndVerifyBasicDir(File f, String message) {
@@ -789,11 +789,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
     
      @Override
     public void createShortcutOnWindowsDesktop() throws IOException {
-        throw new UnsupportedOperationException("not suported on linux like systems");
+        throw new UnsupportedOperationException("not supported on linux like systems");
     }
 
     @Override
     public void createWindowsMenu() throws IOException {
-        throw new UnsupportedOperationException("not suported on linux like systems");
+        throw new UnsupportedOperationException("not supported on linux like systems");
     }
 }

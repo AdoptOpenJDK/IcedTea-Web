@@ -1333,7 +1333,7 @@ public class SplinesDefs {
     static Polygon getNatCubicClosed(Polygon p) {
         NatCubicClosed c = new NatCubicClosed();
         c.setSourcePolygon(p);
-        return c.calcualteResult();
+        return c.calculateResult();
     }
 
     /**
@@ -1367,7 +1367,7 @@ public class SplinesDefs {
                     if (start == null) {
                         start = n;
                     }
-                    //check closest neigbourhood
+                    //check closest neighbourhood
                     for (int xx = -1; xx <= 1; xx++) {
                         for (int yy = -1; yy <= 1; yy++) {
                             if (xx == yy) {
@@ -1375,7 +1375,7 @@ public class SplinesDefs {
                             }
                             int xxx = x + xx;
                             int yyy = y + yy;
-                            //all non-trasnaprent nigbours are neigbours with distance of 1
+                            //all non-transparent neighbours are neighbours with distance of 1
                             Color ccc = new Color(maze.getRGB(xxx, yyy), true);
                             if (ccc.getAlpha() > 0) {
                                 Node n2 = new Node(xxx, yyy);
@@ -1392,7 +1392,7 @@ public class SplinesDefs {
                 }
             }
         }
-        //calculate path from start to mnsot far away point (thats why the empty space)
+        //calculate path from start to mnsot far away point (that's why the empty space)
         Collection<Node> nodesCol = allNodes.values();
         Graph g = new Graph();
         for (Node node : nodesCol) {

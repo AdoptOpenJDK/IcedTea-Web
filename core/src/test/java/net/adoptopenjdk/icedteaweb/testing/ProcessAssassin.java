@@ -1,4 +1,4 @@
-/* ProcessAssasin.java
+/* ProcessAssassin.java
 Copyright (C) 2011,2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -46,21 +46,21 @@ import java.util.List;
  * class which timeout any ThreadedProcess. This killing of 'thread with
  * process' replaced not working process.destroy().
  */
-public class ProcessAssasin extends Thread {
+public class ProcessAssassin extends Thread {
 
     private long timeout;
     private final ThreadedProcess p;
     //false == is disabled:(
     private boolean canRun = true;
     private boolean wasTerminated = false;
-    //signifies that assasin have been summoned
+    //signifies that assassin have been summoned
     private volatile boolean killing = false;
-    //signifies that assasin have done its job
+    //signifies that assassin have done its job
     private volatile boolean killed = false;
 
     private ReactingProcess reactingProcess;
 
-    public ProcessAssasin(ThreadedProcess p, long timeout) {
+    public ProcessAssassin(ThreadedProcess p, long timeout) {
         this.p = (p);
         this.timeout = timeout;
     }
@@ -109,8 +109,8 @@ public class ProcessAssasin extends Thread {
                                     /*
       if this is true, then process is not destroyed after timeout, but just
       left to its own destiny. Its stdout/err is no longer recorded, and it is
-      leaking system resources until it dies by itself The contorl is returned
-      to main thread with all informations recorded untill now. You will be
+      leaking system resources until it dies by itself The control is returned
+      to main thread with all information recorded until now. You will be
       able to listen to std out from listeners still
      */
                                         destroyProcess();
@@ -135,7 +135,7 @@ public class ProcessAssasin extends Thread {
                         }
                         break;
                     } finally {
-                        p.setDestoyed(true);
+                        p.setDestroyed(true);
                     }
                 }
                 Thread.sleep(100);
@@ -196,7 +196,7 @@ public class ProcessAssasin extends Thread {
         ll.add("-s");
         ll.add("SIGTERM");
         ll.add(pid);
-        ServerAccess.executeProcess(ll); //sync, but  acctually release
+        ServerAccess.executeProcess(ll); //sync, but  actually release
         //before affected application close
         Thread.sleep(1000);
     }

@@ -55,8 +55,8 @@ public class RememberDialog {
         if (found.getValue()!=null){
             value = found.getValue().writeValue();
         }
-        SavedRememberAction action = new SavedRememberAction(createAction(found.getRemeberAction().isRemember(), found.getValue()), value);
-        setOrUpdateRememberedState(dialog, found.getRemeberAction().isCodebase(), action);
+        SavedRememberAction action = new SavedRememberAction(createAction(found.getRememberAction().isRemember(), found.getValue()), value);
+        setOrUpdateRememberedState(dialog, found.getRememberAction().isCodebase(), action);
     }
     
     /*
@@ -112,18 +112,18 @@ public class RememberDialog {
         return null;
     }
 
-    public static ExecuteAppletAction createAction(boolean pernament, DialogResult value) {
+    public static ExecuteAppletAction createAction(boolean permanent, DialogResult value) {
         if (value == null){
             return ExecuteAppletAction.NO; 
         }
         if (value.toBoolean()){
-            if (pernament){
+            if (permanent){
                 return ExecuteAppletAction.ALWAYS;
             } else {
                 return ExecuteAppletAction.YES;
             }
         } else {
-            if (pernament){
+            if (permanent){
                 return ExecuteAppletAction.NEVER;
             } else {
                 return ExecuteAppletAction.NO;

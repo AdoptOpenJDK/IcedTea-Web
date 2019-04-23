@@ -139,7 +139,7 @@ public final class HtmlBoot {
             AppletExtractor axe = new AppletExtractor(html, settings);
             AppletsFilter filtered = new AppletsFilter(axe.findAppletsOnPage(), html, vars.subList(1, vars.size()));
             List<AppletParser> applets = filtered.getApplets();
-            // this hack was needed in early phases of the patch.   Now it sees to be not neede. Keeping inside to remove after much more testing
+            // this hack was needed in early phases of the patch.   Now it seems to be not needed. Keeping inside to remove after much more testing
             // will be replaced by regular JNLPRuntime is initialised
 //                System.setSecurityManager(new SecurityManager() {
 //

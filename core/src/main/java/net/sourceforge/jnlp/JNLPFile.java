@@ -318,7 +318,7 @@ public class JNLPFile {
      * @param location of resource to open
      * @param version of resource
      * @param policy update policy of resource
-     * @return  opened streamfrom given url
+     * @return  opened stream from given url
      * @throws java.io.IOException  if something goes wrong
      */
     public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
@@ -492,11 +492,11 @@ public class JNLPFile {
     /**
      * It is not recommended to use this method for internals of itw - use normal getCodeBase rather, as null is expected always except toString calls.
      *
-     * If you are not sure, use getCodeBase and chek null as you need. See that this method is used mostly for xtendedAppletSecuriyty dialogs.
+     * If you are not sure, use getCodeBase and check null as you need. See that this method is used mostly for xtendedAppletSecuriyty dialogs.
      * 
      * @return the codebase URL for the JNLP file  or url of location of calling file (jnlp, hreffed jnlp, or directly html)
      */
-    public URL getNotNullProbalbeCodeBase() {
+    public URL getNotNullProbableCodeBase() {
         if (getCodeBase()!=null){
             return getCodeBase();
         }
@@ -742,28 +742,28 @@ public class JNLPFile {
     }
 
     /**
-     * @return whether the lauch descriptor describes an Applet.
+     * @return whether the launch descriptor describes an Applet.
      */
     public boolean isApplet() {
         return entryPointDesc instanceof AppletDesc;
     }
 
     /**
-     * @return whether the lauch descriptor describes an Application.
+     * @return whether the launch descriptor describes an Application.
      */
     public boolean isApplication() {
         return entryPointDesc instanceof ApplicationDesc;
     }
 
     /**
-     * @return whether the lauch descriptor describes a Component.
+     * @return whether the launch descriptor describes a Component.
      */
     public boolean isComponent() {
         return component != null;
     }
 
     /**
-     * @return whether the lauch descriptor describes an Installer.
+     * @return whether the launch descriptor describes an Installer.
      */
     public boolean isInstaller() {
         return entryPointDesc instanceof InstallerDesc;
@@ -1169,7 +1169,7 @@ public class JNLPFile {
         //case when creating name from already created name
         String shortenedTitle = getTitle();
         int i = shortenedTitle.lastIndexOf("(");
-        if (i >= 2) { // not cutting immidiately...
+        if (i >= 2) { // not cutting immediately...
             shortenedTitle = shortenedTitle.substring(0, i - 1);
         }
         if (createJnlpTitleValue().startsWith(shortenedTitle)) {

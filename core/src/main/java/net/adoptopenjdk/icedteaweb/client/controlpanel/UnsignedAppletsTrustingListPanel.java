@@ -210,7 +210,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             int modelRow = table.convertRowIndexToModel(originalIndexes[i]);
             newIndexes.add(modelRow);
         }
-        //now to sort so we can incrementaly dec safely
+        //now to sort so we can incrementally dec safely
         Collections.sort(newIndexes);
         if (ask) {
             String s = Translator.R("APPEXTSECguiPanelConfirmDeletionOf", newIndexes.size()) + ": \n";

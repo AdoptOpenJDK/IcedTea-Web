@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-exmaple of "bad" jnlp file with resources inside j2sa
+example of "bad" jnlp file with resources inside j2sa
 -->
 <jnlp spec="1.0+" codebase="http://localhost/" href="jnlp.jnlp">
 	<information>

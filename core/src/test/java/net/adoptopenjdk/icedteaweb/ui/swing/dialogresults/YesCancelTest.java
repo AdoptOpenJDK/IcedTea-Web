@@ -51,7 +51,7 @@ public class YesCancelTest {
     }
 
     @Test
-    public void cacnelReadWrite() {
+    public void cancelReadWrite() {
         YesCancel y = YesCancel.cancel();
         String s = y.writeValue();
         YesCancel yy = YesCancel.readValue(s);
@@ -65,7 +65,7 @@ public class YesCancelTest {
         YesCancel y = YesCancel.readValue(Primitive.SANDBOX.name());
     }
 
-   public void cacnelRead() {
+   public void cancelRead() {
         YesCancel y = YesCancel.readValue(Primitive.CANCEL.name());
         Assert.assertFalse(y.toBoolean());
     }

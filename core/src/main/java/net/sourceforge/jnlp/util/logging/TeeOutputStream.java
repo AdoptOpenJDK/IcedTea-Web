@@ -52,7 +52,7 @@ import java.io.PrintStream;
  */
 public final class TeeOutputStream extends PrintStream implements SingleStreamLogger{
 
-    // Everthing written to TeeOutputStream is written to our log too
+    // Everything written to TeeOutputStream is written to our log too
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
 

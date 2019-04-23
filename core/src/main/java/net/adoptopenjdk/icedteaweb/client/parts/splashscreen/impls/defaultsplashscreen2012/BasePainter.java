@@ -75,7 +75,7 @@ public class BasePainter implements Observer {
     private int waterLevel = 0;
     //waving of water and position of shhadowed WEB
     private int animationsPosition = 0;
-    private int greyTextIncrment = 15; //how quickly is greyed web moving
+    private int greyTextIncrement = 15; //how quickly is greyed web moving
     //colors
     protected static final Color TEA_LIVE_COLOR = new Color(205, 1, 3);
     protected static final Color BACKGROUND_LIVE_COLOR = ExtensionManager.getExtension().getBackground();
@@ -89,7 +89,7 @@ public class BasePainter implements Observer {
     protected Color pluginColor;
     protected Color waterColor;
     protected Color plainTextColor;
-    //BufferedImage tmpBackround; //testingBackground for fitting
+    //BufferedImage tmpBackground; //testingBackground for fitting
     protected BufferedImage prerenderedStuff;
     private Font teaFont;
     private Font icedFont;
@@ -97,7 +97,7 @@ public class BasePainter implements Observer {
     private Font pluginFont;
     private Font plainTextsFont;
     private Font alternativeTextFont;
-    //those spaces are meaningful for centering the text.. thats why alternative;)
+    //those spaces are meaningful for centering the text.. that's why alternative;)
     private static final String alternativeICED = "Iced    ";
     private static final String alternativeWeb = "Web  ";
     private static final String alternativeTtea = "    Tea";
@@ -106,13 +106,13 @@ public class BasePainter implements Observer {
     private static final String web = "web";
     private static final String tea = "Tea";
     private static final String plugin = "plugin  ";
-    //inidivdual sizes, all converging to ZERO!!
+    //individual sizes, all converging to ZERO!!
     /**
-     * Experimentaly meassured best top position for painted parts of vectros
+     * Experimentally measured best top position for painted parts of vectros
      */
     private final int WEB_TOP_ALIGMENT = 324;
     /**
-     * Experimentaly meassured best left position for painted parts of vectors
+     * Experimentally measured best left position for painted parts of vectors
      */
     private final int WEB_LEFT_ALIGMENT = 84;
     //enabling
@@ -122,7 +122,7 @@ public class BasePainter implements Observer {
     protected TextWithWaterLevel twl;
     protected TextWithWaterLevel oldTwl;
     protected boolean canWave = true;
-    private Point aboutOfset = new Point();
+    private Point aboutOffset = new Point();
 
     private final static float dash1[] = {10.0f};
     private final static BasicStroke dashed
@@ -155,7 +155,7 @@ public class BasePainter implements Observer {
         drawTextAroundCenter(g2d, -0.6d, alternativeTtea);
         g2d.setColor(pluginColor);
         String s = getAlternativeProductName();
-        int sub = animationsPosition / greyTextIncrment;
+        int sub = animationsPosition / greyTextIncrement;
         sub = sub % s.length();
         if (!master.isAnimationRunning()) {
             sub = s.length();
@@ -164,8 +164,8 @@ public class BasePainter implements Observer {
     }
     //enabling end
 
-    private int scaleAvarage(double origValue) {
-        return (int) (avarageRatio() * origValue);
+    private int scaleAverage(double origValue) {
+        return (int) (averageRatio() * origValue);
     }
 
     private int scaleMax(double origValue) {
@@ -176,7 +176,7 @@ public class BasePainter implements Observer {
         return (int) (minRatio() * origValue);
     }
 
-    private double avarageRatio() {
+    private double averageRatio() {
         return (getRatioX() + getRatioY()) / 2d;
     }
 
@@ -248,7 +248,7 @@ public class BasePainter implements Observer {
 
     public void increaseAnimationPosition() {
         ExtensionManager.getExtension().animate();
-        animationsPosition += greyTextIncrment;
+        animationsPosition += greyTextIncrement;
     }
 
     protected void ensurePrerenderedStuff() {
@@ -413,7 +413,7 @@ public class BasePainter implements Observer {
         public void run() {
             while (master.isAnimationRunning()) {
                 try {
-                    animationsPosition += greyTextIncrment;
+                    animationsPosition += greyTextIncrement;
                     if (animationsPosition > MAX_ANIMATION_VALUE) {
                         animationsPosition = ANIMATION_RESTART_VALUE;
                     }
@@ -475,7 +475,7 @@ public class BasePainter implements Observer {
         g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, master.getSplashWidth() + 5, master.getSplashHeight() + 5);
         if (showNiceTexts) {
-            //g2d.drawImage(tmpBackround, 0, 0, null);
+            //g2d.drawImage(tmpBackground, 0, 0, null);
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -532,10 +532,10 @@ public class BasePainter implements Observer {
                 niceVersion = aboutPrefix + niceVersion;
                 y -= aboutPrefixWidth;
             }
-            aboutOfset = new Point(y, fm.getHeight());
+            aboutOffset = new Point(y, fm.getHeight());
             Stroke backup = g2d.getStroke();
             g2d.setStroke(dashed);
-            g2d.drawRect(aboutOfset.x - 1, 1, master.getSplashWidth() - aboutOfset.x - 1, aboutOfset.y + 1);
+            g2d.drawRect(aboutOffset.x - 1, 1, master.getSplashWidth() - aboutOffset.x - 1, aboutOffset.y + 1);
             g2d.setStroke(backup);
             g2d.drawString(niceVersion, y, fm.getHeight());
         }
@@ -576,8 +576,8 @@ public class BasePainter implements Observer {
         return master;
     }
 
-    public Point getAboutOfset() {
-        return aboutOfset;
+    public Point getAboutOffset() {
+        return aboutOffset;
     }
 
     public Color getWaterColor() {
