@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
@@ -56,7 +55,8 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import org.slf4j.Logger;
@@ -131,12 +131,10 @@ public class CacheUtil {
             File file = CacheUtil.getCacheFile(location, version);
             result = new FilePermission(file.getPath(), "read");
         } else {
-            try {
-                // this is what URLClassLoader does
-                URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(location);
+            // this is what URLClassLoader does
+            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
                 result = conn.getPermission();
-                ConnectionFactory.getConnectionFactory().disconnect(conn);
-            } catch (java.io.IOException ioe) {
+            } catch (IOException ioe) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                 // should try to figure out the permission
             }
@@ -625,7 +623,7 @@ public class CacheUtil {
      * @param source  the remote location
      * @param version the file version to write to
      * @return the stream to write to resource
-     * @throws java.io.IOException if IO breaks
+     * @throws IOException if IO breaks
      */
     public static OutputStream getOutputStream(URL source, Version version) throws IOException {
         File localFile = getCacheFile(source, version);
@@ -641,7 +639,7 @@ public class CacheUtil {
      *
      * @param is stream to read from
      * @param os stream to write to
-     * @throws java.io.IOException if copy fails
+     * @throws IOException if copy fails
      */
     public static void streamCopy(InputStream is, OutputStream os) throws IOException {
         if (!(is instanceof BufferedInputStream))

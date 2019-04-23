@@ -7,9 +7,12 @@ package net.adoptopenjdk.icedteaweb.http;
 public enum HttpMethod {
     GET,
     HEAD,
-    POST,
-    PUT,
-    OPTIONS,
-    DELETE,
-    TRACE
+
+    // The following methods are currently not used
+
+    // POST,
+    // PUT,
+    // OPTIONS,
+    // DELETE,
+    // TRACE,
 }

@@ -9,9 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +21,14 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
-import net.sourceforge.jnlp.DownloadOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.ConnectionFactory;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,9 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 public class ResourceDownloader implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
+
+    private static final String ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
 
     private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
 
@@ -63,52 +65,40 @@ public class ResourceDownloader implements Runnable {
      *
      * @return the response code if HTTP connection and redirection value, or
      * HttpURLConnection.HTTP_OK and null if not.
-     * @throws IOException
+     * @throws IOException if an I/O exception occurs.
      */
     static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-        final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(url);
 
-        for (final Map.Entry<String, String> property : requestProperties.entrySet()) {
-            connection.addRequestProperty(property.getKey(), property.getValue());
-        }
+        try (final CloseableConnection connection = ConnectionFactory.openConnection(url, requestMethod, requestProperties)) {
 
-        final int responseCode;
-        if (connection instanceof HttpURLConnection) {
-            final HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            httpConnection.setRequestMethod(requestMethod.name());
-
-             responseCode = httpConnection.getResponseCode();
+            final int responseCode = connection.getResponseCode();
 
             /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
-            HttpUtils.consumeAndCloseConnectionSilently(httpConnection);
-        } else {
-            responseCode = HttpURLConnection.HTTP_OK;
+            HttpUtils.consumeAndCloseConnectionSilently(connection);
+
+            final Map<String, List<String>> header = connection.getHeaderFields();
+            for (final Map.Entry<String, List<String>> entry : header.entrySet()) {
+                LOG.info("Key : {} ,Value : {}", entry.getKey(), entry.getValue());
+            }
+            /*
+             * Do this only on 301,302,303(?)307,308>
+             * Now setting value for all, and lets upper stack to handle it
+             */
+            final String possibleRedirect = connection.getHeaderField("Location");
+
+            final URL redirectUrl;
+            if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
+                redirectUrl = new URL(possibleRedirect);
+            } else {
+                redirectUrl = null;
+            }
+
+            final long lastModified = connection.getLastModified();
+            final long length = connection.getContentLength();
+
+            return new UrlRequestResult(responseCode, redirectUrl, lastModified, length);
         }
-
-        final Map<String, List<String>> header = connection.getHeaderFields();
-        for (final Map.Entry<String, List<String>> entry : header.entrySet()) {
-            LOG.info("Key : {} ,Value : {}", entry.getKey(), entry.getValue());
-        }
-        /*
-         * Do this only on 301,302,303(?)307,308>
-         * Now setting value for all, and lets upper stack to handle it
-         */
-        final String possibleRedirect = connection.getHeaderField("Location");
-
-        final URL redirectUrl;
-        if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
-            redirectUrl = new URL(possibleRedirect);
-        } else {
-            redirectUrl = null;
-        }
-
-        ConnectionFactory.getConnectionFactory().disconnect(connection);
-
-        final long lastModified = connection.getLastModified();
-        final long length = connection.getContentLengthLong();
-
-        return new UrlRequestResult(responseCode, redirectUrl, lastModified, length);
 
     }
 
@@ -155,15 +145,13 @@ public class ResourceDownloader implements Runnable {
     private void initializeFromURL(final UrlRequestResult location) throws IOException {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
-        try {
+        try (final CloseableConnection connection = getDownloadConnection(location.redirectUrl)) {// this won't change so should be okay not-synchronized
             resource.setDownloadLocation(location.redirectUrl);
-            final URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.redirectUrl); // this won't change so should be okay not-synchronized
-            connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             Long size = location.length;
             if (size == null) {
-                size = connection.getContentLengthLong();
+                size = connection.getContentLength();
             }
             Long lm = location.lastModified;
             if (lm == null) {
@@ -233,9 +221,6 @@ public class ResourceDownloader implements Runnable {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
             resource.fireDownloadEvent(); // fire CONNECTED
-
-            // explicitly close the URLConnection.
-            ConnectionFactory.getConnectionFactory().disconnect(connection);
         } finally {
             entry.unlock();
         }
@@ -294,7 +279,7 @@ public class ResourceDownloader implements Runnable {
                 URL url = urls.get(i);
                 try {
                     Map<String, String> requestProperties = new HashMap<>();
-                    requestProperties.put("Accept-Encoding", "pack200-gzip, gzip");
+                    requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
 
                     UrlRequestResult response = getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
                     if (response.responseCode == 511) {
@@ -341,12 +326,10 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void downloadResource() {
-        URLConnection connection = null;
         URL downloadFrom = resource.getDownloadLocation(); //Where to download from
         URL downloadTo = resource.getLocation(); //Where to download to
 
-        try {
-            connection = getDownloadConnection(downloadFrom);
+        try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
 
             String contentEncoding = connection.getContentEncoding();
 
@@ -380,21 +363,16 @@ public class ResourceDownloader implements Runnable {
                 lock.notifyAll();
             }
             resource.fireDownloadEvent(); // fire ERROR
-        } finally {
-            if (connection != null) {
-                ConnectionFactory.getConnectionFactory().disconnect(connection);
-            }
         }
     }
 
-    private URLConnection getDownloadConnection(URL location) throws IOException {
-        URLConnection con = ConnectionFactory.getConnectionFactory().openConnection(location);
-        con.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
-        con.connect();
-        return con;
+    private CloseableConnection getDownloadConnection(URL location) throws IOException {
+        final Map<String, String> requestProperties = new HashMap<>();
+        requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
+        return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties);
     }
 
-    private void downloadPackGzFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+    private void downloadPackGzFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
         extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
@@ -403,7 +381,7 @@ public class ResourceDownloader implements Runnable {
         markForDelete(downloadFrom);
     }
 
-    private void downloadGZipFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+    private void downloadGZipFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
         extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
@@ -412,7 +390,7 @@ public class ResourceDownloader implements Runnable {
         markForDelete(downloadFrom);
     }
 
-    private void downloadFile(URLConnection connection, URL downloadLocation) throws IOException {
+    private void downloadFile(CloseableConnection connection, URL downloadLocation) throws IOException {
         CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
         LOG.debug("Downloading file: {} into: {}", downloadLocation, downloadEntry.getCacheFile().getCanonicalPath());
         if (!downloadEntry.isCurrent(connection.getLastModified())) {
@@ -437,7 +415,7 @@ public class ResourceDownloader implements Runnable {
             resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
         }
 
-        storeEntryFields(downloadEntry, connection.getContentLengthLong(), connection.getLastModified());
+        storeEntryFields(downloadEntry, connection.getContentLength(), connection.getLastModified());
     }
 
     private void storeEntryFields(CacheEntry entry, long contentLength, long lastModified) {
@@ -465,7 +443,7 @@ public class ResourceDownloader implements Runnable {
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
         byte[] buf = new byte[1024];
         int rlen;
-        try (OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
+        try (final OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
             while (-1 != (rlen = in.read(buf))) {
                 resource.incrementTransferred(rlen);
                 out.write(buf, 0, rlen);
@@ -480,7 +458,7 @@ public class ResourceDownloader implements Runnable {
         byte[] buf = new byte[1024];
         int rlen;
 
-        try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {
             InputStream inputStream = new BufferedInputStream(gzInputStream);
 
@@ -499,7 +477,7 @@ public class ResourceDownloader implements Runnable {
     private void extractPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
         LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
 
-        try (GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
+        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {
             InputStream inputStream = new BufferedInputStream(gzInputStream);
 

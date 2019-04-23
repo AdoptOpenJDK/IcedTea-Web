@@ -38,10 +38,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import net.sourceforge.jnlp.security.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -137,11 +136,11 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
         java.util.jar.JarFile result = null;
 
         final int BUF_SIZE = 2048;
-        URLConnection conn = ConnectionFactory.getConnectionFactory().openConnection(url);
-        /* get the stream before asserting privileges */
-        final InputStream in = conn.getInputStream();
 
-        try {
+        try (CloseableConnection conn = ConnectionFactory.openConnection(url)) {
+            /* get the stream before asserting privileges */
+            final InputStream in = conn.getInputStream();
+
             result =
                     AccessController.doPrivileged(new PrivilegedExceptionAction<java.util.jar.JarFile>() {
                         @Override
@@ -177,8 +176,6 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
                     });
         } catch (PrivilegedActionException pae) {
             throw (IOException) pae.getException();
-        } finally{
-           ConnectionFactory.getConnectionFactory().disconnect(conn);
         }
 
         return result;
