@@ -49,7 +49,7 @@ import net.sourceforge.jnlp.config.BasicValueValidators;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -37,7 +37,7 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

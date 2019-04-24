@@ -68,6 +68,23 @@ import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridgeTest;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 public class XDesktopEntryTest {
 
     private static final String des1 = "/my/little/Desktop";
@@ -331,7 +348,7 @@ public class XDesktopEntryTest {
         a.setFixHref(false);
         a.setShortcutType(type);
         Reader r = xde.getContentsAsReader(menu, a, true);
-        String s = FileUtils.getContentOfReader(r);
+        String s = BasicFileUtils.getContentOfReader(r);
         Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
     }
 

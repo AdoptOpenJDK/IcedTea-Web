@@ -59,6 +59,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
@@ -137,7 +155,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             try {
                 String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF, info.isFixHref());
                 generatedJnlp = getGeneratedJnlpFileName();
-                FileUtils.saveFile(content, generatedJnlp);
+                BasicFileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
@@ -423,7 +441,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
         //TODO TODO TODO TODO TODO TODO TODO TODO 
         //check existing jnlp files
-        //check launcher 
+        //check launcher
         //get where it points
         //try all supported  shortcuts methods
         //choose the one which have most similar result to existing ones
@@ -637,7 +655,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     return urlLocation;
                 }
             }
-            //the icon is much more likely to be found behind / then behind \/ 
+            //the icon is much more likely to be found behind / then behind \/
             //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
             for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("\\", path, file);

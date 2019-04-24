@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class MD5SumWatcherTest {
     @Test
     public void testSavingToFileChangesMd5() throws Exception {
         byte[] original = watcher.getSum();
-        FileUtils.saveFile("some test content\n", file);
+        BasicFileUtils.saveFile("some test content\n", file);
         byte[] changed = watcher.getSum();
         assertFalse("MD5 sum should have changed, but was constant as " + Arrays.toString(original),
                 Arrays.equals(original, changed));
@@ -105,7 +106,7 @@ public class MD5SumWatcherTest {
 
     @Test
     public void testChangedContentUpdate() throws Exception {
-        FileUtils.saveFile("some test content\n", file);
+        BasicFileUtils.saveFile("some test content\n", file);
         final boolean changed = watcher.update();
         assertTrue("update() should return true", changed);
     }

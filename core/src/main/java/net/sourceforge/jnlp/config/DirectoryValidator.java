@@ -4,6 +4,7 @@
  */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.slf4j.Logger;
@@ -324,7 +325,7 @@ public class DirectoryValidator {
                 correctPermissions = false;
             }
             try {
-                FileUtils.saveFile("ww", testFile);
+                BasicFileUtils.saveFile("ww", testFile);
                 String s = FileUtils.loadFileAsString(testFile);
                 if (!s.trim().equals("ww")) {
                     correctPermissions = false;
