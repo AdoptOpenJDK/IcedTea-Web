@@ -35,9 +35,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +47,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.lang.Process;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
