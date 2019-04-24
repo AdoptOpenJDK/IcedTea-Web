@@ -42,7 +42,7 @@ import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosing
 import java.awt.AWTException;
 import java.awt.Robot;
 
-public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable{
+public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable {
 
     //attributes possibly set by user
     private String initStr = null;
@@ -66,7 +66,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     public AWTHelper() {
         try {
             this.robot = new Robot();
-        } catch (AWTException e) {
+        } catch (final AWTException e) {
             throw new RuntimeException("AWTHelper could not create its Robot instance.",e);
         }
     }
@@ -132,20 +132,12 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     	if( initStr != null ){
             return new ContainsRule(this.initStr);
     	}else{
-    		return new Rule<String, String>(){
-
-				@Override
-				public boolean evaluate(String upon) {
-					return true;
-				}
-
-    			
-    		} ;
+    		return v -> true;
     	}
     }
     
     //boolean controls getters
-    private boolean appletIsReady(String content) {
+    private boolean appletIsReady(final String content) {
         return this.getInitStrAsRule().evaluate(content);
     }
 

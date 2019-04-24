@@ -53,7 +53,7 @@ public class ProcessResult {
      */
     public final Throwable deadlyException;
 
-    public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r, Throwable deadlyException) {
+    public ProcessResult(final String stdout, final String stderr, final Process process, final boolean wasTerminated, final Integer r, final Throwable deadlyException) {
         this.notFilteredStdout = stdout;
         if (stdout == null) {
             this.stdout = null;

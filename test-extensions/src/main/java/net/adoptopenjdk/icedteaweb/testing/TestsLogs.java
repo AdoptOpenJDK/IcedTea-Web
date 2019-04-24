@@ -39,6 +39,7 @@ package net.adoptopenjdk.icedteaweb.testing;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 class TestsLogs {
 
@@ -48,11 +49,8 @@ class TestsLogs {
     private static final String LOG_ELEMENT = "log";
     private static final String LOG_ID_ATTRIBUTE = "id";
 
-    synchronized void add(boolean err, boolean out, String text) {
-        if (text == null) {
-            text = "null";
-        }
-        LogItem li = new LogItem(text);
+    synchronized void add(final boolean err, final boolean out, final String text) {
+        LogItem li = new LogItem(Optional.ofNullable(text).orElse("null"));
         if (out) {
             outs.add(li);
         }
@@ -65,17 +63,17 @@ class TestsLogs {
 
     @Override
     public String toString() {
-        StringBuilder sb = listToStringBuilder(outs, "out");
+        final StringBuilder sb = listToStringBuilder(outs, "out");
         sb.append(listToStringBuilder(errs, "err"));
         sb.append(listToStringBuilder(all, "all"));
         return sb.toString();
     }
 
-    private StringBuilder listToStringBuilder(List<LogItem> l, String id) {
-        StringBuilder sb = new StringBuilder();
+    private StringBuilder listToStringBuilder(final List<LogItem> l, final String id) {
+        final StringBuilder sb = new StringBuilder();
         sb.append("<" + LOG_ELEMENT + " " + LOG_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
         int i = 0;
-        for (LogItem logItem : l) {
+        for (final LogItem logItem : l) {
             i++;
             sb.append(logItem.toStringBuilder(i));
         }

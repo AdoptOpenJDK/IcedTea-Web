@@ -112,12 +112,9 @@ public class BrowserFactory {
     }
 
     public Browser getFirst() {
-        for (final Browser configuredBrowser : configuredBrowsers) {
-            return configuredBrowser;
-
-        }
-        return null;
-
+        return configuredBrowsers.stream()
+                .findFirst()
+                .orElse(null);
     }
 
     private Browser getRandom() {
@@ -131,10 +128,11 @@ public class BrowserFactory {
         return Collections.unmodifiableList(configuredBrowsers);
     }
 
-    public List<Browsers> getBrowsers(TestInBrowsers tib) {
+    public List<Browsers> getBrowsers(final TestInBrowsers tib) {
         return getBrowsers(tib.testIn());
     }
-     public List<Browsers> getBrowsers(Browsers[] testIn) {
+
+    public List<Browsers> getBrowsers(final Browsers[] testIn) {
          final List<Browser> q = translateAnnotationSilently(testIn);
          if (q==null || q.isEmpty()){
              final List<Browsers> qq = new ArrayList<>(0);

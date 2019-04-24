@@ -106,17 +106,17 @@ public class LoggingBottleneck {
        writeXmlLog(Collections.unmodifiableMap(processLogs));
    }
 
-    private synchronized static void writeXmlLog(Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
-        Writer w = new OutputStreamWriter(new FileOutputStream(DEFAULT_LOG_FILE));
-        Set<Entry<String, Map<String, TestsLogs>>> classes = processLogs.entrySet();
+    private synchronized static void writeXmlLog(final Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
+        final Writer w = new OutputStreamWriter(new FileOutputStream(DEFAULT_LOG_FILE));
+        final Set<Entry<String, Map<String, TestsLogs>>> classes = processLogs.entrySet();
         w.write("<" + LOGS_ELEMENT + ">");
-        for (Entry<String, Map<String, TestsLogs>> classLog : classes) {
-            String className = classLog.getKey();
+        for (final Entry<String, Map<String, TestsLogs>> classLog : classes) {
+            final String className = classLog.getKey();
             w.write("<" + CLASSLOG_ELEMENT + " " + CLASSNAME_ATTRIBUTE + "=\"" + className + "\">");
-            Set<Entry<String, TestsLogs>> testsLogs = classLog.getValue().entrySet();
-            for (Entry<String, TestsLogs> testLog : testsLogs) {
-                String testName = testLog.getKey();
-                String testLogs = testLog.getValue().toString();
+            final Set<Entry<String, TestsLogs>> testsLogs = classLog.getValue().entrySet();
+            for (final Entry<String, TestsLogs> testLog : testsLogs) {
+                final String testName = testLog.getKey();
+                final String testLogs = testLog.getValue().toString();
                 w.write("<" + TESTLOG_ELEMENT + " " + TESTMETHOD_ATTRIBUTE + "=\"" + testName + "\" " + FULLID_ATTRIBUTE + "=\"" + className + "." + testName + "\"  >");
                 w.write(clearChars(testLogs));
                 w.write("</" + TESTLOG_ELEMENT + ">");
@@ -128,7 +128,7 @@ public class LoggingBottleneck {
         w.close();
     }
 
-    synchronized  void addToXmlLog(String message, boolean printToOut, boolean printToErr, StackTraceElement ste) {
+    synchronized  void addToXmlLog(final String message, final boolean printToOut, final boolean printToErr, final StackTraceElement ste) {
         Map<String, TestsLogs> classLog = processLogs.get(ste.getClassName());
         if (classLog == null) {
             classLog = new HashMap<>(50);
@@ -145,7 +145,7 @@ public class LoggingBottleneck {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     LoggingBottleneck.getDefaultLoggingBottleneck().writeXmlLog();
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ex.printStackTrace();
                 }
             }));
@@ -154,34 +154,34 @@ public class LoggingBottleneck {
         methodLog.add(printToErr, printToOut, message);
     }
 
-   synchronized public String modifyMethodWithForBrowser(String methodBrowseredName, String className) {
+   synchronized public String modifyMethodWithForBrowser(final String methodBrowseredName, final String className) {
         try {
-            Class<?> clazz = Class.forName(className);
+            final Class<?> clazz = Class.forName(className);
             /*
              * By using this isAssignable to ensure corect class before invocation,
              * then we lost possibility to track manualy set browsers, but it is correct,
              * as method description is set only when annotation is used
              */
             if (clazz != null && BrowserTest.class.isAssignableFrom(clazz)) {
-                Method testMethod = clazz.getMethod(methodBrowseredName);
+                final Method testMethod = clazz.getMethod(methodBrowseredName);
                 if (testMethod != null) {
-                    TestInBrowsers tib = testMethod.getAnnotation(TestInBrowsers.class);
+                    final TestInBrowsers tib = testMethod.getAnnotation(TestInBrowsers.class);
                     if (tib != null) {
-                        methodBrowseredName = methodBrowseredName + " - " + loggedBrowser;
+                        return methodBrowseredName + " - " + loggedBrowser;
                     }
                 }
             }
-        } catch (Throwable ex) {
+        } catch (final Throwable ex) {
             ex.printStackTrace();
         }
         return methodBrowseredName;
     }
 
-   synchronized public void setLoggedBrowser(String loggedBrowser) {
+   synchronized public void setLoggedBrowser(final String loggedBrowser) {
         this.loggedBrowser = loggedBrowser;
     }
 
-  synchronized  public void logIntoPlaintextLog(String message, boolean printToOut, boolean printToErr) {
+  synchronized  public void logIntoPlaintextLog(final String message, final boolean printToOut, final boolean printToErr) {
         try {
             if (printToOut) {
                 LoggingBottleneck.getDefaultLoggingBottleneck().stdout(message);
@@ -190,40 +190,40 @@ public class LoggingBottleneck {
                 LoggingBottleneck.getDefaultLoggingBottleneck().stderr(message);
             }
             LoggingBottleneck.getDefaultLoggingBottleneck().stdeall(message);
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             t.printStackTrace();
         }
     }
 
-    private void stdout(String idded) throws IOException {
+    private void stdout(final String idded) throws IOException {
         DEFAULT_STDOUT_WRITER.write(idded);
         DEFAULT_STDOUT_WRITER.newLine();
         DEFAULT_STDOUT_WRITER.flush();
     }
 
-    private void stderr(String idded) throws IOException {
+    private void stderr(final String idded) throws IOException {
         DEFAULT_STDERR_WRITER.write(idded);
         DEFAULT_STDERR_WRITER.newLine();
         DEFAULT_STDERR_WRITER.flush();
     }
 
-    private void stdeall(String idded) throws IOException {
+    private void stdeall(final String idded) throws IOException {
         DEFAULT_STDLOGS_WRITER.write(idded);
         DEFAULT_STDLOGS_WRITER.newLine();
         DEFAULT_STDLOGS_WRITER.flush();
     }
     
-   private synchronized static String clearChars(String ss) {
-        StringBuilder s = new StringBuilder(ss);
+   private synchronized static String clearChars(final String ss) {
+       final StringBuilder s = new StringBuilder(ss);
         for (int i = 0; i < s.length(); i++) {
-            char q = s.charAt(i);
+            final char q = s.charAt(i);
             if (q == '\n') {
                 continue;
             }
             if (q == '\t') {
                 continue;
             }
-            int iq = (int) q;
+            final int iq = (int) q;
             if ((iq <= 31 || iq > 65533)||(iq >= 64976 && iq <= 65007)) {
                 s.setCharAt(i, 'I');
                 s.insert(i + 1, "NVALID_CHAR_" + iq);

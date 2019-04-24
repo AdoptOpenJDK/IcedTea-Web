@@ -47,7 +47,7 @@ public abstract class BrowserTest {
     private static Browsers browser=null;
     public static final ServerAccess server = new ServerAccess();
 
-    public static void setBrowser(Browsers b) {
+    public static void setBrowser(final Browsers b) {
         browser = b;
         server.setCurrentBrowser(browser);
     }

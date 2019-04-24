@@ -75,11 +75,11 @@ public class TinyHttpdImpl extends Thread {
     private boolean supportingHeadRequest = true;
     private boolean supportLastModified = false;
 
-    public TinyHttpdImpl(Socket socket, File dir) {
+    public TinyHttpdImpl(final Socket socket, final File dir) {
         this(socket, dir, true);
     }
 
-    public TinyHttpdImpl(Socket socket, File dir, boolean start) {
+    public TinyHttpdImpl(final Socket socket, final File dir, final boolean start) {
         this.socket = socket;
         this.testDir = dir;
         if (start) {
@@ -87,7 +87,7 @@ public class TinyHttpdImpl extends Thread {
         }
     }
 
-    public void setSupportingHeadRequest(boolean supportsHead) {
+    public void setSupportingHeadRequest(final boolean supportsHead) {
         this.supportingHeadRequest = supportsHead;
     }
 
@@ -95,28 +95,28 @@ public class TinyHttpdImpl extends Thread {
         return this.supportingHeadRequest;
     }
 
-    public void setSupportLastModified(boolean supportLastModified) {
+    public void setSupportLastModified(final boolean supportLastModified) {
         this.supportLastModified = supportLastModified;
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-            DataOutputStream writer = new DataOutputStream(this.socket.getOutputStream());
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            final DataOutputStream writer = new DataOutputStream(this.socket.getOutputStream());
             try {
                 while (true) {
-                    String line = reader.readLine();
+                    final String line = reader.readLine();
                     if (line.length() < 1) {
                         break;
                     }
 
-                    StringTokenizer t = new StringTokenizer(line, " ");
-                    String request = t.nextToken();
+                    final StringTokenizer t = new StringTokenizer(line, " ");
+                    final String request = t.nextToken();
                     String filePath = t.nextToken();
 
-                    boolean isHeadRequest = Objects.equals(request, HttpMethod.HEAD.name());
-                    boolean isGetRequest = Objects.equals(request, HttpMethod.GET.name());
+                    final boolean isHeadRequest = Objects.equals(request, HttpMethod.HEAD.name());
+                    final boolean isGetRequest = Objects.equals(request, HttpMethod.GET.name());
 
                     if (isHeadRequest && !isSupportingHeadRequest()) {
                         ServerAccess.logOutputReprint("Received HEAD request but not supported");
@@ -128,7 +128,7 @@ public class TinyHttpdImpl extends Thread {
                         ServerAccess.logOutputReprint("Received unknown request type " + request);
                         continue;
                     }
-                    boolean slowSend = filePath.startsWith(XSX);
+                    final boolean slowSend = filePath.startsWith(XSX);
 
                     if (requestsCounter != null) {
                         String resource = filePath.replace(XSX, "/");
@@ -154,7 +154,7 @@ public class TinyHttpdImpl extends Thread {
                     ServerAccess.logOutputReprint("Getting- " + request + ": " + filePath);
                     filePath = urlToFilePath(filePath);
 
-                    File resource = new File(this.testDir, filePath);
+                    final File resource = new File(this.testDir, filePath);
 
                     if (!(resource.isFile() && resource.canRead())) {
                         ServerAccess.logOutputReprint("Could not open file " + filePath);
@@ -163,9 +163,9 @@ public class TinyHttpdImpl extends Thread {
                     }
                     ServerAccess.logOutputReprint("Serving- " + request + ": " + filePath);
 
-                    int resourceLength = (int) resource.length();
-                    byte[] buff = new byte[resourceLength];
-                    FileInputStream fis = new FileInputStream(resource);
+                    final int resourceLength = (int) resource.length();
+                    final byte[] buff = new byte[resourceLength];
+                    final FileInputStream fis = new FileInputStream(resource);
                     fis.read(buff);
                     fis.close();
 
@@ -185,7 +185,7 @@ public class TinyHttpdImpl extends Thread {
 
                     if (isGetRequest) {
                         if (slowSend) {
-                            byte[][] bb = splitArray(buff, 10);
+                            final byte[][] bb = splitArray(buff, 10);
                             for (final byte[] aBb : bb) {
                                 Thread.sleep(2000);
                                 writer.write(aBb, 0, aBb.length);
@@ -196,16 +196,16 @@ public class TinyHttpdImpl extends Thread {
                     }
                 }
 
-            } catch (SocketException e) {
+            } catch (final SocketException e) {
                 ServerAccess.logException(e, false);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 writer.writeBytes(HTTP_NOT_FOUND);
                 ServerAccess.logException(e, false);
             } finally {
                 reader.close();
                 writer.close();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             ServerAccess.logException(e, false);
         }
     }
@@ -220,7 +220,7 @@ public class TinyHttpdImpl extends Thread {
      * @return inidividual pices of original array, which concatet again givs
      * original array
      */
-    public static byte[][] splitArray(byte[] input, int pieces) {
+    public static byte[][] splitArray(final byte[] input, int pieces) {
         int rest = input.length;
         int rowLength = rest / pieces;
         if (rest % pieces > 0) {
@@ -230,7 +230,7 @@ public class TinyHttpdImpl extends Thread {
             pieces--;
         }
         int i = 0, j = 0;
-        byte[][] array = new byte[pieces][];
+        final byte[][] array = new byte[pieces][];
         array[0] = new byte[rowLength];
         for (byte b : input) {
             if (i >= rowLength) {
@@ -280,9 +280,9 @@ public class TinyHttpdImpl extends Thread {
 
         // If JNLP specifies JAR URL with .JAR extension (as it should), then look for any semicolons
         // after this position. If one is found, remove it and any following characters.
-        int fileExtension = url.toUpperCase().lastIndexOf(".JAR");
+        final int fileExtension = url.toUpperCase().lastIndexOf(".JAR");
         if (fileExtension != -1) {
-            int firstSemiColon = url.indexOf(';', fileExtension);
+            final int firstSemiColon = url.indexOf(';', fileExtension);
             if (firstSemiColon != -1) {
                 url = url.substring(0, firstSemiColon);
             }
@@ -295,7 +295,7 @@ public class TinyHttpdImpl extends Thread {
     // eg   simpletest1.jnlp -> GET -> 3
     private Map<String, Map<String, Integer>> requestsCounter;
 
-    public void setRequestsCounter(Map<String, Map<String, Integer>> requestsCounter) {
+    public void setRequestsCounter(final Map<String, Map<String, Integer>> requestsCounter) {
         this.requestsCounter = requestsCounter;
     }
 

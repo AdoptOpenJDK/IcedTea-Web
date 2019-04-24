@@ -50,12 +50,12 @@ class LogItem {
     private static final String TEXT_ELEMENT = "text";
     private static final String FULLTRACE_ELEMENT = "fulltrace";
 
-    public LogItem(String text) {
+    public LogItem(final String text) {
         this.text = text;
     }
 
-    public StringBuilder toStringBuilder(int id) {
-        StringBuilder sb = new StringBuilder();
+    public StringBuilder toStringBuilder(final int id) {
+        final StringBuilder sb = new StringBuilder();
         sb.append("  <" + ITEM_ELEMENT + " " + ITEM_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
         sb.append("    <" + STAMP_ELEMENT + "><![CDATA[").append(timeStamp.toString()).append("]]></" + STAMP_ELEMENT + ">\n");
         sb.append("    <" + TEXT_ELEMENT + "><![CDATA[\n").append(text).append("\n]]></" + TEXT_ELEMENT + ">\n");

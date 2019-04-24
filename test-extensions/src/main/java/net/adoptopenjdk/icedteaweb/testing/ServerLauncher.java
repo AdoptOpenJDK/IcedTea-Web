@@ -59,7 +59,7 @@ public class ServerLauncher implements Runnable {
     private boolean supportingHeadRequest = true;
     private final ServerNaming serverNaming = ServerNaming.LOCALHOST;
 
-    public void setSupportingHeadRequest(boolean supportsHead) {
+    public void setSupportingHeadRequest(final boolean supportsHead) {
         this.supportingHeadRequest = supportsHead;
     }
 
@@ -87,7 +87,7 @@ public class ServerLauncher implements Runnable {
         return ServerAccess.DEFAULT_LOCALHOST_NAME;
     }
 
-    public ServerLauncher(Integer port, File dir) {
+    public ServerLauncher(final Integer port, final File dir) {
         this.port = port;
         this.dir = dir;
         System.err.println("port: " + port);
@@ -102,41 +102,36 @@ public class ServerLauncher implements Runnable {
         return dir;
     }
 
-    /**
-     * one of: 301, 302,303, 307, 308,
-     */
-    private final int redirectCode = 302;
-
     @Override
     public void run() {
         running = true;
         try {
             serverSocket = new ServerSocket(port);
             while (running) {
-                TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
+                final TinyHttpdImpl server = new TinyHttpdImpl(serverSocket.accept(), dir, false);
                 server.setRequestsCounter(null);
                 server.setSupportingHeadRequest(isSupportingHeadRequest());
 
                 server.start();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             ServerAccess.logException(e);
         } finally {
             running = false;
         }
     }
 
-    private String sanitizeResource(String resource) {
+    private String sanitizeResource(final String resource) {
         if (resource == null) {
-            resource = "";
+            return  "";
         }
         if (resource.trim().length() > 0 && !resource.startsWith("/")) {
-            resource = "/" + resource;
+            return  "/" + resource;
         }
         return resource;
     }
 
-    public URL getUrl(String resource) throws MalformedURLException {
+    public URL getUrl(final String resource) throws MalformedURLException {
         final String protocol = ServerAccess.DEFAULT_LOCALHOST_PROTOCOL;
         return new URL(protocol, getServerName(), getPort(), sanitizeResource(resource));
     }
@@ -150,7 +145,7 @@ public class ServerLauncher implements Runnable {
         if (serverSocket != null) {
             try {
                 serverSocket.close();
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 ServerAccess.logException(ex);
             }
         }
@@ -161,7 +156,7 @@ public class ServerLauncher implements Runnable {
     public String toString() {
         try {
             return getUrl() + " - " + super.toString();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ServerAccess.logException(ex);
         }
         return super.toString();
