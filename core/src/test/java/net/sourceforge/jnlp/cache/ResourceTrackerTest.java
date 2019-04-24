@@ -63,6 +63,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
@@ -221,7 +222,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
-        ServerAccess.logErrorReprint(currentErrorStream.toString("utf-8"));
+        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8));
         System.setOut(backedUpStream[0]);
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);

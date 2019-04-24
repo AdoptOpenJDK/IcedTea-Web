@@ -1,5 +1,21 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,22 +31,8 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.sourceforge.jnlp.DownloadOptions;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -82,7 +84,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
-        ServerAccess.logErrorReprint(currentErrorStream.toString("utf-8"));
+        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8));
         System.setOut(backedUpStream[0]);
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);

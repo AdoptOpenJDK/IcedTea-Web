@@ -37,10 +37,6 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +47,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -63,7 +64,6 @@ public class XMLParser {
     private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
     private static final String ENCODING_UNICODE_LITTLE = "UnicodeLittle";
-    private static final String ENCODING_UTF_8 = "UTF-8";
     private static final String ENCODING_UTF_16 = "UTF-16";
     private static final String ENCODING_UTF_16_BE = "UTF-16BE";
     private static final String ENCODING_UTF_16_LE = "UTF-16LE";
@@ -176,7 +176,7 @@ public class XMLParser {
             return ENCODING_UTF_16_LE;
         }
 
-        return ENCODING_UTF_8;
+        return UTF_8;
     }
 
     /**

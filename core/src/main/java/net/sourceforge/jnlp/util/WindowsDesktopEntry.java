@@ -15,14 +15,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
-import java.util.List;
 import mslinks.ShellLink;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -31,7 +23,17 @@ import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.Iterator;
+import java.util.List;
+
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 
 /**
  * Based on https://github.com/DmitriiShamrikov/mslinks
@@ -117,7 +119,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         }
 
         if (ManageMode.A == mode) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName("UTF-8"));
+            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName(UTF_8));
             Iterator it = lines.iterator();
             String sItem = "";
             String sPath;

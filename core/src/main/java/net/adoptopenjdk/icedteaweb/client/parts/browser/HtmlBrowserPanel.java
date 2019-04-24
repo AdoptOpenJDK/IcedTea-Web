@@ -68,6 +68,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+
 /**
  * this class intentionally NOT cache any content, but always load data. Its
  * original use case was to to implement http proxy logging. And there reloads
@@ -241,7 +243,7 @@ public class HtmlBrowserPanel extends JPanel {
     private final JComboBox<Charset> encodingBox = new JComboBox<>(new Charset[]{
         null,
         Charset.forName("US-ASCII"),
-        Charset.forName("UTF-8"),
+        Charset.forName(UTF_8),
         Charset.forName("ISO-8859-1"),
         Charset.forName("UTF-16"),
         Charset.forName("UTF-16BE"),

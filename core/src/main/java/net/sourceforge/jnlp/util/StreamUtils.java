@@ -49,12 +49,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Objects;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+
 public class StreamUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
 
     public static final int DEFAULT_BYTE_SIZE = 1024;
-    public static final String UTF_8 = "UTF-8";
 
     /**
      * Closes a stream, without throwing IOException.

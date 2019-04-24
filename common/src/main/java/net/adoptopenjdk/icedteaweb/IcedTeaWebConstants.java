@@ -12,4 +12,6 @@ public interface IcedTeaWebConstants {
     String SYSTEM_PROPERTY_JAVA_VERSION = "java.version";
 
     String DOUBLE_QUOTE = "\"";
+
+    String UTF_8 = "UTF-8";
 }

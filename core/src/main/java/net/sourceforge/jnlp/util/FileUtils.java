@@ -16,6 +16,13 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.sourceforge.jnlp.config.DirectoryValidator;
+import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,13 +52,8 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -522,7 +524,7 @@ public final class FileUtils {
      * @throws IOException if save fails
      */
     public static void saveFile(String content, File f) throws IOException {
-        saveFile(content, f, "utf-8");
+        saveFile(content, f, UTF_8);
     }
 
     /**
@@ -582,7 +584,7 @@ public final class FileUtils {
      * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(InputStream is) throws IOException {
-        return getContentOfStream(is, "UTF-8");
+        return getContentOfStream(is, UTF_8);
 
     }
 

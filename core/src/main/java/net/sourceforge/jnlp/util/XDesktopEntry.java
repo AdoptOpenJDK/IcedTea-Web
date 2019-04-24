@@ -16,6 +16,23 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.BufferedReader;
@@ -42,22 +59,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.imageio.ImageIO;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -349,7 +352,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             File f = getLinuxMenuIconFile();
             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f),
-                    Charset.forName("UTF-8")); Reader reader = getContentsAsReader(true, info, isSigned)) {
+                    Charset.forName(UTF_8)); Reader reader = getContentsAsReader(true, info, isSigned)) {
 
                 char[] buffer = new char[1024];
                 int ret = 0;
@@ -382,7 +385,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             try ( /*
              * Write out a Java String (UTF-16) as a UTF-8 file
              */ OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile),
-                     Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false, info, isSigned)) {
+                     Charset.forName(UTF_8)); Reader reader = getContentsAsReader(false, info, isSigned)) {
                 
                 char[] buffer = new char[1024];
                 int ret = 0;

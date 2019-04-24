@@ -67,6 +67,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+
 public abstract class TextsProvider {
 
     private static File authorFileFromUserInput = null;
@@ -426,7 +428,7 @@ public abstract class TextsProvider {
     }
 
     private static void generateItwIntro(File f, boolean expand) throws IOException {
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider("utf-8", new HtmlFormatter(false, true, false), false, expand);
+        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(UTF_8, new HtmlFormatter(false, true, false), false, expand);
         //!!AUTHORS FILE IS NOT NEEDED IN THIS METHOD, AUTHORS ARE GENERATED SEPARATELY INTO ANOTHER TAB
         itw.setSeeAlso(false);
         itw.writeToFile(f);
@@ -434,7 +436,7 @@ public abstract class TextsProvider {
 
     private static void generateAll(File f, boolean expand) throws IOException {
         generateOnlineHtmlHelp(f, expand);
-        generateManText("UTF-8", f, expand);
+        generateManText(UTF_8, f, expand);
         generatePlainTextDocs(f, 160, expand);
 
     }
@@ -467,11 +469,11 @@ public abstract class TextsProvider {
                 os.flush();
             }
         }
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider("UTF-8", new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        JavaWsTextsProvider javaws = new JavaWsTextsProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
+        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
         for (TextsProvider provider : providers) {
             provider.setAuthorFilePath(authorFileFromUserInput);
@@ -499,7 +501,7 @@ public abstract class TextsProvider {
     }
 
     private static void generatePlainTextDocs(File dir, int lineWidth, boolean expand) throws IOException {
-        generatePlainTextDocs("UTF-8", dir, lineWidth, expand);
+        generatePlainTextDocs(UTF_8, dir, lineWidth, expand);
     }
 
     private static void generatePlainTextDocs(String encoding, File dir, int lineWidth, boolean expand) throws IOException {
