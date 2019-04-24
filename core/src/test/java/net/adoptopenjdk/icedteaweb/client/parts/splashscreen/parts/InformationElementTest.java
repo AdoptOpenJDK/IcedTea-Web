@@ -51,7 +51,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  *

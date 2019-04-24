@@ -42,7 +42,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 public class PrintStreamLoggerTest {
 

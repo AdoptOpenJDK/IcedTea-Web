@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static org.junit.Assert.assertTrue;
 
 public class TeeOutputStreamTest {

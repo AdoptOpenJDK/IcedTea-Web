@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  * Process-locked string storage backed by a file.

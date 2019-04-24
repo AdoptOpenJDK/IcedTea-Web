@@ -13,5 +13,4 @@ public interface IcedTeaWebConstants {
 
     String DOUBLE_QUOTE = "\"";
 
-    String UTF_8 = "UTF-8";
 }

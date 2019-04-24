@@ -63,7 +63,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;

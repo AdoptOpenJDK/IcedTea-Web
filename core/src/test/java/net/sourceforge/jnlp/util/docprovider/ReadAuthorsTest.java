@@ -45,7 +45,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static org.junit.Assert.assertEquals;
 
 public class ReadAuthorsTest {

@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}

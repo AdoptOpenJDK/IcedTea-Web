@@ -54,7 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very

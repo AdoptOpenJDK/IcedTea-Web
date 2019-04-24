@@ -49,7 +49,7 @@ import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.util.Random;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 public class OutputControllerTest {
 

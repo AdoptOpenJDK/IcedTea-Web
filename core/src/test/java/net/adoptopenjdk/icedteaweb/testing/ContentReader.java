@@ -42,7 +42,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  * Class to read content of stdout/stderr of process, and to cooperate with its

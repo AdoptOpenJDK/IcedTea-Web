@@ -32,7 +32,7 @@ import java.util.jar.Manifest;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
