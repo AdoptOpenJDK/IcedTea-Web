@@ -5,18 +5,17 @@ use std::fmt::Write;
 use std::str::FromStr;
 
 /*legacy variables*/
-const PROGRAM_NAME: Option<&'static str> = option_env!("PROGRAM_NAME");
-const LAUNCHER_BOOTCLASSPATH: Option<&'static str> = option_env!("LAUNCHER_BOOTCLASSPATH");
 const SPLASH_PNG: Option<&'static str> = option_env!("SPLASH_PNG");
-const JAVA: Option<&'static str> = option_env!("JAVA");
 const JRE: Option<&'static str> = option_env!("JRE");
 const MAIN_CLASS: Option<&'static str> = option_env!("MAIN_CLASS");
-const BIN_LOCATION: Option<&'static str> = option_env!("BIN_LOCATION");
-const NETX_JAR: Option<&'static str> = option_env!("NETX_JAR");
-const PLUGIN_JAR: Option<&'static str> = option_env!("PLUGIN_JAR");
-const JSOBJECT_JAR: Option<&'static str> = option_env!("JSOBJECT_JAR");
+const CORE_JAR: Option<&'static str> = option_env!("CORE_JAR");
+const COMMON_JAR: Option<&'static str> = option_env!("COMMON_JAR");
+const JNLPAPI_JAR: Option<&'static str> = option_env!("JNLPAPI_JAR");
+const XMLPARSER_JAR: Option<&'static str> = option_env!("XMLPARSER_JAR");
 const TAGSOUP_JAR: Option<&'static str> = option_env!("TAGSOUP_JAR");
 const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
+const SLFAPI_JAR: Option<&'static str> = option_env!("SLFAPI_JAR");
+const SLFSIMPLE_JAR: Option<&'static str> = option_env!("SLFSIMPLE_JAR");
 const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
 const MODULARJDK_ARGS_LOCATION: Option<&'static str> = option_env!("MODULARJDK_ARGS_LOCATION");
 const MSLINKS_JAR: Option<&'static str> = option_env!("MSLINKS_JAR");
@@ -26,42 +25,36 @@ pub fn get_jre() -> &'static str {
     JRE.unwrap_or("JRE-dev-unspecified")
 }
 
-pub fn get_java() -> &'static str {
-    JAVA.unwrap_or("JAVA-dev-unspecified")
-}
-
 pub fn get_main() -> &'static str {
     MAIN_CLASS.unwrap_or("MAIN_CLASS-dev-unspecified")
-}
-
-pub fn get_name() -> &'static str {
-    PROGRAM_NAME.unwrap_or("PROGRAM_NAME-dev-unspecified")
-}
-
-pub fn get_bin() -> &'static str {
-    BIN_LOCATION.unwrap_or("BIN_LOCATION-dev-unspecified")
 }
 
 pub fn get_splash() -> &'static str {
     SPLASH_PNG.unwrap_or("SPLASH_PNG-dev-unspecified")
 }
 
-pub fn get_netx() -> &'static str { NETX_JAR.unwrap_or("NETX_JAR-dev-unspecified") }
+pub fn get_core() -> &'static str { CORE_JAR.unwrap_or("CORE_JAR-dev-unspecified") }
+
+pub fn get_common() -> &'static str { COMMON_JAR.unwrap_or("COMMON_JAR-dev-unspecified") }
+
+pub fn get_jnlpapi() -> &'static str { JNLPAPI_JAR.unwrap_or("JNLPAPI_JAR-dev-unspecified") }
+
+pub fn get_xmlparser() -> &'static str { XMLPARSER_JAR.unwrap_or("XMLPARSER_JAR-dev-unspecified") }
 
 fn get_itwlibsearch() -> &'static str {
     ITW_LIBS.unwrap_or("ITW_LIBS-dev-unspecified")
 }
 
-pub fn get_bootcp() -> &'static str {LAUNCHER_BOOTCLASSPATH.unwrap_or("LAUNCHER_BOOTCLASSPATH-dev-unspecified") }
 
-// optional deps
-pub fn get_plugin() -> Option<&'static str> { sanitize(PLUGIN_JAR) }
+pub fn get_slfapi() -> &'static str { SLFAPI_JAR.unwrap_or("SLFAPI_JAR-dev-unspecified") }
 
-pub fn get_jsobject() -> Option<&'static str> { sanitize(JSOBJECT_JAR) }
+pub fn get_slfsimple() ->  &'static str { SLFSIMPLE_JAR.unwrap_or("SLFSIMPLE_JAR-dev-unspecified") }
+
 
 pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 
 pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
+
 
 pub fn get_mslinks() -> Option<&'static str> { sanitize(MSLINKS_JAR) }
 
@@ -90,7 +83,7 @@ fn sanitize(candidate: Option<&'static str>)  -> Option<&'static str> {
 pub enum ItwLibSearch {
     BUNDLED,
     DISTRIBUTION,
-    BOTH,
+    EMBEDDED //like BUNDLED, but with affect on jre path
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -101,8 +94,8 @@ impl FromStr for ItwLibSearch {
     type Err = ParseItwLibSearch;
 
     fn from_str(sstr: &str) -> Result<ItwLibSearch, ParseItwLibSearch> {
-        if sstr == "BOTH" {
-            return Ok(ItwLibSearch::BOTH);
+        if sstr == "EMBEDDED" {
+            return Ok(ItwLibSearch::EMBEDDED);
         }
         if sstr == "BUNDLED" {
             return Ok(ItwLibSearch::BUNDLED);
@@ -123,7 +116,7 @@ pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
             }
             _err => {
                 let mut info = String::new();
-                write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or BOTH", result_of_override_var);
+                write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or EMBEDDED", result_of_override_var);
                 logger.important(&info);
             }
         }
@@ -152,12 +145,12 @@ mod tests {
     #[test]
     fn variables_non_default() {
         assert_ne!(String::from(super::get_jre()).trim(), String::from("JRE-dev-unspecified"));
-        assert_ne!(String::from(super::get_java()).trim(), String::from("JAVA-dev-unspecified"));
         assert_ne!(String::from(super::get_main()).trim(), String::from("MAIN_CLASS-dev-unspecified"));
-        assert_ne!(String::from(super::get_name()).trim(), String::from("PROGRAM_NAME-dev-unspecified"));
-        assert_ne!(String::from(super::get_bin()).trim(), String::from("BIN_LOCATION-dev-unspecified"));
         assert_ne!(String::from(super::get_splash()).trim(), String::from("SPLASH_PNG-dev-unspecified"));
-        assert_ne!(String::from(super::get_netx()).trim(), String::from("NETX_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_core()).trim(), String::from("CORE_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_common()).trim(), String::from("COMMON_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_xmlparser()).trim(), String::from("XMLPARSER_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from("JNLPAPI_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from("ITW_LIBS-dev-unspecified"));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from("MODULARJDK_ARGS_LOCATION-dev-unspecified"));
     }
@@ -165,25 +158,25 @@ mod tests {
     #[test]
     fn variables_non_empty() {
         assert_ne!(String::from(super::get_jre()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_java()).trim(), String::from(""));
         assert_ne!(String::from(super::get_main()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_name()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_bin()).trim(), String::from(""));
         assert_ne!(String::from(super::get_splash()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_netx()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_core()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_common()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_xmlparser()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from(""));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from(""));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from(""));
     }
 
     #[test]
     fn get_itwlibsearch_in_enumeration() {
-        assert_eq!(super::get_itwlibsearch() == "BOTH" || super::get_itwlibsearch() == "BUNDLED" || super::get_itwlibsearch() == "DISTRIBUTION", true);
+        assert_eq!(super::get_itwlibsearch() == "EMBEDDED" || super::get_itwlibsearch() == "BUNDLED" || super::get_itwlibsearch() == "DISTRIBUTION", true);
     }
 
     #[test]
     fn itw_libsearch_to_enum_test() {
         assert!(super::ItwLibSearch::from_str("BUNDLED") == Ok(super::ItwLibSearch::BUNDLED));
-        assert!(super::ItwLibSearch::from_str("BOTH") == Ok(super::ItwLibSearch::BOTH));
+        assert!(super::ItwLibSearch::from_str("EMBEDDED") == Ok(super::ItwLibSearch::EMBEDDED));
         assert!(super::ItwLibSearch::from_str("DISTRIBUTION") == Ok(super::ItwLibSearch::DISTRIBUTION));
         assert!(super::ItwLibSearch::from_str("") == Err(super::ParseItwLibSearch { _priv: () }));
     }
