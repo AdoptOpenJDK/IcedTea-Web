@@ -104,6 +104,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class UnsignedAppletsTrustingListPanel extends JPanel {
 
@@ -146,7 +147,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
      * for testing and playing
      */
     public static void main(String args[]) {
-        final String defaultDir = System.getProperty("user.home") + "/Desktop/";
+        final String defaultDir = System.getProperty(USER_HOME) + "/Desktop/";
         final String defaultFileName1 = "terrorList1";
         final String defaultFileName2 = "terrorList2";
         final String defaultFile1 = defaultDir + defaultFileName1;

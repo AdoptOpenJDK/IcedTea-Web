@@ -36,6 +36,10 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
+import org.junit.Test;
+
+import javax.sound.sampled.AudioPermission;
 import java.awt.AWTPermission;
 import java.io.FilePermission;
 import java.security.Permission;
@@ -43,25 +47,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.sound.sampled.AudioPermission;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
-import org.junit.Test;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 
 public class TemporaryPermissionsTest {
 
     @Test
     public void testGetPermission() throws Exception {
-        final Permission expected = new FilePermission(System.getProperty("java.io.tmpdir"), "read");
+        final Permission expected = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "read");
         final Permission generated = TemporaryPermissions.getPermission(PolicyEditorPermissions.READ_TMP_FILES);
         assertEquals(expected, generated);
     }
 
     @Test
     public void testGetPermissionsVarargs() throws Exception {
-        final Permission readTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "read");
-        final Permission writeTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "write");
+        final Permission readTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "read");
+        final Permission writeTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "write");
         final Set<Permission> expected = new HashSet<>(Arrays.asList(readTmpPermission, writeTmpPermission));
         final Set<Permission> generated = new HashSet<>(TemporaryPermissions.getPermissions(PolicyEditorPermissions.READ_TMP_FILES, PolicyEditorPermissions.WRITE_TMP_FILES));
         assertEquals(expected, generated);
@@ -69,8 +71,8 @@ public class TemporaryPermissionsTest {
 
     @Test
     public void testGetPermissionsVarargsArray() throws Exception {
-        final Permission readTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "read");
-        final Permission writeTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "write");
+        final Permission readTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "read");
+        final Permission writeTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "write");
         final Set<Permission> expected = new HashSet<>(Arrays.asList(readTmpPermission, writeTmpPermission));
         final PolicyEditorPermissions[] arr = new PolicyEditorPermissions[] { PolicyEditorPermissions.READ_TMP_FILES, PolicyEditorPermissions.WRITE_TMP_FILES };
         final Set<Permission> generated = new HashSet<>(TemporaryPermissions.getPermissions(arr));
@@ -79,8 +81,8 @@ public class TemporaryPermissionsTest {
 
     @Test
     public void testGetPermissionsCollection() throws Exception {
-        final Permission readTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "read");
-        final Permission writeTmpPermission = new FilePermission(System.getProperty("java.io.tmpdir"), "write");
+        final Permission readTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "read");
+        final Permission writeTmpPermission = new FilePermission(System.getProperty(JAVA_IO_TMPDIR), "write");
         final Set<Permission> expected = new HashSet<>(Arrays.asList(readTmpPermission, writeTmpPermission));
         final Collection<PolicyEditorPermissions> coll = Arrays.asList(PolicyEditorPermissions.READ_TMP_FILES, PolicyEditorPermissions.WRITE_TMP_FILES);
         final Set<Permission> generated = new HashSet<>(TemporaryPermissions.getPermissions(coll));

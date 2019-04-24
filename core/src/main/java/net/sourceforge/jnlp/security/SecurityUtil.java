@@ -40,7 +40,6 @@ package net.sourceforge.jnlp.security;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +55,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
 
 public class SecurityUtil {
 
@@ -242,7 +243,7 @@ public class SecurityUtil {
         FileInputStream fis = null;
 
         try {
-            File file = new File(System.getProperty("java.home")
+            File file = new File(System.getProperty(JAVA_HOME)
                                 + "/lib/security/cacerts");
             if (file.exists()) {
                 fis = new FileInputStream(file);

@@ -12,6 +12,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+
 /**
  *
  * @author jvanek
@@ -22,13 +24,13 @@ public class WindowsLockedFileTest {
 
     @BeforeClass
     public static void smuggleOs() {
-        os = System.getProperty("os.name");
-        System.setProperty("os.name", "Windows for itw");
+        os = System.getProperty(OS_NAME);
+        System.setProperty(OS_NAME, "Windows for itw");
     }
 
     @AfterClass
     public static void restoreOs() {
-        System.setProperty("os.name", os);
+        System.setProperty(OS_NAME, os);
     }
 
     @Test

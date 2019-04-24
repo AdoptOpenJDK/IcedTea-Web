@@ -46,11 +46,12 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 
 public class ReadAuthorsTest {
     
-    public static final String NEWLINE = System.getProperty("line.separator");
+    public static final String NEWLINE = System.getProperty(LINE_SEPARATOR);
     public static final String HTMLNEWLINE = "<BR/>";
     public static final String MANNEWLINE = ".br";
     private static final String ANTISPAM_EMAIL="t e s t @ t e s t . t e s t";

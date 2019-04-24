@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -89,7 +90,7 @@ public class CommandLine {
      */
     public CommandLine(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
-        PROGRAM_NAME = System.getProperty("icedtea-web.bin.name");
+        PROGRAM_NAME = System.getProperty(ITW_BIN_NAME);
 
         config = new DeploymentConfiguration();
         try {

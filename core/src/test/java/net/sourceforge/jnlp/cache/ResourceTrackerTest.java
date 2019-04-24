@@ -64,6 +64,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
@@ -243,7 +244,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @BeforeClass
     public static void setupDownloadServer() throws IOException {
-        File dir = new File(System.getProperty("java.io.tmpdir"), "itw-down");
+        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
         redirectErr();
@@ -251,7 +252,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
     }
 
     @AfterClass

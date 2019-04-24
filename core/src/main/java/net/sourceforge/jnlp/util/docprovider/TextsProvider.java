@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_DIR;
 
 public abstract class TextsProvider {
 
@@ -405,7 +406,7 @@ public abstract class TextsProvider {
             boolean expand = Boolean.valueOf(argsList.get(argsList.size() - 2));
             switch (argsList.get(0)) {
                 case "all":
-                    generateAll(new File(System.getProperty("user.dir")), expand);
+                    generateAll(new File(System.getProperty(USER_DIR)), expand);
                     break;
                 case "html":
                     generateOnlineHtmlHelp(new File(argsList.get(1)), expand);

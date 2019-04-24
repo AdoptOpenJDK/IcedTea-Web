@@ -46,6 +46,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
+
 /**
  * This class is able to backup and restore firefox profiles.
  *
@@ -62,7 +64,7 @@ public class FirefoxProfilesOperator {
         if (backuped) {
             return;
         }
-        sourceDir = new File(System.getProperty("user.home") + "/.mozilla/firefox/");
+        sourceDir = new File(System.getProperty(USER_HOME) + "/.mozilla/firefox/");
         final File f = File.createTempFile("backupedFirefox_", "_profiles.default");
         f.delete();
         f.mkdir();

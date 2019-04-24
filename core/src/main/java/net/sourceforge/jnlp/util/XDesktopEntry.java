@@ -61,6 +61,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -226,7 +228,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (exec != null) {
             return exec;
         }
-        String pathResult = findOnPath(new String[]{"javaws", System.getProperty("icedtea-web.bin.name")});
+        String pathResult = findOnPath(new String[]{"javaws", System.getProperty(ITW_BIN_NAME)});
         if (pathResult != null) {
             return pathResult;
         }
@@ -708,7 +710,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return System.getProperty("user.home") + "/Desktop";
+            return System.getProperty(USER_HOME) + "/Desktop";
         }
     }
 
@@ -723,9 +725,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * exists
      */
     private static String findFreedesktopOrgDesktopPath() throws IOException {
-        File userDirs = new File(System.getProperty("user.home") + "/.config/user-dirs.dirs");
+        File userDirs = new File(System.getProperty(USER_HOME) + "/.config/user-dirs.dirs");
         if (!userDirs.exists()) {
-            return System.getProperty("user.home") + "/Desktop/";
+            return System.getProperty(USER_HOME) + "/Desktop/";
         }
         return getFreedesktopOrgDesktopPathFrom(userDirs);
     }

@@ -52,9 +52,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USED_BROWSERS;
+
 public class BrowserFactory {
 
-    private static final BrowserFactory factory = new BrowserFactory(System.getProperty(ServerAccess.USED_BROWSERS));
+    private static final BrowserFactory factory = new BrowserFactory(System.getProperty(USED_BROWSERS));
     private final List<Browser> configuredBrowsers;
     private final Random oneGenerator = new Random();
 

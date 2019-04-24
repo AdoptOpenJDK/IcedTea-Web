@@ -33,6 +33,7 @@ import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -104,14 +105,14 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     @BeforeClass
     public static void startServer() throws Exception {
         redirectErr();
-        testServer = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        testServer = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
         redirectErrBack();
     }
 
     @BeforeClass
     public static void startServer2() throws Exception {
         redirectErr();
-        testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
         testServerWithBrokenHead.setSupportingHeadRequest(false);
         redirectErrBack();
     }
@@ -278,7 +279,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @BeforeClass
     public static void setupCache() throws IOException {
-        File dir = new File(System.getProperty("java.io.tmpdir"), "itw-down");
+        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
 
@@ -287,7 +288,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
     }
 
     @AfterClass
