@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_DIR;
 
 public abstract class TextsProvider {
@@ -222,7 +223,6 @@ public abstract class TextsProvider {
     public static final String ITW_ECLIPSE = ITW_HOME + "/DevelopingWithEclipse";
     private static final String ITW_REPO = "http://icedtea.classpath.org/hg/icedtea-web";
 
-    public static final String JAVAWS = "javaws";
     public static final String ITWEB_SETTINGS = "itweb-settings";
     public static final String ITW = "icedtea-web";
     public static final String ITW_PLUGIN = "icedtea-web-plugin";

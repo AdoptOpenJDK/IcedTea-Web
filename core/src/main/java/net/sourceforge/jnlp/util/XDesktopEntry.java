@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
@@ -95,8 +96,6 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 public class XDesktopEntry implements GenericDesktopEntry {
 
     private final static Logger LOG = LoggerFactory.getLogger(XDesktopEntry.class);
-
-    public static final String JAVA_ICON_NAME = "javaws";
 
     private JNLPFile file = null;
     private int iconSize = -1;
@@ -166,7 +165,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (iconLocation != null) {
             fileContents += "Icon=" + iconLocation + "\n";
         } else {
-            fileContents += "Icon=" + JAVA_ICON_NAME + "\n";
+            fileContents += "Icon=" + JAVAWS + "\n";
 
         }
         if (file.getInformation().getVendor() != null) {
@@ -228,12 +227,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (exec != null) {
             return exec;
         }
-        String pathResult = findOnPath(new String[]{"javaws", System.getProperty(ITW_BIN_NAME)});
+        String pathResult = findOnPath(new String[]{JAVAWS, System.getProperty(ITW_BIN_NAME)});
         if (pathResult != null) {
             return pathResult;
         }
         
-        return "javaws";
+        return JAVAWS;
     }
     
     

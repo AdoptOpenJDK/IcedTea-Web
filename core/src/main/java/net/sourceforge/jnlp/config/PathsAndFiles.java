@@ -47,6 +47,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.sourceforge.jnlp.config.DeploymentConfiguration.APPLET_TRUST_SETTINGS;
 import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_CONFIG_FILE;
 import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_PROPERTIES;
@@ -430,7 +431,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class MenuFileDescriptor extends DataFileDescriptor {
 
         private MenuFileDescriptor(Target... target) {
-            super("javaws", target);
+            super(JAVAWS, target);
         }
     }
 

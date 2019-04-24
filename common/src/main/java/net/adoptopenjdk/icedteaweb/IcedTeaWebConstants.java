@@ -11,4 +11,5 @@ public interface IcedTeaWebConstants {
 
     String DOUBLE_QUOTE = "\"";
 
+    String JAVAWS = "javaws";
 }

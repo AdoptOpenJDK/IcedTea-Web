@@ -51,6 +51,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
+
 /**
  * utility class to find any Interface implementing classes in netx/icedtea-web
  */
@@ -79,7 +81,7 @@ public class ClassFinder extends JDialog {
         for (String classpathEntry : classPathRoots) {
             //need to avoid base jdk jars/modules
             if (classpathEntry.toLowerCase().contains("icedtea-web")
-                    || classpathEntry.toLowerCase().contains("javaws")
+                    || classpathEntry.toLowerCase().contains(JAVAWS)
                     || classpathEntry.toLowerCase().contains("plugin")) {
                 File f = new File(classpathEntry);
                 if (!f.exists()) {
