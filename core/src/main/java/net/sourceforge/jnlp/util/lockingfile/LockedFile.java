@@ -206,6 +206,15 @@ public class LockedFile {
             super.threadLock.lock();
         }
 
+        @Override
+        public boolean tryLock() throws IOException {
+            if (super.threadLock.tryLock()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         /*Comment why it is different*/
         @Override
         public void unlock() throws IOException {
