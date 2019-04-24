@@ -38,7 +38,7 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 
-public interface RemeberActionProvider {
+public interface RememberActionProvider {
     
     public RememberPanelResult getRememberAction();
     

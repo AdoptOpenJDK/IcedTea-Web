@@ -175,7 +175,7 @@ public class TemporaryPermissionsButton extends JButton {
                 policyEditorWindow.asWindow().repaint();
             }
             policyEditorWindow.setModalityType(ModalityType.DOCUMENT_MODAL);
-            policyEditorWindow.getPolicyEditor().addNewEntry(new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptySet(), file.getNotNullProbalbeCodeBase().toString()));
+            policyEditorWindow.getPolicyEditor().addNewEntry(new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptySet(), file.getNotNullProbableCodeBase().toString()));
             policyEditorWindow.asWindow().setVisible(true);
             menu.setVisible(false);
         }

@@ -113,7 +113,7 @@ public class JarFile extends java.util.jar.JarFile implements Closeable {
             try {
                 byte[] buffer = new byte[ZIP_ENTRY_HEADER_SIGNATURE.length];
                 /*
-                 * for case that new byte[] will accidently initialize same
+                 * for case that new byte[] will accidentally initialize same
                  * sequence as zip header and during the read the buffer will not be filled
                  */
                 for (int i = 0; i < buffer.length; i++) {

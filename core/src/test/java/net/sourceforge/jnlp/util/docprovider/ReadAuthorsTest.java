@@ -1,4 +1,4 @@
-/* ReadAutorsTest.java
+/* ReadAuthorsTest.java
    Copyright (C) 2017 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -47,7 +47,7 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 
-public class ReadAutorsTest {
+public class ReadAuthorsTest {
     
     public static final String NEWLINE = System.getProperty("line.separator");
     public static final String HTMLNEWLINE = "<BR/>";
@@ -60,7 +60,7 @@ public class ReadAutorsTest {
     public static final String BRACKETSTESTREPLACEDMAN = "NAME SURNAME <test@test.test>" + NEWLINE + MANNEWLINE + NEWLINE + "<><><>" + NEWLINE + MANNEWLINE + NEWLINE;
     public static final String BRACKETSTESTREPLACEDPLAIN = TESTTEXT + NEWLINE;
     
-    public static final String FILESTREAM = "This is autor list." + NEWLINE + "This is random text." + NEWLINE
+    public static final String FILESTREAM = "This is author list." + NEWLINE + "This is random text." + NEWLINE
             + NEWLINE
             + "NAME SURNAME <test@test.test>" + NEWLINE
             + "NAME SURNAME <test@test.test>" + NEWLINE
@@ -72,7 +72,7 @@ public class ReadAutorsTest {
             + "This is list with links" + NEWLINE
             + "OpenJDK <http://openjdk.java.net/>" + NEWLINE
             + "OpenJDK <http://openjdk.java.net/>" + NEWLINE;
-    public static final String FILESTREAMHTML = "This is autor list." + HTMLNEWLINE + NEWLINE + "This is random text." + HTMLNEWLINE + NEWLINE
+    public static final String FILESTREAMHTML = "This is author list." + HTMLNEWLINE + NEWLINE + "This is random text." + HTMLNEWLINE + NEWLINE
             + HTMLNEWLINE + NEWLINE
             + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
             + "<a href=\"mailto:"+ANTISPAM_EMAIL+"\" target=\"_top\">NAME SURNAME</a>" + HTMLNEWLINE + NEWLINE
@@ -84,7 +84,7 @@ public class ReadAutorsTest {
             + "This is list with links" + HTMLNEWLINE + NEWLINE
             + "OpenJDK <a href=\"http://openjdk.java.net/\">http://openjdk.java.net/</a>" + HTMLNEWLINE + NEWLINE
             + "OpenJDK <a href=\"http://openjdk.java.net/\">http://openjdk.java.net/</a>" + HTMLNEWLINE + NEWLINE;
-    public static final String FILESTREAMPLAIN = "This is autor list." + NEWLINE + "This is random text." + NEWLINE
+    public static final String FILESTREAMPLAIN = "This is author list." + NEWLINE + "This is random text." + NEWLINE
             + "NAME SURNAME <test@test.test>"
             + "NAME SURNAME <test@test.test>"
             + "NAME SURNAME <test@test.test>"

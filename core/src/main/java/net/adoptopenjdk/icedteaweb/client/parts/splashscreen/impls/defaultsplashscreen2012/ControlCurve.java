@@ -75,14 +75,14 @@ public class ControlCurve {
     static Font f = new Font("Courier", Font.PLAIN, 12);
 
     /**
-     * to be overwriten
+     * to be overwritten
      */
-    public Polygon calcualteResult() {
+    public Polygon calculateResult() {
         return null;
     }
 
-    public void calcualteAndSaveResult() {
-        result = calcualteResult();
+    public void calculateAndSaveResult() {
+        result = calculateResult();
     }
 
     /** paint this curve into g.*/

@@ -47,7 +47,7 @@ import org.junit.Test;
 
 public class AppletTestTests extends BrowserTest {
 
-    private final String s7 = "Aplet killing himself after 2000 ms of life";
+    private final String s7 = "Applet killing himself after 2000 ms of life";
     private final String s2 = "value2";
     private final String s1 = "value1";
     private final String s0 = "applet was started";

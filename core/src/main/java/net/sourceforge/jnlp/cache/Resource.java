@@ -161,7 +161,7 @@ public class Resource {
 
     /**
      * Set the url to use for downloading the resource
-     * @param downloadLocation url to be donloaded
+     * @param downloadLocation url to be downloaded
      */
     public void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;
@@ -228,7 +228,7 @@ public class Resource {
     
     /**
      * Sets the amount transferred
-     * @param transferred set the whole transfered amount to this value
+     * @param transferred set the whole transferred amount to this value
      */
     public void setTransferred(long transferred) {
     	this.transferred = transferred;
@@ -236,7 +236,7 @@ public class Resource {
     
     /**
      * Increments the amount transferred (in bytes)
-     * @param incTrans transfered amount in last transfer
+     * @param incTrans transferred amount in last transfer
      */
     public void incrementTransferred(long incTrans) {
     	transferred += incTrans;

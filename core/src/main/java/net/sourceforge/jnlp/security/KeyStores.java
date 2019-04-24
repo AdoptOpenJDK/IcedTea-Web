@@ -284,7 +284,7 @@ public final class KeyStores {
                 break;
         }
 
-        throw new RuntimeException("Unspported");
+        throw new RuntimeException("Unsupported");
 
     }
 

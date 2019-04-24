@@ -24,7 +24,6 @@ package net.sourceforge.jnlp;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -78,7 +77,7 @@ public final class PluginBridge extends JNLPFile {
      * @param documentBase as specified in attribute
      * @param jar jar attribute value
      * @param main main method attribute value
-     * @param width width of appelt as specified in attribute
+     * @param width width of applet as specified in attribute
      * @param height height of applet as specified in attribute
      * @param params parameters as parsed from source html
      * @throws java.lang.Exception general exception as anything can happen
@@ -476,14 +475,14 @@ public final class PluginBridge extends JNLPFile {
         if (useJNLPHref && debugJnlp != null && useHref) {
             LOG.info("Using debugjnlp as return value toJnlp");
             if (fix) {
-                return fixCommonIsuses(needSecurity, debugJnlp);
+                return fixCommonIssues(needSecurity, debugJnlp);
             } else {
                 return debugJnlp;
             }
         } else {
             StringBuilder s = new StringBuilder();
             s.append("<?xml version='1.0' encoding='UTF-8'?>\n"
-                   + "<jnlp codebase='").append(getNotNullProbalbeCodeBase().toString()).append("'>\n")
+                   + "<jnlp codebase='").append(getNotNullProbableCodeBase().toString()).append("'>\n")
                     .append("  <information>\n"
                           + "    <title>").append(createJnlpTitle()).append("</title>\n"
                           + "    <vendor>").append(createJnlpVendor()).append("</vendor>\n"
@@ -517,10 +516,10 @@ public final class PluginBridge extends JNLPFile {
     }
 
     private String getStrippedMain() {
-        return strippClass(getApplet().getMainClass().trim());
+        return stripClass(getApplet().getMainClass().trim());
     }
 
-    public static String strippClass(String s) {
+    public static String stripClass(String s) {
         if (s.endsWith(".class")) {
             return s.substring(0, s.length() - ".class".length());
         } else {
@@ -547,13 +546,13 @@ public final class PluginBridge extends JNLPFile {
         return "(?i)<\\s*" + ((closing) ? "/\\s*" : "") + tagName + "\\s*>";
     }
 
-     private String fixCommonIsuses(boolean needSecurity, String orig) {
-        String codebase = getNotNullProbalbeCodeBase().toString();
-        return fixCommonIsuses(needSecurity, orig, codebase, createJnlpTitle(), createJnlpVendor());
+     private String fixCommonIssues(boolean needSecurity, String orig) {
+        String codebase = getNotNullProbableCodeBase().toString();
+        return fixCommonIssues(needSecurity, orig, codebase, createJnlpTitle(), createJnlpVendor());
     }
      
     //testing allowing method
-    static String fixCommonIsuses(boolean needSecurity, String orig, String codebase, String title, String vendor) {
+    static String fixCommonIssues(boolean needSecurity, String orig, String codebase, String title, String vendor) {
         //no information element at all
         if (!orig.matches(toMatcher(CLOSE_INFORMATION_REGEX))) {
             LOG.info("no information element Found. Trying to fix");
@@ -565,7 +564,7 @@ public final class PluginBridge extends JNLPFile {
                 }
             }
         }
-        //some have missing codebase, thats fatal
+        //some have missing codebase, that's fatal
         if (!orig.matches(toMatcher(CODEBASE_REGEX1))) {
             LOG.info("jnlphref did not had codebase. Fixing");
             orig = orig.replaceAll("(?i)<\\s*jnlp\\s+", "<jnlp codebase='" + codebase + "' ");
@@ -576,7 +575,7 @@ public final class PluginBridge extends JNLPFile {
                 orig = orig.replaceAll(CODEBASE_REGEX2, " codebase='" + codebase + "'");
             }
         }
-        //surprisingly also title or vendor may be misisng
+        //surprisingly also title or vendor may be missing
         if (!orig.matches(toMatcher(TITLE_REGEX))) {
             LOG.info("Missing title. Fixing");
             orig = orig.replaceAll(CLOSE_INFORMATION_REGEX, "\n<title>" + title + "</title>\n</information>\n");

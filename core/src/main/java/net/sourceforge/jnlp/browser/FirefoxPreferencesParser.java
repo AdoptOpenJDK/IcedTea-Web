@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <p>
  * A parser for Firefox's preferences file. It can 'parse' Firefox's
- * preferences file and expose the prefrences in a simple to use format.
+ * preferences file and expose the preferences in a simple to use format.
  * </p>
  * Sample usage:
  * <pre><code>
@@ -75,8 +75,8 @@ public final class FirefoxPreferencesParser {
     }
 
     /**
-     * Parse the prefernces file
-     * @throws IOException if an exception ocurrs while reading the
+     * Parse the preferences file
+     * @throws IOException if an exception occurs while reading the
      * preferences file.
      */
     public void parse() throws IOException {

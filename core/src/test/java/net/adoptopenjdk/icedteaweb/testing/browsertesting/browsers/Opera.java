@@ -62,7 +62,7 @@ public class Opera extends LinuxBrowser {
     private final String[] cs={"-nosession", "-nomail", "-nolirc", "-newtab"};
 
     @Override
-    public List<String> getComaptibilitySwitches() {
+    public List<String> getCompatibilitySwitches() {
         return Arrays.asList(cs);
     }
 

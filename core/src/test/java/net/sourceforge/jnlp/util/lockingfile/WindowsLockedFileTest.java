@@ -63,7 +63,7 @@ public class WindowsLockedFileTest {
 
     @Test
     public void testLockUnlockNotOkExists() throws IOException {
-        File f = new File("/some/deffinitley/not/exisitng/file.itw");
+        File f = new File("/some/definitely/not/existing/file.itw");
         LockedFile lf = LockedFile.getInstance(f);
         lf.lock();
         lf.unlock();

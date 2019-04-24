@@ -157,8 +157,8 @@ public class VersionId {
         final String[] tuple2 = other.asNormalizedTuple(this.asTuple().length);
 
         for (int i = 0; i < tuple1.length; i++) {
-            final Object tuple1Element = prepareForNormalizedComparision(tuple1[i]);
-            final Object tuple2Element = prepareForNormalizedComparision(tuple2[i]);
+            final Object tuple1Element = prepareForNormalizedComparison(tuple1[i]);
+            final Object tuple2Element = prepareForNormalizedComparison(tuple2[i]);
             if (!tuple1Element.equals(tuple2Element)) {
                 return false;
             }
@@ -246,8 +246,8 @@ public class VersionId {
         final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple1.length);
 
         for (int i = 0; i < tuple1.length; i++) {
-            final Object tuple1Element = prepareForNormalizedComparision(tuple1[i]);
-            final Object tuple2Element = prepareForNormalizedComparision(tuple2[i]);
+            final Object tuple1Element = prepareForNormalizedComparison(tuple1[i]);
+            final Object tuple2Element = prepareForNormalizedComparison(tuple2[i]);
 
             if (!tuple1Element.equals(tuple2Element)) {
                 return false; // no prefix matches als elements are different
@@ -295,8 +295,8 @@ public class VersionId {
         for (int i = 0; i < tuple1.length; i++) {
             final String tuple1Element = tuple1[i];
             final String tuple2Element = tuple2[i];
-            final Object tuple1ElementObject = prepareForNormalizedComparision(tuple1Element);
-            final Object tuple2ElementObject = prepareForNormalizedComparision(tuple2Element);
+            final Object tuple1ElementObject = prepareForNormalizedComparison(tuple1Element);
+            final Object tuple2ElementObject = prepareForNormalizedComparison(tuple2Element);
             if (!tuple1ElementObject.equals(tuple2ElementObject)) {
                 if (tuple1ElementObject instanceof Integer && tuple2ElementObject instanceof Integer) {
                     return ((Integer) tuple1ElementObject > (Integer) tuple2ElementObject);
@@ -339,9 +339,9 @@ public class VersionId {
      * See JSR-56 Specification, Appendix A
      *
      * @param tupleValue the raw tuple value
-     * @return the tuple value suited for normalized comparision
+     * @return the tuple value suited for normalized comparison
      */
-    private static Object prepareForNormalizedComparision(final String tupleValue) {
+    private static Object prepareForNormalizedComparison(final String tupleValue) {
         if (tupleValue.length() > 0 && tupleValue.charAt(0) != '-') {
             try {
                 return Integer.valueOf(tupleValue); // numeric, so return as integer

@@ -81,12 +81,12 @@ public class SharedClassLoaderApplet_dotCodeBaseTest extends BrowserTest {
 
         @Override
         public String toPassingString() {
-            return "should contain at least" + countsToBelieve + " occurences of: " + reaadOneKeyword;
+            return "should contain at least" + countsToBelieve + " occurrences of: " + reaadOneKeyword;
         }
 
         @Override
         public String toFailingString() {
-            return "should contain no more than " + countsToBelieve + " occurences of: " + reaadOneKeyword;
+            return "should contain no more than " + countsToBelieve + " occurrences of: " + reaadOneKeyword;
         }
     };
 

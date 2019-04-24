@@ -81,10 +81,10 @@ public class UrlUtilsTest {
 
     @Test
     public void testNormalizeUrl() throws Exception {
-        boolean[] encodeFileUrlPossiblities = {false, true};
+        boolean[] encodeFileUrlPossibilities = {false, true};
 
         // encodeFileUrl flag should have no effect on non-file URLs, but let's be sure.
-        for (boolean encodeFileUrl : encodeFileUrlPossiblities ) {
+        for (boolean encodeFileUrl : encodeFileUrlPossibilities ) {
             // Test URL with no previous encoding
             assertEquals("http://example.com/%20test",
                     UrlUtils.normalizeUrl(new URL("http://example.com/ test"), encodeFileUrl).toString());
@@ -322,10 +322,10 @@ public class UrlUtilsTest {
     }
 
     @Test
-    //the ports are for some unknown reason ignored from comparsion
+    //the ports are for some unknown reason ignored from comparison
     @KnownToFail
     @Ignore
-    public void notNullUrlComapreWithPorts() throws Exception {
+    public void notNullUrlCompareWithPorts() throws Exception {
         final URL u1 = new URL("http://example.com:1"), u2 = new URL("http://example.com:1"), u3 = new URL("http://example.com:3");
         Assert.assertTrue(UrlUtils.notNullUrlEquals(u1, u2));
         Assert.assertFalse(UrlUtils.notNullUrlEquals(u1, u3));

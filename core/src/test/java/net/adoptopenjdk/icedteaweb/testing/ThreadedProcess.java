@@ -65,16 +65,16 @@ public class ThreadedProcess extends Thread {
      * before removing this "useless" variable
      * check DeadLockTestTest.testDeadLockTestTerminated2
      */
-    private boolean destoyed = false;
-    private ProcessAssasin assasin;
+    private boolean destroyed = false;
+    private ProcessAssassin assassin;
     private InputStream writer;
 
-    public boolean isDestoyed() {
-        return destoyed;
+    public boolean isDestroyed() {
+        return destroyed;
     }
 
-    public void setDestoyed(boolean destoyed) {
-        this.destoyed = destoyed;
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
     }
 
     public Boolean isRunning() {
@@ -165,12 +165,12 @@ public class ThreadedProcess extends Thread {
                 }
                 StreamUtils.waitForSafely(p);
                 exitCode = p.exitValue();
-                Thread.sleep(500); //this is giving to fast done proecesses's e/o readers time to read all. I would like to know better solution :-/
-                while(assasin.isKilling() && !assasin.haveKilled()){
+                Thread.sleep(500); //this is giving to fast done processes's e/o readers time to read all. I would like to know better solution :-/
+                while(assassin.isKilling() && !assassin.haveKilled()){
                     Thread.sleep(100);
                 }
             } finally {
-                destoyed = true;
+                destroyed = true;
             }
         } catch (Exception ex) {
             if (ex instanceof InterruptedException) {
@@ -190,7 +190,7 @@ public class ThreadedProcess extends Thread {
         }
     }
 
-    void setAssasin(ProcessAssasin pa) {
-        this.assasin=pa;
+    void setAssassin(ProcessAssassin pa) {
+        this.assassin =pa;
     }
 }

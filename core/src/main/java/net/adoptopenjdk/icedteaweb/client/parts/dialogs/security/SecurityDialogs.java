@@ -90,7 +90,7 @@ public class SecurityDialogs {
         CERT_INFO,
         SINGLE_CERT_INFO,
         ACCESS_WARNING,
-        PARTIALLYSIGNED_WARNING,
+        PARTIALLY_SIGNED_WARNING,
         UNSIGNED_WARNING, /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
@@ -182,8 +182,8 @@ public class SecurityDialogs {
             SecurityDelegate securityDelegate) {
 
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
-        message.dialogType = DialogType.PARTIALLYSIGNED_WARNING;
-        message.accessType = AccessType.PARTIALLYSIGNED;
+        message.dialogType = DialogType.PARTIALLY_SIGNED_WARNING;
+        message.accessType = AccessType.PARTIALLY_SIGNED;
         message.certVerifier = certVerifier;
         message.extras = new Object[]{securityDelegate};
 
@@ -204,7 +204,7 @@ public class SecurityDialogs {
      * @throws SecurityException if the caller does not have the appropriate
      * permissions.
      */
-    public static NamePassword showAuthenicationPrompt(String host, int port, String prompt, String type) {
+    public static NamePassword showAuthenticationPrompt(String host, int port, String prompt, String type) {
 
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -227,7 +227,7 @@ public class SecurityDialogs {
 
         SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MISSING_ALACA;
-        String urlToShow = file.getNotNullProbalbeCodeBase().toExternalForm();
+        String urlToShow = file.getNotNullProbableCodeBase().toExternalForm();
         if (codeBase != null) {
             urlToShow = codeBase.toString();
         } else {
@@ -281,10 +281,10 @@ public class SecurityDialogs {
 
     /**
      * Posts the message to the SecurityThread and gets the response. Blocks
-     * until a response has been recieved. It's safe to call this from an
+     * until a response has been received. It's safe to call this from an
      * EventDispatchThread.
      *
-     * @param message the SecuritDialogMessage indicating what type of dialog to
+     * @param message the SecurityDialogMessage indicating what type of dialog to
      * display
      * @return The user's response. Can be null. The exact answer depends on the
      * type of message, but generally an Integer corresponding to the value 0
@@ -360,7 +360,7 @@ public class SecurityDialogs {
         return message.userResponse;
     }
 
-    // false = termiante ITW
+    // false = terminate ITW
     // true = continue
     public static boolean show511Dialogue(Resource r) {
         SecurityDialogMessage message = new SecurityDialogMessage(null);

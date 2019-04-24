@@ -365,7 +365,7 @@ public class SOPBypassUtil extends BrowserTest {
     /**
      * This is tricky nasty method. Issue with testing this reproducer on
      * localhost rise, when jdk built shortcut for localhost connections. So the
-     * itw's checkPermission of jnlpclasslaoder is called, but jdk happily
+     * itw's checkPermission of jnlpclassloader is called, but jdk happily
      * consume this. So for some connections the exception is thrown, and resutl
      * is in assertAchieved, some just report, and result is in assertCounts
      * Thats also why somtetimes it OR and sometimes AND between connections.
@@ -376,7 +376,7 @@ public class SOPBypassUtil extends BrowserTest {
      * @param usedServer - if null then none, if not null, then the one used for
      * this particular test (eg docbase, or codebase, or resoures base...)
      * @param b - true - should be connected, false should not be connected
-     * @param i - hoe many occurences were counted
+     * @param i - hoe many occurrences were counted
      * @param expected - expected string in app output
      * @param pr - processresult where to searh
      */
@@ -455,9 +455,9 @@ public class SOPBypassUtil extends BrowserTest {
 
     private static void assertCountsImpl(boolean b, int i) {
         if (b) {
-            Assert.assertEquals("`Denying permission: (` was not expected, but occured (on subsegment) " + i + " times", 0, i);
+            Assert.assertEquals("`Denying permission: (` was not expected, but occurred (on subsegment) " + i + " times", 0, i);
         } else {
-            Assert.assertTrue("`Denying permission: (` was expected, but  did not occured (on subsegment)", i >= 1); //test and impl depndentt
+            Assert.assertTrue("`Denying permission: (` was expected, but  did not occurred (on subsegment)", i >= 1); //test and impl depndentt
         }
     }
 
@@ -514,7 +514,7 @@ public class SOPBypassUtil extends BrowserTest {
     }
 
     @Test
-    public void testAppletParamRepalcement2() throws Exception {
+    public void testAppletParamReplacement2() throws Exception {
         AppletTemplate doc = new AppletTemplate(server, "SOPBypass.html") {
         };
         assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
@@ -527,7 +527,7 @@ public class SOPBypassUtil extends BrowserTest {
     }
 
     @Test
-    public void testAppletParamRepalcement1() throws Exception {
+    public void testAppletParamReplacement1() throws Exception {
         AppletTemplate doc = new AppletTemplate(server, "SOPBypass.jnlp") {
         };
         assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
@@ -540,7 +540,7 @@ public class SOPBypassUtil extends BrowserTest {
     }
 
     @Test
-    public void testAppletParamRepalcement3() throws Exception {
+    public void testAppletParamReplacement3() throws Exception {
         AppletTemplate doc = new AppletTemplate(server, "SOPBypass.html") {
         };
         assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
@@ -554,7 +554,7 @@ public class SOPBypassUtil extends BrowserTest {
     }
 
     @Test
-    public void testAppletParamRepalcement4() throws Exception {
+    public void testAppletParamReplacement4() throws Exception {
         AppletTemplate doc = new AppletTemplate(server, "SOPBypass.jnlp") {
         };
         assertFalse("Doc should not contain param1", doc.toString().contains("param1"));
@@ -567,7 +567,7 @@ public class SOPBypassUtil extends BrowserTest {
     }
 
     @Test
-    public void testAppletParamRepalcement5() throws Exception {
+    public void testAppletParamReplacement5() throws Exception {
         AppletTemplate doc = new AppletTemplate(server, "SOPBypass.jnlp") {
         };
         assertFalse("Doc should not contain param1", doc.toString().contains("param1"));

@@ -47,7 +47,7 @@ import java.net.URL;
 public class CacheUtilTest {
 
     @Test
-    public void testNormalizeUrlComparsions() throws Exception {
+    public void testNormalizeUrlComparisons() throws Exception {
         URL[] u = ResourceTrackerTest.getUrls();
         URL[] n = ResourceTrackerTest.getNormalizedUrls();
         for (int i = 0; i < u.length; i++) {
@@ -59,7 +59,7 @@ public class CacheUtilTest {
     @Test
     public void testUrlToPath() throws Exception {
         final URL u = new URL("https://example.com/applet/some:weird*applet?.jar");
-        //stuf behind querry is kept
+        //stuff behind query is kept
         final File expected = new File("/tmp/https/example.com/applet/some_weird_applet..jar");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
@@ -68,7 +68,7 @@ public class CacheUtilTest {
     @Bug(id = "1190")
     public void testUrlToPathWithPort() throws Exception {
         final URL u = new URL("https://example.com:5050/applet/some:weird*applet?.jar");
-        //stuf behind querry is kept
+        //stuff behind query is kept
         final File expected = new File("/tmp/https/example.com/5050/applet/some_weird_applet..jar");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
@@ -93,7 +93,7 @@ public class CacheUtilTest {
     @Test
     public void testUrlToPathWithQuery() throws Exception {
         final URL u = new URL("https://example.com/applet/applet.php?id=applet5");
-        //querry is kept and sanitized
+        //query is kept and sanitized
         final File expected = new File("/tmp/https/example.com/applet/applet.php.id_applet5");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }

@@ -53,13 +53,13 @@ public class ParserSettings {
     private final boolean extensionAllowed;
     private final boolean malformedXmlAllowed;
 
-    /** Create a new ParserSettings with the defautl parser settings */
+    /** Create a new ParserSettings with the default parser settings */
     public ParserSettings() {
         this(false, true, true);
     }
 
     /** Create a new ParserSettings object
-     * @param strict true if parser should be stric
+     * @param strict true if parser should be strict
      * @param extensionAllowed true if extensions are allowed
      * @param malformedXmlAllowed true if xml sanitizer should be used
      */
@@ -100,7 +100,7 @@ public class ParserSettings {
     }
 
     /**
-     * @param optionParser to be read as source for globaPArserSettings
+     * @param optionParser to be read as source for globalParserSettings
      * @return the ParserSettings to be used according to arguments specified
      * at boot on the command line. These settings are also stored so they
      * can be retrieved at a later time.

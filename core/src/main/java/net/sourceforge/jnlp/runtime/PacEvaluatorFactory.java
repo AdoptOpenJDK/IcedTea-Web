@@ -65,7 +65,7 @@ public class PacEvaluatorFactory {
             properties = new Properties();
             properties.load(in);
         } catch (Exception e) {
-            LOG.error("PAC provider is broken or don't exists. This is ok unless your applicatin is using JavaScript.", e);
+            LOG.error("PAC provider is broken or don't exists. This is ok unless your application is using JavaScript.", e);
         }
 
         if (properties == null) {

@@ -178,7 +178,7 @@ class XDownloadService implements DownloadService {
      * @throws IOException
      */
     public void loadResource(URL ref, String version, DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.loadExternalResouceToCache(this.getClassLoader(), ref, version);
+        ManageJnlpResources.loadExternalResourceToCache(this.getClassLoader(), ref, version);
     }
 
     /**

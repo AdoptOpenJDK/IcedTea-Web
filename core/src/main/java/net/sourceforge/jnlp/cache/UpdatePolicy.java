@@ -62,7 +62,7 @@ public class UpdatePolicy {
     /**
      * @return whether the resource should be checked for being
      * up-to-date.
-     * @param entry entry which shoul;d be cared
+     * @param entry entry which should be cared
      */
     public boolean shouldUpdate(CacheEntry entry) {
         long updated = entry.getLastUpdated();

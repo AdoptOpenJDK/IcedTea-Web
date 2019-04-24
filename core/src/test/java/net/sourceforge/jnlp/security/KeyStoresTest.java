@@ -57,7 +57,7 @@ public class KeyStoresTest {
     }
 
     @AfterClass
-    public static void removeClassLaoder() {
+    public static void removeClassLoader() {
         System.setSecurityManager(null);
     }
 

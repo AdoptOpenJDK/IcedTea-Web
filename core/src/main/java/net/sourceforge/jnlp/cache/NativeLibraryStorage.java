@@ -19,7 +19,7 @@ import java.util.jar.JarFile;
 /**
  * Handles loading and access of native code loading through a JNLP application or applet.
  * Stores native code in a temporary folder.
- * Be sure to call cleanupTemporayFolder when finished with the object.
+ * Be sure to call cleanupTemporaryFolder when finished with the object.
  */
 public class NativeLibraryStorage {
 

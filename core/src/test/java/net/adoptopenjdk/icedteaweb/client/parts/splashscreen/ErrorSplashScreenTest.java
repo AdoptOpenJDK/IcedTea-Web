@@ -100,14 +100,14 @@ public class ErrorSplashScreenTest extends JDialog {
 
     @Test
     public void splashScreenTestsExists() {
-        //to silence junit,and test is that thsi class was instantiated ;)
+        //to silence junit,and test is that this class was instantiated ;)
         Assert.assertTrue(true);
     }
 
     @Test
     @Ignore
     public void splashScreenTestsPaint0() {
-        //to silence junit,and test is that thsi class was instantiated ;)
+        //to silence junit,and test is that this class was instantiated ;)
         panel.setSplashWidth(width);
         panel.setSplashHeight(height);
         panel.adjustForSize();
@@ -120,7 +120,7 @@ public class ErrorSplashScreenTest extends JDialog {
     @Test
     @Ignore
     public void splashScreenTestsPaint50() {
-        //to silence junit,and test is that thsi class was instantiated ;)
+        //to silence junit,and test is that this class was instantiated ;)
         panel.setSplashWidth(width);
         panel.setSplashHeight(height);
         panel.adjustForSize();
@@ -133,7 +133,7 @@ public class ErrorSplashScreenTest extends JDialog {
     @Test
     @Ignore
     public void splashScreenTestsPaint100() {
-        //to silence junit,and test is that thsi class was instantiated ;)
+        //to silence junit,and test is that this class was instantiated ;)
         panel.setSplashWidth(width);
         panel.setSplashHeight(height);
         panel.adjustForSize();

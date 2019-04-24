@@ -45,7 +45,7 @@ import java.util.Map;
  * Validates a DeploymentConfiguration by identifying settings with
  * unrecognized names or incorrect values.
  */
-public class ConfiguratonValidator {
+public class ConfigurationValidator {
 
     private List<Setting<String>> incorrectEntries;
     private List<Setting<String>> unrecognizedEntries;
@@ -56,7 +56,7 @@ public class ConfiguratonValidator {
     /**
      * @param toValidate the settings to validate
      */
-    public ConfiguratonValidator(Map<String, Setting<String>> toValidate) {
+    public ConfigurationValidator(Map<String, Setting<String>> toValidate) {
         this.toValidate = toValidate;
     }
 

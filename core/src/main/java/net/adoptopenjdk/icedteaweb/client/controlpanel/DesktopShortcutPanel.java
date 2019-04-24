@@ -44,7 +44,7 @@ import java.awt.event.ItemListener;
 public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListener {
 
     private final DeploymentConfiguration config;
-    private FreeDesktopIntegrationEditorFrame integrationManagment;
+    private FreeDesktopIntegrationEditorFrame integrationManagement;
 
     /**
      * Create a new instance of the desktop shortcut settings panel.
@@ -82,10 +82,10 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
 
                     @Override
                     public void run() {
-                        if (integrationManagment == null) {
-                            integrationManagment = new FreeDesktopIntegrationEditorFrame();
+                        if (integrationManagement == null) {
+                            integrationManagement = new FreeDesktopIntegrationEditorFrame();
                         }
-                        integrationManagment.setVisible(true);
+                        integrationManagement.setVisible(true);
                     }
                 });
             }

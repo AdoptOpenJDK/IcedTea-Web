@@ -92,7 +92,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                 }
                 for (final Browsers browser : testableBrowsers) {
                     try {
-                        injcetBrowser(method, browser);
+                        injectBrowser(method, browser);
                         runChildX(method, notifier, browser, browserIgnoration);
                     } catch (Exception ex) {
                         //throw new RuntimeException("unabled to inject browser", ex);
@@ -113,14 +113,14 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
 
     private void injectBrowserCatched(final FrameworkMethod method) {
         try {
-            injcetBrowser(method, Browsers.none);
+            injectBrowser(method, Browsers.none);
         } catch (final Exception ex) {
-            //throw new RuntimeException("unabled to inject browser", ex);
+            //throw new RuntimeException("unable to inject browser", ex);
             ServerAccess.logException(ex, true);
         }
     }
 
-    private void injcetBrowser(final FrameworkMethod method, Browsers browser) throws IllegalAccessException, SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+    private void injectBrowser(final FrameworkMethod method, Browsers browser) throws IllegalAccessException, SecurityException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
         final Method ff = method.getMethod().getDeclaringClass().getMethod("setBrowser", Browsers.class);
         ff.invoke(null, browser);
     }

@@ -62,7 +62,7 @@ public class Header {
     public String thread1 = "unknown";
     public String thread2 = "unknown";
 
-    //to alow simple inheritance
+    //to allow simple inheritance
     public Header() {
     }
 
@@ -167,7 +167,7 @@ public class Header {
             for (; i < stack.length; i++) {
                 result = stack[i];//at least moving up
                 if (stack[i].getClassName().contains(OutputController.class.getName())
-                        || //PluginDebug.class.getName() not avaiable during netx make
+                        || //PluginDebug.class.getName() not available during netx make
                         stack[i].getClassName().contains("sun.applet.PluginDebug")
                         || stack[i].getClassName().contains(Header.class.getName())
                         || stack[i].getClassName().contains(TeeOutputStream.class.getName())) {

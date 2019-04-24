@@ -5,7 +5,7 @@ import java.util.Objects;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public enum CommandLineOptions {
-    //javaws undocummented swithces
+    //javaws undocumented switches
     TRUSTALL("-Xtrustall","BOTrustall"),
     //javaws control-options
     ABOUT("-about", "BOAbout"),
@@ -56,27 +56,27 @@ public enum CommandLineOptions {
 
     private final String helperString;
 
-    private final String decriptionKey;
+    private final String descriptionKey;
 
     private final NumberOfArguments numberOfArguments;
 
-    CommandLineOptions(final String option, final String helperString, final String decriptionKey, final NumberOfArguments numberOfArguments) {
-        this.decriptionKey = decriptionKey;
+    CommandLineOptions(final String option, final String helperString, final String descriptionKey, final NumberOfArguments numberOfArguments) {
+        this.descriptionKey = descriptionKey;
         this.option = option;
         this.helperString = helperString;
         this.numberOfArguments = numberOfArguments;
     }
 
-    CommandLineOptions(final String option, final String helperString, final String decriptionKey) {
-        this(option, helperString, decriptionKey, NumberOfArguments.NONE);
+    CommandLineOptions(final String option, final String helperString, final String descriptionKey) {
+        this(option, helperString, descriptionKey, NumberOfArguments.NONE);
     }
 
-    CommandLineOptions(final String option, final String decriptionKey, final NumberOfArguments numberOfArguments) {
-        this(option, "", decriptionKey, numberOfArguments);
+    CommandLineOptions(final String option, final String descriptionKey, final NumberOfArguments numberOfArguments) {
+        this(option, "", descriptionKey, numberOfArguments);
     }
 
-    CommandLineOptions(final String option, final String decriptionKey) {
-        this(option, "", decriptionKey);
+    CommandLineOptions(final String option, final String descriptionKey) {
+        this(option, "", descriptionKey);
     }
 
     public String getOption() {
@@ -88,7 +88,7 @@ public enum CommandLineOptions {
     }
 
     public String getLocalizedDescription() {
-        return R(decriptionKey);
+        return R(descriptionKey);
     }
 
     public boolean hasEvenNumberSupportingEqualsChar() {

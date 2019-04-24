@@ -29,7 +29,7 @@
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 /**
- * An XMLParseException is thrown when an error occures while parsing an XML
+ * An XMLParseException is thrown when an error occurs while parsing an XML
  * string.
  * <p>
  * $Revision: 1.1 $</p>

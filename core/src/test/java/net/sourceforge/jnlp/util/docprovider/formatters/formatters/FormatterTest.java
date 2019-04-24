@@ -84,7 +84,7 @@ public class FormatterTest {
         final int x = 10;
         String s = f.getNewLine(x);
         String[] a = s.split("(?mi)br");
-        Assert.assertEquals(x + 1, a.length);//br is in middleof element
+        Assert.assertEquals(x + 1, a.length);//br is in middle of element
     }
 
     @Test
@@ -107,7 +107,7 @@ public class FormatterTest {
         final int x = 10;
         String s = f.getNewLine(x);
         String[] a = s.split("(?m)\\.br");
-        Assert.assertEquals(x + 1, a.length);//br is in middleof element
+        Assert.assertEquals(x + 1, a.length);//br is in middle of element
     }
 
 }

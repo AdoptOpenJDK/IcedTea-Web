@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosingListener;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,8 +46,8 @@ public class PrintStreamLoggerTest {
 
     private static String line1 = "I'm logged line one";
     private static String line2 = "I'm logged line two";
-    private static RulesFolowingClosingListener.ContainsRule r1 = new RulesFolowingClosingListener.ContainsRule(line1);
-    private static RulesFolowingClosingListener.ContainsRule r2 = new RulesFolowingClosingListener.ContainsRule(line2);
+    private static RulesFollowingClosingListener.ContainsRule r1 = new RulesFollowingClosingListener.ContainsRule(line1);
+    private static RulesFollowingClosingListener.ContainsRule r2 = new RulesFollowingClosingListener.ContainsRule(line2);
     
     private static class  AccessiblePrintStream extends PrintStream{
 

@@ -157,7 +157,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                     topLabelText = R("SFileWriteAccess", R("AFileOnTheMachine"));
                 }
                 break;
-            case CREATE_DESTKOP_SHORTCUT:
+            case CREATE_DESKTOP_SHORTCUT:
                 topLabelText = R("SDesktopShortcut");
                 break;
             case CLIPBOARD_READ:
@@ -209,7 +209,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         c.gridy++;
         infoPanel.add(fromLabel,c);
         c.gridy++;
-        if (type == AccessType.CREATE_DESTKOP_SHORTCUT) {
+        if (type == AccessType.CREATE_DESKTOP_SHORTCUT) {
             if (file.getInformation() != null &&  file.getInformation().getShortcut() != null && file.getInformation().getShortcut().onDesktop()) {
                 desktopCheck = new JCheckBox(R("EXAWdesktopWants"));
                 desktopCheck.setSelected(true);
@@ -320,10 +320,10 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         if (desktopCheck != null) {
             if (htmlPanelDesktop != null) {
                 //html
-                ar.setDekstop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
+                ar.setDesktop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
             } else {
                 //jnlp
-                ar.setDekstop(new AccessWarningPaneComplexReturn.ShortcutResult(desktopCheck.isSelected()));
+                ar.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(desktopCheck.isSelected()));
             }
         }
         if (menuCheck != null) {
@@ -364,12 +364,12 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         private boolean isRemembered(){
             return !dont.isSelected();
         }
-        private boolean isRememebredForCodebase(){
+        private boolean isRememberedForCodebase(){
             return byPage.isSelected();
         }
 
         private RememberPanelResult getResult() {
-            return new RememberPanelResult(isRemembered(), isRememebredForCodebase());
+            return new RememberPanelResult(isRemembered(), isRememberedForCodebase());
         }
 
     }
@@ -475,7 +475,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
     
     
      @Override
-    public RememberPanelResult getRemeberAction() {
+    public RememberPanelResult getRememberAction() {
        return rememberPanel.getResult();
     }
 
@@ -511,7 +511,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
 
     @Override
     public String helpToStdIn() {
-        if (parent.getAccessType() == AccessType.CREATE_DESTKOP_SHORTCUT){
+        if (parent.getAccessType() == AccessType.CREATE_DESKTOP_SHORTCUT){
             return Translator.R("AWPstdoutHint1") + PlainTextFormatter.getLineSeparator()
                     + Translator.R("AWPstdoutHint2") + PlainTextFormatter.getLineSeparator()
                     + Translator.R("AWPstdoutHint3", AccessWarningPaneComplexReturn.Shortcut.allValues()) + PlainTextFormatter.getLineSeparator()

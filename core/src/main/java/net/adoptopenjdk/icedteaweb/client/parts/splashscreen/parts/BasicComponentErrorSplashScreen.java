@@ -42,7 +42,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 public abstract class BasicComponentErrorSplashScreen extends BasicComponentSplashScreen implements SplashErrorPanel {
 
     /**
-     * When applet loading fails, then dying stacktrace can be stted, and is then shown to user on demand.
+     * When applet loading fails, then dying stacktrace can be set, and is then shown to user on demand.
      */
     private Throwable loadingException;
    
@@ -66,7 +66,7 @@ public abstract class BasicComponentErrorSplashScreen extends BasicComponentSpla
    
 
     protected void raiseExceptionDialogNOW() {
-        JEditorPaneBasedExceptionDialog dialog = new JEditorPaneBasedExceptionDialog(null, true, getLoadingException(), getInformationElement(), createAditionalInfo());
+        JEditorPaneBasedExceptionDialog dialog = new JEditorPaneBasedExceptionDialog(null, true, getLoadingException(), getInformationElement(), createAdditionalInfo());
         dialog.setVisible(true);
     }
 

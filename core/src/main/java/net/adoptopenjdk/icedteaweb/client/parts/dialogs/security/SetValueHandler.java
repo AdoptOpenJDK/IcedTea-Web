@@ -50,9 +50,9 @@ public class SetValueHandler implements ActionListener {
     /**
      * Create an ActionListener suitable for use with buttons. When this
      * {@link ActionListener} is invoked, it will set the value of the
-     * {@link SecurityDialog} and then dispossed.
+     * {@link SecurityDialog} and then disposed.
      *
-     * @param dialog dialog ressonsible for actual operation
+     * @param dialog dialog responsible for actual operation
      * @param returnValue may contain also information about default, preselected button
      * @return the ActionListener instance.
      */

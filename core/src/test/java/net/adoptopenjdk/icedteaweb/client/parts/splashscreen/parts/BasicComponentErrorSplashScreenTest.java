@@ -45,25 +45,25 @@ import java.awt.Graphics;
 public class BasicComponentErrorSplashScreenTest {
 
     @Test
-    public void createAditionalInfoTest() {
+    public void createAdditionalInfoTest() {
         BasicComponentSplashScreenImpl tested = new BasicComponentSplashScreenImpl();
         String v = "2.118x08";
         tested.setVersion(v);
         tested.setSplashReason(SplashUtils.SplashReason.APPLET);
-        String s1 = tested.createAditionalInfoTest();
+        String s1 = tested.createAdditionalInfoTest();
         Assert.assertNotNull("Not null input must result to something", s1);
         Assert.assertTrue("Not null input must have version value", s1.contains(v));
         Assert.assertTrue("Not null input must have version string", s1.contains("version"));
         Assert.assertTrue("Not null input must have version string", s1.contains(SplashUtils.SplashReason.APPLET.toString()));
         tested.setVersion(null);
         tested.setSplashReason(null);
-        String s2 = tested.createAditionalInfoTest();
+        String s2 = tested.createAdditionalInfoTest();
         Assert.assertNull("Not null input must result to something", s2);
         tested.setSplashReason(null);
         tested.setVersion(v);
         Exception ex = null;
         try {
-            String s3 = tested.createAditionalInfoTest();
+            String s3 = tested.createAdditionalInfoTest();
         } catch (Exception exx) {
             ex = exx;
         }
@@ -111,8 +111,8 @@ public class BasicComponentErrorSplashScreenTest {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        public String createAditionalInfoTest() {
-            return super.createAditionalInfo();
+        public String createAdditionalInfoTest() {
+            return super.createAdditionalInfo();
         }
 
         @Override

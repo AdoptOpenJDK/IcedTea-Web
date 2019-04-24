@@ -218,7 +218,7 @@ public class Launcher {
 
     /**
      * Launches a JNLP file inside the given container if it is an applet.  Specifying a
-     * container has no effect for Applcations and Installers.
+     * container has no effect for Applications and Installers.
      *
      * @param file the JNLP file to launch
      * @param cont the container in which to place the application, if it is an applet
@@ -245,7 +245,7 @@ public class Launcher {
             //Xoffline IS specified
             if (!file.getInformation().isOfflineAllowed() && !JNLPRuntime.isOnlineDetected()) {
                 {
-                    LOG.error("Remote systems unreachable, and client application is not able to run offline. However, you specified -Xoffline argument. Attmpting to run.");
+                    LOG.error("Remote systems unreachable, and client application is not able to run offline. However, you specified -Xoffline argument. Attempting to run.");
                 }
             }
         }
@@ -469,12 +469,12 @@ public class Launcher {
             if (!isLocal && haveHref){
                 //this is case when remote file have href to different file
                 if (!location.equals(file.getSourceLocation())){
-                    //mark local true, so the folowing condition will be true and 
-                    //new jnlp file will be downlaoded
+                    //mark local true, so the following condition will be true and 
+                    //new jnlp file will be downloaded
                     isLocal = true;
-                    //maybe this check is to strict, and will force redownlaod to often
+                    //maybe this check is to strict, and will force redownload to often
                     //another check can be just on jnlp name. But it will not work
-                    //if the href will be the file of same name, but on diferent path (or even domain)
+                    //if the href will be the file of same name, but on different path (or even domain)
                 }
             }
 
@@ -728,8 +728,8 @@ public class Launcher {
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
      //FIXME - when multiple applets are on one page, this method is visited simultaneously
-    //and then appelts creates in little bit strange manner. This issue is visible with
-    //randomly showing/notshowing spalshscreens.
+    //and then applets creates in little bit strange manner. This issue is visible with
+    //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
     protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
          AppletInstance appletInstance = null;
@@ -754,7 +754,7 @@ public class Launcher {
              }
 
              /**
-              * Due to PR2968, moved to earlier phase, so early stages of appelt
+              * Due to PR2968, moved to earlier phase, so early stages of applet
               * can access Thread.currentThread().getContextClassLoader().
               *
               * However it is notable, that init and start still do not have access to right classloader.
@@ -894,7 +894,7 @@ public class Launcher {
 
         /*
          * With OpenJDK6 (but not with 7) a per-AppContext dtd is maintained.
-         * This dtd is created by the ParserDelgate. However, the code in
+         * This dtd is created by the ParserDelegate. However, the code in
          * HTMLEditorKit (used to render HTML in labels and textpanes) creates
          * the ParserDelegate only if there are no existing ParserDelegates. The
          * result is that all other AppContexts see a null dtd.

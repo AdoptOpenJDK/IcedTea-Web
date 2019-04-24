@@ -65,7 +65,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LinksPanel extends JPanel implements DocumentChangededListener {
+public class LinksPanel extends JPanel implements DocumentChangedListener {
 
     private final static Logger LOG = LoggerFactory.getLogger(LinksPanel.class);
 
@@ -82,7 +82,7 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
 
     private class RowHolder extends JPanel {
 
-        //shoudl go from text state
+        //should go from text state
         private final String url;
 
         public RowHolder(final String urll) {
@@ -183,12 +183,12 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
     public static final String HREF_REGEX_START = "(?i)href\\s*=\\s*" + HTML_QUOTING_REGEX;
     private static final String HREF_REGEX_END = HTML_QUOTING_REGEX;
     public static final String HREF_REGEX = HREF_REGEX_START + ".*?" + HREF_REGEX_END;
-    public static final Pattern HREF_REGEX_PATERN = Pattern.compile(HREF_REGEX);
+    public static final Pattern HREF_REGEX_PATTERN = Pattern.compile(HREF_REGEX);
 
     public List<String> pullHrefs(String text) {
         List<String> links = new ArrayList<>();
 
-        Matcher m = HREF_REGEX_PATERN.matcher(text);
+        Matcher m = HREF_REGEX_PATTERN.matcher(text);
         while (m.find()) {
             String urlStr = m.group();
             urlStr = urlStr.replaceFirst(HREF_REGEX_START, "");
@@ -220,7 +220,7 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
     }
 
     @Override
-    public void documentChangeded(String current) {
+    public void documentChanged(String current) {
         parseAndAdd(current);
     }
 
@@ -232,12 +232,12 @@ public class LinksPanel extends JPanel implements DocumentChangededListener {
     }
 
     @Override
-    public void addressChangeded(String url) {
+    public void addressChanged(String url) {
         addLink(url);
     }
 
     @Override
-    public void addressChangeded(URL url) {
+    public void addressChanged(URL url) {
         if (url != null) {
             baseUrl = url;
             addLink(url.toExternalForm());

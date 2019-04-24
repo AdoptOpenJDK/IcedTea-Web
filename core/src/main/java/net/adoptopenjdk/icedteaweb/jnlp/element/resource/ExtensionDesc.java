@@ -59,11 +59,11 @@ public class ExtensionDesc {
     private final List<String> eagerExtParts = new ArrayList<>();
 
     /**
-     * Create an extention descriptor.
+     * Create an extension descriptor.
      *
      * @param name the extension name
-     * @param version the required version of the extention JNLPFile
-     * @param location the location of the extention JNLP file
+     * @param version the required version of the extension JNLPFile
+     * @param location the location of the extension JNLP file
      */
     public ExtensionDesc(String name, Version version, URL location) {
         this.name = name;

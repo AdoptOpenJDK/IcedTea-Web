@@ -59,10 +59,10 @@ public class LegacyUnsignedAppletActionStorageImplTest {
     private static File ff3;
     private static File ff4;
     
-    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPreffix+UnsignedAppletActionStorageImpl.currentVersion+"\n";
+    private static final String versionLine=UnsignedAppletActionStorageImpl.versionPrefix +UnsignedAppletActionStorageImpl.currentVersion+"\n";
 
     @BeforeClass
-    public static void preapreTestFiles() throws IOException {
+    public static void prepareTestFiles() throws IOException {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");

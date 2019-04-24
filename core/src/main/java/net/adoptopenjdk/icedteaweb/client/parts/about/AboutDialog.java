@@ -75,7 +75,7 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
 
     private final JDialog frame;
     private JPanel contentPane;
-    //singletons to not laod/generate them all around
+    //singletons to not load/generate them all around
     private static HTMLPanel aboutPanel, authorsPanel, newsPanel, changelogPanel, copyingPanel, helpPanel;
     private final JButton aboutButton, authorsButton, newsButton, changelogButton, copyingButton, helpButton;
 

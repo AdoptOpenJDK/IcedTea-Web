@@ -89,7 +89,7 @@ public class HtmlFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getHeaders(final String id, final String encoding) {
-        //jeditorpane dont like <? declaration
+        //jeditorpane doesn't like <? declaration
         String xml = "";
         if (includeXmlHeader) {
             xml = "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n";
@@ -175,14 +175,14 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getAdressLink(final String s) {
+    public String getAddressLink(final String s) {
         final String emailDelBracket = s.replaceAll(".*<", "");
-        final String adress = emailDelBracket.replaceAll(">.*", "");
+        final String address = emailDelBracket.replaceAll(">.*", "");
         if (s.contains("@")) {
             final String name = s.replaceAll("<.*", "").trim();
-            return "<a href=\"mailto:" + antiSpam(adress) + "\" target=\"_top\">" + name + "</a>";
+            return "<a href=\"mailto:" + antiSpam(address) + "\" target=\"_top\">" + name + "</a>";
         } else {
-            return s.replaceAll("<.*>", "<a href=\"" + adress + "\">" + adress + "</a>");
+            return s.replaceAll("<.*>", "<a href=\"" + address + "\">" + address + "</a>");
         }
     }
 
@@ -194,10 +194,10 @@ public class HtmlFormatter extends ReplacingTextFormatter {
         return replaceLt.replaceAll(">", gT);
     }
 
-    private static String antiSpam(final String adress) {
+    private static String antiSpam(final String address) {
         final StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < adress.length(); x++) {
-            sb.append(adress.charAt(x)).append(" ");
+        for (int x = 0; x < address.length(); x++) {
+            sb.append(address.charAt(x)).append(" ");
         }
         return sb.toString().trim();
     }

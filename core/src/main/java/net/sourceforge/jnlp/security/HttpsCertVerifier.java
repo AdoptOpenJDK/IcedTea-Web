@@ -206,7 +206,7 @@ public class HttpsCertVerifier implements CertVerifier {
     }
 
     @Override
-    public Certificate getPublisher(CertPath certPath) { // Paramater ignored.
+    public Certificate getPublisher(CertPath certPath) { // Parameter ignored.
         if (chain.length > 0)
             return (Certificate) chain[0];
         return null;

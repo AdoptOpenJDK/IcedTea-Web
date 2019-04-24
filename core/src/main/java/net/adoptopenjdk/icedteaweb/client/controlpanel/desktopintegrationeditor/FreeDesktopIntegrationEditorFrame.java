@@ -434,7 +434,7 @@ public class FreeDesktopIntegrationEditorFrame extends JFrame {
         }
 
         for (int x = 1; x <= 3; x++) {
-            //we dont wont recurse, so sending copies in
+            //we don't recurse, so sending copies in
             selectShortcutsByFiles(
                     objectListToFileList(iconsList.getSelectedValuesList()),
                     objectListToFileList(generatedList.getSelectedValuesList())

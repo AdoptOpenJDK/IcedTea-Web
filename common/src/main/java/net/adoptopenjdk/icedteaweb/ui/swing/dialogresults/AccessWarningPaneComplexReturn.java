@@ -55,7 +55,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
             m = ShortcutResult.readValue(sq[3]);
         }
         AccessWarningPaneComplexReturn a = new AccessWarningPaneComplexReturn(regularReturn);
-        a.dekstop = d;
+        a.desktop = d;
         a.menu = m;
         return a;
     }
@@ -64,8 +64,8 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
     public String writeValue() {
         StringBuilder sb = new StringBuilder();
         sb.append(regularReturn.writeValue()).append(",D(");
-        if (dekstop != null) {
-            sb.append(dekstop.writeValue());
+        if (desktop != null) {
+            sb.append(desktop.writeValue());
         }
         sb.append(")M(");
         if (menu != null) {
@@ -177,7 +177,7 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
     }
 
     private final YesNo regularReturn;
-    private ShortcutResult dekstop;
+    private ShortcutResult desktop;
     private ShortcutResult menu;
 
     public AccessWarningPaneComplexReturn(boolean b) {
@@ -192,12 +192,12 @@ public class AccessWarningPaneComplexReturn implements DialogResult {
         this.regularReturn = new YesNo(regularReturn);
     }
 
-    public void setDekstop(ShortcutResult dekstop) {
-        this.dekstop = dekstop;
+    public void setDesktop(ShortcutResult desktop) {
+        this.desktop = desktop;
     }
 
-    public ShortcutResult getDekstop() {
-        return dekstop;
+    public ShortcutResult getDesktop() {
+        return desktop;
     }
 
     public void setMenu(ShortcutResult menu) {

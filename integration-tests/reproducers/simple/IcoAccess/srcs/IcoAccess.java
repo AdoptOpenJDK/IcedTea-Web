@@ -109,7 +109,7 @@ public class IcoAccess  extends Applet{
 
     private static void check(int i, byte b) {
         if (i != b) {
-            throw new RuntimeException("The image was not laoded!");
+            throw new RuntimeException("The image was not loaded!");
         }
     }
 }

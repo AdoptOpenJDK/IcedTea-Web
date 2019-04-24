@@ -164,7 +164,7 @@ public class UnsignedAppletTrustConfirmationTest {
     
     
     @Test
-    public void testSripFile() throws Exception {
+    public void testStripFile() throws Exception {
         String sample = "http://aa.bb/";
         String result = UrlUtils.stripFile(new URL(sample));
         assertEquals(sample, result);
@@ -208,10 +208,10 @@ public class UnsignedAppletTrustConfirmationTest {
     
     @BeforeClass
     public static void initUrlsX123() throws MalformedURLException, IOException {
-        urlX1 = new URL("http://&#10;does&#32;not&#32;metter&#32;is&#32;ok");
-        urlX2 = new URL("http://\ndoes not metter is harmfull");
+        urlX1 = new URL("http://&#10;does&#32;not&#32;matter&#32;is&#32;ok");
+        urlX2 = new URL("http://\ndoes not matter is harmful");
         Properties p = new Properties();
-        p.load(new StringReader("key=http:\\u002F\\u002F\\u000Adoes\\u0020not\\u0020metter\\u0020is\\u0020harmfull"));
+        p.load(new StringReader("key=http:\\u002F\\u002F\\u000Adoes\\u0020not\\u0020matter\\u0020is\\u0020harmful"));
         urlX3=new URL(p.getProperty("key"));
     }
 
@@ -295,12 +295,12 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
                 Boolean.FALSE,
                 UnsignedAppletTrustWarningPanel.class);
-        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        //may throw  RuntimeException which is correct, however, wee need to check result
         } catch (Exception ex){
             ServerAccess.logException(ex);
         }
         String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
-        Assert.assertFalse(s.contains("harmfull"));
+        Assert.assertFalse(s.contains("harmful"));
     }
     
     @Test
@@ -312,17 +312,17 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
                 Boolean.FALSE,
                 UnsignedAppletTrustWarningPanel.class);
-        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        //may throw  RuntimeException which is correct, however, wee need to check result
         } catch (Exception ex){
             ServerAccess.logException(ex);
         }
         String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
-        Assert.assertFalse(s.contains("harmfull"));
+        Assert.assertFalse(s.contains("harmful"));
     }
     
      @Test
     public void updateAppletActionTestX1() throws Exception {
-        //this case is correct, if html ecnoded url is passed as URL from javaws, it is kept intact
+        //this case is correct, if html encoded url is passed as URL from javaws, it is kept intact
         PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
         Exception eex = null;
         try{
@@ -331,14 +331,14 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
                 Boolean.FALSE,
                 UnsignedAppletTrustWarningPanel.class);
-        //may throw  RuntimeExeption which is correct, however, wee need to check result
+        //may throw  RuntimeException which is correct, however, wee need to check result
         } catch (Exception ex){
             eex = ex;
             ServerAccess.logException(ex);
         }
         String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertNull(eex);
-        Assert.assertTrue(s.contains("http://&#10;does&#32;not&#32;metter&#32;is&#32;ok"));
+        Assert.assertTrue(s.contains("http://&#10;does&#32;not&#32;matter&#32;is&#32;ok"));
     }
 
     private static class DummyJnlpWithTitleAndUrlsWithOverwrite extends DummyJnlpWithTitleAndUrls {

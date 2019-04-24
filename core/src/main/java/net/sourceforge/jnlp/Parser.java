@@ -1005,7 +1005,7 @@ public final class Parser {
 
     // other methods
     /**
-     * @return an array of substrings seperated by spaces (spaces escaped with
+     * @return an array of substrings separated by spaces (spaces escaped with
      * backslash do not separate strings). This method splits strings as per the
      * spec except that it does replace escaped other characters with their own
      * value.
@@ -1179,7 +1179,7 @@ public final class Parser {
             boolean valid = true;
             if (!Character.isJavaIdentifierStart(main.charAt(0))) {
                 valid = false;
-                LOG.debug("Invlaid char in main-class: '{}'", main.charAt(0));
+                LOG.debug("Invalid char in main-class: '{}'", main.charAt(0));
             }
             for (int i = 1; i < main.length(); i++) {
                 if (main.charAt(i) == '.') {
@@ -1188,7 +1188,7 @@ public final class Parser {
                 }
                 if (!Character.isJavaIdentifierPart(main.charAt(i))) {
                     valid = false;
-                    LOG.debug("Invlaid char in main-class: '{}'", main.charAt(i));
+                    LOG.debug("Invalid char in main-class: '{}'", main.charAt(i));
                 }
             }
             if (!valid) {

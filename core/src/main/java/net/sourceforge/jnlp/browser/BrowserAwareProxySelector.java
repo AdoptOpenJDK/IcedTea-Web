@@ -93,7 +93,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     private PacEvaluator browserProxyAutoConfig = null;
 
     /**
-     * Create a new instance of this class, reading configuration fropm the browser
+     * Create a new instance of this class, reading configuration from the browser
      */
     public BrowserAwareProxySelector(DeploymentConfiguration config) {
         super(config);

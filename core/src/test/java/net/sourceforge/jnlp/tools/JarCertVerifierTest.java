@@ -275,7 +275,7 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("thirdSignedByBeta", betaSigners));
         VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
-        Assert.assertEquals("First two entries signed by alpha signer, third entry signed by beta signer should be considered unisgned.",
+        Assert.assertEquals("First two entries signed by alpha signer, third entry signed by beta signer should be considered unsigned.",
                 VerifyResult.UNSIGNED, result);
         Assert.assertEquals("Three entries signed by some common signers but not all means no signers in the verifier.",
                 0, jcv.getCertsList().size());
@@ -291,7 +291,7 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("thirdUnsigned"));
         VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
-        Assert.assertEquals("First two entries signed by alpha signer, third entry not signed, should be considered unisgned.",
+        Assert.assertEquals("First two entries signed by alpha signer, third entry not signed, should be considered unsigned.",
                 VerifyResult.UNSIGNED, result);
         Assert.assertEquals("First two entries signed by alpha signer, third entry not signed, means no signers in the verifier.",
                 0, jcv.getCertsList().size());

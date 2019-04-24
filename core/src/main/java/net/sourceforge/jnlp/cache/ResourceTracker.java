@@ -237,7 +237,7 @@ public class ResourceTracker {
 
     /**
      * Adds the listener to the list of objects interested in
-     * receivind DownloadEvents.
+     * receiving DownloadEvents.
      *
      * @param listener the listener to add.
      */
@@ -261,7 +261,7 @@ public class ResourceTracker {
 
     /**
      * Fires the download event corresponding to the resource's
-     * state.  This method is typicall called by the Resource itself
+     * state.  This method is typically called by the Resource itself
      * on each tracker that is monitoring the resource.  Do not call
      * this method with any locks because the listeners may call
      * back to this ResourceTracker.
@@ -379,7 +379,7 @@ public class ResourceTracker {
         Resource lresources[] = new Resource[urls.length];
 
         synchronized (lresources) {
-            // keep the lock so getResource doesn't have to aquire it each time
+            // keep the lock so getResource doesn't have to acquire it each time
             for (int i = 0; i < urls.length; i++) {
                 lresources[i] = getResource(urls[i]);
             }

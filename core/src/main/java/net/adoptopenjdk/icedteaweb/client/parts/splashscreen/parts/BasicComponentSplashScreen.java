@@ -145,7 +145,7 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
     }
 
    
-    protected String createAditionalInfo() {
+    protected String createAdditionalInfo() {
         if (getVersion() != null) {
             return getSplashReason().toString() + " version: " + getVersion();
         } else {

@@ -91,7 +91,7 @@ public class CommandLineTest extends NoStdOutErrTest{
     }
 
     @Test
-    public void testHandleSetCommandDisplaysWarningOnUknownProperty() throws IOException {
+    public void testHandleSetCommandDisplaysWarningOnUnknownProperty() throws IOException {
         ByteArrayOutputStream outStream = getOutputControllerStream();
 
         String[] args = {

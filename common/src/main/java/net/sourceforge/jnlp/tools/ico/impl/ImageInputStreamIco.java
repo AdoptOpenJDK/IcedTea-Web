@@ -111,7 +111,7 @@ public class ImageInputStreamIco {
         //bmp
         img = prefixByFakeHeader(img, e);
         bis = new ByteArrayInputStream(img);
-        //dont try catch this one. you will break it
+        //don't try catch this one. you will break it
         image = ImageIO.read(bis);
 
         return image;
@@ -148,13 +148,13 @@ public class ImageInputStreamIco {
         img[7] = 0;
         img[8] = 0;
         img[9] = 0;
-        int ofset = fakingArray + 40 + 4 * e.getColorCount();
-        img[10] = (byte) (ofset & 0xFF);
-        img[11] = (byte) ((ofset >> 8) & 0xFF);
-        img[12] = (byte) ((ofset >> 16) & 0xFF);
-        img[13] = (byte) ((ofset >> 24) & 0xFF);
+        int offset = fakingArray + 40 + 4 * e.getColorCount();
+        img[10] = (byte) (offset & 0xFF);
+        img[11] = (byte) ((offset >> 8) & 0xFF);
+        img[12] = (byte) ((offset >> 16) & 0xFF);
+        img[13] = (byte) ((offset >> 24) & 0xFF);
         //ico is storing height as height of XOR + height of AND bitmaps
-        //that is 2 x hight. Bitmap expects only height of single image
+        //that is 2 x height. Bitmap expects only height of single image
         int tmpHeight = e.getHeight();
         img[fakingArray + 4/*size*/ + 4/*width*/] = (byte) (tmpHeight & 0xFF);
         img[fakingArray + 4/*size*/ + 4/*width*/ + 1] = (byte) ((tmpHeight >> 8) & 0xFF);

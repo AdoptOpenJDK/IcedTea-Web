@@ -419,9 +419,9 @@ public class XMLElement {
      * </ul></dd></dl>
      *
      * @throws java.io.IOException
-     *     If an error occured while reading the input.
+     *     If an error occurred while reading the input.
      * @throws XMLParseException
-     *     If an error occured while parsing the read data.
+     *     If an error occurred while parsing the read data.
      */
     public void parseFromReader(final Reader reader)
             throws IOException, XMLParseException {
@@ -551,7 +551,7 @@ public class XMLElement {
      /**
      * This method scans an leading identifier from the current reader.
      * 
-     * UNlike scanWhitespace, it skipps also BOM
+     * Unlike scanWhitespace, it skips also BOM
      *
      * @return the next character following the whitespace.
      * @throws java.io.IOException if something goes wrong

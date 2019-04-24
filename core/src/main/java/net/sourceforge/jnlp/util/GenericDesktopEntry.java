@@ -23,8 +23,8 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 
 /**
  *
- * Thsi is very wierd interface, as two implementing classes have empty
- * intersection. The interface exists only because windows implementation depnds
+ * This is very weird interface, as two implementing classes have empty
+ * intersection. The interface exists only because windows implementation depends
  * on mslink.jar, and thus is optional. todo. unify the X and win
  * implementations so this interface have sense
  */

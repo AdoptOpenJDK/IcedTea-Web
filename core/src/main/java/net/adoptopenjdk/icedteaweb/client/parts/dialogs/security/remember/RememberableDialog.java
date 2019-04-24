@@ -44,7 +44,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 public interface RememberableDialog {
 
     
-    public RememberPanelResult getRemeberAction();
+    public RememberPanelResult getRememberAction();
     public DialogResult getValue();
     public JNLPFile getFile();
     public DialogResult readValue(String s);

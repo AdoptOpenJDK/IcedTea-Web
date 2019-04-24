@@ -193,7 +193,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         Assert.assertEquals("related-content title", relatedContent.getTitle());
         Assert.assertNotNull(relatedContent.getLocation());
         Assert.assertEquals("http://related-content/", relatedContent.getLocation().toString());
-        Assert.assertEquals("decription of related-content", relatedContent.getDescription());
+        Assert.assertEquals("description of related-content", relatedContent.getDescription());
         IconDesc relatedIcon = relatedContent.getIcon();
         Assert.assertNotNull(relatedIcon.getLocation());
         Assert.assertEquals("http://localhost/related-content-icon.png", relatedIcon.getLocation().toString());

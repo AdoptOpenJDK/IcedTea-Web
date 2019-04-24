@@ -347,24 +347,24 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     
      @Test
     public void stripClassNoClass() throws Exception {
-         Assert.assertEquals("blah.class.someclass", PluginBridge.strippClass("blah.class.someclass"));
+         Assert.assertEquals("blah.class.someclass", PluginBridge.stripClass("blah.class.someclass"));
     }
     
     @Test
     public void stripClassClass() throws Exception {
-         Assert.assertEquals("blah.class.someclass", PluginBridge.strippClass("blah.class.someclass.class"));
+         Assert.assertEquals("blah.class.someclass", PluginBridge.stripClass("blah.class.someclass.class"));
     }
     
     
     private static final String CV="cbVal";
     
     private static String fixCommonIssues(String input, boolean needsSecurity) {
-        return PluginBridge.fixCommonIsuses(needsSecurity, input, CV, "titTets", "ventest");
+        return PluginBridge.fixCommonIssues(needsSecurity, input, CV, "titTets", "ventest");
     }
 
     ;
     
-    public static int countOccurences(String str, String findStr) {
+    public static int countOccurrences(String str, String findStr) {
         int lastIndex = 0;
         int count = 0;
         while (lastIndex != -1) {
@@ -380,22 +380,22 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     }
 
     private void checkIssuesFixed(String input, boolean security, boolean defaultCB) {
-        assertEquals(1, countOccurences(input, "<jnlp"));
+        assertEquals(1, countOccurrences(input, "<jnlp"));
         if (defaultCB) {
-            assertEquals(1, countOccurences(input, CV));
+            assertEquals(1, countOccurrences(input, CV));
         } else {
-            assertEquals(0, countOccurences(input, CV));
+            assertEquals(0, countOccurrences(input, CV));
         }
-        assertEquals(1, countOccurences(input, "codebase"));
+        assertEquals(1, countOccurrences(input, "codebase"));
         if (security) {
-            assertEquals(2, countOccurences(input, "security"));
-            assertEquals(1, countOccurences(input, "<security"));
-            assertEquals(1, countOccurences(input, "all-permissions"));
+            assertEquals(2, countOccurrences(input, "security"));
+            assertEquals(1, countOccurrences(input, "<security"));
+            assertEquals(1, countOccurrences(input, "all-permissions"));
         } else {
-            assertEquals(0, countOccurences(input, "all-permissions"));
+            assertEquals(0, countOccurrences(input, "all-permissions"));
         }
-        assertEquals(1, countOccurences(input, "<title>"));
-        assertEquals(1, countOccurences(input, "<vendor>"));
+        assertEquals(1, countOccurrences(input, "<title>"));
+        assertEquals(1, countOccurrences(input, "<vendor>"));
     }
     ;
             
@@ -443,7 +443,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         Assert.assertFalse("zzz codebase='someVal' zzz".matches(PluginBridge.toMatcher(PluginBridge.CODEBASE_REGEX2)));
     }
     
-    private static final String jnlpTempalte = "<jnlp @CB@ > "
+    private static final String jnlpTemplate = "<jnlp @CB@ > "
             + " @INFO@ \n"
             + " @SEC@ \n "
             + "<resources>\n"
@@ -457,7 +457,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
             + " </jnlp>";
     
     private static String prepareTemplate(String codebase, String information, String security ){
-        return jnlpTempalte.replace("@CB@", codebase).replace("@INFO@", information).replace("@SEC@", security);
+        return jnlpTemplate.replace("@CB@", codebase).replace("@INFO@", information).replace("@SEC@", security);
     }
     
 

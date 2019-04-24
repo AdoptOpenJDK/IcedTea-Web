@@ -189,24 +189,24 @@ public class DeploymentPropertiesModifierTest {
         Assert.assertTrue(propertiesChanged.contains("i.j"));
         
         dpm1.restoreProperties();
-        String propertiesResored = FileUtils.loadFileAsString(deploymentFile);
+        String propertiesRestored = FileUtils.loadFileAsString(deploymentFile);
         
         Assert.assertNotEquals(content, propertiesChanged);
-        Assert.assertTrue(propertiesResored.contains("12"));
-        Assert.assertTrue(propertiesResored.contains("34"));
-        Assert.assertFalse(propertiesResored.contains("22"));
-        Assert.assertTrue(propertiesResored.contains("56"));
-        Assert.assertTrue(propertiesResored.contains("78"));
-        Assert.assertTrue(propertiesResored.contains("90"));
-        Assert.assertFalse(propertiesResored.contains("44"));
-        Assert.assertTrue(propertiesResored.contains("a.b"));
-        Assert.assertTrue(propertiesResored.contains("c.d"));
-        Assert.assertTrue(propertiesResored.contains("e.f"));
-        Assert.assertTrue(propertiesResored.contains("g.h"));
-        Assert.assertTrue(propertiesResored.contains("i.j"));
+        Assert.assertTrue(propertiesRestored.contains("12"));
+        Assert.assertTrue(propertiesRestored.contains("34"));
+        Assert.assertFalse(propertiesRestored.contains("22"));
+        Assert.assertTrue(propertiesRestored.contains("56"));
+        Assert.assertTrue(propertiesRestored.contains("78"));
+        Assert.assertTrue(propertiesRestored.contains("90"));
+        Assert.assertFalse(propertiesRestored.contains("44"));
+        Assert.assertTrue(propertiesRestored.contains("a.b"));
+        Assert.assertTrue(propertiesRestored.contains("c.d"));
+        Assert.assertTrue(propertiesRestored.contains("e.f"));
+        Assert.assertTrue(propertiesRestored.contains("g.h"));
+        Assert.assertTrue(propertiesRestored.contains("i.j"));
         
         // /n at the end of last line may not matter
-        assertEquals(content.trim(), propertiesResored.trim());
+        assertEquals(content.trim(), propertiesRestored.trim());
     }
 
     private static class DummyInfrastructureFileDescriptor extends InfrastructureFileDescriptor {

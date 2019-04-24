@@ -42,8 +42,8 @@ import java.util.List;
 /**
  * This is abstract access to white/blacklist created from some permanent storage.
  * <p>
- * It is daclaring adding, updating and searching. Intentionally not removing as 
- * during plugin runtime no deletations should be done.
+ * It is declaring adding, updating and searching. Intentionally not removing as 
+ * during plugin runtime no delegations should be done.
  * </p>
  * <p>
  * Implementations of this interface (unless dummy ones:) should ensure correct

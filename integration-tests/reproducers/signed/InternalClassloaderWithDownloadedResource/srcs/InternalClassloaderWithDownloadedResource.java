@@ -61,19 +61,19 @@ public class InternalClassloaderWithDownloadedResource extends Applet {
 
     }
 
-    private static void downlaodAndExecuteForeignMethod(int port, int classlaoder) throws SecurityException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, MalformedURLException, IllegalArgumentException {
+    private static void downloadAndExecuteForeignMethod(int port, int classloader) throws SecurityException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, MalformedURLException, IllegalArgumentException {
         URL url = new URL("http://localhost:" + port + "/SimpletestSigned1.jar");
         URLClassLoader ucl = null;
-        if (classlaoder == 1) {
+        if (classloader == 1) {
             ucl = (URLClassLoader) InternalClassloaderWithDownloadedResource.class.getClassLoader();
             System.out.println("Downloading " + url.toString());
             Method privateStringMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             privateStringMethod.setAccessible(true);
             privateStringMethod.invoke(ucl, url);
-        } else if (classlaoder == 2) {
+        } else if (classloader == 2) {
             ucl = new URLClassLoader(new URL[]{url});
         } else {
-            throw new IllegalArgumentException("just 1 or 2 classlaoder id expected");
+            throw new IllegalArgumentException("just 1 or 2 classloader id expected");
         }
         executeForeignMethod(port, ucl);
     }
@@ -90,9 +90,9 @@ public class InternalClassloaderWithDownloadedResource extends Applet {
         if (s == null) {
             throw new IllegalArgumentException("arg was null");
         } else if (s.equalsIgnoreCase("hack")) {
-            downlaodAndExecuteForeignMethod(port, 1);
+            downloadAndExecuteForeignMethod(port, 1);
         } else if (s.equalsIgnoreCase("new")) {
-            downlaodAndExecuteForeignMethod(port, 2);
+            downloadAndExecuteForeignMethod(port, 2);
         } else {
             throw new IllegalArgumentException("hack or new expected as argument");
         }

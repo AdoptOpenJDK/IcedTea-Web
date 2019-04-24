@@ -63,7 +63,7 @@ public interface Formatter {
 
     String getUrl(String url);
 
-    String getUrl(String url, String appearence);
+    String getUrl(String url, String appearance);
     
     String getOption(String key, String value);
 
@@ -73,7 +73,7 @@ public interface Formatter {
 
     String getFileSuffix();
     
-    String getAdressLink(String s);
+    String getAddressLink(String s);
     
     String replaceLtGtCharacters(String s);
 

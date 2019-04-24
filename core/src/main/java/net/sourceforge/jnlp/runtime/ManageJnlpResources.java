@@ -94,7 +94,7 @@ public class ManageJnlpResources {
      * @param ref Path of the launch or extension JNLP File containing the
      * resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the path.
-     * @param version version of jar to be downlaoded
+     * @param version version of jar to be downloaded
      */
     public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final Version version) {
         JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
@@ -111,7 +111,7 @@ public class ManageJnlpResources {
      * @param version The version of resource. If null, no version is specified.
      */
 
-    public static void loadExternalResouceToCache(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
+    public static void loadExternalResourceToCache(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
         rootClassLoader.manageExternalJars(ref, version, DownloadAction.DOWNLOAD_TO_CACHE);
     }
 

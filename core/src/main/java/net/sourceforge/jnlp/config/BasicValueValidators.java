@@ -351,7 +351,7 @@ public class BasicValueValidators {
                     throw new IllegalArgumentException("Value should be string!");
                 }
                if (verifyFileOrCommand((String)value) == null){
-                    //jsut warn?
+                    //just warn?
                     throw new IllegalArgumentException("Value should be file, or on PATH, or known keyword. See possible values.");
                }
             }

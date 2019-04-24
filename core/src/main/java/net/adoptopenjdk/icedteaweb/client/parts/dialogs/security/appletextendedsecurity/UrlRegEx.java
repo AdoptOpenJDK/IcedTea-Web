@@ -74,7 +74,7 @@ public class UrlRegEx {
      * Just cosmetic method to show nicer tables, as \Qsomething\Emaybe is most
      * common record when cell is edited, the regex is shown fully
      *
-     * @return unquted pattern or original string
+     * @return unquoted pattern or original string
      */
     public String getFilteredRegEx() {
         try {

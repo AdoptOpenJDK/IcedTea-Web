@@ -145,8 +145,8 @@ final public class VariableX509TrustManager {
      * Check if client is trusted (no support for custom here, only system/user)
      *
      * @param chain    certificate chain
-     * @param authType type of authentification
-     * @param hostName hostnem
+     * @param authType type of authentication
+     * @param hostName hostname
      * @throws java.security.cert.CertificateException if certificate is wrong
      */
     public void checkTrustClient(final X509Certificate[] chain, final String authType,

@@ -206,7 +206,7 @@ public class ParametrizedJarUrlTests extends BrowserTest{
         Assert.assertTrue("AppletTest stdout should contain " + s1 + " but didn't", pr.stdout.contains(s1));
         String s2 = "value2";
         Assert.assertTrue("AppletTest stdout should contain " + s2 + " but didn't", pr.stdout.contains(s2));
-        String s7 = "Aplet killing himself after 2000 ms of life";
+        String s7 = "Applet killing himself after 2000 ms of life";
         Assert.assertTrue("AppletTest stdout should contain " + s7 + " but didn't", pr.stdout.contains(s7));
     }
 

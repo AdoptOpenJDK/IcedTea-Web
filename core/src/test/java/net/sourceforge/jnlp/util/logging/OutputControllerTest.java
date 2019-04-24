@@ -35,7 +35,7 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosingListener;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import org.junit.After;
@@ -57,12 +57,12 @@ public class OutputControllerTest {
     private static final String line4 = "I'm logged line four";
     private static final String line5 = "I'm logged line five";
     private static final String line6 = "I'm logged line six";
-    private static final RulesFolowingClosingListener.ContainsRule r1 = new RulesFolowingClosingListener.ContainsRule(line1);
-    private static final RulesFolowingClosingListener.ContainsRule r2 = new RulesFolowingClosingListener.ContainsRule(line2);
-    private static final RulesFolowingClosingListener.ContainsRule r3 = new RulesFolowingClosingListener.ContainsRule(line3);
-    private static final RulesFolowingClosingListener.ContainsRule r4 = new RulesFolowingClosingListener.ContainsRule(line4);
-    private static final RulesFolowingClosingListener.ContainsRule r5 = new RulesFolowingClosingListener.ContainsRule(line5);
-    private static final RulesFolowingClosingListener.ContainsRule r6 = new RulesFolowingClosingListener.ContainsRule(line6);
+    private static final RulesFollowingClosingListener.ContainsRule r1 = new RulesFollowingClosingListener.ContainsRule(line1);
+    private static final RulesFollowingClosingListener.ContainsRule r2 = new RulesFollowingClosingListener.ContainsRule(line2);
+    private static final RulesFollowingClosingListener.ContainsRule r3 = new RulesFollowingClosingListener.ContainsRule(line3);
+    private static final RulesFollowingClosingListener.ContainsRule r4 = new RulesFollowingClosingListener.ContainsRule(line4);
+    private static final RulesFollowingClosingListener.ContainsRule r5 = new RulesFollowingClosingListener.ContainsRule(line5);
+    private static final RulesFollowingClosingListener.ContainsRule r6 = new RulesFollowingClosingListener.ContainsRule(line6);
 
     private static class AccessiblePrintStream extends PrintStream {
 
@@ -163,7 +163,7 @@ public class OutputControllerTest {
         public void run() {
             for (int i = 0; i < iterations; i++) {
                 try {
-                    //be sure this pattern is kept in assers
+                    //be sure this pattern is kept in asserts
                     oc.log(OutputControllerLevel.WARNING_ALL, "thread " + id + " line " + i);
                     Thread.sleep(random.nextInt(delayable));
                 } catch (Exception ex) {
@@ -182,12 +182,12 @@ public class OutputControllerTest {
      * todo - include syslog once implemented
      */
     @Test
-    public void isParalelLogingWorking() throws Exception {
+    public void isParallelLoggingWorking() throws Exception {
         LogConfig.getLogConfig().setEnableLogging(true);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
         String s = "";
-        //this was tested with  1-100 iterations and 100 threads. But can couse OutOfMemoryError
+        //this was tested with  1-100 iterations and 100 threads. But can cause OutOfMemoryError
         int maxi = 90;
         int minits = 70;
         int maxt = 10;
@@ -258,7 +258,7 @@ public class OutputControllerTest {
     }
 
     @Test
-    public void isChangingOfStreasmWorking() throws Exception {
+    public void isChangingOfStreamsWorking() throws Exception {
         LogConfig.getLogConfig().setEnableLogging(true);
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);

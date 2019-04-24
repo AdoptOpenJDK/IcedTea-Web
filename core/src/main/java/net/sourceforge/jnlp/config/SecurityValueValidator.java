@@ -46,7 +46,7 @@ class SecurityValueValidator implements ValueValidator {
     public void validate(Object value) throws IllegalArgumentException {
         if (value == null) {
             // null is correct, it means it is not user set
-            // and so default shoudl be used whatever it is
+            // and so default should be used whatever it is
             // returning to prevent NPE in fromString
             return;
         }

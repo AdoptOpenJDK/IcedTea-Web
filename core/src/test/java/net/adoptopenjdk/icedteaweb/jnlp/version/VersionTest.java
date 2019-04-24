@@ -128,7 +128,7 @@ public class VersionTest {
 
     @Test
     public void jreVersionTestOk() {
-        //no exception occures
+        //no exception occurs
         //head support jdk 7+, so this statements should be always true
         JreVersion jreVersion = new JreVersion("1.4 1.5+", true, true);
         JreVersion jreVersion1 = new JreVersion("1.6+", true, true);

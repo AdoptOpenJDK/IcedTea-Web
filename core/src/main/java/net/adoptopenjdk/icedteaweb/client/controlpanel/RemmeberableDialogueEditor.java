@@ -129,11 +129,11 @@ public class RemmeberableDialogueEditor extends JDialog {
                             if (result != null) {
                                 String s = result.toString();
                                 if (!s.trim().isEmpty()){
-                                    actions.setAction(entry.getKey(), createRember(entry.getValue().getAction(), s));
+                                    actions.setAction(entry.getKey(), createRemember(entry.getValue().getAction(), s));
                                 }
                             }
                         }
-                        private SavedRememberAction createRember(ExecuteAppletAction action, String newValue) {
+                        private SavedRememberAction createRemember(ExecuteAppletAction action, String newValue) {
                             return new SavedRememberAction(action, newValue);
                         }
                     });

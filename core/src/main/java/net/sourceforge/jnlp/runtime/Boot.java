@@ -202,13 +202,13 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.setAllowRedirect(true);
         }
 
-        //if it is browser go by ots own, otherwise procedd with normal ITW logic
+        //if it is browser go by ots own, otherwise proceed with normal ITW logic
         if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
             String url = optionParser.getParam(CommandLineOptions.BROWSER);
             LinkingBrowser.showStandAloneWindow(url, false);
         } else {
 
-            JNLPRuntime.setInitialArgments(Arrays.asList(argsIn));
+            JNLPRuntime.setInitialArguments(Arrays.asList(argsIn));
 
             AccessController.doPrivileged(new Boot());
         }
@@ -252,7 +252,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (param.matches("^jnlp[s]?:.*://.*")) {
             param = param.replaceFirst("^jnlp[s]?:", "");
         }
-        //transalte jnlp://some.app/file.jnlp to http/https
+        //translate jnlp://some.app/file.jnlp to http/https
         return param.replaceFirst("^jnlp:", "http:").replaceFirst("^jnlps:", "https:");
     }
 

@@ -40,7 +40,7 @@ public interface ExtendedService {
     FileContents openFile(File file) throws IOException;
 
     /**
-     * Opens multiple files on the user's sytem and returns their contents as a
+     * Opens multiple files on the user's system and returns their contents as a
      * {@link FileContents} array
      *
      * @param files the files to open

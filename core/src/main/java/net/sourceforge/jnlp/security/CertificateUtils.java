@@ -74,7 +74,7 @@ public class CertificateUtils {
     public static final String X_509 = "X509";
 
     /**
-     * Adds the X509Certficate in the file to the KeyStore. Note that it does
+     * Adds the X509Certificate in the file to the KeyStore. Note that it does
      * not update the copy of the KeyStore on disk.
      * @param file file with certificate
      * @param ks keystore to save to
@@ -187,7 +187,7 @@ public class CertificateUtils {
     /**
      * Writes the certificate in base64 encoded from to the print stream.
      * See http://tools.ietf.org/html/rfc4945#section-6.1 for more information
-     * @param cert sertifcate to export
+     * @param cert certificate to export
      * @param out stream to print it to
      * @throws java.security.cert.CertificateException if certificate fails
      */

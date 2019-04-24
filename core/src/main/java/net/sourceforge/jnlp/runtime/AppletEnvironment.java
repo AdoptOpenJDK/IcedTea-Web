@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The applet environment including stub, context, and frame.  The
- * default environment puts the applet in a non-resiable frame;
+ * default environment puts the applet in a non-resizable frame;
  * this can be changed by obtaining the frame and setting it
  * resizable.
  *
@@ -160,7 +160,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
      /**
-     * container must be SplashContoler.
+     * container must be SplashController.
      * @return container
      */
     public SplashController getSplashController() {

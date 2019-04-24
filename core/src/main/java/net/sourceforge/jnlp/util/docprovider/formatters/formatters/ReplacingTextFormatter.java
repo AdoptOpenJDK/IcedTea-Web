@@ -101,7 +101,7 @@ public abstract class ReplacingTextFormatter implements Formatter {
     }
     
     @Override
-    public String getAdressLink(String s) {
+    public String getAddressLink(String s) {
         return s;
     }
 

@@ -36,7 +36,7 @@ public class JreVersion extends Version {
         boolean match = matchesJreVersion();
         if (!match) {
             String s = Translator.R("JREversionDontMatch", getJreVersion(), v);
-            String e = "Strict run is  deffined, and your JRE - " + getJreVersion() + " - dont match requested JRE(s) - " + v;
+            String e = "Strict run is defined, and your JRE - " + getJreVersion() + " - doesn't match requested JRE(s) - " + v;
             if (strict) {
                 if (!headless) {
                     if (!warned) {

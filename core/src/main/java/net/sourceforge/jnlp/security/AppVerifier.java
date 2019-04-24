@@ -87,7 +87,7 @@ public interface AppVerifier {
      * Prompt the user with requests for trusting the certificates used by this app
      * @param securityDelegate parental security
      * @param jcv jar verifier
-     * @param file jnlp fiel to provide information
+     * @param file jnlp file to provide information
      * @throws LaunchException if it fails to verify
      */
     public void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)

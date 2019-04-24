@@ -151,7 +151,7 @@ class XBasicService implements BasicService {
         }
 
         // this section is only reached if the jnlp file has no jars.
-        // that doesnt seem very likely.
+        // that doesn't seem very likely.
         URL arbitraryURL;
         try {
             arbitraryURL = new URL("http://icedtea.classpath.org");
@@ -187,7 +187,7 @@ class XBasicService implements BasicService {
 //                return false;
 //            }
 //        }
-// Ignorance of this code is the only regression against original code (if you asume msot of the jnlps havejnlp suffix...) we had
+// Ignorance of this code is the only regression against original code (if you assume most of the jnlps have jnlp suffix...) we had
 // anyway, also jnlp protocol should be handled via this, so while this can be set via 
 // ALWAYS-ASK, or directly via BROWSER of deployment.browser.path , it still should be better then it was
 // in all cases, the mime recognition is much harder then .jnlp suffix
@@ -227,7 +227,7 @@ class XBasicService implements BasicService {
         }
     }
 
-    //cmd form user can contains spaces, wuotes and so... now we are relying on default dummy impl
+    //cmd form user can contains spaces, quotes and so... now we are relying on default dummy impl
     private boolean exec(String cmd, String url) {
         try {
             if (cmd == null || cmd.length() == 0) {

@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * in a string by separating them with spaces.
  * </p>
  * <p>
- * Version strings are divided by "._-" charecters into parts.
+ * Version strings are divided by "._-" characters into parts.
  * These parts are compared numerically if they can be parsed as
- * integers or lexographically as strings otherwise.  If the
+ * integers or lexicographically as strings otherwise.  If the
  * number of parts is different between two version strings then
  * the smaller one is padded with zero or the empty string.  Note
  * that the padding in this version means that 1.2+ matches
@@ -58,7 +58,7 @@ public class Version {
     // "*" and "+" modifiers.
 
     /** separates parts of a version string */
-    private static final String seperators = ".-_";
+    private static final String separators = ".-_";
 
     /** magic key for whether a version part was created due to normalization */
     private static final String emptyString = new String("<EMPTY>"); // not intern'ed
@@ -85,7 +85,7 @@ public class Version {
 
     /**
      * @return true if all of this version's version-ids match one
-     * or more of the specifed version's version-id.
+     * or more of the specified version's version-id.
      *
      * @param version a version string
      */
@@ -95,7 +95,7 @@ public class Version {
 
     /**
      * @return true if all of this version's version-ids match one
-     * or more of the specifed version's version-id.
+     * or more of the specified version's version-id.
      *
      * @param version a Version object
      */
@@ -113,7 +113,7 @@ public class Version {
 
     /**
      * @return true if any of this version's version-ids match one
-     * or more of the specifed version's version-id.
+     * or more of the specified version's version-id.
      *
      * @param version a version string
      */
@@ -123,7 +123,7 @@ public class Version {
 
     /**
      * @return true if any of this version's version-ids match one
-     * or more of the specifed version's version-id.
+     * or more of the specified version's version-id.
      *
      * @param version a Version object
      */
@@ -212,7 +212,7 @@ public class Version {
             if (compare(parts1.get(i), parts2.get(i)) > 0)
                 return true;
 
-            // if part1 < part2 then it's a ealier version, so return false
+            // if part1 < part2 then it's a earlier version, so return false
             if (compare(parts1.get(i), parts2.get(i)) < 0)
                 return false;
 
@@ -308,7 +308,7 @@ public class Version {
     protected List<String> getParts(String oneVersion) {
         ArrayList<String> strings = new ArrayList<>();
 
-        StringTokenizer st = new StringTokenizer(oneVersion, seperators + "+*");
+        StringTokenizer st = new StringTokenizer(oneVersion, separators + "+*");
         while (st.hasMoreTokens()) {
             strings.add(st.nextToken());
         }

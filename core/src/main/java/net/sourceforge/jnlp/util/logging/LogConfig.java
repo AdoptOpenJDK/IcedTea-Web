@@ -63,7 +63,7 @@ public class LogConfig {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
         // Check whether logging and tracing is enabled.
         enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
-        //enagle disable headers
+        //enable/disable headers
         enableHeaders = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS));
         //enable/disable individual channels
         logToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE));

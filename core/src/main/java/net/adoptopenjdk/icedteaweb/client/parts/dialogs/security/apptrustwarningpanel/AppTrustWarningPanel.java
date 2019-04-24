@@ -284,7 +284,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
     }
 
     @Override
-    public RememberPanelResult getRemeberAction() {
+    public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();
     }
 

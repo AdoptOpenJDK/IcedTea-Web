@@ -206,7 +206,7 @@ public class ViwableDialog {
     }
 
     public void setResizable(final boolean b) {
-        // not defered: called when alive
+        // not deferred: called when alive
         if (jd != null) {
             jd.setResizable(b);
         }

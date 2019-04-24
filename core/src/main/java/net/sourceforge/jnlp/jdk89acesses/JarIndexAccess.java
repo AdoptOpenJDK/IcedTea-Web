@@ -39,7 +39,7 @@ public class JarIndexAccess {
 
     private JarIndexAccess(Object parent) {
         if (parent == null) {
-            throw new RuntimeException("JarFile can notbe null!");
+            throw new RuntimeException("JarFile can not be null!");
         }
         this.parent = parent;
     }

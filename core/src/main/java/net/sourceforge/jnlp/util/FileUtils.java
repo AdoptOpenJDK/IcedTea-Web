@@ -111,7 +111,7 @@ public final class FileUtils {
     }
 
     public static String sanitizePath(String path, char substitute) {
-        //on windows, we can recieve both c:/path/ and c:\path\
+        //on windows, we can receive both c:/path/ and c:\path\
         path = path.replace("\\", "/");
         if (JNLPRuntime.isWindows() && path.matches("^[a-zA-Z]\\:.*")) {
             path = path.replaceFirst(":", WIN_DRIVE_LETTER_COLON_WILDCHAR);
@@ -163,7 +163,7 @@ public final class FileUtils {
 
     /**
      * Creates a new file with minimum permissions. The file is not readable or
-     * writable by anyone other than the owner. If writeableByOnwer is false,
+     * writable by anyone other than the owner. If writeableByOwner is false,
      * even the owner can not write to it.
      *
      * @param file path to file
@@ -229,7 +229,7 @@ public final class FileUtils {
 
     /**
      * Creates a new file or directory with minimum permissions. The file is not
-     * readable or writable by anyone other than the owner. If writeableByOnwer
+     * readable or writable by anyone other than the owner. If writeableByOwner
      * is false, even the owner can not write to it. If isDir is true, then the
      * directory can be executed by the owner
      *

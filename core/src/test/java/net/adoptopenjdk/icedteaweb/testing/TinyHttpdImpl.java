@@ -59,7 +59,7 @@ import java.util.StringTokenizer;
  * small implementation of http return headers for our served resources
  * Originally Licenced under GPLv2.0
  * <p>
- * When resource starts with XslowX prefix, then resouce (without XslowX) is
+ * When resource starts with XslowX prefix, then resource (without XslowX) is
  * returned, but its delivery is delayed
  */
 public class TinyHttpdImpl extends Thread {
@@ -133,17 +133,17 @@ public class TinyHttpdImpl extends Thread {
                     if (requestsCounter != null) {
                         String resource = filePath.replace(XSX, "/");
                         resource = urlToFilePath(resource);
-                        Map<String, Integer> reosurceRecord = requestsCounter.get(resource);
-                        if (reosurceRecord == null) {
-                            reosurceRecord = new HashMap<>();
-                            requestsCounter.put(resource, reosurceRecord);
+                        Map<String, Integer> resourceRecord = requestsCounter.get(resource);
+                        if (resourceRecord == null) {
+                            resourceRecord = new HashMap<>();
+                            requestsCounter.put(resource, resourceRecord);
                         }
-                        Integer i = reosurceRecord.get(request);
+                        Integer i = resourceRecord.get(request);
                         if (i == null) {
                             i = 0;
                         }
                         i++;
-                        reosurceRecord.put(request, i);
+                        resourceRecord.put(request, i);
                     }
 
 
@@ -211,13 +211,13 @@ public class TinyHttpdImpl extends Thread {
     }
 
     /**
-     * This function splits input array to severasl pieces from byte[length]
-     * splitt to n pieces s is retrunrd byte[n][length/n], except last piece
+     * This function splits input array to several pieces from byte[length]
+     * split to n pieces s is returned byte[n][length/n], except last piece
      * which contains length%n
      *
-     * @param input  - array to be splitted
+     * @param input  - array to be split
      * @param pieces - to how many pieces it should be broken
-     * @return inidividual pices of original array, which concatet again givs
+     * @return individual pieces of original array, which concatet again givs
      * original array
      */
     public static byte[][] splitArray(byte[] input, int pieces) {
@@ -252,7 +252,7 @@ public class TinyHttpdImpl extends Thread {
      * @throws UnsupportedEncodingException
      */
     public static String urlToFilePath(String url) throws UnsupportedEncodingException {
-        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded charaters, eg "%3B" becomes ';'
+        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded characters, eg "%3B" becomes ';'
         if (url.startsWith(XSX)) {
             url = url.replace(XSX, "/");
         }
@@ -291,7 +291,7 @@ public class TinyHttpdImpl extends Thread {
     }
 
 
-    //resoource -> request -> number of requests on of this rsource on this server
+    //resource -> request -> number of requests on of this resource on this server
     // eg   simpletest1.jnlp -> GET -> 3
     private Map<String, Map<String, Integer>> requestsCounter;
 

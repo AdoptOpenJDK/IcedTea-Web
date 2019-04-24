@@ -17,7 +17,7 @@ public class AppletUtils {
     public static int getFixedWidth(final int width, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
-        if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
+        if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
             final Integer nww = fixWidth(parameters);
             if (nww != null) {
                 return nww;
@@ -32,7 +32,7 @@ public class AppletUtils {
     public static int getFixedHeight(final int height, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
-        if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_TRESHOLD)) {
+        if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
             final Integer nwh = fixHeight(parameters);
             if (nwh != null) {
                 return nwh;

@@ -188,7 +188,7 @@ public class CacheEntry {
     /**
      * Save the current information for the cache entry.
      *
-     * @return True if successfuly stored into file, false otherwise
+     * @return True if successfully stored into file, false otherwise
      */
     protected boolean store() {
         if (properties.isHeldByCurrentThread()) {

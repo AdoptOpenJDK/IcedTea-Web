@@ -118,7 +118,7 @@ public class ClasspathMatcherTest {
             ex = e;
         }
         Assert.assertNotNull(ex);
-        //wrongly palced :// - is catched by hasProtocol
+        //wrongly placed :// - is caught by hasProtocol
         Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.correct.url:5050://full/path")));
         Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.corr://ect.url:5050/full/path")));
         Assert.assertFalse("http".equals(ClasspathMatcher.extractProtocol("httpsome.corr://ect.url")));
@@ -154,7 +154,7 @@ public class ClasspathMatcherTest {
             ex = e;
         }
         Assert.assertNotNull(ex);
-        //wrongly palced :// - is catched by hasProtocol
+        //wrongly placed :// - is caught by hasProtocol
         Assert.assertFalse("some.correct.url:5050://full/path".equals(ClasspathMatcher.removeProtocol("httpsome.correct.url:5050://full/path")));
         Assert.assertFalse("some.corr://ect.url:5050/full/path".equals(ClasspathMatcher.removeProtocol("httpsome.corr://ect.url:5050/full/path")));
         Assert.assertFalse("some.corr://ect.url".equals(ClasspathMatcher.removeProtocol("httpsome.corr://ect.url")));
@@ -426,7 +426,7 @@ public class ClasspathMatcherTest {
         Assert.assertTrue(p.match(urls[15]));
         Assert.assertTrue(p.match(urls[16]));
         Assert.assertFalse(p.match(urls[17]));
-        //reasons for alowing "dot" issue
+        //reasons for allowing "dot" issue
         Assert.assertTrue(p.match(new URL("http://www.example.com")));
         Assert.assertTrue(p.match(new URL("http://example.com")));
         //reason for restricting dost issue

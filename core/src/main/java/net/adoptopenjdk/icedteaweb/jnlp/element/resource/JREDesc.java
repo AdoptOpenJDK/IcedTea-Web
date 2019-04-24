@@ -42,7 +42,7 @@ public class JREDesc {
     /** the location of a JRE product or null */
     private final URL location;
 
-    /** inital heap size */
+    /** initial heap size */
     private final String initialHeapSize;
 
     /** maximum head size */

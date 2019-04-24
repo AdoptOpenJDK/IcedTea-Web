@@ -60,7 +60,7 @@ public final class AssociationDesc {
     }
 
     /**
-     * @return the mimetype for this association
+     * @return the MIME type for this association
      */
     public String getMimeType() {
         return mimeType;

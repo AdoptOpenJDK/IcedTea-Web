@@ -86,7 +86,7 @@ public class SecurityUtil {
          * Issues:
          * - rfc2253 talks about utf8, java uses utf16.
          * - theoretically, java should have dealt with all byte encodings
-         *   so we shouldnt even see cases like \FF
+         *   so we shouldn't even see cases like \FF
          * - if the above is wrong, then we need to deal with cases like
          *   \FF\FF
          */
@@ -408,7 +408,7 @@ public class SecurityUtil {
     }
 
     private static RuntimeException unexpectedException(Exception ex) {
-        return new RuntimeException("This usage of KeystorePasswordAttempter shopuld not throw this kind of exception", ex);
+        return new RuntimeException("This usage of KeystorePasswordAttempter should not throw this kind of exception", ex);
     }
 
 }

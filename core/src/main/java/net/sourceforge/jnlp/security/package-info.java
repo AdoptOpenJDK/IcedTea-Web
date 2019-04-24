@@ -32,13 +32,13 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version.*/
 /**
  *package generally about showing various security prompts
- *<h3>Following diagram shows how dialog is handled when some application/appelt needs to show it</h3>
+ *<h3>Following diagram shows how dialog is handled when some application/applet needs to show it</h3>
  *
  *<pre>
 {@code
         ITW-thread(s)               | dialogs-thread                                                                                                                                  X
                                     |                                                                                                                                                 X
-   presteps in SecurtyDialogs       |                                                                                                                                                 X
+   presteps in SecurityDialogs      |                                                                                                                                                 X
       # eg handle trustall/none     |                                                                                                                                                 X
             |                       |                                                                                                                                                 X
     prepare message                 |                                                                                                                                                 X
@@ -71,7 +71,7 @@ statement from your version.*/
                                     |                |                                                                                                     |                        | X
                                     |                      according to set value, set default selected button?                                            |                        | X
                                     |                |                                                                                                     |                        | X
-                                    |            if his applet+action was already stored in .appletSecurity include text approved/denyed and when          |                        | X
+                                    |            if his applet+action was already stored in .appletSecurity include text approved/denied and when          |                        | X
                                     |                |                                                                                                     |                        | X
                                     |            wait for user to click button or close dialogue                                                          |                        | X
                                     |                |                                                                                                     |                        | X
@@ -93,7 +93,7 @@ statement from your version.*/
  *</ul>
  *<blockquote>
  *<ul>
- * <li>  RememberPanelResult getRemeberAction - if your dialogue uses RememberPanel, then you get RememberPanelResult for free</li>
+ * <li>  RememberPanelResult getRememberAction - if your dialogue uses RememberPanel, then you get RememberPanelResult for free</li>
  * <li>  DialogResult getValue() - what your dialogue actually returns. If it is some simple Yes, No.. Then you can use existing types in dialogresults package. If it handles something more complex, you can inspire yourself in AccessWarningPaneComplexReturn </li>
  * <li>  JNLPFile getFile() - ok, file keeps all needed to identify applet/app, so it is a must.</li>
  * <li>  DialogResult readValue(String s) - the dialog must be able to read answer from String, which is supplied to it via engine. If you use some PrimitivesSubset extension, then it is mostly only static call its factory creator from String. </li>

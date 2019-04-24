@@ -206,11 +206,11 @@ public class ServerAccess {
             throw new RuntimeException("test.server.dir property must be set to valid directory!");
         }
         try {
-            ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
-            Thread r = new Thread(lServerLuncher);
+            ServerLauncher lServerLauncher = new ServerLauncher(port, new File(dir));
+            Thread r = new Thread(lServerLauncher);
             r.setDaemon(true);
             r.start();
-            return lServerLuncher;
+            return lServerLauncher;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -225,7 +225,7 @@ public class ServerAccess {
     }
 
     /**
-     * @return - bianry from where to lunch current browser
+     * @return - binary from where to lunch current browser
      */
     private String getBrowserLocation() {
         if (this.currentBrowser == null) return UNSET_BROWSER;
@@ -237,7 +237,7 @@ public class ServerAccess {
             return null;
         }
 
-        final List<String> l1 = this.currentBrowser.getComaptibilitySwitches();
+        final List<String> l1 = this.currentBrowser.getCompatibilitySwitches();
         final List<String> l = new ArrayList<>();
         if (l1 != null) l.addAll(l1);
         return l;
@@ -458,13 +458,13 @@ public class ServerAccess {
 
     private ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
-        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not matter
         return rpw.execute();
     }
 
     private ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
         ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
-        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not matter
         return rpw.execute();
     }
 
@@ -512,7 +512,7 @@ public class ServerAccess {
     }
 
     /**
-     * Proceed message s to logging withhout request to reprint
+     * Proceed message s to logging without request to reprint
      *
      * @param s
      */
@@ -566,7 +566,7 @@ public class ServerAccess {
             if (stack[i].getClassName().contains("$")) {
                 continue;
             }
-            //probablky it is necessary to get out of net.sourceforge.jnlp.
+            //probably it is necessary to get out of net.sourceforge.jnlp.
             //package where are right now all test-extensions
             //for now keeping exactly the three classes helping you  access the log
             try {

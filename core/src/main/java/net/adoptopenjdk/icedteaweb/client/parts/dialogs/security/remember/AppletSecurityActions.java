@@ -113,7 +113,7 @@ public class AppletSecurityActions implements Iterable<SavedRememberAction> {
             s = "";
         }
         s = s.trim(); //to not return on leading space, may be dangerous, 
-        //but the s shouldbe already trimmed before bubbling here.
+        //but the s should be already trimmed before bubbling here.
         //does " A"  means UNSET(1)+ALWAYS(2)  or ALWAYS(1)+UNSET(2)
         //or UNSET(1)+UNSET(2)?
         AppletSecurityActions asas = new AppletSecurityActions();

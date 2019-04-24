@@ -90,7 +90,7 @@ public class InformationElementTest {
     private final static TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionKind.SHORT);
     private final static TestDescriptionInfoItem short2D = new TestDescriptionInfoItem("short2", DescriptionKind.SHORT);
     private final static TestDescriptionInfoItem noKindD = new TestDescriptionInfoItem("noKind", null);
-    private static final String testJnlpheader =
+    private static final String testJnlpHeader =
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
             + "<jnlp spec=\"1.0\" href=\"http://somehref.jnlp\" codebase=\"http://some.code.base\">\n"
             + "  <information>\n";
@@ -110,17 +110,17 @@ public class InformationElementTest {
         InformationElement ie = new InformationElement();
         Assert.assertNull("After creation value must be null", ie.getTitle());
         ie.setTitle(title.getValue());
-        Assert.assertNotNull("After assigmentvalue must NOT be null", ie.getTitle());
-        Assert.assertTrue("After assigment value must be included in output", ie.getTitle().contains(title.getValue()));
+        Assert.assertNotNull("After assignment value must NOT be null", ie.getTitle());
+        Assert.assertTrue("After assignment value must be included in output", ie.getTitle().contains(title.getValue()));
     }
 
     @Test
-    public void testSetGetvendor() {
+    public void testSetGetVendor() {
         InformationElement ie = new InformationElement();
         Assert.assertNull("After creation value must be null", ie.getVendor());
         ie.setvendor(vendor.getValue());
-        Assert.assertNotNull("After assigmentvalue must NOT be null", ie.getVendor());
-        Assert.assertTrue("After assigment value must be included in output", ie.getVendor().contains(vendor.getValue()));
+        Assert.assertNotNull("After assignment value must NOT be null", ie.getVendor());
+        Assert.assertTrue("After assignment value must be included in output", ie.getVendor().contains(vendor.getValue()));
     }
 
     @Test
@@ -128,8 +128,8 @@ public class InformationElementTest {
         InformationElement ie = new InformationElement();
         Assert.assertNull("After creation value must be null", ie.getHomepage());
         ie.setHomepage(homepage.getValue());
-        Assert.assertNotNull("After assigmentvalue must NOT be null", ie.getHomepage());
-        Assert.assertTrue("After assigment value must be included in output", ie.getHomepage().contains(homepage.getValue()));
+        Assert.assertNotNull("After assignment value must NOT be null", ie.getHomepage());
+        Assert.assertTrue("After assignment value must be included in output", ie.getHomepage().contains(homepage.getValue()));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class InformationElementTest {
         Assert.assertEquals("Descriptions should be empty", 2, ie.getDescriptions().size());
         ie.addDescription(short2D.getValue(), short2D.getKind());
         Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should reamin same", 2, ie.getDescriptions().size());
+        Assert.assertEquals("Descriptions should remain same", 2, ie.getDescriptions().size());
         ie.addDescription(oneLineD.getValue(), oneLineD.getKind());
         Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
         Assert.assertEquals("Descriptions should be ", 3, ie.getDescriptions().size());
@@ -240,28 +240,28 @@ public class InformationElementTest {
         Assert.assertNotNull(ie1);
 
         //title, vendor and homepage are obligatory.. not so much to test
-        String exJnlp2 = testJnlpheader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
+        String exJnlp2 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
         JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes("utf-8")), parser);
         InformationElement ie2 = InformationElement.createFromJNLP(jnlpFile2);
         Assert.assertNotNull(ie2);
         Assert.assertEquals(3, ie2.getHeader().size());
         Assert.assertEquals(0, ie2.getDescriptions().size());
 
-        String exJnlp3 = testJnlpheader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
+        String exJnlp3 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
         JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes("utf-8")), parser);
         InformationElement ie3 = InformationElement.createFromJNLP(jnlpFile3);
         Assert.assertNotNull(ie3);
         Assert.assertEquals(3, ie3.getHeader().size());
         Assert.assertEquals(1, ie3.getDescriptions().size());
 
-        String exJnlp4 = testJnlpheader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
+        String exJnlp4 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
         JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes("utf-8")), parser);
         InformationElement ie4 = InformationElement.createFromJNLP(jnlpFile4);
         Assert.assertNotNull(ie4);
         Assert.assertEquals(3, ie4.getHeader().size());
         Assert.assertEquals(1, ie4.getDescriptions().size());
 
-        String exJnlp5 = testJnlpheader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
+        String exJnlp5 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
         JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes("utf-8")), parser);
         InformationElement ie5 = InformationElement.createFromJNLP(jnlpFile5);
         Assert.assertNotNull(ie5);

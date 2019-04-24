@@ -429,7 +429,7 @@ public class SecurityDesc {
             }
         }
         try {
-            final URI codebase = file.getNotNullProbalbeCodeBase().toURI().normalize();
+            final URI codebase = file.getNotNullProbableCodeBase().toURI().normalize();
             final URI host = getHost(codebase);
             final String codebaseHostUriString = host.toString();
             final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(codebaseHostUriString);

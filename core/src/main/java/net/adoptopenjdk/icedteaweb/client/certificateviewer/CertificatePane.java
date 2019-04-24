@@ -116,7 +116,7 @@ public class CertificatePane extends JPanel {
     private KeyStores.Type currentKeyStoreType;
     private KeyStores.Level currentKeyStoreLevel;
 
-    /** JComponents that should be disbled for system store */
+    /** JComponents that should be disabled for system store */
     private final List<JComponent> disableForSystem;
 
     private Window parent;

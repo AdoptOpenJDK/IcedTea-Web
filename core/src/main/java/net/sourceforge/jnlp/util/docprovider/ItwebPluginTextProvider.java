@@ -66,7 +66,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
 
     @Override
     public String getSynopsis() {
-        //yes, thsi really returns arch of jdk. So just nice nicly looking, mostly ok workaround.
+        //yes, this really returns arch of jdk. So just nicely looking, mostly ok workaround.
         //fix needs native code
         String jdkArch = System.getProperty("os.arch") + "x";
 

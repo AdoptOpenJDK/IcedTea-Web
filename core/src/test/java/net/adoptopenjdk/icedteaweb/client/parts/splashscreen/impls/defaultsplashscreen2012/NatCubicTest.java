@@ -53,7 +53,7 @@ public class NatCubicTest {
         Assert.assertNull(cc.getResult());
         Exception ex = null;
         try {
-            cc.calcualteAndSaveResult();
+            cc.calculateAndSaveResult();
         } catch (Exception eex) {
             ex = eex;
         }
@@ -64,7 +64,7 @@ public class NatCubicTest {
         Assert.assertNotNull(cc.getSourcePolygon());
         Assert.assertEquals(p1, cc.getSourcePolygon());
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         Assert.assertTrue(cc.isWithPoints());
         cc.setWithPoints(false);
@@ -94,7 +94,7 @@ public class NatCubicTest {
         b.addPoint(10, 10);
         b.addPoint(50, 20);
         b.addPoint(-10, -10);
-        b.calcualteAndSaveResult();
+        b.calculateAndSaveResult();
         Assert.assertTrue(b.pts.npoints < b.result.npoints / 5);
         Assert.assertFalse(b.result.xpoints[0] == b.result.xpoints[b.result.npoints - 1]);
         Assert.assertFalse(b.result.ypoints[0] == b.result.ypoints[b.result.npoints - 1]);
@@ -108,7 +108,7 @@ public class NatCubicTest {
         Assert.assertNull(cc.getResult());
         Exception ex = null;
         try {
-            cc.calcualteAndSaveResult();
+            cc.calculateAndSaveResult();
         } catch (Exception eex) {
             ex = eex;
         }
@@ -119,7 +119,7 @@ public class NatCubicTest {
         Assert.assertNull(cc.getResult());
         ex = null;
         try {
-            cc.calcualteAndSaveResult();
+            cc.calculateAndSaveResult();
         } catch (Exception eex) {
             ex = eex;
         }
@@ -128,12 +128,12 @@ public class NatCubicTest {
         cc.addPoint(10, 10);
         Assert.assertEquals(2, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.addPoint(100, 100);
         Assert.assertEquals(3, cc.getSourcePolygon().npoints);
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
     }
 
@@ -146,7 +146,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.setSelection(-1);
         cc.setPoint(10, 10);
@@ -172,7 +172,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         Assert.assertEquals(20, cc.getSourcePolygon().ypoints[3]);
         Assert.assertEquals(10, cc.getSourcePolygon().xpoints[3]);
@@ -187,7 +187,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.removePoint(-1);
         Assert.assertEquals(4, cc.getSourcePolygon().npoints);
@@ -196,7 +196,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNotNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.removePoint(4);
         Assert.assertEquals(4, cc.getSourcePolygon().npoints);
@@ -205,7 +205,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNotNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.removePoint(3);
         Assert.assertEquals(3, cc.getSourcePolygon().npoints);
@@ -214,7 +214,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
 
     }
@@ -227,7 +227,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.setSelection(-1);
         cc.removePoint();
@@ -237,7 +237,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNotNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.setSelection(4);
         cc.removePoint();
@@ -247,7 +247,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNotNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
         cc.setSelection(0);
         cc.removePoint();
@@ -257,7 +257,7 @@ public class NatCubicTest {
             Assert.assertEquals(xs[i + 1], cc.getSourcePolygon().xpoints[i]);
         }
         Assert.assertNull(cc.getResult());
-        cc.calcualteAndSaveResult();
+        cc.calculateAndSaveResult();
         Assert.assertNotNull(cc.getResult());
 
     }

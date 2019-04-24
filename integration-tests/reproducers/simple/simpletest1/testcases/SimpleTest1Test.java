@@ -74,7 +74,7 @@ public class SimpleTest1Test {
         if (negate) {
             Assert.assertTrue("testSimpletest1lunchOk stderr should contains " + ss + " but didn't", pr.stderr.contains(ss));
         } else {
-            //disabled, unnecessary exceptions may occure
+            //disabled, unnecessary exceptions may occur
             //Assert.assertFalse("testSimpletest1lunchOk stderr should not contains " + ss + " but did", pr.stderr.contains(ss));
         }
         if (checkTermination) {

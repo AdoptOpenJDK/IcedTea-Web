@@ -85,7 +85,7 @@ public class Main {
             System.exit(1);
         }
         if (dieOnFailure && warned) {
-            System.err.println(die_on_failure + " is specified and warning occured. Exiting");
+            System.err.println(die_on_failure + " is specified and warning occurred. Exiting");
             System.exit(2);
         }
         r.run();

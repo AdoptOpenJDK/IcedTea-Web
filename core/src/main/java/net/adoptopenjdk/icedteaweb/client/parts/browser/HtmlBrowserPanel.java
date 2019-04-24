@@ -69,9 +69,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * this calss intentioanlly NOT cache any content, but always load data. Its
- * original usecase was to to implement http proxy logging. And there reloads
- * really metters.
+ * this class intentionally NOT cache any content, but always load data. Its
+ * original use case was to to implement http proxy logging. And there reloads
+ * really matters.
  *
  */
 public class HtmlBrowserPanel extends JPanel {
@@ -79,27 +79,27 @@ public class HtmlBrowserPanel extends JPanel {
     private final static Logger LOG = LoggerFactory.getLogger(HtmlBrowserPanel.class);
 
     private void fireDocumentChanged(String current) {
-        for (DocumentChangededListener documentChangededListener : documentChangededListeners) {
-            documentChangededListener.documentChangeded(current);
+        for (DocumentChangedListener documentChangedListener : documentChangedListeners) {
+            documentChangedListener.documentChanged(current);
         }
     }
 
     private void fireAddressChanged(String url) {
-        for (DocumentChangededListener documentChangededListener : documentChangededListeners) {
-            documentChangededListener.addressChangeded(url);
+        for (DocumentChangedListener documentChangedListener : documentChangedListeners) {
+            documentChangedListener.addressChanged(url);
         }
     }
 
     private void fireAddressChanged(URL url) {
-        for (DocumentChangededListener documentChangededListener : documentChangededListeners) {
-            documentChangededListener.addressChangeded(url);
+        for (DocumentChangedListener documentChangedListener : documentChangedListeners) {
+            documentChangedListener.addressChanged(url);
         }
     }
 
-    public void addDocumentChangedListener(DocumentChangededListener i) {
-        documentChangededListeners.add(i);
+    public void addDocumentChangedListener(DocumentChangedListener i) {
+        documentChangedListeners.add(i);
     }
-    List<DocumentChangededListener> documentChangededListeners = new ArrayList<>();
+    List<DocumentChangedListener> documentChangedListeners = new ArrayList<>();
 
     public URL getUrl() {
         if (current == null) {
@@ -252,7 +252,7 @@ public class HtmlBrowserPanel extends JPanel {
     private static final String TEXTPLAIN = "text/plain";
     private static final String TEXTHTML = "text/html";
 
-    //because of various relaodings, those are always recreated
+    //because of various reloadings, those are always recreated
     private JEditorPane currentHtml;
     private JScrollPane currentScrollHtml;
 
@@ -314,7 +314,7 @@ public class HtmlBrowserPanel extends JPanel {
         goTo.setText(url.toExternalForm());
         fireAddressChanged(url);
         fireAddressChanged(url.toExternalForm());
-        //url conenction is checking response code.It can be used as 511 is unimplemented
+        //url connection is checking response code.It can be used as 511 is unimplemented
         String[] result;
         if (isUseSocket()) {
             LOG.debug("Using socket connection");
@@ -353,7 +353,7 @@ public class HtmlBrowserPanel extends JPanel {
             ((HTMLDocument) currentHtml.getDocument()).setBase(current.url);
         }
         fireDocumentChanged(getCurrentSource());
-        currentHtml.setEditable(false);//oherwise hyperlinks dont work
+        currentHtml.setEditable(false);//otherwise hyperlinks don't work
         currentHtml.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {

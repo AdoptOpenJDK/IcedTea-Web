@@ -169,7 +169,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
 
         
      @Override
-    public RememberPanelResult  getRemeberAction() {
+    public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();
     }
 

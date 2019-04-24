@@ -79,7 +79,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
     // todo: weak remember last getProperty application and
     // re-install properties if another application calls, or find
     // another way for different apps to have different properties
-    // in java.lang.Sytem with the same names.
+    // in java.lang.System with the same names.
 
     /** only class that can exit the JVM, if set */
     private Object exitClass = null;
@@ -459,12 +459,12 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * http://hg.openjdk.java.net/jdk7/awt/jdk/rev/8022709a306d
      *
      * @exception  SecurityException  if the caller does not have
-     *             permission to accesss the AWT event queue.
+     *             permission to access the AWT event queue.
      */
     @Override
     public void checkAwtEventQueueAccess() {
         /*
-         * this is the templace of the code that should allow applets access to
+         * this is the template of the code that should allow applets access to
          * eventqueues
          */
 

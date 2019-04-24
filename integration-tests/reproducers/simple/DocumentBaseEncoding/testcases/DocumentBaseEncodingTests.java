@@ -51,7 +51,7 @@ public class DocumentBaseEncodingTests extends BrowserTest {
         return "\\Q" + plainText + "\\E";
     }
 
-    // Surround a pattern with two plain text matches and wildcards to match any occurence
+    // Surround a pattern with two plain text matches and wildcards to match any occurrence
     private String surroundPattern(String plainText1, String pattern, String plainText2) {
         return "(?s).*" + escapePattern(plainText1) + pattern + escapePattern(plainText2) + "\\W.*";
     }

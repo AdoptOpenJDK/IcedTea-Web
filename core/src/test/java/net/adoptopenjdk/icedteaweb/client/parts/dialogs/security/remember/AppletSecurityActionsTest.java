@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 
 public class AppletSecurityActionsTest {
 
-    //before 1.7 only those two were remebered. Using in legacy parsing tests
+    //before 1.7 only those two were remembered. Using in legacy parsing tests
     public static final Class UATWA = UnsignedAppletTrustWarningPanel.class;
     public static final Class MACA = MatchingALACAttributePanel.class;
 
@@ -77,14 +77,14 @@ public class AppletSecurityActionsTest {
         as.setAction("c2", new SavedRememberAction(ExecuteAppletAction.ALWAYS, null));
         as.setAction("c3", new SavedRememberAction(ExecuteAppletAction.ALWAYS, "item"));
         String saveString = as.toShortString();
-        //order is not guaranted
+        //order is not guaranteed
         Assert.assertTrue(saveString.contains("c3:A{item};"));
         Assert.assertTrue(saveString.contains("c1:A{};"));
         Assert.assertTrue(saveString.contains("c2:A{};"));
     }
 
     @Test
-    public void checkToStringIsParsableBack() throws Exception {
+    public void checkToStringIsParseableBack() throws Exception {
         AppletSecurityActions as = new AppletSecurityActions();
         as.setAction("c1", new SavedRememberAction(ExecuteAppletAction.ALWAYS, ""));
         as.setAction("c2", new SavedRememberAction(ExecuteAppletAction.NEVER, null));
