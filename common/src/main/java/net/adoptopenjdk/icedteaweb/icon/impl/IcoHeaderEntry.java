@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.tools.ico.impl;
+package net.adoptopenjdk.icedteaweb.icon.impl;
 
 /*
  Copyright (C) 2015 Red Hat, Inc.
@@ -47,11 +47,10 @@ public class IcoHeaderEntry {
     private int colorCount;
     private final int reserved;
     private final int planes; //should be 1 but  I met quite a lot of  0
-    private final int bitCount;
     private final int sizeInBytes; // InfoHeader + ANDbitmap + XORbitmap
     private final int fileOffset; //FilePos, where InfoHeader starts
 
-    public IcoHeaderEntry(ImageInputStream src) throws IOException, IcoException {
+    public IcoHeaderEntry(final ImageInputStream src) throws IOException, IcoException {
         width = src.read();
         height = src.read();
         colorCount = src.read();
@@ -64,20 +63,9 @@ public class IcoHeaderEntry {
         reserved = src.read();
         planes = src.readUnsignedShort();
         isIcoHeader();
-        bitCount = src.readUnsignedShort();
+        src.readUnsignedShort(); //bitCount
         sizeInBytes = src.readInt();
         fileOffset = src.readInt();
-    }
-
-    private IcoHeaderEntry(int width, int height, int planes, int sizeInBytes, int fileOffset) {
-        this.width = width;
-        this.height = height;
-        this.colorCount = 1;
-        this.reserved = 0;
-        this.planes = planes;
-        this.bitCount = 1;
-        this.sizeInBytes = sizeInBytes;
-        this.fileOffset = fileOffset;
     }
 
     private void isIcoHeader() throws IcoException {
@@ -89,13 +77,13 @@ public class IcoHeaderEntry {
     /**
      * @return the colorCount
      */
-    int getColorCount() {
+    public int getColorCount() {
         return colorCount;
     }
 
     /**
      */
-    void resetColorCount() {
+    public void resetColorCount() {
         this.colorCount = 0;
     }
 
@@ -109,7 +97,7 @@ public class IcoHeaderEntry {
     /**
      * @param width the width to set
      */
-    void setWidth(int width) {
+    public void setWidth(final int width) {
         this.width = width;
     }
 
@@ -123,15 +111,15 @@ public class IcoHeaderEntry {
     /**
      * @param height the height to set
      */
-    void setHeight(int height) {
+    public void setHeight(final int height) {
         this.height = height;
     }
 
-    int getSizeInBytes() {
+    public int getSizeInBytes() {
         return sizeInBytes;
     }
 
-    int getFileOffset() {
+    public int getFileOffset() {
         return fileOffset;
     }
 

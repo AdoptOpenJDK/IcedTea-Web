@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.tools.ico.IcoSpi;
+import net.adoptopenjdk.icedteaweb.icon.IcoSpi;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

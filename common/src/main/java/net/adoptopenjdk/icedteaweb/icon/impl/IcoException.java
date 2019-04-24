@@ -34,53 +34,13 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.sourceforge.jnlp.tools.ico.impl;
+package net.adoptopenjdk.icedteaweb.icon.impl;
 
-import javax.imageio.stream.ImageInputStream;
-import java.io.IOException;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * http://www.daubnet.com/en/file-format-ico
- */
-public class IcoHeader {
+class IcoException extends Exception {
 
-    private final int reserved; //0
-    private final int type; //should be 1 (0 is for cusrsor?)
-    final int countOfIcons;
-    final List<IcoHeaderEntry> entries; //size 16*countOfIcons bytes
-
-    public IcoHeader(ImageInputStream src) throws IOException, IcoException {
-        final ByteOrder originalOrder = src.getByteOrder();
-        try {
-            src.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-            reserved = src.readUnsignedShort();
-            type = src.readUnsignedShort();
-            isIco();
-            countOfIcons = src.readUnsignedShort();
-            entries = new ArrayList<>(countOfIcons);
-            for (int x = 0; x < countOfIcons; x++) {
-                entries.add(new IcoHeaderEntry(src));
-            }
-        } finally {
-            src.setByteOrder(originalOrder);
-        }
-    }
-
-    private void isIco() throws IcoException {
-        if (reserved != 0 || (type != 1)) {
-            throw new IcoException("Invalid header. Expected 0 and 1, got " + reserved + " and " + type);
-        }
-    }
-
-    public List<IcoHeaderEntry> getEntries() {
-        return entries;
-    }
-
-    public int getCountOfIcons() {
-        return countOfIcons;
+    public IcoException(final String string) {
+        super(string);
     }
 
 }
