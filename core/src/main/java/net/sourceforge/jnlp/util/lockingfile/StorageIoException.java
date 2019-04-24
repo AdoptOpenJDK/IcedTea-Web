@@ -41,18 +41,12 @@ package net.sourceforge.jnlp.util.lockingfile;
  */
 public class StorageIoException extends RuntimeException {
 
-    LockingReaderWriter outer;
-
-    public StorageIoException(Exception e) {
+    public StorageIoException(final Exception e) {
         super(e);
     }
 
-    public StorageIoException(String e) {
+    public StorageIoException(final String e) {
         super(e);
     }
 
-     public StorageIoException(Exception e, LockingReaderWriter outer) {
-        super(e);
-        this.outer = outer;
-    }
 }

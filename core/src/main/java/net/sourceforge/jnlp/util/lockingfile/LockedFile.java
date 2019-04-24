@@ -52,22 +52,24 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LockedFile {
 
+    static private final Map<File, LockedFile> instanceCache = new WeakHashMap<>();
+
     // The file for access
     private RandomAccessFile randomAccessFile;
     private FileChannel fileChannel;
-    private File file;
+    private final File file;
     // A file lock will protect against locks for multiple
     // processes, while a thread lock is still needed within a single JVM.
     private FileLock processLock = null;
-    private ReentrantLock threadLock = new ReentrantLock();
+    private final ReentrantLock threadLock = new ReentrantLock();
     private boolean readOnly;
 
-    private LockedFile(File file) {
+    protected LockedFile(final File file) {
         this.file = file;
         try {
             //just try to create
             this.file.createNewFile();
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             //intentionally silent
         }
         if (!this.file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
@@ -84,7 +86,6 @@ public class LockedFile {
         return readOnly;
     }
     // Provide shared access to LockedFile's via weak map
-    static private final Map<File, LockedFile> instanceCache = new WeakHashMap<File, LockedFile>();
 
     /**
      * Get a LockedFile for a given File. Ensures that we share the same
@@ -93,7 +94,7 @@ public class LockedFile {
      * @param file the file to lock
      * @return a LockedFile instance
      */
-    synchronized public static LockedFile getInstance(File file) {
+    synchronized public static LockedFile getInstance(final File file) {
         if (!instanceCache.containsKey(file)) {
             LockedFile l;
             if (JNLPRuntime.isWindows()) {
@@ -162,11 +163,11 @@ public class LockedFile {
         if (!this.threadLock.isHeldByCurrentThread()) {
             return;
         }
-        boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
+        final boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
         unlockImpl(releaseProcessLock);
     }
 
-    protected void unlockImpl(boolean releaseProcessLock) throws IOException {
+    protected void unlockImpl(final boolean releaseProcessLock) throws IOException {
         try {
             if (releaseProcessLock) {
                 if (this.processLock != null){
@@ -191,28 +192,9 @@ public class LockedFile {
         return this.threadLock.isHeldByCurrentThread();
     }
 
-    private static class WindowsLockedFile extends LockedFile {
-
-        public WindowsLockedFile(File file) {
-            super(file);
-        }
-
-        /*Comment why it is different*/
-        @Override
-        public void lock() throws IOException {
-            if (!isReadOnly()) {
-                super.file.createNewFile();
-            }
-            super.threadLock.lock();
-        }
-
-        /*Comment why it is different*/
-        @Override
-        public void unlock() throws IOException {
-            if (!super.threadLock.isHeldByCurrentThread()) {
-                return;
-            }
-            unlockImpl(false);
-        }
+    protected ReentrantLock getThreadLock() {
+        return threadLock;
     }
+
+
 }
