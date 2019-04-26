@@ -1,5 +1,6 @@
-package net.sourceforge.jnlp.config;
+package net.adoptopenjdk.icedteaweb.config;
 
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
@@ -8,6 +9,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * This class provided several values that are based on system properties in a thread safe way.
+ */
 public class FilesystemConfiguration {
 
     private static final AtomicReference<String> configHome = new AtomicReference<>();
