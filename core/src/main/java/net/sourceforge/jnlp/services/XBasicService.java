@@ -45,7 +45,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.BasicValueValidators;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;

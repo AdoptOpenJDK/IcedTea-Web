@@ -39,12 +39,15 @@ package net.sourceforge.jnlp.config;
 
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.sourceforge.jnlp.config.validators.SecurityValueValidator;
+import net.sourceforge.jnlp.config.validators.ValueValidator;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.config.PathsAndFiles.CACHE_DIR;
 import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_POLICY;
 import static net.sourceforge.jnlp.config.PathsAndFiles.LOCKS_DIR;
@@ -63,7 +66,6 @@ import static net.sourceforge.jnlp.config.PathsAndFiles.USER_CLIENTCERT;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DEPLOYMENT_FILE;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECAC;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class stores the default configuration
@@ -98,175 +100,177 @@ public class Defaults {
                 /* infrastructure */
                 {
                         DeploymentConfiguration.KEY_USER_CACHE_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         CACHE_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         PCACHE_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CACHE_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         null
                 },
                 {
                         DeploymentConfiguration.KEY_USER_LOG_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         LOG_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TMP_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         TMP_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_LOCKS_DIR,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         LOCKS_DIR.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         MAIN_LOCK.getDefaultFullPath()
                 },
                 /* certificates and policy files */
                 {
                         DeploymentConfiguration.KEY_USER_SECURITY_POLICY,
-                        BasicValueValidators.getUrlValidator(),
+                        ValidatorFactory.createUrlValidator(),
+                        
                         "file://" + JAVA_POLICY.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         USER_CACERTS.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         USER_JSSECAC.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         USER_CERTS.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         USER_JSSECER.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         USER_CLIENTCERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY,
-                        BasicValueValidators.getUrlValidator(),
+                        ValidatorFactory.createUrlValidator(),
                         null
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         SYS_CACERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         SYS_JSSECAC.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         SYS_CERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         SYS_JSSECERT.getDefaultFullPath()
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         SYS_CLIENTCERT.getDefaultFullPath()
                 },
                 /* security access and control */
                 {
                         DeploymentConfiguration.KEY_SECURITY_PROMPT_USER,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         "deployment.security.askgrantdialog.notinca",
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         "deployment.security.notinca.warning",
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         "deployment.security.expired.warning",
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         "deployment.security.jsse.hostmismatch.warning",
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         DeploymentConfiguration.KEY_SECURITY_TRUSTED_POLICY,
-                        BasicValueValidators.getFilePathValidator(),
+                        ValidatorFactory.createFilePathValidator(),
                         null
                 },
                 {
                         DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
                         DeploymentConfiguration.KEY_STRICT_JNLP_CLASSLOADER,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
+                        
                         String.valueOf(true)
                 },
                 {
                         DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 /* networking */
                 {
                         DeploymentConfiguration.KEY_PROXY_TYPE,
-                        BasicValueValidators.getRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN, JNLPProxySelector.PROXY_TYPE_BROWSER),
+                        ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN, JNLPProxySelector.PROXY_TYPE_BROWSER),
                         String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER)
                 },
                 {
                         DeploymentConfiguration.KEY_PROXY_SAME,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_PROXY_AUTO_CONFIG_URL,
-                        BasicValueValidators.getUrlValidator(),
+                        ValidatorFactory.createUrlValidator(),
                         null
                 },
                 {
@@ -327,23 +331,23 @@ public class Defaults {
                 /* cache and optional package repository */
                 {
                         "deployment.cache.max.size",
-                        BasicValueValidators.getRangedIntegerValidator(-1, Integer.MAX_VALUE),
+                        ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE),
                         "-1"
                 },
                 {
                         "deployment.cache.jarcompression",
-                        BasicValueValidators.getRangedIntegerValidator(0, 10),
+                        ValidatorFactory.createRangedIntegerValidator(0, 10),
                         String.valueOf(0)
                 },
                 {
                         "deployment.javapi.cache.enabled",
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 /* java console */
                 {
                         DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE,
-                        BasicValueValidators.getStringValidator(new String[] {
+                        ValidatorFactory.createStringValidator(new String[] {
                                 DeploymentConfiguration.CONSOLE_DISABLE,
                                 DeploymentConfiguration.CONSOLE_HIDE,
                                 DeploymentConfiguration.CONSOLE_SHOW,
@@ -354,50 +358,50 @@ public class Defaults {
                 },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                  {
                         DeploymentConfiguration.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },                
                 {
                         DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 /* JNLP association */
                 {
                         DeploymentConfiguration.KEY_JNLP_ASSOCIATIONS,
-                        BasicValueValidators.getRangedIntegerValidator(DeploymentConfiguration.JNLP_ASSOCIATION_NEVER,
+                        ValidatorFactory.createRangedIntegerValidator(DeploymentConfiguration.JNLP_ASSOCIATION_NEVER,
                                 DeploymentConfiguration.JNLP_ASSOCIATION_REPLACE_ASK),
                         String.valueOf(DeploymentConfiguration.JNLP_ASSOCIATION_ASK_USER)
                 },
                 /* desktop integration */
                 {
                         DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT,
-                        BasicValueValidators.getStringValidator(new String[] {
+                        ValidatorFactory.createStringValidator(new String[] {
                                 ShortcutDesc.CREATE_ALWAYS,
                                 ShortcutDesc.CREATE_ALWAYS_IF_HINTED,
                                 ShortcutDesc.CREATE_ASK_USER,
@@ -409,30 +413,30 @@ public class Defaults {
                 /* jre selection */
                 {
                         DeploymentConfiguration.KEY_JRE_INTSTALL_URL,
-                        BasicValueValidators.getUrlValidator(),
+                        ValidatorFactory.createUrlValidator(),
                         null
                 },
                 /* jre management */
                 {
                         DeploymentConfiguration.KEY_AUTO_DOWNLOAD_JRE,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 /* browser selection */
                 {
                         DeploymentConfiguration.KEY_BROWSER_PATH,
-                        BasicValueValidators.getBrowserPathValidator(),
+                        ValidatorFactory.createBrowserPathValidator(),
                         null
                 },
                 /* check for update timeout */
                 {
                         DeploymentConfiguration.KEY_UPDATE_TIMEOUT,
-                        BasicValueValidators.getRangedIntegerValidator(0, 10000),
+                        ValidatorFactory.createRangedIntegerValidator(0, 10000),
                         String.valueOf(500)
                 },
                 {
                         DeploymentConfiguration.IGNORE_HEADLESS_CHECK,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
                 //JVM arguments for plugin
@@ -456,32 +460,32 @@ public class Defaults {
                 //enable manifest-attributes checks
                 {
                         DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
-                        BasicValueValidators.getManifestAttributeCheckValidator(),
+                        ValidatorFactory.createManifestAttributeCheckValidator(),
                         String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL)
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CONFIG,
-                        BasicValueValidators.getUrlValidator(),
+                        ValidatorFactory.createUrlValidator(),
                         null
                 },
                 {
                         DeploymentConfiguration.KEY_SYSTEM_CONFIG_MANDATORY,
-                        BasicValueValidators.getBooleanValidator(),
+                        ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 } ,
                 {
                         DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH,
-                        BasicValueValidators.getRangedIntegerValidator(-9999, +9999),
+                        ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
                         String.valueOf(800)//0 is disabling it; negative is enforcing it
                 },
                 {
                         DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_HEIGHT,
-                        BasicValueValidators.getRangedIntegerValidator(-9999, +9999),
+                        ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
                         String.valueOf(600)//0 is disabling it; negative is enforcing it
                 },
                 {
                         DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD,
-                        BasicValueValidators.getRangedIntegerValidator(0, 1000),
+                        ValidatorFactory.createRangedIntegerValidator(0, 1000),
                         String.valueOf(10)// threshold when applet is considered as too small
                 },
                 //**************
@@ -489,22 +493,22 @@ public class Defaults {
                 //**************
                 {
                         "deployment.launcher.rust.cp.add",
-                       new BasicValueValidators.RustCpValidator(),
+                       ValidatorFactory.createRustCpValidator(),
                         ""
                 },
                 {
                         "deployment.launcher.rust.cp.remove",
-                        new BasicValueValidators.RustCpValidator(),
+                        ValidatorFactory.createRustCpValidator(),
                         ""
                 },
                 {
                         "deployment.launcher.rust.bootcp.add",
-                        new BasicValueValidators.RustCpValidator(),
+                        ValidatorFactory.createRustCpValidator(),
                         null
                 },
                 {
                         "deployment.launcher.rust.bootcp.remove",
-                        new BasicValueValidators.RustCpValidator(),
+                        ValidatorFactory.createRustCpValidator(),
                         ""
                 }
                 //**************

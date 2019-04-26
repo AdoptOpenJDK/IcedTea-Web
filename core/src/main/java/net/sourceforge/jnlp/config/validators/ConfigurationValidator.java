@@ -35,9 +35,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.config;
+package net.sourceforge.jnlp.config.validators;
+
+import net.sourceforge.jnlp.config.Defaults;
+import net.sourceforge.jnlp.config.Setting;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,16 +51,16 @@ import java.util.Map;
  */
 public class ConfigurationValidator {
 
-    private List<Setting<String>> incorrectEntries;
-    private List<Setting<String>> unrecognizedEntries;
-    private Map<String, Setting<String>> toValidate = null;
+    private final List<Setting<String>> incorrectEntries = new ArrayList<>();
+    private final List<Setting<String>> unrecognizedEntries = new ArrayList<>();
+    private final Map<String, Setting<String>> toValidate;
 
     private boolean validated = false;
 
     /**
      * @param toValidate the settings to validate
      */
-    public ConfigurationValidator(Map<String, Setting<String>> toValidate) {
+    public ConfigurationValidator(final Map<String, Setting<String>> toValidate) {
         this.toValidate = toValidate;
     }
 
@@ -66,29 +70,29 @@ public class ConfigurationValidator {
      * get the list of incorrect or unrecognized settings.
      */
     public void validate() {
-        incorrectEntries = new ArrayList<>();
-        unrecognizedEntries = new ArrayList<>();
+        incorrectEntries.clear();
+        unrecognizedEntries.clear();
 
-        Map<String, Setting<String>> knownGood = Defaults.getDefaults();
+        final Map<String, Setting<String>> knownGood = Defaults.getDefaults();
 
-        for (String key : toValidate.keySet()) {
+        for (final String key : toValidate.keySet()) {
             // check for known incorrect settings
             if (knownGood.containsKey(key)) {
-                Setting<String> good = knownGood.get(key);
-                Setting<String> unknown = toValidate.get(key);
-                ValueValidator checker = good.getValidator();
+                final Setting<String> good = knownGood.get(key);
+                final Setting<String> unknown = toValidate.get(key);
+                final ValueValidator checker = good.getValidator();
                 if (checker != null) {
                     try {
                         checker.validate(unknown.getValue());
-                    } catch (IllegalArgumentException e) {
-                        Setting<String> strange = new Setting<>(unknown);
+                    } catch (final IllegalArgumentException e) {
+                        final Setting<String> strange = new Setting<>(unknown);
                         strange.setValue(unknown.getValue());
                         incorrectEntries.add(strange);
                     }
                 }
             } else {
                 // check for unknown settings
-                Setting<String> strange = new Setting<>(toValidate.get(key));
+                final Setting<String> strange = new Setting<>(toValidate.get(key));
                 unrecognizedEntries.add(strange);
             }
         }
@@ -101,10 +105,10 @@ public class ConfigurationValidator {
      */
     public List<Setting<String>> getIncorrectSetting() {
         if (!validated) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Validation has not been done");
         }
 
-        return new ArrayList<>(incorrectEntries);
+        return Collections.unmodifiableList(incorrectEntries);
     }
 
     /**
@@ -112,9 +116,9 @@ public class ConfigurationValidator {
      */
     public List<Setting<String>> getUnrecognizedSetting() {
         if (!validated) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Validation has not been done");
         }
-        return new ArrayList<>(unrecognizedEntries);
+        return Collections.unmodifiableList(unrecognizedEntries);
     }
 
 }

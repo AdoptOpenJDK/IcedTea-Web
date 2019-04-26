@@ -33,17 +33,17 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.config;
+package net.sourceforge.jnlp.config.validators;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 
-class SecurityValueValidator implements ValueValidator {
+public class SecurityValueValidator implements ValueValidator {
 
     public SecurityValueValidator() {
     }
 
     @Override
-    public void validate(Object value) throws IllegalArgumentException {
+    public void validate(final Object value) throws IllegalArgumentException {
         if (value == null) {
             // null is correct, it means it is not user set
             // and so default should be used whatever it is
@@ -58,13 +58,13 @@ class SecurityValueValidator implements ValueValidator {
             throw new IllegalArgumentException("Expected was String, was " + value.getClass());
         }
         try {
-            AppletSecurityLevel validated = AppletSecurityLevel.fromString((String) value);
+            final AppletSecurityLevel validated = AppletSecurityLevel.fromString((String) value);
             if (validated == null) {
                 throw new IllegalArgumentException("Result can't be null, was");
             }
             //thrown by fromString
-        } catch (RuntimeException ex) {
-            throw new IllegalArgumentException(ex);
+        } catch (final RuntimeException ex) {
+            throw new IllegalArgumentException("Error in validation", ex);
         }
     }
 
