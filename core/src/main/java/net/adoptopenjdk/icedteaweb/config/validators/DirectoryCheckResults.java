@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.config.validators;
+package net.adoptopenjdk.icedteaweb.config.validators;
 
 import java.util.List;
 

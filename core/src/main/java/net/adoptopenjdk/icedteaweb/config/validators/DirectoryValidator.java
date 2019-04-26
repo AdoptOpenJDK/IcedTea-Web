@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.jnlp.config.validators;
+package net.adoptopenjdk.icedteaweb.config.validators;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;

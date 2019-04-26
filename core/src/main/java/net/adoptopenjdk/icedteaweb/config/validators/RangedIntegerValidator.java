@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.config.validators;
+package net.adoptopenjdk.icedteaweb.config.validators;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

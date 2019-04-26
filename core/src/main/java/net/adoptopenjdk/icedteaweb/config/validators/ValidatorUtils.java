@@ -35,9 +35,9 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.config.validators;
+package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 import java.io.File;
 
@@ -53,7 +53,7 @@ public class ValidatorUtils {
 
     public static String verifyFileOrCommand(final String value) {
         final String cmd = value.split("\\s+")[0];
-          if (cmd.equals(DeploymentConfigurationConstants.ALWAYS_ASK) || cmd.equals(DeploymentConfigurationConstants.INTERNAL_HTML)) {
+          if (cmd.equals(ConfigurationConstants.ALWAYS_ASK) || cmd.equals(ConfigurationConstants.INTERNAL_HTML)) {
               return "keyword";
           }
         final File fileCandidate = new File(cmd);

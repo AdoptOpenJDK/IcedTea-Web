@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.config.validators;
+package net.adoptopenjdk.icedteaweb.config.validators;
 
 import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 
