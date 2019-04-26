@@ -1,27 +1,37 @@
 #!/bin/bash
 
+set -e
+set -u
+set -o pipefail
+
+if echo "'$*'" | grep -e "-verbose" ; then
+  set -x
+fi
+
 NASHORN=lib/ext/nashorn.jar
 JRE=@JRE@
-#unused
-JAVA=$JRE/bin/java
-LAUNCHER_BOOTCLASSPATH='@LAUNCHER_BOOTCLASSPATH@'
 LAUNCHER_FLAGS=-Xms8m
-CLASSNAME=@MAIN_CLASS@
-BINARY_LOCATION=@BIN_LOCATION@
-SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@
+MAIN_CLASS=@MAIN_CLASS@
+SPLASH_PNG=@SPLASH_PNG@
 RUN_ARGS_LOCATION=@MODULARJDK_ARGS_LOCATION@
-PROGRAM_NAME=@PROGRAM_NAME@
-CP=$JRE/lib/rt.jar:$JRE/lib/ext/jfxrt.jar
+ITW_LIBS=@ITW_LIBS@
 
-# individual parts of bootclasspath for more easy processing
-NETX_JAR=@NETX_JAR@
-PLUGIN_JAR=@PLUGIN_JAR@
-JSOBJECT_JAR=@JSOBJECT_JAR@
+# individual parts of bootclasspath
+CORE_JAR=@CORE_JAR@
+COMMON_JAR=@COMMON_JAR@
+JNLPAPI_JAR=@JNLPAPI_JAR@
+XMLPARSER_JAR=@XMLPARSER_JAR@
+SLFAPI_JAR=@SLFAPI_JAR@
+SLFSIMPLE_JAR=@SLFSIMPLE_JAR@
 TAGSOUP_JAR=@TAGSOUP_JAR@
 RHINO_JAR=@RHINO_JAR@
-# windows only:
-#MSLINKS_JAR=@MSLINKS_JAR@
+# windows only: (cywin usage?); need to decare it anyway
+MSLINKS_JAR=@MSLINKS_JAR@
 
+if [ "x$ITW_LIBS" == "xEMBEDDED" ] ; then
+ echo "ITW_LIBS=EMBEDDED not (yet?) supported"
+ exit 1
+fi
 
 ## resolve folder of this script, following all symlinks:
 ## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
@@ -34,9 +44,11 @@ while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer 
 done
 readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
 readonly PORTABLE_ITW_HOME="`dirname $SCRIPT_DIR`"
+BINARY_LOCATION="$SCRIPT_DIR/`basename $SCRIPT_SOURCE`"
 
 
 ## resolve custom JRE:
+set +ue
 CONFIG_HOME=$XDG_CONFIG_HOME
 if [ "x$CONFIG_HOME" = "x" ] ; then
   CONFIG_HOME=~/.config
@@ -56,29 +68,38 @@ if [ ! "x$JAVA_HOME" = "x" ] ; then
   echo "Warning! JAVA_HOME of $JAVA_HOME in play!"
   CUSTOM_JRE=$JAVA_HOME
 fi
-
+set -ue
 
 # Support portable ITW:
 # note, that this is temporary, experimental solution, moreover for 1.7 and will likely change since 1.8
 # by this, sh launchers can be again a bit more portable then win ones, thats why we moved to native ones since 1.8
 # still this is very dummy
-if [ ! -f $NETX_JAR ] ; then
-  ITW_LIBS="BUNDLED";
-fi
+function locallib() {
+  echo "$ITW_HOME/libs/`basename \"$1\"`"
+}
+
+set +u
 if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
   if [ "x$ITW_HOME" = "x" ] ; then
     ITW_HOME=$PORTABLE_ITW_HOME
   fi
+  set -u
   BINARY_LOCATION="$ITW_HOME/bin/`basename \"$BINARY_LOCATION\"`"
-  SPLASH_LOCATION="$ITW_HOME/share/icedtea-web/`basename \"$SPLASH_LOCATION\"`"
-  RUN_ARGS_LOCATION="$ITW_HOME/bin/`basename \"$RUN_ARGS_LOCATION\"`"
-  NETX_JAR="$ITW_HOME/share/icedtea-web/`basename \"$NETX_JAR\"`"
-  PLUGIN_JAR="$ITW_HOME/share/icedtea-web/`basename \"$PLUGIN_JAR\"`"
-  JSOBJECT_JAR="$ITW_HOME/share/icedtea-web/`basename \"$JSOBJECT_JAR\"`"
-  LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$NETX_JAR:$PLUGIN_JAR:$JSOBJECT_JAR:$ITW_HOME/linux-deps-runtime/`basename \"$TAGSOUP_JAR\"`:$ITW_HOME/linux-deps-runtime/`basename \"$RHINO_JAR\"`"
-  echo "warning, using portable itw from $ITW_HOME: $LAUNCHER_BOOTCLASSPATH $BINARY_LOCATION $SPLASH_LOCATION"
+  SPLASH_PNG="`locallib \"$SPLASH_PNG\"`"
+  RUN_ARGS_LOCATION="`locallib \"$RUN_ARGS_LOCATION\"`"
+  CORE_JAR="`locallib  \"$CORE_JAR\"`"
+  COMMON_JAR="`locallib  \"$COMMON_JAR\"`"
+  JNLPAPI_JAR="`locallib  \"$JNLPAPI_JAR\"`"
+  XMLPARSER_JAR="`locallib  \"$XMLPARSER_JAR\"`"
+  RHINO_JAR="`locallib  \"$RHINO_JAR\"`"
+  TAGSOUP_JAR="`locallib  \"$TAGSOUP_JAR\"`"
+  SLFAPI_JAR="`locallib  \"$SLFAPI_JAR\"`"
+  SLFSIMPLE_JAR="`locallib  \"$SLFSIMPLE_JAR\"`"
+  MSLINKS_JAR="`locallib  \"$MSLINKS_JAR\"`"
+  echo "warning, using portable itw from $ITW_HOME"
 fi
-
+set -u
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$CORE_JAR:$COMMON_JAR:$JNLPAPI_JAR:$XMLPARSER_JAR:$TAGSOUP_JAR:$RHINO_JAR:$SLFAPI_JAR:$SLFSIMPLE_JAR:$MSLINKS_JAR"
 
 # Fix classpaths for custom JRE:
 if [ "x$CUSTOM_JRE" != "x" ] ; then
@@ -90,6 +111,8 @@ if [ "x$CUSTOM_JRE" != "x" ] ; then
     echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JRE, $CP) in attempt to start. Please fix this."
   fi
 else
+  JAVA=$JRE/bin/java
+  CP=$JRE/lib/rt.jar:$JRE/lib/ext/jfxrt.jar
   LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:$JRE/$NASHORN"
 fi;
 
@@ -116,10 +139,11 @@ j=0
 
 # Filter script args:
 SPLASH="false"
+set +u
 if [ "x$ICEDTEA_WEB_SPLASH" = "x" ] ; then
   SPLASH="true"
 fi;
-
+set -u
 while [ "$#" -gt "0" ]; do
   case "$1" in
     -J*)
@@ -142,7 +166,7 @@ k=0
 COMMAND[k]="${JAVA}"
 k=$((k+1))
 if [ "$SPLASH" = "true" ] ; then
-  COMMAND[k]="-splash:${SPLASH_LOCATION}"
+  COMMAND[k]="-splash:${SPLASH_PNG}"
   k=$((k+1))
 fi;
 COMMAND[k]="${LAUNCHER_BOOTCLASSPATH}"
@@ -151,20 +175,6 @@ COMMAND[k]="${LAUNCHER_FLAGS}"
 k=$((k+1))
 
 if [ "x$MODULAR_JDK" == "xYES" ] ; then
-  COMMAND[k]="--patch-module"
-  k=$((k+1))
-  COMMAND[k]="java.desktop=$NETX_JAR:$PLUGIN_JAR"
-  k=$((k+1))
-  # jsobject must be patched separately from plugin
-  # otherwise netscape pkg would be shared by two modules, which is forbiden
-  # plugin jar may not be built
-  if [ ! "x$JSOBJECT_JAR" == "x" ] ; then
-    COMMAND[k]="--patch-module"
-    k=$((k+1))
-    COMMAND[k]="jdk.jsobject=$JSOBJECT_JAR"
-    k=$((k+1))
-  fi
-
   # add JDK9+ arg file:
   COMMAND[k]="@$RUN_ARGS_LOCATION"
   k=$((k+1))
@@ -183,12 +193,12 @@ k=$((k+1))
 COMMAND[k]="${CP}"
 k=$((k+1))
 
-COMMAND[k]="-Dicedtea-web.bin.name=${PROGRAM_NAME}"
+COMMAND[k]="-Dicedtea-web.bin.name=`basename $SCRIPT_SOURCE`"
 k=$((k+1))
 COMMAND[k]="-Dicedtea-web.bin.location=${BINARY_LOCATION}"
 k=$((k+1))
 
-COMMAND[k]="${CLASSNAME}"
+COMMAND[k]="${MAIN_CLASS}"
 k=$((k+1))
 j=0
 while [ "$j" -lt "${#ARGS[@]}" ]; do
@@ -197,7 +207,7 @@ while [ "$j" -lt "${#ARGS[@]}" ]; do
   k=$((k+1))
 done
 
-exec -a "$PROGRAM_NAME" "${COMMAND[@]}"
+exec -a "`basename $SCRIPT_SOURCE`" "${COMMAND[@]}"
 
 exit $?
 
