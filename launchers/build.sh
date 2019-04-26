@@ -39,7 +39,7 @@ function publishExternalLib() {
 if [ "x$ITW_LIBS" = "xDISTRIBUTION" ] ; then
   RESOURCES_SRC_TO_DEST["$1"]="$1"
 else
-   publishInternalLib "$1" "$LIB_TARGET_DIR"
+  publishInternalLib "$1" "$LIB_TARGET_DIR"
 fi
 }
 
@@ -94,24 +94,44 @@ function build() {
       fi
     popd
   elif [ "x$TYPE" = "xsh" ]; then
-    ls -l $SCRIPT_DIR/shell-launcher
+    for x in `find $SCRIPT_DIR/shell-launcher -type f ` ; do
+      nwname=`basename $x | sed "s/launchers/$PROGRAM_NAME/" | sed "s/.in//"`
+      cat $x | sed \
+        -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
+        -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
+        -e "s|[@]SLFAPI_JAR[@]|$SLFAPI_JAR|g" \
+        -e "s|[@]SLFSIMPLE_JAR[@]|$SLFSIMPLE_JAR|g" \
+        -e "s|[@]MSLINKS_JAR[@]|$MSLINKS_JAR|g" \
+        -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
+        -e "s|[@]CORE_JAR[@]|$CORE_JAR|g" \
+        -e "s|[@]COMMON_JAR[@]|$COMMON_JAR|g" \
+        -e "s|[@]JNLPAPI_JAR[@]|$JNLPAPI_JAR|g" \
+        -e "s|[@]XMLPARSER_JAR[@]|$XMLPARSER_JAR|g" \
+        -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
+        -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \
+        -e "s|[@]JRE[@]|$JRE|g" \
+        -e "s|[@]MAIN_CLASS[@]|$MAIN_CLASS|g" \
+        -e "s|[@]ITW_LIBS[@]|$ITW_LIBS|g" \
+      >  $BIN_TARGET_DIR/$nwname ;
+      chmod 755 $BIN_TARGET_DIR/$nwname
+    done
   else
     echo "invlaid build type: $TYPE"
     exit 2
   fi
 }
 
-mkdir $TARGET_TMP
-export ITW_TMP_REPLACEMENT=$TARGET_TMP
+build sh javaws         net.sourceforge.jnlp.runtime.Boot
+build sh itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
+build sh policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+
+mkdir $TARGET_TMP  # for tests output
+export ITW_TMP_REPLACEMENT=$TARGET_TMP # for tests output
 build rust javaws         net.sourceforge.jnlp.runtime.Boot
 build rust itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
 build rust policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
 if [ ! "$KCOV" = "none" ] ; then 
   build rust coverage   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
 fi
-
-build sh javaws         net.sourceforge.jnlp.runtime.Boot
-build sh itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
-build sh policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
 
 

@@ -18,26 +18,26 @@ rm -rf "$TARGET"
 
 # where to search for libraris [MAVEN/SYSTEM]
 if [ "x$ITW_LIBS" = "x" ] ; then
-  ITW_LIBS="BUNDLED"
+  readonly ITW_LIBS="BUNDLED"
 else
   readonly ITW_LIBS=$ITW_LIBS
 fi
 
 # where to gather external libraries
 if [ "x$LIB_TARGET_DIR" == "x" ] ; then
-  readonly LIB_TARGET_DIR=$TARGET/lib
+  readonly LIB_TARGET_DIR=$TARGET/libs
 else
   readonly LIB_TARGET_DIR=$LIB_TARGET_DIR
 fi
 # where to gather itw's libraries
 if [ "x$ITW_TARGET_DIR" == "x" ] ; then
-  readonly ITW_TARGET_DIR=$TARGET/lib
+  readonly ITW_TARGET_DIR=$TARGET/libs
 else
   readonly ITW_TARGET_DIR=$ITW_TARGET_DIR
 fi
 # where to gather config files
 if [ "x$ETC_TARGET_DIR" == "x" ] ; then
-  readonly ETC_TARGET_DIR=$TARGET/lib
+  readonly ETC_TARGET_DIR=$TARGET/libs
 else
   readonly ETC_TARGET_DIR=$ETC_TARGET_DIR
 fi
@@ -49,13 +49,13 @@ else
 fi
 # where to splash
 if [ "x$SPLASH_TARGET_DIR" == "x" ] ; then
-  readonly SPLASH_TARGET_DIR=$TARGET/lib
+  readonly SPLASH_TARGET_DIR=$TARGET/libs
 else
   readonly SPLASH_TARGET_DIR=$SPLASH_TARGET_DIR
 fi
 # where to icons
 if [ "x$ICO_TARGET_DIR" == "x" ] ; then
-  readonly ICO_TARGET_DIR=$TARGET/lib
+  readonly ICO_TARGET_DIR=$TARGET/libs
 else
   readonly ICO_TARGET_DIR=$ICO_TARGET_DIR
 fi
@@ -82,7 +82,7 @@ function findJar() {
 
 
 function getJar() {
-  if [ "x$ITW_LIBS" == "DISTRIBUTION" ] ; then
+  if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
     findJar "$SYSTEM_JARS"  "$1"
   else
     findJar "$MAVEN_REPO" "$1"
