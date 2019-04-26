@@ -36,6 +36,8 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
+import net.sourceforge.jnlp.config.validators.FilePathValidator;
+import net.sourceforge.jnlp.config.validators.ValueValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,7 +57,7 @@ public class BasicValueValidatorsTests {
     public static boolean isOsWindows() {
         return canBeWindows(System.getProperty(OS_NAME));
     }
-    private static final BasicValueValidators.FilePathValidator pv = new BasicValueValidators.FilePathValidator();
+    private static final FilePathValidator pv = new FilePathValidator();
     private final String neverLegal = "aaa/bb/cc";
     private final String winLegal = "C:\\aaa\\bb\\cc";
     private final String linuxLegal = "/aaa/bb/cc";
@@ -141,7 +143,7 @@ public class BasicValueValidatorsTests {
         String[] multipleValues = {
             "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
         };
-        ValueValidator multipleValidator = BasicValueValidators.getMultipleStringValidator(singleValues, multipleValues);
+        ValueValidator multipleValidator = ValidatorFactory.getMultipleStringValidator(singleValues, multipleValues);
 
         multipleValidator.validate("SINGLE");
         multipleValidator.validate("ONLY");
@@ -159,14 +161,14 @@ public class BasicValueValidatorsTests {
         String[] multipleValues = {
                 "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
         };
-        ValueValidator multipleValidator = BasicValueValidators.getMultipleStringValidator(singleValues, multipleValues);
+        ValueValidator multipleValidator = ValidatorFactory.getMultipleStringValidator(singleValues, multipleValues);
 
         multipleValidator.validate("SINGLE,COMBO");
     }
 
     @Test
     public void testManifestAttributeCheckValidator() {
-        ValueValidator multipleValidator = BasicValueValidators.getManifestAttributeCheckValidator();
+        ValueValidator multipleValidator = ValidatorFactory.getManifestAttributeCheckValidator();
 
         multipleValidator.validate("ALL");
         multipleValidator.validate("PERMISSIONS");
@@ -179,7 +181,7 @@ public class BasicValueValidatorsTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testManifestAttributeCheckValidatorCantMixSingleAndComboValues() {
-        ValueValidator multipleValidator = BasicValueValidators.getManifestAttributeCheckValidator();
+        ValueValidator multipleValidator = ValidatorFactory.getManifestAttributeCheckValidator();
 
         multipleValidator.validate("ALL,CODEBASE,NONE");
     }

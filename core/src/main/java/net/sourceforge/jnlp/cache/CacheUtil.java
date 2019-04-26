@@ -821,7 +821,7 @@ public class CacheUtil {
 
                 long maxSize = -1; // Default
                 try {
-                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE));
+                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_CACHE_MAX_SIZE));
                 } catch (NumberFormatException nfe) {
                 }
 

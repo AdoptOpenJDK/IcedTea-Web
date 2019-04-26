@@ -14,6 +14,44 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPMatcher;
+import net.sourceforge.jnlp.JNLPMatcherException;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
+import net.sourceforge.jnlp.cache.NativeLibraryStorage;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.security.PluginAppVerifier;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,42 +92,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPMatcher;
-import net.sourceforge.jnlp.JNLPMatcherException;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
-import net.sourceforge.jnlp.cache.NativeLibraryStorage;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.security.AppVerifier;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.JarFile;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -307,7 +309,7 @@ public class JNLPClassLoader extends URLClassLoader {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
-        strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_STRICT_JNLP_CLASSLOADER));
+        strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
         this.updatePolicy = policy;
@@ -348,13 +350,13 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     public static boolean isCertUnderestimated() {
-        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES))
+        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
                 && !JNLPRuntime.isSecurityEnabled();
     }
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), DeploymentConfiguration.KEY_SECURITY_ITW_IGNORECERTISSUES);
+            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), DeploymentConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
         } else {
             throw ex;
         }

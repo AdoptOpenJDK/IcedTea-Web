@@ -218,24 +218,24 @@ public class DirectoryValidator {
      * Creates DirectoryValidator to ensure directories read from
      * user (if any - default otherwise) settings via keys:
      * <ul>
-     *     <li>{@link DeploymentConfiguration#KEY_USER_CACHE_DIR}</li>
-     *     <li>{@link DeploymentConfiguration#KEY_USER_PERSISTENCE_CACHE_DIR}</li>
-     *     <li>{@link DeploymentConfiguration#KEY_SYSTEM_CACHE_DIR}</li>
-     *     <li>{@link DeploymentConfiguration#KEY_USER_LOG_DIR}</li>
-     *     <li>{@link DeploymentConfiguration#KEY_USER_TMP_DIR}</li>
-     *     <li>{@link DeploymentConfiguration#KEY_USER_LOCKS_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_USER_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_USER_PERSISTENCE_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_SYSTEM_CACHE_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_USER_LOG_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_USER_TMP_DIR}</li>
+     *     <li>{@link DeploymentConfigurationConstants#KEY_USER_LOCKS_DIR}</li>
      * </ul>
      */
     private DirectoryValidator() {
         dirsToCheck = new ArrayList<>(6);
         DeploymentConfiguration dc = JNLPRuntime.getConfiguration();
         String[] keys = new String[]{
-            DeploymentConfiguration.KEY_USER_CACHE_DIR,
-            DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR,
-            DeploymentConfiguration.KEY_SYSTEM_CACHE_DIR,
-            DeploymentConfiguration.KEY_USER_LOG_DIR,
-            DeploymentConfiguration.KEY_USER_TMP_DIR,
-            DeploymentConfiguration.KEY_USER_LOCKS_DIR};
+                DeploymentConfigurationConstants.KEY_USER_CACHE_DIR,
+                DeploymentConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR,
+                DeploymentConfigurationConstants.KEY_SYSTEM_CACHE_DIR,
+                DeploymentConfigurationConstants.KEY_USER_LOG_DIR,
+                DeploymentConfigurationConstants.KEY_USER_TMP_DIR,
+                DeploymentConfigurationConstants.KEY_USER_LOCKS_DIR};
         for (String key : keys) {
             String value = dc.getProperty(key);
             if (value == null) {

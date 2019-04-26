@@ -15,6 +15,33 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.validators.ValidatorUtils;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jnlp.BasicService;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -28,33 +55,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
-import javax.jnlp.BasicService;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.sourceforge.jnlp.config.BasicValueValidators.verifyFileOrCommand;
 
 /**
  * The BasicService JNLP service.
@@ -195,16 +197,16 @@ class XBasicService implements BasicService {
             LOG.debug("showDocument for: {}", urls);
 
             DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            String command = config.getProperty(DeploymentConfiguration.KEY_BROWSER_PATH);
+            String command = config.getProperty(DeploymentConfigurationConstants.KEY_BROWSER_PATH);
             //for various debugging
             //command=DeploymentConfiguration.ALWAYS_ASK;
             if (command != null) {
-                LOG.debug("{} located. Using: {}", DeploymentConfiguration.KEY_BROWSER_PATH, command);
+                LOG.debug("{} located. Using: {}", DeploymentConfigurationConstants.KEY_BROWSER_PATH, command);
                 return exec(command, urls);
             }
-            if (System.getenv(DeploymentConfiguration.BROWSER_ENV_VAR) != null) {
-                command = System.getenv(DeploymentConfiguration.BROWSER_ENV_VAR);
-                LOG.debug("variable {} located. Using: {}", DeploymentConfiguration.BROWSER_ENV_VAR, command);
+            if (System.getenv(DeploymentConfigurationConstants.BROWSER_ENV_VAR) != null) {
+                command = System.getenv(DeploymentConfigurationConstants.BROWSER_ENV_VAR);
+                LOG.debug("variable {} located. Using: {}", DeploymentConfigurationConstants.BROWSER_ENV_VAR, command);
                 return exec(command, urls);
             }
             if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
@@ -235,10 +237,10 @@ class XBasicService implements BasicService {
             if (url == null || url.length() == 0) {
                 return false;
             }
-            if (cmd.equals(DeploymentConfiguration.ALWAYS_ASK)) {
+            if (cmd.equals(DeploymentConfigurationConstants.ALWAYS_ASK)) {
                 cmd = promptForCommand(url, true);
             }
-            if (cmd.equals(DeploymentConfiguration.INTERNAL_HTML)) {
+            if (cmd.equals(DeploymentConfigurationConstants.INTERNAL_HTML)) {
                 LinkingBrowser.createFrame(url, false, JFrame.DISPOSE_ON_CLOSE);
                 return true;
             }
@@ -275,7 +277,7 @@ class XBasicService implements BasicService {
             OutputController.getLogger().printOutLn("*** " + targetUrl + " ***");
             OutputController.getLogger().printOutLn(title);
             String entered = OutputController.getLogger().readLine();
-            String verification = verifyFileOrCommand(entered);
+            String verification = ValidatorUtils.verifyFileOrCommand(entered);
             if (verification == null) {
                 OutputController.getLogger().printOutLn(R("VVBrowserVerificationFail"));
             } else {
@@ -332,7 +334,7 @@ class XBasicService implements BasicService {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (save.isSelected()) {
-                        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_BROWSER_PATH, value.getText());
+                        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_BROWSER_PATH, value.getText());
                         try {
                             JNLPRuntime.getConfiguration().save();
                         } catch (IOException ex) {
@@ -356,10 +358,10 @@ class XBasicService implements BasicService {
             if (this.ask) {
                 save.setSelected(false);
                 save.setEnabled(false);
-                save.setToolTipText(R("VVBrowserSaveNotAllowed", DeploymentConfiguration.ALWAYS_ASK, DeploymentConfiguration.KEY_BROWSER_PATH));
+                save.setToolTipText(R("VVBrowserSaveNotAllowed", DeploymentConfigurationConstants.ALWAYS_ASK, DeploymentConfigurationConstants.KEY_BROWSER_PATH));
             } else {
                 save.setEnabled(true);
-                save.setToolTipText(R("VVBrowserSaveAllowed", DeploymentConfiguration.KEY_BROWSER_PATH));
+                save.setToolTipText(R("VVBrowserSaveAllowed", DeploymentConfigurationConstants.KEY_BROWSER_PATH));
             }
             this.addWindowListener(cl);
 
@@ -381,7 +383,7 @@ class XBasicService implements BasicService {
                 }
 
                 private void check() {
-                    String result = BasicValueValidators.verifyFileOrCommand(value.getText());
+                    String result = ValidatorUtils.verifyFileOrCommand(value.getText());
                     if (result == null) {
                         verification.setForeground(Color.red);
                         verification.setText(R("VVBrowserVerificationFail"));

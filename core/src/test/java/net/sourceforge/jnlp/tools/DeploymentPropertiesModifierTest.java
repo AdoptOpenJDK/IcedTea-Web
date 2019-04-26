@@ -43,12 +43,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.AbstractMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -68,8 +73,8 @@ public class DeploymentPropertiesModifierTest {
         assertEquals(0, properties.length());
 
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
-        dpm.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-        String setProperty = DeploymentConfiguration.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
+        dpm.setProperties(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        String setProperty = DeploymentConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
 
         properties = FileUtils.loadFileAsString(deploymentFile);
         assertEquals(setProperty, properties);
@@ -88,9 +93,9 @@ public class DeploymentPropertiesModifierTest {
         assertEquals(0, properties.length());
 
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
-        dpm.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        dpm.setProperties(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
 
-        String setProperty = DeploymentConfiguration.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
+        String setProperty = DeploymentConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
         properties = FileUtils.loadFileAsString(deploymentFile);
         assertEquals(setProperty, properties);
 
@@ -126,9 +131,9 @@ public class DeploymentPropertiesModifierTest {
 
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
 
-        dpm.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        dpm.setProperties(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
         try {
-            dpm.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
+            dpm.setProperties(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
         } catch (IllegalStateException ise) {
             dpm.restoreProperties();
             throw new IllegalStateException();
@@ -147,10 +152,10 @@ public class DeploymentPropertiesModifierTest {
         DeploymentPropertiesModifier dpm1 = new DeploymentPropertiesModifier(deploymentInfrastructure);
         DeploymentPropertiesModifier dpm2 = new DeploymentPropertiesModifier(deploymentInfrastructure);
 
-        dpm1.setProperties(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-        dpm2.setProperties(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
+        dpm1.setProperties(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        dpm2.setProperties(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
 
-        String contents = DeploymentConfiguration.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n" + DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK + "=" + ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString() + "\n";
+        String contents = DeploymentConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n" + DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK + "=" + ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString() + "\n";
         String properties = FileUtils.loadFileAsString(deploymentFile);
         assertEquals(contents, properties);
 

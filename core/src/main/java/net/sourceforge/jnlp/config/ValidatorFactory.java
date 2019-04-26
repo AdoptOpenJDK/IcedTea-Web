@@ -114,4 +114,12 @@ public class ValidatorFactory {
     public static ValueValidator createRustCpValidator() {
         return new RustCpValidator();
     }
+
+    public static ValueValidator getManifestAttributeCheckValidator() {
+        return new ManifestAttributeCheckValidator();
+    }
+
+    public static ValueValidator getMultipleStringValidator(final String[] singleValues, final String[] multipleValues) {
+        return new MultipleStringValueValidator(singleValues, multipleValues);
+    }
 }

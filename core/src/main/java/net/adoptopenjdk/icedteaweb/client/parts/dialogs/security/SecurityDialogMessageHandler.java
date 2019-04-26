@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Rememb
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
@@ -277,7 +277,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             @Override
             public Boolean run() {
                 return Boolean.valueOf(JNLPRuntime.getConfiguration()
-                        .getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER));
+                        .getProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER));
             }
         });
     }

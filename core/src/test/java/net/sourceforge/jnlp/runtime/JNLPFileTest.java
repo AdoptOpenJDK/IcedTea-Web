@@ -36,6 +36,22 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
@@ -43,21 +59,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
-import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class JNLPFileTest extends NoStdOutErrTest {
 
@@ -68,14 +69,14 @@ public class JNLPFileTest extends NoStdOutErrTest {
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
         attCheckValue = ManifestAttributesChecker.getAttributesCheck();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL));
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL));
     }
 
     @AfterClass
     public static void resetPermissions() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, level.toChars());
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(attCheckValue));
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
+        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, String.valueOf(attCheckValue));
     }
 
 

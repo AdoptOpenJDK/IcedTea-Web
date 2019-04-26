@@ -18,9 +18,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 
 import javax.swing.Box;
@@ -53,13 +54,13 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
     /** List of properties used by checkboxes in this panel */
     public static String[] properties = {
-            DeploymentConfiguration.KEY_ENABLE_LOGGING,
-            DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS,
-            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE,
-            DeploymentConfiguration.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
-            DeploymentConfiguration.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
-            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS,
-            DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG
+            DeploymentConfigurationConstants.KEY_ENABLE_LOGGING,
+            DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
+            DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
+            DeploymentConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
+            DeploymentConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
+            DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
+            DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG
             
     };
     
@@ -162,15 +163,15 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 (Translator.R("DPEnableSyslogHint"))
         };
 
-        final ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), DeploymentConfiguration.CONSOLE_DISABLE),
-                new ComboItem(Translator.R("DPHide"), DeploymentConfiguration.CONSOLE_HIDE),
-                new ComboItem(Translator.R("DPShow"), DeploymentConfiguration.CONSOLE_SHOW), 
-                new ComboItem(Translator.R("DPShowPluginOnly"), DeploymentConfiguration.CONSOLE_SHOW_PLUGIN), 
-                new ComboItem(Translator.R("DPShowJavawsOnly"), DeploymentConfiguration.CONSOLE_SHOW_JAVAWS) };
+        final ComboItem[] javaConsoleItems = { new ComboItem(Translator.R("DPDisable"), DeploymentConfigurationConstants.CONSOLE_DISABLE),
+                new ComboItem(Translator.R("DPHide"), DeploymentConfigurationConstants.CONSOLE_HIDE),
+                new ComboItem(Translator.R("DPShow"), DeploymentConfigurationConstants.CONSOLE_SHOW),
+                new ComboItem(Translator.R("DPShowPluginOnly"), DeploymentConfigurationConstants.CONSOLE_SHOW_PLUGIN),
+                new ComboItem(Translator.R("DPShowJavawsOnly"), DeploymentConfigurationConstants.CONSOLE_SHOW_JAVAWS) };
 
         JLabel consoleLabel = new JLabel(Translator.R("DPJavaConsole"));
         JComboBox<ComboItem> consoleComboBox = new JComboBox<>();
-        consoleComboBox.setActionCommand(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE); // The property this comboBox affects.
+        consoleComboBox.setActionCommand(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE); // The property this comboBox affects.
 
         JPanel consolePanel = new JPanel();
         consolePanel.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -225,7 +226,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         for (int j = 0; j < javaConsoleItems.length; j++) {
             consoleComboBox.addItem(javaConsoleItems[j]);
-            if (config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE).equals(javaConsoleItems[j].getValue())) {
+            if (config.getProperty(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE).equals(javaConsoleItems[j].getValue())) {
                 consoleComboBox.setSelectedIndex(j);
             }
         }

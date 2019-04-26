@@ -18,8 +18,8 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class JNLPPolicy extends Policy {
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
         systemPolicy = Policy.getPolicy();
 
-        systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
+        systemJnlpPolicy = getPolicyFromConfig(DeploymentConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
         String jre = System.getProperty(JAVA_HOME);

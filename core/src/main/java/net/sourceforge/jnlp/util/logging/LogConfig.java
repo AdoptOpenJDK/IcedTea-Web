@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -62,15 +63,15 @@ public class LogConfig {
     private LogConfig() {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
         // Check whether logging and tracing is enabled.
-        enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING));
+        enableLogging = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LOGGING));
         //enable/disable headers
-        enableHeaders = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_HEADERS));
+        enableHeaders = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS));
         //enable/disable individual channels
-        logToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOFILE));
-        logToStreams = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSTREAMS));
-        logToSysLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
-        legacyLogaAsedFileLog = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_LEGACY_LOGBASEDFILELOG));
-        logClientAppToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfiguration.KEY_ENABLE_APPLICATION_LOGGING_TOFILE));
+        logToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE));
+        logToStreams = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS));
+        logToSysLog = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
+        legacyLogaAsedFileLog = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG));
+        logClientAppToFile = Boolean.parseBoolean(config.getProperty(DeploymentConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE));
 
         // Get log directory, create it if it doesn't exist. If unable to create and doesn't exist, don't log.
         icedteaLogDir = PathsAndFiles.LOG_DIR.getFullPath();

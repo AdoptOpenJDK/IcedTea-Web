@@ -1,12 +1,13 @@
 package net.sourceforge.jnlp.util;
 
-import java.util.Map;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class AppletUtils {
     private final static Logger LOG = LoggerFactory.getLogger(AppletUtils.class);
@@ -17,7 +18,7 @@ public class AppletUtils {
     public static int getFixedWidth(final int width, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
-        if (width < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
+        if (width < getConfigurationPropertyAsInt(DeploymentConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
             final Integer nww = fixWidth(parameters);
             if (nww != null) {
                 return nww;
@@ -32,7 +33,7 @@ public class AppletUtils {
     public static int getFixedHeight(final int height, final Map<String, String> parameters) {
         Assert.requireNonNull(parameters, "parameters");
 
-        if (height < getConfigurationPropertyAsInt(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
+        if (height < getConfigurationPropertyAsInt(DeploymentConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD)) {
             final Integer nwh = fixHeight(parameters);
             if (nwh != null) {
                 return nwh;
@@ -42,10 +43,10 @@ public class AppletUtils {
     }
 
     private static Integer fixHeight(final Map<String, String> parameters) {
-        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_HEIGHT, parameters, "Height", "height", "HEIGHT");
+        return fixSize(DeploymentConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_HEIGHT, parameters, "Height", "height", "HEIGHT");
     }
     private static Integer fixWidth(final Map<String, String> parameters) {
-        return fixSize(DeploymentConfiguration.KEY_SMALL_SIZE_OVERRIDE_WIDTH, parameters, "Width", "width", "WIDTH");
+        return fixSize(DeploymentConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_WIDTH, parameters, "Width", "width", "WIDTH");
     }
 
     private static Integer getConfigurationPropertyAsInt(final String name) {

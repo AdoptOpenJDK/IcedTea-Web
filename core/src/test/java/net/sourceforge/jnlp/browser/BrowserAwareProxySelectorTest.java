@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.browser;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,7 +82,7 @@ public class BrowserAwareProxySelectorTest {
     @Before
     public void setUp() {
         config = new DeploymentConfiguration();
-        config.setProperty(DeploymentConfiguration.KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER));
+        config.setProperty(DeploymentConfigurationConstants.KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER));
 
         browserPrefs = new HashMap<String, String>();
     }

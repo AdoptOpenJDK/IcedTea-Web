@@ -37,8 +37,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +119,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_CACHE_DIR;
+            return DeploymentConfigurationConstants.KEY_USER_CACHE_DIR;
         }
 
     };
@@ -145,14 +145,14 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR;
+            return DeploymentConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR;
         }
     };
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_LOG_DIR;
+            return DeploymentConfigurationConstants.KEY_USER_LOG_DIR;
         }
     
         
@@ -162,14 +162,14 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     public static final InfrastructureFileDescriptor GEN_JNLPS_DIR = new ItwConfigFileDescriptor("generated_jnlps", "FILEjnlps", Target.PLUGIN, Target.ITWEB_SETTINGS);
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(DeploymentConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(DeploymentConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TMP_DIR;
+            return DeploymentConfigurationConstants.KEY_USER_TMP_DIR;
         }
         
     };
@@ -177,7 +177,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_LOCKS_DIR;
+            return DeploymentConfigurationConstants.KEY_USER_LOCKS_DIR;
         }
         
     };
@@ -185,7 +185,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE;
+            return DeploymentConfigurationConstants.KEY_USER_NETX_RUNNING_FILE;
         }
         
     };
@@ -193,7 +193,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
                    @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_SECURITY_POLICY;
+            return DeploymentConfigurationConstants.KEY_USER_SECURITY_POLICY;
         }
 
         @Override
@@ -204,35 +204,35 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS;
+            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS;
+            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CERTS;
+            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS;
+            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS;
+            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -240,7 +240,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS;
+            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS;
         }
         
     };
@@ -248,21 +248,21 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
       
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
+            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs"){
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS;
+            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS;
         }
     };
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
+            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
         }
         
     };
@@ -270,7 +270,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
+            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -278,11 +278,11 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getDescription() {
-             return Translator.R(getDescriptionKey(), DeploymentConfiguration.KEY_JRE_DIR);
+             return Translator.R(getDescriptionKey(), DeploymentConfigurationConstants.KEY_JRE_DIR);
         }
         
     };
-    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
     public static List<InfrastructureFileDescriptor> getAllFiles() {
         return getAllFiles(null);
@@ -395,7 +395,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class SystemJavaLibFileDescriptor extends SystemJavaFileDescriptor {
 
         private SystemJavaLibFileDescriptor(Target... target) {
-            super(DeploymentConfiguration.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
+            super(DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
         }
 
         private SystemJavaLibFileDescriptor(String fileName, Target... target) {

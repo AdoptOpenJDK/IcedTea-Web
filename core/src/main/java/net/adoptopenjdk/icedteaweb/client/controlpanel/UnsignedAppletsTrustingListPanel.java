@@ -537,7 +537,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
     private void mainPolicyComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            conf.setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
+            conf.setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
             conf.save();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -852,7 +852,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         userTable.setRowSorter(customFilter);
         globalTable.setRowSorter(globalFilter);
         AppletSecurityLevel gs = AppletSecurityLevel.getDefault();
-        String s = this.conf.getProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL);
+        String s = this.conf.getProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL);
         if (s != null) {
             gs = AppletSecurityLevel.fromString(s);
         }
