@@ -1,5 +1,6 @@
-package net.sourceforge.jnlp.config;
+package net.adoptopenjdk.icedteaweb.config;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.validators.BooleanValidator;
 import net.sourceforge.jnlp.config.validators.FilePathValidator;
 import net.sourceforge.jnlp.config.validators.ManifestAttributeCheckValidator;
@@ -21,6 +22,7 @@ import net.sourceforge.jnlp.config.validators.ValueValidator;
  * @see ValidatorFactory#createUrlValidator()
  */
 public class ValidatorFactory {
+
     /**
      * @return a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that can be used to check if an object is
      * a valid Boolean
@@ -114,12 +116,4 @@ public class ValidatorFactory {
     public static ValueValidator createRustCpValidator() {
         return new RustCpValidator();
     }
-
-    public static ValueValidator getManifestAttributeCheckValidator() {
-        return new ManifestAttributeCheckValidator();
-    }
-
-    public static ValueValidator getMultipleStringValidator(final String[] singleValues, final String[] multipleValues) {
-        return new MultipleStringValueValidator(singleValues, multipleValues);
-    }
-}
+ }

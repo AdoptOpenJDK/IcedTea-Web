@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 
+import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.sourceforge.jnlp.config.validators.SecurityValueValidator;
 import net.sourceforge.jnlp.config.validators.ValueValidator;

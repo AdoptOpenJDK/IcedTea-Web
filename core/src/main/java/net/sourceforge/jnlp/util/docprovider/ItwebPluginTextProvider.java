@@ -45,6 +45,8 @@ import java.nio.charset.Charset;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 
+import static net.sourceforge.jnlp.config.FilesystemConstants.ICEDTEA_SO;
+
 /**
  *
  * @author jvanek
@@ -112,7 +114,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
         return super.getSynopsis()
                 + getFormatter().getBold(getId() + " ") + getFormatter().process(Translator.R("ITWPsynopsL1")) + getFormatter().getNewLine()
                 + getFormatter().wrapParagraph(
-                        getFormatter().process(Translator.R("ITWPsynopsL2", PathsAndFiles.ICEDTEA_SO, getFormatter().getUrl(ITW_PLUGIN_URL))) + getFormatter().getNewLine()
+                        getFormatter().process(Translator.R("ITWPsynopsL2", ICEDTEA_SO, getFormatter().getUrl(ITW_PLUGIN_URL))) + getFormatter().getNewLine()
                         + getFormatter().process(Translator.R("ITWPsynopsL3")) + getFormatter().getNewLine()
                         + mozillas)
                 + getFormatter().wrapParagraph(getFormatter().process(Translator.R("ITWPsynopsL4")) + getFormatter().getNewLine()

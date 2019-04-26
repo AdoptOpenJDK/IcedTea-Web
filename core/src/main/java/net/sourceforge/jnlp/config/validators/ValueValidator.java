@@ -37,11 +37,13 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config.validators;
 
+import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
+
 /**
  * A class implements the ValueValidator interface to indicate that it can validate
  * values.
  *
- * @see ValidatorUtils
+ * @see ValidatorFactory
  */
 public interface ValueValidator {
 

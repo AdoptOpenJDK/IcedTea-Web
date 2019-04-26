@@ -38,9 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +49,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CountDownLatch;
 
+import static net.sourceforge.jnlp.config.FilesystemConstants.CACHE_INDEX_FILE_NAME;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

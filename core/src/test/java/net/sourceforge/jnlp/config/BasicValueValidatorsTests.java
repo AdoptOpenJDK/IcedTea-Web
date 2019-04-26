@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.sourceforge.jnlp.config.validators.FilePathValidator;
 import net.sourceforge.jnlp.config.validators.ValueValidator;
 import org.junit.Assert;
@@ -143,7 +144,7 @@ public class BasicValueValidatorsTests {
         String[] multipleValues = {
             "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
         };
-        ValueValidator multipleValidator = ValidatorFactory.getMultipleStringValidator(singleValues, multipleValues);
+        ValueValidator multipleValidator = ValidatorFactory.createMultipleStringValidator(singleValues, multipleValues);
 
         multipleValidator.validate("SINGLE");
         multipleValidator.validate("ONLY");
@@ -161,14 +162,14 @@ public class BasicValueValidatorsTests {
         String[] multipleValues = {
                 "MULTIPLE", "COMBO", "ONE", "TWO", "THREE"
         };
-        ValueValidator multipleValidator = ValidatorFactory.getMultipleStringValidator(singleValues, multipleValues);
+        ValueValidator multipleValidator = ValidatorFactory.createMultipleStringValidator(singleValues, multipleValues);
 
         multipleValidator.validate("SINGLE,COMBO");
     }
 
     @Test
     public void testManifestAttributeCheckValidator() {
-        ValueValidator multipleValidator = ValidatorFactory.getManifestAttributeCheckValidator();
+        ValueValidator multipleValidator = ValidatorFactory.createManifestAttributeCheckValidator();
 
         multipleValidator.validate("ALL");
         multipleValidator.validate("PERMISSIONS");
@@ -181,7 +182,7 @@ public class BasicValueValidatorsTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testManifestAttributeCheckValidatorCantMixSingleAndComboValues() {
-        ValueValidator multipleValidator = ValidatorFactory.getManifestAttributeCheckValidator();
+        ValueValidator multipleValidator = ValidatorFactory.createManifestAttributeCheckValidator();
 
         multipleValidator.validate("ALL,CODEBASE,NONE");
     }
