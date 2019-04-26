@@ -101,15 +101,9 @@ public class LockedFile {
      */
     synchronized public static LockedFile getInstance(final File file) {
         if (!instanceCache.containsKey(file)) {
-            LockedFile l;
-            if (OsUtil.isWindows()) {
-                l = new WindowsLockedFile(file);
-            } else {
-                l = new LockedFile(file);
-            }
+            final LockedFile l = new LockedFile(file);
             instanceCache.put(file, l);
         }
-
         return instanceCache.get(file);
     }
 
@@ -133,8 +127,9 @@ public class LockedFile {
         }
 
         this.threadLock.lock();
-
-        lockProcess();
+        if(!OsUtil.isWindows()) {
+            lockProcess();
+        }
     }
 
     public boolean tryLock() throws IOException {
@@ -168,8 +163,12 @@ public class LockedFile {
         if (!this.threadLock.isHeldByCurrentThread()) {
             return;
         }
-        final boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
-        unlockImpl(releaseProcessLock);
+        if(!OsUtil.isWindows()) {
+            final boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
+            unlockImpl(releaseProcessLock);
+        } else {
+            unlockImpl(false);
+        }
     }
 
     protected void unlockImpl(final boolean releaseProcessLock) throws IOException {
@@ -196,10 +195,4 @@ public class LockedFile {
     public boolean isHeldByCurrentThread() {
         return this.threadLock.isHeldByCurrentThread();
     }
-
-    protected ReentrantLock getThreadLock() {
-        return threadLock;
-    }
-
-
 }
