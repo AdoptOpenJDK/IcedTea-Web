@@ -45,7 +45,7 @@ import java.nio.charset.Charset;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 
-import static net.sourceforge.jnlp.config.FilesystemConstants.ICEDTEA_SO;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.ICEDTEA_SO;
 
 /**
  *

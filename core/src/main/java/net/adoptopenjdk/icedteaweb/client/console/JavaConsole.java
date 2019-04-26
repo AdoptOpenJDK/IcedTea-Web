@@ -39,7 +39,7 @@ package net.adoptopenjdk.icedteaweb.client.console;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -181,7 +181,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public static boolean isEnabled(DeploymentConfiguration config) {
-        return !DeploymentConfigurationConstants.CONSOLE_DISABLE.equals(config.getProperty(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
+        return !ConfigurationConstants.CONSOLE_DISABLE.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && !JNLPRuntime.isHeadless();
     }
 
@@ -193,10 +193,10 @@ public class JavaConsole implements ObservableMessagesProvider {
         if (!isEnabled(config)) {
             return false;
         }
-        return DeploymentConfigurationConstants.CONSOLE_SHOW.equals(config.getProperty(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
-                || (DeploymentConfigurationConstants.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
+        return ConfigurationConstants.CONSOLE_SHOW.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
+                || (ConfigurationConstants.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && !isApplication)
-                || (DeploymentConfigurationConstants.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(DeploymentConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
+                || (ConfigurationConstants.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && isApplication);
     }
 

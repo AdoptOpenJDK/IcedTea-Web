@@ -31,7 +31,7 @@ import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -747,10 +747,10 @@ public class JNLPRuntime {
                 headless = true;
             }
             if (!headless) {
-                boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.IGNORE_HEADLESS_CHECK));
+                boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.IGNORE_HEADLESS_CHECK));
                 if (noCheck) {
                     headless = false;
-                    LOG.debug("{} set to {}. Avoiding headless check.", DeploymentConfigurationConstants.IGNORE_HEADLESS_CHECK, noCheck);
+                    LOG.debug("{} set to {}. Avoiding headless check.", ConfigurationConstants.IGNORE_HEADLESS_CHECK, noCheck);
                 } else {
                     try {
                         if (GraphicsEnvironment.isHeadless()) {
@@ -800,7 +800,7 @@ public class JNLPRuntime {
 
     /**
      * Indicate that netx is running by creating the
-     * {@link DeploymentConfigurationConstants#KEY_USER_NETX_RUNNING_FILE} and
+     * {@link ConfigurationConstants#KEY_USER_NETX_RUNNING_FILE} and
      * acquiring a shared lock on it
      */
     public synchronized static void markNetxRunning() {
@@ -847,7 +847,7 @@ public class JNLPRuntime {
 
     /**
      * Indicate that netx is stopped by releasing the shared lock on
-     * {@link DeploymentConfigurationConstants#KEY_USER_NETX_RUNNING_FILE}.
+     * {@link ConfigurationConstants#KEY_USER_NETX_RUNNING_FILE}.
      */
     private static void markNetxStopped() {
         if (fileLock == null) {

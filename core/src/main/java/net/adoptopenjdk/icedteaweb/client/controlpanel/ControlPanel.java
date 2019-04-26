@@ -24,7 +24,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.JVMPanel.JvmValidationRes
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -157,7 +157,7 @@ public class ControlPanel extends JFrame {
     }
     
     private int validateJdk() {
-        String s = ControlPanel.this.config.getProperty(DeploymentConfigurationConstants.KEY_JRE_DIR);
+        String s = ControlPanel.this.config.getProperty(ConfigurationConstants.KEY_JRE_DIR);
         JvmValidationResult validationResult = JVMPanel.validateJvm(s);
         if (validationResult.id == JvmValidationResult.STATE.NOT_DIR
                 || validationResult.id == JvmValidationResult.STATE.NOT_VALID_DIR
@@ -165,7 +165,7 @@ public class ControlPanel extends JFrame {
             return JOptionPane.showConfirmDialog(ControlPanel.this,
                     "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br/>"
                     + validationResult.formattedText+"<br/>"
-                    + Translator.R("CPJVMNotokMessage2", DeploymentConfigurationConstants.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath(config))+"</html>",
+                    + Translator.R("CPJVMNotokMessage2", ConfigurationConstants.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath(config))+"</html>",
                     Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
         }
         return JOptionPane.OK_OPTION;

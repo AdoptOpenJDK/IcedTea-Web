@@ -20,7 +20,7 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -65,11 +65,11 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
 
     /** List of properties used by this panel */
     public static String[] properties = {
-            DeploymentConfigurationConstants.KEY_PROXY_TYPE,
-            DeploymentConfigurationConstants.KEY_PROXY_HTTP_HOST,
-            DeploymentConfigurationConstants.KEY_PROXY_HTTP_PORT,
-            DeploymentConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
-            DeploymentConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL
+            ConfigurationConstants.KEY_PROXY_TYPE,
+            ConfigurationConstants.KEY_PROXY_HTTP_HOST,
+            ConfigurationConstants.KEY_PROXY_HTTP_PORT,
+            ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
+            ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL
     };
 
     /**

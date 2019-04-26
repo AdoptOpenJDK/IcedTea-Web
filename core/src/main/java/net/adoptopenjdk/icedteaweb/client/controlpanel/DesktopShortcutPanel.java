@@ -22,7 +22,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.swing.Box;
@@ -97,10 +97,10 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
             deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ASK_USER_IF_HINTED),
             deploymentJavawsShortcutToComboItem(ShortcutDesc.CREATE_ALWAYS_IF_HINTED)};
 
-        shortcutComboOptions.setActionCommand(DeploymentConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT); // The configuration property this combobox affects.
+        shortcutComboOptions.setActionCommand(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT); // The configuration property this combobox affects.
         for (int j = 0; j < items.length; j++) {
             shortcutComboOptions.addItem(items[j]);
-            if (config.getProperty(DeploymentConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT).equals(items[j].getValue())) {
+            if (config.getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT).equals(items[j].getValue())) {
                 shortcutComboOptions.setSelectedIndex(j);
             }
         }

@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
-import net.sourceforge.jnlp.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 
 /**
  * Represents a value for a configuration. Provides methods to get the value

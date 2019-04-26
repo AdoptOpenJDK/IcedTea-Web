@@ -20,7 +20,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
@@ -299,7 +299,7 @@ public class ServiceUtil {
             @Override
             public Boolean run() {
                 return Boolean.valueOf(JNLPRuntime.getConfiguration()
-                        .getProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
+                        .getProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP));
             }
         });
     }

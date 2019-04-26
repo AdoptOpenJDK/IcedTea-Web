@@ -103,7 +103,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         dc.save();
 
         String s = FileUtils.loadFileAsString(f);
-        Assert.assertTrue(s.contains("#" + DeploymentConfigurationConstants.DEPLOYMENT_COMMENT));
+        Assert.assertTrue(s.contains("#" + ConfigurationConstants.DEPLOYMENT_COMMENT));
         String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
         Assert.assertTrue(s.contains("#" + date)); //check day part of date...
         Assert.assertTrue(s.contains("#commented1"));
@@ -146,7 +146,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
                 //ensure salt
                 Assert.assertTrue(s.contains("#id" + y + "id"));
             }
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, DeploymentConfigurationConstants.DEPLOYMENT_COMMENT));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, ConfigurationConstants.DEPLOYMENT_COMMENT));
             String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, date)); //check day part of date...
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "#commented1"));

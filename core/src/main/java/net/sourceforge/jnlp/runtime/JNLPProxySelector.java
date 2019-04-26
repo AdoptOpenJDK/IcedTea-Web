@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,9 +96,9 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * Initialize this ProxySelector by reading the configuration
      */
     private void parseConfiguration(DeploymentConfiguration config) {
-        proxyType = Integer.valueOf(config.getProperty(DeploymentConfigurationConstants.KEY_PROXY_TYPE));
+        proxyType = Integer.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE));
 
-        String autoConfigString = config.getProperty(DeploymentConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
+        String autoConfigString = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
         if (autoConfigString != null) {
             try {
                 autoConfigUrl = new URL(autoConfigString);
@@ -112,7 +112,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
         }
 
         bypassList = new ArrayList<>();
-        String proxyBypass = config.getProperty(DeploymentConfigurationConstants.KEY_PROXY_BYPASS_LIST);
+        String proxyBypass = config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LIST);
         if (proxyBypass != null) {
             StringTokenizer tokenizer = new StringTokenizer(proxyBypass, ",");
             while (tokenizer.hasMoreTokens()) {
@@ -124,23 +124,23 @@ public abstract class JNLPProxySelector extends ProxySelector {
         }
 
         bypassLocal = Boolean.valueOf(config
-                .getProperty(DeploymentConfigurationConstants.KEY_PROXY_BYPASS_LOCAL));
+                .getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL));
 
-        sameProxy = Boolean.valueOf(config.getProperty(DeploymentConfigurationConstants.KEY_PROXY_SAME));
+        sameProxy = Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
 
-        proxyHttpHost = getHost(config, DeploymentConfigurationConstants.KEY_PROXY_HTTP_HOST);
-        proxyHttpPort = getPort(config, DeploymentConfigurationConstants.KEY_PROXY_HTTP_PORT);
+        proxyHttpHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST);
+        proxyHttpPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT);
 
-        proxyHttpsHost = getHost(config, DeploymentConfigurationConstants.KEY_PROXY_HTTPS_HOST);
-        proxyHttpsPort = getPort(config, DeploymentConfigurationConstants.KEY_PROXY_HTTPS_PORT);
+        proxyHttpsHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTPS_HOST);
+        proxyHttpsPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTPS_PORT);
 
-        proxyFtpHost = getHost(config, DeploymentConfigurationConstants.KEY_PROXY_FTP_HOST);
-        proxyFtpPort = getPort(config, DeploymentConfigurationConstants.KEY_PROXY_FTP_PORT);
+        proxyFtpHost = getHost(config, ConfigurationConstants.KEY_PROXY_FTP_HOST);
+        proxyFtpPort = getPort(config, ConfigurationConstants.KEY_PROXY_FTP_PORT);
 
-        proxySocks4Host = getHost(config, DeploymentConfigurationConstants.KEY_PROXY_SOCKS4_HOST);
-        proxySocks4Port = getPort(config, DeploymentConfigurationConstants.KEY_PROXY_SOCKS4_PORT);
+        proxySocks4Host = getHost(config, ConfigurationConstants.KEY_PROXY_SOCKS4_HOST);
+        proxySocks4Port = getPort(config, ConfigurationConstants.KEY_PROXY_SOCKS4_PORT);
 
-        overrideHosts = config.getProperty(DeploymentConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS);
+        overrideHosts = config.getProperty(ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS);
     }
 
     /**

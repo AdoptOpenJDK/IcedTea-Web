@@ -36,9 +36,9 @@
  */
 package net.sourceforge.jnlp.config;
 
-import net.sourceforge.jnlp.config.validators.DirectoryCheckResult;
-import net.sourceforge.jnlp.config.validators.DirectoryCheckResults;
-import net.sourceforge.jnlp.config.validators.DirectoryValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResult;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Test;
 

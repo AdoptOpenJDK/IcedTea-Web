@@ -49,7 +49,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.sourceforge.jnlp.config.validators.ValidatorUtils.splitCombination;
+import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 
 public class ManifestAttributesChecker {
 
@@ -139,7 +139,7 @@ public class ManifestAttributesChecker {
     }
 
     public static List<MANIFEST_ATTRIBUTES_CHECK> getAttributesCheck() {
-        final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
         String[] attributesCheck = splitCombination(deploymentProperty);
         List<MANIFEST_ATTRIBUTES_CHECK> manifestAttributesCheckList = new ArrayList<>();
         for (String attribute : attributesCheck) {

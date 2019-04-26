@@ -40,8 +40,7 @@ import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
@@ -309,7 +308,7 @@ public class JNLPClassLoader extends URLClassLoader {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
-        strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
+        strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
         this.updatePolicy = policy;
@@ -350,13 +349,13 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     public static boolean isCertUnderestimated() {
-        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
+        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
                 && !JNLPRuntime.isSecurityEnabled();
     }
 
     private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
-            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), DeploymentConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
         } else {
             throw ex;
         }

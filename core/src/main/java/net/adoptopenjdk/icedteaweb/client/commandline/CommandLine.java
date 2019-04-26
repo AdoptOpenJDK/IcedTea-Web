@@ -26,7 +26,7 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
-import net.sourceforge.jnlp.config.validators.ConfigurationValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ConfigurationValidator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;

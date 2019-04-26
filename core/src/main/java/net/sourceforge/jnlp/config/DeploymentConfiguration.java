@@ -17,7 +17,8 @@
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.config.ConfigType;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.sourceforge.jnlp.tools.ico.IcoSpi;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.slf4j.Logger;
@@ -168,7 +169,7 @@ public final class DeploymentConfiguration {
 
         if (systemConfigFile != null) {
             if (loadSystemConfiguration(systemConfigFile)) {
-                LOG.info("System level {} is mandatory: {}", DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
+                LOG.info("System level {} is mandatory: {}", ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
                 /* Second, read the System level deployment.properties file */
                 systemProperties.putAll(loadProperties(ConfigType.SYSTEM, systemPropertiesFile,
                         systemPropertiesMandatory));
@@ -337,7 +338,7 @@ public final class DeploymentConfiguration {
         String jrePath = null;
         try {
             final Map<String, Setting<String>> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getUrl());
-            final Setting<String> jreSetting = tmpProperties.get(DeploymentConfigurationConstants.KEY_JRE_DIR);
+            final Setting<String> jreSetting = tmpProperties.get(ConfigurationConstants.KEY_JRE_DIR);
             if (jreSetting != null) {
                 jrePath = jreSetting.getValue();
             }
@@ -349,7 +350,7 @@ public final class DeploymentConfiguration {
         if (jrePath != null) {
             //based on property KEY_JRE_DIR
             jreFile = new File(jrePath + File.separator + "lib"
-                    + File.separator + DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE);
+                    + File.separator + ConfigurationConstants.DEPLOYMENT_CONFIG_FILE);
         } else {
             jreFile = PathsAndFiles.JAVA_DEPLOYMENT_PROP_FILE.getFile();
         }
@@ -372,7 +373,7 @@ public final class DeploymentConfiguration {
         try {
             systemConfiguration.putAll(parsePropertiesFile(configFile));
         } catch (final IOException e) {
-            LOG.error("No System level " + DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE + " found.", e);
+            LOG.error("No System level " + ConfigurationConstants.DEPLOYMENT_CONFIG_FILE + " found.", e);
             return false;
         }
 
@@ -382,20 +383,20 @@ public final class DeploymentConfiguration {
          */
         String urlString = null;
         try {
-            final Setting<String> urlSettings = systemConfiguration.get(DeploymentConfigurationConstants.KEY_SYSTEM_CONFIG);
+            final Setting<String> urlSettings = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
-                LOG.info("No System level {} found in {}", DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
+                LOG.info("No System level {} found in {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
-            final Setting<String> mandatory = systemConfiguration.get(DeploymentConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
+            final Setting<String> mandatory = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
             systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
-            LOG.info("System level settings {} are mandatory: {}", DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
+            LOG.info("System level settings {} are mandatory: {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
             systemPropertiesFile = new URL(urlString);
-            LOG.info("Using System level {} : {}", DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
+            LOG.info("Using System level {} : {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (final MalformedURLException e) {
-            LOG.error("Invalid url for " + DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm(), e);
+            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm(), e);
             if (systemPropertiesMandatory){
                 final ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
@@ -418,7 +419,7 @@ public final class DeploymentConfiguration {
     private Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
-            LOG.info("No {} level {} found.", type.toString(), DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES);
+            LOG.info("No {} level {} found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
             if (!mandatory) {
                 return null;
             } else {
@@ -484,7 +485,7 @@ public final class DeploymentConfiguration {
 
         FileUtils.createParentDir(userPropertiesFile);
         try (final OutputStream out = new BufferedOutputStream(new FileOutputStream(userPropertiesFile))) {
-            String comments = DeploymentConfigurationConstants.DEPLOYMENT_COMMENT;
+            String comments = ConfigurationConstants.DEPLOYMENT_COMMENT;
             if (userComments.length() > 0) {
                 comments = comments + System.lineSeparator() + userComments;
             }
@@ -593,7 +594,7 @@ public final class DeploymentConfiguration {
                     if (decommented.isEmpty()){
                         continue;
                     }
-                    if (decommented.equals(DeploymentConfigurationConstants.DEPLOYMENT_COMMENT)){
+                    if (decommented.equals(ConfigurationConstants.DEPLOYMENT_COMMENT)){
                         continue;
                     }
                     //there is always also date
@@ -621,11 +622,11 @@ public final class DeploymentConfiguration {
      * @return translation of VVPossibleBrowserValues with all params in
      */
     public static String VVPossibleBrowserValues() {
-        return R(DeploymentConfigurationConstants.VV_POSSIBLE_BROWSER_VALUES, DeploymentConfigurationConstants.LEGACY_WIN32_URL__HANDLER,
-                DeploymentConfigurationConstants.BROWSER_ENV_VAR,
-                DeploymentConfigurationConstants.INTERNAL_HTML,
-                DeploymentConfigurationConstants.ALWAYS_ASK,
-                DeploymentConfigurationConstants.KEY_BROWSER_PATH
+        return R(ConfigurationConstants.VV_POSSIBLE_BROWSER_VALUES, ConfigurationConstants.LEGACY_WIN32_URL__HANDLER,
+                ConfigurationConstants.BROWSER_ENV_VAR,
+                ConfigurationConstants.INTERNAL_HTML,
+                ConfigurationConstants.ALWAYS_ASK,
+                ConfigurationConstants.KEY_BROWSER_PATH
         );
     }
 }

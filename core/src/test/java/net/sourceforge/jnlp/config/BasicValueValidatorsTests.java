@@ -37,8 +37,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
-import net.sourceforge.jnlp.config.validators.FilePathValidator;
-import net.sourceforge.jnlp.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import org.junit.Assert;
 import org.junit.Test;
 

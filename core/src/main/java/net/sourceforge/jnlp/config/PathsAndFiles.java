@@ -60,19 +60,19 @@ public class PathsAndFiles {
 
     public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(Target.PLUGIN);
 
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(FilesystemConstants.ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
 
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(FilesystemConstants.ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
 
-    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(FilesystemConstants.ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
 
-    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(FilesystemConstants.ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
+    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
     
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS) {
     
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_CACHE_DIR;
+            return ConfigurationConstants.KEY_USER_CACHE_DIR;
         }
 
     };
@@ -84,7 +84,7 @@ public class PathsAndFiles {
     }
 
     private static class RECENTLY_USED_FILE_HOLDER {
-        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(FilesystemConstants.CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS){
+        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(ConfigurationConstants.CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
             @Override
             public String getFullPath() {
@@ -98,14 +98,14 @@ public class PathsAndFiles {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR;
+            return ConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR;
         }
     };
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_LOG_DIR;
+            return ConfigurationConstants.KEY_USER_LOG_DIR;
         }
     
         
@@ -115,14 +115,14 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor GEN_JNLPS_DIR = new ItwConfigFileDescriptor("generated_jnlps", "FILEjnlps", Target.PLUGIN, Target.ITWEB_SETTINGS);
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(DeploymentConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(DeploymentConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TMP_DIR;
+            return ConfigurationConstants.KEY_USER_TMP_DIR;
         }
         
     };
@@ -130,7 +130,7 @@ public class PathsAndFiles {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_LOCKS_DIR;
+            return ConfigurationConstants.KEY_USER_LOCKS_DIR;
         }
         
     };
@@ -138,7 +138,7 @@ public class PathsAndFiles {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_NETX_RUNNING_FILE;
+            return ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE;
         }
         
     };
@@ -146,7 +146,7 @@ public class PathsAndFiles {
 
                    @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_SECURITY_POLICY;
+            return ConfigurationConstants.KEY_USER_SECURITY_POLICY;
         }
 
         @Override
@@ -157,35 +157,35 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -193,7 +193,7 @@ public class PathsAndFiles {
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS;
         }
         
     };
@@ -201,21 +201,21 @@ public class PathsAndFiles {
       
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs"){
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS;
         }
     };
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
         }
         
     };
@@ -223,7 +223,7 @@ public class PathsAndFiles {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -231,11 +231,11 @@ public class PathsAndFiles {
 
         @Override
         public String getDescription() {
-             return Translator.R(getDescriptionKey(), DeploymentConfigurationConstants.KEY_JRE_DIR);
+             return Translator.R(getDescriptionKey(), ConfigurationConstants.KEY_JRE_DIR);
         }
         
     };
-    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DeploymentConfigurationConstants.DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
     public static List<InfrastructureFileDescriptor> getAllFiles() {
         return getAllFiles(null);
@@ -289,11 +289,11 @@ public class PathsAndFiles {
     private static class HomeFileDescriptor extends InfrastructureFileDescriptor {
 
         private HomeFileDescriptor(Target... target) {
-            super(FilesystemConstants.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(FilesystemConstants.HOME_PROP), "FILEmozillauser", target);
+            super(ConfigurationConstants.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(ConfigurationConstants.HOME_PROP), "FILEmozillauser", target);
         }
               @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "HOME";
+            return FilesystemConfiguration.getVariablePrefix() + "HOME";
         }
 
 
@@ -306,7 +306,7 @@ public class PathsAndFiles {
 
         private static String getSystemConfigDir() {
             if (JNLPRuntime.isWindows()) {
-                return System.getenv(FilesystemConstants.WINDIR) + windowsPathSuffix;
+                return System.getenv(ConfigurationConstants.WINDIR) + windowsPathSuffix;
             } else {
                 return unixPathSuffix;
             }
@@ -315,7 +315,7 @@ public class PathsAndFiles {
         @Override
         public String getSystemPathStubAcronym() {
             //note the hardcoded % instead of VARIABLE (actually leading to idea, that docs, when generated on windows may not make sense)
-            return "{" + "%" + FilesystemConstants.WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
+            return "{" + "%" + ConfigurationConstants.WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
         }
 
         private SystemConfigFileDescriptor(String fileName, String description, Target... target) {
@@ -335,12 +335,12 @@ public class PathsAndFiles {
     private static class SystemJavaFileDescriptor extends InfrastructureFileDescriptor {
 
         private SystemJavaFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, System.getProperty(FilesystemConstants.JAVA_PROP), description, target);
+            super(fileName, pathSub, System.getProperty(ConfigurationConstants.JAVA_PROP), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "JAVA_HOME";
+            return FilesystemConfiguration.getVariablePrefix() + "JAVA_HOME";
         }
 
     }
@@ -348,11 +348,11 @@ public class PathsAndFiles {
     private static class SystemJavaLibFileDescriptor extends SystemJavaFileDescriptor {
 
         private SystemJavaLibFileDescriptor(Target... target) {
-            super(DeploymentConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
+            super(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
         }
 
         private SystemJavaLibFileDescriptor(String fileName, Target... target) {
-            super(fileName, "lib" + File.separator + FilesystemConstants.SECURITY_WORD, "FILEjavacerts", target);
+            super(fileName, "lib" + File.separator + ConfigurationConstants.SECURITY_WORD, "FILEjavacerts", target);
         }
 
     }
@@ -368,12 +368,12 @@ public class PathsAndFiles {
     private static class DataFileDescriptor extends InfrastructureFileDescriptor {
 
         private DataFileDescriptor(String fileName, Target... target) {
-            super(fileName, "applications", FilesystemConstants.DATA_HOME, "FILEmenus", target);
+            super(fileName, "applications", FilesystemConfiguration.getDataHome(), "FILEmenus", target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "" + FilesystemConstants.XDG_DATA_HOME;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_DATA_HOME_VAR;
         }
 
     }
@@ -392,12 +392,12 @@ public class PathsAndFiles {
     private static class RuntimeFileDescriptor extends InfrastructureFileDescriptor {
 
         private RuntimeFileDescriptor(Target... target) {
-            super("icedteaplugin-user-*", FilesystemConstants.RUNTIME_HOME, "", "FILEpipe", target);
+            super("icedteaplugin-user-*", FilesystemConfiguration.getRuntimeHome(), "", "FILEpipe", target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "" + FilesystemConstants.XDG_RUNTIME_DIR_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_RUNTIME_DIR_VAR;
         }
 
     }
@@ -405,12 +405,12 @@ public class PathsAndFiles {
     private static class ConfigFileDescriptor extends InfrastructureFileDescriptor {
 
         private ConfigFileDescriptor(String fileName, String pathStub, String description, Target... target) {
-            super(fileName, pathStub, FilesystemConstants.CONFIG_HOME, description, target);
+            super(fileName, pathStub, FilesystemConfiguration.getConfigHome(), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "" + FilesystemConstants.XDG_CONFIG_HOME_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_CONFIG_HOME_VAR;
         }
 
     }
@@ -418,12 +418,12 @@ public class PathsAndFiles {
     private static class CacheFileDescriptor extends InfrastructureFileDescriptor {
 
         private CacheFileDescriptor(String fileName, String pathStub, String description, Target... target) {
-            super(fileName, pathStub, FilesystemConstants.CACHE_HOME, description, target);
+            super(fileName, pathStub, FilesystemConfiguration.getCacheHome(), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "" + FilesystemConstants.XDG_CACHE_HOME_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_CACHE_HOME_VAR;
         }
 
     }
@@ -431,11 +431,11 @@ public class PathsAndFiles {
     private static class ItwConfigFileDescriptor extends ConfigFileDescriptor {
 
         private ItwConfigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, FilesystemConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
         private ItwConfigFileDescriptor(String fileName, String followingPath, String description, Target... target) {
-            super(fileName, FilesystemConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
 
     }
@@ -443,7 +443,7 @@ public class PathsAndFiles {
     private static class UserSecurityConfigFileDescriptor extends ItwConfigFileDescriptor {
 
         private UserSecurityConfigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, FilesystemConstants.SECURITY_WORD, description, target);
+            super(fileName, ConfigurationConstants.SECURITY_WORD, description, target);
         }
 
     }
@@ -459,23 +459,23 @@ public class PathsAndFiles {
     private static class ItwCacheFileDescriptor extends CacheFileDescriptor {
 
         private ItwCacheFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, FilesystemConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
         private ItwCacheFileDescriptor(String fileName, String followingPath, String description, Target... target) {
-            super(fileName, FilesystemConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
     }
 
     private static class TmpUsrFileDescriptor extends InfrastructureFileDescriptor {
 
         private TmpUsrFileDescriptor(String fileName, String pathStub, String description) {
-            super(fileName, pathStub, System.getProperty(FilesystemConstants.TMP_PROP) + File.separator + System.getProperty(FilesystemConstants.USER_PROP), description, Target.JAVAWS);
+            super(fileName, pathStub, System.getProperty(ConfigurationConstants.TMP_PROP) + File.separator + System.getProperty(ConfigurationConstants.USER_PROP), description, Target.JAVAWS);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return FilesystemConstants.VARIABLE + "TMP" + File.separator + FilesystemConstants.VARIABLE + "USER";
+            return FilesystemConfiguration.getVariablePrefix() + "TMP" + File.separator + FilesystemConfiguration.getVariablePrefix() + "USER";
         }
 
     }

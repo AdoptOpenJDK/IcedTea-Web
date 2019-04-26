@@ -17,7 +17,7 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 public final class ShortcutDesc {
     public static final String SHORTCUT_ELEMENT = "shortcut";
@@ -123,7 +123,7 @@ public final class ShortcutDesc {
                 return Translator.R("DSPAlwaysIfHinted");
 
         }
-        throw new RuntimeException("Unknown value of " + DeploymentConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT + " for " + i);
+        throw new RuntimeException("Unknown value of " + ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT + " for " + i);
 
     }
 }

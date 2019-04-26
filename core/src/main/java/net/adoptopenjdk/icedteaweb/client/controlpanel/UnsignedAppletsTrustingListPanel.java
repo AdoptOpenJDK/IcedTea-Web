@@ -47,6 +47,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -537,7 +538,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
     private void mainPolicyComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            conf.setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
+            conf.setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
             conf.save();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -852,7 +853,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         userTable.setRowSorter(customFilter);
         globalTable.setRowSorter(globalFilter);
         AppletSecurityLevel gs = AppletSecurityLevel.getDefault();
-        String s = this.conf.getProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL);
+        String s = this.conf.getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL);
         if (s != null) {
             gs = AppletSecurityLevel.fromString(s);
         }

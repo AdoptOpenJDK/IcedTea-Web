@@ -58,7 +58,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
@@ -177,8 +177,8 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //trustNone is not used in dialogues, its considered as default
         //but is used in Unsigned... dialogs family
         wasTrustNone = JNLPRuntime.isTrustNone();
-        prompt = JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER);
-        seclevel = JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL);
+        prompt = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER);
+        seclevel = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL);
     }
 
     @After
@@ -187,15 +187,15 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     private static void setPrompt(String p) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER, p);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, p);
     }
 
     private static void setPrompt(boolean p) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER, String.valueOf(p));
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, String.valueOf(p));
     }
 
     private static void setAS(AppletSecurityLevel as) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, String.valueOf(as.toChars()));
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, String.valueOf(as.toChars()));
     }
 
     @AfterClass
@@ -204,7 +204,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustAll(wasTrustAll);
         JNLPRuntime.setTrustNone(wasTrustNone);
         setPrompt(prompt);
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, seclevel);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, seclevel);
     }
 
     @Test(timeout = 10000)//if gui pops up

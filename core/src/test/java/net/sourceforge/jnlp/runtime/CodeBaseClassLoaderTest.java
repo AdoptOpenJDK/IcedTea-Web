@@ -45,7 +45,7 @@ import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
@@ -68,16 +68,16 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        macStatus = JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.NONE.toString());
+        macStatus = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.NONE.toString());
         
     }
 
     @AfterClass
     public static void resetPermissions() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, macStatus);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, macStatus);
     }
 
     private static final String isWSA = "isWebstartApplication";

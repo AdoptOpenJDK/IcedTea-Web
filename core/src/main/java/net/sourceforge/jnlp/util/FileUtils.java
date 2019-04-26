@@ -17,8 +17,8 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.validators.DirectoryCheckResults;
-import net.sourceforge.jnlp.config.validators.DirectoryValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

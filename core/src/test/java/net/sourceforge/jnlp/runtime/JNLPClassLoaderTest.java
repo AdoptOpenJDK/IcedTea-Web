@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -72,23 +72,23 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     @BeforeClass
     public static void setPermissions() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
     }
 
     @AfterClass
     public static void resetPermissions() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
     }
 
     @BeforeClass
     public static void noDialogs() {
-        askUser = JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER);
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER, Boolean.toString(false));
+        askUser = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, Boolean.toString(false));
     }
 
     @AfterClass
     public static void restoreDialogs() {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_SECURITY_PROMPT_USER, askUser);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, askUser);
     }
 
     /* Note: Only does file leak testing for now. */

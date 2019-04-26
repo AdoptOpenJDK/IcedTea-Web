@@ -21,8 +21,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
-import net.sourceforge.jnlp.config.validators.ValidatorUtils;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.StreamUtils;
@@ -197,16 +197,16 @@ class XBasicService implements BasicService {
             LOG.debug("showDocument for: {}", urls);
 
             DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            String command = config.getProperty(DeploymentConfigurationConstants.KEY_BROWSER_PATH);
+            String command = config.getProperty(ConfigurationConstants.KEY_BROWSER_PATH);
             //for various debugging
             //command=DeploymentConfiguration.ALWAYS_ASK;
             if (command != null) {
-                LOG.debug("{} located. Using: {}", DeploymentConfigurationConstants.KEY_BROWSER_PATH, command);
+                LOG.debug("{} located. Using: {}", ConfigurationConstants.KEY_BROWSER_PATH, command);
                 return exec(command, urls);
             }
-            if (System.getenv(DeploymentConfigurationConstants.BROWSER_ENV_VAR) != null) {
-                command = System.getenv(DeploymentConfigurationConstants.BROWSER_ENV_VAR);
-                LOG.debug("variable {} located. Using: {}", DeploymentConfigurationConstants.BROWSER_ENV_VAR, command);
+            if (System.getenv(ConfigurationConstants.BROWSER_ENV_VAR) != null) {
+                command = System.getenv(ConfigurationConstants.BROWSER_ENV_VAR);
+                LOG.debug("variable {} located. Using: {}", ConfigurationConstants.BROWSER_ENV_VAR, command);
                 return exec(command, urls);
             }
             if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
@@ -237,10 +237,10 @@ class XBasicService implements BasicService {
             if (url == null || url.length() == 0) {
                 return false;
             }
-            if (cmd.equals(DeploymentConfigurationConstants.ALWAYS_ASK)) {
+            if (cmd.equals(ConfigurationConstants.ALWAYS_ASK)) {
                 cmd = promptForCommand(url, true);
             }
-            if (cmd.equals(DeploymentConfigurationConstants.INTERNAL_HTML)) {
+            if (cmd.equals(ConfigurationConstants.INTERNAL_HTML)) {
                 LinkingBrowser.createFrame(url, false, JFrame.DISPOSE_ON_CLOSE);
                 return true;
             }
@@ -334,7 +334,7 @@ class XBasicService implements BasicService {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (save.isSelected()) {
-                        JNLPRuntime.getConfiguration().setProperty(DeploymentConfigurationConstants.KEY_BROWSER_PATH, value.getText());
+                        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_BROWSER_PATH, value.getText());
                         try {
                             JNLPRuntime.getConfiguration().save();
                         } catch (IOException ex) {
@@ -358,10 +358,10 @@ class XBasicService implements BasicService {
             if (this.ask) {
                 save.setSelected(false);
                 save.setEnabled(false);
-                save.setToolTipText(R("VVBrowserSaveNotAllowed", DeploymentConfigurationConstants.ALWAYS_ASK, DeploymentConfigurationConstants.KEY_BROWSER_PATH));
+                save.setToolTipText(R("VVBrowserSaveNotAllowed", ConfigurationConstants.ALWAYS_ASK, ConfigurationConstants.KEY_BROWSER_PATH));
             } else {
                 save.setEnabled(true);
-                save.setToolTipText(R("VVBrowserSaveAllowed", DeploymentConfigurationConstants.KEY_BROWSER_PATH));
+                save.setToolTipText(R("VVBrowserSaveAllowed", ConfigurationConstants.KEY_BROWSER_PATH));
             }
             this.addWindowListener(cl);
 

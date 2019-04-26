@@ -37,7 +37,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextended
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
@@ -87,7 +87,7 @@ public class AppletStartupSecuritySettings {
         if (conf == null) {
             throw new StorageIoException("JNLPRuntime configuration is null. Try to reinstall IcedTea-Web");
         }
-        String s = conf.getProperty(DeploymentConfigurationConstants.KEY_SECURITY_LEVEL);
+        String s = conf.getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL);
         if (s == null) {
             return getHardcodedDefaultSecurityLevel();
         }

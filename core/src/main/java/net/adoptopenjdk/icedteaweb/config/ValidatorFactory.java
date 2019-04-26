@@ -1,19 +1,19 @@
 package net.adoptopenjdk.icedteaweb.config;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.validators.BooleanValidator;
-import net.sourceforge.jnlp.config.validators.FilePathValidator;
-import net.sourceforge.jnlp.config.validators.ManifestAttributeCheckValidator;
-import net.sourceforge.jnlp.config.validators.MultipleStringValueValidator;
-import net.sourceforge.jnlp.config.validators.RangedIntegerValidator;
-import net.sourceforge.jnlp.config.validators.RustCpValidator;
-import net.sourceforge.jnlp.config.validators.StringValueValidator;
-import net.sourceforge.jnlp.config.validators.UrlValidator;
-import net.sourceforge.jnlp.config.validators.ValidatorUtils;
-import net.sourceforge.jnlp.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.BooleanValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ManifestAttributeCheckValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.MultipleStringValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.RangedIntegerValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.RustCpValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.StringValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.UrlValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 
 /**
- * Provides {@link net.sourceforge.jnlp.config.validators.ValueValidator} implementations for some common value types
+ * Provides {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} implementations for some common value types
  *
  * @see ValidatorFactory#createBooleanValidator()
  * @see ValidatorFactory#createFilePathValidator()
@@ -24,7 +24,7 @@ import net.sourceforge.jnlp.config.validators.ValueValidator;
 public class ValidatorFactory {
 
     /**
-     * @return a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that can be used to check if an object is
+     * @return a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that can be used to check if an object is
      * a valid Boolean
      */
     public static ValueValidator createBooleanValidator() {
@@ -32,7 +32,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * @return a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that can be used to check if an object is
+     * @return a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that can be used to check if an object is
      * a String containing a valid file path or not
      */
     public static ValueValidator createFilePathValidator() {
@@ -63,7 +63,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * Returns a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that checks if an object represents a
+     * Returns a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object represents a
      * valid integer (it is a Integer or Long or a String representation of
      * one), within the given range. The values are inclusive.
      * @param low the lowest valid value
@@ -75,7 +75,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * Returns a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that checks if an object is a string from
+     * Returns a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object is a string from
      * one of the provided Strings.
      * @param validValues an array of Strings which are considered valid
      * @return validator for given strings
@@ -85,7 +85,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * Returns a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that checks if an object is a string from
+     * Returns a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object is a string from
      * one of the provided single NumberOfArguments Strings or a combination from
      * the provided combination Strings.
      * @param singleValues an array of Strings which are considered valid only by themselves
@@ -98,7 +98,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * @return a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that checks if an object is a string
+     * @return a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object is a string
      * from the possible single or combination ManifestAttributeCheck values
      */
     public static ValueValidator createManifestAttributeCheckValidator() {
@@ -106,7 +106,7 @@ public class ValidatorFactory {
     }
 
     /**
-     * @return a {@link net.sourceforge.jnlp.config.validators.ValueValidator} that checks if an object represents a
+     * @return a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object represents a
      * valid url
      */
     public static ValueValidator createUrlValidator() {

@@ -48,7 +48,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
@@ -248,7 +248,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 c.gridy++;
             }
             infoPanel.add(new JLabel(R("EXAWsettingsInfo",
-                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(DeploymentConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT)),
+                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT)),
                     R("CPTabDesktopIntegration"))),c);
             c.gridy++;
             infoPanel.add(new JLabel(R("EXAWsettingsManage", R("CPTabMenuShortcuts"))),c);

@@ -39,7 +39,7 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.DeploymentConfigurationConstants;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.StreamUtils;
 import org.slf4j.Logger;
@@ -101,8 +101,8 @@ public class JVMPanel extends NamedBorderPanel {
         final JLabel description = new JLabel("<html>" + Translator.R("CPJVMPluginArguments") + "<hr /></html>");
         final JTextField testFieldArguments = new JTextField(25);
 
-        testFieldArguments.getDocument().addDocumentListener(new DocumentAdapter(config, DeploymentConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
-        testFieldArguments.setText(config.getProperty(DeploymentConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
+        testFieldArguments.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
+        testFieldArguments.setText(config.getProperty(ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
 
         final JLabel descriptionExec = new JLabel("<html>" + Translator.R("CPJVMitwExec") + "<hr /></html>");
         testFieldArgumentsExec = new JTextField(100);
@@ -146,8 +146,8 @@ public class JVMPanel extends NamedBorderPanel {
             }
         });
 
-        testFieldArgumentsExec.getDocument().addDocumentListener(new DocumentAdapter(config, DeploymentConfigurationConstants.KEY_JRE_DIR));
-        testFieldArgumentsExec.setText(config.getProperty(DeploymentConfigurationConstants.KEY_JRE_DIR));
+        testFieldArgumentsExec.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_JRE_DIR));
+        testFieldArgumentsExec.setText(config.getProperty(ConfigurationConstants.KEY_JRE_DIR));
 
         final JButton selectJvm = new JButton(Translator.R("CPJVMPluginSelectExec"));
         selectJvm.addActionListener(new ActionListener() {
