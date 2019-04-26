@@ -43,8 +43,8 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.lockingfile.LockingReaderWriter;
-import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
+import net.adoptopenjdk.icedteaweb.lockingfile.LockingReaderWriter;
+import net.adoptopenjdk.icedteaweb.lockingfile.StorageIoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

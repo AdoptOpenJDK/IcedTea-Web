@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.logging;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.OutputUtils;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
@@ -301,7 +302,7 @@ public class OutputController {
         private static final SingleStreamLogger INSTANCE = initSystemLogger();
 
         private static SingleStreamLogger initSystemLogger() {
-            if (JNLPRuntime.isWindows()) {
+            if (OsUtil.isWindows()) {
                 return new WinSystemLog();
             } else {
                 return new UnixSystemLog();

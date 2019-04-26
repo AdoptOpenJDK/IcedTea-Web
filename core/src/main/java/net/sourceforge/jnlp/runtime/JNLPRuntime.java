@@ -82,6 +82,41 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import javax.jnlp.ServiceManager;
+import javax.naming.ConfigurationException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.text.html.parser.ParserDelegator;
+import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.Authenticator;
+import java.net.InetAddress;
+import java.net.ProxySelector;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.security.AllPermission;
+import java.security.KeyStore;
+import java.security.Policy;
+import java.security.Security;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
+
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.SYSTEM_PROPERTY_JAVA_VERSION;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -766,14 +801,6 @@ public class JNLPRuntime {
         } finally {
             headlessChecked = true;
         }
-    }
-
-    /**
-     * @return {@code true} if running on Windows
-     */
-    public static boolean isWindows() {
-        String os = System.getProperty(OS_NAME);
-        return (os != null && os.startsWith("Windows"));
     }
 
     /**

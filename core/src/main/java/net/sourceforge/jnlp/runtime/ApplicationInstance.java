@@ -22,9 +22,12 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.event.ApplicationEvent;
 import net.sourceforge.jnlp.event.ApplicationListener;
 import net.sourceforge.jnlp.security.AccessType;
@@ -157,7 +160,7 @@ public class ApplicationInstance {
 
     private void addMenuAndDesktopEntries() {
         ShortcutDesc sd = file.getInformation().getShortcut();
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             LOG.debug("Generating windows desktop shortcut");
             try {
                 Object instance = null;

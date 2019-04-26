@@ -16,6 +16,15 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.config.DirectoryValidator;
+import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -109,7 +118,7 @@ public final class FileUtils {
     public static String sanitizePath(String path, char substitute) {
         //on windows, we can receive both c:/path/ and c:\path\
         path = path.replace("\\", "/");
-        if (JNLPRuntime.isWindows() && path.matches("^[a-zA-Z]\\:.*")) {
+        if (OsUtil.isWindows() && path.matches("^[a-zA-Z]\\:.*")) {
             path = path.replaceFirst(":", WIN_DRIVE_LETTER_COLON_WILDCHAR);
         }
         for (int i = 0; i < INVALID_PATH.size(); i++) {
@@ -117,7 +126,7 @@ public final class FileUtils {
                 path = path.replace(INVALID_PATH.get(i), substitute);
             }
         }
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             path = path.replaceFirst(WIN_DRIVE_LETTER_COLON_WILDCHAR, ":");
         }
         return path;
@@ -245,7 +254,7 @@ public final class FileUtils {
             }
         }
 
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             // prepare ACL flags
             Set<AclEntryFlag> flags = new LinkedHashSet<>();
             if (tempFile.isDirectory()) {

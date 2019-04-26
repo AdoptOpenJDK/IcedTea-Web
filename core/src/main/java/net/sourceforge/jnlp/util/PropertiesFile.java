@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.lockingfile.LockedFile;
+import net.adoptopenjdk.icedteaweb.lockingfile.LockedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

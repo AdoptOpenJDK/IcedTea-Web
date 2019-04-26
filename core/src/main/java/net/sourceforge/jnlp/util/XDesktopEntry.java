@@ -473,7 +473,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 targetName = file.getNotNullProbableCodeBase().getHost() + ".ico";
             }
             File target = null;
-            if (JNLPRuntime.isWindows() &&
+            if (OsUtil.isWindows() &&
                 (targetName.toLowerCase().endsWith(GIF)  || 
                  targetName.toLowerCase().endsWith(JPG)  || 
                  targetName.toLowerCase().endsWith(JPEG) || 

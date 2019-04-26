@@ -5,7 +5,7 @@
  */
 package net.adoptopenjdk.icedteaweb.testing.util;
 
-import net.sourceforge.jnlp.util.lockingfile.WindowsLockedFileTest;
+import net.adoptopenjdk.icedteaweb.lockingfile.WindowsLockedFileTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
