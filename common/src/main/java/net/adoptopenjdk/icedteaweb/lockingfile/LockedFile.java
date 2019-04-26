@@ -34,9 +34,9 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,16 +52,21 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LockedFile {
 
-    static private final Map<File, LockedFile> instanceCache = new WeakHashMap<>();
+    private static final Map<File, LockedFile> instanceCache = new WeakHashMap<>();
 
     // The file for access
     private RandomAccessFile randomAccessFile;
+
     private FileChannel fileChannel;
+
     private final File file;
+
     // A file lock will protect against locks for multiple
     // processes, while a thread lock is still needed within a single JVM.
     private FileLock processLock = null;
+
     private final ReentrantLock threadLock = new ReentrantLock();
+
     private boolean readOnly;
 
     protected LockedFile(final File file) {
@@ -97,7 +102,7 @@ public class LockedFile {
     synchronized public static LockedFile getInstance(final File file) {
         if (!instanceCache.containsKey(file)) {
             LockedFile l;
-            if (JNLPRuntime.isWindows()) {
+            if (OsUtil.isWindows()) {
                 l = new WindowsLockedFile(file);
             } else {
                 l = new LockedFile(file);

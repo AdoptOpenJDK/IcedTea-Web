@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
 import java.io.File;
 import java.io.IOException;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
