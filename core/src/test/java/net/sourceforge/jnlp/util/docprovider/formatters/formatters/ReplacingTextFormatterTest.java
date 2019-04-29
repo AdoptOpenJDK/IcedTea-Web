@@ -39,6 +39,8 @@ package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
+
 public class ReplacingTextFormatterTest {
 
     Formatter tr = new ReplacingTextFormatter() {
@@ -49,7 +51,7 @@ public class ReplacingTextFormatterTest {
             }
 
             @Override
-            public String getHeaders(String id, String encoding) {
+            public String getHeaders(String id, Charset encoding) {
                 throw new UnsupportedOperationException("Not supported yet."); 
             }
 

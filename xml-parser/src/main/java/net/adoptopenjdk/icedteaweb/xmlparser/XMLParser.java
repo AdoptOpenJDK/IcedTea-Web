@@ -49,18 +49,14 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UNICODE_LITTLE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_BE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_LE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_32_BE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_32_LE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.X_UTF_32_BE_BOM;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.X_UTF_32_LE_BOM;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -71,7 +67,11 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class XMLParser {
     private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
-
+    private static final String UNICODE_LITTLE = "UnicodeLittle";
+    private static final String UTF_32_BE = "UTF-32BE";
+    private static final String UTF_32_LE = "UTF-32LE";
+    private static final String X_UTF_32_BE_BOM = "X-UTF-32BE-BOM";
+    private static final String X_UTF_32_LE_BOM = "X-UTF-32LE-BOM";
 
     public static final String CODEBASE = "codebase";
 
@@ -130,7 +130,7 @@ public class XMLParser {
      * @param input the InputStream
      * @return a String representation of encoding
      */
-    private static String getEncoding(final InputStream input) throws IOException {
+    private static Charset getEncoding(final InputStream input) throws IOException {
         //Fixme: This only recognizes UTF-8, UTF-16, and
         //UTF-32, which is enough to parse the prolog portion of xml to
         //find out the exact encoding (if it exists). The reason being
@@ -154,23 +154,23 @@ public class XMLParser {
         if (s[0] == 255) {
             if (s[1] == 254) {
                 if (s[2] != 0 || s[3] != 0) {
-                    return UNICODE_LITTLE;
+                    return Charset.forName(UNICODE_LITTLE);
                 } else {
-                    return X_UTF_32_LE_BOM;
+                    return Charset.forName(X_UTF_32_LE_BOM);
                 }
             }
         } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 || s[3] != 0)) {
             return UTF_16;
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 && s[3] == 255) {
-            return X_UTF_32_BE_BOM;
+            return Charset.forName(X_UTF_32_BE_BOM);
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 60) {
-            return UTF_32_BE;
+            return Charset.forName(UTF_32_BE);
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 && s[3] == 0) {
-            return UTF_32_LE;
+            return Charset.forName(UTF_32_LE);
         } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 && s[3] == 63) {
-            return UTF_16_BE;
+            return UTF_16BE;
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 && s[3] == 0) {
-            return UTF_16_LE;
+            return UTF_16LE;
         }
         return UTF_8;
     }
@@ -209,10 +209,8 @@ public class XMLParser {
      * "&lt;description&gt;text&lt;/description&gt;".
      *
      * @param node the node with text under it
-     * @return
-     * @throws ParseException if the JNLP file is invalid
      */
-    public static String getSpanText(final Node node) throws ParseException {
+    public static String getSpanText(final Node node) {
         return getSpanText(node, true);
     }
 
@@ -224,7 +222,6 @@ public class XMLParser {
      *
      * @param node the node with text under it
      * @param preserveSpacing if true, preserve whitespace
-     * @throws ParseException if the JNLP file is invalid
      */
     public static String getSpanText(final Node node, final boolean preserveSpacing) {
         if (node == null) {

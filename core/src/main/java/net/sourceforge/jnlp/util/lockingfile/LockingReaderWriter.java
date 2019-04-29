@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Process-locked string storage backed by a file.
@@ -157,7 +157,7 @@ public abstract class LockingReaderWriter {
      * Reads contents from the file, first acquiring a lock.
      * @throws IOException
      */
-    protected synchronized void readContentsLocked() throws IOException {
+    protected synchronized void readContentsLocked() {
         doLocked(new Runnable() {
 
             @Override

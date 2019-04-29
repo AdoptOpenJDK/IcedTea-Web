@@ -47,11 +47,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
-
 public class OutputControllerTest {
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     private static final String line1 = "I'm logged line one";
     private static final String line2 = "I'm logged line two";
@@ -378,6 +379,6 @@ public class OutputControllerTest {
      * add syslog once implemented
      */
     @Test
-    public void isSysLoggerWorking() throws Exception {
+    public void isSysLoggerWorking() {
     }
 }

@@ -103,7 +103,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class UnsignedAppletsTrustingListPanel extends JPanel {

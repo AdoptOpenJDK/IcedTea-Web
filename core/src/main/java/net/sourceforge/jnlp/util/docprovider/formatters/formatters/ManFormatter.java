@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
+import java.nio.charset.Charset;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -101,7 +102,7 @@ public class ManFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getHeaders(String id, String encoding) {
+    public String getHeaders(String id, Charset encoding) {
         return ".TH " + id + " 1 \"" + getManPageDate() + "\"" + " \"" + TextsProvider.ITW + " " + getVersion() + "\"" + PlainTextFormatter.getLineSeparator();
     }
 

@@ -40,10 +40,11 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class IcedTeaWebTextsProvider extends TextsProvider {
 
-    public IcedTeaWebTextsProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
+    public IcedTeaWebTextsProvider(Charset encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
         super(encoding, formatter, forceTitles, expandFiles);
     }
 

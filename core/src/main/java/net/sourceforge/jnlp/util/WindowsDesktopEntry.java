@@ -26,14 +26,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 
 /**
  * Based on https://github.com/DmitriiShamrikov/mslinks
@@ -119,7 +118,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         }
 
         if (ManageMode.A == mode) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName(UTF_8));
+            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), UTF_8);
             Iterator it = lines.iterator();
             String sItem = "";
             String sPath;
