@@ -77,6 +77,8 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_SPEC_VENDOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_VENDOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_VERSION;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.WEBSTART_VERSION;
+import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
+import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
 
 /**
  * The security element.
@@ -216,7 +218,6 @@ public class SecurityDesc {
     // Since this is security sensitive, take a conservative approach:
     // Allow only what is specifically allowed, and deny everything else
 
-    public static final String READ = "read";
     /**
      * basic permissions for restricted mode
      */
@@ -233,41 +234,40 @@ public class SecurityDesc {
             new SocketPermission("*", "connect"),
             new SocketPermission("localhost:1024-", "accept, listen"),
             new FilePermission("*", "read, write"),
-            new PropertyPermission("*", READ),
+            new PropertyPermission("*", PROPERTY_READ_ACTION),
     };
 
-    public static final String READ_AND_WRITE = "read,write";
     /**
      * basic permissions for restricted mode
      */
     private static final Permission[] sandboxPermissions = {
             new SocketPermission("localhost:1024-", "listen"),
             // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
-            new PropertyPermission(ARRAY_LEGACY_MERGE_SORT, READ_AND_WRITE),
-            new PropertyPermission(JAVA_VERSION, READ),
-            new PropertyPermission(JAVA_VENDOR, READ),
-            new PropertyPermission(JAVA_VENDOR_URL, READ),
-            new PropertyPermission(JAVA_CLASS_VERSION, READ),
-            new PropertyPermission(OS_NAME, READ),
-            new PropertyPermission(OS_VERSION, READ),
-            new PropertyPermission(OS_ARCH, READ),
-            new PropertyPermission(FILE_SEPARATOR, READ),
-            new PropertyPermission(PATH_SEPARATOR, READ),
-            new PropertyPermission(LINE_SEPARATOR, READ),
-            new PropertyPermission(JAVA_SPEC_VERSION, READ),
-            new PropertyPermission(JAVA_SPEC_VENDOR, READ),
-            new PropertyPermission(JAVA_SPEC_NAME, READ),
-            new PropertyPermission(VM_SPEC_VENDOR, READ),
-            new PropertyPermission(VM_SPEC_NAME, READ),
-            new PropertyPermission(VM_VERSION, READ),
-            new PropertyPermission(VM_VENDOR, READ),
-            new PropertyPermission(VM_NAME, READ),
-            new PropertyPermission(WEBSTART_VERSION, READ),
-            new PropertyPermission(JAVA_PLUGIN, READ),
-            new PropertyPermission(JNLP, READ_AND_WRITE),
-            new PropertyPermission(JAVAWS, READ_AND_WRITE),
-            new PropertyPermission(BROWSER, READ),
-            new PropertyPermission(BROWSER_STAR, READ),
+            new PropertyPermission(ARRAY_LEGACY_MERGE_SORT, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVA_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_VENDOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_VENDOR_URL, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_CLASS_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(OS_NAME, PROPERTY_READ_ACTION),
+            new PropertyPermission(OS_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(OS_ARCH, PROPERTY_READ_ACTION),
+            new PropertyPermission(FILE_SEPARATOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(PATH_SEPARATOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(LINE_SEPARATOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_SPEC_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_SPEC_VENDOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_SPEC_NAME, PROPERTY_READ_ACTION),
+            new PropertyPermission(VM_SPEC_VENDOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(VM_SPEC_NAME, PROPERTY_READ_ACTION),
+            new PropertyPermission(VM_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(VM_VENDOR, PROPERTY_READ_ACTION),
+            new PropertyPermission(VM_NAME, PROPERTY_READ_ACTION),
+            new PropertyPermission(WEBSTART_VERSION, PROPERTY_READ_ACTION),
+            new PropertyPermission(JAVA_PLUGIN, PROPERTY_READ_ACTION),
+            new PropertyPermission(JNLP, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVAWS, PROPERTY_RW_ACTION),
+            new PropertyPermission(BROWSER, PROPERTY_READ_ACTION),
+            new PropertyPermission(BROWSER_STAR, PROPERTY_READ_ACTION),
             new RuntimePermission(EXIT_VM),
             new RuntimePermission(STOP_THREAD),
             // disabled because we can't at this time prevent an
@@ -281,23 +281,23 @@ public class SecurityDesc {
      * basic permissions for restricted mode
      */
     private static final Permission[] jnlpRIAPermissions = {
-            new PropertyPermission(AWT_AA_FONT_SETTINGS, READ_AND_WRITE),
-            new PropertyPermission(HTTP_AGENT, READ_AND_WRITE),
-            new PropertyPermission(HTTP_KEEP_ALIVE, READ_AND_WRITE),
-            new PropertyPermission("java.awt.syncLWRequests", READ_AND_WRITE),
-            new PropertyPermission("java.awt.Window.locationByPlatform", READ_AND_WRITE),
-            new PropertyPermission("javaws.cfg.jauthenticator", READ_AND_WRITE),
-            new PropertyPermission("javax.swing.defaultlf", READ_AND_WRITE),
-            new PropertyPermission("sun.awt.noerasebackground", READ_AND_WRITE),
-            new PropertyPermission("sun.awt.erasebackgroundonresize", READ_AND_WRITE),
-            new PropertyPermission("sun.java2d.d3d", READ_AND_WRITE),
-            new PropertyPermission("sun.java2d.dpiaware", READ_AND_WRITE),
-            new PropertyPermission("sun.java2d.noddraw", READ_AND_WRITE),
-            new PropertyPermission("sun.java2d.opengl", READ_AND_WRITE),
-            new PropertyPermission("swing.boldMetal", READ_AND_WRITE),
-            new PropertyPermission("swing.metalTheme", READ_AND_WRITE),
-            new PropertyPermission("swing.noxp", READ_AND_WRITE),
-            new PropertyPermission("swing.useSystemFontSettings", READ_AND_WRITE),
+            new PropertyPermission(AWT_AA_FONT_SETTINGS, PROPERTY_RW_ACTION),
+            new PropertyPermission(HTTP_AGENT, PROPERTY_RW_ACTION),
+            new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION),
+            new PropertyPermission("java.awt.syncLWRequests", PROPERTY_RW_ACTION),
+            new PropertyPermission("java.awt.Window.locationByPlatform", PROPERTY_RW_ACTION),
+            new PropertyPermission("javaws.cfg.jauthenticator", PROPERTY_RW_ACTION),
+            new PropertyPermission("javax.swing.defaultlf", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.awt.noerasebackground", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.awt.erasebackgroundonresize", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.java2d.d3d", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.java2d.dpiaware", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.java2d.noddraw", PROPERTY_RW_ACTION),
+            new PropertyPermission("sun.java2d.opengl", PROPERTY_RW_ACTION),
+            new PropertyPermission("swing.boldMetal", PROPERTY_RW_ACTION),
+            new PropertyPermission("swing.metalTheme", PROPERTY_RW_ACTION),
+            new PropertyPermission("swing.noxp", PROPERTY_RW_ACTION),
+            new PropertyPermission("swing.useSystemFontSettings", PROPERTY_RW_ACTION),
     };
     
     /**
