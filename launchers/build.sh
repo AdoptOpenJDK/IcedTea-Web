@@ -52,6 +52,7 @@ publishInternalLib "$CORE_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$COMMON_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$JNLPAPI_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$XMLPARSER_SRC" "$ITW_TARGET_DIR"
+publishInternalLib "$CLIENTS_SRC" "$ITW_TARGET_DIR"
 
 publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
@@ -73,6 +74,7 @@ function build() {
   export COMMON_JAR=${RESOURCES_SRC_TO_DEST["$COMMON_SRC"]}
   export JNLPAPI_JAR=${RESOURCES_SRC_TO_DEST["$JNLPAPI_SRC"]}
   export XMLPARSER_JAR=${RESOURCES_SRC_TO_DEST["$XMLPARSER_SRC"]}
+  export CLIENTS_JAR=${RESOURCES_SRC_TO_DEST["$CLIENTS_SRC"]}
   export SPLASH_PNG=${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}
   export MODULARJDK_ARGS_LOCATION=${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}
   BUILD_DIR=$TARGET/launcher.in.$PROGRAM_NAME
@@ -107,6 +109,7 @@ function build() {
         -e "s|[@]COMMON_JAR[@]|$COMMON_JAR|g" \
         -e "s|[@]JNLPAPI_JAR[@]|$JNLPAPI_JAR|g" \
         -e "s|[@]XMLPARSER_JAR[@]|$XMLPARSER_JAR|g" \
+        -e "s|[@]CLIENTS_JAR[@]|$CLIENTS_JAR|g" \
         -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
         -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \
         -e "s|[@]JRE[@]|$JRE|g" \

@@ -25,6 +25,7 @@
         <module>core</module>
         <module>integration</module>
         <module>clients</module>
+        <module>launchers</module>
     </modules>
 
     <repositories>
