@@ -97,7 +97,7 @@ function build() {
     popd
   elif [ "x$TYPE" = "xsh" ]; then
     for x in `find $SCRIPT_DIR/shell-launcher -type f ` ; do
-      nwname=`basename $x | sed "s/launchers/$PROGRAM_NAME/" | sed "s/.in//"`
+      nwname=`basename $x | sed "s/launchers/$PROGRAM_NAME/" | sed "s/\\.in//"`
       cat $x | sed \
         -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
