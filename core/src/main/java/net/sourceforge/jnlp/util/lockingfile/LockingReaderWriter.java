@@ -45,6 +45,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+
 /**
  * Process-locked string storage backed by a file.
  * Each string is stored on its own line.
@@ -112,7 +114,7 @@ public abstract class LockingReaderWriter {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(getBackingFile()), "UTF-8"));
+                    new FileOutputStream(getBackingFile()), UTF_8));
             writeContent(writer);
             writer.flush();
         } finally {
@@ -135,7 +137,7 @@ public abstract class LockingReaderWriter {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(getBackingFile()), "UTF-8"));
+                    new FileInputStream(getBackingFile()), UTF_8));
 
             while (true) {
                 String line = reader.readLine();

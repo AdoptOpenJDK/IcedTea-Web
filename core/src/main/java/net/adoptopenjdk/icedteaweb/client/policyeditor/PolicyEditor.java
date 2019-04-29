@@ -121,6 +121,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -1726,7 +1727,7 @@ public class PolicyEditor extends JPanel {
         }
 
         if (optionParser.hasOption(CommandLineOptions.HELP1)) {
-            final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+            final TextsProvider helpMessagesProvider = new PolicyEditorTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
             String HELP_MESSAGE = "\n";
             if (JNLPRuntime.isDebug()) {
                 HELP_MESSAGE = HELP_MESSAGE + helpMessagesProvider.writeToString();

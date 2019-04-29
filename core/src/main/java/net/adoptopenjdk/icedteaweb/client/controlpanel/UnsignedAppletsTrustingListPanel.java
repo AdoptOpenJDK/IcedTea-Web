@@ -35,26 +35,22 @@
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UrlRegEx;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -86,21 +82,29 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UrlRegEx;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageExtendedImpl;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class UnsignedAppletsTrustingListPanel extends JPanel {
 
@@ -143,7 +147,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
      * for testing and playing
      */
     public static void main(String args[]) {
-        final String defaultDir = System.getProperty("user.home") + "/Desktop/";
+        final String defaultDir = System.getProperty(USER_HOME) + "/Desktop/";
         final String defaultFileName1 = "terrorList1";
         final String defaultFileName2 = "terrorList2";
         final String defaultFile1 = defaultDir + defaultFileName1;
@@ -600,7 +604,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         }
         try {
             currentModel.back.writeContentsLocked();
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), UTF_8));
             currentModel.back.writeContent(bw);
             bw.flush();
             bw.close();

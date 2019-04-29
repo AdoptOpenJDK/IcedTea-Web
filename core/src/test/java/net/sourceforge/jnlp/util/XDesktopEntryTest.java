@@ -36,6 +36,22 @@
  */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridgeTest;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -49,35 +65,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridgeTest;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
-import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class XDesktopEntryTest {
 
     private static final String des1 = "/my/little/Desktop";
     private static final String des2name = "Plocha";
-    private static final String des2Res = System.getProperty("user.home") + "/" + des2name;
+    private static final String des2Res = System.getProperty(USER_HOME) + "/" + des2name;
     private static final String HOME = "HOME";
     private static final String des2 = "$" + HOME + "/" + des2name;
     private static final String des7 = "\"$" + HOME + "/" + des2name + "\"";
-    private static final String des7res = System.getProperty("user.home") + "/" + des2name;
+    private static final String des7res = System.getProperty(USER_HOME) + "/" + des2name;
     private static final String des8 = "\\\"$" + HOME + "/" + des2name + "\\\"";
-    private static final String des8res = "\"" + System.getProperty("user.home") + "/" + des2name + "\"";
+    private static final String des8res = "\"" + System.getProperty(USER_HOME) + "/" + des2name + "\"";
     private static final String des9 = "\"$" + HOME + "/\\\"" + des2name + "\\\"\"";
-    private static final String des9res = System.getProperty("user.home") + "/\"" + des2name + "\"";
+    private static final String des9res = System.getProperty(USER_HOME) + "/\"" + des2name + "\"";
     private static final String src1 = XDesktopEntry.XDG_DESKTOP_DIR + "=" + des1;
     private static final String src2 = "  " + XDesktopEntry.XDG_DESKTOP_DIR + " = " + des1;
     private static final String src3 = "#" + XDesktopEntry.XDG_DESKTOP_DIR + " = " + des1;
@@ -230,7 +233,7 @@ public class XDesktopEntryTest {
 
     @Test
     public void desktopPath() {
-        Assert.assertTrue(XDesktopEntry.getDesktop().getAbsolutePath().startsWith(System.getProperty("user.home")));;
+        Assert.assertTrue(XDesktopEntry.getDesktop().getAbsolutePath().startsWith(System.getProperty(USER_HOME)));;
     }
 
     private static void envToString() {

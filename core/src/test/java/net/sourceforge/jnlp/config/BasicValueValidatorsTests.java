@@ -39,6 +39,8 @@ package net.sourceforge.jnlp.config;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+
 public class BasicValueValidatorsTests {
 
     //decomposed for testing
@@ -51,7 +53,7 @@ public class BasicValueValidatorsTests {
      * @return
      */
     public static boolean isOsWindows() {
-        return canBeWindows(System.getProperty("os.name"));
+        return canBeWindows(System.getProperty(OS_NAME));
     }
     private static final BasicValueValidators.FilePathValidator pv = new BasicValueValidators.FilePathValidator();
     private final String neverLegal = "aaa/bb/cc";

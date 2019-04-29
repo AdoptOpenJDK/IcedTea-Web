@@ -1,11 +1,11 @@
 package net.adoptopenjdk.icedteaweb.os;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+
 /**
  * Copied from RICO (https://github.com/rico-projects/rico)
  */
 public class OsUtil {
-
-    private final static String OS_NAME = "os.name";
 
     private final static String WIN = "win";
 

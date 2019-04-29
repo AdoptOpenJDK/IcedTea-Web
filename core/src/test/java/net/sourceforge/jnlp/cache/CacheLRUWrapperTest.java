@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CountDownLatch;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -57,7 +58,7 @@ public class CacheLRUWrapperTest {
 
     // does no DeploymentConfiguration exist for this file name? 
     private static final String cacheIndexFileName = PathsAndFiles.CACHE_INDEX_FILE_NAME + "_testing";
-    private static final File javaTmp = new File(System.getProperty("java.io.tmpdir"));
+    private static final File javaTmp = new File(System.getProperty(JAVA_IO_TMPDIR));
     private static final File tmpCache;
     private static final File tmpIndexFile;
 

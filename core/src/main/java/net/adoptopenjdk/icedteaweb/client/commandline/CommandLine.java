@@ -18,29 +18,32 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.naming.ConfigurationException;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.ConfigurationValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
-import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.ConfigurationException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -87,7 +90,7 @@ public class CommandLine {
      */
     public CommandLine(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
-        PROGRAM_NAME = System.getProperty("icedtea-web.bin.name");
+        PROGRAM_NAME = System.getProperty(ITW_BIN_NAME);
 
         config = new DeploymentConfiguration();
         try {
@@ -103,7 +106,7 @@ public class CommandLine {
      * @return the result of handling the help command. SUCCESS if no errors occurred.
      */
     public int handleHelpCommand() {
-        final TextsProvider helpMessagesProvider = new ItwebSettingsTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+        final TextsProvider helpMessagesProvider = new ItwebSettingsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
         String helpMessage = "\n";
 
         if (JNLPRuntime.isDebug()) {

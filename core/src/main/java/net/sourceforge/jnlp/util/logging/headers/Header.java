@@ -46,10 +46,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_NAME;
+
 public class Header {
 
     private final static Logger LOG = LoggerFactory.getLogger(Header.class);
-    private static final String  default_user = System.getProperty("user.name");
+    private static final String  default_user = System.getProperty(USER_NAME);
     
     public String user = default_user;
     public boolean application = true;

@@ -22,15 +22,6 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -47,6 +38,16 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
@@ -90,7 +91,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     @BeforeClass
     public static void setup() {
         originalCacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty("java.io.tmpdir") + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
     }
 
     @AfterClass

@@ -48,6 +48,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+
 public class JNLPMatcherTestMalformedAllowedTest {
 
     final String tests[] = JNLPMatcherTest.tests;
@@ -337,8 +339,8 @@ public class JNLPMatcherTestMalformedAllowedTest {
                 "  </information>\n" +
                 "</jnlp>\n";
 
-        InputStream reader1 = new ByteArrayInputStream(file.getBytes("utf-8"));
-        InputStream reader2 = new ByteArrayInputStream(file.getBytes("utf-8"));
+        InputStream reader1 = new ByteArrayInputStream(file.getBytes(UTF_8));
+        InputStream reader2 = new ByteArrayInputStream(file.getBytes(UTF_8));
         JNLPMatcher matcher = new JNLPMatcher(reader1, reader2, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
         Assert.assertTrue(matcher.isMatch());
     }

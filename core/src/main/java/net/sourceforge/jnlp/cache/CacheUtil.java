@@ -16,6 +16,22 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jnlp.DownloadServiceListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -46,22 +62,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.jnlp.DownloadServiceListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -251,7 +253,7 @@ public class CacheUtil {
             throws IOException {
         LOG.debug("Clearing Windows shortcuts");
         if (CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName("UTF-8"));
+            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName(UTF_8));
             Iterator it = lines.iterator();
             Boolean fDelete;
             while (it.hasNext()) {
@@ -284,7 +286,7 @@ public class CacheUtil {
                 Files.deleteIfExists(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath());
             } else {
                 //write file after application shortcuts have been removed
-                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, Charset.forName("UTF-8"));
+                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, Charset.forName(UTF_8));
             }
         }
 

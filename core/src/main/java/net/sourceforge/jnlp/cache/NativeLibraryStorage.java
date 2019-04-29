@@ -2,7 +2,6 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +14,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 
 /**
  * Handles loading and access of native code loading through a JNLP application or applet.
@@ -43,7 +44,7 @@ public class NativeLibraryStorage {
             LOG.info("Cleaning up native directory {}", jarEntryDirectory.getAbsolutePath());
             try {
                 FileUtils.recursiveDelete(jarEntryDirectory,
-                        new File(System.getProperty("java.io.tmpdir")));
+                        new File(System.getProperty(JAVA_IO_TMPDIR)));
                 jarEntryDirectory = null;
             } catch (IOException e) {
                 /*
@@ -147,7 +148,7 @@ public class NativeLibraryStorage {
      */
     private static File createNativeStoreDirectory() {
         final int rand = (int)((Math.random()*2 - 1) * Integer.MAX_VALUE);
-        File nativeDir = new File(System.getProperty("java.io.tmpdir")
+        File nativeDir = new File(System.getProperty(JAVA_IO_TMPDIR)
                              + File.separator + "netx-native-"
                              + (rand & 0xFFFF));
         File parent = nativeDir.getParentFile();

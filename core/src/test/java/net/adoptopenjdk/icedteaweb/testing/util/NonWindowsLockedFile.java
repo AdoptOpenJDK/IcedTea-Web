@@ -9,6 +9,8 @@ import net.sourceforge.jnlp.util.lockingfile.WindowsLockedFileTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+
 /**
  *
  * @author jvanek
@@ -19,13 +21,13 @@ public class NonWindowsLockedFile extends WindowsLockedFileTest {
 
     @BeforeClass
     public static void smuggleOs() {
-        os = System.getProperty("os.name");
-        System.setProperty("os.name", "No Windows for itw");
+        os = System.getProperty(OS_NAME);
+        System.setProperty(OS_NAME, "No Windows for itw");
     }
 
     @AfterClass
     public static void restoreOs() {
-        System.setProperty("os.name", os);
+        System.setProperty(OS_NAME, os);
     }
 
 }

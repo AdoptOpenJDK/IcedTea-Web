@@ -84,6 +84,7 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -563,7 +564,7 @@ public class JavaConsole implements ObservableMessagesProvider {
                 BufferedReader br = null;
                 try {
                     br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                            Charset.forName("UTF-8")));
+                            Charset.forName(UTF_8)));
                     //never ending loop
                     while (true) {
                         try {

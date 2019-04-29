@@ -53,6 +53,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertTrue;
 
 public class DeploymentConfigurationTest extends NoStdOutErrTest {
@@ -204,7 +205,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteNotOk404_1() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
         File f = File.createTempFile("itw", "checkUrlTest");
         f.delete();
         f.mkdir();
@@ -228,7 +229,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteOk() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
         try {
             File f = File.createTempFile("itw", "checkUrlTest");
             f.deleteOnExit();

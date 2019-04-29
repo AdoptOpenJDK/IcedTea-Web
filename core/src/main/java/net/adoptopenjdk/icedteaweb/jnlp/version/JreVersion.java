@@ -1,12 +1,14 @@
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
-import javax.swing.JOptionPane;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.SYSTEM_PROPERTY_JAVA_VERSION;
+import javax.swing.JOptionPane;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
+
 
 /**
  * This is special case of version, used only for checking jre version. If
@@ -62,7 +64,7 @@ public class JreVersion extends Version {
     }
 
     private String getJreVersion() {
-        return System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION);
+        return System.getProperty(JAVA_VERSION);
     }
 
 }

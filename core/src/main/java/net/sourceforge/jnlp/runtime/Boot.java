@@ -15,15 +15,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import java.io.File;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.swing.UIManager;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificateViewer;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
@@ -50,6 +41,17 @@ import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
+import javax.swing.UIManager;
+import java.io.File;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -216,7 +218,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     private static void handleMessage() {
-        final TextsProvider helpMessagesProvider = new JavaWsTextsProvider("utf-8", new PlainTextFormatter(), true, true);
+        final TextsProvider helpMessagesProvider = new JavaWsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
 
         String helpMessage = "\n";
         if (JNLPRuntime.isDebug()) {
@@ -233,7 +235,7 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     private static void handleAbout() {
-        final TextsProvider aboutMessagesProvider = new IcedTeaWebTextsProvider("utf-8", new PlainTextFormatter(), false, true);
+        final TextsProvider aboutMessagesProvider = new IcedTeaWebTextsProvider(UTF_8, new PlainTextFormatter(), false, true);
         String itwInfoMessage = ""
                 + nameAndVersion
                 + "\n\n";

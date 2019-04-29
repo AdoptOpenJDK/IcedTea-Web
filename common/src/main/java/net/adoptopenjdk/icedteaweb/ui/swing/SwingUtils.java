@@ -49,6 +49,8 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_EDT_DEBUG;
+
 /**
  * Swing / AWT utility class
  */
@@ -56,7 +58,7 @@ public final class SwingUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(SwingUtils.class);
 
-    private static final boolean DEBUG_EDT = System.getProperty("icedtea-web.edt.debug", "false").equalsIgnoreCase("true");
+    private static final boolean DEBUG_EDT = System.getProperty(ITW_EDT_DEBUG, "false").equalsIgnoreCase("true");
 
     // debugging flags:
     private static final boolean INFO_DIALOG = false;

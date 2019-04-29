@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -126,7 +127,7 @@ public class FileUtilsTest {
 
     @Test
     public void testCreateParentDir() throws Exception {
-        final File tmpdir = new File(System.getProperty("java.io.tmpdir")), testParent = new File(tmpdir, "itw_test_create_parent_dir"), testChild = new File(testParent, "test_child_dir");
+        final File tmpdir = new File(System.getProperty(JAVA_IO_TMPDIR)), testParent = new File(tmpdir, "itw_test_create_parent_dir"), testChild = new File(testParent, "test_child_dir");
         testChild.deleteOnExit();
         testParent.deleteOnExit();
         FileUtils.createParentDir(testChild);
@@ -140,7 +141,7 @@ public class FileUtilsTest {
         if (!JNLPRuntime.isWindows()) {
             return;
         }
-        final File tmpdir = new File(System.getProperty("java.io.tmpdir")), testfile = new File(tmpdir, "itw_test_create_restricted_file");
+        final File tmpdir = new File(System.getProperty(JAVA_IO_TMPDIR)), testfile = new File(tmpdir, "itw_test_create_restricted_file");
         if (testfile.exists()) {
             assertTrue(testfile.delete());
         }

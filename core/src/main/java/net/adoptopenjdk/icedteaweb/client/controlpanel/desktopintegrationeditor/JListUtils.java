@@ -56,6 +56,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
+
 public class JListUtils {
 
     private static Map<File, Icon> iconCache = new HashMap<>();
@@ -244,7 +246,7 @@ public class JListUtils {
         }
 
         private boolean isJavaws(String s) {
-            return haveString(s, "javaws");
+            return haveString(s, JAVAWS);
         }
 
         private boolean isBrowser(String s) {

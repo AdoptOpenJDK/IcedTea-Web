@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static org.junit.Assert.assertTrue;
 
 public class TeeOutputStreamTest {
@@ -64,8 +65,8 @@ public class TeeOutputStreamTest {
     @KnownToFail
     public void testWriteByteArrayString2() throws IOException { //last character missing
         String s = "He\n\n\\llo chào"; //grave accent as "?" by windows' default character encoding
-        tos.write(s.getBytes("utf-8"), 0, s.getBytes().length);
-        assertTrue(tos.getByteArrayOutputStream().toString("utf-8").equals(s));
+        tos.write(s.getBytes(UTF_8), 0, s.getBytes().length);
+        assertTrue(tos.getByteArrayOutputStream().toString(UTF_8).equals(s));
     }
     
     @Test

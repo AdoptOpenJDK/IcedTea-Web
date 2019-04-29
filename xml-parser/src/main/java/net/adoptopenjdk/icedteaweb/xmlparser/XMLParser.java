@@ -37,10 +37,6 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +47,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UNICODE_LITTLE;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_BE;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_LE;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_32_BE;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_32_LE;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.X_UTF_32_BE_BOM;
+import static net.adoptopenjdk.icedteaweb.EncodingConstants.X_UTF_32_LE_BOM;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -62,15 +71,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class XMLParser {
     private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
-    private static final String ENCODING_UNICODE_LITTLE = "UnicodeLittle";
-    private static final String ENCODING_UTF_8 = "UTF-8";
-    private static final String ENCODING_UTF_16 = "UTF-16";
-    private static final String ENCODING_UTF_16_BE = "UTF-16BE";
-    private static final String ENCODING_UTF_16_LE = "UTF-16LE";
-    private static final String ENCODING_UTF_32_BE = "UTF-32BE";
-    private static final String ENCODING_UTF_32_LE = "UTF-32LE";
-    private static final String ENCODING_X_UTF_32_BE_BOM = "X-UTF-32BE-BOM";
-    private static final String ENCODING_X_UTF_32_LE_BOM = "X-UTF-32LE-BOM";
+
 
     public static final String CODEBASE = "codebase";
 
@@ -153,30 +154,25 @@ public class XMLParser {
         if (s[0] == 255) {
             if (s[1] == 254) {
                 if (s[2] != 0 || s[3] != 0) {
-                    return ENCODING_UNICODE_LITTLE;
+                    return UNICODE_LITTLE;
                 } else {
-                    return ENCODING_X_UTF_32_LE_BOM;
+                    return X_UTF_32_LE_BOM;
                 }
             }
         } else if (s[0] == 254 && s[1] == 255 && (s[2] != 0 || s[3] != 0)) {
-            return ENCODING_UTF_16;
-
+            return UTF_16;
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 254 && s[3] == 255) {
-            return ENCODING_X_UTF_32_BE_BOM;
-
+            return X_UTF_32_BE_BOM;
         } else if (s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 60) {
-            return ENCODING_UTF_32_BE;
-
+            return UTF_32_BE;
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 0 && s[3] == 0) {
-            return ENCODING_UTF_32_LE;
-
+            return UTF_32_LE;
         } else if (s[0] == 0 && s[1] == 60 && s[2] == 0 && s[3] == 63) {
-            return ENCODING_UTF_16_BE;
+            return UTF_16_BE;
         } else if (s[0] == 60 && s[1] == 0 && s[2] == 63 && s[3] == 0) {
-            return ENCODING_UTF_16_LE;
+            return UTF_16_LE;
         }
-
-        return ENCODING_UTF_8;
+        return UTF_8;
     }
 
     /**

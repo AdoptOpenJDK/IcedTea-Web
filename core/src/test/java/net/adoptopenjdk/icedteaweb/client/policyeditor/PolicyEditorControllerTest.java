@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -60,7 +61,7 @@ public class PolicyEditorControllerTest {
     private static final String CODEBASE = "http://example.com";
     private static final List<PolicyParser.PrincipalEntry> EMPTY_PRINCIPALS = Collections.emptyList();
     private static final PolicyIdentifier DEFAULT_IDENTIFIER = new PolicyIdentifier(SIGNED_BY, EMPTY_PRINCIPALS, CODEBASE);
-    private static final String LINEBREAK = System.getProperty("line.separator");
+    private static final String LINEBREAK = System.getProperty(LINE_SEPARATOR);
 
     private static final String EXAMPLE_POLICY_1 = "grant {" + LINEBREAK
             + "permission some.java.permission \"somePermission\";" + LINEBREAK

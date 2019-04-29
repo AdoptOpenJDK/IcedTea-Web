@@ -37,6 +37,8 @@ import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
+
 /**
  * Policy for JNLP environment.  This class delegates to the
  * system policy but always grants permissions to the JNLP code
@@ -76,7 +78,7 @@ public class JNLPPolicy extends Policy {
         systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
-        String jre = System.getProperty("java.home");
+        String jre = System.getProperty(JAVA_HOME);
         jreExtDir = (new File(jre + File.separator + "lib" + File.separator + "ext")).toURI();
     }
 
