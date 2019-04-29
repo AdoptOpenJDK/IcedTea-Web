@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -173,7 +174,7 @@ public final class Boot implements PrivilegedAction<Void> {
                     LOG.error("Unable to set system look and feel", e);
                 }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
-                AboutDialog.display(TextsProvider.JAVAWS);
+                AboutDialog.display(JAVAWS);
                 return;
             }
         }
