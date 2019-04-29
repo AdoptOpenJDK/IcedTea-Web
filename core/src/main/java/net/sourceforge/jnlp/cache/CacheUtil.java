@@ -65,6 +65,7 @@ import java.util.function.Predicate;
 
 import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -131,7 +132,7 @@ public class CacheUtil {
         Permission result = null;
         if (CacheUtil.isCacheable(location, version)) {
             File file = CacheUtil.getCacheFile(location, version);
-            result = new FilePermission(file.getPath(), "read");
+            result = new FilePermission(file.getPath(), FILE_READ_ACTION);
         } else {
             // this is what URLClassLoader does
             try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
