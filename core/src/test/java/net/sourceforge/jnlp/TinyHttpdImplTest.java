@@ -16,7 +16,7 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TinyHttpdImplTest {
 
@@ -82,7 +82,7 @@ public class TinyHttpdImplTest {
 
         for (String url : FilePathTestUrls) {
             String newUrl = TinyHttpdImpl.urlToFilePath(url);
-            Assert.assertEquals(newUrl, URLDecoder.decode(newUrl, UTF_8));
+            Assert.assertEquals(newUrl, URLDecoder.decode(newUrl, UTF_8.name()));
         }
     }
 

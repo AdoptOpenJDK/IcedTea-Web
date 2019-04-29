@@ -68,12 +68,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.ISO_8859_1;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.US_ASCII;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_BE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_16_LE;
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * this class intentionally NOT cache any content, but always load data. Its
@@ -247,12 +247,12 @@ public class HtmlBrowserPanel extends JPanel {
     private final JCheckBox socketCheckbox = new JCheckBox(Translator.R("BrowserSocket"));
     private final JComboBox<Charset> encodingBox = new JComboBox<>(new Charset[]{
         null,
-        Charset.forName(US_ASCII),
-        Charset.forName(UTF_8),
-        Charset.forName(ISO_8859_1),
-        Charset.forName(UTF_16),
-        Charset.forName(UTF_16_BE),
-        Charset.forName(UTF_16_LE)
+        US_ASCII,
+        UTF_8,
+        ISO_8859_1,
+        UTF_16,
+        UTF_16BE,
+        UTF_16LE
     
 });
 

@@ -63,7 +63,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
@@ -191,7 +191,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @BeforeClass
     //keeping silent outputs from launched jvm
-    public static void redirectErr() throws IOException {
+    public static void redirectErr() {
         for (int i = 0; i < backedUpStream.length; i++) {
             if (backedUpStream[i] == null) {
                 switch (i) {
@@ -223,7 +223,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
-        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8));
+        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
         System.setOut(backedUpStream[0]);
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);

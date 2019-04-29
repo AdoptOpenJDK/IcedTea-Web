@@ -121,7 +121,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.provider.PolicyParser;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -1517,7 +1517,7 @@ public class PolicyEditor extends JPanel {
         final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Loading...");
         final SwingWorker<Void, Void> openPolicyFileWorker = new SwingWorker<Void, Void>() {
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 try {
                     if (parentWindow != null) {
                         SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {
@@ -1577,7 +1577,7 @@ public class PolicyEditor extends JPanel {
         final JDialog progressIndicator = new IndeterminateProgressDialog(parentWindow, "Saving...");
         final SwingWorker<Void, Void> savePolicyFileWorker = new SwingWorker<Void, Void>() {
             @Override
-            public Void doInBackground() throws Exception {
+            public Void doInBackground() {
                 try {
                     if (parentWindow != null) {
                         SwingUtils.invokeRunnableOrEnqueueLater(new Runnable() {

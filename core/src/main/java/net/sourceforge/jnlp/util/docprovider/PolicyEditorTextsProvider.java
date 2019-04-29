@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -49,7 +50,7 @@ import java.io.IOException;
  */
 public class PolicyEditorTextsProvider extends TextsProvider {
 
-    public PolicyEditorTextsProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
+    public PolicyEditorTextsProvider(Charset encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
         super(encoding, formatter, forceTitles, expandFiles);
     }
 

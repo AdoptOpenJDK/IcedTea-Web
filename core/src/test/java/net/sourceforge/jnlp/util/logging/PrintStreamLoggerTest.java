@@ -41,10 +41,11 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import java.nio.charset.StandardCharsets;
 
 public class PrintStreamLoggerTest {
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     private static String line1 = "I'm logged line one";
     private static String line2 = "I'm logged line two";

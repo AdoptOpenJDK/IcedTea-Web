@@ -60,6 +60,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+
 @Ignore // Not working at the moment
 public class ResourcesTest extends  BrowserTest{
 
@@ -127,7 +129,7 @@ public class ResourcesTest extends  BrowserTest{
     }
 
     @Test
-    public void testBrowsers1() throws Exception {
+    public void testBrowsers1() {
         BrowserFactory bf = new BrowserFactory(null);
         int expected = 0;
         Assert.assertTrue("Created from null there must be " + expected + " browsers in factory. Is" + bf.getAllBrowsers().size(), bf.getAllBrowsers().size() == expected);
@@ -371,7 +373,7 @@ public class ResourcesTest extends  BrowserTest{
         } else {
             plugins = userPlugins;
         }
-        String s = ServerAccess.getContentOfStream(new FileInputStream(plugins[0]), "ASCII");
+        String s = ServerAccess.getContentOfStream(new FileInputStream(plugins[0]), US_ASCII);
         Assert.assertTrue("browser's plugins  should points to" + currentPath + ", but didn't",
                 s.contains(s));
     }

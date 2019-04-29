@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,7 +95,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getHeaders(String id, String encoding) {
+    public String getHeaders(String id, Charset encoding) {
         return "  ***  " + TextsProvider.ITW + " " + getVersion() + "  ***  ";
     }
 
