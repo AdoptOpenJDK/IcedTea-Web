@@ -125,16 +125,16 @@ function build() {
 }
 
 build sh javaws         net.sourceforge.jnlp.runtime.Boot
-build sh itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
-build sh policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+build sh itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
+build sh policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
 
 mkdir $TARGET_TMP  # for tests output
 export ITW_TMP_REPLACEMENT=$TARGET_TMP # for tests output
 build rust javaws         net.sourceforge.jnlp.runtime.Boot
-build rust itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
-build rust policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+build rust itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
+build rust policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
 if [ ! "$KCOV" = "none" ] ; then 
-  build rust coverage   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+  build rust coverage   net.sourceforge.jnlp.runtime.Boot
 fi
 
 
