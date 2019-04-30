@@ -50,17 +50,13 @@ public class BasicFileUtils {
      * @throws IOException if connection can't be established or resource does not exist
      */
     public static String getContentOfStream(final InputStream is, final Charset encoding) throws IOException {
-        try {
-            return getContentOfReader(new InputStreamReader(is, encoding));
-        }
-        finally {
-            is.close();
+        try (Reader r = new InputStreamReader(is, encoding)) {
+            return getContentOfReader(r);
         }
     }
 
     public static String getContentOfReader(final Reader r) throws IOException {
-        try {
-            BufferedReader br = new BufferedReader(r);
+        try (BufferedReader br = new BufferedReader(r)) {
             StringBuilder sb = new StringBuilder();
             while (true) {
                 String s = br.readLine();
@@ -71,9 +67,6 @@ public class BasicFileUtils {
 
             }
             return sb.toString();
-        }
-        finally {
-            r.close();
         }
     }
 
