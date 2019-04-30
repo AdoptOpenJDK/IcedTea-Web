@@ -49,7 +49,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
@@ -352,8 +351,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f),
-                    Charset.forName(UTF_8)); Reader reader = getContentsAsReader(true, info, isSigned)) {
+            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f), UTF_8);
+                 Reader reader = getContentsAsReader(true, info, isSigned)) {
 
                 char[] buffer = new char[1024];
                 int ret = 0;
@@ -383,11 +382,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             FileUtils.createRestrictedFile(shortcutFile, true);
 
-            try ( /*
-             * Write out a Java String (UTF-16) as a UTF-8 file
-             */ OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile),
-                     Charset.forName(UTF_8)); Reader reader = getContentsAsReader(false, info, isSigned)) {
-                
+            try ( /* Write out a Java String (UTF-16) as a UTF-8 file */
+                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile), UTF_8);
+                    Reader reader = getContentsAsReader(false, info, isSigned)) {
+
                 char[] buffer = new char[1024];
                 int ret = 0;
                 while (-1 != (ret = reader.read(buffer))) {
@@ -792,12 +790,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
     
      @Override
-    public void createShortcutOnWindowsDesktop() throws IOException {
+    public void createShortcutOnWindowsDesktop() {
         throw new UnsupportedOperationException("not supported on linux like systems");
     }
 
     @Override
-    public void createWindowsMenu() throws IOException {
+    public void createWindowsMenu() {
         throw new UnsupportedOperationException("not supported on linux like systems");
     }
 }

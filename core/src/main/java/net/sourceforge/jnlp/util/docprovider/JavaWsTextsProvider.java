@@ -44,13 +44,14 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class JavaWsTextsProvider extends TextsProvider {
 
-    public JavaWsTextsProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
+    public JavaWsTextsProvider(Charset encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
         super(encoding, formatter, forceTitles, expandFiles);
     }
 

@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -500,9 +500,8 @@ public class CommandLine {
     /**
      * The starting point of the program
      * @param args the command line arguments to this program
-     * @throws Exception when it goes wrong
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 

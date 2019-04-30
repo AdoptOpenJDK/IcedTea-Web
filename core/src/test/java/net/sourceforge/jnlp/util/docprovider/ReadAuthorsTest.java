@@ -45,7 +45,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 
@@ -159,7 +159,7 @@ public class ReadAuthorsTest {
     }
     
     @Test
-    public void replaceLtGtTest() throws IOException {
+    public void replaceLtGtTest() {
         TextsProvider tp = new TextsProvider(UTF_8, new HtmlFormatter(), true, true) {
             @Override
             public String getId() {

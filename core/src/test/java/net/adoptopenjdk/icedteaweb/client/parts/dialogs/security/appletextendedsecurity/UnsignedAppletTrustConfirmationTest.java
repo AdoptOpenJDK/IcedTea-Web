@@ -109,6 +109,7 @@ public class UnsignedAppletTrustConfirmationTest {
 
     @BeforeClass
     public static void backupAppTrust() throws IOException{
+        PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().createNewFile();
         backup = File.createTempFile("appletExtendedSecurity", "itwUnittest");
         backup.deleteOnExit();
         FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), backup);

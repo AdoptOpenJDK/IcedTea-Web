@@ -44,8 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,7 +61,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
@@ -76,7 +74,7 @@ import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
  */
 public class CacheUtil {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -254,7 +252,7 @@ public class CacheUtil {
             throws IOException {
         LOG.debug("Clearing Windows shortcuts");
         if (CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), Charset.forName(UTF_8));
+            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), UTF_8);
             Iterator it = lines.iterator();
             Boolean fDelete;
             while (it.hasNext()) {
@@ -287,7 +285,7 @@ public class CacheUtil {
                 Files.deleteIfExists(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath());
             } else {
                 //write file after application shortcuts have been removed
-                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, Charset.forName(UTF_8));
+                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, UTF_8);
             }
         }
 
@@ -714,7 +712,7 @@ public class CacheUtil {
              */
             try {
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
-                byte[] sum = md.digest(candidate.getName().getBytes(StandardCharsets.UTF_8));
+                byte[] sum = md.digest(candidate.getName().getBytes(UTF_8));
                 //convert the byte to hex format method 2
                 StringBuilder hexString = new StringBuilder();
                 for (int i = 0; i < sum.length; i++) {

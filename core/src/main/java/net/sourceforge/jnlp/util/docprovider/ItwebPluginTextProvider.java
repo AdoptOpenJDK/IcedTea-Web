@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 
@@ -50,7 +51,7 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
  */
 public class ItwebPluginTextProvider extends TextsProvider {
 
-    public ItwebPluginTextProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
+    public ItwebPluginTextProvider(Charset encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
         super(encoding, formatter, forceTitles, expandFiles);
     }
 
