@@ -5,7 +5,7 @@
  */
 package net.adoptopenjdk.icedteaweb.testing.util;
 
-import net.adoptopenjdk.icedteaweb.lockingfile.WindowsLockedFileTest;
+import net.adoptopenjdk.icedteaweb.lockingfile.WindowsLockableFileTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -15,7 +15,7 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
  *
  * @author jvanek
  */
-public class NonWindowsLockedFile extends WindowsLockedFileTest {
+public class NonWindowsLockableFile extends WindowsLockableFileTest {
 
     private static String os;
 

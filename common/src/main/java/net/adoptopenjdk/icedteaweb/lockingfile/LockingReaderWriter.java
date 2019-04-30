@@ -54,7 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public abstract class LockingReaderWriter {
 
-    private final LockedFile lockedFile;
+    private final LockableFile lockableFile;
 
     /**
      * Create locking file-backed storage.
@@ -62,7 +62,7 @@ public abstract class LockingReaderWriter {
      * @param file the storage file
      */
     public LockingReaderWriter(final File file) {
-        this.lockedFile = LockedFile.getInstance(file);
+        this.lockableFile = LockableFile.getInstance(file);
     }
 
     /**
@@ -72,11 +72,11 @@ public abstract class LockingReaderWriter {
      * @return the file
      */
     public File getBackingFile() {
-        return this.lockedFile.getFile();
+        return this.lockableFile.getFile();
     }
 
     public boolean isReadOnly() {
-        return this.lockedFile.isReadOnly();
+        return this.lockableFile.isReadOnly();
     }
 
     /**
@@ -84,7 +84,7 @@ public abstract class LockingReaderWriter {
      */
     public void lock() {
         try {
-            lockedFile.lock();
+            lockableFile.lock();
         } catch (final IOException e) {
             throw new StorageIoException(e);
         }
@@ -95,7 +95,7 @@ public abstract class LockingReaderWriter {
      */
     public void unlock() {
         try {
-            lockedFile.unlock();
+            lockableFile.unlock();
         } catch (final IOException e) {
             throw new StorageIoException(e);
         }

@@ -50,9 +50,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /*
  * Process & thread locked access to a file. Creates file if it does not already exist.
  */
-public class LockedFile {
+public class LockableFile {
 
-    private static final Map<File, LockedFile> instanceCache = new WeakHashMap<>();
+    private static final Map<File, LockableFile> instanceCache = new WeakHashMap<>();
 
     /**
      * Get a LockedFile for a given File. Ensures that we share the same
@@ -61,7 +61,7 @@ public class LockedFile {
      * @param file the file to lock
      * @return a LockedFile instance
      */
-    public static LockedFile getInstance(final File file) {
+    public static LockableFile getInstance(final File file) {
         if (instanceCache.containsKey(file)) {
             return instanceCache.get(file);
         }
@@ -71,9 +71,9 @@ public class LockedFile {
                 return instanceCache.get(file);
             }
 
-            final LockedFile lockedFile = new LockedFile(file);
-            instanceCache.put(file, lockedFile);
-            return lockedFile;
+            final LockableFile lockableFile = new LockableFile(file);
+            instanceCache.put(file, lockableFile);
+            return lockableFile;
         }
     }
 
@@ -88,7 +88,7 @@ public class LockedFile {
     private FileLock processLock;
 
 
-    private LockedFile(final File file) {
+    private LockableFile(final File file) {
         this.file = file;
         try {
             //just try to create

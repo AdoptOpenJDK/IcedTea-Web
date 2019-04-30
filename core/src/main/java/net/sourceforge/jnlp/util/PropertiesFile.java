@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.lockingfile.LockedFile;
+import net.adoptopenjdk.icedteaweb.lockingfile.LockableFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class PropertiesFile extends Properties {
     /**
      * the file to save to
      */
-    private final LockedFile lockedFile;
+    private final LockableFile lockableFile;
 
     /**
      * the header string
@@ -72,7 +72,7 @@ public class PropertiesFile extends Properties {
      * @param header the file header
      */
     public PropertiesFile(final File file, final String header) {
-        this.lockedFile = LockedFile.getInstance(file);
+        this.lockableFile = LockableFile.getInstance(file);
         this.header = header;
     }
 
@@ -117,7 +117,7 @@ public class PropertiesFile extends Properties {
      * @return the file backing this properties object.
      */
     public File getStoreFile() {
-        return lockedFile.getFile();
+        return lockableFile.getFile();
     }
 
     /**
@@ -129,7 +129,7 @@ public class PropertiesFile extends Properties {
      * false, if file was still current
      */
     public boolean load() {
-        final File file = lockedFile.getFile();
+        final File file = lockableFile.getFile();
         if (!file.exists()) {
             return false;
         }
@@ -159,7 +159,7 @@ public class PropertiesFile extends Properties {
      * Saves the properties to the file.
      */
     public void store() {
-        final File file = lockedFile.getFile();
+        final File file = lockableFile.getFile();
         try (final FileOutputStream s = new FileOutputStream(file)) {
             file.getParentFile().mkdirs();
             store(s, header);
@@ -173,7 +173,7 @@ public class PropertiesFile extends Properties {
 
     public void lock() {
         try {
-            lockedFile.lock();
+            lockableFile.lock();
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
@@ -181,7 +181,7 @@ public class PropertiesFile extends Properties {
 
     public boolean tryLock() {
         try {
-            return lockedFile.tryLock();
+            return lockableFile.tryLock();
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
@@ -194,14 +194,14 @@ public class PropertiesFile extends Properties {
 
     public void unlock() {
         try {
-            lockedFile.unlock();
+            lockableFile.unlock();
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
 
     public boolean isHeldByCurrentThread() {
-        return lockedFile.isHeldByCurrentThread();
+        return lockableFile.isHeldByCurrentThread();
     }
 
 }

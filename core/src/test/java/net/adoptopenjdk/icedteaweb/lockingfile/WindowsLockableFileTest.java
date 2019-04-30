@@ -18,7 +18,7 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
  *
  * @author jvanek
  */
-public class WindowsLockedFileTest {
+public class WindowsLockableFileTest {
 
     private static String os;
 
@@ -37,7 +37,7 @@ public class WindowsLockedFileTest {
     public void testLockUnlockOkExists() throws IOException {
         File f = File.createTempFile("itw", "lockingFile");
         f.deleteOnExit();
-        LockedFile lf = LockedFile.getInstance(f);
+        LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
         lf.unlock();
     }
@@ -46,7 +46,7 @@ public class WindowsLockedFileTest {
     public void testLockUnlockOkNotExists() throws IOException {
         File f = File.createTempFile("itw", "lockingFile");
         f.delete();
-        LockedFile lf = LockedFile.getInstance(f);
+        LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
         lf.unlock();
     }
@@ -58,7 +58,7 @@ public class WindowsLockedFileTest {
         File f = new File(parent, "itwLcokingRelict");
         f.delete();
         parent.setReadOnly();
-        LockedFile lf = LockedFile.getInstance(f);
+        LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
         lf.unlock();;
     }
@@ -66,7 +66,7 @@ public class WindowsLockedFileTest {
     @Test
     public void testLockUnlockNotOkExists() throws IOException {
         File f = new File("/some/definitely/not/existing/file.itw");
-        LockedFile lf = LockedFile.getInstance(f);
+        LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
         lf.unlock();
     }
