@@ -77,18 +77,15 @@ public class LockedFile {
         }
     }
 
-    // The file for access
-    private RandomAccessFile randomAccessFile;
-
-    private FileChannel fileChannel;
-
     private final File file;
     private final boolean readOnly;
 
-    // A file lock will protect against locks for multiple
-    // processes, while a thread lock is still needed within a single JVM.
-    private FileLock processLock = null;
+    // internal modifiable state.
+    // these fields are not exposed but are used within this class
     private final ReentrantLock threadLock = new ReentrantLock();
+    private RandomAccessFile randomAccessFile;
+    private FileChannel fileChannel;
+    private FileLock processLock;
 
 
     private LockedFile(final File file) {
@@ -103,16 +100,16 @@ public class LockedFile {
     }
 
     private boolean isReadOnly(final File file) {
+        boolean result;
         if (!file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-            return true;
+            result = true;
+        } else {
+            result = !file.canWrite();
+            if (!result && file.getParentFile() != null && !file.getParentFile().canWrite()) {
+                result = true;
+            }
         }
-
-        final boolean canWrite = !file.canWrite();
-        if (!canWrite && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-            return true;
-        }
-
-        return canWrite;
+        return result;
     }
 
     /**
