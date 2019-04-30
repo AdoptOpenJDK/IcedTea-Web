@@ -115,10 +115,6 @@ public class LockedFile {
         return canWrite;
     }
 
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
     /**
      * Get the file being locked.
      *
@@ -129,8 +125,15 @@ public class LockedFile {
     }
 
     /**
+     * @return if the file is read only.
+     */
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    /**
      * Lock access to the file.Lock is reentrant.
-     * @throws java.io.IOException
+     * @throws java.io.IOException if an I/O error occurs.
      */
     public void lock() throws IOException {
         // Create if does not already exist, cannot lock non-existing file
@@ -169,7 +172,7 @@ public class LockedFile {
 
     /**
      * Unlock access to the file.Lock is reentrant. Does not do anything if not holding the lock.
-     * @throws java.io.IOException
+     * @throws java.io.IOException if an I/O error occurs.
      */
     public void unlock() throws IOException {
         if (!this.threadLock.isHeldByCurrentThread()) {
@@ -183,7 +186,7 @@ public class LockedFile {
         }
     }
 
-    protected void unlockImpl(final boolean releaseProcessLock) throws IOException {
+    private void unlockImpl(final boolean releaseProcessLock) throws IOException {
         try {
             if (releaseProcessLock) {
                 if (this.processLock != null){
