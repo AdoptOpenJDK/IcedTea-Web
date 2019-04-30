@@ -40,7 +40,7 @@ public class BasicFileUtils {
      * @throws IOException if save fails
      */
     public static void saveFile(final String content, final File f, final Charset encoding) throws IOException {
-        try (Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding))) {
+        try (final Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding))) {
             output.write(content);
             output.flush();
         }
