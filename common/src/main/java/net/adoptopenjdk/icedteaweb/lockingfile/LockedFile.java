@@ -54,6 +54,29 @@ public class LockedFile {
 
     private static final Map<File, LockedFile> instanceCache = new WeakHashMap<>();
 
+    /**
+     * Get a LockedFile for a given File. Ensures that we share the same
+     * instance for all threads
+     *
+     * @param file the file to lock
+     * @return a LockedFile instance
+     */
+    public static LockedFile getInstance(final File file) {
+        if (instanceCache.containsKey(file)) {
+            return instanceCache.get(file);
+        }
+
+        synchronized (instanceCache) {
+            if (instanceCache.containsKey(file)) {
+                return instanceCache.get(file);
+            }
+
+            final LockedFile lockedFile = new LockedFile(file);
+            instanceCache.put(file, lockedFile);
+            return lockedFile;
+        }
+    }
+
     // The file for access
     private RandomAccessFile randomAccessFile;
 
@@ -69,7 +92,7 @@ public class LockedFile {
 
     private boolean readOnly;
 
-    protected LockedFile(final File file) {
+    private LockedFile(final File file) {
         this.file = file;
         try {
             //just try to create
@@ -89,22 +112,6 @@ public class LockedFile {
 
     public boolean isReadOnly() {
         return readOnly;
-    }
-    // Provide shared access to LockedFile's via weak map
-
-    /**
-     * Get a LockedFile for a given File. Ensures that we share the same
-     * instance for all threads
-     *
-     * @param file the file to lock
-     * @return a LockedFile instance
-     */
-    synchronized public static LockedFile getInstance(final File file) {
-        if (!instanceCache.containsKey(file)) {
-            final LockedFile l = new LockedFile(file);
-            instanceCache.put(file, l);
-        }
-        return instanceCache.get(file);
     }
 
     /**
