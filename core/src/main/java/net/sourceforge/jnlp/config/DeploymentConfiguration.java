@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileLock;
@@ -283,10 +284,18 @@ public final class DeploymentConfiguration {
     }
 
     static boolean checkUrl(URL file) {
-        try (InputStream s = file.openStream()) {
-            return true;
+        try {
+            try (InputStream s = file.openStream()) {
+                return true;
+            } catch (ConnectException e) {
+                // get some sleep and retry
+                Thread.sleep(500);
+                try (InputStream s = file.openStream()) {
+                    return true;
+                }
+            }
         } catch (Throwable ex) {
-            // this should be logged, however, logging botle neck may not be initialised here
+            LOG.info("checkUrl failed for " + file.toExternalForm() + " reason: " + ex.getMessage());
             return false;
         }
     }
