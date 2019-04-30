@@ -22,7 +22,7 @@ public class BasicFileUtils {
      * @param f file to be saved. No warnings provided
      * @throws IOException if save fails
      */
-    public static void saveFile(String content, File f) throws IOException {
+    public static void saveFile(final String content, final File f) throws IOException {
         saveFile(content, f, UTF_8);
     }
 
@@ -34,7 +34,7 @@ public class BasicFileUtils {
      * @param encoding of output byte representation
      * @throws IOException if save fails
      */
-    public static void saveFile(String content, File f, Charset encoding) throws IOException {
+    public static void saveFile(final String content, final File f, final Charset encoding) throws IOException {
         try (Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding))) {
             output.write(content);
             output.flush();
@@ -49,7 +49,7 @@ public class BasicFileUtils {
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(InputStream is, Charset encoding) throws IOException {
+    public static String getContentOfStream(final InputStream is, final Charset encoding) throws IOException {
         try {
             return getContentOfReader(new InputStreamReader(is, encoding));
         }
@@ -58,7 +58,7 @@ public class BasicFileUtils {
         }
     }
 
-    public static String getContentOfReader(Reader r) throws IOException {
+    public static String getContentOfReader(final Reader r) throws IOException {
         try {
             BufferedReader br = new BufferedReader(r);
             StringBuilder sb = new StringBuilder();
@@ -84,7 +84,7 @@ public class BasicFileUtils {
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(InputStream is) throws IOException {
+    public static String getContentOfStream(final InputStream is) throws IOException {
         return getContentOfStream(is, UTF_8);
     }
 }
