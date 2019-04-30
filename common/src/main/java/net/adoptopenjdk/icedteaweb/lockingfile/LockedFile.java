@@ -142,9 +142,7 @@ public class LockedFile {
         }
 
         this.threadLock.lock();
-        if(!OsUtil.isWindows()) {
-            lockProcess();
-        }
+        lockProcess();
     }
 
     public boolean tryLock() throws IOException {
@@ -157,6 +155,10 @@ public class LockedFile {
     }
 
     private void lockProcess() throws IOException {
+        if (OsUtil.isWindows()) {
+            return;
+        }
+
         if (this.processLock != null) {
             return;
         }
@@ -175,35 +177,33 @@ public class LockedFile {
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void unlock() throws IOException {
-        if (!this.threadLock.isHeldByCurrentThread()) {
-            return;
-        }
-        if(!OsUtil.isWindows()) {
-            final boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
-            unlockImpl(releaseProcessLock);
-        } else {
-            unlockImpl(false);
+        if (this.threadLock.isHeldByCurrentThread()) {
+            try {
+                if (this.threadLock.getHoldCount() == 1) {
+                    unlockProcess();
+                }
+            } finally {
+                this.threadLock.unlock();
+            }
         }
     }
 
-    private void unlockImpl(final boolean releaseProcessLock) throws IOException {
-        try {
-            if (releaseProcessLock) {
-                if (this.processLock != null){
-                    this.processLock.release();
-                }
-                this.processLock = null;
-                //necessary for read only file
-                if (this.randomAccessFile != null){
-                    this.randomAccessFile.close();
-                }
-                //necessary for not existing parent directory
-                if (this.fileChannel != null){
-                    this.fileChannel.close();
-                }
-            }
-        } finally {
-            this.threadLock.unlock();
+    private void unlockProcess() throws IOException {
+        if (OsUtil.isWindows()) {
+            return;
+        }
+
+        if (this.processLock != null) {
+            this.processLock.release();
+        }
+        this.processLock = null;
+        //necessary for read only file
+        if (this.randomAccessFile != null) {
+            this.randomAccessFile.close();
+        }
+        //necessary for not existing parent directory
+        if (this.fileChannel != null) {
+            this.fileChannel.close();
         }
     }
 
