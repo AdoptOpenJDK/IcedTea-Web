@@ -40,13 +40,12 @@ import net.adoptopenjdk.icedteaweb.testing.ProcessResult;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.TinyHttpdImpl;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
@@ -163,16 +162,14 @@ public class ServerAccessTest {
         Assert.assertTrue(dirFile.exists());
         Assert.assertTrue(server.getDir().listFiles().length > 1);
 
-        String portFileContent = ServerAccess.getContentOfStream(new FileInputStream(portFile));
-        String dirFileContent = ServerAccess.getContentOfStream(new FileInputStream(dirFile));
+        String portFileContent = FileUtils.loadFileAsString(portFile);
+        String dirFileContent = FileUtils.loadFileAsString(dirFile);
 
         URL portUrl = new URL("http", "localhost", server.getPort(), "/server.port");
-        HttpURLConnection portConn = (HttpURLConnection) portUrl.openConnection();
         URL dirUrl = new URL("http", "localhost", server.getPort(), "/server.dir");
-        HttpURLConnection dirConn = (HttpURLConnection) dirUrl.openConnection();
 
-        String portUrlContent = ServerAccess.getContentOfStream(portConn.getInputStream());
-        String dirUrlContent = ServerAccess.getContentOfStream(dirConn.getInputStream());
+        String portUrlContent = ServerAccess.getResourceAsString(portUrl);
+        String dirUrlContent = ServerAccess.getResourceAsString(dirUrl);
 
         Assert.assertEquals(portUrlContent.trim(), portFileContent.trim());
         Assert.assertEquals(dirUrlContent.trim(), dirFileContent.trim());
@@ -180,19 +177,11 @@ public class ServerAccessTest {
         Assert.assertEquals(new Integer(portUrlContent.trim()), server.getPort());
 
         URL fastUrl = new URL("http", "localhost", server.getPort(), "/simpletest1.jnlp");
-        HttpURLConnection fastUrlConn = (HttpURLConnection) fastUrl.openConnection();
         URL slowUrl = new URL("http", "localhost", server.getPort(), "/XslowXsimpletest1.jnlp");
-        HttpURLConnection slowUrlConn = (HttpURLConnection) slowUrl.openConnection();
 
-        String fastUrlcontent = ServerAccess.getContentOfStream(fastUrlConn.getInputStream());
-        String slowUrlContent = ServerAccess.getContentOfStream(slowUrlConn.getInputStream());
+        String fastUrlcontent = ServerAccess.getResourceAsString(fastUrl);
+        String slowUrlContent = ServerAccess.getResourceAsString(slowUrl);
         Assert.assertEquals(fastUrlcontent, slowUrlContent);
-        
-        portConn.disconnect();
-        dirConn.disconnect();
-        fastUrlConn.disconnect();
-        slowUrlConn.disconnect();
-
     }
 
     @Test

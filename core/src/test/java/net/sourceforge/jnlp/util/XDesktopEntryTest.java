@@ -347,8 +347,7 @@ public class XDesktopEntryTest {
         a.setBrowser("blah");
         a.setFixHref(false);
         a.setShortcutType(type);
-        Reader r = xde.getContentsAsReader(menu, a, true);
-        String s = BasicFileUtils.getContentOfReader(r);
+        String s = xde.getContent(menu, a, true);
         Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
     }
 

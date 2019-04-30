@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.BasicFileUtils;
@@ -346,29 +345,6 @@ public class ServerAccess {
     }
 
     /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is       stream to be read
-     * @param encoding encoding of this stream
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String getContentOfStream(final InputStream is, final Charset encoding) throws IOException {
-        return BasicFileUtils.getContentOfStream(is, encoding);
-    }
-
-    /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is input stream to read from
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String getContentOfStream(final InputStream is) throws IOException {
-        return BasicFileUtils.getContentOfStream(is);
-    }
-
-    /**
      * utility method which can read bytes of resource from any url
      *
      * @param u full url to read from
@@ -402,7 +378,7 @@ public class ServerAccess {
      * @throws IOException if connection can't be established or resource does
      *                     not exist
      */
-    private static String getResourceAsString(final URL u) throws IOException {
+    public static String getResourceAsString(final URL u) throws IOException {
         URLConnection connection = null;
         try {
             connection = u.openConnection();
@@ -412,9 +388,12 @@ public class ServerAccess {
             connection.setDoOutput(true);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.connect();
-            return getContentOfStream(connection.getInputStream());
+
+            try (final InputStream is = connection.getInputStream()) {
+                return BasicFileUtils.toString(is);
+            }
         } finally {
-            if (connection != null && connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).disconnect();
             }
         }

@@ -149,7 +149,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @return reader with desktop shortcut specification
      */
      Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+         final String fileContents = getContent(menu, info, isSigned);
+         return new StringReader(fileContents);
+    }
 
+    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         File generatedJnlp = null;
         if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF)) {
             try {
@@ -160,7 +164,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
-        
+
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
         fileContents += "Name=" + getDesktopIconName() + "\n";
@@ -223,8 +227,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 fileContents += exec;
             }
         }
-        return new StringReader(fileContents);
-
+        return fileContents;
     }
 
     public static String getBrowserBin() {

@@ -1,20 +1,25 @@
 package net.adoptopenjdk.icedteaweb;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class BasicFileUtils {
+
+    /**
+     * End-of-file or end-of-stream
+     */
+    private static final int EOF = -1;
+
     /**
      * Method to save String as file in UTF-8 encoding.
      *
@@ -44,40 +49,38 @@ public class BasicFileUtils {
     /**
      * utility method which can read from any stream as one long String
      *
-     * @param is       stream
-     * @param encoding the encoding to use to convert the bytes from the stream
+     * @param is stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(final InputStream is, final Charset encoding) throws IOException {
-        try (Reader r = new InputStreamReader(is, encoding)) {
-            return getContentOfReader(r);
-        }
-    }
-
-    public static String getContentOfReader(final Reader r) throws IOException {
-        try (BufferedReader br = new BufferedReader(r)) {
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                String s = br.readLine();
-                if (s == null) {
-                    break;
-                }
-                sb.append(s).append("\n");
-
-            }
-            return sb.toString();
-        }
+    public static String toString(final InputStream is) throws IOException {
+        return toString(is, UTF_8);
     }
 
     /**
      * utility method which can read from any stream as one long String
      *
-     * @param is stream
+     * @param is       stream
+     * @param encoding the encoding to use to convert the bytes from the stream
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(final InputStream is) throws IOException {
-        return getContentOfStream(is, UTF_8);
+    public static String toString(final InputStream is, final Charset encoding) throws IOException {
+        return new String(toByteArray(is), encoding);
+    }
+
+    public static byte[] toByteArray(final InputStream input) throws IOException {
+        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            copy(input, output);
+            return output.toByteArray();
+        }
+    }
+
+    private static void copy(final InputStream input, final OutputStream output) throws IOException {
+        final byte[] buffer = new byte[1024];
+        int n;
+        while (EOF != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
     }
 }

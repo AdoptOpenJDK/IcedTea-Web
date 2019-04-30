@@ -25,15 +25,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,7 +33,6 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryFlag;
@@ -522,11 +512,13 @@ public final class FileUtils {
     }
 
     public static String loadFileAsString(File f) throws IOException {
-        return BasicFileUtils.getContentOfStream(new FileInputStream(f));
+        return loadFileAsString(f, UTF_8);
     }
 
     public static String loadFileAsString(File f, Charset encoding) throws IOException {
-        return BasicFileUtils.getContentOfStream(new FileInputStream(f), encoding);
+        try (final FileInputStream is = new FileInputStream(f)) {
+            return BasicFileUtils.toString(is, encoding);
+        }
     }
 
     public static byte[] getFileMD5Sum(final File file, final String algorithm) throws NoSuchAlgorithmException, IOException {
@@ -538,7 +530,7 @@ public final class FileUtils {
             is = new FileInputStream(file);
             dis = new DigestInputStream(is, md5);
 
-            md5.update(BasicFileUtils.getContentOfStream(dis).getBytes());
+            md5.update(BasicFileUtils.toByteArray(dis));
         } finally {
             if (is != null) {
                 is.close();
