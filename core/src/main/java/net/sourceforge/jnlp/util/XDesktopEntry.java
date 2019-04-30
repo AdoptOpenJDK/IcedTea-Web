@@ -141,18 +141,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
 
     /**
-     * Returns the contents of the {@link XDesktopEntry} through the
-     * {@link Reader} interface.
+     * Returns the contents of the {@link XDesktopEntry} as a String.
      * @param menu whether to create this icon to menu
      * @param info result of user's interference
      * @param isSigned whether the app is signed
-     * @return reader with desktop shortcut specification
+     * @return string with desktop shortcut specification
      */
-     Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
-         final String fileContents = getContent(menu, info, isSigned);
-         return new StringReader(fileContents);
-    }
-
     String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         File generatedJnlp = null;
         if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF)) {
@@ -372,16 +366,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f), UTF_8);
-                 Reader reader = getContentsAsReader(true, info, isSigned)) {
-
-                char[] buffer = new char[1024];
-                int ret = 0;
-                while (-1 != (ret = reader.read(buffer))) {
-                    writer.write(buffer, 0, ret);
-                }
-
-            }
+            BasicFileUtils.saveFile(getContent(true, info, isSigned), f, UTF_8);
             LOG.info("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -402,18 +387,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
             FileUtils.createRestrictedFile(shortcutFile, true);
-
-            try ( /* Write out a Java String (UTF-16) as a UTF-8 file */
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile), UTF_8);
-                    Reader reader = getContentsAsReader(false, info, isSigned)) {
-
-                char[] buffer = new char[1024];
-                int ret = 0;
-                while (-1 != (ret = reader.read(buffer))) {
-                    writer.write(buffer, 0, ret);
-                }
-                
-            }
+            BasicFileUtils.saveFile(getContent(false, info, isSigned), shortcutFile, UTF_8);
 
             /*
              * Install the desktop entry
