@@ -121,8 +121,8 @@ public class ProcessWrapper {
             final String connectionMesaage = createConnectionMessage(t);
             ServerAccess.log(connectionMesaage, true, true);
         }
-        final ProcessAssasin pa = new ProcessAssasin(t, ServerAccess.PROCESS_TIMEOUT);
-        t.setAssasin(pa);
+        final ProcessAssassin pa = new ProcessAssassin(t, ServerAccess.PROCESS_TIMEOUT);
+        t.setAssassin(pa);
         pa.setReactingProcess(reactingProcess);
         setUpClosingListener(stdoutl, pa);
         setUpClosingListener(stderrl, pa);
@@ -150,7 +150,7 @@ public class ProcessWrapper {
             Thread.sleep(100);
         }
 
-        while (!t.isDestoyed()) {
+        while (!t.isDestroyed()) {
             Thread.sleep(100);
         }
         pa.setCanRun(false);
@@ -164,10 +164,10 @@ public class ProcessWrapper {
         return pr;
     }
 
-    private static void setUpClosingListener(final List<ContentReaderListener> listeners, final ProcessAssasin pa) {
+    private static void setUpClosingListener(final List<ContentReaderListener> listeners, final ProcessAssassin pa) {
         for (final ContentReaderListener listener : listeners) {
             if (listener != null && (listener instanceof ClosingListener)) {
-                ((ClosingListener) listener).setAssasin(pa);
+                ((ClosingListener) listener).setAssassin(pa);
             }
         }
 

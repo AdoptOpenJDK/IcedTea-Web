@@ -42,6 +42,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Class to read content of stdout/stderr of process, and to cooperate with its
  * running/terminated/finished statuses.
@@ -67,7 +69,7 @@ class ContentReader implements Runnable {
     @Override
     public void run() {
         try {
-            final Reader br = new InputStreamReader(is, "UTF-8");
+            final Reader br = new InputStreamReader(is, UTF_8);
             StringBuilder line = new StringBuilder();
             while (true) {
                 int s = br.read();
@@ -75,7 +77,7 @@ class ContentReader implements Runnable {
                     if (line.length() > 0 && listeners != null) {
                         for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
-                                listener.lineReaded(line.toString());
+                                listener.lineRead(line.toString());
                             }
                         }
                     }
@@ -88,7 +90,7 @@ class ContentReader implements Runnable {
                     if (listeners != null) {
                         for (final ContentReaderListener listener : listeners) {
                             if (listener != null) {
-                                listener.lineReaded(line.toString());
+                                listener.lineRead(line.toString());
                             }
                         }
                     }
@@ -97,7 +99,7 @@ class ContentReader implements Runnable {
                 if (listeners != null) {
                     for (final ContentReaderListener listener : listeners) {
                         if (listener != null) {
-                            listener.charReaded(ch);
+                            listener.charRead(ch);
                         }
                     }
                 }

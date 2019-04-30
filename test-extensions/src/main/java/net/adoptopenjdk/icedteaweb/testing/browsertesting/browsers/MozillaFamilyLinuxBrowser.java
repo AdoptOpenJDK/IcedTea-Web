@@ -48,7 +48,7 @@ public  abstract class MozillaFamilyLinuxBrowser  extends LinuxBrowser{
  
 
     @Override
-    public List<String> getComaptibilitySwitches() {
+    public List<String> getCompatibilitySwitches() {
         return null;
     }
 

@@ -66,7 +66,7 @@ public class ProcessAssassin extends Thread {
     }
 
 
-    public void setCanRun(boolean canRun) {
+    public void setCanRun(final boolean canRun) {
         this.canRun = canRun;
         if (p != null) {
             if (p.getP() != null) {
@@ -89,10 +89,10 @@ public class ProcessAssassin extends Thread {
 
     @Override
     public void run() {
-        long startTime = System.nanoTime() / ServerAccess.NANO_TIME_DELIMITER;
+        final long startTime = System.nanoTime() / ServerAccess.NANO_TIME_DELIMITER;
         while (canRun) {
             try {
-                long time = System.nanoTime() / ServerAccess.NANO_TIME_DELIMITER;
+                final long time = System.nanoTime() / ServerAccess.NANO_TIME_DELIMITER;
                 //ServerAccess.logOutputReprint(time - startTime);
                 //ServerAccess.logOutputReprint((time - startTime) > timeout);
                 if ((time - startTime) > timeout) {
@@ -114,7 +114,7 @@ public class ProcessAssassin extends Thread {
       able to listen to std out from listeners still
      */
                                         destroyProcess();
-                                } catch (Throwable ex) {
+                                } catch (final Throwable ex) {
                                     if (p.deadlyException == null) {
                                         p.deadlyException = ex;
                                     }
@@ -139,7 +139,7 @@ public class ProcessAssassin extends Thread {
                     }
                 }
                 Thread.sleep(100);
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -173,15 +173,15 @@ public class ProcessAssassin extends Thread {
 
 
 
-    private static void destroyProcess(ThreadedProcess pp, ReactingProcess reactingProcess) {
-        Process p = pp.getP();
+    private static void destroyProcess(final ThreadedProcess pp, final ReactingProcess reactingProcess) {
+        final Process p = pp.getP();
         try {
-            Field f = p.getClass().getDeclaredField("pid");
+            final Field f = p.getClass().getDeclaredField("pid");
             f.setAccessible(true);
-            String pid = (f.get(p)).toString();
+            final String pid = (f.get(p)).toString();
 //            sigInt(pid);
                 sigTerm(pid);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ServerAccess.logException(ex);
         } finally {
             if (reactingProcess != null) {
@@ -190,8 +190,8 @@ public class ProcessAssassin extends Thread {
         }
     }
 
-    private static void sigTerm(String pid) throws Exception {
-        List<String> ll = new ArrayList<>(4);
+    private static void sigTerm(final String pid) throws Exception {
+        final List<String> ll = new ArrayList<>(4);
         ll.add("kill");
         ll.add("-s");
         ll.add("SIGTERM");
@@ -201,7 +201,7 @@ public class ProcessAssassin extends Thread {
         Thread.sleep(1000);
     }
 
-    void setReactingProcess(ReactingProcess reactingProcess) {
+    void setReactingProcess(final ReactingProcess reactingProcess) {
         this.reactingProcess = reactingProcess;
     }
 }

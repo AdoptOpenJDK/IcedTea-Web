@@ -51,7 +51,7 @@ public class Epiphany extends MozillaFamilyLinuxBrowser {
     }
 
     @Override
-    public List<String> getComaptibilitySwitches() {
+    public List<String> getCompatibilitySwitches() {
         return Arrays.asList(cs);
     }
 

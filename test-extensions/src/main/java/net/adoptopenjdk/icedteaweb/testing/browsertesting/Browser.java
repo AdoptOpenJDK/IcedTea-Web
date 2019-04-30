@@ -47,5 +47,5 @@ public interface Browser extends ReactingProcess{
     String getBin();
     String getUserDefaultPluginExpectedLocation();
     Browsers getID();
-    List<String> getComaptibilitySwitches();
+    List<String> getCompatibilitySwitches();
 }

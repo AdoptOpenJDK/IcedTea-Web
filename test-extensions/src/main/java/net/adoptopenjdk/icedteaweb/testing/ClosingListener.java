@@ -38,13 +38,13 @@ package net.adoptopenjdk.icedteaweb.testing;
 
 public abstract class ClosingListener implements ContentReaderListener {
 
-    private ProcessAssasin assasin;
+    private ProcessAssassin assassin;
 
-    void setAssasin(final ProcessAssasin assasin) {
-        this.assasin = assasin;
+    void setAssassin(final ProcessAssassin assassin) {
+        this.assassin = assassin;
     }
 
     protected void terminate() {
-        assasin.setTimeout();
+        assassin.setTimeout();
     }
 }

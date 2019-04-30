@@ -43,18 +43,18 @@ public abstract class CountingClosingListener extends ClosingListener {
     private final StringBuilder sb = new StringBuilder();
 
     @Override
-    public void charReaded(final char ch) {
+    public void charRead(final char ch) {
         sb.append(ch);
-        if (isAlowedToFinish(sb.toString())) {
+        if (isAllowedToFinish(sb.toString())) {
             terminate();
         }
 
     }
 
     @Override
-    public void lineReaded(final String s) {
+    public void lineRead(final String s) {
         //nothing to do
     }
 
-    protected abstract boolean isAlowedToFinish(String content);
+    protected abstract boolean isAllowedToFinish(String content);
 }

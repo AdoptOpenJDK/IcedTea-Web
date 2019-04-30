@@ -36,12 +36,6 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.testing;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
-import net.adoptopenjdk.icedteaweb.OutputUtils;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +45,14 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.adoptopenjdk.icedteaweb.OutputUtils;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 /**
  * This class provides access to virtual server and stuff around.
@@ -80,7 +80,6 @@ public class ServerAccess {
     /**
      * property to set the different then default browser
      */
-    public static final String USED_BROWSERS = "used.browsers";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     public static final String DEFAULT_LOCALHOST_IP = "127.0.0.1";
     public static final String DEFAULT_LOCALHOST_PROTOCOL = "http";
@@ -107,6 +106,36 @@ public class ServerAccess {
 
     private Browser currentBrowser;
     private static final String UNSET_BROWSER = "unset_browser";
+
+    /**
+     * main method of this class prints out random free port
+     * or runs server
+     * param "port" prints out the port
+     * nothing or number will run server on random(or on number specified)
+     * port in -Dtest.server.dir
+     *
+     * @param args params from commandline. recognized params are port and randomport
+     * @throws java.lang.Exception if anything happens
+     */
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0 && args[0].equalsIgnoreCase("port")) {
+            int i = findFreePort();
+            System.out.println(i);
+            System.exit(0);
+        } else {
+            int port = 44321;
+            if (args.length > 0 && args[0].equalsIgnoreCase("randomport")) {
+                port = findFreePort();
+            } else if (args.length > 0) {
+                port = new Integer(args[0]);
+            }
+            getIndependentInstance(port);
+            while (true) {
+                Thread.sleep(1000);
+            }
+
+        }
+    }
 
     /**
      * utility method to find random free port
@@ -156,6 +185,19 @@ public class ServerAccess {
     }
 
 
+    /**
+     * @param port specific port on which this server is accepting requests
+     * @return new not cached iserver instance on random port,
+     * useful for testing application loading from different url then base
+     */
+
+    private static ServerLauncher getIndependentInstance(int port) {
+        String dir = (System.getProperty(TEST_SERVER_DIR));
+        return getIndependentInstance(dir, port);
+    }
+
+
+
     public static ServerLauncher getIndependentInstance(final String dir, final int port) {
 
 
@@ -182,7 +224,7 @@ public class ServerAccess {
     }
 
     /**
-     * @return - bianry from where to lunch current browser
+     * @return - binary from where to lunch current browser
      */
     private String getBrowserLocation() {
         if (this.currentBrowser == null) return UNSET_BROWSER;
@@ -194,7 +236,7 @@ public class ServerAccess {
             return null;
         }
 
-        final List<String> l1 = this.currentBrowser.getComaptibilitySwitches();
+        final List<String> l1 = this.currentBrowser.getCompatibilitySwitches();
         final List<String> l = new ArrayList<>();
         if (l1 != null) l.addAll(l1);
         return l;
@@ -311,7 +353,7 @@ public class ServerAccess {
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(final InputStream is, final String encoding) throws IOException {
+    public static String getContentOfStream(final InputStream is, final Charset encoding) throws IOException {
         return BasicFileUtils.getContentOfStream(is, encoding);
     }
 
@@ -469,7 +511,7 @@ public class ServerAccess {
     }
 
     /**
-     * Proceed message s to logging withhout request to reprint
+     * Proceed message s to logging without request to reprint
      *
      * @param s
      */
@@ -523,7 +565,7 @@ public class ServerAccess {
             if (stack[i].getClassName().contains("$")) {
                 continue;
             }
-            //probablky it is necessary to get out of net.sourceforge.jnlp.
+            //probably it is necessary to get out of net.sourceforge.jnlp.
             //package where are right now all test-extensions
             //for now keeping exactly the three classes helping you  access the log
             try {

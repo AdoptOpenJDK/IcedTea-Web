@@ -37,12 +37,12 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.awt;
 
 import net.adoptopenjdk.icedteaweb.testing.closinglisteners.Rule;
-import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFolowingClosingListener;
+import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosingListener;
 
 import java.awt.AWTException;
 import java.awt.Robot;
 
-public abstract class AWTHelper extends RulesFolowingClosingListener implements Runnable {
+public abstract class AWTHelper extends RulesFollowingClosingListener implements Runnable{
 
     //attributes possibly set by user
     private String initStr = null;
@@ -87,7 +87,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
     }
 
     /**
-     * override of method charReaded (from RulesFolowingClosingListener)
+     * override of method charRead (from RulesFollowingClosingListener)
      * 
      * waiting for the applet, when applet is ready run action thread
      * (if initStr==null, do not check and do not call run)
@@ -97,7 +97,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * @param ch 
      */
     @Override
-    public void charReaded(final char ch) {
+    public void charRead(final char ch) {
         sb.append(ch);
         //is applet ready to start clicking?
         //check and run applet only if initStr is not null
@@ -111,7 +111,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
             }
         }
         //is all the wanted output in stdout?
-        super.charReaded(ch);
+        super.charRead(ch);
     }
     
 
@@ -151,7 +151,7 @@ public abstract class AWTHelper extends RulesFolowingClosingListener implements 
      * 2. captures screen, 
      * 3. finds the rectangle where applet is and saves it to the attribute
      *    actionArea 
-     * 4. sets screenCapture indicator to true (after tryKTimes unsuccessfull
+     * 4. sets screenCapture indicator to true (after tryKTimes unsuccessful
      *    tries an exception "ComponentNotFound" will be raised)
      * 
      * @throws AWTFrameworkException
