@@ -60,14 +60,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_DIR;
 
@@ -75,7 +75,7 @@ public abstract class TextsProvider {
 
     private static File authorFileFromUserInput = null;
 
-    private final String encoding;
+    private final Charset encoding;
     private final Formatter formatter;
     private final boolean forceTitles;
     protected final boolean expandVariables;
@@ -84,7 +84,7 @@ public abstract class TextsProvider {
 
     private boolean seeAlso = true;
 
-    public TextsProvider(String encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
+    public TextsProvider(Charset encoding, Formatter formatter, boolean forceTitles, boolean expandFiles) {
         this.encoding = encoding;
         this.formatter = formatter;
         this.forceTitles = forceTitles;
@@ -201,7 +201,7 @@ public abstract class TextsProvider {
         return formatter;
     }
 
-    private String getEncoding() {
+    private Charset getEncoding() {
         return encoding;
     }
 
@@ -415,7 +415,7 @@ public abstract class TextsProvider {
                     generateItwIntro(new File(argsList.get(1)), expand);
                     break;
                 case "man":
-                    generateManText(argsList.get(1), new File(argsList.get(2)), expand);
+                    generateManText(Charset.forName(argsList.get(1)), new File(argsList.get(2)), expand);
                     break;
                 case "plain":
                     generatePlainTextDocs(new File(argsList.get(1)), Integer.valueOf(argsList.get(2)), expand);
@@ -483,11 +483,11 @@ public abstract class TextsProvider {
 
     }
 
-    private static void generateManText(String encoding, File dir, boolean expand) throws IOException {
+    private static void generateManText(Charset encoding, File dir, boolean expand) throws IOException {
         generateManText(encoding, dir, true, expand);
     }
 
-    private static void generateManText(String encoding, File dir, boolean titles, boolean expand) throws IOException {
+    private static void generateManText(Charset encoding, File dir, boolean titles, boolean expand) throws IOException {
         JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new ManFormatter(), titles, expand);
         ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new ManFormatter(), titles, expand);
         PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new ManFormatter(), titles, expand);
@@ -505,7 +505,7 @@ public abstract class TextsProvider {
         generatePlainTextDocs(UTF_8, dir, lineWidth, expand);
     }
 
-    private static void generatePlainTextDocs(String encoding, File dir, int lineWidth, boolean expand) throws IOException {
+    private static void generatePlainTextDocs(Charset encoding, File dir, int lineWidth, boolean expand) throws IOException {
         JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
         ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
         PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
@@ -574,7 +574,7 @@ public abstract class TextsProvider {
     }
 
     private String readAuthorsImpl(File authors) throws IOException {
-        return readAuthorsImpl(new InputStreamReader(new FileInputStream(authors), StandardCharsets.UTF_8));
+        return readAuthorsImpl(new InputStreamReader(new FileInputStream(authors), UTF_8));
 
     }
 

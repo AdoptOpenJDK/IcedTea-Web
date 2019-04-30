@@ -64,7 +64,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UrlUtils {
 
@@ -113,7 +113,7 @@ public class UrlUtils {
     /* Decode a percent-encoded URL. Catch checked exceptions and log. */
     public static URL decodeUrlQuietly(final URL url) {
         try {
-            return new URL(URLDecoder.decode(url.toString(), UTF_8));
+            return new URL(URLDecoder.decode(url.toString(), UTF_8.name()));
         } catch (IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return url;
@@ -147,7 +147,7 @@ public class UrlUtils {
         }
 
         //Decode the URL before encoding
-        final URL decodedURL = new URL(URLDecoder.decode(url.toString(), UTF_8));
+        final URL decodedURL = new URL(URLDecoder.decode(url.toString(), UTF_8.name()));
 
         //Create URI with the decoded URL
         final URI uri = new URI(decodedURL.getProtocol(), null, decodedURL.getHost(), decodedURL.getPort(), decodedURL.getPath(), decodedURL.getQuery(), null);

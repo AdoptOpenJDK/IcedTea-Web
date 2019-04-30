@@ -49,9 +49,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  *
@@ -225,7 +224,7 @@ public class InformationElementTest {
     }
 
     @Test
-    public void createFromJNLP() throws UnsupportedEncodingException, ParseException {
+    public void createFromJNLP() throws ParseException {
         ParserSettings parser = new ParserSettings();
         JNLPFile jnlpFile0 = null;
         InformationElement ie0 = InformationElement.createFromJNLP(jnlpFile0);

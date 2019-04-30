@@ -32,7 +32,7 @@ import java.util.jar.Manifest;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +54,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @BeforeClass
     //keeping silent outputs from launched jvm
-    public static void redirectErr() throws IOException {
+    public static void redirectErr() {
         for (int i = 0; i < backedUpStream.length; i++) {
             if (backedUpStream[i] == null) {
                 switch (i) {
@@ -85,7 +85,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
-        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8));
+        ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
         System.setOut(backedUpStream[0]);
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);

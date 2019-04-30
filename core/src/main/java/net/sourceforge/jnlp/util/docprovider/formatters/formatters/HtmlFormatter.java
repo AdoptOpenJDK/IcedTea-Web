@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -88,11 +89,11 @@ public class HtmlFormatter extends ReplacingTextFormatter {
     }
 
     @Override
-    public String getHeaders(final String id, final String encoding) {
+    public String getHeaders(final String id, final Charset encoding) {
         //jeditorpane doesn't like <? declaration
         String xml = "";
         if (includeXmlHeader) {
-            xml = "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n";
+            xml = "<?xml version=\"1.0\" encoding=\"" + encoding.name() + "\"?>\n";
         }
         return xml + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n"
                 + "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n"

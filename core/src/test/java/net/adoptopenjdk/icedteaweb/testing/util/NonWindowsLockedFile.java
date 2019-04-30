@@ -22,7 +22,7 @@ public class NonWindowsLockedFile extends WindowsLockedFileTest {
     @BeforeClass
     public static void smuggleOs() {
         os = System.getProperty(OS_NAME);
-        System.setProperty(OS_NAME, "No Windows for itw");
+        System.setProperty(OS_NAME, "No Microsoft OS for itw");
     }
 
     @AfterClass

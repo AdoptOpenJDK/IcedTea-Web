@@ -51,7 +51,7 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
  */
 public class JNLPPolicy extends Policy {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
 
     /** classes from this source have all permissions */
     private static CodeSource shellSource;
@@ -192,8 +192,8 @@ public class JNLPPolicy extends Policy {
     }
     
     /**
-     * Constructs a delegate policy based on a config setting
-     * @param key a KEY_* in DeploymentConfiguration
+     * Loads a policy from a URI
+     * @param policyLocation the URI of the policy
      * @return a policy based on the configuration set by the user
      */
     private Policy getPolicyFromUrl(String policyLocation) {

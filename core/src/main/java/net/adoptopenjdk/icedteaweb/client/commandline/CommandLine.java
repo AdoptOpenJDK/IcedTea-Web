@@ -41,7 +41,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

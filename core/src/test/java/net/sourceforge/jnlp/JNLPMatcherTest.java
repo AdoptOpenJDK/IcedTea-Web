@@ -45,10 +45,9 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
-import static net.adoptopenjdk.icedteaweb.EncodingConstants.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class JNLPMatcherTest {
 
@@ -337,7 +336,7 @@ public class JNLPMatcherTest {
     }
 
     @Test (timeout=5000 /*ms*/)
-    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException, UnsupportedEncodingException {
+    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException {
         /* construct an alphabet containing characters 'a' to 'z' */
         final int ALPHABET_SIZE = 26;
         char[] alphabet = new char[ALPHABET_SIZE];

@@ -59,6 +59,7 @@ import java.security.ProtectionDomain;
 import java.util.PropertyPermission;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_NAME;
+import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
 
 /**
  * Represents a Proxy Auto Config file. This object can be used to evaluate the
@@ -136,7 +137,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
         Permissions p = new Permissions();
         p.add(new RuntimePermission("accessClassInPackage.org.mozilla.javascript"));
         p.add(new SocketPermission("*", "resolve"));
-        p.add(new PropertyPermission(VM_NAME, "read"));
+        p.add(new PropertyPermission(VM_NAME, PROPERTY_READ_ACTION));
 
         ProtectionDomain pd = new ProtectionDomain(null, p);
         AccessControlContext context = new AccessControlContext(new ProtectionDomain[] { pd });
