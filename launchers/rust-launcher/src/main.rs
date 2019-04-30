@@ -108,28 +108,18 @@ fn main() {
 }
 
 fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Vec<String>, os: &os_access::Os) -> Vec<String> {
-    let hard_bootcp = hardcoded_paths::get_bootcp();
     let bootcp = jars_helper::get_bootclasspath(&java_dir, os);
     let cp = jars_helper::get_classpath(&java_dir, os);
     let current_name = dirs_paths_helper::current_program_name();
     let current_bin = dirs_paths_helper::current_program();
     let mut info2 = String::new();
-    write!(&mut info2, "itw-rust-debug: exemplar boot classpath: {}", hard_bootcp).expect("unwrap failed");
-    os.log(&info2);
-    info2 = String::new();
     write!(&mut info2, "itw-rust-debug: used boot classpath: {}", bootcp).expect("unwrap failed");
     os.log(&info2);
     info2 = String::new();
     write!(&mut info2, "itw-rust-debug: used classpath: {}", cp).expect("unwrap failed");
     os.log(&info2);
     info2 = String::new();
-    write!(&mut info2, "itw-rust-debug: expected name: {}", hardcoded_paths::get_name()).expect("unwrap failed");
-    os.log(&info2);
-    info2 = String::new();
     write!(&mut info2, "itw-rust-debug: current name: {}", current_name).expect("unwrap failed");
-    os.log(&info2);
-    info2 = String::new();
-    write!(&mut info2, "itw-rust-debug: installed bin: {}", hardcoded_paths::get_bin()).expect("unwrap failed");
     os.log(&info2);
     info2 = String::new();
     write!(&mut info2, "itw-rust-debug: current bin: {}", &dirs_paths_helper::path_to_string(&current_bin)).expect("unwrap failed");
@@ -155,14 +145,6 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     }
     if is_modular_jdk(os, &java_dir) {
         all_args.push(resolve_argsfile(os));
-        let js_object_candidate = get_jsobject_patchmodule(os);
-        match js_object_candidate {
-            Some(js_object_path) => {
-                all_args.push(js_object_path.0);
-                all_args.push(js_object_path.1);
-            }
-            _none => {}
-        }
     }
     all_args.push(bootcp);
     all_args.push(String::from("-classpath"));
@@ -227,25 +209,6 @@ fn resolve_argsfile(os: &os_access::Os) -> String {
     owned_string.insert_str(0, splash_switch);
     let r = String::from(owned_string);
     r
-}
-
-
-fn get_jsobject_patchmodule(os: &os_access::Os) -> Option<(String, String)> {
-    let js_object_candidate = jars_helper::resolve_jsobject(os);
-    match js_object_candidate {
-        Some(js_object_path) => {
-            let args_location = dirs_paths_helper::path_to_string(&js_object_path);
-            let mut owned_string: String = args_location.to_owned();
-            let splash_switch: &str = "jdk.jsobject=";
-            owned_string.insert_str(0, splash_switch);
-            let r = String::from(owned_string);
-            let tuple = ("--patch-module".to_string(), r);
-            return Some(tuple)
-        }
-        None => {
-            return None
-        }
-    }
 }
 
 fn get_splash(os: &os_access::Os) -> Option<String> {

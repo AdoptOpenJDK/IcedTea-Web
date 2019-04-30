@@ -68,6 +68,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * this class intentionally NOT cache any content, but always load data. Its
  * original use case was to to implement http proxy logging. And there reloads
@@ -240,12 +247,12 @@ public class HtmlBrowserPanel extends JPanel {
     private final JCheckBox socketCheckbox = new JCheckBox(Translator.R("BrowserSocket"));
     private final JComboBox<Charset> encodingBox = new JComboBox<>(new Charset[]{
         null,
-        Charset.forName("US-ASCII"),
-        Charset.forName("UTF-8"),
-        Charset.forName("ISO-8859-1"),
-        Charset.forName("UTF-16"),
-        Charset.forName("UTF-16BE"),
-        Charset.forName("UTF-16LE")
+        US_ASCII,
+        UTF_8,
+        ISO_8859_1,
+        UTF_16,
+        UTF_16BE,
+        UTF_16LE
     
 });
 

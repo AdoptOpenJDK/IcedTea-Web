@@ -36,6 +36,23 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -47,23 +64,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditorWindow;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -193,7 +195,7 @@ public class PolicyPanel extends NamedBorderPanel {
             @Override
             public void run() {
                 final ProcessBuilder pb = new ProcessBuilder("policytool", "-file", filePath)
-                        .directory(new File(System.getProperty("user.home")));
+                        .directory(new File(System.getProperty(USER_HOME)));
                 try {
                     pb.start();
                 } catch (IOException ioe) {

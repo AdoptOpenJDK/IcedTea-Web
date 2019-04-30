@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_LANGUAGE;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
 
 public class SupportedLanguagesTest {
@@ -96,7 +97,7 @@ public class SupportedLanguagesTest {
     @Test
     @Ignore
     public void testDefaultLocalization() throws Exception {
-        final String sysPropLang = System.getProperty("user.language");
+        final String sysPropLang = System.getProperty(USER_LANGUAGE);
         final Locale sysPropLocale = new Locale(sysPropLang);
 
         final Locale defaultLocale = Locale.getDefault();

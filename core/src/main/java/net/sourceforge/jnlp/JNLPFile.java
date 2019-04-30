@@ -16,18 +16,6 @@
 
 package net.sourceforge.jnlp;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.jar.Attributes;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -55,6 +43,21 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.jar.Attributes;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -165,8 +168,8 @@ public class JNLPFile {
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
-            defaultOS = System.getProperty("os.name");
-            defaultArch = System.getProperty("os.arch");
+            defaultOS = System.getProperty(OS_NAME);
+            defaultArch = System.getProperty(OS_ARCH);
         } catch (SecurityException ex) {
             // null values will still work, and app can set defaults later
         }

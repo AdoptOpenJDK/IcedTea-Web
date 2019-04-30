@@ -8,32 +8,16 @@ use dirs_paths_helper;
 use std::fmt::Write;
 
 //order important!
+// TODO verify with EMBEDDED
 const LOCAL_PATHS: &'static [&'static str] = &[
-    "share/icedtea-web",
-    "linux-deps-runtime",
-    "win-deps-runtime",
-    "win-deps-all",
-    "../share/icedtea-web",
-    "../linux-deps-runtime",
-    "../win-deps-runtime",
-    "../win-deps-all",
+    "libs",
+    "../libs",
     ".",
     "bin",
     "../bin"];
 
 pub fn resolve_argsfile(logger: &os_access::Os) -> std::path::PathBuf {
     resolve_jar(hardcoded_paths::get_argsfile(), logger)
-}
-
-pub fn resolve_jsobject(logger: &os_access::Os) -> Option<std::path::PathBuf> {
-    match hardcoded_paths::get_jsobject() {
-        Some(js) => {
-            Some(resolve_jar(js, logger))
-        }
-        None => {
-            None
-        }
-    }
 }
 
 
@@ -86,7 +70,7 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
         }
     }
     //first local dir - if allowed
-    if current_libsearch == ItwLibSearch::BUNDLED || current_libsearch == ItwLibSearch::BOTH {
+    if current_libsearch == ItwLibSearch::BUNDLED {
         let pgmdir = dirs_paths_helper::current_program_parent();
         let pgmparent: std::path::PathBuf = match pgmdir.parent() {
             Some(s) => {
@@ -106,7 +90,7 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
         }
     }
     //then installed dirs, if allowd
-    if current_libsearch == ItwLibSearch::DISTRIBUTION || current_libsearch == ItwLibSearch::BOTH {
+    if current_libsearch == ItwLibSearch::DISTRIBUTION || current_libsearch == ItwLibSearch::EMBEDDED {
         let candidate = std::path::PathBuf::from(full_hardcoded_path);
         if dirs_paths_helper::is_file(&candidate) {
             logger.log(&dirs_paths_helper::path_to_string(&candidate));
@@ -165,9 +149,12 @@ fn filter_in_key(key: &str, os: &os_access::Os, vec: &mut Vec<std::path::PathBuf
 //TODO what to do with rt.jar, nashorn and javafx.jar with jdk11 and up?
 fn get_bootcp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
-    cp_parts.push(resolve_jar(hardcoded_paths::get_netx(), os));
-    append_if_exists(hardcoded_paths::get_plugin(), os, &mut cp_parts);
-    append_if_exists(hardcoded_paths::get_jsobject(), os, &mut cp_parts);
+    cp_parts.push(resolve_jar(hardcoded_paths::get_core(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_common(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_jnlpapi(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_xmlparser(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_slfapi(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_slfsimple(), os));
     append_if_exists(hardcoded_paths::get_rhino(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_tagsoup(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_mslinks(), os, &mut cp_parts);
@@ -224,7 +211,6 @@ pub fn get_bootclasspath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> S
 #[cfg(test)]
 mod tests {
     use utils::tests_utils as tu;
-    use std::path::PathBuf;
 
     #[test]
     fn compose_class_path_test_empty() {

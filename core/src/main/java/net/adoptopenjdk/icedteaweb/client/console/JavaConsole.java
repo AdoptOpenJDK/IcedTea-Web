@@ -75,7 +75,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +83,7 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -562,8 +562,7 @@ public class JavaConsole implements ObservableMessagesProvider {
             public void run() {
                 BufferedReader br = null;
                 try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                            Charset.forName("UTF-8")));
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
                     //never ending loop
                     while (true) {
                         try {

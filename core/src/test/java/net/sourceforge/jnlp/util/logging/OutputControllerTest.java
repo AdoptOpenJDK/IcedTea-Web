@@ -47,9 +47,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class OutputControllerTest {
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     private static final String line1 = "I'm logged line one";
     private static final String line2 = "I'm logged line two";
@@ -97,50 +100,50 @@ public class OutputControllerTest {
         oc.log(OutputControllerLevel.MESSAGE_DEBUG, line1);
         oc.log(OutputControllerLevel.ERROR_DEBUG, line1);
         oc.flush();
-        Assert.assertFalse(r1.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r1.evaluate(os2.toString("utf-8")));
+        Assert.assertFalse(r1.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r1.evaluate(os2.toString(UTF_8)));
         oc.log(OutputControllerLevel.MESSAGE_ALL, line1);
         oc.log(OutputControllerLevel.ERROR_DEBUG, line1);
         oc.flush();
-        Assert.assertTrue(r1.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r1.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r1.evaluate(os2.toString(UTF_8)));
         oc.log(OutputControllerLevel.ERROR_ALL, line1);
         oc.flush();
-        Assert.assertTrue(r1.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(os2.toString(UTF_8)));
 
         LogConfig.getLogConfig().setEnableLogging(true);
         oc.log(OutputControllerLevel.MESSAGE_DEBUG, line2);
         oc.flush();
-        Assert.assertTrue(r2.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r2.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r2.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r2.evaluate(os2.toString(UTF_8)));
         oc.log(OutputControllerLevel.ERROR_DEBUG, line2);
         oc.flush();
-        Assert.assertTrue(r2.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r2.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(os2.toString(UTF_8)));
 
         oc.log(OutputControllerLevel.ERROR_DEBUG, line3);
         oc.flush();
-        Assert.assertFalse(r3.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r3.evaluate(os2.toString("utf-8")));
+        Assert.assertFalse(r3.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r3.evaluate(os2.toString(UTF_8)));
         oc.log(OutputControllerLevel.MESSAGE_DEBUG, line3);
         oc.flush();
-        Assert.assertTrue(r3.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r3.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r3.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r3.evaluate(os2.toString(UTF_8)));
 
         LogConfig.getLogConfig().setEnableLogging(false);
         oc.log(OutputControllerLevel.WARNING_DEBUG, line4);
         oc.flush();
-        Assert.assertFalse(r4.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r4.evaluate(os2.toString("utf-8")));
+        Assert.assertFalse(r4.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r4.evaluate(os2.toString(UTF_8)));
         oc.log(OutputControllerLevel.WARNING_ALL, line5);
         oc.flush();
-        Assert.assertTrue(r5.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r5.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r5.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r5.evaluate(os2.toString(UTF_8)));
         LogConfig.getLogConfig().setEnableLogging(true);
         oc.log(OutputControllerLevel.WARNING_DEBUG, line4);
         oc.flush();
-        Assert.assertTrue(r4.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r4.evaluate(os2.toString("utf-8")));
+        Assert.assertTrue(r4.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r4.evaluate(os2.toString(UTF_8)));
 
     }
     private static final Random random = new Random();
@@ -228,8 +231,8 @@ public class OutputControllerTest {
                         }
                     }
                     oc.flush();
-                    String s1 = os1.toString("utf-8");
-                    String s2 = os2.toString("utf-8");
+                    String s1 = os1.toString(UTF_8);
+                    String s2 = os2.toString(UTF_8);
                     String s3 = StreamUtils.readStreamAsString(new FileInputStream(f), true);
                     for (int i = minits; i < maxi; i++) {
                         for (int t = 0; t < maxt; t++) {
@@ -280,31 +283,31 @@ public class OutputControllerTest {
         oc.log(OutputControllerLevel.ERROR_ALL, line3);
         oc.flush();
 
-        Assert.assertTrue(r1.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r1.evaluate(os2.toString("utf-8")));
-        Assert.assertFalse(r1.evaluate(os3.toString("utf-8")));
-        Assert.assertFalse(r1.evaluate(os4.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r1.evaluate(os2.toString(UTF_8)));
+        Assert.assertFalse(r1.evaluate(os3.toString(UTF_8)));
+        Assert.assertFalse(r1.evaluate(os4.toString(UTF_8)));
 
 
-        Assert.assertFalse(r2.evaluate(os1.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(os2.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(os3.toString("utf-8")));
-        Assert.assertFalse(r2.evaluate(os4.toString("utf-8")));
+        Assert.assertFalse(r2.evaluate(os1.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(os2.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(os3.toString(UTF_8)));
+        Assert.assertFalse(r2.evaluate(os4.toString(UTF_8)));
 
-        Assert.assertFalse(r3.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r3.evaluate(os2.toString("utf-8")));
-        Assert.assertTrue(r3.evaluate(os3.toString("utf-8")));
-        Assert.assertTrue(r3.evaluate(os4.toString("utf-8")));
+        Assert.assertFalse(r3.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r3.evaluate(os2.toString(UTF_8)));
+        Assert.assertTrue(r3.evaluate(os3.toString(UTF_8)));
+        Assert.assertTrue(r3.evaluate(os4.toString(UTF_8)));
 
         LogConfig.getLogConfig().setLogToStreams(false);
 
         oc.log(OutputControllerLevel.MESSAGE_ALL, line4);
         oc.log(OutputControllerLevel.ERROR_ALL, line4);
 
-        Assert.assertFalse(r4.evaluate(os1.toString("utf-8")));
-        Assert.assertFalse(r4.evaluate(os2.toString("utf-8")));
-        Assert.assertFalse(r4.evaluate(os3.toString("utf-8")));
-        Assert.assertFalse(r4.evaluate(os4.toString("utf-8")));
+        Assert.assertFalse(r4.evaluate(os1.toString(UTF_8)));
+        Assert.assertFalse(r4.evaluate(os2.toString(UTF_8)));
+        Assert.assertFalse(r4.evaluate(os3.toString(UTF_8)));
+        Assert.assertFalse(r4.evaluate(os4.toString(UTF_8)));
 
     }
 
@@ -376,6 +379,6 @@ public class OutputControllerTest {
      * add syslog once implemented
      */
     @Test
-    public void isSysLoggerWorking() throws Exception {
+    public void isSysLoggerWorking() {
     }
 }

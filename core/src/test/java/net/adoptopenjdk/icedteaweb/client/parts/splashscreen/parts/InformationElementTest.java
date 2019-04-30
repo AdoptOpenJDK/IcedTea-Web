@@ -39,8 +39,6 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -49,6 +47,10 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  *
@@ -222,7 +224,7 @@ public class InformationElementTest {
     }
 
     @Test
-    public void createFromJNLP() throws UnsupportedEncodingException, ParseException {
+    public void createFromJNLP() throws ParseException {
         ParserSettings parser = new ParserSettings();
         JNLPFile jnlpFile0 = null;
         InformationElement ie0 = InformationElement.createFromJNLP(jnlpFile0);
@@ -231,7 +233,7 @@ public class InformationElementTest {
         Exception ex = null;
         JNLPFile jnlpFile1 = null;
         try {
-            jnlpFile1 = new JNLPFile(new ByteArrayInputStream(exJnlp1.getBytes("utf-8")), parser);
+            jnlpFile1 = new JNLPFile(new ByteArrayInputStream(exJnlp1.getBytes(UTF_8)), parser);
         } catch (Exception eex) {
             ex = eex;
         }
@@ -241,28 +243,28 @@ public class InformationElementTest {
 
         //title, vendor and homepage are obligatory.. not so much to test
         String exJnlp2 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes("utf-8")), parser);
+        JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes(UTF_8)), parser);
         InformationElement ie2 = InformationElement.createFromJNLP(jnlpFile2);
         Assert.assertNotNull(ie2);
         Assert.assertEquals(3, ie2.getHeader().size());
         Assert.assertEquals(0, ie2.getDescriptions().size());
 
         String exJnlp3 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes("utf-8")), parser);
+        JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes(UTF_8)), parser);
         InformationElement ie3 = InformationElement.createFromJNLP(jnlpFile3);
         Assert.assertNotNull(ie3);
         Assert.assertEquals(3, ie3.getHeader().size());
         Assert.assertEquals(1, ie3.getDescriptions().size());
 
         String exJnlp4 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes("utf-8")), parser);
+        JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes(UTF_8)), parser);
         InformationElement ie4 = InformationElement.createFromJNLP(jnlpFile4);
         Assert.assertNotNull(ie4);
         Assert.assertEquals(3, ie4.getHeader().size());
         Assert.assertEquals(1, ie4.getDescriptions().size());
 
         String exJnlp5 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes("utf-8")), parser);
+        JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes(UTF_8)), parser);
         InformationElement ie5 = InformationElement.createFromJNLP(jnlpFile5);
         Assert.assertNotNull(ie5);
         Assert.assertEquals(3, ie5.getHeader().size());

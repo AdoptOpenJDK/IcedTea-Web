@@ -16,6 +16,43 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
+import net.adoptopenjdk.icedteaweb.client.GuiLaunchHandler;
+import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.DefaultLaunchHandler;
+import net.sourceforge.jnlp.LaunchHandler;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.services.XServiceManagerStub;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.logging.LogConfig;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.net.www.protocol.jar.URLJarFile;
+
+import javax.jnlp.ServiceManager;
+import javax.naming.ConfigurationException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.text.html.parser.ParserDelegator;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -39,44 +76,11 @@ import java.security.Security;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.jnlp.ServiceManager;
-import javax.naming.ConfigurationException;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.text.html.parser.ParserDelegator;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
-import net.adoptopenjdk.icedteaweb.client.GuiLaunchHandler;
-import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.DefaultLaunchHandler;
-import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.security.JNLPAuthenticator;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.services.XServiceManagerStub;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.LogConfig;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.net.www.protocol.jar.URLJarFile;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.SYSTEM_PROPERTY_JAVA_VERSION;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -247,7 +251,7 @@ public class JNLPRuntime {
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
         System.setProperty("javawebstart.version", "javaws-" +
-                System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION));
+                System.getProperty(JAVA_VERSION));
 
         if (!isHeadless() && indicator == null)
             indicator = new DefaultDownloadIndicator();
@@ -323,7 +327,7 @@ public class JNLPRuntime {
             Class<?> trustManagerClass;
             Constructor<?> tmCtor;
 
-            if (System.getProperty(SYSTEM_PROPERTY_JAVA_VERSION).startsWith("1.6")) { // Java 6
+            if (System.getProperty(JAVA_VERSION).startsWith("1.6")) { // Java 6
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
@@ -738,7 +742,7 @@ public class JNLPRuntime {
         //if (GraphicsEnvironment.isHeadless()) // jdk1.4+ only
         //    headless = true;
         try {
-            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))) {
+            if ("true".equalsIgnoreCase(System.getProperty(AWT_HEADLESS))) {
                 headless = true;
             }
             if (!headless) {
@@ -767,7 +771,7 @@ public class JNLPRuntime {
      * @return {@code true} if running on Windows
      */
     public static boolean isWindows() {
-        String os = System.getProperty("os.name");
+        String os = System.getProperty(OS_NAME);
         return (os != null && os.startsWith("Windows"));
     }
 
@@ -777,7 +781,7 @@ public class JNLPRuntime {
      */
     @Deprecated
     public static boolean isUnix() {
-        String sep = System.getProperty("file.separator");
+        String sep = System.getProperty(FILE_SEPARATOR);
         return (sep != null && sep.equals("/"));
     }
 

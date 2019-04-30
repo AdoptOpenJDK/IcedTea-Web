@@ -37,6 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,9 +49,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 /**
  * Finds the file corresponding to firefox's (default) preferences file
@@ -66,7 +69,7 @@ public class FirefoxPreferencesFinder {
      */
     public static File find() throws IOException {
 
-        String configPath = System.getProperty("user.home") + File.separator + ".mozilla"
+        String configPath = System.getProperty(USER_HOME) + File.separator + ".mozilla"
                 + File.separator + "firefox" + File.separator;
 
         if (JNLPRuntime.isWindows()) {

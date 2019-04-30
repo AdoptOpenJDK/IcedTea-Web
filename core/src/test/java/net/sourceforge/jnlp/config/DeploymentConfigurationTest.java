@@ -53,6 +53,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertTrue;
 
 public class DeploymentConfigurationTest extends NoStdOutErrTest {
@@ -163,7 +164,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlFileOk() throws ConfigurationException, IOException {
-        File f = File.createTempFile("itw", "checkUrlTest");
+        File f = File.createTempFile("itw", "checkUrlTest_ok");
         f.deleteOnExit();
         boolean is = DeploymentConfiguration.checkUrl(f.toURI().toURL());
         Assert.assertTrue("File was supposed to exists", is);
@@ -182,7 +183,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlFileOkNotOk() throws ConfigurationException, IOException {
-        File f = File.createTempFile("itw", "checkUrlTest");
+        File f = File.createTempFile("itw", "checkUrlTest_not_ok");
         f.deleteOnExit();
         boolean is = DeploymentConfiguration.checkUrl(f.toURI().toURL());
         Assert.assertTrue("File was supposed to exists", is);
@@ -204,8 +205,8 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteNotOk404_1() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
-        File f = File.createTempFile("itw", "checkUrlTest");
+        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        File f = File.createTempFile("itw", "checkUrlTest_404");
         f.delete();
         f.mkdir();
         f.deleteOnExit();
@@ -228,9 +229,9 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteOk() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty("java.io.tmpdir"), ServerAccess.findFreePort());
+        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
         try {
-            File f = File.createTempFile("itw", "checkUrlTest");
+            File f = File.createTempFile("itw", "checkUrlTest_remote");
             f.deleteOnExit();
             URL u = new URL("http://localhost:" + server.getPort() + "/" + f.getName());
             boolean is = DeploymentConfiguration.checkUrl(u);
@@ -238,7 +239,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
             f.delete();
             //404_3
             boolean is2 = DeploymentConfiguration.checkUrl(u);
-            Assert.assertFalse("File was NOT  supposed to exists", is2);
+            Assert.assertFalse("File was NOT supposed to exists", is2);
             f.createNewFile();
             f.deleteOnExit();
             boolean is3 = DeploymentConfiguration.checkUrl(u);

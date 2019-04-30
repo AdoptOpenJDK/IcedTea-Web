@@ -45,8 +45,9 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class JNLPMatcherTestMalformedAllowedTest {
 
@@ -312,7 +313,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test (timeout=5000 /*ms*/)
-    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException, UnsupportedEncodingException {
+    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException {
         /* construct an alphabet containing characters 'a' to 'z' */
         final int ALPHABET_SIZE = 26;
         char[] alphabet = new char[ALPHABET_SIZE];
@@ -337,8 +338,8 @@ public class JNLPMatcherTestMalformedAllowedTest {
                 "  </information>\n" +
                 "</jnlp>\n";
 
-        InputStream reader1 = new ByteArrayInputStream(file.getBytes("utf-8"));
-        InputStream reader2 = new ByteArrayInputStream(file.getBytes("utf-8"));
+        InputStream reader1 = new ByteArrayInputStream(file.getBytes(UTF_8));
+        InputStream reader2 = new ByteArrayInputStream(file.getBytes(UTF_8));
         JNLPMatcher matcher = new JNLPMatcher(reader1, reader2, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
         Assert.assertTrue(matcher.isMatch());
     }

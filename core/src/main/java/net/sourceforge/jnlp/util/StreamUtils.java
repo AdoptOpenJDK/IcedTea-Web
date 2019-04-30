@@ -47,14 +47,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Objects;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class StreamUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
 
     public static final int DEFAULT_BYTE_SIZE = 1024;
-    public static final String UTF_8 = "UTF-8";
 
     /**
      * Closes a stream, without throwing IOException.
@@ -96,7 +98,7 @@ public class StreamUtils {
         return readStreamAsString(stream, false);
     }
     
-    public static String readStreamAsString(final InputStream stream, final String encoding)  throws IOException {
+    public static String readStreamAsString(final InputStream stream, final Charset encoding)  throws IOException {
         return readStreamAsString(stream, false, encoding);
     }
     
@@ -104,7 +106,7 @@ public class StreamUtils {
         return readStreamAsString(stream, includeEndOfLines, UTF_8);
     }
             
-    public static String readStreamAsString(final InputStream stream, final boolean includeEndOfLines, final String encoding) throws IOException {
+    public static String readStreamAsString(final InputStream stream, final boolean includeEndOfLines, final Charset encoding) throws IOException {
         final InputStreamReader is = new InputStreamReader(stream, encoding);
         final StringBuilder sb = new StringBuilder();
         final BufferedReader br = new BufferedReader(is);

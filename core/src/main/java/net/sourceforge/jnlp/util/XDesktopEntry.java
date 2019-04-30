@@ -16,6 +16,23 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Launcher;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.BufferedReader;
@@ -32,7 +49,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -42,22 +58,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.imageio.ImageIO;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Launcher;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -90,8 +95,6 @@ import org.slf4j.LoggerFactory;
 public class XDesktopEntry implements GenericDesktopEntry {
 
     private final static Logger LOG = LoggerFactory.getLogger(XDesktopEntry.class);
-
-    public static final String JAVA_ICON_NAME = "javaws";
 
     private JNLPFile file = null;
     private int iconSize = -1;
@@ -161,7 +164,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (iconLocation != null) {
             fileContents += "Icon=" + iconLocation + "\n";
         } else {
-            fileContents += "Icon=" + JAVA_ICON_NAME + "\n";
+            fileContents += "Icon=" + JAVAWS + "\n";
 
         }
         if (file.getInformation().getVendor() != null) {
@@ -223,12 +226,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
         if (exec != null) {
             return exec;
         }
-        String pathResult = findOnPath(new String[]{"javaws", System.getProperty("icedtea-web.bin.name")});
+        String pathResult = findOnPath(new String[]{JAVAWS, System.getProperty(ITW_BIN_NAME)});
         if (pathResult != null) {
             return pathResult;
         }
         
-        return "javaws";
+        return JAVAWS;
     }
     
     
@@ -348,8 +351,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f),
-                    Charset.forName("UTF-8")); Reader reader = getContentsAsReader(true, info, isSigned)) {
+            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f), UTF_8);
+                 Reader reader = getContentsAsReader(true, info, isSigned)) {
 
                 char[] buffer = new char[1024];
                 int ret = 0;
@@ -379,11 +382,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             FileUtils.createRestrictedFile(shortcutFile, true);
 
-            try ( /*
-             * Write out a Java String (UTF-16) as a UTF-8 file
-             */ OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile),
-                     Charset.forName("UTF-8")); Reader reader = getContentsAsReader(false, info, isSigned)) {
-                
+            try ( /* Write out a Java String (UTF-16) as a UTF-8 file */
+                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile), UTF_8);
+                    Reader reader = getContentsAsReader(false, info, isSigned)) {
+
                 char[] buffer = new char[1024];
                 int ret = 0;
                 while (-1 != (ret = reader.read(buffer))) {
@@ -705,7 +707,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return System.getProperty("user.home") + "/Desktop";
+            return System.getProperty(USER_HOME) + "/Desktop";
         }
     }
 
@@ -720,9 +722,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * exists
      */
     private static String findFreedesktopOrgDesktopPath() throws IOException {
-        File userDirs = new File(System.getProperty("user.home") + "/.config/user-dirs.dirs");
+        File userDirs = new File(System.getProperty(USER_HOME) + "/.config/user-dirs.dirs");
         if (!userDirs.exists()) {
-            return System.getProperty("user.home") + "/Desktop/";
+            return System.getProperty(USER_HOME) + "/Desktop/";
         }
         return getFreedesktopOrgDesktopPathFrom(userDirs);
     }
@@ -788,12 +790,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
     
      @Override
-    public void createShortcutOnWindowsDesktop() throws IOException {
+    public void createShortcutOnWindowsDesktop() {
         throw new UnsupportedOperationException("not supported on linux like systems");
     }
 
     @Override
-    public void createWindowsMenu() throws IOException {
+    public void createWindowsMenu() {
         throw new UnsupportedOperationException("not supported on linux like systems");
     }
 }

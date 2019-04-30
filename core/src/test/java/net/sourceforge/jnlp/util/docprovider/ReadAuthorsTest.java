@@ -45,11 +45,13 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringReader;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 
 public class ReadAuthorsTest {
     
-    public static final String NEWLINE = System.getProperty("line.separator");
+    public static final String NEWLINE = System.getProperty(LINE_SEPARATOR);
     public static final String HTMLNEWLINE = "<BR/>";
     public static final String MANNEWLINE = ".br";
     private static final String ANTISPAM_EMAIL="t e s t @ t e s t . t e s t";
@@ -97,7 +99,7 @@ public class ReadAuthorsTest {
 
     @Test
     public void replaceBracketsWithEntitiesHtml() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new HtmlFormatter(), true, true) {
+        TextsProvider tp = new TextsProvider(UTF_8, new HtmlFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test1";
@@ -109,7 +111,7 @@ public class ReadAuthorsTest {
 
     @Test
     public void replaceBracketsWithEntitiesMan() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new ManFormatter(), true, true) {
+        TextsProvider tp = new TextsProvider(UTF_8, new ManFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test2";
@@ -121,7 +123,7 @@ public class ReadAuthorsTest {
 
     @Test
     public void replaceBracketsWithEntitiesPlain() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new PlainTextFormatter(), true, true) {
+        TextsProvider tp = new TextsProvider(UTF_8, new PlainTextFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test3";
@@ -133,7 +135,7 @@ public class ReadAuthorsTest {
 
     @Test
     public void newLineTestHtml() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new HtmlFormatter(), true, true) {
+        TextsProvider tp = new TextsProvider(UTF_8, new HtmlFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test4";
@@ -146,7 +148,7 @@ public class ReadAuthorsTest {
     
     @Test
     public void newLineTestPlainText() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new PlainTextFormatter(), true, true) {
+        TextsProvider tp = new TextsProvider(UTF_8, new PlainTextFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test5";
@@ -157,8 +159,8 @@ public class ReadAuthorsTest {
     }
     
     @Test
-    public void replaceLtGtTest() throws IOException {
-        TextsProvider tp = new TextsProvider("utf-8", new HtmlFormatter(), true, true) {
+    public void replaceLtGtTest() {
+        TextsProvider tp = new TextsProvider(UTF_8, new HtmlFormatter(), true, true) {
             @Override
             public String getId() {
                 return "test6";

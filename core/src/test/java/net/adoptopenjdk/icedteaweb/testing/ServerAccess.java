@@ -51,6 +51,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,6 @@ public class ServerAccess {
     /**
      * property to set the different then default browser
      */
-    public static final String USED_BROWSERS = "used.browsers";
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     public static final String DEFAULT_LOCALHOST_IP = "127.0.0.1";
     public static final String DEFAULT_LOCALHOST_PROTOCOL = "http";
@@ -354,7 +354,7 @@ public class ServerAccess {
      * @return stream as string
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public static String getContentOfStream(InputStream is, String encoding) throws IOException {
+    public static String getContentOfStream(InputStream is, Charset encoding) throws IOException {
         return FileUtils.getContentOfStream(is, encoding);
     }
 

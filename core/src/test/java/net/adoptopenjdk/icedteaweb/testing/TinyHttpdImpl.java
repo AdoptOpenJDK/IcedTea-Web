@@ -54,6 +54,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * based on http://www.mcwalter.org/technology/java/httpd/tiny/index.html Very
  * small implementation of http return headers for our served resources
@@ -252,7 +254,7 @@ public class TinyHttpdImpl extends Thread {
      * @throws UnsupportedEncodingException
      */
     public static String urlToFilePath(String url) throws UnsupportedEncodingException {
-        url = URLDecoder.decode(url, "UTF-8"); // Decode URL encoded characters, eg "%3B" becomes ';'
+        url = URLDecoder.decode(url, UTF_8.name()); // Decode URL encoded characters, eg "%3B" becomes ';'
         if (url.startsWith(XSX)) {
             url = url.replace(XSX, "/");
         }

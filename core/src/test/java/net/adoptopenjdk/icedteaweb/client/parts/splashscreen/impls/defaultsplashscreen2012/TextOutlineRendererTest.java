@@ -49,6 +49,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
+
 public class TextOutlineRendererTest {
 
     final int imageSize = 100;
@@ -139,7 +141,7 @@ public class TextOutlineRendererTest {
             if (name == null || name.trim().length() <= 0) {
                 name = "testImage";
             }
-            ImageIO.write(bi1, "png", new File(System.getProperty("user.home") + "/Desktop/" + name + ".png"));
+            ImageIO.write(bi1, "png", new File(System.getProperty(USER_HOME) + "/Desktop/" + name + ".png"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

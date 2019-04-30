@@ -41,8 +41,11 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 public class PrintStreamLoggerTest {
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     private static String line1 = "I'm logged line one";
     private static String line2 = "I'm logged line two";
@@ -68,10 +71,10 @@ public class PrintStreamLoggerTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         PrintStreamLogger l = new PrintStreamLogger(new PrintStream(output));
         l.log(line1);
-        Assert.assertTrue(r1.evaluate(output.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(output.toString(UTF_8)));
         l.log(line2);
-        Assert.assertTrue(r1.evaluate(output.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(output.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(output.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(output.toString(UTF_8)));
     }
 
     @Test
@@ -81,14 +84,14 @@ public class PrintStreamLoggerTest {
         AccessiblePrintStream ps = new AccessiblePrintStream(output);
         PrintStreamLogger l = new PrintStreamLogger(ps);
         l.log(line1);
-        Assert.assertTrue(r1.evaluate(output.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(output.toString(UTF_8)));
         AccessiblePrintStream got = (AccessiblePrintStream) l.getStream();
-        Assert.assertTrue(r1.evaluate(got.getOut().toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(got.getOut().toString(UTF_8)));
         l.log(line2);
-        Assert.assertTrue(r1.evaluate(output.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(output.toString("utf-8")));
-        Assert.assertTrue(r1.evaluate(got.getOut().toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(got.getOut().toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(output.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(output.toString(UTF_8)));
+        Assert.assertTrue(r1.evaluate(got.getOut().toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(got.getOut().toString(UTF_8)));
         Assert.assertTrue(got == ps);
     }
     
@@ -100,14 +103,14 @@ public class PrintStreamLoggerTest {
         AccessiblePrintStream ps = new AccessiblePrintStream(output1);
         PrintStreamLogger l = new PrintStreamLogger(ps);
         l.log(line1);
-        Assert.assertTrue(r1.evaluate(output1.toString("utf-8")));
+        Assert.assertTrue(r1.evaluate(output1.toString(UTF_8)));
         AccessiblePrintStream set = new AccessiblePrintStream(output2);
         l.setStream(set);
         l.log(line2);
-        Assert.assertFalse(r1.evaluate(output2.toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(output2.toString("utf-8")));
-        Assert.assertFalse(r1.evaluate(set.getOut().toString("utf-8")));
-        Assert.assertTrue(r2.evaluate(set.getOut().toString("utf-8")));
+        Assert.assertFalse(r1.evaluate(output2.toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(output2.toString(UTF_8)));
+        Assert.assertFalse(r1.evaluate(set.getOut().toString(UTF_8)));
+        Assert.assertTrue(r2.evaluate(set.getOut().toString(UTF_8)));
         Assert.assertTrue(set != ps);
         Assert.assertTrue(set == l.getStream());
     }

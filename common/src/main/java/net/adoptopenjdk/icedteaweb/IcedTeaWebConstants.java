@@ -9,7 +9,7 @@ public interface IcedTeaWebConstants {
     @Deprecated
     String DEFAULT_ERROR_MESSAGE = "ERROR";
 
-    String SYSTEM_PROPERTY_JAVA_VERSION = "java.version";
-
     String DOUBLE_QUOTE = "\"";
+
+    String JAVAWS = "javaws";
 }

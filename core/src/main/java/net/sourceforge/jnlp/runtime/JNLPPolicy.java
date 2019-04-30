@@ -37,6 +37,8 @@ import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
+
 /**
  * Policy for JNLP environment.  This class delegates to the
  * system policy but always grants permissions to the JNLP code
@@ -49,7 +51,7 @@ import java.util.Enumeration;
  */
 public class JNLPPolicy extends Policy {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
 
     /** classes from this source have all permissions */
     private static CodeSource shellSource;
@@ -76,7 +78,7 @@ public class JNLPPolicy extends Policy {
         systemJnlpPolicy = getPolicyFromConfig(DeploymentConfiguration.KEY_SYSTEM_SECURITY_POLICY);
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
-        String jre = System.getProperty("java.home");
+        String jre = System.getProperty(JAVA_HOME);
         jreExtDir = (new File(jre + File.separator + "lib" + File.separator + "ext")).toURI();
     }
 
@@ -190,8 +192,8 @@ public class JNLPPolicy extends Policy {
     }
     
     /**
-     * Constructs a delegate policy based on a config setting
-     * @param key a KEY_* in DeploymentConfiguration
+     * Loads a policy from a URI
+     * @param policyLocation the URI of the policy
      * @return a policy based on the configuration set by the user
      */
     private Policy getPolicyFromUrl(String policyLocation) {

@@ -37,13 +37,15 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import java.nio.charset.Charset;
+
 public interface Formatter {
 
     String process(String s);
 
     String wrapParagraph(String s);
 
-    String getHeaders(String id, String encoding);
+    String getHeaders(String id, Charset encoding);
 
     String getNewLine();
     

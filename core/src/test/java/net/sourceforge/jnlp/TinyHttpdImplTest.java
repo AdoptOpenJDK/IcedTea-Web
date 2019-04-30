@@ -16,6 +16,8 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class TinyHttpdImplTest {
 
     private static final String HTTP_OK = "HTTP/1.0 200 OK";
@@ -80,7 +82,7 @@ public class TinyHttpdImplTest {
 
         for (String url : FilePathTestUrls) {
             String newUrl = TinyHttpdImpl.urlToFilePath(url);
-            Assert.assertEquals(newUrl, URLDecoder.decode(newUrl, "UTF-8"));
+            Assert.assertEquals(newUrl, URLDecoder.decode(newUrl, UTF_8.name()));
         }
     }
 

@@ -37,12 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Locale;
-import java.util.Map;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
@@ -51,6 +45,16 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Locale;
+import java.util.Map;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 
 public class JNLPFileTest extends NoStdOutErrTest{
     Locale jvmLocale = new Locale("en", "CA", "utf8");
@@ -159,8 +163,8 @@ public class JNLPFileTest extends NoStdOutErrTest{
     @Bug(id={"PR1533"})
     @Test
     public void testDownloadOptionsAppliedEverywhere() throws MalformedURLException, ParseException {
-        String os = System.getProperty("os.name");
-        String arch = System.getProperty("os.arch");
+        String os = System.getProperty(OS_NAME);
+        String arch = System.getProperty(OS_ARCH);
 
         String jnlpContents = "<?xml version='1.0'?>\n" +
                 "<jnlp spec='1.5' href='foo' codebase='bar'>\n" +
