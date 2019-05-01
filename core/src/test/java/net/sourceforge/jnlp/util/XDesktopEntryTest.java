@@ -55,7 +55,6 @@ import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -67,23 +66,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
-
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridgeTest;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
-import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class XDesktopEntryTest {
 

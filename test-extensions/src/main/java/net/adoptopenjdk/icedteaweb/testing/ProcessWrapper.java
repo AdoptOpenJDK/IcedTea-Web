@@ -118,8 +118,8 @@ public class ProcessWrapper {
         }
         final ThreadedProcess t = new ThreadedProcess(args, dir, vars);
         if (ServerAccess.PROCESS_LOG) {
-            final String connectionMesaage = createConnectionMessage(t);
-            ServerAccess.log(connectionMesaage, true, true);
+            final String connectionMessage = createConnectionMessage(t);
+            ServerAccess.log(connectionMessage, true, true);
         }
         final ProcessAssassin pa = new ProcessAssassin(t, ServerAccess.PROCESS_TIMEOUT);
         t.setAssassin(pa);
