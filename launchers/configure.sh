@@ -64,6 +64,7 @@ readonly CORE_SRC=`ls $PROJECT_TOP/core/target/icedtea-web-core-*.jar`
 readonly COMMON_SRC=`ls $PROJECT_TOP/common/target/icedtea-web-common-*.jar`
 readonly JNLPAPI_SRC=`ls $PROJECT_TOP/jnlp-api/target/jnlp-api-*.jar`
 readonly XMLPARSER_SRC=`ls $PROJECT_TOP/xml-parser/target/icedtea-web-xml-parser-*.jar`
+readonly CLIENTS_SRC=`ls $PROJECT_TOP/clients/target/icedtea-web-clients-*.jar`
 
 if [ "x$MAVEN_REPO" == "x" ] ; then
   readonly MAVEN_REPO=${HOME}/.m2/
