@@ -61,13 +61,13 @@ import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.OutputUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.LaunchException;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -336,14 +336,14 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
         if (exception == null) {
             return "";
         }
-        return OutputController.exceptionToString(exception);
+        return OutputUtils.exceptionToString(exception);
     }
 
     public static String[] getExceptionStackTraceAsStrings(Throwable exception) {
         if (exception == null) {
             return new String[0];
         }
-        return OutputController.exceptionToString(exception).split("\n");
+        return OutputUtils.exceptionToString(exception).split("\n");
     }
 
     @Override

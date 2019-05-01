@@ -1,4 +1,4 @@
-/* BrowserTest.java
+/* TestInBrowsers.java
 Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,28 +35,19 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.browser;
+package net.adoptopenjdk.icedteaweb.testing.annotations;
 
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTestRunner;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import org.junit.runner.RunWith;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@RunWith(value = BrowserTestRunner.class)
-public abstract class BrowserTest {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TestInBrowsers {
 
-    private static Browsers browser=null;
-    public static final ServerAccess server = new ServerAccess();
-
-    public static void setBrowser(Browsers b) {
-        browser = b;
-        server.setCurrentBrowser(browser);
-    }
-
-    public static Browsers getBrowser() {
-        return browser;
-    }
-
+    Browsers[] testIn();
 
 }

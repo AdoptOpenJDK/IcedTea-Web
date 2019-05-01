@@ -35,6 +35,7 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.InvalidLineException;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
@@ -318,7 +319,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             } else {
                 s = readVersion + " " + warning + "\n" + s;
             }
-            FileUtils.saveFile(s, backup);
+            BasicFileUtils.saveFile(s, backup);
         } catch (Exception ex) {
             LOG.error("Error during backuping", ex);
         }

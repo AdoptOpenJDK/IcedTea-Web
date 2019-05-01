@@ -1,5 +1,5 @@
-/* TestsLogs.java
-Copyright (C) 2011,2012 Red Hat, Inc.
+/* BrowserTest.java
+Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -35,51 +35,26 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.adoptopenjdk.icedteaweb.testing;
+package net.adoptopenjdk.icedteaweb.testing.browsertesting;
 
-import java.util.LinkedList;
-import java.util.List;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import org.junit.runner.RunWith;
 
-class TestsLogs {
 
-    private final List<LogItem> outs = new LinkedList<>();
-    private final List<LogItem> errs = new LinkedList<>();
-    private final List<LogItem> all = new LinkedList<>();
-    private static final String LOG_ELEMENT = "log";
-    private static final String LOG_ID_ATTRIBUTE = "id";
+@RunWith(value = BrowserTestRunner.class)
+public abstract class BrowserTest {
 
-    synchronized void add(boolean err, boolean out, String text) {
-        if (text == null) {
-            text = "null";
-        }
-        LogItem li = new LogItem(text);
-        if (out) {
-            outs.add(li);
-        }
-        if (err) {
-            errs.add(li);
-        }
-        all.add(li);
+    private static Browsers browser=null;
+    public static final ServerAccess server = new ServerAccess();
 
+    public static void setBrowser(final Browsers b) {
+        browser = b;
+        server.setCurrentBrowser(browser);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = listToStringBuilder(outs, "out");
-        sb.append(listToStringBuilder(errs, "err"));
-        sb.append(listToStringBuilder(all, "all"));
-        return sb.toString();
+    public static Browsers getBrowser() {
+        return browser;
     }
 
-    private StringBuilder listToStringBuilder(List<LogItem> l, String id) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<" + LOG_ELEMENT + " " + LOG_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
-        int i = 0;
-        for (LogItem logItem : l) {
-            i++;
-            sb.append(logItem.toStringBuilder(i));
-        }
-        sb.append("</" + LOG_ELEMENT + ">\n");
-        return sb;
-    }
+
 }

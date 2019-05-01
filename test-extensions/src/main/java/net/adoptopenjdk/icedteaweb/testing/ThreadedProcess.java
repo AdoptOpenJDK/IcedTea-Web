@@ -37,8 +37,6 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing;
 
-import net.sourceforge.jnlp.util.StreamUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,8 +44,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 /**
  *
@@ -89,41 +86,41 @@ public class ThreadedProcess extends Thread {
 
 
 
-    public void setWriter(InputStream writer) {
+    public void setWriter(final InputStream writer) {
         this.writer = writer;
     }
 
     
 
 
-    private ThreadedProcess(List<String> args) {
+    private ThreadedProcess(final List<String> args) {
         this.args = args;
     }
 
-    private ThreadedProcess(List<String> args, File dir) {
+    private ThreadedProcess(final List<String> args, File dir) {
         this(args);
         this.dir = dir;
     }
 
-     public ThreadedProcess(List<String> args, File dir,String[] vars) {
+     public ThreadedProcess(final List<String> args, final File dir, final String[] vars) {
         this(args,dir);
         this.variables = vars;
     }
 
 
     public String getCommandLine() {
-        String commandLine = "unknown command";
+        StringBuilder commandLine = new StringBuilder("unknown command");
         try {
             if (args != null && args.size() > 0) {
-                commandLine = "";
+                commandLine = new StringBuilder();
                 for (String string : args) {
-                    commandLine = commandLine + " " + string;
+                    commandLine.append(" ").append(string);
                 }
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ex.printStackTrace();
         }
-        return commandLine;
+        return commandLine.toString();
     }
 
     public Process getP() {
@@ -134,7 +131,7 @@ public class ThreadedProcess extends Thread {
     public void run() {
         try {
             running = true;
-            Runtime r = Runtime.getRuntime();
+            final Runtime r = Runtime.getRuntime();
             if (dir == null) {
                 if (variables == null) {
                     p = r.exec(args.toArray(new String[0]));
@@ -146,12 +143,12 @@ public class ThreadedProcess extends Thread {
             }
             try {
                 if (writer != null){
-                    Thread t = new Thread(() -> {
+                    final Thread t = new Thread(() -> {
                         try (
-                                BufferedReader br = new BufferedReader(new InputStreamReader(writer, UTF_8));
-                                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), UTF_8))) {
+                                final BufferedReader br = new BufferedReader(new InputStreamReader(writer, "utf-8"));
+                                final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "utf-8"))) {
                             while (true) {
-                                String s = br.readLine();
+                                final String s = br.readLine();
                                 if (s == null) {
                                     break;
                                 }
@@ -159,7 +156,7 @@ public class ThreadedProcess extends Thread {
                                 bw.flush();
 
                             }
-                        } catch (Exception ex) {
+                        } catch (final Exception ex) {
                             ServerAccess.logException(ex);
                         }
                     });
@@ -174,7 +171,7 @@ public class ThreadedProcess extends Thread {
             } finally {
                 destroyed = true;
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             if (ex instanceof InterruptedException) {
                 //add to the set of terminated threaded processes
                 deadlyException = ex;

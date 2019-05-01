@@ -1,4 +1,4 @@
-/* LogItem.java
+/* ProcessResult.java
 Copyright (C) 2011,2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -37,35 +37,33 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing;
 
-import java.util.Date;
+/**
+ * artefacts what are left by finished process
+ */
+public class ProcessResult {
 
-class LogItem {
+    public final String stdout;
+    public final String notFilteredStdout;
+    public final String stderr;
+    public final Process process;
+    public final Integer returnValue;
+    public final boolean wasTerminated;
+    /*
+     * possible exception which caused Process not to be launched
+     */
+    public final Throwable deadlyException;
 
-    private final Date timeStamp = new Date();
-    private final StackTraceElement[] fullTrace = Thread.currentThread().getStackTrace();
-    private final String text;
-    private static final String ITEM_ELEMENT = "item";
-    private static final String ITEM_ID_ATTRIBUTE = "id";
-    private static final String STAMP_ELEMENT = "stamp";
-    private static final String TEXT_ELEMENT = "text";
-    private static final String FULLTRACE_ELEMENT = "fulltrace";
-
-    public LogItem(String text) {
-        this.text = text;
-    }
-
-    public StringBuilder toStringBuilder(int id) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("  <" + ITEM_ELEMENT + " " + ITEM_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
-        sb.append("    <" + STAMP_ELEMENT + "><![CDATA[").append(timeStamp.toString()).append("]]></" + STAMP_ELEMENT + ">\n");
-        sb.append("    <" + TEXT_ELEMENT + "><![CDATA[\n").append(text).append("\n]]></" + TEXT_ELEMENT + ">\n");
-        sb.append("    <" + FULLTRACE_ELEMENT + "><![CDATA[\n");
-        //five methods since call in log methods + getStacktrace method
-        for (int i = 6; i < fullTrace.length; i++) {
-            sb.append(fullTrace[i].toString()).append("\n");
+    public ProcessResult(final String stdout, final String stderr, final Process process, final boolean wasTerminated, final Integer r, final Throwable deadlyException) {
+        this.notFilteredStdout = stdout;
+        if (stdout == null) {
+            this.stdout = null;
+        } else {
+            this.stdout = stdout.replaceAll("EMMA:.*\n?", "");
         }
-        sb.append("\n]]>    </" + FULLTRACE_ELEMENT + ">\n");
-        sb.append("  </" + ITEM_ELEMENT + ">\n");
-        return sb;
+        this.stderr = stderr;
+        this.process = process;
+        this.wasTerminated = wasTerminated;
+        this.returnValue = r;
+        this.deadlyException = deadlyException;
     }
 }

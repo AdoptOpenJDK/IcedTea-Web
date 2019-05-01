@@ -1,5 +1,5 @@
-/* TestInBrowsers.java
-Copyright (C) 2012 Red Hat, Inc.
+/* LogItem.java
+Copyright (C) 2011,2012 Red Hat, Inc.
 
 This file is part of IcedTea.
 
@@ -35,17 +35,37 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.adoptopenjdk.icedteaweb.testing.annotations;
+package net.adoptopenjdk.icedteaweb.testing;
 
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
+import java.util.Date;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+class LogItem {
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TestInBrowsers {
-    Browsers[] testIn();
+    private final Date timeStamp = new Date();
+    private final StackTraceElement[] fullTrace = Thread.currentThread().getStackTrace();
+    private final String text;
+    private static final String ITEM_ELEMENT = "item";
+    private static final String ITEM_ID_ATTRIBUTE = "id";
+    private static final String STAMP_ELEMENT = "stamp";
+    private static final String TEXT_ELEMENT = "text";
+    private static final String FULLTRACE_ELEMENT = "fulltrace";
+
+    public LogItem(final String text) {
+        this.text = text;
+    }
+
+    public StringBuilder toStringBuilder(final int id) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("  <" + ITEM_ELEMENT + " " + ITEM_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
+        sb.append("    <" + STAMP_ELEMENT + "><![CDATA[").append(timeStamp.toString()).append("]]></" + STAMP_ELEMENT + ">\n");
+        sb.append("    <" + TEXT_ELEMENT + "><![CDATA[\n").append(text).append("\n]]></" + TEXT_ELEMENT + ">\n");
+        sb.append("    <" + FULLTRACE_ELEMENT + "><![CDATA[\n");
+        //five methods since call in log methods + getStacktrace method
+        for (int i = 6; i < fullTrace.length; i++) {
+            sb.append(fullTrace[i].toString()).append("\n");
+        }
+        sb.append("\n]]>    </" + FULLTRACE_ELEMENT + ">\n");
+        sb.append("  </" + ITEM_ELEMENT + ">\n");
+        return sb;
+    }
 }

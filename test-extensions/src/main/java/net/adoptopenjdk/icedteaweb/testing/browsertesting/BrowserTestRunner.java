@@ -51,7 +51,7 @@ import org.junit.runners.model.Statement;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -81,7 +81,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                         // namely enumerated concrete browsers, so we want to pick up
                         // random one from those already enumerated
                         if (isBrowsersNoneSet(tib)) {
-                            testableBrowsers = Arrays.asList(testableBrowsers.get(new Random().nextInt(testableBrowsers.size())));
+                            testableBrowsers = Collections.singletonList(testableBrowsers.get(new Random().nextInt(testableBrowsers.size())));
                         }
                     } else if (mbr.equalsIgnoreCase("ignore")) {
                         testableBrowsers = BrowserFactory.getFactory().getBrowsers(new Browsers[]{Browsers.none});
@@ -94,7 +94,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                     try {
                         injectBrowser(method, browser);
                         runChildX(method, notifier, browser, browserIgnoration);
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         //throw new RuntimeException("unabled to inject browser", ex);
                         ServerAccess.logException(ex, true);
                     }

@@ -11,29 +11,32 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>icedtea-web-integration-tests</artifactId>
-    <name>Integration Tests</name>
-    <description>This module contains integration tests for the main JNLP application execution scenarios.</description>
-
+    <artifactId>icedtea-web-test-extensions</artifactId>
+    <name>Test Extensions</name>
+    <description>This module contains common classes that are used in unit and integration tests.</description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>icedtea-web-core</artifactId>
+            <artifactId>icedtea-web-common</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>1.11.1</version>
-            <scope>test</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>icedtea-web-test-extensions</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.1</version>
         </dependency>
     </dependencies>
 </project>

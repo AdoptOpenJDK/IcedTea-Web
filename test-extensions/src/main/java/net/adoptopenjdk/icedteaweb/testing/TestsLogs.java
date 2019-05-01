@@ -1,4 +1,4 @@
-/* ProcessResult.java
+/* TestsLogs.java
 Copyright (C) 2011,2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -37,33 +37,47 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing;
 
-/**
- * artefacts what are left by finished process
- */
-public class ProcessResult {
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
-    public final String stdout;
-    public final String notFilteredStdout;
-    public final String stderr;
-    public final Process process;
-    public final Integer returnValue;
-    public final boolean wasTerminated;
-    /*
-     * possible exception which caused Process not to be launched
-     */
-    public final Throwable deadlyException;
+class TestsLogs {
 
-    public ProcessResult(String stdout, String stderr, Process process, boolean wasTerminated, Integer r, Throwable deadlyException) {
-        this.notFilteredStdout = stdout;
-        if (stdout == null) {
-            this.stdout = null;
-        } else {
-            this.stdout = stdout.replaceAll("EMMA:.*\n?", "");
+    private final List<LogItem> outs = new LinkedList<>();
+    private final List<LogItem> errs = new LinkedList<>();
+    private final List<LogItem> all = new LinkedList<>();
+    private static final String LOG_ELEMENT = "log";
+    private static final String LOG_ID_ATTRIBUTE = "id";
+
+    synchronized void add(final boolean err, final boolean out, final String text) {
+        LogItem li = new LogItem(Optional.ofNullable(text).orElse("null"));
+        if (out) {
+            outs.add(li);
         }
-        this.stderr = stderr;
-        this.process = process;
-        this.wasTerminated = wasTerminated;
-        this.returnValue = r;
-        this.deadlyException = deadlyException;
+        if (err) {
+            errs.add(li);
+        }
+        all.add(li);
+
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = listToStringBuilder(outs, "out");
+        sb.append(listToStringBuilder(errs, "err"));
+        sb.append(listToStringBuilder(all, "all"));
+        return sb.toString();
+    }
+
+    private StringBuilder listToStringBuilder(final List<LogItem> l, final String id) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("<" + LOG_ELEMENT + " " + LOG_ID_ATTRIBUTE + "=\"").append(id).append("\">\n");
+        int i = 0;
+        for (final LogItem logItem : l) {
+            i++;
+            sb.append(logItem.toStringBuilder(i));
+        }
+        sb.append("</" + LOG_ELEMENT + ">\n");
+        return sb;
     }
 }

@@ -45,7 +45,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 
 /**
@@ -64,25 +64,22 @@ public class ProcessWrapper {
 
 
 
-    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u) {
+    public ProcessWrapper(final String toBeExecuted, final List<String> otherargs, final URL u) {
         this(toBeExecuted, otherargs, u.toString());
     }
 
-    private ProcessWrapper(String toBeExecuted, List<String> otherargs, String s) {
+    private ProcessWrapper(final String toBeExecuted, final List<String> otherargs, final String s) {
         Assert.assertNotNull(s);
         Assert.assertNotNull(toBeExecuted);
         Assert.assertTrue(toBeExecuted.trim().length() > 1);
-        if (otherargs == null) {
-            otherargs = new ArrayList<>(1);
-        }
-        List<String> urledArgs = new ArrayList<>(otherargs);
+        final List<String> urledArgs = new ArrayList<>(Optional.ofNullable(otherargs).orElse(new ArrayList<>(1)));
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(s);
         this.args = urledArgs;
         this.vars=null;
     }
 
-    public ProcessWrapper(String toBeExecuted, List<String> otherargs, URL u, ContentReaderListener stdoutl, ContentReaderListener stderrl, String[] vars) {
+    public ProcessWrapper(final String toBeExecuted, final List<String> otherargs, final URL u, final ContentReaderListener stdoutl, final ContentReaderListener stderrl, final String[] vars) {
         this(toBeExecuted, otherargs, u);
         this.addStdOutListener(stdoutl);
         this.addStdErrListener(stderrl);
@@ -90,7 +87,7 @@ public class ProcessWrapper {
     
     }
 
-    public ProcessWrapper(final List<String> args, File dir, ContentReaderListener stdoutl, ContentReaderListener stderrl) {
+    public ProcessWrapper(final List<String> args, final File dir, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) {
         this.args = args;
         this.dir = dir;
         this.addStdOutListener(stdoutl);
@@ -99,7 +96,7 @@ public class ProcessWrapper {
     }
 
 
-    private void addStdOutListener(ContentReaderListener l) {
+    private void addStdOutListener(final ContentReaderListener l) {
         if (l == null) {
             return;
         }
@@ -107,7 +104,7 @@ public class ProcessWrapper {
 
     }
 
-    private void addStdErrListener(ContentReaderListener l) {
+    private void addStdErrListener(final ContentReaderListener l) {
         if (l == null) {
             return;
         }
@@ -119,12 +116,12 @@ public class ProcessWrapper {
         if (reactingProcess !=null ){
             reactingProcess.beforeProcess("");
         }
-        ThreadedProcess t = new ThreadedProcess(args, dir, vars);
+        final ThreadedProcess t = new ThreadedProcess(args, dir, vars);
         if (ServerAccess.PROCESS_LOG) {
-            String connectionMessage = createConnectionMessage(t);
+            final String connectionMessage = createConnectionMessage(t);
             ServerAccess.log(connectionMessage, true, true);
         }
-        ProcessAssassin pa = new ProcessAssassin(t, ServerAccess.PROCESS_TIMEOUT);
+        final ProcessAssassin pa = new ProcessAssassin(t, ServerAccess.PROCESS_TIMEOUT);
         t.setAssassin(pa);
         pa.setReactingProcess(reactingProcess);
         setUpClosingListener(stdoutl, pa);
@@ -139,10 +136,10 @@ public class ProcessWrapper {
             pa.setCanRun(false);
             return new ProcessResult("", "", null, true, Integer.MIN_VALUE, t.deadlyException);
         }
-        ContentReader crs = new ContentReader(t.getP().getInputStream(), stdoutl);
-        ContentReader cre = new ContentReader(t.getP().getErrorStream(), stderrl);
+        final ContentReader crs = new ContentReader(t.getP().getInputStream(), stdoutl);
+        final ContentReader cre = new ContentReader(t.getP().getErrorStream(), stderrl);
 
-        OutputStream out = t.getP().getOutputStream();
+        final OutputStream out = t.getP().getOutputStream();
         if (out != null) {
             out.close();
         }
@@ -159,7 +156,7 @@ public class ProcessWrapper {
         pa.setCanRun(false);
         // ServerAccess.logOutputReprint(t.getP().exitValue()); when process is killed, this throws exception
 
-        ProcessResult pr = new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
+        final ProcessResult pr = new ProcessResult(crs.getContent(), cre.getContent(), t.getP(), pa.wasTerminated(), t.getExitCode(), null);
         if (ServerAccess.PROCESS_LOG) {
             ServerAccess.log(pr.stdout, true, false);
             ServerAccess.log(pr.stderr, false, true);
@@ -167,8 +164,8 @@ public class ProcessWrapper {
         return pr;
     }
 
-    private static void setUpClosingListener(List<ContentReaderListener> listeners, ProcessAssassin pa) {
-        for (ContentReaderListener listener : listeners) {
+    private static void setUpClosingListener(final List<ContentReaderListener> listeners, final ProcessAssassin pa) {
+        for (final ContentReaderListener listener : listeners) {
             if (listener != null && (listener instanceof ClosingListener)) {
                 ((ClosingListener) listener).setAssassin(pa);
             }
@@ -176,11 +173,11 @@ public class ProcessWrapper {
 
     }
 
-    private static String createConnectionMessage(ThreadedProcess t) {
+    private static String createConnectionMessage(final ThreadedProcess t) {
         return "Connecting " + t.getCommandLine();
     }
     
-     void setReactingProcess(ReactingProcess reactingProcess) {
+     void setReactingProcess(final ReactingProcess reactingProcess) {
         this.reactingProcess = reactingProcess;
     }
 }

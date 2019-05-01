@@ -35,7 +35,7 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,7 +120,7 @@ public class PolicyEditorParsingTest {
     }
 
     private void setupTest(final String policyContents, final PolicyIdentifier identifier) throws Exception {
-        FileUtils.saveFile(policyContents, file);
+        BasicFileUtils.saveFile(policyContents, file);
         policyFileModel = new PolicyFileModel(file.getCanonicalFile());
         policyFileModel.openAndParsePolicyFile();
         policyFileModel.addIdentifier(DEFAULT_IDENTIFIER);

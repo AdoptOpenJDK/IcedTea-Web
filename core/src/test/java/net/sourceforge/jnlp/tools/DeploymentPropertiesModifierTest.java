@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
 import java.io.File;
 import java.io.IOException;
@@ -163,7 +164,7 @@ public class DeploymentPropertiesModifierTest {
         tempUserFile.deleteOnExit();
 
         String content = "a.b=12\nc.d=34\ne.f=56\ng.h=78\ni.j=90";
-        FileUtils.saveFile(content, tempUserFile);
+        BasicFileUtils.saveFile(content, tempUserFile);
         deploymentFile = tempUserFile;
         DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
 

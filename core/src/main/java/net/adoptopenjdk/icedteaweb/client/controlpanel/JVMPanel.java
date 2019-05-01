@@ -40,7 +40,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

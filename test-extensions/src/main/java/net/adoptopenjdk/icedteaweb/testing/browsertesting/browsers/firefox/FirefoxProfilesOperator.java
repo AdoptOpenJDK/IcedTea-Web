@@ -73,14 +73,11 @@ public class FirefoxProfilesOperator {
         ServerAccess.logOutputReprint(message);
         copyDirs(sourceDir, backupDir, firefoxProfilesFilter);
         backuped = true;
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    restoreProfiles();
-                } catch (final Exception ex) {
-                    ServerAccess.logException(ex);
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                restoreProfiles();
+            } catch (final Exception ex) {
+                ServerAccess.logException(ex);
             }
         }));
 

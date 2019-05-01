@@ -38,7 +38,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.util;
 
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;

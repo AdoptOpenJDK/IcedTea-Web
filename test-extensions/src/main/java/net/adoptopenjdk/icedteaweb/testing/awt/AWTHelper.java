@@ -66,7 +66,7 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
     public AWTHelper() {
         try {
             this.robot = new Robot();
-        } catch (AWTException e) {
+        } catch (final AWTException e) {
             throw new RuntimeException("AWTHelper could not create its Robot instance.",e);
         }
     }
@@ -132,20 +132,12 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
     	if( initStr != null ){
             return new ContainsRule(this.initStr);
     	}else{
-    		return new Rule<String, String>(){
-
-				@Override
-				public boolean evaluate(String upon) {
-					return true;
-				}
-
-    			
-    		} ;
+    		return v -> true;
     	}
     }
     
     //boolean controls getters
-    private boolean appletIsReady(String content) {
+    private boolean appletIsReady(final String content) {
         return this.getInitStrAsRule().evaluate(content);
     }
 

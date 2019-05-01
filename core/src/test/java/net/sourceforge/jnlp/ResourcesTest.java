@@ -43,16 +43,16 @@ import net.adoptopenjdk.icedteaweb.testing.annotations.NeedsDisplay;
 import net.adoptopenjdk.icedteaweb.testing.annotations.TestInBrowsers;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
-import net.sourceforge.jnlp.browser.BrowserTest;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -373,7 +373,8 @@ public class ResourcesTest extends  BrowserTest{
         } else {
             plugins = userPlugins;
         }
-        String s = ServerAccess.getContentOfStream(new FileInputStream(plugins[0]), US_ASCII);
+
+        String s = FileUtils.loadFileAsString(plugins[0], US_ASCII);
         Assert.assertTrue("browser's plugins  should points to" + currentPath + ", but didn't",
                 s.contains(s));
     }

@@ -36,12 +36,6 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.testing;
 
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +45,13 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.adoptopenjdk.icedteaweb.OutputUtils;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 
 /**
  * This class provides access to virtual server and stuff around.
@@ -146,8 +144,8 @@ public class ServerAccess {
      */
     public static int findFreePort()
             throws IOException {
-        ServerSocket findPortTestingSocket = new ServerSocket(0);
-        int port = findPortTestingSocket.getLocalPort();
+        final ServerSocket findPortTestingSocket = new ServerSocket(0);
+        final int port = findPortTestingSocket.getLocalPort();
         findPortTestingSocket.close();
         return port;
     }
@@ -177,10 +175,10 @@ public class ServerAccess {
      * useful for testing application loading from different url then base
      */
     private static ServerLauncher getIndependentInstance() {
-        String dir = (System.getProperty(TEST_SERVER_DIR));
+        final String dir = (System.getProperty(TEST_SERVER_DIR));
         try {
             return getIndependentInstance(dir, findFreePort());
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -199,19 +197,19 @@ public class ServerAccess {
 
 
 
-    public static ServerLauncher getIndependentInstance(String dir, int port) {
+    public static ServerLauncher getIndependentInstance(final String dir, final int port) {
 
 
         if (dir == null || dir.trim().length() == 0 || !new File(dir).exists() || !new File(dir).isDirectory()) {
             throw new RuntimeException("test.server.dir property must be set to valid directory!");
         }
         try {
-            ServerLauncher lServerLauncher = new ServerLauncher(port, new File(dir));
-            Thread r = new Thread(lServerLauncher);
+            final ServerLauncher lServerLuncher = new ServerLauncher(port, new File(dir));
+            final Thread r = new Thread(lServerLuncher);
             r.setDaemon(true);
             r.start();
-            return lServerLauncher;
-        } catch (Exception ex) {
+            return lServerLuncher;
+        } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
 
@@ -253,7 +251,7 @@ public class ServerAccess {
         return currentBrowser;
     }
 
-    public void setCurrentBrowser(Browsers currentBrowser) {
+    public void setCurrentBrowser(final Browsers currentBrowser) {
         this.currentBrowser = BrowserFactory.getFactory().getBrowser(currentBrowser);
         if (this.currentBrowser == null) {
             LoggingBottleneck.getDefaultLoggingBottleneck().setLoggedBrowser(UNSET_BROWSER);
@@ -297,7 +295,7 @@ public class ServerAccess {
      * @return complete url for this resource on this server
      * @throws java.net.MalformedURLException if url for this resource can not be constructed
      */
-    private URL getUrl(String resource) throws MalformedURLException {
+    private URL getUrl(final String resource) throws MalformedURLException {
         if (server == null) {
             getInstance();
         }
@@ -313,7 +311,7 @@ public class ServerAccess {
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public ByteArrayOutputStream getResourceAsBytes(String resource) throws IOException {
+    public ByteArrayOutputStream getResourceAsBytes(final String resource) throws IOException {
         return getResourceAsBytes(getUrl(resource));
     }
 
@@ -324,7 +322,7 @@ public class ServerAccess {
      * @return string constructed from  resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    public String getResourceAsString(String resource) throws IOException {
+    public String getResourceAsString(final String resource) throws IOException {
         return getResourceAsString(getUrl(resource));
     }
 
@@ -335,38 +333,15 @@ public class ServerAccess {
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    private static ByteArrayOutputStream getBytesFromStream(InputStream is) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private static ByteArrayOutputStream getBytesFromStream(final InputStream is) throws IOException {
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int nRead;
-        byte[] data = new byte[16384];
+        final byte[] data = new byte[16384];
         while ((nRead = is.read(data, 0, data.length)) != -1) {
             buffer.write(data, 0, nRead);
         }
         buffer.flush();
         return buffer;
-    }
-
-    /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is       stream to be read
-     * @param encoding encoding of this stream
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String getContentOfStream(InputStream is, Charset encoding) throws IOException {
-        return FileUtils.getContentOfStream(is, encoding);
-    }
-
-    /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is input stream to read from
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String getContentOfStream(InputStream is) throws IOException {
-        return FileUtils.getContentOfStream(is);
     }
 
     /**
@@ -376,7 +351,7 @@ public class ServerAccess {
      * @return individual bytes of resource
      * @throws IOException if connection can't be established or resource does not exist
      */
-    private static ByteArrayOutputStream getResourceAsBytes(URL u) throws IOException {
+    private static ByteArrayOutputStream getResourceAsBytes(final URL u) throws IOException {
         URLConnection connection = null;
         try {
             connection = u.openConnection();
@@ -403,7 +378,7 @@ public class ServerAccess {
      * @throws IOException if connection can't be established or resource does
      *                     not exist
      */
-    private static String getResourceAsString(URL u) throws IOException {
+    public static String getResourceAsString(final URL u) throws IOException {
         URLConnection connection = null;
         try {
             connection = u.openConnection();
@@ -413,9 +388,12 @@ public class ServerAccess {
             connection.setDoOutput(true);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.connect();
-            return getContentOfStream(connection.getInputStream());
+
+            try (final InputStream is = connection.getInputStream()) {
+                return BasicFileUtils.toString(is);
+            }
         } finally {
-            if (connection != null && connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 ((HttpURLConnection) connection).disconnect();
             }
         }
@@ -428,8 +406,8 @@ public class ServerAccess {
      * @param f       file to be saved. No warnings provided
      * @throws IOException
      */
-    public static void saveFile(String content, File f) throws IOException {
-        FileUtils.saveFile(content, f);
+    public static void saveFile(final String content, final File f) throws IOException {
+        BasicFileUtils.saveFile(content, f);
     }
 
 
@@ -437,7 +415,7 @@ public class ServerAccess {
      * @param resource relative resource to be opened in browser for current server instance.
      * @return result of browser run
      */
-    public ProcessResult executeBrowser(String resource) throws Exception {
+    public ProcessResult executeBrowser(final String resource) throws Exception {
         return executeBrowser(getBrowserParams(), resource);
     }
 
@@ -447,24 +425,24 @@ public class ServerAccess {
      * @param stderrl  listener for stderr
      * @return result of browser run
      */
-    public ProcessResult executeBrowser(String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
+    public ProcessResult executeBrowser(final String resource, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) throws Exception {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
     }
 
 
-    private ProcessResult executeBrowser(List<String> otherargs, String resource) throws Exception {
+    private ProcessResult executeBrowser(final List<String> otherargs, final String resource) throws Exception {
         return executeBrowser(otherargs, getUrlUponThisInstance(resource));
     }
 
-    private ProcessResult executeBrowser(List<String> otherargs, URL url) throws Exception {
-        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
-        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not matter
+    private ProcessResult executeBrowser(final List<String> otherargs, final URL url) throws Exception {
+        final ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
+        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
         return rpw.execute();
     }
 
-    private ProcessResult executeBrowser(List<String> otherargs, String resource, ContentReaderListener stdoutl, ContentReaderListener stderrl) throws Exception {
-        ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
-        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not matter
+    private ProcessResult executeBrowser(final List<String> otherargs, final String resource, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) throws Exception {
+        final ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
+        rpw.setReactingProcess(getCurrentBrowser()); //current browser may be null, but it does not matter
         return rpw.execute();
     }
 
@@ -475,7 +453,7 @@ public class ServerAccess {
      * @return
      * @throws MalformedURLException
      */
-    public URL getUrlUponThisInstance(String resource) throws MalformedURLException {
+    public URL getUrlUponThisInstance(final String resource) throws MalformedURLException {
         getInstance();
         return getUrlUponInstance(server, resource);
     }
@@ -488,7 +466,7 @@ public class ServerAccess {
      * @return the absolute url
      * @throws MalformedURLException
      */
-    private static URL getUrlUponInstance(ServerLauncher instance, String resource) throws MalformedURLException {
+    private static URL getUrlUponInstance(final ServerLauncher instance, final String resource) throws MalformedURLException {
         return instance.getUrl(resource);
     }
 
@@ -498,7 +476,7 @@ public class ServerAccess {
      *
      * @param s
      */
-    public static void logErrorReprint(String s) {
+    public static void logErrorReprint(final String s) {
         log(s, false, true);
     }
 
@@ -507,7 +485,7 @@ public class ServerAccess {
      *
      * @param s
      */
-    public static void logOutputReprint(String s) {
+    public static void logOutputReprint(final String s) {
         log(s, true, false);
     }
 
@@ -516,14 +494,14 @@ public class ServerAccess {
      *
      * @param s
      */
-    public static void logNoReprint(String s) {
+    public static void logNoReprint(final String s) {
         log(s, false, false);
     }
 
-    static void log(String message, boolean printToOut, boolean printToErr) {
+    static void log(final String message, final boolean printToOut, final boolean printToErr) {
         String idded;
-        StackTraceElement ste = getTestMethod();
-        String fullId = LoggingBottleneck.getDefaultLoggingBottleneck().modifyMethodWithForBrowser(ste.getMethodName(), ste.getClassName());
+        final StackTraceElement ste = getTestMethod();
+        final String fullId = LoggingBottleneck.getDefaultLoggingBottleneck().modifyMethodWithForBrowser(ste.getMethodName(), ste.getClassName());
         if (message.contains("\n")) {
             idded = fullId + ": \n" + message + "\n" + fullId + " ---";
         } else {
@@ -542,19 +520,19 @@ public class ServerAccess {
         LoggingBottleneck.getDefaultLoggingBottleneck().addToXmlLog(message, printToOut, printToErr, ste);
     }
 
-    public static void logException(Throwable t) {
+    public static void logException(final Throwable t) {
         logException(t, true);
     }
 
-    public static void logException(Throwable t, boolean print) {
-        log(OutputController.exceptionToString(t), false, print);
+    public static void logException(final Throwable t, final boolean print) {
+        log(OutputUtils.exceptionToString(t), false, print);
     }
 
     private static StackTraceElement getTestMethod() {
         return getTestMethod(Thread.currentThread().getStackTrace());
     }
 
-    private static StackTraceElement getTestMethod(StackTraceElement[] stack) {
+    private static StackTraceElement getTestMethod(final StackTraceElement[] stack) {
         //0 is always thread
         //1 is net.sourceforge.jnlp.*
         //we need to get out of all  of classes from this package or pick last of it
@@ -570,11 +548,11 @@ public class ServerAccess {
             //package where are right now all test-extensions
             //for now keeping exactly the three classes helping you  access the log
             try {
-                Class<?> clazz = Class.forName(stack[i].getClassName());
+                final Class<?> clazz = Class.forName(stack[i].getClassName());
                 String path = null;
                 try {
                     path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-                } catch (NullPointerException ex) {
+                } catch (final NullPointerException ex) {
                     //silently ignoring and continuing with null path
                 }
                 if (path != null && path.contains("/tests.build/")) {
@@ -587,7 +565,7 @@ public class ServerAccess {
                         break;
                     }
                 }
-            } catch (ClassNotFoundException ex) {
+            } catch (final ClassNotFoundException ex) {
                 ///should not happen, searching  only for already loaded class
                 ex.printStackTrace();
             }

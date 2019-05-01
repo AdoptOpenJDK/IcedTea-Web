@@ -84,8 +84,8 @@ public class CodeSignerCreator {
 
         // KeyTool#doSelfCert
         final byte[] encoded = oldCert.getEncoded();
-        X509CertImpl certImpl = new X509CertImpl(encoded);
-        X509CertInfo certInfo = (X509CertInfo) certImpl.get(X509CertImpl.NAME
+        final X509CertImpl certImpl = new X509CertImpl(encoded);
+        final X509CertInfo certInfo = (X509CertInfo) certImpl.get(X509CertImpl.NAME
                 + "." + X509CertImpl.INFO);
 
         final Date notAfter = new Date(notBefore.getTime() + validity*1000L*24L*60L*60L);
@@ -103,7 +103,7 @@ public class CodeSignerCreator {
         // The way we achieve that is really ugly, but there seems to be no
         // other solution: We first sign the cert, then retrieve the
         // outer sigalg and use it to set the inner sigalg
-        X509CertImpl newCert = new X509CertImpl(certInfo);
+        final X509CertImpl newCert = new X509CertImpl(certInfo);
         newCert.sign(privKey, sigAlgName);
         final AlgorithmId sigAlgid = (AlgorithmId)newCert.get(X509CertImpl.SIG_ALG);
         certInfo.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, sigAlgid);
@@ -119,10 +119,10 @@ public class CodeSignerCreator {
 //                null);
 //        certInfo.set(X509CertInfo.EXTENSIONS, ext);
 
-        newCert = new X509CertImpl(certInfo);
-        newCert.sign(privKey, sigAlgName);
+        final X509CertImpl finalCert = new X509CertImpl(certInfo);
+        finalCert.sign(privKey, sigAlgName);
 
-        return newCert;
+        return finalCert;
     }
 
     /**
