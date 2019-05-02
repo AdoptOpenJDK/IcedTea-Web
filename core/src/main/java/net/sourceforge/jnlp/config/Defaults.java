@@ -72,7 +72,7 @@ import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
  * This class stores the default configuration
  */
 public class Defaults {
-    
+
 
     /**
      * Get the default settings for deployment
@@ -138,7 +138,7 @@ public class Defaults {
                 {
                         ConfigurationConstants.KEY_USER_SECURITY_POLICY,
                         ValidatorFactory.createUrlValidator(),
-                        
+
                         "file://" + JAVA_POLICY.getDefaultFullPath()
                 },
                 {
@@ -203,22 +203,22 @@ public class Defaults {
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.askgrantdialog.notinca",
+                        ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.notinca.warning",
+                        ConfigurationConstants.KEY_SECURITY_NOTINCA_WARNING,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.expired.warning",
+                        ConfigurationConstants.KEY_SECURITY_EXPIRED_WARNING,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.jsse.hostmismatch.warning",
+                        ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 },
@@ -240,7 +240,7 @@ public class Defaults {
                 {
                         ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER,
                         ValidatorFactory.createBooleanValidator(),
-                        
+
                         String.valueOf(true)
                 },
                 {
@@ -493,22 +493,22 @@ public class Defaults {
                 //* Native (rust) only - beggin
                 //**************
                 {
-                        "deployment.launcher.rust.cp.add",
+                        ConfigurationConstants.KEY_LAUNCHER_RUST_CP_ADD,
                        ValidatorFactory.createRustCpValidator(),
                         ""
                 },
                 {
-                        "deployment.launcher.rust.cp.remove",
+                        ConfigurationConstants.KEY_LAUNCHER_RUST_CP_REMOVE,
                         ValidatorFactory.createRustCpValidator(),
                         ""
                 },
                 {
-                        "deployment.launcher.rust.bootcp.add",
+                        ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_ADD,
                         ValidatorFactory.createRustCpValidator(),
                         null
                 },
                 {
-                        "deployment.launcher.rust.bootcp.remove",
+                        ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
                         ValidatorFactory.createRustCpValidator(),
                         ""
                 }

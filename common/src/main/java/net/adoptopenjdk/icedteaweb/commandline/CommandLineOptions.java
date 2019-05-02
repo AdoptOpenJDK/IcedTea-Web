@@ -42,7 +42,7 @@ public enum CommandLineOptions {
     SET("-set", "name value", "IBOSet", NumberOfArguments.EVEN_NUMBER_SUPPORTS_EQUALS_CHAR),
     RESETALL("-reset", "all", "IBOResetAll"),
     RESET("-reset", "name", "IBOReset", NumberOfArguments.ONE_OR_MORE),
-    CHECK("-check", "name", "IBOCheck"),
+    CHECK("-check", "IBOCheck"),
     HELP2("-help", "BOHelp2"),
     //policyeditor
     //-help

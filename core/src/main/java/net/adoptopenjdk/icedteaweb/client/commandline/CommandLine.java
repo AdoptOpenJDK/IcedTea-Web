@@ -23,10 +23,10 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.config.validators.ConfigurationValidator;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.Setting;
-import net.adoptopenjdk.icedteaweb.config.validators.ConfigurationValidator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
@@ -78,11 +78,11 @@ public class CommandLine {
     public static final int ERROR = 1;
     public static final int SUCCESS = 0;
 
-    public final String PROGRAM_NAME;
+    private final String programName;
 
-    private CommandLineOptionsParser optionParser;
+    private final CommandLineOptionsParser optionParser;
 
-    DeploymentConfiguration config = null;
+    private DeploymentConfiguration config;
 
     /**
      * Creates a new instance
@@ -90,7 +90,7 @@ public class CommandLine {
      */
     public CommandLine(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
-        PROGRAM_NAME = System.getProperty(ITW_BIN_NAME);
+        programName = System.getProperty(ITW_BIN_NAME);
 
         config = new DeploymentConfiguration();
         try {
@@ -105,7 +105,7 @@ public class CommandLine {
      *
      * @return the result of handling the help command. SUCCESS if no errors occurred.
      */
-    public int handleHelpCommand() {
+    private int handleHelpCommand() {
         final TextsProvider helpMessagesProvider = new ItwebSettingsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
         String helpMessage = "\n";
 
@@ -128,9 +128,9 @@ public class CommandLine {
     /**
      * Prints help message for the list command
      */
-    public void printListHelp() {
+    private void printListHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " list [--details]");
+        OutputController.getLogger().printOutLn("  " + programName + " list [--details]");
         OutputController.getLogger().printOutLn(R("CLListDescription"));
     }
 
@@ -139,7 +139,7 @@ public class CommandLine {
      *
      * @return result of handling the command. SUCCESS if no errors occurred.
      */
-    public int handleListCommand() {
+    private int handleListCommand() {
         if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printListHelp();
             return SUCCESS;
@@ -164,9 +164,9 @@ public class CommandLine {
     /**
      * Prints help message for the get command
      */
-    public void printGetHelp() {
+    private void printGetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " get property-name");
+        OutputController.getLogger().printOutLn("  " + programName + " get property-name");
         OutputController.getLogger().printOutLn(R("CLGetDescription"));
     }
 
@@ -176,7 +176,7 @@ public class CommandLine {
      * @return an integer representing success (SUCCESS) or error handling the
      * get command.
      */
-    public int handleGetCommand() {
+    private int handleGetCommand() {
         if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printGetHelp();
             return SUCCESS;
@@ -203,9 +203,9 @@ public class CommandLine {
     /**
      * Prints the help message for the 'set' command
      */
-    public void printSetHelp() {
+    private void printSetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " set property-name value");
+        OutputController.getLogger().printOutLn("  " + programName + " set property-name value");
         OutputController.getLogger().printOutLn(R("CLSetDescription"));
     }
 
@@ -278,9 +278,9 @@ public class CommandLine {
     /**
      * Prints a help message for the reset command
      */
-    public void printResetHelp() {
+    private void printResetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " reset [all|property-name]");
+        OutputController.getLogger().printOutLn("  " + programName + " reset [all|property-name]");
         OutputController.getLogger().printOutLn(R("CLResetDescription"));
     }
 
@@ -290,7 +290,7 @@ public class CommandLine {
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleResetCommand() {
+    private int handleResetCommand() {
         if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printResetHelp();
             return SUCCESS;
@@ -342,9 +342,9 @@ public class CommandLine {
     /**
      * Print a help message for the 'info' command
      */
-    public void printInfoHelp() {
+    private void printInfoHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " info property-name");
+        OutputController.getLogger().printOutLn("  " + programName + " info property-name");
         OutputController.getLogger().printOutLn(R("CLInfoDescription"));
     }
 
@@ -354,7 +354,7 @@ public class CommandLine {
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleInfoCommand() {
+    private int handleInfoCommand() {
         if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printInfoHelp();
             return SUCCESS;
@@ -383,9 +383,9 @@ public class CommandLine {
     /**
      * Prints a help message for the 'check' command
      */
-    public void printCheckHelp() {
+    private void printCheckHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " check");
+        OutputController.getLogger().printOutLn("  " + programName + " check");
         OutputController.getLogger().printOutLn(R("CLCheckDescription"));
     }
 
@@ -395,7 +395,7 @@ public class CommandLine {
      * @return an integer indicating success (SUCCESS) or error in handling
      * the command
      */
-    public int handleCheckCommand() {
+    private int handleCheckCommand() {
         if (optionParser.hasOption(CommandLineOptions.HELP2)) {
             printCheckHelp();
             return SUCCESS;

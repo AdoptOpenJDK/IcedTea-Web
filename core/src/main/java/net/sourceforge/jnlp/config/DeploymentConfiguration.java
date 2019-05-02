@@ -16,6 +16,15 @@
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+import net.sourceforge.jnlp.tools.ico.IcoSpi;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.spi.IIORegistry;
+import javax.naming.ConfigurationException;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,6 +35,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -36,14 +46,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import javax.imageio.spi.IIORegistry;
-import javax.naming.ConfigurationException;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
-import net.sourceforge.jnlp.tools.ico.IcoSpi;
-import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -60,6 +62,7 @@ public final class DeploymentConfiguration {
     private String userComments;
 
     private ConfigurationException loadingException = null;
+
 
     public enum ConfigType {
         SYSTEM, USER
@@ -115,17 +118,25 @@ public final class DeploymentConfiguration {
     }
 
     static boolean checkUrl(final URL file) {
-        try (final InputStream s = file.openStream()) {
-            return true;
-        } catch (final Throwable ex) {
-            // this should be logged, however, logging botle neck may not be initialised here
+        try {
+            try (InputStream s = file.openStream()) {
+                return true;
+            } catch (ConnectException e) {
+                // get some sleep and retry
+                Thread.sleep(500);
+                try (InputStream s = file.openStream()) {
+                    return true;
+                }
+            }
+        } catch (Throwable ex) {
+            LOG.info("checkUrl failed for " + file.toExternalForm() + " reason: " + ex.getMessage());
             return false;
         }
     }
 
 
     /**
-     * Initialize this deployment configuration by reading configuration filesystem.
+     * Initialize this deployment configuration by reading configuration files.
      * Generally, it will try to continue and ignore errors it finds (such as file not found).
      *
      * @throws ConfigurationException if it encounters a fatal error.
@@ -139,7 +150,7 @@ public final class DeploymentConfiguration {
     }
 
     /**
-     * Initialize this deployment configuration by reading configuration filesystem.
+     * Initialize this deployment configuration by reading configuration files.
      * Generally, it will try to continue and ignore errors it finds (such as file not found).
      *
      * @param fixIssues If true, fix issues that are discovered when reading configuration by

@@ -102,6 +102,14 @@ public interface ConfigurationConstants {
 
     String KEY_SYSTEM_TRUSTED_CLIENT_CERTS = "deployment.system.security.trusted.clientautcerts";
 
+    String KEY_SECURITY_ASKGRANTDIALOG_NOTINCA = "deployment.security.askgrantdialog.notinca";
+
+    String KEY_SECURITY_NOTINCA_WARNING = "deployment.security.notinca.warning";
+
+    String KEY_SECURITY_EXPIRED_WARNING = "deployment.security.expired.warning";
+
+    String KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING = "deployment.security.jsse.hostmismatch.warning";
+
     /**
      * Boolean. Only show security prompts to user if true
      */
@@ -265,4 +273,12 @@ public interface ConfigurationConstants {
     String XDG_DATA_HOME_VAR = "XDG_DATA_HOME";
     String WIN_VARIABLE_PREFIX = "%";
     String UNIX_VARIABLE_PREFIX = "$";
+
+    /*
+     * Native (rust)
+     */
+    String KEY_LAUNCHER_RUST_CP_ADD = "deployment.launcher.rust.cp.add";
+    String KEY_LAUNCHER_RUST_CP_REMOVE = "deployment.launcher.rust.cp.remove";
+    String KEY_LAUNCHER_RUST_BOOTCP_ADD = "deployment.launcher.rust.bootcp.add";
+    String KEY_LAUNCHER_RUST_BOOTCP_REMOVE = "deployment.launcher.rust.bootcp.remove";
 }
