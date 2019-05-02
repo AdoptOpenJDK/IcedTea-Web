@@ -55,11 +55,11 @@ import java.util.Vector;
 
 public class IcoReader extends ImageReader {
 
-    private final static Logger LOG = LoggerFactory.getLogger(IcoReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IcoReader.class);
 
     private ImageInputStreamIco cheat;
 
-    public IcoReader(final ImageReaderSpi originatingProvider) {
+    IcoReader(final ImageReaderSpi originatingProvider) {
         super(originatingProvider);
     }
 
