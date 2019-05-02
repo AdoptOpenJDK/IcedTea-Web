@@ -22,7 +22,14 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 /**
  * A JNLP file is an installer extension if the installer-desc element is specified. It describes an
  * application that is executed only once, the first time the JNLP file is used on the local system.
- *
+ * <p/>
+ * The installer extension is intended to install platform-specific native code that requires a more
+ * complicated setup than simply loading a native library into the JVM, such as installing a JRE or
+ * device driver. The installer executed by the JNLP Client must be a Java Technology-based application.
+ * Note that this does not limit the kind of code that can be installed or executed. For example, the
+ * installer could be a thin wrapper that executes a traditional native installer, executes a shell
+ * script, or unzips a ZIP file with native code onto the disk.
+ * <p/>
  * @implSpec See <b>JSR-56, Section 3.8.2 Installer Extension</b>
  * for a detailed specification of this class.
  *
