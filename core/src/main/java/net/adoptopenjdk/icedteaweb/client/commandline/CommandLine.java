@@ -77,7 +77,7 @@ public class CommandLine {
     public static final int ERROR = 1;
     public static final int SUCCESS = 0;
 
-    private final String PROGRAM_NAME;
+    private final String programName;
 
     private final CommandLineOptionsParser optionParser;
 
@@ -89,7 +89,7 @@ public class CommandLine {
      */
     public CommandLine(CommandLineOptionsParser optionParser) {
         this.optionParser = optionParser;
-        PROGRAM_NAME = System.getProperty(ITW_BIN_NAME);
+        programName = System.getProperty(ITW_BIN_NAME);
 
         config = new DeploymentConfiguration();
         try {
@@ -129,7 +129,7 @@ public class CommandLine {
      */
     private void printListHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " list [--details]");
+        OutputController.getLogger().printOutLn("  " + programName + " list [--details]");
         OutputController.getLogger().printOutLn(R("CLListDescription"));
     }
 
@@ -165,7 +165,7 @@ public class CommandLine {
      */
     private void printGetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " get property-name");
+        OutputController.getLogger().printOutLn("  " + programName + " get property-name");
         OutputController.getLogger().printOutLn(R("CLGetDescription"));
     }
 
@@ -204,7 +204,7 @@ public class CommandLine {
      */
     private void printSetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " set property-name value");
+        OutputController.getLogger().printOutLn("  " + programName + " set property-name value");
         OutputController.getLogger().printOutLn(R("CLSetDescription"));
     }
 
@@ -279,7 +279,7 @@ public class CommandLine {
      */
     private void printResetHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " reset [all|property-name]");
+        OutputController.getLogger().printOutLn("  " + programName + " reset [all|property-name]");
         OutputController.getLogger().printOutLn(R("CLResetDescription"));
     }
 
@@ -343,7 +343,7 @@ public class CommandLine {
      */
     private void printInfoHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " info property-name");
+        OutputController.getLogger().printOutLn("  " + programName + " info property-name");
         OutputController.getLogger().printOutLn(R("CLInfoDescription"));
     }
 
@@ -384,7 +384,7 @@ public class CommandLine {
      */
     private void printCheckHelp() {
         OutputController.getLogger().printOutLn(R("Usage"));
-        OutputController.getLogger().printOutLn("  " + PROGRAM_NAME + " check");
+        OutputController.getLogger().printOutLn("  " + programName + " check");
         OutputController.getLogger().printOutLn(R("CLCheckDescription"));
     }
 
