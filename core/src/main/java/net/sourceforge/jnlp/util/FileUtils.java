@@ -16,15 +16,14 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
-import net.sourceforge.jnlp.config.DirectoryValidator;
-import net.sourceforge.jnlp.config.DirectoryValidator.DirectoryCheckResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,13 +47,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
-import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;

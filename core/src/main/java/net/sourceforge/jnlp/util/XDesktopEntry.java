@@ -16,9 +16,12 @@
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
@@ -55,9 +58,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
