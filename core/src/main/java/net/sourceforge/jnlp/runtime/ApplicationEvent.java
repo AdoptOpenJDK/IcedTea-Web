@@ -14,23 +14,38 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.event;
+package net.sourceforge.jnlp.runtime;
 
-import java.util.EventListener;
+import java.util.EventObject;
 
 /**
- * The listener that is notified when an application instance is
- * terminated.
+ * This event is sent when an application is terminated.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.5 $
  */
-public interface ApplicationListener extends EventListener {
+public class ApplicationEvent extends EventObject {
+
+    /** the application instance */
+    final transient private ApplicationInstance application;
 
     /**
-     * Invoked when the application is destroyed.
-     * @param applicationEvent information about destruction
+     * Creates a launch event for the specified application
+     * instance.
+     *
+     * @param source the application instance
      */
-    public void applicationDestroyed(ApplicationEvent applicationEvent);
+    ApplicationEvent(final ApplicationInstance source) {
+        super(source);
+
+        this.application = source;
+    }
+
+    /**
+     * @return  the application instance.
+     */
+    public ApplicationInstance getApplication() {
+        return application;
+    }
 
 }

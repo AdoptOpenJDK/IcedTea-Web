@@ -25,8 +25,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.event.ApplicationEvent;
-import net.sourceforge.jnlp.event.ApplicationListener;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.util.GenericDesktopEntry;
 import net.sourceforge.jnlp.util.WeakList;

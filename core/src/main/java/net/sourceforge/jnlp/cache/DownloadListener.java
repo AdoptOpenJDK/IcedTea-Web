@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.event;
+package net.sourceforge.jnlp.cache;
 
 import java.util.EventListener;
 
@@ -29,23 +29,21 @@ import java.util.EventListener;
  * @version $Revision: 1.3 $
  */
 public interface DownloadListener extends EventListener {
-
     /**
      * Called when a resource is checked for being up-to-date.
      * @param downloadEvent information about started update
      */
-    public void updateStarted(DownloadEvent downloadEvent);
+    void updateStarted(DownloadEvent downloadEvent);
 
     /**
      * Called when a download starts.
      * @param downloadEvent  information about started download
      */
-    public void downloadStarted(DownloadEvent downloadEvent);
+    void downloadStarted(DownloadEvent downloadEvent);
 
     /**
      * Called when a download completed or there was an error.
      * @param downloadEvent  information about finished download
      */
-    public void downloadCompleted(DownloadEvent downloadEvent);
-
+    void downloadCompleted(DownloadEvent downloadEvent);
 }
