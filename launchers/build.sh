@@ -128,13 +128,55 @@ build sh javaws         net.sourceforge.jnlp.runtime.Boot
 build sh itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
 build sh policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
 
-mkdir $TARGET_TMP  # for tests output
-export ITW_TMP_REPLACEMENT=$TARGET_TMP # for tests output
-build rust javaws         net.sourceforge.jnlp.runtime.Boot
-build rust itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
-build rust policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
-if [ ! "$KCOV" = "none" ] ; then 
-  build rust coverage   net.sourceforge.jnlp.runtime.Boot
+if which $CARGO_RUST ; then
+  mkdir $TARGET_TMP  # for tests output
+  export ITW_TMP_REPLACEMENT=$TARGET_TMP # for tests output
+  build rust javaws         net.sourceforge.jnlp.runtime.Boot
+  build rust itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
+  build rust policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
+  if [ ! "$KCOV" = "none" ] ; then 
+    build rust coverage   net.sourceforge.jnlp.runtime.Boot
+  fi
+else
+  if [ "$CARGO_RUST" = "none" ] ; then 
+    echo "intentionally none cargo. Skipping build of native launchers"
+  else
+    echo "no cargo; can not build native launchers"
+    exit 1
+  fi
 fi
 
+if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
+  echo "not creating images in $ITW_LIBS mode; image is already done"
+  echo "TODO: make + make install support?"
+  echo "TODO: copy to proper targets, or already done during build?"
+  exit 0
+fi
+
+function image() {
+  local img_name=icedtea-web-$VERSION-$1
+  mkdir $TARGET_IMAGES/icedtea-web
+  cp -r $LIB_TARGET_DIR  $BIN_TARGET_DIR $TARGET_IMAGES/icedtea-web
+  pushd $TARGET_IMAGES/icedtea-web
+    rm -rvf $EXCLUDE
+  popd
+  pushd $TARGET_IMAGES
+    zip -r $img_name.zip icedtea-web
+  popd
+  mv $TARGET_IMAGES/icedtea-web $TARGET_IMAGES/$img_name
+}
+
+mkdir $TARGET_IMAGES
+EXCLUDE="bin/javaws bin/itweb-settings bin/policyeditor bin/*.exe"
+image portable.bin
+if which $CARGO_RUST ; then
+  EXCLUDE="bin/*.sh bin/*.bat"
+  if isWindows; then
+    image win.bin
+  else
+    image linux.bin
+  fi
+else
+  echo "intentionally none cargo. Skipping build of native images. Staying on portable shell image one only"
+fi
 

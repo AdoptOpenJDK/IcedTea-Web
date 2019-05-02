@@ -58,7 +58,7 @@
                                 </goals>
                                 <configuration>
                                     <executable>bash</executable>
-                                    <commandlineArgs>${basedir}/build.sh</commandlineArgs>
+                                    <commandlineArgs>${basedir}/build.sh ${project.version}</commandlineArgs>
                                     <outputFile>${basedir}/build.log</outputFile>
                                 </configuration>
                             </execution>

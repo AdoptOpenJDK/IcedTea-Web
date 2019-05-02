@@ -1,5 +1,13 @@
 #!/bin/sh
 
+VERSION=$1
+
+if [ "x$VERSION"  == "x" ] ; then
+ readonly VERSION="unknown"
+else
+ readonly VERSION=$VERSION
+fi
+
 if [ "x$JRE" == "x" ] ; then
   echo "default jre is necessary"
   exit 1
@@ -11,7 +19,8 @@ fi
 # sourced from build.sh
 readonly PROJECT_TOP=`dirname $SCRIPT_DIR`
 readonly TARGET=$SCRIPT_DIR/target
-readonly TARGET_TMP=$SCRIPT_DIR/target/tmp
+readonly TARGET_TMP=$TARGET/tmp
+readonly TARGET_IMAGES=$TARGET/images
 
 rm -rf "$TARGET"
 
@@ -146,4 +155,16 @@ KCOV="none" ;
 	  KCOV=$KCOV_HOME/build/src/kcov ;
 	fi ;
 
+if [ "x$CARGO_RUST" == "x" ] ; then
+  readonly CARGO_RUST=cargo
+else
+  readonly CARGO_RUST="$CARGO_RUST"
+fi
 
+isWindows() {
+  if [[ $( uname ) == *"NT"* ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
