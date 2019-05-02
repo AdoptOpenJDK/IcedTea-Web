@@ -16,16 +16,6 @@
 
 package net.sourceforge.jnlp.config;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.config.ConfigType;
-import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
-import net.sourceforge.jnlp.tools.ico.IcoSpi;
-import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.spi.IIORegistry;
-import javax.naming.ConfigurationException;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +36,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import javax.imageio.spi.IIORegistry;
+import javax.naming.ConfigurationException;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+import net.sourceforge.jnlp.tools.ico.IcoSpi;
+import net.sourceforge.jnlp.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -65,7 +62,7 @@ public final class DeploymentConfiguration {
     private ConfigurationException loadingException = null;
 
     public enum ConfigType {
-        System, User
+        SYSTEM, USER
     }
 
     /** is it mandatory to load the system properties? */

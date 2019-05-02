@@ -4,6 +4,7 @@
  */
 package net.adoptopenjdk.icedteaweb.config.validators;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
@@ -101,7 +102,7 @@ public class DirectoryValidator {
                 correctPermissions = false;
             }
             try {
-                FileUtils.saveFile("ww", testFile);
+                BasicFileUtils.saveFile("ww", testFile);
                 final String s = FileUtils.loadFileAsString(testFile);
                 if (!s.trim().equals("ww")) {
                     correctPermissions = false;
