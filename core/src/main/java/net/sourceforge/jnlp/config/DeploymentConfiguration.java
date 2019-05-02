@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
-import net.sourceforge.jnlp.tools.ico.IcoSpi;
+import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
 import net.sourceforge.jnlp.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public final class DeploymentConfiguration {
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
         try {
-            final IcoSpi spi = new IcoSpi();
+            final IcoReaderSpi spi = new IcoReaderSpi();
             IIORegistry.getDefaultInstance().registerServiceProvider(spi);
             LOG.info("Ico provider registered correctly.");
         } catch (final Exception ex) {

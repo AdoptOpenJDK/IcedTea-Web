@@ -34,30 +34,25 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.sourceforge.jnlp.tools.ico;
-
-import net.sourceforge.jnlp.tools.ico.impl.IcoHeader;
-import net.sourceforge.jnlp.tools.ico.impl.ImageInputStreamIco;
+package net.adoptopenjdk.icedteaweb.icon;
 
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
 
-public class IcoSpi extends ImageReaderSpi {
+public class IcoReaderSpi extends ImageReaderSpi {
 
-    private static final String readerClassName
-            = ImageInputStreamIco.class.getName();
-    private static final String[] localNames = {"ico"};
-    private static final String[] localSuffixes = {"ico", "Ico", "ICO"};
-    private static final String[] localMIMETypes = {
-        "image/vnd.microsoft.icon", "image/x-icon"};
 
-    public IcoSpi() {
+    private static final String readerClassName = Icons.class.getName();
+    private static final String[] localNames = {IconConstants.ICO};
+    private static final String[] localSuffixes = {IconConstants.ICO, IconConstants.ICO_CAMELCASE, IconConstants.ICO_UPPERCASE};
+    private static final String[] localMIMETypes = {IconConstants.IMAGE_VND_MICROSOFT_ICON, IconConstants.IMAGE_X_ICON};
+
+    public IcoReaderSpi() {
         super("icedtea-web",
                 "1.0",
                 localNames,
@@ -79,32 +74,31 @@ public class IcoSpi extends ImageReaderSpi {
     }
 
     @Override
-    public String getDescription(Locale locale) {
+    public String getDescription(final Locale locale) {
         return "icedtea-web ico decoder provider";
     }
 
     @Override
-    public boolean canDecodeInput(Object input) {
+    public boolean canDecodeInput(final Object input) {
         try {
-            IcoHeader header = null;
             if (input instanceof ImageInputStream) {
-                ImageInputStream in = (ImageInputStream) input;
+                final ImageInputStream in = (ImageInputStream) input;
                 in.mark();
                 try {
-                    header = new IcoHeader(in);
+                    new IcoHeader(in);
                 } finally {
                     in.reset();
                 }
+                return true;
             }
-            return header != null;
-        } catch (Exception ex) {
-            //ex.printStackTrace();
+            return false;
+        } catch (final Exception ex) {
             return false;
         }
     }
 
     @Override
-    public ImageReader createReaderInstance(Object extension) {
+    public ImageReader createReaderInstance(final Object extension) {
         return new IcoReader(this);
     }
 

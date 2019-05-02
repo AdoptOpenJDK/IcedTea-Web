@@ -34,9 +34,11 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.sourceforge.jnlp.tools.ico;
+package net.adoptopenjdk.icedteaweb.icon;
 
-import net.sourceforge.jnlp.tools.ico.impl.ImageInputStreamIco;
+import net.adoptopenjdk.icedteaweb.LazyLoaded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -51,63 +53,49 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class IcoReader extends ImageReader {
+class IcoReader extends ImageReader {
 
-    private ImageInputStreamIco cheat;
+    private static final Logger LOG = LoggerFactory.getLogger(IcoReader.class);
 
-    private void loadIcon() {
-        if (cheat == null) {
-            try {
+    private final LazyLoaded<Icons> imagesCache;
 
-                if (input instanceof ImageInputStream) {
-                    ImageInputStream iis = (ImageInputStream) input;
-                    cheat = new ImageInputStreamIco(iis);
-
-                }
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    public IcoReader(ImageReaderSpi originatingProvider) {
+    IcoReader(final ImageReaderSpi originatingProvider) {
         super(originatingProvider);
+        imagesCache = new LazyLoaded<>(this::loadIcon);
     }
 
-    @Override
-    public int getNumImages(boolean allowSearch) {
-        loadIcon();
-        return cheat.getHeader().getCountOfIcons();
-    }
-
-    private void checkIndex(int imageIndex) {
-        loadIcon();
-        if (imageIndex < 0 || imageIndex >= cheat.getHeader().getCountOfIcons()) {
-            throw new IndexOutOfBoundsException("bad index " + imageIndex + ". Should be >=0 and < " + cheat.getHeader().getCountOfIcons());
+    private Icons loadIcon() {
+        try {
+            final Object input = getInput();
+            if (input instanceof ImageInputStream) {
+                return new Icons((ImageInputStream) input);
+            }
+        } catch (final Exception ex) {
+            LOG.error("Error in loading icon", ex);
         }
+        return null;
     }
 
     @Override
-    public int getWidth(int imageIndex) {
-        checkIndex(imageIndex);
-        return cheat.getHeader().getEntries().get(imageIndex).getWidth();
+    public int getNumImages(final boolean allowSearch) {
+        return imagesCache.get().getNumImages();
     }
 
     @Override
-    public int getHeight(int imageIndex) {
-        checkIndex(imageIndex);
-        return cheat.getHeader().getEntries().get(imageIndex).getHeight();
-
+    public int getWidth(final int imageIndex) {
+        return imagesCache.get().getWidth(imageIndex);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Iterator<ImageTypeSpecifier> getImageTypes(int imageIndex) {
-        checkIndex(imageIndex);
-        List l = new ArrayList();
-        Vector<RenderedImage> q = cheat.getImage(imageIndex).getSources();
-        for (RenderedImage q1 : q) {
+    public int getHeight(final int imageIndex) {
+        return imagesCache.get().getHeight(imageIndex);
+    }
+
+    @Override
+    public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) {
+        final Vector<RenderedImage> q = imagesCache.get().getImage(imageIndex).getSources();
+        final List<ImageTypeSpecifier> l = new ArrayList<>();
+        for (final RenderedImage q1 : q) {
             l.add(new ImageTypeSpecifier(q1));
         }
 
@@ -120,14 +108,12 @@ public class IcoReader extends ImageReader {
     }
 
     @Override
-    public IIOMetadata getImageMetadata(int imageIndex) {
-        checkIndex(imageIndex);
+    public IIOMetadata getImageMetadata(final int imageIndex) {
         return null;
     }
 
     @Override
-    public BufferedImage read(int imageIndex, ImageReadParam param) {
-        checkIndex(imageIndex);
-        return cheat.getImage(imageIndex);
+    public BufferedImage read(final int imageIndex, final ImageReadParam param) {
+        return imagesCache.get().getImage(imageIndex);
     }
 }

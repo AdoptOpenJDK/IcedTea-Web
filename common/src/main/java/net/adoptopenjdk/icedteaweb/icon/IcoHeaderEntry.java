@@ -1,5 +1,3 @@
-package net.sourceforge.jnlp.tools.ico.impl;
-
 /*
  Copyright (C) 2015 Red Hat, Inc.
 
@@ -37,21 +35,20 @@ package net.sourceforge.jnlp.tools.ico.impl;
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
+package net.adoptopenjdk.icedteaweb.icon;
+
 import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
 
-public class IcoHeaderEntry {
+class IcoHeaderEntry {
 
     private int width;
     private int height;
     private int colorCount;
-    private final int reserved;
-    private final int planes; //should be 1 but  I met quite a lot of  0
-    private final int bitCount;
     private final int sizeInBytes; // InfoHeader + ANDbitmap + XORbitmap
     private final int fileOffset; //FilePos, where InfoHeader starts
 
-    public IcoHeaderEntry(ImageInputStream src) throws IOException, IcoException {
+    IcoHeaderEntry(final ImageInputStream src) throws IOException, IcoException {
         width = src.read();
         height = src.read();
         colorCount = src.read();
@@ -61,29 +58,16 @@ public class IcoHeaderEntry {
         if (colorCount == 0) {
             colorCount = 256;
         }
-        reserved = src.read();
-        planes = src.readUnsignedShort();
-        isIcoHeader();
-        bitCount = src.readUnsignedShort();
-        sizeInBytes = src.readInt();
-        fileOffset = src.readInt();
-    }
+        int reserved = src.read();
+        int planes = src.readUnsignedShort(); //should be 1 but I met quite a lot of  0
 
-    private IcoHeaderEntry(int width, int height, int planes, int sizeInBytes, int fileOffset) {
-        this.width = width;
-        this.height = height;
-        this.colorCount = 1;
-        this.reserved = 0;
-        this.planes = planes;
-        this.bitCount = 1;
-        this.sizeInBytes = sizeInBytes;
-        this.fileOffset = fileOffset;
-    }
-
-    private void isIcoHeader() throws IcoException {
-        if (reserved != 0 || (planes != 1 && planes != 0)) {
+        if (reserved != 0 || !(planes == 1 || planes == 0)) {
             throw new IcoException("Invalid header. Expected 0 and 1(0?), got " + reserved + " and " + planes);
         }
+
+        src.readUnsignedShort(); //bitCount
+        sizeInBytes = src.readInt();
+        fileOffset = src.readInt();
     }
 
     /**
@@ -102,28 +86,28 @@ public class IcoHeaderEntry {
     /**
      * @return the width
      */
-    public int getWidth() {
+    int getWidth() {
         return width;
     }
 
     /**
      * @param width the width to set
      */
-    void setWidth(int width) {
+    void setWidth(final int width) {
         this.width = width;
     }
 
     /**
      * @return the height
      */
-    public int getHeight() {
+    int getHeight() {
         return height;
     }
 
     /**
      * @param height the height to set
      */
-    void setHeight(int height) {
+    void setHeight(final int height) {
         this.height = height;
     }
 

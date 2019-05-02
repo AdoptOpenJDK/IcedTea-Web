@@ -34,7 +34,7 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.sourceforge.jnlp.tools.ico.impl;
+package net.adoptopenjdk.icedteaweb.icon;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +45,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ImageInputStreamIcoTest {
+public class IconsTest {
 
-    private ImageInputStreamIco loadIco(String id) throws IOException, IcoException {
+    private Icons loadIco(String id) throws IOException, IcoException {
         try (InputStream is = this.getClass().getResourceAsStream("resources/" + id)) {
             Assert.assertNotNull(is);
-            ImageInputStreamIco i = new ImageInputStreamIco(ImageIO.createImageInputStream(is));
+            Icons i = new Icons(ImageIO.createImageInputStream(is));
             Assert.assertNotNull(i);
             return i;
         }
@@ -85,8 +85,8 @@ public class ImageInputStreamIcoTest {
     }
 
     @Test
-    public void twhoPlanesDifferentSizesDifferentTransparencies() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon1.ico");
+    public void twoPlanesDifferentSizesDifferentTransparencies() throws IOException, IcoException {
+        Icons i = loadIco("favicon1.ico");
         Assert.assertEquals(2, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -94,15 +94,15 @@ public class ImageInputStreamIcoTest {
             Assert.assertEquals(ii * 16, x.getWidth());
             Assert.assertEquals(ii * 16, x.getHeight());
         }
-        Color lwhite = new Color(252, 253, 252);
-        checkColors(new Color(0, 128, 0), lwhite, i.getImage(0));
+        Color white = new Color(252, 253, 252);
+        checkColors(new Color(0, 128, 0), white, i.getImage(0));
         checkColors(new Color(0, 131, 0), Color.white, i.getImage(1));
 
     }
 
     @Test
     public void strangeStrips() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon2.ico");
+        Icons i = loadIco("favicon2.ico");
         Assert.assertEquals(2, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -127,7 +127,7 @@ public class ImageInputStreamIcoTest {
 
     @Test
     public void strangePng() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon3.ico");
+        Icons i = loadIco("favicon3.ico");
         Assert.assertEquals(1, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -140,7 +140,7 @@ public class ImageInputStreamIcoTest {
 
     @Test
     public void bmpsMixedWithPngAndTransparencyAndLAyersFromBiggestToSmallest() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon4.ico");
+        Icons i = loadIco("favicon4.ico");
         Assert.assertEquals(4, i.getImages().size());
         int index = 0;
         //1 256
@@ -171,8 +171,8 @@ public class ImageInputStreamIcoTest {
     }
 
     @Test
-    public void notHonoredTahta256is0() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon5.ico");
+    public void notHonoredThat256is0() throws IOException, IcoException {
+        Icons i = loadIco("favicon5.ico");
         Assert.assertEquals(1, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -186,7 +186,7 @@ public class ImageInputStreamIcoTest {
 
     @Test
     public void corruptedHeader() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon5.ico");
+        Icons i = loadIco("favicon5.ico");
         Assert.assertEquals(1, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -200,7 +200,7 @@ public class ImageInputStreamIcoTest {
 
     @Test
     public void corruptedHeader2() throws IOException, IcoException {
-        ImageInputStreamIco i = loadIco("favicon6.ico");
+        Icons i = loadIco("favicon6.ico");
         Assert.assertEquals(1, i.getImages().size());
         int ii = 0;
         for (BufferedImage x : i.getImages()) {
@@ -221,7 +221,7 @@ public class ImageInputStreamIcoTest {
             for (String comp : compressions) {
                 for (String tran : trans) {
                     String name = "ico" + palette + "-" + comp + "-" + tran + ".ico";
-                    ImageInputStreamIco i = loadIco(name);
+                    Icons i = loadIco(name);
                     Assert.assertEquals(1, i.getImages().size());
                     Assert.assertEquals(16, i.getImage(0).getWidth());
                     Assert.assertEquals(16, i.getImage(0).getHeight());
