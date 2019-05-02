@@ -62,6 +62,18 @@
                                     <outputFile>${basedir}/build.log</outputFile>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>clean-launchers</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>rm</executable>
+                                    <commandlineArgs>-rvf ${basedir}/target  ${basedir}/rust-launcher/target/</commandlineArgs>
+                                    <outputFile>${basedir}/build.log</outputFile>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
