@@ -16,9 +16,10 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+
 import java.util.Arrays;
 import java.util.List;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 
 /**
  * The application-desc element contains all information needed to launch an application, given the resources
@@ -31,6 +32,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
 public class ApplicationDesc implements EntryPoint {
+    public static final String APPLICATION_DESC_ELEMENT = "application-desc";
+    public static final String JAVAFX_DESC_ELEMENT = "javafx-desc";
 
     /**
      * The type of application supported by the JNLP Client. The optional attribute indicates the type of

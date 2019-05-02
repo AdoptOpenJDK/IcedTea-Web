@@ -69,6 +69,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.APPLET_DESC_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.JAVAFX_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
@@ -756,9 +759,9 @@ public final class Parser {
      */
     public EntryPoint getEntryPointDesc(final Node parent) throws ParseException {
         // check for other than one application type
-        if (1 < getChildNodes(parent, "applet-desc").length
-                + getChildNodes(parent, "application-desc").length
-                + getChildNodes(parent, "javafx-desc").length
+        if (1 < getChildNodes(parent, APPLET_DESC_ELEMENT).length
+                + getChildNodes(parent, APPLICATION_DESC_ELEMENT).length
+                + getChildNodes(parent, JAVAFX_DESC_ELEMENT).length
                 + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
             throw new ParseException(R("PTwoDescriptors"));
         }
@@ -767,16 +770,16 @@ public final class Parser {
         while (child != null) {
             final String name = child.getNodeName().getName();
 
-            if ("applet-desc".equals(name)) {
+            if (APPLET_DESC_ELEMENT.equals(name)) {
                 return getApplet(child);
             }
-            if ("application-desc".equals(name)) {
+            if (APPLICATION_DESC_ELEMENT.equals(name)) {
                 return getApplication(ApplicationType.JAVA, child);
             }
             if (INSTALLER_DESC_ELEMENT.equals(name)) {
                 return getInstaller(child);
             }
-            if ("javafx-desc".equals(name)) {
+            if (JAVAFX_DESC_ELEMENT.equals(name)) {
                 return getApplication(ApplicationType.JAVAFX, child);
             }
 

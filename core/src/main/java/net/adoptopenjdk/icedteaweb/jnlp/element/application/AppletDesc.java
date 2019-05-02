@@ -16,13 +16,14 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The applet-desc element contains all information needed to launch an Applet, given the resources described
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class AppletDesc implements EntryPoint {
 
     private final static Logger LOG = LoggerFactory.getLogger(AppletDesc.class);
+    public static final String APPLET_DESC_ELEMENT = "applet-desc";
 
     /** Name of the Applet. This is available to the Applet through the AppletContext. */
     private final String name;
