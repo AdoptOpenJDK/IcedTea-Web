@@ -69,6 +69,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
@@ -758,7 +759,7 @@ public final class Parser {
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length
                 + getChildNodes(parent, "javafx-desc").length
-                + getChildNodes(parent, "installer-desc").length) {
+                + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
             throw new ParseException(R("PTwoDescriptors"));
         }
 
@@ -772,7 +773,7 @@ public final class Parser {
             if ("application-desc".equals(name)) {
                 return getApplication(ApplicationType.JAVA, child);
             }
-            if ("installer-desc".equals(name)) {
+            if (INSTALLER_DESC_ELEMENT.equals(name)) {
                 return getInstaller(child);
             }
             if ("javafx-desc".equals(name)) {
