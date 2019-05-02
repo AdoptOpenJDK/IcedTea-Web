@@ -135,6 +135,9 @@ public final class DeploymentConfiguration {
      * Security and access control
      */
 
+    public static final String KEY_SECURITY_ASKGRANTDIALOG_NOTINCA = "deployment.security.askgrantdialog.notinca";
+    public static final String KEY_SECURITY_NOTINCA_WARNING = "deployment.security.notinca.warning";
+
     /** Boolean. Only show security prompts to user if true */
     public static final String KEY_SECURITY_PROMPT_USER = "deployment.security.askgrantdialog.show";
 
@@ -157,6 +160,10 @@ public final class DeploymentConfiguration {
     
     /** Boolean. Do not prefer https over http */
     public static final String KEY_HTTPS_DONT_ENFORCE = "deployment.https.noenforce";
+
+    public static final String KEY_SECURITY_EXPIRED_WARNING = "deployment.security.expired.warning";
+    public static final String KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING = "deployment.security.jsse.hostmismatch.warning";
+
     /*
      * Networking
      */
@@ -249,6 +256,15 @@ public final class DeploymentConfiguration {
     public static final String KEY_SMALL_SIZE_OVERRIDE_THRESHOLD = "deployment.small.size.threshold";
     public static final String KEY_SMALL_SIZE_OVERRIDE_WIDTH = "deployment.small.size.override.width";
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
+
+    /*
+     * Native (rust)
+     */
+
+    public static final String KEY_LAUNCHER_RUST_CP_ADD = "deployment.launcher.rust.cp.add";
+    public static final String KEY_LAUNCHER_RUST_CP_REMOVE = "deployment.launcher.rust.cp.remove";
+    public static final String KEY_LAUNCHER_RUST_BOOTCP_ADD = "deployment.launcher.rust.bootcp.add";
+    public static final String KEY_LAUNCHER_RUST_BOOTCP_REMOVE = "deployment.launcher.rust.bootcp.remove";
 
 
     private static final String VV_POSSIBLE_BROWSER_VALUES = "VVPossibleBrowserValues";

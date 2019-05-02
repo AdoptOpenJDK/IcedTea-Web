@@ -69,7 +69,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * This class stores the default configuration
  */
 public class Defaults {
-    
+
 
     /**
      * Get the default settings for deployment
@@ -199,22 +199,22 @@ public class Defaults {
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.askgrantdialog.notinca",
+                        DeploymentConfiguration.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.notinca.warning",
+                        DeploymentConfiguration.KEY_SECURITY_NOTINCA_WARNING,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.expired.warning",
+                        DeploymentConfiguration.KEY_SECURITY_EXPIRED_WARNING,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
                 {
-                        "deployment.security.jsse.hostmismatch.warning",
+                        DeploymentConfiguration.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING,
                         BasicValueValidators.getBooleanValidator(),
                         String.valueOf(true)
                 },
@@ -488,22 +488,22 @@ public class Defaults {
                 //* Native (rust) only - beggin
                 //**************
                 {
-                        "deployment.launcher.rust.cp.add",
+                        DeploymentConfiguration.KEY_LAUNCHER_RUST_CP_ADD,
                        new BasicValueValidators.RustCpValidator(),
                         ""
                 },
                 {
-                        "deployment.launcher.rust.cp.remove",
+                        DeploymentConfiguration.KEY_LAUNCHER_RUST_CP_REMOVE,
                         new BasicValueValidators.RustCpValidator(),
                         ""
                 },
                 {
-                        "deployment.launcher.rust.bootcp.add",
+                        DeploymentConfiguration.KEY_LAUNCHER_RUST_BOOTCP_ADD,
                         new BasicValueValidators.RustCpValidator(),
                         null
                 },
                 {
-                        "deployment.launcher.rust.bootcp.remove",
+                        DeploymentConfiguration.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
                         new BasicValueValidators.RustCpValidator(),
                         ""
                 }
