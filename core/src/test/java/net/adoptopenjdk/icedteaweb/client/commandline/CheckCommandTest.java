@@ -16,9 +16,10 @@
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import java.util.Arrays;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.SUCCESS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;

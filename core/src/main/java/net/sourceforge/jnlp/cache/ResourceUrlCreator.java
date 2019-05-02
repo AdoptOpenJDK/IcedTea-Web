@@ -38,9 +38,8 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +101,7 @@ public class ResourceUrlCreator {
 
         urls.add(resource.getLocation());
 
-        boolean noHttpsPreferred = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_HTTPS_DONT_ENFORCE));
+        boolean noHttpsPreferred = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE));
         if (!noHttpsPreferred) {
             //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
             List<URL> urlsCopy = new LinkedList<>(urls);

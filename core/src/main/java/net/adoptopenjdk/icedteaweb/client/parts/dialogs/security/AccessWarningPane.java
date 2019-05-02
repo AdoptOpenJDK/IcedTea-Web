@@ -37,21 +37,21 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.CertVerifier;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
@@ -248,7 +248,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 c.gridy++;
             }
             infoPanel.add(new JLabel(R("EXAWsettingsInfo",
-                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CREATE_DESKTOP_SHORTCUT)),
+                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT)),
                     R("CPTabDesktopIntegration"))),c);
             c.gridy++;
             infoPanel.add(new JLabel(R("EXAWsettingsManage", R("CPTabMenuShortcuts"))),c);

@@ -37,7 +37,9 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.console;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -45,7 +47,6 @@ import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +181,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     public static boolean isEnabled(DeploymentConfiguration config) {
-        return !DeploymentConfiguration.CONSOLE_DISABLE.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+        return !ConfigurationConstants.CONSOLE_DISABLE.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && !JNLPRuntime.isHeadless();
     }
 
@@ -192,10 +193,10 @@ public class JavaConsole implements ObservableMessagesProvider {
         if (!isEnabled(config)) {
             return false;
         }
-        return DeploymentConfiguration.CONSOLE_SHOW.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
-                || (DeploymentConfiguration.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+        return ConfigurationConstants.CONSOLE_SHOW.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
+                || (ConfigurationConstants.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && !isApplication)
-                || (DeploymentConfiguration.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(DeploymentConfiguration.KEY_CONSOLE_STARTUP_MODE))
+                || (ConfigurationConstants.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && isApplication);
     }
 

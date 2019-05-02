@@ -37,8 +37,10 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.config.FilesystemConfiguration;
+import net.adoptopenjdk.icedteaweb.config.Target;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,78 +50,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
-import static net.sourceforge.jnlp.config.DeploymentConfiguration.APPLET_TRUST_SETTINGS;
-import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_CONFIG_FILE;
-import static net.sourceforge.jnlp.config.DeploymentConfiguration.DEPLOYMENT_PROPERTIES;
 
 public class PathsAndFiles {
 
     private final static Logger LOG = LoggerFactory.getLogger(PathsAndFiles.class);
 
-    private static final String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
-
-    private static final String CONFIG_HOME;
-    private static final String CACHE_HOME;
-    private static final String DATA_HOME;
-    private static final String RUNTIME_HOME;
-    private static final String USER_CONFIG_HOME;
-private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
-    private static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
-    private static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
-    private static final String XDG_DATA_HOME = "XDG_DATA_HOME";
-    private static final String WINDIR = "WINDIR";
-    private static final String TMP_PROP = "java.io.tmpdir";
-    private static final String HOME_PROP = "user.home";
-    private static final String JAVA_PROP = "java.home";
-    private static final String USER_PROP = "user.name";
-    private static final String VARIABLE = JNLPRuntime.isWindows() ? "%" : "$";
-    private static final String securityWord = "security";
-    public static final String ICEDTEA_SO = "IcedTeaPlugin.so";
-    public static final String CACHE_INDEX_FILE_NAME = "recently_used";
-
-    static {
-        String configHome = System.getProperty(HOME_PROP) + File.separator + ".config";
-        String cacheHome = System.getProperty(HOME_PROP) + File.separator + ".cache";
-        String dataHome = System.getProperty(HOME_PROP) +  File.separator + ".local" + File.separator + "share";
-        String runtimeHome = System.getProperty(TMP_PROP);
-        String xdg_config_home = System.getenv(XDG_CONFIG_HOME_VAR);
-        String xdg_cache_home = System.getenv(XDG_CACHE_HOME_VAR);
-        String xdg_runtime_home = System.getenv(XDG_RUNTIME_DIR_VAR);
-        String xdg_data_home = System.getenv(XDG_DATA_HOME);
-        if (xdg_config_home != null) {
-            CONFIG_HOME = xdg_config_home;
-        } else {
-            CONFIG_HOME = configHome;
-        }
-        if (xdg_cache_home != null) {
-            CACHE_HOME = xdg_cache_home;
-        } else {
-            CACHE_HOME = cacheHome;
-        }
-        if (xdg_runtime_home != null) {
-            RUNTIME_HOME = xdg_runtime_home;
-        } else {
-            RUNTIME_HOME = runtimeHome;
-        }
-         if (xdg_data_home != null) {
-           DATA_HOME = xdg_data_home;
-        } else {
-            DATA_HOME = dataHome;
-        }
-        USER_CONFIG_HOME = CONFIG_HOME + File.separator + DEPLOYMENT_SUBDIR_DIR;
-    }
 
     public static final InfrastructureFileDescriptor MOZILA_USER = new HomeFileDescriptor(Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
-    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
+
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_64 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib64/mozilla/plugins/", "",  "FILEmozillaglobal64", Target.PLUGIN);
+
+    public static final InfrastructureFileDescriptor MOZILA_GLOBAL_32 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib/mozilla/plugins/", "",  "FILEmozillaglobal32", Target.PLUGIN);
+
+    public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
+
+    public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
     
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS) {
     
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_CACHE_DIR;
+            return ConfigurationConstants.KEY_USER_CACHE_DIR;
         }
 
     };
@@ -131,7 +82,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     }
 
     private static class RECENTLY_USED_FILE_HOLDER {
-        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS){
+        static final InfrastructureFileDescriptor RECENTLY_USED_FILE = new ItwCacheFileDescriptor(ConfigurationConstants.CACHE_INDEX_FILE_NAME, CACHE_DIR.getFile().getName(), "FILErecentlyUsed", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
             @Override
             public String getFullPath() {
@@ -145,14 +96,14 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_PERSISTENCE_CACHE_DIR;
+            return ConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR;
         }
     };
     public static final InfrastructureFileDescriptor LOG_DIR = new ItwConfigFileDescriptor("log", "FILElogs", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_LOG_DIR;
+            return ConfigurationConstants.KEY_USER_LOG_DIR;
         }
     
         
@@ -162,14 +113,14 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     public static final InfrastructureFileDescriptor GEN_JNLPS_DIR = new ItwConfigFileDescriptor("generated_jnlps", "FILEjnlps", Target.PLUGIN, Target.ITWEB_SETTINGS);
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
-    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TMP_DIR;
+            return ConfigurationConstants.KEY_USER_TMP_DIR;
         }
         
     };
@@ -177,7 +128,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_LOCKS_DIR;
+            return ConfigurationConstants.KEY_USER_LOCKS_DIR;
         }
         
     };
@@ -185,7 +136,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_NETX_RUNNING_FILE;
+            return ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE;
         }
         
     };
@@ -193,7 +144,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
                    @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_SECURITY_POLICY;
+            return ConfigurationConstants.KEY_USER_SECURITY_POLICY;
         }
 
         @Override
@@ -204,35 +155,35 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     public static final InfrastructureFileDescriptor USER_CACERTS = new UserCacertsFileDescriptor("trusted.cacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CA_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECAC = new UserCacertsFileDescriptor("trusted.jssecacerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CA_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CERTS = new UserCacertsFileDescriptor("trusted.certs") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_JSSECER = new UserCacertsFileDescriptor("trusted.jssecerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_JSSE_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor USER_CLIENTCERT = new UserCacertsFileDescriptor("trusted.clientcerts") {
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_USER_TRUSTED_CLIENT_CERTS;
+            return ConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -240,7 +191,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
         
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CA_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS;
         }
         
     };
@@ -248,21 +199,21 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
       
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
         }
 
     };
     public static final InfrastructureFileDescriptor SYS_CERT = new SystemJavaSecurityFileDescriptor("trusted.certs"){
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS;
         }
     };
     public static final InfrastructureFileDescriptor SYS_JSSECERT = new SystemJavaSecurityFileDescriptor("trusted.jssecerts") {
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
         }
         
     };
@@ -270,7 +221,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getPropertiesKey() {
-            return DeploymentConfiguration.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
+            return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS;
         }
 
     };
@@ -278,11 +229,11 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         @Override
         public String getDescription() {
-             return Translator.R(getDescriptionKey(), DeploymentConfiguration.KEY_JRE_DIR);
+             return Translator.R(getDescriptionKey(), ConfigurationConstants.KEY_JRE_DIR);
         }
         
     };
-    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
     public static List<InfrastructureFileDescriptor> getAllFiles() {
         return getAllFiles(null);
@@ -336,11 +287,11 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class HomeFileDescriptor extends InfrastructureFileDescriptor {
 
         private HomeFileDescriptor(Target... target) {
-            super(PathsAndFiles.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(HOME_PROP), "FILEmozillauser", target);
+            super(ConfigurationConstants.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(ConfigurationConstants.HOME_PROP), "FILEmozillauser", target);
         }
               @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "HOME";
+            return FilesystemConfiguration.getVariablePrefix() + "HOME";
         }
 
 
@@ -353,7 +304,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
 
         private static String getSystemConfigDir() {
             if (JNLPRuntime.isWindows()) {
-                return System.getenv(WINDIR) + windowsPathSuffix;
+                return System.getenv(ConfigurationConstants.WINDIR) + windowsPathSuffix;
             } else {
                 return unixPathSuffix;
             }
@@ -362,7 +313,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
         @Override
         public String getSystemPathStubAcronym() {
             //note the hardcoded % instead of VARIABLE (actually leading to idea, that docs, when generated on windows may not make sense)
-            return "{" + "%" + WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
+            return "{" + "%" + ConfigurationConstants.WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
         }
 
         private SystemConfigFileDescriptor(String fileName, String description, Target... target) {
@@ -382,12 +333,12 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class SystemJavaFileDescriptor extends InfrastructureFileDescriptor {
 
         private SystemJavaFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, System.getProperty(JAVA_PROP), description, target);
+            super(fileName, pathSub, System.getProperty(ConfigurationConstants.JAVA_PROP), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "JAVA_HOME";
+            return FilesystemConfiguration.getVariablePrefix() + "JAVA_HOME";
         }
 
     }
@@ -395,11 +346,11 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class SystemJavaLibFileDescriptor extends SystemJavaFileDescriptor {
 
         private SystemJavaLibFileDescriptor(Target... target) {
-            super(DeploymentConfiguration.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
+            super(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "lib", "FILEjavadp", target);
         }
 
         private SystemJavaLibFileDescriptor(String fileName, Target... target) {
-            super(fileName, "lib" + File.separator + PathsAndFiles.securityWord, "FILEjavacerts", target);
+            super(fileName, "lib" + File.separator + ConfigurationConstants.SECURITY_WORD, "FILEjavacerts", target);
         }
 
     }
@@ -415,12 +366,12 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class DataFileDescriptor extends InfrastructureFileDescriptor {
 
         private DataFileDescriptor(String fileName, Target... target) {
-            super(fileName, "applications", DATA_HOME, "FILEmenus", target);
+            super(fileName, "applications", FilesystemConfiguration.getDataHome(), "FILEmenus", target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "" + XDG_DATA_HOME;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_DATA_HOME_VAR;
         }
 
     }
@@ -439,12 +390,12 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class RuntimeFileDescriptor extends InfrastructureFileDescriptor {
 
         private RuntimeFileDescriptor(Target... target) {
-            super("icedteaplugin-user-*", RUNTIME_HOME, "", "FILEpipe", target);
+            super("icedteaplugin-user-*", FilesystemConfiguration.getRuntimeHome(), "", "FILEpipe", target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "" + XDG_RUNTIME_DIR_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_RUNTIME_DIR_VAR;
         }
 
     }
@@ -452,12 +403,12 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class ConfigFileDescriptor extends InfrastructureFileDescriptor {
 
         private ConfigFileDescriptor(String fileName, String pathStub, String description, Target... target) {
-            super(fileName, pathStub, CONFIG_HOME, description, target);
+            super(fileName, pathStub, FilesystemConfiguration.getConfigHome(), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "" + XDG_CONFIG_HOME_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_CONFIG_HOME_VAR;
         }
 
     }
@@ -465,12 +416,12 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class CacheFileDescriptor extends InfrastructureFileDescriptor {
 
         private CacheFileDescriptor(String fileName, String pathStub, String description, Target... target) {
-            super(fileName, pathStub, CACHE_HOME, description, target);
+            super(fileName, pathStub, FilesystemConfiguration.getCacheHome(), description, target);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "" + XDG_CACHE_HOME_VAR;
+            return FilesystemConfiguration.getVariablePrefix() + "" + ConfigurationConstants.XDG_CACHE_HOME_VAR;
         }
 
     }
@@ -478,11 +429,11 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class ItwConfigFileDescriptor extends ConfigFileDescriptor {
 
         private ItwConfigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
         private ItwConfigFileDescriptor(String fileName, String followingPath, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
 
     }
@@ -490,7 +441,7 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class UserSecurityConfigFileDescriptor extends ItwConfigFileDescriptor {
 
         private UserSecurityConfigFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, securityWord, description, target);
+            super(fileName, ConfigurationConstants.SECURITY_WORD, description, target);
         }
 
     }
@@ -506,23 +457,23 @@ private static final String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     private static class ItwCacheFileDescriptor extends CacheFileDescriptor {
 
         private ItwCacheFileDescriptor(String fileName, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
         private ItwCacheFileDescriptor(String fileName, String followingPath, String description, Target... target) {
-            super(fileName, DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
+            super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR + File.separator + followingPath, description, target);
         }
     }
 
     private static class TmpUsrFileDescriptor extends InfrastructureFileDescriptor {
 
         private TmpUsrFileDescriptor(String fileName, String pathStub, String description) {
-            super(fileName, pathStub, System.getProperty(TMP_PROP) + File.separator + System.getProperty(USER_PROP), description, Target.JAVAWS);
+            super(fileName, pathStub, System.getProperty(ConfigurationConstants.TMP_PROP) + File.separator + System.getProperty(ConfigurationConstants.USER_PROP), description, Target.JAVAWS);
         }
 
         @Override
         public String getSystemPathStubAcronym() {
-            return VARIABLE + "TMP" + File.separator + VARIABLE + "USER";
+            return FilesystemConfiguration.getVariablePrefix() + "TMP" + File.separator + FilesystemConfiguration.getVariablePrefix() + "USER";
         }
 
     }

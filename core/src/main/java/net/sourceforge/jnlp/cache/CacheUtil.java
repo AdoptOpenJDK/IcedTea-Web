@@ -60,6 +60,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import javax.jnlp.DownloadServiceListener;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
@@ -821,7 +836,7 @@ public class CacheUtil {
 
                 long maxSize = -1; // Default
                 try {
-                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE));
+                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE));
                 } catch (NumberFormatException nfe) {
                 }
 

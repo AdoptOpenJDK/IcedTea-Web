@@ -16,13 +16,14 @@
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import java.util.Arrays;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.SUCCESS;
-import static net.sourceforge.jnlp.config.DeploymentConfiguration.KEY_SECURITY_LEVEL;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_LEVEL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;

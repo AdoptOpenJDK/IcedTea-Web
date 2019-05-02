@@ -19,15 +19,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import java.io.IOException;
-import java.util.Arrays;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.sourceforge.jnlp.config.DeploymentConfiguration.KEY_SECURITY_LEVEL;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_LEVEL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;

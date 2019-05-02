@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+
 /**
  * Represents a value for a configuration. Provides methods to get the value
  * as well as marking the value as locked.
@@ -70,7 +72,7 @@ public class Setting<T> {
      * @param source the origin of the value (a file, or perhaps "{@code <internal>}")
      */
     public Setting(String name, String description, boolean locked,
-            ValueValidator validator, T defaultValue, T value, String source) {
+                   ValueValidator validator, T defaultValue, T value, String source) {
         this.name = name;
         this.description = description;
         this.locked = locked;

@@ -18,19 +18,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificatePane;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.JVMPanel.JvmValidationResult;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.ImageResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.imageio.ImageIO;
 import javax.naming.ConfigurationException;
 import javax.swing.ImageIcon;
@@ -47,17 +47,19 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificatePane;
-import net.adoptopenjdk.icedteaweb.client.controlpanel.JVMPanel.JvmValidationResult;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ImageResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -155,7 +157,7 @@ public class ControlPanel extends JFrame {
     }
     
     private int validateJdk() {
-        String s = ControlPanel.this.config.getProperty(DeploymentConfiguration.KEY_JRE_DIR);
+        String s = ControlPanel.this.config.getProperty(ConfigurationConstants.KEY_JRE_DIR);
         JvmValidationResult validationResult = JVMPanel.validateJvm(s);
         if (validationResult.id == JvmValidationResult.STATE.NOT_DIR
                 || validationResult.id == JvmValidationResult.STATE.NOT_VALID_DIR
@@ -163,7 +165,7 @@ public class ControlPanel extends JFrame {
             return JOptionPane.showConfirmDialog(ControlPanel.this,
                     "<html>"+Translator.R("CPJVMNotokMessage1", s)+"<br/>"
                     + validationResult.formattedText+"<br/>"
-                    + Translator.R("CPJVMNotokMessage2", DeploymentConfiguration.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath(config))+"</html>",
+                    + Translator.R("CPJVMNotokMessage2", ConfigurationConstants.KEY_JRE_DIR, PathsAndFiles.USER_DEPLOYMENT_FILE.getFullPath(config))+"</html>",
                     Translator.R("CPJVMconfirmInvalidJdkTitle"),JOptionPane.OK_CANCEL_OPTION);
         }
         return JOptionPane.OK_OPTION;

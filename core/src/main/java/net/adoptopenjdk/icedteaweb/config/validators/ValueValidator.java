@@ -35,13 +35,15 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.config;
+package net.adoptopenjdk.icedteaweb.config.validators;
+
+import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 
 /**
  * A class implements the ValueValidator interface to indicate that it can validate
  * values.
  *
- * @see BasicValueValidators
+ * @see ValidatorFactory
  */
 public interface ValueValidator {
 
