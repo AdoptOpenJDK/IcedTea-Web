@@ -8,7 +8,7 @@ public interface IconConstants {
 
     String ICO_CAMELCASE = "Ico";
 
-    String RICO_UPPERCASE = "ICO";
+    String ICO_UPPERCASE = "ICO";
 
     String IMAGE_X_ICON = "image/x-icon";
 }

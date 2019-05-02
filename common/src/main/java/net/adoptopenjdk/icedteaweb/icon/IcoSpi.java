@@ -52,7 +52,7 @@ public class IcoSpi extends ImageReaderSpi {
 
     private static final String readerClassName = ImageInputStreamIco.class.getName();
     private static final String[] localNames = {IconConstants.ICO};
-    private static final String[] localSuffixes = {IconConstants.ICO, IconConstants.ICO_CAMELCASE, IconConstants.RICO_UPPERCASE};
+    private static final String[] localSuffixes = {IconConstants.ICO, IconConstants.ICO_CAMELCASE, IconConstants.ICO_UPPERCASE};
     private static final String[] localMIMETypes = {IconConstants.IMAGE_VND_MICROSOFT_ICON, IconConstants.IMAGE_X_ICON};
 
     public IcoSpi() {
