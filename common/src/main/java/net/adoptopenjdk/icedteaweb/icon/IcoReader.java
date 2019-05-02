@@ -36,6 +36,7 @@
  exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.icon;
 
+import net.adoptopenjdk.icedteaweb.LazyLoaded;
 import net.adoptopenjdk.icedteaweb.icon.impl.ImageInputStreamIco;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,59 +58,44 @@ public class IcoReader extends ImageReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(IcoReader.class);
 
-    private ImageInputStreamIco cheat;
+    private final LazyLoaded<ImageInputStreamIco> imagesCache;
 
     IcoReader(final ImageReaderSpi originatingProvider) {
         super(originatingProvider);
+        imagesCache = new LazyLoaded<>(this::loadIcon);
     }
 
-    private void loadIcon() {
-        if (cheat == null) {
-            try {
-                final Object input = getInput();
-                if (input instanceof ImageInputStream) {
-                    final ImageInputStream iis = (ImageInputStream) input;
-                    cheat = new ImageInputStreamIco(iis);
-
-                }
-
-            } catch (final Exception ex) {
-                LOG.error("Error in loading icon", ex);
+    private ImageInputStreamIco loadIcon() {
+        try {
+            final Object input = getInput();
+            if (input instanceof ImageInputStream) {
+                return new ImageInputStreamIco((ImageInputStream) input);
             }
+        } catch (final Exception ex) {
+            LOG.error("Error in loading icon", ex);
         }
+        return null;
     }
 
     @Override
     public int getNumImages(final boolean allowSearch) {
-        loadIcon();
-        return cheat.getHeader().getCountOfIcons();
-    }
-
-    private void checkIndex(final int imageIndex) {
-        loadIcon();
-        if (imageIndex < 0 || imageIndex >= cheat.getHeader().getCountOfIcons()) {
-            throw new IndexOutOfBoundsException("bad index " + imageIndex + ". Should be >=0 and < " + cheat.getHeader().getCountOfIcons());
-        }
+        return imagesCache.get().getNumImages();
     }
 
     @Override
     public int getWidth(final int imageIndex) {
-        checkIndex(imageIndex);
-        return cheat.getHeader().getEntries().get(imageIndex).getWidth();
+        return imagesCache.get().getWidth(imageIndex);
     }
 
     @Override
     public int getHeight(final int imageIndex) {
-        checkIndex(imageIndex);
-        return cheat.getHeader().getEntries().get(imageIndex).getHeight();
-
+        return imagesCache.get().getHeight(imageIndex);
     }
 
     @Override
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) {
-        checkIndex(imageIndex);
+        final Vector<RenderedImage> q = imagesCache.get().getImage(imageIndex).getSources();
         final List<ImageTypeSpecifier> l = new ArrayList<>();
-        final Vector<RenderedImage> q = cheat.getImage(imageIndex).getSources();
         for (final RenderedImage q1 : q) {
             l.add(new ImageTypeSpecifier(q1));
         }
@@ -124,13 +110,11 @@ public class IcoReader extends ImageReader {
 
     @Override
     public IIOMetadata getImageMetadata(final int imageIndex) {
-        checkIndex(imageIndex);
         return null;
     }
 
     @Override
     public BufferedImage read(final int imageIndex, final ImageReadParam param) {
-        checkIndex(imageIndex);
-        return cheat.getImage(imageIndex);
+        return imagesCache.get().getImage(imageIndex);
     }
 }

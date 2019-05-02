@@ -49,27 +49,49 @@ import java.util.List;
 public class ImageInputStreamIco {
 
     private final IcoHeader header;
+    private final int countOfIcons;
     private final List<BufferedImage> images; //size 16*countOfIcons bytes
-
-    public IcoHeader getHeader() {
-        return header;
-    }
-
-    public BufferedImage getImage(final int i) {
-        return images.get(i);
-    }
 
     public ImageInputStreamIco(final ImageInputStream src) throws IOException, IcoException {
         this.header = new IcoHeader(src);
-        images = new ArrayList<>(header.getCountOfIcons());
+        this.countOfIcons = header.getCountOfIcons();
+
+        final List<BufferedImage> imgs = new ArrayList<>(countOfIcons);
         for (final IcoHeaderEntry e : header.getEntries()) {
             final BufferedImage image = readImage(e, src);
-            images.add(image);
+            imgs.add(image);
         }
+
+        this.images = Collections.unmodifiableList(imgs);
+    }
+
+    public BufferedImage getImage(final int imageIndex) {
+        checkIndex(imageIndex);
+        return images.get(imageIndex);
     }
 
     public List<BufferedImage> getImages() {
-        return Collections.unmodifiableList(images);
+        return images;
+    }
+
+    public int getNumImages() {
+        return countOfIcons;
+    }
+
+    private void checkIndex(final int imageIndex) {
+        if (imageIndex < 0 || imageIndex >= countOfIcons) {
+            throw new IndexOutOfBoundsException("bad index " + imageIndex + ". Should be >=0 and < " + countOfIcons);
+        }
+    }
+
+    public int getWidth(final int imageIndex) {
+        checkIndex(imageIndex);
+        return header.getEntries().get(imageIndex).getWidth();
+    }
+
+    public int getHeight(final int imageIndex) {
+        checkIndex(imageIndex);
+        return header.getEntries().get(imageIndex).getHeight();
     }
 
     private static BufferedImage readImage(final IcoHeaderEntry e, final ImageInputStream src1) throws IOException {
