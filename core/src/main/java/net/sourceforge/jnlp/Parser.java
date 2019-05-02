@@ -16,19 +16,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
@@ -67,6 +54,19 @@ import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
@@ -356,11 +356,11 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ResourcesDesc getResourcesDesc(Node node, boolean j2se) throws ParseException {
+    private ResourcesDesc getResourcesDesc(final Node node, final boolean j2se) throws ParseException {
         boolean mainFlag = false; // if found a main tag
 
         // create resources
-        ResourcesDesc resources
+        final ResourcesDesc resources
                 = new ResourcesDesc(file,
                         getLocales(node),
                         splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
@@ -369,7 +369,7 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            final String name = child.getNodeName().getName();
 
             // check for nativelib but no trusted environment
             if ("nativelib".equals(name)) {
@@ -379,7 +379,7 @@ public final class Parser {
             }
 
             if ("j2se".equals(name) || "java".equals(name)) {
-                if (getChildNode(root, "component-desc") != null) {
+                if (getChildNode(root, ComponentDesc.COMPONENT_DESC_ELEMENT) != null) {
                     if (strict) {
                         throw new ParseException(R("PExtensionHasJ2SE"));
                     }
@@ -853,17 +853,17 @@ public final class Parser {
      * @return the component descriptor.
      * @throws ParseException
      */
-    ComponentDesc getComponent(Node parent) throws ParseException {
+    ComponentDesc getComponent(final Node parent) throws ParseException {
 
-        if (1 < getChildNodes(parent, "component-desc").length) {
+        if (1 < getChildNodes(parent, ComponentDesc.COMPONENT_DESC_ELEMENT).length) {
             throw new ParseException(R("PTwoDescriptors"));
         }
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            final String name = child.getNodeName().getName();
 
-            if ("component-desc".equals(name)) {
+            if (ComponentDesc.COMPONENT_DESC_ELEMENT.equals(name)) {
                 return new ComponentDesc();
             }
 
