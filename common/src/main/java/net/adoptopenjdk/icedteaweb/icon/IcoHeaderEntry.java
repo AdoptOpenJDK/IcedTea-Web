@@ -1,5 +1,3 @@
-package net.adoptopenjdk.icedteaweb.icon.impl;
-
 /*
  Copyright (C) 2015 Red Hat, Inc.
 
@@ -37,20 +35,20 @@ package net.adoptopenjdk.icedteaweb.icon.impl;
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
 
+package net.adoptopenjdk.icedteaweb.icon;
+
 import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
 
-public class IcoHeaderEntry {
+class IcoHeaderEntry {
 
     private int width;
     private int height;
     private int colorCount;
-    private final int reserved;
-    private final int planes; //should be 1 but  I met quite a lot of  0
     private final int sizeInBytes; // InfoHeader + ANDbitmap + XORbitmap
     private final int fileOffset; //FilePos, where InfoHeader starts
 
-    public IcoHeaderEntry(final ImageInputStream src) throws IOException, IcoException {
+    IcoHeaderEntry(final ImageInputStream src) throws IOException, IcoException {
         width = src.read();
         height = src.read();
         colorCount = src.read();
@@ -60,66 +58,64 @@ public class IcoHeaderEntry {
         if (colorCount == 0) {
             colorCount = 256;
         }
-        reserved = src.read();
-        planes = src.readUnsignedShort();
-        isIcoHeader();
+        int reserved = src.read();
+        int planes = src.readUnsignedShort(); //should be 1 but I met quite a lot of  0
+
+        if (reserved != 0 || !(planes == 1 || planes == 0)) {
+            throw new IcoException("Invalid header. Expected 0 and 1(0?), got " + reserved + " and " + planes);
+        }
+
         src.readUnsignedShort(); //bitCount
         sizeInBytes = src.readInt();
         fileOffset = src.readInt();
     }
 
-    private void isIcoHeader() throws IcoException {
-        if (reserved != 0 || (planes != 1 && planes != 0)) {
-            throw new IcoException("Invalid header. Expected 0 and 1(0?), got " + reserved + " and " + planes);
-        }
-    }
-
     /**
      * @return the colorCount
      */
-    public int getColorCount() {
+    int getColorCount() {
         return colorCount;
     }
 
     /**
      */
-    public void resetColorCount() {
+    void resetColorCount() {
         this.colorCount = 0;
     }
 
     /**
      * @return the width
      */
-    public int getWidth() {
+    int getWidth() {
         return width;
     }
 
     /**
      * @param width the width to set
      */
-    public void setWidth(final int width) {
+    void setWidth(final int width) {
         this.width = width;
     }
 
     /**
      * @return the height
      */
-    public int getHeight() {
+    int getHeight() {
         return height;
     }
 
     /**
      * @param height the height to set
      */
-    public void setHeight(final int height) {
+    void setHeight(final int height) {
         this.height = height;
     }
 
-    public int getSizeInBytes() {
+    int getSizeInBytes() {
         return sizeInBytes;
     }
 
-    public int getFileOffset() {
+    int getFileOffset() {
         return fileOffset;
     }
 

@@ -34,7 +34,7 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.adoptopenjdk.icedteaweb.icon.impl;
+package net.adoptopenjdk.icedteaweb.icon;
 
 import javax.imageio.stream.ImageInputStream;
 import java.io.IOException;
@@ -46,12 +46,12 @@ import java.util.List;
 /**
  * http://www.daubnet.com/en/file-format-ico
  */
-public class IcoHeader {
+class IcoHeader {
 
     private final int countOfIcons;
     private final List<IcoHeaderEntry> entries; //size 16*countOfIcons bytes
 
-    public IcoHeader(final ImageInputStream src) throws IOException, IcoException {
+    IcoHeader(final ImageInputStream src) throws IOException, IcoException {
         final ByteOrder originalOrder = src.getByteOrder();
         try {
             src.setByteOrder(ByteOrder.LITTLE_ENDIAN);
@@ -73,11 +73,11 @@ public class IcoHeader {
         }
     }
 
-    public List<IcoHeaderEntry> getEntries() {
+    List<IcoHeaderEntry> getEntries() {
         return entries;
     }
 
-    public int getCountOfIcons() {
+    int getCountOfIcons() {
         return countOfIcons;
     }
 

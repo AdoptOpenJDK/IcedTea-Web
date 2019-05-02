@@ -37,7 +37,6 @@
 package net.adoptopenjdk.icedteaweb.icon;
 
 import net.adoptopenjdk.icedteaweb.LazyLoaded;
-import net.adoptopenjdk.icedteaweb.icon.impl.ImageInputStreamIco;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,22 +53,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class IcoReader extends ImageReader {
+class IcoReader extends ImageReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(IcoReader.class);
 
-    private final LazyLoaded<ImageInputStreamIco> imagesCache;
+    private final LazyLoaded<Icons> imagesCache;
 
     IcoReader(final ImageReaderSpi originatingProvider) {
         super(originatingProvider);
         imagesCache = new LazyLoaded<>(this::loadIcon);
     }
 
-    private ImageInputStreamIco loadIcon() {
+    private Icons loadIcon() {
         try {
             final Object input = getInput();
             if (input instanceof ImageInputStream) {
-                return new ImageInputStreamIco((ImageInputStream) input);
+                return new Icons((ImageInputStream) input);
             }
         } catch (final Exception ex) {
             LOG.error("Error in loading icon", ex);

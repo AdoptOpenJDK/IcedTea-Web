@@ -34,7 +34,7 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.adoptopenjdk.icedteaweb.icon.impl;
+package net.adoptopenjdk.icedteaweb.icon;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
@@ -46,13 +46,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImageInputStreamIco {
+class Icons {
 
     private final IcoHeader header;
     private final int countOfIcons;
     private final List<BufferedImage> images; //size 16*countOfIcons bytes
 
-    public ImageInputStreamIco(final ImageInputStream src) throws IOException, IcoException {
+    Icons(final ImageInputStream src) throws IOException, IcoException {
         this.header = new IcoHeader(src);
         this.countOfIcons = header.getCountOfIcons();
 
@@ -65,16 +65,16 @@ public class ImageInputStreamIco {
         this.images = Collections.unmodifiableList(imgs);
     }
 
-    public BufferedImage getImage(final int imageIndex) {
+    BufferedImage getImage(final int imageIndex) {
         checkIndex(imageIndex);
         return images.get(imageIndex);
     }
 
-    public List<BufferedImage> getImages() {
+    List<BufferedImage> getImages() {
         return images;
     }
 
-    public int getNumImages() {
+    int getNumImages() {
         return countOfIcons;
     }
 
@@ -84,23 +84,19 @@ public class ImageInputStreamIco {
         }
     }
 
-    public int getWidth(final int imageIndex) {
+    int getWidth(final int imageIndex) {
         checkIndex(imageIndex);
         return header.getEntries().get(imageIndex).getWidth();
     }
 
-    public int getHeight(final int imageIndex) {
+    int getHeight(final int imageIndex) {
         checkIndex(imageIndex);
         return header.getEntries().get(imageIndex).getHeight();
     }
 
-    private static BufferedImage readImage(final IcoHeaderEntry e, final ImageInputStream src1) throws IOException {
+    private BufferedImage readImage(final IcoHeaderEntry e, final ImageInputStream src1) throws IOException {
         BufferedImage image;
         final byte[] img = new byte[e.getSizeInBytes()];
-        if (src1.getStreamPosition() != e.getFileOffset()) {
-            //I had never seen this thrown, Still, is it worthy to tempt it, or rather read and die later?
-            //throw new IOException("Stream position do nto match expected position. Bmp(or png) will read wrongly");
-        }
         src1.readFully(img);
         try {
             image = parse(img, e);
@@ -118,7 +114,7 @@ public class ImageInputStreamIco {
         return image;
     }
 
-    private static BufferedImage parse(byte[] img, final IcoHeaderEntry e) throws IOException {
+    private BufferedImage parse(final byte[] img, final IcoHeaderEntry e) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(img);
         BufferedImage image = null;
         try {
@@ -131,15 +127,15 @@ public class ImageInputStreamIco {
             return image;
         }
         //bmp
-        img = prefixByFakeHeader(img, e);
-        bis = new ByteArrayInputStream(img);
+        final byte[] imgPrefixed = prefixByFakeHeader(img, e);
+        bis = new ByteArrayInputStream(imgPrefixed);
         //don't try catch this one. you will break it
         image = ImageIO.read(bis);
 
         return image;
     }
 
-    private static void fixSizesInHeader(final IcoHeaderEntry e, final BufferedImage image) {
+    private void fixSizesInHeader(final IcoHeaderEntry e, final BufferedImage image) {
         //may happen for png
         if (e.getWidth() == 0) {
             e.setWidth(image.getWidth());
@@ -149,7 +145,7 @@ public class ImageInputStreamIco {
         }
     }
 
-    private static byte[] prefixByFakeHeader(final byte[] origArray, final IcoHeaderEntry e) {
+    private byte[] prefixByFakeHeader(final byte[] origArray, final IcoHeaderEntry e) {
         final int fakingArray = 14;
         final byte[] img = new byte[fakingArray + e.getSizeInBytes()];
         System.arraycopy(origArray, 0, img, 14, origArray.length);

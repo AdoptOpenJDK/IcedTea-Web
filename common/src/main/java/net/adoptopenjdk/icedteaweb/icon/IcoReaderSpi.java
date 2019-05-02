@@ -36,9 +36,6 @@
  exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.icon;
 
-import net.adoptopenjdk.icedteaweb.icon.impl.IcoHeader;
-import net.adoptopenjdk.icedteaweb.icon.impl.ImageInputStreamIco;
-
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
@@ -47,15 +44,15 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
 
-public class IcoSpi extends ImageReaderSpi {
+public class IcoReaderSpi extends ImageReaderSpi {
 
 
-    private static final String readerClassName = ImageInputStreamIco.class.getName();
+    private static final String readerClassName = Icons.class.getName();
     private static final String[] localNames = {IconConstants.ICO};
     private static final String[] localSuffixes = {IconConstants.ICO, IconConstants.ICO_CAMELCASE, IconConstants.ICO_UPPERCASE};
     private static final String[] localMIMETypes = {IconConstants.IMAGE_VND_MICROSOFT_ICON, IconConstants.IMAGE_X_ICON};
 
-    public IcoSpi() {
+    public IcoReaderSpi() {
         super("icedtea-web",
                 "1.0",
                 localNames,
