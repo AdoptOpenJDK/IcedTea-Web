@@ -55,7 +55,6 @@ import org.junit.Test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -330,8 +329,7 @@ public class XDesktopEntryTest {
         a.setBrowser("blah");
         a.setFixHref(false);
         a.setShortcutType(type);
-        Reader r = xde.getContentsAsReader(menu, a, true);
-        String s = FileUtils.getContentOfReader(r);
+        String s = xde.getContent(menu, a, true);
         Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
     }
 

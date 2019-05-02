@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.sourceforge.jnlp.PluginBridgeTest;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -84,7 +85,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     public void testPersistedComments() throws ConfigurationException, IOException {
         final File f = File.createTempFile("properties", "withComments");
         f.deleteOnExit();
-        FileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
+        BasicFileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
         DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor() {
 
             @Override
@@ -102,7 +103,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         dc.save();
 
         String s = FileUtils.loadFileAsString(f);
-        Assert.assertTrue(s.contains("#" + DeploymentConfiguration.DEPLOYMENT_COMMENT));
+        Assert.assertTrue(s.contains("#" + ConfigurationConstants.DEPLOYMENT_COMMENT));
         String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
         Assert.assertTrue(s.contains("#" + date)); //check day part of date...
         Assert.assertTrue(s.contains("#commented1"));
@@ -121,7 +122,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     public void testEnsurePersistedCommentsDoNotMultiplyHeaderAndDate() throws ConfigurationException, IOException {
         final File f = File.createTempFile("properties", "withComments");
         f.deleteOnExit();
-        FileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
+        BasicFileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
         DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor() {
 
             @Override
@@ -145,7 +146,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
                 //ensure salt
                 Assert.assertTrue(s.contains("#id" + y + "id"));
             }
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, DeploymentConfiguration.DEPLOYMENT_COMMENT));
+            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, ConfigurationConstants.DEPLOYMENT_COMMENT));
             String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, date)); //check day part of date...
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "#commented1"));
@@ -157,7 +158,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val3"));
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val4"));
             //insert some salt to check if it really iterates
-            FileUtils.saveFile(s + "\n#id" + x + "id", f);
+            BasicFileUtils.saveFile(s + "\n#id" + x + "id", f);
         }
         //System.out.println(s);
     }

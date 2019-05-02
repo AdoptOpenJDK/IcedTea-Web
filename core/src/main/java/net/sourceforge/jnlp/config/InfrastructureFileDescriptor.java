@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.config.Target;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 

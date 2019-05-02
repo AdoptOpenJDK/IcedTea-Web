@@ -21,10 +21,12 @@
     <modules>
         <module>jnlp-api</module>
         <module>common</module>
+        <module>test-extensions</module>
         <module>xml-parser</module>
         <module>core</module>
         <module>integration</module>
         <module>clients</module>
+        <module>launchers</module>
     </modules>
 
     <repositories>

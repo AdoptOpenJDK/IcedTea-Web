@@ -40,14 +40,14 @@ package net.sourceforge.jnlp.util.docprovider;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.Defaults;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.config.Setting;
-import net.sourceforge.jnlp.config.ValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
@@ -112,7 +112,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
         return super.getExamples()
                 + getFormatter().wrapParagraph(
                         getFormatter().getOption(getId(), Translator.R("IWSexampleL1"))
-                        + getFormatter().getOption(getId() + "  " + CommandLineOptions.RESET.getOption() + " " + DeploymentConfiguration.KEY_PROXY_TYPE, " " + Translator.R("IWSexampleL2", DeploymentConfiguration.KEY_PROXY_TYPE)))
+                        + getFormatter().getOption(getId() + "  " + CommandLineOptions.RESET.getOption() + " " + ConfigurationConstants.KEY_PROXY_TYPE, " " + Translator.R("IWSexampleL2", ConfigurationConstants.KEY_PROXY_TYPE)))
                 + getFormatter().getNewLine()
                 + getFormatter().wrapParagraph(getKpMinorTitle() + getFormatter().getNewLine()
                         + getFormatter().wrapParagraph(getProperties()));

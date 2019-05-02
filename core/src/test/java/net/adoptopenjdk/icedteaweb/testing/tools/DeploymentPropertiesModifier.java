@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.tools;
 
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.util.FileUtils;
 
@@ -127,7 +128,7 @@ public class DeploymentPropertiesModifier {
             properties += property + "=" + value + "\n";
         }
 
-        FileUtils.saveFile(properties, src.getFile());
+        BasicFileUtils.saveFile(properties, src.getFile());
     }
 
     private void restoreDeploymentProperties() throws IOException {
@@ -138,7 +139,7 @@ public class DeploymentPropertiesModifier {
             properties = properties.replace(requestedProperty + "=" + requestedValue + "\n", "");
         }
 
-        FileUtils.saveFile(properties, src.getFile());
+        BasicFileUtils.saveFile(properties, src.getFile());
     }
 
 }

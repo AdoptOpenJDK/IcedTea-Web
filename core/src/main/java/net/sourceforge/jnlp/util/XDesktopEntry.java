@@ -42,9 +42,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -58,6 +55,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
@@ -123,26 +123,24 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
 
     /**
-     * Returns the contents of the {@link XDesktopEntry} through the
-     * {@link Reader} interface.
+     * Returns the contents of the {@link XDesktopEntry} as a String.
      * @param menu whether to create this icon to menu
      * @param info result of user's interference
      * @param isSigned whether the app is signed
-     * @return reader with desktop shortcut specification
+     * @return string with desktop shortcut specification
      */
-     Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
-
+    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         File generatedJnlp = null;
         if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF)) {
             try {
                 String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF, info.isFixHref());
                 generatedJnlp = getGeneratedJnlpFileName();
-                FileUtils.saveFile(content, generatedJnlp);
+                BasicFileUtils.saveFile(content, generatedJnlp);
             } catch (Exception ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
         }
-        
+
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
         fileContents += "Name=" + getDesktopIconName() + "\n";
@@ -205,8 +203,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 fileContents += exec;
             }
         }
-        return new StringReader(fileContents);
-
+        return fileContents;
     }
 
     public static String getBrowserBin() {
@@ -351,16 +348,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(f), UTF_8);
-                 Reader reader = getContentsAsReader(true, info, isSigned)) {
-
-                char[] buffer = new char[1024];
-                int ret = 0;
-                while (-1 != (ret = reader.read(buffer))) {
-                    writer.write(buffer, 0, ret);
-                }
-
-            }
+            BasicFileUtils.saveFile(getContent(true, info, isSigned), f, UTF_8);
             LOG.info("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -381,18 +369,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
             FileUtils.createRestrictedFile(shortcutFile, true);
-
-            try ( /* Write out a Java String (UTF-16) as a UTF-8 file */
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(shortcutFile), UTF_8);
-                    Reader reader = getContentsAsReader(false, info, isSigned)) {
-
-                char[] buffer = new char[1024];
-                int ret = 0;
-                while (-1 != (ret = reader.read(buffer))) {
-                    writer.write(buffer, 0, ret);
-                }
-                
-            }
+            BasicFileUtils.saveFile(getContent(false, info, isSigned), shortcutFile, UTF_8);
 
             /*
              * Install the desktop entry
@@ -423,7 +400,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
         //TODO TODO TODO TODO TODO TODO TODO TODO 
         //check existing jnlp files
-        //check launcher 
+        //check launcher
         //get where it points
         //try all supported  shortcuts methods
         //choose the one which have most similar result to existing ones
@@ -637,7 +614,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     return urlLocation;
                 }
             }
-            //the icon is much more likely to be found behind / then behind \/ 
+            //the icon is much more likely to be found behind / then behind \/
             //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
             for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("\\", path, file);

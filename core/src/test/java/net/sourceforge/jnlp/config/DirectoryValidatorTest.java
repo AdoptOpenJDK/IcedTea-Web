@@ -36,6 +36,9 @@
  */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResult;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Test;
 
@@ -49,7 +52,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestNotExists() {
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(new File("/definitely/not/existing/file/efgrhisaes"), false, false);
+        DirectoryCheckResult result = DirectoryValidator.testDir(new File("/definitely/not/existing/file/efgrhisaes"), false, false);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 3);
@@ -59,7 +62,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     public void testMainDirTestExistsAsFile() throws IOException {
         File f = File.createTempFile("test", "testMainDirs");
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 2);
@@ -71,7 +74,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.delete());
         assertTrue(f.mkdir());
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.isEmpty());
     }
@@ -83,7 +86,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.mkdir());
         assertTrue(f.setWritable(false));
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 1);
@@ -97,7 +100,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.mkdir());
         f.deleteOnExit();
         assertTrue(f.setReadable(false));
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 1);
@@ -106,7 +109,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestNotExistsWithSubdir() {
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(new File("/definitely/not/existing/file/efgrhisaes"), false, true);
+        DirectoryCheckResult result = DirectoryValidator.testDir(new File("/definitely/not/existing/file/efgrhisaes"), false, true);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 3);
@@ -116,7 +119,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     public void testMainDirTestExistsAsFileWithSubdir() throws IOException {
         File f = File.createTempFile("test", "testMainDirs");
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 2);
@@ -128,7 +131,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.delete());
         assertTrue(f.mkdir());
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.isEmpty());
     }
@@ -140,7 +143,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.mkdir());
         assertTrue(f.setWritable(false));
         f.deleteOnExit();
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 1);
@@ -154,7 +157,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f.mkdir());
         f.deleteOnExit();
         f.setReadable(false);
-        DirectoryValidator.DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
+        DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
         assertTrue(s.split("\n").length == 1);
@@ -162,8 +165,8 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testDirectoryCheckResult() {
-        DirectoryValidator.DirectoryCheckResult r1 = new DirectoryValidator.DirectoryCheckResult(new File("a"));
-        DirectoryValidator.DirectoryCheckResult r2 = new DirectoryValidator.DirectoryCheckResult(new File("b"));
+        DirectoryCheckResult r1 = new DirectoryCheckResult(new File("a"));
+        DirectoryCheckResult r2 = new DirectoryCheckResult(new File("b"));
         r1.subDir = r2;
         assertTrue(r1.getMessage().isEmpty());
         assertTrue(r2.getMessage().isEmpty());
@@ -214,7 +217,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         f2.deleteOnExit();
 
 
-        DirectoryValidator.DirectoryCheckResults results1 = dv.ensureDirs();
+        DirectoryCheckResults results1 = dv.ensureDirs();
         assertTrue(results1.results.size() == 2);
         assertTrue(results1.getFailures() == 2);
         assertTrue(results1.getPasses() == 4);
@@ -224,7 +227,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
         assertTrue(f1.setWritable(true));
 
-        DirectoryValidator.DirectoryCheckResults results2 = dv.ensureDirs();
+        DirectoryCheckResults results2 = dv.ensureDirs();
         assertTrue(results2.results.size() == 2);
         assertTrue(results2.getFailures() == 1);
         assertTrue(results2.getPasses() == 5);
@@ -234,7 +237,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
         assertTrue(f2.setWritable(true));
 
-        DirectoryValidator.DirectoryCheckResults results3 = dv.ensureDirs();
+        DirectoryCheckResults results3 = dv.ensureDirs();
         assertTrue(results3.results.size() == 2);
         assertTrue(results3.getFailures() == 0);
         assertTrue(results3.getPasses() == 6);
@@ -243,7 +246,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
         assertTrue(f2.delete()); //will be created in dv.ensureDirs();
 
-        DirectoryValidator.DirectoryCheckResults results4 = dv.ensureDirs();
+        DirectoryCheckResults results4 = dv.ensureDirs();
         assertTrue(results4.results.size() == 2);
         assertTrue(results4.getFailures() == 0);
         assertTrue(results4.getPasses() == 6);
@@ -259,7 +262,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         
         dv= new DirectoryValidator(Arrays.asList(f3, f4));
 
-        DirectoryValidator.DirectoryCheckResults results5 = dv.ensureDirs();
+        DirectoryCheckResults results5 = dv.ensureDirs();
         assertTrue(results5.results.size() == 2);
         assertTrue(results5.getFailures() == 3);
         assertTrue(results5.getPasses() == 3);

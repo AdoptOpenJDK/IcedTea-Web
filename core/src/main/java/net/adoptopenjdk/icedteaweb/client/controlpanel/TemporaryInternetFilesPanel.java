@@ -18,9 +18,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -142,16 +143,16 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
         JLabel description = new JLabel(Translator.R("CPTempInternetFilesDescription"));
 
         // This section deals with how to use the disk space.
-        cbCompression.setSelectedIndex(parseInt(this.config.getProperty(DeploymentConfiguration.KEY_CACHE_COMPRESSION_ENABLED)));
+        cbCompression.setSelectedIndex(parseInt(this.config.getProperty(ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED)));
         cbCompression.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                config.setProperty(DeploymentConfiguration.KEY_CACHE_COMPRESSION_ENABLED, ((ComboItem) e.getItem()).getValue());
+                config.setProperty(ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED, ((ComboItem) e.getItem()).getValue());
             }
         });
 
         //Override getNextValue and getPreviousValue to make it jump to the closest increment/decrement of step size
-        final Long configCacheSize = parseLong(this.config.getProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE));
+        final Long configCacheSize = parseLong(this.config.getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE));
         final Long initialCacheSize = configCacheSize < CACHE_MIN_SIZE ? CACHE_MIN_SIZE : configCacheSize;
         final SpinnerNumberModel snmCacheSize = new PowerOfSpinnerNumberModel(initialCacheSize, TemporaryInternetFilesPanel.CACHE_MIN_SIZE, TemporaryInternetFilesPanel.CACHE_MAX_SIZE, TemporaryInternetFilesPanel.SPINNER_STEP_SIZE);
         cacheSizeSpinner.setModel(snmCacheSize);
@@ -372,7 +373,7 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                     cacheSizeWarningLabel.setText(Translator.R("TIFPCacheSizeSpinnerLargeValueWarning", usableDiskSpace));
                 }
 
-                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, Long.valueOf(cacheSizeSpinnerValue).toString());
+                config.setProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE, Long.valueOf(cacheSizeSpinnerValue).toString());
             } else {
                 showCacheSizeSpinnerGUIElements(false);
                 showCompressionAndLocationGUIElements(true);
@@ -393,12 +394,12 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
             }
 
             if (selected) {
-                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, cacheSizeSpinner.getValue().toString());
+                config.setProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE, cacheSizeSpinner.getValue().toString());
             } else {
-                config.setProperty(DeploymentConfiguration.KEY_CACHE_MAX_SIZE, Long.toString(CACHE_UNLIMITED_SIZE));
+                config.setProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE, Long.toString(CACHE_UNLIMITED_SIZE));
             }
 
-            config.setProperty(DeploymentConfiguration.KEY_CACHE_ENABLED, String.valueOf(!selected));
+            config.setProperty(ConfigurationConstants.KEY_CACHE_ENABLED, String.valueOf(!selected));
         }
     }
 

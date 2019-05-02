@@ -52,6 +52,7 @@ publishInternalLib "$CORE_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$COMMON_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$JNLPAPI_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$XMLPARSER_SRC" "$ITW_TARGET_DIR"
+publishInternalLib "$CLIENTS_SRC" "$ITW_TARGET_DIR"
 
 publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
@@ -73,6 +74,7 @@ function build() {
   export COMMON_JAR=${RESOURCES_SRC_TO_DEST["$COMMON_SRC"]}
   export JNLPAPI_JAR=${RESOURCES_SRC_TO_DEST["$JNLPAPI_SRC"]}
   export XMLPARSER_JAR=${RESOURCES_SRC_TO_DEST["$XMLPARSER_SRC"]}
+  export CLIENTS_JAR=${RESOURCES_SRC_TO_DEST["$CLIENTS_SRC"]}
   export SPLASH_PNG=${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}
   export MODULARJDK_ARGS_LOCATION=${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}
   BUILD_DIR=$TARGET/launcher.in.$PROGRAM_NAME
@@ -95,7 +97,7 @@ function build() {
     popd
   elif [ "x$TYPE" = "xsh" ]; then
     for x in `find $SCRIPT_DIR/shell-launcher -type f ` ; do
-      nwname=`basename $x | sed "s/launchers/$PROGRAM_NAME/" | sed "s/.in//"`
+      nwname=`basename $x | sed "s/launchers/$PROGRAM_NAME/" | sed "s/\\.in//"`
       cat $x | sed \
         -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
@@ -107,6 +109,7 @@ function build() {
         -e "s|[@]COMMON_JAR[@]|$COMMON_JAR|g" \
         -e "s|[@]JNLPAPI_JAR[@]|$JNLPAPI_JAR|g" \
         -e "s|[@]XMLPARSER_JAR[@]|$XMLPARSER_JAR|g" \
+        -e "s|[@]CLIENTS_JAR[@]|$CLIENTS_JAR|g" \
         -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
         -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \
         -e "s|[@]JRE[@]|$JRE|g" \
@@ -122,16 +125,16 @@ function build() {
 }
 
 build sh javaws         net.sourceforge.jnlp.runtime.Boot
-build sh itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
-build sh policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+build sh itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
+build sh policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
 
 mkdir $TARGET_TMP  # for tests output
 export ITW_TMP_REPLACEMENT=$TARGET_TMP # for tests output
 build rust javaws         net.sourceforge.jnlp.runtime.Boot
-build rust itweb-settings net.sourceforge.jnlp.controlpanel.CommandLine
-build rust policyeditor   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+build rust itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
+build rust policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
 if [ ! "$KCOV" = "none" ] ; then 
-  build rust coverage   net.sourceforge.jnlp.security.policyeditor.PolicyEditor
+  build rust coverage   net.sourceforge.jnlp.runtime.Boot
 fi
 
 

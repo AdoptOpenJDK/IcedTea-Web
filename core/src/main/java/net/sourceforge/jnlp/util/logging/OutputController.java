@@ -36,6 +36,7 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.OutputUtils;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
@@ -48,8 +49,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -248,24 +247,6 @@ public class OutputController {
         this.errLog.setStream(err);
     }
 
-    public static String exceptionToString(Throwable t) {
-        if (t == null) {
-            return null;
-        }
-        String s = "Error during processing of exception";
-        try {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
-            s = sw.toString();
-            pw.close();
-            sw.close();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        return s;
-    }
-
     public void log(OutputControllerLevel level, String s) {
         log(level, (Object) s);
     }
@@ -276,7 +257,7 @@ public class OutputController {
         if (o == null) {
             s = NULL_OBJECT;
         } else if (o instanceof Throwable) {
-            s = exceptionToString((Throwable) o);
+            s = OutputUtils.exceptionToString((Throwable) o);
         } else {
             s=o.toString();
         }

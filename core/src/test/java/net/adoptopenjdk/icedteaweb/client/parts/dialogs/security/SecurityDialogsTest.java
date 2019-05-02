@@ -44,23 +44,24 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+
+import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -176,8 +177,8 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //trustNone is not used in dialogues, its considered as default
         //but is used in Unsigned... dialogs family
         wasTrustNone = JNLPRuntime.isTrustNone();
-        prompt = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER);
-        seclevel = JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL);
+        prompt = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER);
+        seclevel = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL);
     }
 
     @After
@@ -186,15 +187,15 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     }
 
     private static void setPrompt(String p) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, p);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, p);
     }
 
     private static void setPrompt(boolean p) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_PROMPT_USER, String.valueOf(p));
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, String.valueOf(p));
     }
 
     private static void setAS(AppletSecurityLevel as) {
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, String.valueOf(as.toChars()));
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, String.valueOf(as.toChars()));
     }
 
     @AfterClass
@@ -203,7 +204,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustAll(wasTrustAll);
         JNLPRuntime.setTrustNone(wasTrustNone);
         setPrompt(prompt);
-        JNLPRuntime.getConfiguration().setProperty(DeploymentConfiguration.KEY_SECURITY_LEVEL, seclevel);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, seclevel);
     }
 
     @Test(timeout = 10000)//if gui pops up
@@ -663,9 +664,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             //no we fake queue
             fakeQueue();
             //file exists our 6 rememberable dialogues should pass
-            FileUtils.saveFile(appletSecurityContent, f);
+            BasicFileUtils.saveFile(appletSecurityContent, f);
             runRememeberableClasses(ExpectedResults.PositiveResults);
-            FileUtils.saveFile(appletSecurityContent.replace("{YES}", "{NO}"), f);
+            BasicFileUtils.saveFile(appletSecurityContent.replace("{YES}", "{NO}"), f);
             runRememeberableClasses(ExpectedResults.NegativeResults);
         } finally {
             resetQueue();

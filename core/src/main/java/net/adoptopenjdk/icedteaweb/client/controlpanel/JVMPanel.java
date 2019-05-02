@@ -36,22 +36,6 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.StreamUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -60,6 +44,22 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class JVMPanel extends NamedBorderPanel {
@@ -100,8 +100,8 @@ public class JVMPanel extends NamedBorderPanel {
         final JLabel description = new JLabel("<html>" + Translator.R("CPJVMPluginArguments") + "<hr /></html>");
         final JTextField testFieldArguments = new JTextField(25);
 
-        testFieldArguments.getDocument().addDocumentListener(new DocumentAdapter(config, DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS));
-        testFieldArguments.setText(config.getProperty(DeploymentConfiguration.KEY_PLUGIN_JVM_ARGUMENTS));
+        testFieldArguments.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
+        testFieldArguments.setText(config.getProperty(ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS));
 
         final JLabel descriptionExec = new JLabel("<html>" + Translator.R("CPJVMitwExec") + "<hr /></html>");
         testFieldArgumentsExec = new JTextField(100);
@@ -145,8 +145,8 @@ public class JVMPanel extends NamedBorderPanel {
             }
         });
 
-        testFieldArgumentsExec.getDocument().addDocumentListener(new DocumentAdapter(config, DeploymentConfiguration.KEY_JRE_DIR));
-        testFieldArgumentsExec.setText(config.getProperty(DeploymentConfiguration.KEY_JRE_DIR));
+        testFieldArgumentsExec.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_JRE_DIR));
+        testFieldArgumentsExec.setText(config.getProperty(ConfigurationConstants.KEY_JRE_DIR));
 
         final JButton selectJvm = new JButton(Translator.R("CPJVMPluginSelectExec"));
         selectJvm.addActionListener(new ActionListener() {

@@ -46,7 +46,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.AppletUtils;
-import net.sourceforge.jnlp.util.StreamUtils;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

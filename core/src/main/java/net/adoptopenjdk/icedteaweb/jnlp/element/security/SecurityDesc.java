@@ -20,7 +20,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
@@ -317,7 +317,7 @@ public class SecurityDesc {
         this.type = type;
         this.downloadHost = downloadHost;
 
-        String key = DeploymentConfiguration.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+        String key = ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
         grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
 
         customTrustedPolicy = getCustomTrustedPolicy();
@@ -343,7 +343,7 @@ public class SecurityDesc {
      * instead.
      */
     private Policy getCustomTrustedPolicy() {
-        String key = DeploymentConfiguration.KEY_SECURITY_TRUSTED_POLICY;
+        String key = ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY;
         String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
 
         Policy policy = null;
