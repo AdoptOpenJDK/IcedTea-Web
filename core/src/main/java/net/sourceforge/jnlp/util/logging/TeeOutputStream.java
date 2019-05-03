@@ -43,7 +43,6 @@ import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -55,10 +54,16 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     // Everything written to TeeOutputStream is written to our log too
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
+    private final BasicOutputController outputController;
 
     public TeeOutputStream(PrintStream stdStream, boolean isError) {
+        this(stdStream, isError, OutputController.getLogger());
+    }
+
+    TeeOutputStream(PrintStream stdStream, boolean isError, BasicOutputController outputController) {
         super(stdStream);
         this.isError = isError;
+        this.outputController = outputController;
     }
 
     @Override
@@ -102,9 +107,9 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     @Override
     public void log(String s) {
-        JavaMessage  jm = new JavaMessage(new Header(getlevel(), false), s);
+        JavaMessage  jm = new JavaMessage(new Header(getLevel(), false), s);
         jm.getHeader().isClientApp = true;
-        OutputController.getLogger().log(jm);
+        outputController.log(jm);
     }
 
     private boolean isError() {
@@ -127,18 +132,11 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         }
     }
 
-    private OutputControllerLevel getlevel() {
+    private OutputControllerLevel getLevel() {
         if (isError()) {
             return OutputControllerLevel.ERROR_ALL;
         } else {
             return OutputControllerLevel.MESSAGE_ALL;
         }
-    }
-
-    //For unit testing
-    protected ByteArrayOutputStream getByteArrayOutputStream() throws IOException {
-        ByteArrayOutputStream copy = new ByteArrayOutputStream();
-        copy.write(this.byteArrayOutputStream.toByteArray());
-        return copy;
     }
 }
