@@ -289,27 +289,6 @@ public class JNLPFileTest extends NoStdOutErrTest{
     }
     
     @Test
-    public void splitEmptyEntryPointsReturnsTests() throws Exception {
-        Assert.assertArrayEquals(null, JNLPFile.splitEntryPoints("  "));
-        Assert.assertArrayEquals(null, JNLPFile.splitEntryPoints(null));
-    }
-
-    @Test
-    public void ensureSingleEntryPointIsParsed() throws Exception {
-        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("  a.b.c  "));
-        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("a.b.c"));
-        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("  a.b.c"));
-        Assert.assertArrayEquals(new String[]{"a.b.c"}, JNLPFile.splitEntryPoints("a.b.c  "));
-    }
-
-    @Test
-    public void ensureMultipleEntryPointsAreParsed() throws Exception {
-        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("  a.b.c     cde"));
-        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("  a.b.c cde    "));
-        Assert.assertArrayEquals(new String[]{"a.b.c", "cde"}, JNLPFile.splitEntryPoints("a.b.c         cde    "));
-    }
-    
-    @Test
     public void WindowsWithNameAreRecognized(){
         boolean r = JNLPFile.stringMatches("Windows", new String[]{"Windows 7"});
         Assert.assertTrue(r);

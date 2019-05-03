@@ -862,7 +862,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void initializeManifestAttributesChecker() throws LaunchException {
         if (mac == null) {
-            file.getManifestsAttributes().setLoader(this);
+            file.getManifestAttributeReader().setLoader(this);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
         }
     }
