@@ -37,8 +37,6 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -322,19 +320,19 @@ public class PolicyEditorTest {
     }
 
     @Test
-    public void testFilePathArgumentDefaultFileSwitch() throws URISyntaxException {
+    public void testFilePathArgumentDefaultFileSwitch() {
         String[] args = new String[] { "-defaultfile" };
         CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getPolicyEditorOptions());
         String result = getFilePathArgument(optionParser);
-        assertTrue(result.equals(new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath()));
+        assertTrue(result.equals(new File(PathsAndFiles.JAVA_POLICY.getFullPath()).getAbsolutePath()));
     }
 
     @Test
-    public void testFilePathArgumentDefaultFileSwitch2() throws URISyntaxException {
+    public void testFilePathArgumentDefaultFileSwitch2() {
         String[] args = new String[] { "-codebase", "http://example.com", "-defaultfile" };
         CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getPolicyEditorOptions());
         String result = getFilePathArgument(optionParser);
-        assertTrue(result.equals(new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath()));
+        assertTrue(result.equals(new File(PathsAndFiles.JAVA_POLICY.getFullPath()).getAbsolutePath()));
     }
 
     @Test(expected = IllegalArgumentException.class)
