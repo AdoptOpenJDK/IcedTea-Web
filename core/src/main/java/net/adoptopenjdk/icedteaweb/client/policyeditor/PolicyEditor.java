@@ -56,8 +56,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -364,7 +362,7 @@ public class PolicyEditor extends JPanel {
                 try {
                     PolicyEditor.this.setFile(getDefaultPolicyFilePath());
                     PolicyEditor.this.getFile().createNewFile();
-                } catch (final IOException | URISyntaxException e) {
+                } catch (final IOException e) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
                     return;
                 }
@@ -522,8 +520,9 @@ public class PolicyEditor extends JPanel {
         setupLayout();
     }
 
-    private static String getDefaultPolicyFilePath() throws URISyntaxException {
-        return new File(new URI(PathsAndFiles.JAVA_POLICY.getFullPath())).getAbsolutePath();
+    private static String getDefaultPolicyFilePath() {
+        final String fullPath = PathsAndFiles.JAVA_POLICY.getFullPath();
+        return new File(fullPath).getAbsolutePath();
     }
 
     private void addDefaultAllAppletsIdentifier() {
@@ -1828,12 +1827,7 @@ public class PolicyEditor extends JPanel {
         } else if (hasMainArgument) {
             filepath = cleanFilePathArgument(optionParser.getMainArg());
         } else if (openDefaultFile) {
-            try {
-                filepath = getDefaultPolicyFilePath();
-            } catch (URISyntaxException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                throw new RuntimeException(e);
-            }
+            filepath = getDefaultPolicyFilePath();
         }
         return filepath;
     }
