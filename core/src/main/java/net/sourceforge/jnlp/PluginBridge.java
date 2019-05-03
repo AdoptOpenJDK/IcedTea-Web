@@ -22,6 +22,23 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.AppletUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -34,22 +51,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.AppletUtils;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Allows reuse of code that expects a JNLPFile object,
@@ -58,6 +59,8 @@ import org.slf4j.LoggerFactory;
 public final class PluginBridge extends JNLPFile {
 
     private final static Logger LOG = LoggerFactory.getLogger(PluginBridge.class);
+
+    public static final String PERMISSIONS_NAME = "permissions";
 
     private final PluginParameters params;
     final private Set<String> jars = new HashSet<>();
@@ -235,7 +238,7 @@ public final class PluginBridge extends JNLPFile {
                                     height, params.getUnmodifiableMap());
 
         if (main.endsWith(".class")) //single class file only
-            security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS,
+            security = new SecurityDesc(this, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS,
                                         codebase);
         else
             security = null;
@@ -278,18 +281,18 @@ public final class PluginBridge extends JNLPFile {
     
 
     @Override
-    public RequestedPermissionLevel getRequestedPermissionLevel() {
+    public AppletPermissionLevel getAppletPermissionLevel() {
         final String level = params.getPermissions();
         if (level == null) {
-            return RequestedPermissionLevel.NONE;
-        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.DEFAULT.toHtmlString())) {
-            return RequestedPermissionLevel.NONE;
-        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
-            return RequestedPermissionLevel.SANDBOX;
-        } else if (level.equals(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
-            return RequestedPermissionLevel.ALL;
+            return AppletPermissionLevel.NONE;
+        } else if (level.equals(AppletPermissionLevel.DEFAULT.getValue())) {
+            return AppletPermissionLevel.NONE;
+        } else if (level.equals(AppletPermissionLevel.SANDBOX.getValue())) {
+            return AppletPermissionLevel.SANDBOX;
+        } else if (level.equals(AppletPermissionLevel.ALL.getValue())) {
+            return AppletPermissionLevel.ALL;
         } else {
-            return RequestedPermissionLevel.NONE;
+            return AppletPermissionLevel.NONE;
         }
     }
 
@@ -528,13 +531,13 @@ public final class PluginBridge extends JNLPFile {
     }
 
     //Those constants are public, because they are tested in PluginBridgeTest
-    static final String SANDBOX_REGEX = toBaseRegex("sandbox", false);
+    static final String SANDBOX_REGEX = toBaseRegex(AppletPermissionLevel.SANDBOX.getValue(), false);
     static final String CLOSE_INFORMATION_REGEX = toBaseRegex("information", true);
     static final String SECURITY_REGEX = toBaseRegex("security", false);
     static final String RESOURCE_REGEX = toBaseRegex("resources", false);
     static final String TITLE_REGEX = toBaseRegex("title", false);
     static final String VENDOR_REGEX = toBaseRegex("vendor", false);
-    static final String AP_REGEX = toBaseRegex("all-permissions", false);
+    static final String AP_REGEX = toBaseRegex(AppletPermissionLevel.ALL.getValue(), false);
     static final String CODEBASE_REGEX1 = "(?i).*\\s+codebase\\s*=\\s*";
     static final String CODEBASE_REGEX2 = "(?i)\\s+codebase\\s*=\\s*.\\.{0,1}.((\\s+)|(\\s*>))";// "." '.' '' ""
 

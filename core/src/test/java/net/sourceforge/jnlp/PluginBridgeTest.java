@@ -26,7 +26,7 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.CacheUtil;
@@ -145,24 +145,19 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         params.put("jnlp_href", relativeLocation);
         MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
         PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
-        assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.NONE);
+        assertEquals(pb.getAppletPermissionLevel(), AppletPermissionLevel.NONE);
         
-        params.put(SecurityDesc.RequestedPermissionLevel.PERMISSIONS_NAME,SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString());
+        params.put(PluginBridge.PERMISSIONS_NAME, AppletPermissionLevel.ALL.getValue());
         pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
-        assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.ALL);
+        assertEquals(pb.getAppletPermissionLevel(), AppletPermissionLevel.ALL);
         
-        //unknown for applets!
-        params.put(SecurityDesc.RequestedPermissionLevel.PERMISSIONS_NAME, SecurityDesc.RequestedPermissionLevel.J2EE.toJnlpString());
+        params.put(PluginBridge.PERMISSIONS_NAME, AppletPermissionLevel.SANDBOX.getValue());
         pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
-        assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.NONE);
+        assertEquals(pb.getAppletPermissionLevel(), AppletPermissionLevel.SANDBOX);
         
-        params.put(SecurityDesc.RequestedPermissionLevel.PERMISSIONS_NAME, SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString());
+        params.put(PluginBridge.PERMISSIONS_NAME, AppletPermissionLevel.DEFAULT.getValue());
         pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
-        assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.SANDBOX);
-        
-        params.put(SecurityDesc.RequestedPermissionLevel.PERMISSIONS_NAME, SecurityDesc.RequestedPermissionLevel.DEFAULT.toHtmlString());
-        pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
-        assertEquals(pb.getRequestedPermissionLevel(), SecurityDesc.RequestedPermissionLevel.NONE);
+        assertEquals(pb.getAppletPermissionLevel(), AppletPermissionLevel.NONE);
     }
 
     @Test
