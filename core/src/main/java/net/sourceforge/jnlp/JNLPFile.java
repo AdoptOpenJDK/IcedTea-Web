@@ -88,8 +88,8 @@ public class JNLPFile {
     public static final String SPEC_ATTRIBUTE = "spec";
     public static final String VERSION_ATTRIBUTE = "version";
 
-    public static enum ManifestBoolean {
-        TRUE, FALSE, UNDEFINED;
+    public enum ManifestBoolean {
+        TRUE, FALSE, UNDEFINED
     }
    
 
@@ -129,7 +129,7 @@ public class JNLPFile {
     protected List<ResourcesDesc> resources;
 
     /** additional resources not in JNLP file (from command line) */
-    protected ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
+    protected final ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
 
     /** the application entry point */
     protected EntryPoint entryPointDesc;
@@ -807,7 +807,7 @@ public class JNLPFile {
      * @return true if prefixStr is a prefix of any strings in
      * available, or if available is empty or null.
      */
-    static boolean stringMatches(String prefixStr, String available[]) {
+    static boolean stringMatches(String prefixStr, String[] available) {
         if (available == null || available.length == 0){
             return true;
         }
@@ -1076,7 +1076,7 @@ public class JNLPFile {
                 return ManifestBoolean.UNDEFINED;
             } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
                 return ManifestBoolean.TRUE;
-            } else if (permissionLevel.trim().equalsIgnoreCase(getAppletPermissionLevel().ALL.getValue())) {
+            } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
                 return ManifestBoolean.FALSE;
             } else {
                 throw new IllegalArgumentException(
@@ -1090,7 +1090,7 @@ public class JNLPFile {
          * @return plain string values of Permissions manifest attribute
          */
         public String permissionsToString() {
-            String s = getManifestPermissionsAttribute();
+            final String s = getManifestPermissionsAttribute();
             if (s == null) {
                 return "Not defined";
             } else if (s.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {

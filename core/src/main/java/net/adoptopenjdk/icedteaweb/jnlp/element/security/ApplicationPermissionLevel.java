@@ -52,9 +52,9 @@ public enum ApplicationPermissionLevel {
     // as there is no such thing as NONE in the specs
     NONE(null);
 
-    private String value;
+    private final String value;
 
-    ApplicationPermissionLevel(String value) {
+    ApplicationPermissionLevel(final String value) {
         this.value = value;
     }
 

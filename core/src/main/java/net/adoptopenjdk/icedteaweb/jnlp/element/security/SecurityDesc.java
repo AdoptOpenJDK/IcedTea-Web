@@ -130,8 +130,8 @@ public class SecurityDesc {
      * when the SecurityDesc is constructed, rather than every time a call is made to
      * {@link SecurityDesc#getSandBoxPermissions()}, which is called frequently.
      */
-    private static Class<Permission> urlPermissionClass = null;
-    private static Constructor<Permission> urlPermissionConstructor = null;
+    private static Class<Permission> urlPermissionClass;
+    private static Constructor<Permission> urlPermissionConstructor;
     
     static {
         try {

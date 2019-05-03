@@ -60,9 +60,9 @@ public enum AppletPermissionLevel {
     // as there is no such thing as NONE in the specs
     NONE(null);
 
-    private String value;
+    private final String value;
 
-    AppletPermissionLevel(String value) {
+    AppletPermissionLevel(final String value) {
         this.value = value;
     }
 
