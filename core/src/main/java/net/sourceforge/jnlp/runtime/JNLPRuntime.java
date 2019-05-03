@@ -456,9 +456,9 @@ public class JNLPRuntime {
      */
     private static class DeploymentConfigurationHolder {
 
-        private static final DeploymentConfiguration INSTANCE = initConfiguration();
+        private static final DeploymentConfiguration INSTANCE;
 
-        private static DeploymentConfiguration initConfiguration() {
+        static {
             DeploymentConfiguration config = new DeploymentConfiguration();
             try {
                 config.load();
@@ -476,9 +476,9 @@ public class JNLPRuntime {
                 //try to survive this unlikely exception
                 config.resetToDefaults();
             } finally {
+                INSTANCE = config;
                 OutputController.getLogger().startConsumer();
             }
-            return config;
         }
     }
 
