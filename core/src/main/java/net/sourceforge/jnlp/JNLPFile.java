@@ -1071,7 +1071,7 @@ public class JNLPFile {
          * @return value of Permissions manifest attribute
          */
         public ManifestBoolean isSandboxForced() {
-            String permissionLevel = getManifestPermissionsAttribute();
+            final String permissionLevel = getManifestPermissionsAttribute();
             if (permissionLevel == null) {
                 return ManifestBoolean.UNDEFINED;
             } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
