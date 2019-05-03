@@ -240,7 +240,7 @@ public class SecurityDesc {
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(JNLPFile file, ApplicationPermissionLevel applicationPermissionLevel, Object type, URL downloadHost) {
+    public SecurityDesc(final JNLPFile file, final ApplicationPermissionLevel applicationPermissionLevel, final Object type, final URL downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
@@ -263,7 +263,7 @@ public class SecurityDesc {
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(JNLPFile file, AppletPermissionLevel appletPermissionLevel, Object type, URL downloadHost) {
+    public SecurityDesc(final JNLPFile file, final AppletPermissionLevel appletPermissionLevel, final Object type, final URL downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
