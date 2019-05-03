@@ -30,8 +30,8 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -81,7 +81,6 @@ import java.util.List;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -766,14 +765,6 @@ public class JNLPRuntime {
         } finally {
             headlessChecked = true;
         }
-    }
-
-    /**
-     * @return {@code true} if running on Windows
-     */
-    public static boolean isWindows() {
-        String os = System.getProperty(OS_NAME);
-        return (os != null && os.startsWith("Windows"));
     }
 
     /**

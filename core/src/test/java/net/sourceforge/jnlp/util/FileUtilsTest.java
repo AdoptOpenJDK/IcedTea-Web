@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.util;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import org.junit.Test;
 
 import java.io.File;
@@ -76,7 +76,7 @@ public class FileUtilsTest {
     public void testSanitizeMoreDoubleDots() throws Exception {
         String str = "C:/some:dir/some:file";
         String sanitized = FileUtils.sanitizePath(str);
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             assertEquals("C:/some_dir/some_file", sanitized);
         } else {
             assertEquals("C_/some_dir/some_file", sanitized);
@@ -87,7 +87,7 @@ public class FileUtilsTest {
     public void testSanitizePathWindowsLinuxSlashes() throws Exception {
         String str = "C:/some.dir/some.file";
         String sanitized = FileUtils.sanitizePath(str);
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             assertEquals("C:/some.dir/some.file", sanitized);
         } else {
             assertEquals("C_/some.dir/some.file", sanitized);
@@ -98,7 +98,7 @@ public class FileUtilsTest {
     public void testSanitizePathWindowsWinSlashes() throws Exception {
         String str = "C:\\some.dir\\some.file";
         String sanitized = FileUtils.sanitizePath(str);
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             assertEquals("C:/some.dir/some.file", sanitized);
         } else {
             assertEquals("C_/some.dir/some.file", sanitized);
@@ -138,7 +138,7 @@ public class FileUtilsTest {
 
     @Test
     public void testCreateRestrictedFile() throws Exception {
-        if (!JNLPRuntime.isWindows()) {
+        if (!OsUtil.isWindows()) {
             return;
         }
         final File tmpdir = new File(System.getProperty(JAVA_IO_TMPDIR)), testfile = new File(tmpdir, "itw_test_create_restricted_file");

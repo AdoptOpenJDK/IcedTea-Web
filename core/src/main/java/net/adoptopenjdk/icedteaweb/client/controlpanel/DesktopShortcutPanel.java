@@ -20,10 +20,12 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor.FreeDesktopIntegrationEditorFrame;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -71,7 +73,7 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
         JLabel description = new JLabel("<html>" + Translator.R("CPDesktopIntegrationDescription") + "<hr /></html>");
         JComboBox<ComboItem> shortcutComboOptions = new JComboBox<>();
         JButton manageIntegrationsButton = new JButton(Translator.R("CPDesktopIntegrationShowIntegrations"));
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             manageIntegrationsButton.setToolTipText(Translator.R("CPDesktopIntegrationLinuxOnly"));
             manageIntegrationsButton.setEnabled(false);
         }

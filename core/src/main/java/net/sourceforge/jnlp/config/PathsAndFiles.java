@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.FilesystemConfiguration;
 import net.adoptopenjdk.icedteaweb.config.Target;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -303,7 +304,7 @@ public class PathsAndFiles {
         private static final String unixPathSuffix = File.separator + "etc" + File.separator + ".java";
 
         private static String getSystemConfigDir() {
-            if (JNLPRuntime.isWindows()) {
+            if (OsUtil.isWindows()) {
                 return System.getenv(ConfigurationConstants.WINDIR) + windowsPathSuffix;
             } else {
                 return unixPathSuffix;

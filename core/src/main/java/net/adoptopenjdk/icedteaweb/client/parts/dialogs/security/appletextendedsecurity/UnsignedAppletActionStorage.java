@@ -118,7 +118,7 @@ public interface UnsignedAppletActionStorage {
     /**
      * Will replace (current impl is matching by object's hashcode. This is not
      * reloading the list (but still saving after), so
-     * {@link net.sourceforge.jnlp.util.lockingfile.StorageIoException} can be
+     * {@link net.adoptopenjdk.icedteaweb.lockingfile.StorageIoException} can be
      * thrown if it was not loaded before.
      * <p>
      * Imho this should be used only to actualise timestamps or change

@@ -34,9 +34,9 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,41 +50,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /*
  * Process & thread locked access to a file. Creates file if it does not already exist.
  */
-public class LockedFile {
+public class LockableFile {
 
-    // The file for access
-    private RandomAccessFile randomAccessFile;
-    private FileChannel fileChannel;
-    private File file;
-    // A file lock will protect against locks for multiple
-    // processes, while a thread lock is still needed within a single JVM.
-    private FileLock processLock = null;
-    private ReentrantLock threadLock = new ReentrantLock();
-    private boolean readOnly;
-
-    private LockedFile(File file) {
-        this.file = file;
-        try {
-            //just try to create
-            this.file.createNewFile();
-        } catch (Exception ex) {
-            //intentionally silent
-        }
-        if (!this.file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-            readOnly = true;
-        } else {
-            this.readOnly = !file.canWrite();
-            if (!readOnly && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-                readOnly = true;
-            }
-        }
-    }
-
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-    // Provide shared access to LockedFile's via weak map
-    static private final Map<File, LockedFile> instanceCache = new WeakHashMap<File, LockedFile>();
+    private static final Map<File, LockableFile> instanceCache = new WeakHashMap<>();
 
     /**
      * Get a LockedFile for a given File. Ensures that we share the same
@@ -93,18 +61,55 @@ public class LockedFile {
      * @param file the file to lock
      * @return a LockedFile instance
      */
-    synchronized public static LockedFile getInstance(File file) {
-        if (!instanceCache.containsKey(file)) {
-            LockedFile l;
-            if (JNLPRuntime.isWindows()) {
-                l = new WindowsLockedFile(file);
-            } else {
-                l = new LockedFile(file);
-            }
-            instanceCache.put(file, l);
+    public static LockableFile getInstance(final File file) {
+        if (instanceCache.containsKey(file)) {
+            return instanceCache.get(file);
         }
 
-        return instanceCache.get(file);
+        synchronized (instanceCache) {
+            if (instanceCache.containsKey(file)) {
+                return instanceCache.get(file);
+            }
+
+            final LockableFile lockableFile = new LockableFile(file);
+            instanceCache.put(file, lockableFile);
+            return lockableFile;
+        }
+    }
+
+    private final File file;
+    private final boolean readOnly;
+
+    // internal modifiable state.
+    // these fields are not exposed but are used within this class
+    private final ReentrantLock threadLock = new ReentrantLock();
+    private RandomAccessFile randomAccessFile;
+    private FileChannel fileChannel;
+    private FileLock processLock;
+
+
+    private LockableFile(final File file) {
+        this.file = file;
+        try {
+            //just try to create
+            this.file.createNewFile();
+        } catch (final Exception ex) {
+            //intentionally silent
+        }
+        this.readOnly = isReadOnly(this.file);
+    }
+
+    private boolean isReadOnly(final File file) {
+        boolean result;
+        if (!file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
+            result = true;
+        } else {
+            result = !file.canWrite();
+            if (!result && file.getParentFile() != null && !file.getParentFile().canWrite()) {
+                result = true;
+            }
+        }
+        return result;
     }
 
     /**
@@ -117,8 +122,15 @@ public class LockedFile {
     }
 
     /**
+     * @return if the file is read only.
+     */
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    /**
      * Lock access to the file.Lock is reentrant.
-     * @throws java.io.IOException
+     * @throws java.io.IOException if an I/O error occurs.
      */
     public void lock() throws IOException {
         // Create if does not already exist, cannot lock non-existing file
@@ -127,7 +139,6 @@ public class LockedFile {
         }
 
         this.threadLock.lock();
-
         lockProcess();
     }
 
@@ -141,6 +152,10 @@ public class LockedFile {
     }
 
     private void lockProcess() throws IOException {
+        if (OsUtil.isWindows()) {
+            return;
+        }
+
         if (this.processLock != null) {
             return;
         }
@@ -156,63 +171,40 @@ public class LockedFile {
 
     /**
      * Unlock access to the file.Lock is reentrant. Does not do anything if not holding the lock.
-     * @throws java.io.IOException
+     * @throws java.io.IOException if an I/O error occurs.
      */
     public void unlock() throws IOException {
-        if (!this.threadLock.isHeldByCurrentThread()) {
-            return;
+        if (this.threadLock.isHeldByCurrentThread()) {
+            try {
+                if (this.threadLock.getHoldCount() == 1) {
+                    unlockProcess();
+                }
+            } finally {
+                this.threadLock.unlock();
+            }
         }
-        boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
-        unlockImpl(releaseProcessLock);
     }
 
-    protected void unlockImpl(boolean releaseProcessLock) throws IOException {
-        try {
-            if (releaseProcessLock) {
-                if (this.processLock != null){
-                    this.processLock.release();
-                }
-                this.processLock = null;
-                //necessary for read only file
-                if (this.randomAccessFile != null){
-                    this.randomAccessFile.close();
-                }
-                //necessary for not existing parent directory
-                if (this.fileChannel != null){
-                    this.fileChannel.close();
-                }
-            }
-        } finally {
-            this.threadLock.unlock();
+    private void unlockProcess() throws IOException {
+        if (OsUtil.isWindows()) {
+            return;
+        }
+
+        if (this.processLock != null) {
+            this.processLock.release();
+        }
+        this.processLock = null;
+        //necessary for read only file
+        if (this.randomAccessFile != null) {
+            this.randomAccessFile.close();
+        }
+        //necessary for not existing parent directory
+        if (this.fileChannel != null) {
+            this.fileChannel.close();
         }
     }
 
     public boolean isHeldByCurrentThread() {
         return this.threadLock.isHeldByCurrentThread();
-    }
-
-    private static class WindowsLockedFile extends LockedFile {
-
-        public WindowsLockedFile(File file) {
-            super(file);
-        }
-
-        /*Comment why it is different*/
-        @Override
-        public void lock() throws IOException {
-            if (!isReadOnly()) {
-                super.file.createNewFile();
-            }
-            super.threadLock.lock();
-        }
-
-        /*Comment why it is different*/
-        @Override
-        public void unlock() throws IOException {
-            if (!super.threadLock.isHeldByCurrentThread()) {
-                return;
-            }
-            unlockImpl(false);
-        }
     }
 }

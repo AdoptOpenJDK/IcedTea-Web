@@ -39,7 +39,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UrlRegEx;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
+import net.adoptopenjdk.icedteaweb.lockingfile.StorageIoException;
 
 import java.io.File;
 import java.io.IOException;

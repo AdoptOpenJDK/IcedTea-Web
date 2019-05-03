@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.config;
 
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.util.Optional;
@@ -98,7 +98,7 @@ public class FilesystemConfiguration {
             variablePrefixLock.lock();
             try {
                 if (variablePrefix.get() == null) {
-                    variablePrefix.set(JNLPRuntime.isWindows() ? ConfigurationConstants.WIN_VARIABLE_PREFIX : ConfigurationConstants.UNIX_VARIABLE_PREFIX);
+                    variablePrefix.set(OsUtil.isWindows() ? ConfigurationConstants.WIN_VARIABLE_PREFIX : ConfigurationConstants.UNIX_VARIABLE_PREFIX);
                 }
             } finally {
                 variablePrefixLock.unlock();

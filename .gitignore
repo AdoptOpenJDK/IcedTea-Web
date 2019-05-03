@@ -7,3 +7,5 @@
 
 *.log
 ServerAccess-logs.xml
+launchers/build.log
+launchers/rust-launcher/Cargo.lock
