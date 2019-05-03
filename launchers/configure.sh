@@ -1,6 +1,7 @@
 #!/bin/sh
 
 VERSION=$1
+LOCALIZATIONS="en_US.UTF-8 cs_CZ.UTF-8 pl_PL.UTF-8 de_DE.UTF-8"
 
 if [ "x$VERSION"  == "x" ] ; then
  readonly VERSION="unknown"
@@ -16,11 +17,12 @@ else
 fi
 
 
-# sourced from build.sh
 readonly PROJECT_TOP=`dirname $SCRIPT_DIR`
 readonly TARGET=$SCRIPT_DIR/target
 readonly TARGET_TMP=$TARGET/tmp
 readonly TARGET_IMAGES=$TARGET/images
+readonly TARGET_DOCS_PARENT=$TARGET/icedtea-web-docs
+readonly TARGET_DOCS=$TARGET_DOCS_PARENT/$VERSION
 
 rm -rf "$TARGET"
 

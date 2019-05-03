@@ -84,6 +84,7 @@ function image() {
   local img_name=icedtea-web-$VERSION-$1
   mkdir $TARGET_IMAGES/icedtea-web
   cp -r $LIB_TARGET_DIR  $BIN_TARGET_DIR $TARGET_IMAGES/icedtea-web
+  cp -r $TARGET_DOCS_PARENT  $TARGET_IMAGES/icedtea-web/
   pushd $TARGET_IMAGES/icedtea-web
     rm -rvf $EXCLUDE
   popd
@@ -91,5 +92,64 @@ function image() {
     zip -r $img_name.zip icedtea-web
   popd
   mv $TARGET_IMAGES/icedtea-web $TARGET_IMAGES/$img_name
+}
+
+
+function htmlIndex() {
+  local htmlIndexFile="$TARGET_DOCS/html/index.html"
+  echo "<html><head><title>$VERSION</title></head>" > "$htmlIndexFile"
+  echo "<body><h3>$VERSION docs:</h3>"  >> "$htmlIndexFile"
+  for LANG_ID in "$@" ; do 
+    local ID=`echo "$LANG_ID" | head -c 2`
+    echo "<li><a href='$ID/icedtea-web.html'>$LANG_ID</a></li>"  >> "$htmlIndexFile"
+  done
+  echo "</body></html>"  >> $htmlIndexFile
+}
+
+function createCp() {
+ local CP=""
+ if isWindows; then
+    local CP_DEL=";"
+  else
+    local CP_DEL=":"
+  fi
+ for CP_ELEMENT in "$@" ; do
+   CP="$CP$CP_ELEMENT$CP_DEL"
+ done
+ echo -n $CP
+}
+
+function docs() {
+  local type=$1 # html plain man
+  local LANG_ID=$2
+  local docDir=$TARGET_DOCS/$type
+  mkdir -p $docDir
+  local LANG_BACKUP=$LANG
+  local ID=`echo "$LANG_ID" | head -c 2`
+  local ENCOD=`echo "$LANG_ID" | tail -c 6 -`
+  export LANG=$LANG_ID
+  local langDir="$docDir/$ID"
+  if [ $type == "plain" ] ; then
+    WIDTH=160
+  else
+    unset WIDTH
+  fi
+  if [ $type == "man" ] ; then 
+      local langDir="$docDir/$ID/man1"
+    if [ $ID == "en" ] ; then
+      local langDir="$docDir/man1"
+    fi
+    ENPARAM=$ENCOD
+  else
+   unset ENPARAM
+  fi
+  mkdir -p $langDir
+  $JRE/bin/java \
+    -cp `createCp $CORE_SRC $COMMON_SRC $JNLPAPI_SRC $SLFAPI_SRC $SLFSIMPLE_SRC` \
+    net.sourceforge.jnlp.util.docprovider.TextsProvider \
+    $type $ENPARAM $langDir $WIDTH false $VERSION "-authorString=https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors"
+  # TODO, genere on fly resource
+  # $TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$ID.html" $TP_TAIL; \
+  export LANG=$LANG_BACKUP ; \
 }
 

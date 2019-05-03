@@ -42,6 +42,13 @@ publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
 publishInternalLib "$MODULARJDK_ARGS_FILE_SRC" "$ETC_TARGET_DIR"
 
+for TYPE in man html plain ; do
+  for LANG_ID in $LOCALIZATIONS ;  do
+    docs $TYPE $LANG_ID
+  done
+done
+htmlIndex $LOCALIZATIONS
+
 build sh javaws         net.sourceforge.jnlp.runtime.Boot
 build sh itweb-settings net.adoptopenjdk.icedteaweb.client.commandline.CommandLine
 build sh policyeditor   net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
@@ -66,7 +73,8 @@ fi
 
 if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
   echo "not creating images in $ITW_LIBS mode; image is already done, as launchers are built against your system libraries."
-  echo "If you wish, copy man pages and bash completion"
+  echo "TODO automate below; defualt none? or as in Fedora? Overwritable as all others in configure?"
+  echo "If you wish, copy man pages, desktop files and bash completion. Sed as necessary"
   exit 0
 fi
 
@@ -76,6 +84,7 @@ image portable.bin
 if which $CARGO_RUST ; then
   EXCLUDE="bin/*.sh bin/*.bat"
   if isWindows; then
+    EXCLUDE="$EXCLUDE icedtea-web-docs/*/man"
     image win.bin
   else
     image linux.bin
