@@ -107,7 +107,7 @@ public class CommandLine {
      */
     private int handleHelpCommand() {
         final TextsProvider helpMessagesProvider = new ItwebSettingsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
-        String helpMessage = "\n";
+        String helpMessage = PlainTextFormatter.getLineSeparator();
 
         if (JNLPRuntime.isDebug()) {
             helpMessage = helpMessage
