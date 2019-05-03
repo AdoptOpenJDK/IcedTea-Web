@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResult;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.File;
@@ -70,10 +71,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDir() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
-        f.deleteOnExit();
+        File f = createTempDir();
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.isEmpty());
@@ -81,11 +79,8 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDirButNotWritable() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
+        File f = createTempDir();
         assertTrue(f.setWritable(false));
-        f.deleteOnExit();
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
@@ -95,10 +90,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDirButNotReadable() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
-        f.deleteOnExit();
+        File f = createTempDir();
         assertTrue(f.setReadable(false));
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, false);
         String s = result.getMessage();
@@ -127,10 +119,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDirWithSubdir() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
-        f.deleteOnExit();
+        File f = createTempDir();
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.isEmpty());
@@ -138,11 +127,8 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDirButNotWritableWithSubdir() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
+        File f = createTempDir();
         assertTrue(f.setWritable(false));
-        f.deleteOnExit();
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
         assertTrue(s.endsWith("\n"));
@@ -152,10 +138,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testMainDirTestExistsAsDirButNotReadableWithSubdir() throws IOException {
-        File f = File.createTempFile("test", "testMainDirs");
-        assertTrue(f.delete());
-        assertTrue(f.mkdir());
-        f.deleteOnExit();
+        File f = createTempDir();
         f.setReadable(false);
         DirectoryCheckResult result = DirectoryValidator.testDir(f, false, true);
         String s = result.getMessage();
@@ -202,20 +185,12 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     @Test
     public void testDirectoryValidator() throws IOException {
-        File f1 = File.createTempFile("test", "testMainDirs");
-        File f2 = File.createTempFile("test", "testMainDirs");
+        File f1 = createTempDir();
+        File f2 = createTempDir();
         DirectoryValidator dv = new DirectoryValidator(Arrays.asList(f1, f2));
 
-        assertTrue(f1.delete());
-        assertTrue(f1.mkdir());
         assertTrue(f1.setWritable(false));
-        f1.deleteOnExit();
-
-        assertTrue(f2.delete());
-        assertTrue(f2.mkdir());
         assertTrue(f2.setWritable(false));
-        f2.deleteOnExit();
-
 
         DirectoryCheckResults results1 = dv.ensureDirs();
         assertTrue(results1.results.size() == 2);
@@ -272,5 +247,14 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
         assertTrue(f2.setWritable(true));
         assertTrue(f4.delete());
 
+    }
+
+    @NotNull
+    private File createTempDir() throws IOException {
+        File f1 = File.createTempFile("test", "testMainDirs");
+        assertTrue(f1.delete());
+        assertTrue(f1.mkdir());
+        f1.deleteOnExit();
+        return f1;
     }
 }
