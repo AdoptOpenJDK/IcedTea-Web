@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
@@ -265,7 +266,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPFile dummyJnlpFile = new DummyJNLPFile() {
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(null, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
             }
         };
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);

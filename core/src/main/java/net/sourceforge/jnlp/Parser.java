@@ -39,8 +39,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
@@ -80,6 +80,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.SECURITY_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
@@ -698,8 +699,8 @@ public final class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    public SecurityDesc getSecurity(Node parent) throws ParseException {
-        Node nodes[] = getChildNodes(parent, "security");
+    public SecurityDesc getSecurity(final Node parent) throws ParseException {
+        final Node nodes[] = getChildNodes(parent, SECURITY_ELEMENT);
 
         // test for too many security elements
         if (nodes.length > 1) {
@@ -709,25 +710,25 @@ public final class Parser {
         }
 
         Object type = SecurityDesc.SANDBOX_PERMISSIONS;
-        RequestedPermissionLevel requestedPermissionLevel = RequestedPermissionLevel.NONE;
+        ApplicationPermissionLevel applicationPermissionLevel = ApplicationPermissionLevel.NONE;
 
         if (nodes.length == 0) {
             type = SecurityDesc.SANDBOX_PERMISSIONS;
-            requestedPermissionLevel = RequestedPermissionLevel.NONE;
-        } else if (null != getChildNode(nodes[0], "all-permissions")) {
+            applicationPermissionLevel = ApplicationPermissionLevel.NONE;
+        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.ALL.getValue())) {
             type = SecurityDesc.ALL_PERMISSIONS;
-            requestedPermissionLevel = RequestedPermissionLevel.ALL;
-        } else if (null != getChildNode(nodes[0], "j2ee-application-client-permissions")) {
+            applicationPermissionLevel = ApplicationPermissionLevel.ALL;
+        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.J2EE.getValue())) {
             type = SecurityDesc.J2EE_PERMISSIONS;
-            requestedPermissionLevel = RequestedPermissionLevel.J2EE;
+            applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
         } else if (strict) {
             throw new ParseException(R("PEmptySecurity"));
         }
 
         if (base != null) {
-            return new SecurityDesc(file, requestedPermissionLevel, type, base);
+            return new SecurityDesc(file, applicationPermissionLevel, type, base);
         } else {
-            return new SecurityDesc(file, requestedPermissionLevel, type, null);
+            return new SecurityDesc(file, applicationPermissionLevel, type, null);
         }
     }
 
@@ -735,11 +736,11 @@ public final class Parser {
      * Returns whether the JNLP file requests a trusted execution environment.
      */
     private boolean isTrustedEnvironment() {
-        Node security = getChildNode(root, "security");
+        final Node security = getChildNode(root, SECURITY_ELEMENT);
 
         if (security != null) {
-            if (getChildNode(security, "all-permissions") != null
-                    || getChildNode(security, "j2ee-application-client-permissions") != null) {
+            if (getChildNode(security, ApplicationPermissionLevel.ALL.getValue()) != null
+                    || getChildNode(security, ApplicationPermissionLevel.J2EE.getValue()) != null) {
                 return true;
             }
         }

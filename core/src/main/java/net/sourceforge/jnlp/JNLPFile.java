@@ -26,8 +26,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
@@ -599,8 +600,18 @@ public class JNLPFile {
         return security;
     }
 
-    public RequestedPermissionLevel getRequestedPermissionLevel() {
-        return this.security.getRequestedPermissionLevel();
+    /**
+     * @return the requested security level of the application represented by this JNLP file.
+     */
+    public ApplicationPermissionLevel getApplicationPermissionLevel() {
+        return this.security.getApplicationPermissionLevel();
+    }
+
+    /**
+     * @return the requested security level of the applet represented by this JNLP file.
+     */
+    public AppletPermissionLevel getAppletPermissionLevel() {
+        return this.security.getAppletPermissionLevel();
     }
 
     /**
@@ -1060,34 +1071,39 @@ public class JNLPFile {
          * @return value of Permissions manifest attribute
          */
         public ManifestBoolean isSandboxForced() {
-            String s = getAttribute(PERMISSIONS);
-            if (s == null) {
+            String permissionLevel = getManifestPermissionsAttribute();
+            if (permissionLevel == null) {
                 return ManifestBoolean.UNDEFINED;
-            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
+            } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
                 return ManifestBoolean.TRUE;
-            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
+            } else if (permissionLevel.trim().equalsIgnoreCase(getAppletPermissionLevel().ALL.getValue())) {
                 return ManifestBoolean.FALSE;
             } else {
-                throw new IllegalArgumentException("Unknown value of " + PERMISSIONS + " attribute " + s + ". Expected "+SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString()+" or "+SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString());
+                throw new IllegalArgumentException(
+                        String.format("Unknown value of %s attribute %s. Expected %s or %s", PERMISSIONS, permissionLevel,
+                                AppletPermissionLevel.SANDBOX.getValue(), AppletPermissionLevel.ALL.getValue())
+                );
             }
-
-
         }
         /**
          * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
          * @return plain string values of Permissions manifest attribute
          */
         public String permissionsToString() {
-            String s = getAttribute(PERMISSIONS);
+            String s = getManifestPermissionsAttribute();
             if (s == null) {
                 return "Not defined";
-            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString())) {
+            } else if (s.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
                 return s.trim();
-            } else if (s.trim().equalsIgnoreCase(SecurityDesc.RequestedPermissionLevel.ALL.toHtmlString())) {
+            } else if (s.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
                 return s.trim();
             } else {
                 return "illegal";
             }
+        }
+
+        String getManifestPermissionsAttribute() {
+            return getAttribute(PERMISSIONS);
         }
 
         /**

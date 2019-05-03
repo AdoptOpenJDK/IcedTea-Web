@@ -1,17 +1,19 @@
 package net.adoptopenjdk.icedteaweb.testing.mock;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.sourceforge.jnlp.JNLPFile;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.JNLPFile;
 
 /* A mocked dummy JNLP file with a single JAR. */
 public class DummyJNLPFileWithJar extends JNLPFile {
@@ -54,7 +56,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
         }
         info = new ArrayList<>();
-        this.security = new SecurityDesc(this, SecurityDesc.SANDBOX_PERMISSIONS, null);
+        this.security = new SecurityDesc(this, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
     }
 
     public URL getJarLocation() {
