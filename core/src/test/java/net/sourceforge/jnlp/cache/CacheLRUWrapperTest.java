@@ -122,9 +122,7 @@ public class CacheLRUWrapperTest {
         final File cacheIndexFile = clw.getRecentlyUsedFile().getFile();
         cacheIndexFile.delete();
         try {
-            int noLoops = 1000;
-
-            long time[] = new long[noLoops];
+            final int noLoops = 1000;
 
             clw.lock();
             clearCacheIndexFile();
@@ -135,17 +133,13 @@ public class CacheLRUWrapperTest {
             // FIXME: wait a second, because of file modification timestamp only provides accuracy on seconds.
             Thread.sleep(1000);
 
-            long sum = 0;
-            for(int i=0; i < noLoops - 1; i++) {
-                time[i]= System.nanoTime();
+            final long start = System.nanoTime();
+            for (int i=0; i < noLoops; i++) {
                 clw.load();
-                time[i+1]= System.nanoTime();
-                if(i==0)
-                    continue;
-                sum = sum + time[i] - time[i-1];
             }
+            final long end = System.nanoTime();
 
-            double avg = sum / time.length;
+            double avg = (end-start) / noLoops;
             ServerAccess.logErrorReprint("Average = " + avg + "ns");
 
             // wait more than 100 microseconds for noLoops = 1000 and noEntries=1000 is bad
