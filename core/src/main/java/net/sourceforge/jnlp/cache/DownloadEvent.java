@@ -14,10 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.event;
-
-import net.sourceforge.jnlp.cache.Resource;
-import net.sourceforge.jnlp.cache.ResourceTracker;
+package net.sourceforge.jnlp.cache;
 
 import java.net.URL;
 import java.util.EventObject;
@@ -44,7 +41,7 @@ public class DownloadEvent extends EventObject {
      * @param source the resource tracker
      * @param resource the resource
      */
-    public DownloadEvent(ResourceTracker source, Resource resource) {
+    public DownloadEvent(final ResourceTracker source, final Resource resource) {
         super(source);
 
         this.tracker = source;
