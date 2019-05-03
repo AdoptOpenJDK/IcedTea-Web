@@ -34,7 +34,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -54,28 +54,29 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public abstract class LockingReaderWriter {
 
-    private LockedFile lockedFile;
+    private final LockableFile lockableFile;
 
     /**
      * Create locking file-backed storage.
+     *
      * @param file the storage file
      */
-    public LockingReaderWriter(File file) {
-        this.lockedFile = LockedFile.getInstance(file);
+    public LockingReaderWriter(final File file) {
+        this.lockableFile = LockableFile.getInstance(file);
     }
 
     /**
-     * Get the underlying file. 
+     * Get the underlying file.
      * Any access to this file should use lock() and unlock().
-     * 
+     *
      * @return the file
      */
     public File getBackingFile() {
-        return this.lockedFile.getFile();
+        return this.lockableFile.getFile();
     }
 
     public boolean isReadOnly() {
-        return this.lockedFile.isReadOnly();
+        return this.lockableFile.isReadOnly();
     }
 
     /**
@@ -83,8 +84,8 @@ public abstract class LockingReaderWriter {
      */
     public void lock() {
         try {
-            lockedFile.lock();
-        } catch (IOException e) {
+            lockableFile.lock();
+        } catch (final IOException e) {
             throw new StorageIoException(e);
         }
     }
@@ -94,51 +95,42 @@ public abstract class LockingReaderWriter {
      */
     public void unlock() {
         try {
-            lockedFile.unlock();
-        } catch (IOException e) {
+            lockableFile.unlock();
+        } catch (final IOException e) {
             throw new StorageIoException(e);
         }
     }
 
     /**
      * Writes stored contents to file. Assumes lock is held.
+     *
      * @throws IOException
      */
     protected void writeContents() throws IOException {
-        if (!getBackingFile().isFile()){
+        if (!getBackingFile().isFile()) {
             return;
         }
-        if (isReadOnly()){
+        if (isReadOnly()) {
             return;
         }
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(getBackingFile()), UTF_8));
+        try (final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(getBackingFile()), UTF_8))) {
             writeContent(writer);
             writer.flush();
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 
-    protected abstract void writeContent(BufferedWriter writer) throws IOException;
-
     /**
      * Reads contents from file. Assumes lock is held.
+     *
      * @throws IOException
      */
     protected void readContents() throws IOException {
-        if (!getBackingFile().isFile()){
+        if (!getBackingFile().isFile()) {
             return;
         }
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(getBackingFile()), UTF_8));
-
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(getBackingFile()), UTF_8))) {
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {
@@ -146,50 +138,26 @@ public abstract class LockingReaderWriter {
                 }
                 readLine(line);
             }
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
         }
     }
 
     /**
-     * Reads contents from the file, first acquiring a lock.
-     * @throws IOException
-     */
-    protected synchronized void readContentsLocked() {
-        doLocked(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    readContents();
-                } catch (IOException ex) {
-                    throw new StorageIoException(ex);
-                }
-            }
-        });
-    }
-
-    /**
      * Write contents to the file, first acquiring a lock.
+     *
      * @throws IOException
      */
     protected synchronized void writeContentsLocked() throws IOException {
-        doLocked(new Runnable() {
-
-            public void run() {
-                try {
-                    writeContents();
-                } catch (IOException ex) {
-                    throw new StorageIoException(ex);
-                }
+        doLocked(() -> {
+            try {
+                writeContents();
+            } catch (final IOException ex) {
+                throw new StorageIoException(ex);
             }
         });
 
     }
 
-    protected void doLocked(Runnable r) {
+    protected void doLocked(final Runnable r) {
         lock();
         try {
             r.run();
@@ -197,6 +165,8 @@ public abstract class LockingReaderWriter {
             unlock();
         }
     }
+
+    protected abstract void writeContent(BufferedWriter writer) throws IOException;
 
     protected abstract void readLine(String line);
 }

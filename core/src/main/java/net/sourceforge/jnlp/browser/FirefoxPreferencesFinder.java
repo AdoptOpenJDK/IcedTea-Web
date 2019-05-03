@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class FirefoxPreferencesFinder {
         String configPath = System.getProperty(USER_HOME) + File.separator + ".mozilla"
                 + File.separator + "firefox" + File.separator;
 
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             Map<String, String> env = System.getenv();
             if (env != null) {
                 String appdata = env.get("APPDATA");

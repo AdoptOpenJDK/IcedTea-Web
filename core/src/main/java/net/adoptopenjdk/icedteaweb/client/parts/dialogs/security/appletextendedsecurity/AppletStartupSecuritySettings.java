@@ -36,11 +36,11 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.adoptopenjdk.icedteaweb.lockingfile.StorageIoException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.lockingfile.StorageIoException;
 
 public class AppletStartupSecuritySettings {
 

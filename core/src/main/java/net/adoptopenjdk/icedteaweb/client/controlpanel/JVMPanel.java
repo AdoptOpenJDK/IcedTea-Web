@@ -36,14 +36,15 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -52,14 +53,14 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 @SuppressWarnings("serial")
 public class JVMPanel extends NamedBorderPanel {
@@ -241,7 +242,7 @@ public class JVMPanel extends NamedBorderPanel {
         }
         File javaFile = new File(cmd + File.separator + "bin" + 
                                        File.separator + "java" + 
-                                       (JNLPRuntime.isWindows() ? ".exe" : ""));
+                                       (OsUtil.isWindows() ? ".exe" : ""));
         if (javaFile.isFile()) {
             validationResult += "<span color=\"green\">" + Translator.R("CPJVMjava") + "</span><br />";
         } else {

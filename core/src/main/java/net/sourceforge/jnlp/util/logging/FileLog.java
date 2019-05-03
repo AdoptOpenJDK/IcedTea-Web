@@ -37,7 +37,7 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
@@ -60,7 +60,7 @@ public final class FileLog  {
     }
 
     private static String getColon() {
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             return "_";
         } else {
             return ":";

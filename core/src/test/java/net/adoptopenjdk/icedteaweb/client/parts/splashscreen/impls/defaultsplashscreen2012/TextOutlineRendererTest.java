@@ -36,8 +36,8 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -116,7 +116,7 @@ public class TextOutlineRendererTest {
         Color c5 = null;
         Color c1 = new Color(bi2.getRGB(1, 1));
         Color c4 = new Color(bi2.getRGB(70, 70));
-        if (JNLPRuntime.isWindows()) {
+        if (OsUtil.isWindows()) {
             c2 = new Color(bi2.getRGB(45, 54));
             c3 = new Color(bi2.getRGB(27, 27));
             c5 = new Color(bi2.getRGB(20, 52));

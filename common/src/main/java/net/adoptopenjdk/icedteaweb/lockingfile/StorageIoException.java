@@ -34,25 +34,19 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.util.lockingfile;
+package net.adoptopenjdk.icedteaweb.lockingfile;
 
 /**
  * Thrown when an exception occurs using the storage (namely IOException)
  */
 public class StorageIoException extends RuntimeException {
 
-    LockingReaderWriter outer;
-
-    public StorageIoException(Exception e) {
+    public StorageIoException(final Exception e) {
         super(e);
     }
 
-    public StorageIoException(String e) {
+    public StorageIoException(final String e) {
         super(e);
     }
 
-     public StorageIoException(Exception e, LockingReaderWriter outer) {
-        super(e);
-        this.outer = outer;
-    }
 }

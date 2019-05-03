@@ -3,29 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.adoptopenjdk.icedteaweb;
+package net.adoptopenjdk.icedteaweb.testing.util;
 
-import net.sourceforge.jnlp.util.lockingfile.WindowsLockedFileTest;
+import net.adoptopenjdk.icedteaweb.lockingfile.WindowsLockableFileTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 
 /**
  *
  * @author jvanek
  */
-public class NonWindowsLockedFileTests extends WindowsLockedFileTest {
+public class NonWindowsLockableFile extends WindowsLockableFileTest {
 
     private static String os;
 
     @BeforeClass
     public static void smuggleOs() {
-        os = System.getProperty("os.name");
-        System.setProperty("os.name", "No Windows for itw");
+        os = System.getProperty(OS_NAME);
+        System.setProperty(OS_NAME, "No Microsoft OS for itw");
     }
 
     @AfterClass
     public static void restoreOs() {
-        System.setProperty("os.name", os);
+        System.setProperty(OS_NAME, os);
     }
 
 }

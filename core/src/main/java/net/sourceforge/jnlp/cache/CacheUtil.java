@@ -32,6 +32,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jnlp.DownloadServiceListener;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.PropertiesFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jnlp.DownloadServiceListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -44,6 +61,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -181,7 +200,7 @@ public class CacheUtil {
         try {
             cacheDir = cacheDir.getCanonicalFile();
             // remove windows shortcuts before cache dir is gone
-            if (JNLPRuntime.isWindows()) {
+            if (OsUtil.isWindows()) {
                 removeWindowsShortcuts("ALL");
             }
             FileUtils.recursiveDelete(cacheDir, cacheDir);
@@ -241,7 +260,7 @@ public class CacheUtil {
                     }
                 }
             });
-            if (JNLPRuntime.isWindows()) {
+            if (OsUtil.isWindows()) {
                 removeWindowsShortcuts(application.toLowerCase());
             }
             // clean the cache of entries now marked for deletion
