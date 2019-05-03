@@ -131,13 +131,14 @@ readonly JAVAWS_ICO_SRC=`find $SCRIPT_DIR |  grep /javaws.png$`
 readonly MODULARJDK_ARGS_FILE_SRC=`find $SCRIPT_DIR |  grep /itw-modularjdk.args$` 
 
 if [ "x$KCOV_HOME" == "x" ] ; then
-  readonly KCOV_HOME=$HOME/kcov-master
+  readonly KCOV_HOME=$HOME/kcov
 else
   readonly KCOV_HOME=$KCOV_HOME
 fi
 
 # https://github.com/SimonKagstrom/kcov/
 KCOV="none" ;
+if [ -e $KCOV_HOME ] ; then
 	if [ -f $KCOV_HOME/kcov ] ; then
 	  KCOV=$KCOV_HOME/kcov ;
 	elif [ -f $KCOV_HOME/bin/kcov ] ; then
@@ -149,11 +150,12 @@ KCOV="none" ;
 	else
 	  mkdir $KCOV_HOME/build ;
 	  pushd $KCOV_HOME/build ;
-	  cmake .. ;
+	    cmake .. ;
 	  make ;
 	  popd ;
 	  KCOV=$KCOV_HOME/build/src/kcov ;
 	fi ;
+fi
 
 if [ "x$CARGO_RUST" == "x" ] ; then
   readonly CARGO_RUST=cargo
