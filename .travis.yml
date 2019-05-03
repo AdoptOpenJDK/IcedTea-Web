@@ -14,4 +14,4 @@ install:
 cache:
   directories:
     - $HOME/.m2
-script: mvn clean verify
+script: ./mvnw clean verify
