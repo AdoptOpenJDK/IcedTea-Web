@@ -30,13 +30,7 @@
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -99,8 +93,6 @@ import java.util.Vector;
  * @version $Name:  $, $Revision: 1.2 $
  */
 public class XMLElement {
-    
-    private final static Logger LOG = LoggerFactory.getLogger(XMLElement.class);
 
     private static final String AMP_KEY = "amp";
     private static final String QUOT_KEY = "quot";
@@ -1099,113 +1091,4 @@ public class XMLElement {
         final String msg = "Unknown or invalid entity: &" + name + ";";
         return new XMLParseException(this.getName(), this.parserLineNr, msg);
     }
-
-    /**
-     * Reads an xml file and removes the comments, leaving only relevant
-     * xml code.
-     *
-     * @param isr The reader of the {@link java.io.InputStream} containing the xml.
-     * @param pout The {@link java.io.PipedOutputStream} that will be receiving the
-     *             filtered xml file.
-     */
-    public void sanitizeInput(final Reader isr, final OutputStream pout) {
-        StringBuilder line = new StringBuilder();
-        try (final PrintStream out = new PrintStream(pout)) {
-            /**
-             * Character read too much for the comment remover.
-             */
-            char sanitizeCharReadTooMuch = '\0';
-            this.reader = isr;
-            this.parserLineNr = 0;
-            int newline = 2;
-
-            while (true) {
-                char ch;
-                if (sanitizeCharReadTooMuch != '\0') {
-                    ch = sanitizeCharReadTooMuch;
-                    sanitizeCharReadTooMuch = '\0';
-                } else {
-
-                    int i = this.reader.read();
-                    if (i == -1) {
-                        // no character in buffer, and nothing read
-                        out.flush();
-                        break;
-                    } else if (i == 10) {
-                        ch = '\n';
-                    } else {
-                        ch = (char) i;
-                    }
-                }
-
-                char next;
-                int i = this.reader.read();
-                if (i == -1) {
-                    // character in buffer and nothing read. write out
-                    // what's in the buffer
-                    out.print(ch);
-                    out.flush();
-                    if (ch == 10) {
-                        //LOG.debug(line.toString());
-                        line = new StringBuilder("line: " + newline + " ");
-                        newline++;
-                    } else {
-                        line.append(ch);
-                    }
-                    break;
-                } else if (i == 10) {
-                    next = '\n';
-                } else {
-                    next = (char) i;
-                }
-
-                sanitizeCharReadTooMuch = next;
-
-                // If the next chars are !--, then we've hit a comment tag,
-                // and should skip it.
-                if (ch == '<' && sanitizeCharReadTooMuch == '!') {
-                    ch = (char) this.reader.read();
-                    if (ch == '-') {
-                        ch = (char) this.reader.read();
-                        if (ch == '-') {
-                            this.skipComment();
-                            sanitizeCharReadTooMuch = '\0';
-                        } else {
-                            out.print('<');
-                            out.print('!');
-                            out.print('-');
-                            sanitizeCharReadTooMuch = ch;
-                            line.append("<");
-                            line.append("!");
-                            line.append("-");
-                        }
-                    } else {
-                        out.print('<');
-                        out.print('!');
-                        sanitizeCharReadTooMuch = ch;
-                        line.append("<");
-                        line.append("!");
-                    }
-                }
-                // Otherwise we haven't hit a comment, and we should write ch.
-                else {
-                    out.print(ch);
-                    if (ch == 10) {
-                        //LOG.debug(line.toString());
-                        line = new StringBuilder("line: " + newline + " ");
-                        newline++;
-                    } else {
-                        line.append(ch);
-                    }
-                }
-            }
-            isr.close();
-        } catch (final Exception e) {
-            // Print the stack trace here -- xml.parseFromReader() will
-            // throw the ParseException if something goes wrong.
-            throw new RuntimeException("Error in XML", e);
-            //LOG.error("ERROR", e);
-        }
-    }
-
 }
