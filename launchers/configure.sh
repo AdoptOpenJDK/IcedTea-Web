@@ -1,6 +1,7 @@
 #!/bin/sh
 
 VERSION=$1
+LOCALIZATIONS="en_US.UTF-8 cs_CZ.UTF-8 pl_PL.UTF-8 de_DE.UTF-8"
 
 if [ "x$VERSION"  == "x" ] ; then
  readonly VERSION="unknown"
@@ -16,11 +17,12 @@ else
 fi
 
 
-# sourced from build.sh
 readonly PROJECT_TOP=`dirname $SCRIPT_DIR`
 readonly TARGET=$SCRIPT_DIR/target
 readonly TARGET_TMP=$TARGET/tmp
 readonly TARGET_IMAGES=$TARGET/images
+readonly TARGET_DOCS_PARENT=$TARGET/icedtea-web-docs
+readonly TARGET_DOCS=$TARGET_DOCS_PARENT/$VERSION
 
 rm -rf "$TARGET"
 
@@ -131,13 +133,14 @@ readonly JAVAWS_ICO_SRC=`find $SCRIPT_DIR |  grep /javaws.png$`
 readonly MODULARJDK_ARGS_FILE_SRC=`find $SCRIPT_DIR |  grep /itw-modularjdk.args$` 
 
 if [ "x$KCOV_HOME" == "x" ] ; then
-  readonly KCOV_HOME=$HOME/kcov-master
+  readonly KCOV_HOME=$HOME/kcov
 else
   readonly KCOV_HOME=$KCOV_HOME
 fi
 
 # https://github.com/SimonKagstrom/kcov/
 KCOV="none" ;
+if [ -e $KCOV_HOME ] ; then
 	if [ -f $KCOV_HOME/kcov ] ; then
 	  KCOV=$KCOV_HOME/kcov ;
 	elif [ -f $KCOV_HOME/bin/kcov ] ; then
@@ -149,11 +152,12 @@ KCOV="none" ;
 	else
 	  mkdir $KCOV_HOME/build ;
 	  pushd $KCOV_HOME/build ;
-	  cmake .. ;
+	    cmake .. ;
 	  make ;
 	  popd ;
 	  KCOV=$KCOV_HOME/build/src/kcov ;
 	fi ;
+fi
 
 if [ "x$CARGO_RUST" == "x" ] ; then
   readonly CARGO_RUST=cargo

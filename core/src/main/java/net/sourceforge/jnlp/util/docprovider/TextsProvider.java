@@ -1,38 +1,38 @@
 /* 
-   Copyright (C) 2008 Red Hat, Inc.
+ Copyright (C) 2008 Red Hat, Inc.
 
-This file is part of IcedTea.
+ This file is part of IcedTea.
 
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
+ IcedTea is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, version 2.
 
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+ IcedTea is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+ You should have received a copy of the GNU General Public License
+ along with IcedTea; see the file COPYING.  If not, write to
+ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ 02110-1301 USA.
 
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
+ Linking this library statically or dynamically with other modules is
+ making a combined work based on this library.  Thus, the terms and
+ conditions of the GNU General Public License cover the whole
+ combination.
 
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
+ As a special exception, the copyright holders of this library give you
+ permission to link this library with independent modules to produce an
+ executable, regardless of the license terms of these independent
+ modules, and to copy and distribute the resulting executable under
+ terms of your choice, provided that you also meet, for each linked
+ independent module, the terms and conditions of the license of that
+ module.  An independent module is a module which is not derived from
+ or based on this library.  If you modify this library, you may extend
+ this exception to your version of the library, but you are not
+ obligated to do so.  If you do not wish to do so, delete this
+ exception statement from your version.
  */
 package net.sourceforge.jnlp.util.docprovider;
 
@@ -48,17 +48,13 @@ import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ManFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.ReplacingTextFormatter;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -73,14 +69,14 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_DIR;
 
 public abstract class TextsProvider {
 
-    private static File authorFileFromUserInput = null;
+    private static String authorsLine = null;
 
     private final Charset encoding;
     private final Formatter formatter;
     private final boolean forceTitles;
     protected final boolean expandVariables;
     private boolean prepared = false;
-    private File authorFilePath = null;
+    private String authorLineImpl = null;
 
     private boolean seeAlso = true;
 
@@ -216,12 +212,13 @@ public abstract class TextsProvider {
         return sb.toString();
     }
 
+    private static final String IT_NEW_HOME = "https://github.com/AdoptOpenJDK/icedtea-web";
     private static final String IT_BASE = "http://icedtea.classpath.org/wiki";
     public static final String ITW_HOME = IT_BASE + "/IcedTea-Web";
     public static final String ITW_EAS = IT_BASE + "/Extended_Applets_Security";
     public static final String ITW_STYLE = ITW_HOME + "#Code_style";
     public static final String ITW_ECLIPSE = ITW_HOME + "/DevelopingWithEclipse";
-    private static final String ITW_REPO = "http://icedtea.classpath.org/hg/icedtea-web";
+    private static final String ITW_REPO = "https://github.com/AdoptOpenJDK/icedtea-web.git";
 
     public static final String ITWEB_SETTINGS = "itweb-settings";
     public static final String ITW = "icedtea-web";
@@ -236,7 +233,7 @@ public abstract class TextsProvider {
     public static final String ITW_REPRODUCERS = IT_BASE + "/Reproducers";
     public static final String ITW_BUGS = ITW_HOME + "#Filing_bugs";
     public static final String ITW_PLUGIN_URL = ITW_HOME + "#Plugin";
-    public static final String ITW_BUGZILLAHOME = "http://icedtea.classpath.org/bugzilla";
+    public static final String ITW_BUGZILLAHOME = "https://github.com/AdoptOpenJDK/icedtea-web/issues";
 
     private String getBugs() {
 
@@ -260,9 +257,9 @@ public abstract class TextsProvider {
     private String getAuthors() {
         if (forceTitles) {
             return getFormatter().getTitle(ManFormatter.KnownSections.AUTHOR)
-                    + generateAuthorsSection(authorFilePath);
+                    + generateAuthorsSection(authorLineImpl);
         } else {
-            return generateAuthorsSection(authorFilePath);
+            return generateAuthorsSection(authorLineImpl);
         }
     }
 
@@ -277,7 +274,7 @@ public abstract class TextsProvider {
         sb.append(getFormatter().getSeeAlso("policytool"));
         sb.append(getFormatter().getSeeAlso("java"));
         sb.append(getFormatter().getNewLine());
-        sb.append(getFormatter().getUrl(ITW_HOME));
+        sb.append(getFormatter().getUrl(IT_NEW_HOME));
         sb.append(getFormatter().getNewLine());
         sb.append(getFormatter().getUrl(ITW_REPO));
         sb.append(getFormatter().getNewLine());
@@ -393,11 +390,8 @@ public abstract class TextsProvider {
         } else {
             List<String> argsList = new ArrayList<>(Arrays.asList(args));
             for (String s : argsList) {
-                if (s.startsWith("-authorFile=")) {
-                    authorFileFromUserInput = new File(s.split("=")[1]);
-                    if (!authorFileFromUserInput.exists()) {
-                        throw new RuntimeException(authorFileFromUserInput.getAbsolutePath() + " does not exists");
-                    }
+                if (s.startsWith("-authorString=")) {
+                    authorsLine = s.split("=")[1];
                     argsList.remove(s);
                     break;
                 }
@@ -465,7 +459,7 @@ public abstract class TextsProvider {
         if (allowLogo) {
             File flogo = new File(dir, logo_name);
             try (InputStream is = TextsProvider.class.getResourceAsStream(logo_url);
-                 OutputStream os = new FileOutputStream(flogo)) {
+                    OutputStream os = new FileOutputStream(flogo)) {
                 copy(is, os);
                 os.flush();
             }
@@ -477,7 +471,7 @@ public abstract class TextsProvider {
         ItwebPluginTextProvider pl = new ItwebPluginTextProvider(UTF_8, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
         for (TextsProvider provider : providers) {
-            provider.setAuthorFilePath(authorFileFromUserInput);
+            provider.setAuthorFilePath(authorsLine);
             provider.writeToDir(dir);
         }
 
@@ -495,7 +489,7 @@ public abstract class TextsProvider {
         ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new ManFormatter(), titles, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
         for (TextsProvider provider : providers) {
-            provider.setAuthorFilePath(authorFileFromUserInput);
+            provider.setAuthorFilePath(authorsLine);
             provider.writeToDir(dir);
         }
 
@@ -513,7 +507,7 @@ public abstract class TextsProvider {
         ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new PlainTextFormatter(PlainTextFormatter.DEFAULT_INDENT, lineWidth), true, expand);
         TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
         for (TextsProvider provider : providers) {
-            provider.setAuthorFilePath(authorFileFromUserInput);
+            provider.setAuthorFilePath(authorsLine);
             provider.writeToDir(dir);
         }
 
@@ -535,11 +529,9 @@ public abstract class TextsProvider {
         return total;
     }
 
-
-    private void setAuthorFilePath(File authorFilePath) {
-        this.authorFilePath = authorFilePath;
+    private void setAuthorFilePath(String authorFilePath) {
+        this.authorLineImpl = authorFilePath;
     }
-
 
     /**
      * @return the seeAlso
@@ -565,7 +557,7 @@ public abstract class TextsProvider {
         return s;
     }
 
-    private String readAuthors(File authors) {
+    String readAuthors(String authors) {
         try {
             return readAuthorsImpl(authors);
         } catch (IOException e) {
@@ -573,41 +565,36 @@ public abstract class TextsProvider {
         }
     }
 
-    private String readAuthorsImpl(File authors) throws IOException {
-        return readAuthorsImpl(new InputStreamReader(new FileInputStream(authors), UTF_8));
-
-    }
-
-    String readAuthorsImpl(Reader authors) throws IOException {
+    String readAuthorsImpl(String authors) throws IOException {
+        String[] toMark = authors.split(" ");
         StringBuilder sb = new StringBuilder();
-        boolean areAuthors = false;
-        BufferedReader reader = new BufferedReader(authors);
-        while (true) {
-            String line = reader.readLine();
-            if (line == null) {
-                break;
+        for (String word : toMark) {
+            if (getFormatter() instanceof HtmlFormatter) {
+                word = word.replaceAll("\n", getFormatter().getNewLine());
             }
-            if (line.trim().isEmpty()) {
-                areAuthors = !areAuthors;
+            if (word.contains("@")) {
+                sb.append(getFormatter().process(getFormatter().getAddressLink(word))).append(" ");
+            } else if (word.contains("://")) {
+                sb.append(getFormatter().process(getFormatter().getUrl(word))).append(" ");
+            } else if (word.equals("")) {
+                sb.append(" ");
+            } else {
+                sb.append(word).append(" ");
             }
-            sb.append(getFormatter().process(getFormatter().getAddressLink(line)));
-            if (getFormatter() instanceof HtmlFormatter || !areAuthors) {
-                sb.append(getFormatter().getNewLine());
-            }
+
         }
-        return sb.toString();
+        return sb.toString().substring(0, sb.length()-1);
     }
 
-    private String generateAuthorsSection(File filePath) {
-        if (filePath == null) {
+    private String generateAuthorsSection(String authors) {
+        if (authors == null || authors.isEmpty()) {
             return getFormatter().wrapParagraph(
                     getFormatter().process(Translator.R("ITWdocsMissingAuthors"))
-                            + getFormatter().getNewLine());
+                    + getFormatter().getNewLine());
         } else {
             return getFormatter().wrapParagraph(
-                    getFormatter().process(readAuthors(filePath))
-                            + getFormatter().getNewLine());
+                    getFormatter().process(readAuthors(authors))
+                    + getFormatter().getNewLine());
         }
     }
 }
-
