@@ -39,8 +39,11 @@ package net.sourceforge.jnlp.config;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResult;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
+import net.adoptopenjdk.icedteaweb.testing.AnnotationConditionChecker;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -50,6 +53,9 @@ import java.util.Arrays;
 import static org.junit.Assert.assertTrue;
 
 public class DirectoryValidatorTest extends NoStdOutErrTest{
+
+    @Rule
+    public final AnnotationConditionChecker acc = new AnnotationConditionChecker();
 
     @Test
     public void testMainDirTestNotExists() {
@@ -78,6 +84,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     }
 
     @Test
+    @WindowsIssue
     public void testMainDirTestExistsAsDirButNotWritable() throws IOException {
         File f = createTempDir();
         assertTrue(f.setWritable(false));
@@ -89,6 +96,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     }
 
     @Test
+    @WindowsIssue
     public void testMainDirTestExistsAsDirButNotReadable() throws IOException {
         File f = createTempDir();
         assertTrue(f.setReadable(false));
@@ -126,6 +134,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     }
 
     @Test
+    @WindowsIssue
     public void testMainDirTestExistsAsDirButNotWritableWithSubdir() throws IOException {
         File f = createTempDir();
         assertTrue(f.setWritable(false));
@@ -137,6 +146,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     }
 
     @Test
+    @WindowsIssue
     public void testMainDirTestExistsAsDirButNotReadableWithSubdir() throws IOException {
         File f = createTempDir();
         f.setReadable(false);
@@ -184,6 +194,7 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
     }
 
     @Test
+    @WindowsIssue
     public void testDirectoryValidator() throws IOException {
         File f1 = createTempDir();
         File f2 = createTempDir();
