@@ -52,6 +52,8 @@ import static org.junit.Assert.assertEquals;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
 
+    public static final long TEN_SECONDS = 10_000L;
+
     private class MockJnlpFileFactory extends JNLPFileFactory {
 
         private URL JNLPHref;
@@ -98,6 +100,22 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     public static void teardown() {
         CacheUtil.clearCache();
         PathsAndFiles.CACHE_DIR.setValue(originalCacheDir);
+    }
+
+    @Test(timeout = TEN_SECONDS)
+    public void testDeadLock() throws Exception {
+        // given
+        URL codeBase = new URL("http://undesired.absolute.codebase.com");
+        String absoluteLocation = "http://absolute.href.com/test.jnlp";
+        PluginParameters params = createValidParamObject();
+        params.put("jnlp_href", absoluteLocation);
+        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
+
+        // when
+        new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
+
+        // then
+        CacheUtil.clearCache();
     }
 
     @Test
