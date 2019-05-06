@@ -14,6 +14,44 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPMatcher;
+import net.sourceforge.jnlp.JNLPMatcherException;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
+import net.sourceforge.jnlp.cache.NativeLibraryStorage;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.security.PluginAppVerifier;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.UrlUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,42 +92,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPMatcher;
-import net.sourceforge.jnlp.JNLPMatcherException;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
-import net.sourceforge.jnlp.cache.NativeLibraryStorage;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.security.AppVerifier;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -2420,23 +2422,23 @@ public class JNLPClassLoader extends URLClassLoader {
         @Override
         public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
             if (runInSandbox) {
-                return new SecurityDesc(classLoader.file,
+                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                         SecurityDesc.SANDBOX_PERMISSIONS,
                         codebaseHost);
             } else if (isPluginApplet()) {
                 try {
                     if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.tracker)) {
-                        return new SecurityDesc(classLoader.file,
+                        return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                                 SecurityDesc.ALL_PERMISSIONS,
                                 codebaseHost);
                     } else {
-                        return new SecurityDesc(classLoader.file,
+                        return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                                 SecurityDesc.SANDBOX_PERMISSIONS,
                                 codebaseHost);
                     }
                 } catch (final Exception e) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                    return new SecurityDesc(classLoader.file,
+                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);
                 }
@@ -2449,11 +2451,11 @@ public class JNLPClassLoader extends URLClassLoader {
         public SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException {
             if (isPluginApplet()) {
                 if (!runInSandbox && classLoader.getSigning()) {
-                    return new SecurityDesc(classLoader.file,
+                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                             SecurityDesc.ALL_PERMISSIONS,
                             codebaseHost);
                 } else {
-                    return new SecurityDesc(classLoader.file,
+                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);
                 }
@@ -2486,7 +2488,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (!runInSandbox && classLoader.getSigning()) {
                 return classLoader.file.getSecurity();
             } else {
-                return new SecurityDesc(classLoader.file,
+                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                         SecurityDesc.SANDBOX_PERMISSIONS,
                         codebaseHost);
             }
@@ -2496,11 +2498,11 @@ public class JNLPClassLoader extends URLClassLoader {
         public SecurityDesc getJarPermissions(final URL codebaseHost) {
             if (!runInSandbox && classLoader.jcv.isFullySigned()) {
                 // Already trust application, nested jar should be given
-                return new SecurityDesc(classLoader.file,
+                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                         SecurityDesc.ALL_PERMISSIONS,
                         codebaseHost);
             } else {
-                return new SecurityDesc(classLoader.file,
+                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
                         SecurityDesc.SANDBOX_PERMISSIONS,
                         codebaseHost);
             }

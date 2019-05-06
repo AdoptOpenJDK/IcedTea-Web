@@ -53,6 +53,8 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * 
@@ -63,14 +65,15 @@ public class OutputController {
 
     private final static Logger LOG = LoggerFactory.getLogger(OutputController.class);
 
-    /*
-     * singleton instance
-     */
     private static final String NULL_OBJECT = "Trying to log null object";
-    private PrintStreamLogger outLog;
-    private PrintStreamLogger errLog;
+
+    private final PrintStreamLogger outLog;
+    private final PrintStreamLogger errLog;
     private final List<MessageWithHeader> messageQue = new LinkedList<>();
-    private Thread consumerThread;
+    //itw logger have to be fully initialised before start
+    private final Thread consumerThread = new Thread(new MessageQueConsumer(), "Output controller consumer daemon");
+    private final Thread shutdownThread = new Thread(this::flush);
+    private boolean javaConsoleInitialized;
      /*stdin reader for headless dialogues*/
     private BufferedReader br;
 
@@ -82,10 +85,10 @@ public class OutputController {
             while (true) {
                 try {
                     synchronized (OutputController.this) {
-                        OutputController.this.wait(1000);
                         if (!messageQue.isEmpty()) {
                             flush();
                         }
+                        OutputController.this.wait(1000);
                     }
 
                 } catch (Throwable t) {
@@ -113,7 +116,7 @@ public class OutputController {
         MessageWithHeader s = messageQue.get(0);
         messageQue.remove(0);
         //filtering is done in console during runtime
-        if (LogConfig.getLogConfig().isLogToConsole()) {
+        if (LogConfig.getLogConfig().isLogToConsole() && javaConsoleInitialized) {
             JavaConsole.getConsole().addMessage(s);
         }
         //clients app's messages are reprinted only to console
@@ -190,25 +193,29 @@ public class OutputController {
      * for testing purposes the logger with custom streams can be created
      * otherwise only getLogger()'s singleton can be called.
      */
-     public OutputController(PrintStream out, PrintStream err) {
-        if (out == null || err == null) {
-            throw new IllegalArgumentException("No stream can be null");
-        }
-        outLog = new PrintStreamLogger(out);
-        errLog = new PrintStreamLogger(err);
-        //itw logger have to be fully initialised before start
-         final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
-         consumerThread = new Thread(messageQueConsumer, "Output controller consumer daemon");
+    public OutputController(PrintStream out, PrintStream err) {
+        outLog = new PrintStreamLogger(requireNonNull(out, "out"));
+        errLog = new PrintStreamLogger(requireNonNull(err, "err"));
+
+        // the consumer thread is started in JNLPRuntime.getConfig() after config is loaded
         consumerThread.setDaemon(true);
-        //is started in JNLPRuntime.getConfig() after config is loaded
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> flush()));
+
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
-     
+
     public void startConsumer() {
+        initJavaConsole();
         consumerThread.start();
-        //some messages were probably posted before start of consumer
-        synchronized (this) {
-            this.notifyAll();
+    }
+
+    private void initJavaConsole() {
+        // only if logging to console and not already shutting down
+        if (Thread.currentThread() != shutdownThread) {
+            LogConfig.resetLogConfig();
+            if (LogConfig.getLogConfig().isLogToConsole()) {
+                javaConsoleInitialized = true;
+                JavaConsole.getConsole();
+            }
         }
     }
 

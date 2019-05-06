@@ -43,8 +43,8 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import net.sourceforge.jnlp.LaunchException;
@@ -64,8 +64,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class ManifestAttributesChecker {
 
@@ -294,16 +294,16 @@ public class ManifestAttributesChecker {
             return;
         }
 
-        final RequestedPermissionLevel requestedPermissions = file.getRequestedPermissionLevel();
-        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissions, sandboxForced);
+        final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
+        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
         if (file instanceof PluginBridge) { // HTML applet
-            if (isNoneOrDefault(requestedPermissions)) {
+            if (isNoneOrDefault(requestedPermissionLevel)) {
                 if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
                     securityDelegate.setRunInSandbox();
                 }
             }
         } else { // JNLP
-            if (isNoneOrDefault(requestedPermissions)) {
+            if (isNoneOrDefault(requestedPermissionLevel)) {
                 if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
                     LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", file.getManifestsAttributes().permissionsToString());
                     securityDelegate.setRunInSandbox();
@@ -320,16 +320,16 @@ public class ManifestAttributesChecker {
         return AppletStartupSecuritySettings.getInstance().getSecurityLevel().equals(AppletSecurityLevel.ALLOW_UNSIGNED);
     }
 
-    private static boolean isNoneOrDefault(final RequestedPermissionLevel requested) {
-        return requested == RequestedPermissionLevel.NONE || requested == RequestedPermissionLevel.DEFAULT;
+    private static boolean isNoneOrDefault(final AppletPermissionLevel requested) {
+        return requested == AppletPermissionLevel.NONE || requested == AppletPermissionLevel.DEFAULT;
     }
 
-    private void validateRequestedPermissionLevelMatchesManifestPermissions(final RequestedPermissionLevel requested, final ManifestBoolean sandboxForced) throws LaunchException {
-        if (requested == RequestedPermissionLevel.ALL && sandboxForced != ManifestBoolean.FALSE) {
+    private void validateRequestedPermissionLevelMatchesManifestPermissions(final AppletPermissionLevel requested, final ManifestBoolean sandboxForced) throws LaunchException {
+        if (requested == AppletPermissionLevel.ALL && sandboxForced != ManifestBoolean.FALSE) {
             throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
 
-        if (requested == RequestedPermissionLevel.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
+        if (requested == AppletPermissionLevel.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
             throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
     }

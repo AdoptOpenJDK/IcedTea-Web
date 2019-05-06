@@ -105,6 +105,9 @@ public class JavaConsole implements ObservableMessagesProvider {
         System.setOut(new TeeOutputStream(System.out, false));
         //internal stdOut/Err are going throughs outLog/errLog
         //when console is off, those tees are not installed
+
+        // initialize SwingUtils
+        updateModel();
     }
 
     private void refreshOutputs() {
