@@ -37,229 +37,149 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+
+import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.APPLET;
+import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.JAVAWS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class SplashUtilsTest {
 
+    @Rule
+    public EnvironmentVariables envVars = new EnvironmentVariables();
 
+    @Before
+    public void setUp() {
+        envVars.clear(System.getenv().keySet().toArray(new String[0]));
+    }
 
     @Test
     public void determineCallerTest() {
-        modifyRuntime(false);
-        SplashPanel p1 = SplashUtils.getSplashScreen(100, 100);
-        Assert.assertEquals(SplashUtils.SplashReason.APPLET, p1.getSplashReason());
-        modifyRuntime(true);
-        SplashPanel p2 = SplashUtils.getSplashScreen(100, 100);
-        Assert.assertEquals(SplashUtils.SplashReason.JAVAWS, p2.getSplashReason());
+        assertSplashReason(false, APPLET);
+        assertSplashReason(true, JAVAWS);
     }
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, String> getEnvironment() throws Exception {
-        Class<?>[] classes = Collections.class.getDeclaredClasses();
-        Map<String, String> env = System.getenv();
-        for (Class<?> cl : classes) {
-            if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-                Field field = cl.getDeclaredField("m");
-                field.setAccessible(true);
-                Object obj = field.get(env);
-                Map<String, String> map = (Map<String, String>) obj;
-                return map;
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static void fakeEnvironment(Map<String, String> newenv) throws Exception {
-        Class<?>[] classes = Collections.class.getDeclaredClasses();
-        Map<String, String> env = System.getenv();
-        for (Class<?> cl : classes) {
-            if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-                Field field = cl.getDeclaredField("m");
-                field.setAccessible(true);
-                Object obj = field.get(env);
-                Map<String, String> map = (Map<String, String>) obj;
-                map.clear();
-                map.putAll(newenv);
-            }
-        }
+    private void assertSplashReason(boolean isWebstartApplication, SplashUtils.SplashReason reason) {
+        modifyIsWebstartApplicationRuntime(isWebstartApplication);
+        final SplashPanel p2 = SplashUtils.getSplashScreen(100, 100);
+        assertThat(p2.getSplashReason(), is(reason));
     }
 
     @Test
-    public void testGetSplashScreen1() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sa.getSplashReason() == SplashUtils.SplashReason.APPLET);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sw.getSplashReason() == SplashUtils.SplashReason.JAVAWS);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen1() {
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
 
-
-
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
-    public void testGetSplashScreen2() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sa.getSplashReason() == SplashUtils.SplashReason.APPLET);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sw.getSplashReason() == SplashUtils.SplashReason.JAVAWS);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen2() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
+        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
 
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
-    public void testGetSplashScreen3() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
-        fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sa.getSplashReason() == SplashUtils.SplashReason.APPLET);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw == null);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen3() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
+        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
 
-
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(nullValue()));
     }
 
     @Test
-    public void testGetSplashScreen4() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa == null);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sw.getSplashReason() == SplashUtils.SplashReason.JAVAWS);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen4() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
+        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(nullValue()));
 
-
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
-    public void testGetSplashScreen5() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
-        fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa == null);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw == null);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen5() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
+        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(nullValue()));
+
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(nullValue()));
     }
 
     @Test
-    public void testGetSplashScreen6() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        fake1.put(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sa.getSplashReason() == SplashUtils.SplashReason.APPLET);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sw.getSplashReason() == SplashUtils.SplashReason.JAVAWS);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen6() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
+        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
 
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
-    public void testGetSplashScreen7() throws Exception {
-        Map<String,String> fake1 = new HashMap<String,String>();
-        fake1.put(SplashUtils.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
-        Map<String,String> original = getEnvironment();
-        Assert.assertNotNull(original);
-        try {
-            fakeEnvironment(fake1);
-            SplashPanel sa = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.APPLET);
-            Assert.assertTrue(sa instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sa.getSplashReason() == SplashUtils.SplashReason.APPLET);
-            SplashPanel sw = SplashUtils.getSplashScreen(100, 100, SplashUtils.SplashReason.JAVAWS);
-            Assert.assertTrue(sw instanceof DefaultSplashScreen2012);
-            Assert.assertTrue(sw.getSplashReason() == SplashUtils.SplashReason.JAVAWS);
-        } finally {
-            fakeEnvironment(original);
-        }
+    public void testGetSplashScreen7() {
+        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
 
+        SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
 
+        SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
+        assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
-     static void modifyRuntime(boolean b) {
-        try{
-        setStatic(JNLPRuntime.class.getDeclaredField("isWebstartApplication"), b);
-        }catch(Exception ex){
+    @Test
+    public void assertNullsAreOkInShow() {
+        SplashUtils.showError(null, (AppletEnvironment) null);
+        SplashUtils.showError(null, (AppletInstance) null);
+        SplashUtils.showError(null, (SplashController) null);
+    }
+
+    static void modifyIsWebstartApplicationRuntime(boolean isWebstartApplication) {
+        try {
+            Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
+            field.setAccessible(true);
+            field.set(null, isWebstartApplication);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
-     static void setStatic(Field field, Object newValue) throws Exception {
-      field.setAccessible(true);
-      field.set(null, newValue);
-   }
-     
-    @Test
-    public void assertNulsAreOkInShow() {
-        SplashUtils.showError(null, (AppletEnvironment)null);
-        SplashUtils.showError(null, (AppletInstance)null);
-        SplashUtils.showError(null, (SplashController)null);
-    }
-     
-
 }
