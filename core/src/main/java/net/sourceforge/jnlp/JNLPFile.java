@@ -32,7 +32,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLe
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributeReader;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.ResourceTracker;
@@ -156,7 +156,7 @@ public class JNLPFile {
     final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
     
     /** important manifests' attributes */
-    private final ManifestAttributeReader manifestAttributeReader = new ManifestAttributeReader(this);
+    private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
     public static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
 
@@ -383,7 +383,7 @@ public class JNLPFile {
         if (jnlpTitle == null && manifestTitle != null) {
             return manifestTitle;
         }
-        String mainClass = getManifestAttributeReader().getMainClass();
+        String mainClass = getManifestAttributesReader().getMainClass();
         return mainClass;
     }
 
@@ -396,8 +396,8 @@ public class JNLPFile {
     }
 
     public String getTitleFromManifest() {
-        String inManifestTitle = getManifestAttributeReader().getApplicationName();
-        if (inManifestTitle == null && getManifestAttributeReader().isLoader()) {
+        String inManifestTitle = getManifestAttributesReader().getApplicationName();
+        if (inManifestTitle == null && getManifestAttributesReader().isLoader()) {
             LOG.warn(TITLE_NOT_FOUND);
         }
         return inManifestTitle;
@@ -956,8 +956,8 @@ public class JNLPFile {
         missingSignedJNLP = true;
     }
 
-    public ManifestAttributeReader getManifestAttributeReader() {
-        return manifestAttributeReader;
+    public ManifestAttributesReader getManifestAttributesReader() {
+        return manifestAttributesReader;
     }
 
 

@@ -168,7 +168,7 @@ public class ManifestAttributesChecker {
             LOG.debug("Entry-Point can not be checked now, because of unknown main class.");
             return;
         }
-        final String[] eps = file.getManifestAttributeReader().getEntryPoints();
+        final String[] eps = file.getManifestAttributesReader().getEntryPoints();
         String mainClass = file.getEntryPointDesc().getMainClass();
         if (eps == null) {
             LOG.debug("Entry-Point manifest attribute for yours '{}' not found. Continuing.", mainClass);
@@ -180,14 +180,14 @@ public class ManifestAttributesChecker {
                 return;
             }
         }
-        throw new LaunchException("None of the entry points specified: '" + file.getManifestAttributeReader().getEntryPoint() + "' matched the main class " + mainClass + " and applet is signed. This is a security error and the app will not be launched.");
+        throw new LaunchException("None of the entry points specified: '" + file.getManifestAttributesReader().getEntryPoint() + "' matched the main class " + mainClass + " and applet is signed. This is a security error and the app will not be launched.");
     }
 
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#trusted_only
      */
     private void checkTrustedOnlyAttribute() throws LaunchException {
-        final ManifestBoolean trustedOnly = file.getManifestAttributeReader().isTrustedOnly();
+        final ManifestBoolean trustedOnly = file.getManifestAttributesReader().isTrustedOnly();
         if (trustedOnly == ManifestBoolean.UNDEFINED) {
             LOG.debug("Trusted Only manifest attribute not found. Continuing.");
             return;
@@ -241,7 +241,7 @@ public class ManifestAttributesChecker {
         }
         final Object securityType = security.getSecurityType();
         final URL codebase = UrlUtils.guessCodeBase(file);
-        final ClasspathMatchers codebaseAtt = file.getManifestAttributeReader().getCodebase();
+        final ClasspathMatchers codebaseAtt = file.getManifestAttributesReader().getCodebase();
         if (codebaseAtt == null) {
             LOG.warn(R("CBCheckNoEntry"));
             return;
@@ -257,7 +257,7 @@ public class ManifestAttributesChecker {
                 LOG.info(R("CBCheckOkSignedOk"));
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestAttributeReader().getCodebase().toString(), codebase));
+                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestAttributesReader().getCodebase().toString(), codebase));
                 } else {
                     LOG.error(R("CBCheckSignedFail"));
                 }
@@ -407,7 +407,7 @@ public class ManifestAttributesChecker {
         ClasspathMatchers att = null;
         if (signing != SigningState.NONE) {
             // we only consider values in manifest for signed apps (as they may be faked)
-            att = file.getManifestAttributeReader().getApplicationLibraryAllowableCodebase();
+            att = file.getManifestAttributesReader().getApplicationLibraryAllowableCodebase();
         }
         if (att == null) {
             final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
@@ -457,7 +457,7 @@ public class ManifestAttributesChecker {
     }
 
     private String permissionsToString() {
-        final String value = file.getManifestAttributeReader().getPermissions();
+        final String value = file.getManifestAttributesReader().getPermissions();
         if (value == null) {
             return "Not defined";
         } else if (value.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
@@ -470,7 +470,7 @@ public class ManifestAttributesChecker {
     }
 
     private ManifestBoolean isSandboxForced() {
-        final String permissionLevel = file.getManifestAttributeReader().getPermissions();
+        final String permissionLevel = file.getManifestAttributesReader().getPermissions();
         if (permissionLevel == null) {
             return ManifestBoolean.UNDEFINED;
         } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {

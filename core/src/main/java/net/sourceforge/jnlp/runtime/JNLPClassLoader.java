@@ -28,7 +28,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributeReader;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
@@ -863,7 +863,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void initializeManifestAttributesChecker() throws LaunchException {
         if (mac == null) {
-            file.getManifestAttributeReader().setLoader(this);
+            file.getManifestAttributesReader().setLoader(this);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
         }
     }
@@ -902,7 +902,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // The main class may be specified in the manifest
         if (mainClass == null) {
-            mainClass = file.getManifestAttributeReader().getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
+            mainClass = file.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
         }
 
         final String desiredJarEntryName = mainClass + ".class";
@@ -1324,7 +1324,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 // If jnlp_href is used, the app should be treated similarly to when
                                 // it is run from javaws as a webstart.
                                 if (file instanceof PluginBridge && !((PluginBridge) file).useJNLPHref()) {
-                                    classpaths.addAll(ManifestAttributeReader.getClassPaths(mf, jar.getLocation()));
+                                    classpaths.addAll(ManifestAttributesReader.getClassPaths(mf, jar.getLocation()));
                                 }
 
                                 JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);

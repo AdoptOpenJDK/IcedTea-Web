@@ -43,13 +43,13 @@ import java.util.jar.Manifest;
  * @implSpec See https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/manifest.html for more details
  * on the security and configuration attributes stored in the JAR file manifest.
  */
-public class ManifestAttributeReader {
-    private final static Logger LOG = LoggerFactory.getLogger(ManifestAttributeReader.class);
+public class ManifestAttributesReader {
+    private final static Logger LOG = LoggerFactory.getLogger(ManifestAttributesReader.class);
 
     private final JNLPFile jnlpFile;
     private JNLPClassLoader loader;
 
-    public ManifestAttributeReader(final JNLPFile jnlpFile) {
+    public ManifestAttributesReader(final JNLPFile jnlpFile) {
         this.jnlpFile = jnlpFile;
     }
 
