@@ -20,7 +20,8 @@ package net.adoptopenjdk.icedteaweb.manifest;
  * The JAR file manifest contains information about the contents of the JAR file, including security
  * and configuration information. These attributes apply to signed applets and Web Start applications.
  *
- * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html
+ * @implSpec See https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/manifest.html for more details
+ * on the security and configuration attributes stored in the JAR file manifest.
  */
 public enum ManifestAttributes {
     /**
@@ -68,7 +69,6 @@ public enum ManifestAttributes {
      * untrusted components.
      */
     TRUSTED_LIBRARY("Trusted-Library");
-
 
     private final String name;
 
