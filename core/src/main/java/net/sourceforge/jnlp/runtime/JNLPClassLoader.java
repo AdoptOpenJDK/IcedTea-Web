@@ -15,7 +15,6 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -29,6 +28,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
@@ -94,6 +94,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.manifest.ManifestAttributeReader.getManifestAttribute;
 
 /**
  * Classloader that takes it's resources from a JNLP file. If the JNLP file
@@ -894,7 +895,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Check main jar
         JARDesc mainJarDesc = ResourcesDesc.getMainJAR(jars);
-        String result = getManifestAttribute(mainJarDesc.getLocation(), name);
+        String result = getManifestAttribute(mainJarDesc.getLocation(), name, tracker);
 
         if (result != null) {
             return result;
@@ -902,7 +903,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Check first jar
         JARDesc firstJarDesc = jars.get(0);
-        result = getManifestAttribute(firstJarDesc.getLocation(), name);
+        result = getManifestAttribute(firstJarDesc.getLocation(), name, tracker);
 
         if (result != null) {
             return result;
@@ -910,7 +911,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Still not found? Iterate and set if only 1 was found
         for (JARDesc jarDesc : jars) {
-            String attributeInThisJar = getManifestAttribute(jarDesc.getLocation(), name);
+            String attributeInThisJar = getManifestAttribute(jarDesc.getLocation(), name, tracker);
             if (attributeInThisJar != null) {
                 if (result == null) { // first main class
                     result = attributeInThisJar;
@@ -990,40 +991,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * error
      */
     String getMainClassName(URL location) {
-        return getManifestAttribute(location, Attributes.Name.MAIN_CLASS);
-    }
-
-    /**
-     * Gets the name of the main method if specified in the manifest
-     *
-     * @param location The JAR location
-     * @param attribute name of the attribute to find
-     * @return the attribute value, null if there isn't one of if there was an
-     * error
-     */
-    public String getManifestAttribute(URL location, Attributes.Name attribute) {
-
-        String attributeValue = null;
-        File f = tracker.getCacheFile(location);
-
-        if (f != null) {
-            JarFile mainJar = null;
-            try {
-                mainJar = new JarFile(f);
-                Manifest manifest = mainJar.getManifest();
-                if (manifest == null || manifest.getMainAttributes() == null) {
-                    //yes, jars without manifest exists
-                    return null;
-                }
-                attributeValue = manifest.getMainAttributes().getValue(attribute);
-            } catch (IOException ioe) {
-                attributeValue = null;
-            } finally {
-                StreamUtils.closeSilently(mainJar);
-            }
-        }
-
-        return attributeValue;
+        return getManifestAttribute(location, Attributes.Name.MAIN_CLASS, tracker);
     }
 
     /**
@@ -2714,4 +2682,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
+    public ResourceTracker getTracker() {
+        return tracker;
+    }
 }

@@ -1,5 +1,6 @@
 /* 
 Copyright (C) 2011 Red Hat, Inc.
+Copyright (C) 2019 Karakun AG
 
 This file is part of IcedTea.
 
@@ -34,7 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.manifest;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
@@ -46,12 +47,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestBoolean;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class ManifestAttributesChecker {
         ENTRYPOINT
     }
 
-    void checkAll() throws LaunchException {
+    public void checkAll() throws LaunchException {
         List<MANIFEST_ATTRIBUTES_CHECK> attributesCheck = getAttributesCheck();
         if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.NONE)) {
             LOG.warn(R("MACDisabledMessage"));

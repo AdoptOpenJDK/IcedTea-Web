@@ -34,7 +34,7 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.manifest;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -16,15 +16,22 @@
 
 package net.adoptopenjdk.icedteaweb.manifest;
 
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
+import net.sourceforge.jnlp.util.JarFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class ManifestAttributeReader {
     private final static Logger LOG = LoggerFactory.getLogger(ManifestAttributeReader.class);
@@ -36,7 +43,6 @@ public class ManifestAttributeReader {
         this.jnlpFile = jnlpFile;
     }
 
-
     public void setLoader(JNLPClassLoader loader) {
         this.loader = loader;
     }
@@ -44,8 +50,6 @@ public class ManifestAttributeReader {
     public boolean isLoader() {
         return loader != null;
     }
-
-
 
     /**
      * main class can be defined outside of manifest.
@@ -61,8 +65,7 @@ public class ManifestAttributeReader {
     }
 
      /**
-     *
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
      * @return values of Entry-Points attribute
      */
     public String[] getEntryPoints() {
@@ -74,15 +77,15 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
      * @return value of Application-Name manifest attribute
      */
-    public String getApplicationName(){
+    public String getApplicationName() {
         return getAttribute(ManifestAttributes.APPLICATION_NAME.toString());
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
      * @return values of Caller-Allowable-Codebase manifest attribute
      */
     public ClasspathMatcher.ClasspathMatchers getCallerAllowableCodebase() {
@@ -90,7 +93,7 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
      * @return values of Application-Library-Allowable-Codebase manifest attribute
      */
     public ClasspathMatcher.ClasspathMatchers getApplicationLibraryAllowableCodebase() {
@@ -98,7 +101,7 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
      * @return values of Codebase manifest attribute
      */
     public ClasspathMatcher.ClasspathMatchers getCodebase() {
@@ -106,7 +109,7 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_only
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_only
      * @return value of Trusted-Only manifest attribute
      */
     public ManifestBoolean isTrustedOnly() {
@@ -115,7 +118,7 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_library
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_library
      * @return value of Trusted-Library manifest attribute
      */
     public ManifestBoolean isTrustedLibrary() {
@@ -123,7 +126,7 @@ public class ManifestAttributeReader {
     }
 
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
      * @return value of Permissions manifest attribute
      */
     public ManifestBoolean isSandboxForced() {
@@ -143,7 +146,7 @@ public class ManifestAttributeReader {
         }
     }
     /**
-     * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
+     * https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
      * @return plain string values of Permissions manifest attribute
      */
     public String permissionsToString() {
@@ -166,7 +169,7 @@ public class ManifestAttributeReader {
     /**
      * get custom attribute.
      */
-    String getAttribute(String name) {
+    private String getAttribute(String name) {
         return getAttribute(new Attributes.Name(name));
     }
 
@@ -183,11 +186,56 @@ public class ManifestAttributeReader {
         return loader.checkForAttributeInJars(Arrays.asList(jnlpFile.getResources().getJARs()), name);
     }
 
-    public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s, boolean includePath) {
+    /**
+     * Gets the name of the main method if specified in the manifest
+     *
+     * @param location The JAR location
+     * @param attribute name of the attribute to find
+     * @param resourceTracker the resource tracker
+     * @return the attribute value, null if there isn't one of if there was an
+     * error
+     */
+    public static String getManifestAttribute(final URL location, final Attributes.Name attribute, final ResourceTracker resourceTracker) {
+
+        String attributeValue = null;
+        final File f = resourceTracker.getCacheFile(location);
+
+        if (f != null) {
+            JarFile mainJar = null;
+            try {
+                mainJar = new JarFile(f);
+                final Manifest manifest = mainJar.getManifest();
+                if (manifest == null || manifest.getMainAttributes() == null) {
+                    //yes, jars without manifest exists
+                    return null;
+                }
+                attributeValue = manifest.getMainAttributes().getValue(attribute);
+            } catch (IOException ioe) {
+                attributeValue = null;
+            } finally {
+                StreamUtils.closeSilently(mainJar);
+            }
+        }
+
+        return attributeValue;
+    }
+
+    public static String[] splitEntryPoints(final String entryPointString) {
+        if (entryPointString == null || entryPointString.trim().isEmpty()) {
+            return null;
+        }
+        final String[] result = entryPointString.trim().split("\\s+");
+        if (result.length == 0) {
+            return null;
+        }
+        return result;
+    }
+
+    private ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s, boolean includePath) {
         return getCodeBaseMatchersAttribute(new Attributes.Name(s), includePath);
     }
 
-    public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name, boolean includePath) {
+    private ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name, boolean includePath) {
         String s = getAttribute(name);
         if (s == null) {
             return null;
@@ -210,17 +258,5 @@ public class ManifestAttributeReader {
                     throw new IllegalArgumentException("Unknown value of " + id + " attribute " + s + ". Expected true or false");
             }
         }
-    }
-
-    //not private for testing purposes
-    public static String[] splitEntryPoints(String entryPointString) {
-        if (entryPointString == null || entryPointString.trim().isEmpty()) {
-            return null;
-        }
-        String[] result = entryPointString.trim().split("\\s+");
-        if (result.length == 0) {
-            return null;
-        }
-        return result;
     }
 }

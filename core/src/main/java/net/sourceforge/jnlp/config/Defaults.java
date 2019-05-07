@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.config.validators.SecurityValueValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
-import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 
 import java.util.HashMap;
 import java.util.Map;

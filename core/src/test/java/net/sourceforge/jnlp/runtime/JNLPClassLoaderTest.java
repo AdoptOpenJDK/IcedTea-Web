@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributeReader;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
@@ -214,9 +215,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
-                assertEquals("rh", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
-                assertEquals("DummyClass", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                assertEquals("it", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                assertEquals("rh", ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR, classLoader.getTracker()));
+                assertEquals("DummyClass", ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS, classLoader.getTracker()));
+                assertEquals("it", ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE, classLoader.getTracker()));
             }
         });
     }
@@ -235,9 +236,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                assertEquals(null, ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR, classLoader.getTracker()));
+                assertEquals(null, ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS, classLoader.getTracker()));
+                assertEquals(null, ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE, classLoader.getTracker()));
             }
         });
     }
@@ -314,8 +315,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
                 @Override
                 public void run() {
                     try {
-                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                        assertEquals(null, ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS, classLoader.getTracker()));
+                        assertEquals(null, ManifestAttributeReader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE, classLoader.getTracker()));
                     } catch (Exception e) {
                         exs[0] = e;
                     }
