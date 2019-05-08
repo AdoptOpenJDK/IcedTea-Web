@@ -49,15 +49,11 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1090,64 +1086,6 @@ public final class Parser {
         } else {
             return new Version(version);
         }
-    }
-
-    public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
-    public static final String NORMAL_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.XMLParser";
-
-    /**
-     * @return the root node from the XML document in the specified input
-     * stream.
-     *
-     * @throws ParseException if the JNLP file is invalid
-     */
-    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
-        try {
-            Object parser = getParserInstance(settings);
-            Method m = parser.getClass().getMethod("getRootNode", InputStream.class);
-            return (Node) m.invoke(parser, input);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof ParseException) {
-                throw (ParseException) (e.getCause());
-            }
-            throw new ParseException(R("PBadXML"), e);
-        } catch (Exception e) {
-            throw new ParseException(R("PBadXML"), e);
-        }
-    }
-
-    public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String className;
-        if (settings.isMalformedXmlAllowed()) {
-            className = MALFORMED_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.MALFORMED);
-        } else {
-            className = NORMAL_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.NORMAL);
-        }
-
-        Class<?> klass;
-        Object instance;
-
-        try {
-            klass = Class.forName(className);
-            instance = klass.newInstance();
-            //catch both, for case that tagsoup was removed after build
-        } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            klass = Class.forName(NORMAL_PARSER_CLASS);
-            instance = klass.newInstance();
-        }
-
-        switch (instance.getClass().getName()) {
-            case MALFORMED_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.MALFORMED);
-                break;
-            case NORMAL_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.NORMAL);
-                break;
-        }
-        return instance;
     }
 
     private String getOptionalMainClass(Node node) {

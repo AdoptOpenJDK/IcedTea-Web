@@ -71,6 +71,29 @@ public class XMLParser {
     public static final String CODEBASE = "codebase";
 
     /**
+     * @return the root node from the XML document in the specified input
+     * stream.
+     *
+     * @throws ParseException if the JNLP file is invalid
+     */
+    public static Node getRootNode(InputStream input, boolean malformedXmlAllowed) throws ParseException {
+        try {
+            XMLParser parser = getParserInstance(malformedXmlAllowed);
+            return parser.getRootNode(input);
+        } catch (Exception e) {
+            throw new ParseException(R("PBadXML"), e);
+        }
+    }
+
+    public static XMLParser getParserInstance(boolean malformedXmlAllowed) {
+        if (malformedXmlAllowed) {
+            return new MalformedXMLParser();
+        } else {
+            return new XMLParser();
+        }
+    }
+
+    /**
      * Parses input from an InputStream and returns a Node representing the
      * root of the parse tree.
      *

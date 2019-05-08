@@ -56,6 +56,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -77,7 +78,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         }
         ParserSettings defaultParser = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
-        root = Parser.getRootNode(jnlpStream, defaultParser);
+        root = XMLParser.getRootNode(jnlpStream, defaultParser.isMalformedXmlAllowed());
         parser = new Parser(new DummyJNLPFile(), null, root, defaultParser);
     }
 
@@ -238,7 +239,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         }
         ParserSettings defaultParser = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        Node omega = Parser.getRootNode(jnlpStream, defaultParser);
+        Node omega = XMLParser.getRootNode(jnlpStream, defaultParser.isMalformedXmlAllowed());
         Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParser);
         ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
         JARDesc[] r = resources.getJARs();

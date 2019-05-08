@@ -69,7 +69,7 @@ public class ParserTest extends NoStdOutErrTest {
     public void testMissingInfoFullLocale() throws ParseException {
         String data = "<jnlp></jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -84,7 +84,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -107,7 +107,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -137,7 +137,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -164,7 +164,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -187,7 +187,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -218,7 +218,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -249,7 +249,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -279,7 +279,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -308,7 +308,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -336,7 +336,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -363,7 +363,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -387,7 +387,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -411,7 +411,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -433,7 +433,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -456,7 +456,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -495,7 +495,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
@@ -518,7 +518,7 @@ public class ParserTest extends NoStdOutErrTest {
     public void testMissingInfoLangCountryLocale() throws ParseException {
         String data = "<jnlp></jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -533,7 +533,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -556,7 +556,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -582,7 +582,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -609,7 +609,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -632,7 +632,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -663,7 +663,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -694,7 +694,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -724,7 +724,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -753,7 +753,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -781,7 +781,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -808,7 +808,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -832,7 +832,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -856,7 +856,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -878,7 +878,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -901,7 +901,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -940,7 +940,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
@@ -963,7 +963,7 @@ public class ParserTest extends NoStdOutErrTest {
     public void testMissingInfoLangLocale() throws ParseException {
         String data = "<jnlp></jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -978,7 +978,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1001,7 +1001,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1023,7 +1023,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -1047,7 +1047,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1070,7 +1070,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1101,7 +1101,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1132,7 +1132,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1158,7 +1158,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1186,7 +1186,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -1213,7 +1213,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -1237,7 +1237,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -1261,7 +1261,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, strictParser);
@@ -1283,7 +1283,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1306,7 +1306,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1345,7 +1345,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "  </information>\n"
                 + "</jnlp>\n";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1373,7 +1373,7 @@ public class ParserTest extends NoStdOutErrTest {
                 ">\n" +
                 "</jnlp>";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
@@ -1392,7 +1392,7 @@ public class ParserTest extends NoStdOutErrTest {
                 ">\n" +
                 "</jnlp>";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
@@ -1410,7 +1410,7 @@ public class ParserTest extends NoStdOutErrTest {
                 ">\n" +
                 "</jnlp>";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
@@ -1429,7 +1429,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + ">\n"
                 + "</jnlp>";
 
-        Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         ParseException eex = null;
@@ -1454,7 +1454,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1462,7 +1462,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, main1);
         
         //strict also ok
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, defaultParser, null);
@@ -1479,7 +1479,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</installer-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1487,7 +1487,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, main1);
         
         //strict also ok
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
@@ -1504,7 +1504,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</applet-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1521,7 +1521,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1529,7 +1529,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("some.main.class", main1);
         
         //strict also ok
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
@@ -1547,7 +1547,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1555,7 +1555,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("some.main.class", main1);
         
         //strict throws
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
@@ -1571,7 +1571,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1579,7 +1579,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("some.main.class", main1);
         
         //strict throws
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
@@ -1595,7 +1595,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1603,7 +1603,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("som e.main .class", main1);
         
         //strict throws
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
@@ -1618,7 +1618,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-        Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node root1 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
@@ -1626,7 +1626,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("some . another . main .class. here", main1);
         
         //strict throws
-        Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
+        Node root2 = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser.isMalformedXmlAllowed());
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);

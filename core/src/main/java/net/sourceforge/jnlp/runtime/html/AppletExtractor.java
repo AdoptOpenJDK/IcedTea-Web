@@ -37,13 +37,13 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -56,7 +56,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,9 +93,8 @@ public class AppletExtractor {
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
             if (ps != null && ps.isMalformedXmlAllowed()){
-                Object parser = Parser.getParserInstance(ps);
-                Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
-                return (InputStream) m.invoke(null, is);
+                MalformedXMLParser parser = new MalformedXMLParser();
+                return parser.xmlizeInputStream(is);
             } else {
                 LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
             }

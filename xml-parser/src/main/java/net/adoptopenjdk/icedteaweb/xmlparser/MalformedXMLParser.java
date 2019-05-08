@@ -89,7 +89,7 @@ public class MalformedXMLParser extends XMLParser {
      * version of the input XML
      * @throws ParseException if an exception occurs while parsing the input
      */
-    private static InputStream xmlizeInputStream(final InputStream original) throws ParseException {
+    public InputStream xmlizeInputStream(final InputStream original) throws ParseException {
         try(final ByteArrayOutputStream out = new ByteArrayOutputStream()){
             final HTMLSchema schema = new HTMLSchema();
             final XMLReader reader = new Parser();

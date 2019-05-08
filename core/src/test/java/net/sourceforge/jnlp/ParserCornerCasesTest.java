@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLElement;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,24 +52,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
-/** Test various corner cases of the parser */
+/**
+ * Test various corner cases of the parser
+ */
 public class ParserCornerCasesTest {
-    private static final ParserSettings defaultParser = new ParserSettings(false, true,true);
+    private static final ParserSettings defaultParser = new ParserSettings(false, true, true);
 
     @Test
     public void testCdata() throws ParseException, XMLParseException, IOException {
         String data = "<argument><![CDATA[<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <!DOCT" +
                 "YPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\"> <properties> <entry key=\"key\">value</entry> </properties> ]]></argument>";
-        XMLElement elem = new XMLElement();
-        elem.parseFromReader(new StringReader(data));
-        XMLElement target = elem;
+        XMLElement target = new XMLElement();
+        target.parseFromReader(new StringReader(data));
         Assert.assertEquals("argument", target.getName());
         Assert.assertTrue("too small", target.getContent().length() > 20);
         Assert.assertTrue(target.getContent().contains("xml"));
         Assert.assertTrue(target.getContent().contains("DOCTYPE"));
         Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
 
-        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node node = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), true);
         Assert.assertEquals("argument", node.getNodeName().getName());
         String contents = node.getNodeValue();
         Assert.assertTrue(contents.contains("xml"));
@@ -95,7 +97,7 @@ public class ParserCornerCasesTest {
         Assert.assertTrue(target.getContent().contains("DOCTYPE"));
         Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
 
-        Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
+        Node node = XMLParser.getRootNode(new ByteArrayInputStream(data.getBytes()), true);
         node = node.getFirstChild().getFirstChild();
         Assert.assertEquals("argument", node.getNodeName().getName());
         String contents = node.getNodeValue();
@@ -133,7 +135,7 @@ public class ParserCornerCasesTest {
     @Test
     public void testUnsupportedSpecNumber() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='11.11'></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser parser = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("11.11", parser.getSpecVersion().toString());
     }
@@ -141,7 +143,7 @@ public class ParserCornerCasesTest {
     @Test
     public void testApplicationAndComponent() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp><application-desc/><component-desc/></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser parser = new Parser(null, null, root, defaultParser);
         Assert.assertNotNull(parser.getEntryPointDesc(root));
     }
@@ -149,7 +151,7 @@ public class ParserCornerCasesTest {
     @Test
     public void testCommentInElements() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='1.0' <!-- comment -->> </jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("1.0", p.getSpecVersion().toString());
     }
@@ -161,7 +163,7 @@ public class ParserCornerCasesTest {
                 "<vendor>IcedTea</vendor><description>" +
                 "<!-- outer <!-- inner --> -->" +
                 "</description></information></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals(" -->", p.getInformationDescs(root).get(0).getDescription());
     }
@@ -176,68 +178,63 @@ public class ParserCornerCasesTest {
                 " -->\n" +
                 "  <information/>" +
                 "</jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), defaultParser);
-        Parser p = new Parser(null, null, root, defaultParser);
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
+        new Parser(null, null, root, defaultParser);
     }
-
 
     @Test
     public void testCommentInElements2() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,true));
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser p = new Parser(null, null, root, defaultParser);
         //default is used
         Assert.assertEquals("1.0+", p.getSpecVersion().toString());
     }
 
-     @Test
+    @Test
     public void testCommentInElements2_malformedOff() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,false));
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), false);
         Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("1.0", p.getSpecVersion().toString());
     }
+
     @Test
     public void testCommentInAttributes() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,true));
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
         Parser p = new Parser(null, null, root, defaultParser);
         Assert.assertEquals("<!-- something -->", p.getSpecVersion().toString());
     }
 
-
-     @Test
+    @Test
     public void testCommentInAttributes_malformedOff() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
-        Node root = Parser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), new ParserSettings(false, true,false));
+        Node root = XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), false);
         Parser p = new Parser(null, null, root, defaultParser);
         //default is used
         Assert.assertEquals("1.0+", p.getSpecVersion().toString());
     }
-    
-    @Test
-    public void testCommentInElements3_malformedOff() throws JNLPMatcherException, IOException, ParseException {
-        //having comment inside element declaration is invalid but internal parser can handle it
-         try (InputStream fileStream = ClassLoader.getSystemClassLoader()
-                 .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
-             Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, false));
-             String a = root.getChildNodes()[2].getAttribute("main-class");
-             Assert.assertEquals("*", a);
 
+    @Test
+    public void testCommentInElements3_malformedOff() throws IOException, ParseException {
+        //having comment inside element declaration is invalid but internal parser can handle it
+        try (InputStream fileStream = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
+            Node root = XMLParser.getRootNode(fileStream, false);
+            String a = root.getChildNodes()[2].getAttribute("main-class");
+            Assert.assertEquals("*", a);
         }
     }
-    
-      @Test
-      @Ignore
-      @KnownToFail
-    public void testCommentInElements3_malformedOn() throws JNLPMatcherException, IOException, ParseException {
-        //having comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
-         try (InputStream fileStream = ClassLoader.getSystemClassLoader()
-                 .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
-             Node root = Parser.getRootNode(fileStream, new ParserSettings(false, true, true));
-             String a = root.getChildNodes()[2].getAttribute("main-class");
-             Assert.assertEquals("*", a);
 
+    @Test
+    @Ignore
+    @KnownToFail
+    public void testCommentInElements3_malformedOn() throws IOException, ParseException {
+        //having comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
+        try (InputStream fileStream = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
+            Node root = XMLParser.getRootNode(fileStream, true);
+            String a = root.getChildNodes()[2].getAttribute("main-class");
+            Assert.assertEquals("*", a);
         }
     }
 }
