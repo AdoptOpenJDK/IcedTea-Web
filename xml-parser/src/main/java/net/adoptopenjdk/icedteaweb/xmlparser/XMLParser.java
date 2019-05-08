@@ -38,15 +38,11 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -58,6 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_16BE;
 import static java.nio.charset.StandardCharsets.UTF_16LE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
 
 /**
  * A gateway to the actual implementation of the parsers.
@@ -65,8 +62,6 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * Used by net.sourceforge.jnlp.Parser
  */
 public class XMLParser {
-    private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
-
     private static final String UNICODE_LITTLE = "UnicodeLittle";
     private static final String UTF_32_BE = "UTF-32BE";
     private static final String UTF_32_LE = "UTF-32LE";
@@ -84,40 +79,15 @@ public class XMLParser {
      * @throws ParseException if parsing fails
      */
     public Node getRootNode(final InputStream input) throws ParseException {
-        // A BufferedInputStream is used to allow marking and resetting of a stream.
-        try(final BufferedInputStream bs = new BufferedInputStream(input)) {
-            /* SAX
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setErrorHandler(errorHandler);
+        try {
+            // A BufferedInputStream is used to allow marking and resetting of a stream.
+            final BufferedInputStream bs = new BufferedInputStream(input);
+            final Charset encoding = getEncoding(bs);
+            final InputStreamReader isr = new InputStreamReader(bs, encoding);
 
-            Document doc = builder.parse(input);
-            return doc.getDocumentElement();
-            */
-
-            /* TINY
-            Node document = new Node(TinyParser.parseXML(input));
-            Node jnlpNode = getChildNode(document, "jnlp"); // skip comments
-            */
-
-            /* NANO */
-            final XMLElement xml = new XMLElement();
-            final PipedInputStream pin = new PipedInputStream();
-            final PipedOutputStream pout = new PipedOutputStream(pin);
-            final InputStreamReader isr = new InputStreamReader(bs, getEncoding(bs));
             // Clean the jnlp xml file of all comments before passing it to the parser.
-            new Thread(
-                    () -> {
-                        (new XMLElement()).sanitizeInput(isr, pout);
-                        try {
-                            pout.close();
-                        } catch (IOException ioe) {
-                            LOG.error("Error in XML parser", ioe);
-                        }
-                    }).start();
-            xml.parseFromReader(new InputStreamReader(pin));
+            final XMLElement xml = new XMLElement();
+            xml.parseFromReader(sanitizeXml(isr));
             return new Node(xml);
         } catch (Exception ex) {
             throw new ParseException(R("PBadXML"), ex);
@@ -131,13 +101,14 @@ public class XMLParser {
      * @return a String representation of encoding
      */
     private static Charset getEncoding(final InputStream input) throws IOException {
-        //Fixme: This only recognizes UTF-8, UTF-16, and
-        //UTF-32, which is enough to parse the prolog portion of xml to
-        //find out the exact encoding (if it exists). The reason being
-        //there could be other encodings, such as ISO 8859 which is 8-bits
-        //but it supports latin characters.
-        //So what needs to be done is to parse the prolog and retrieve
-        //the exact encoding from it.
+        //Fixme:
+        // This only recognizes UTF-8, UTF-16, and UTF-32,
+        // which is enough to parse the prolog portion of xml to
+        // find out the exact encoding (if it exists). The reason being
+        // there could be other encodings, such as ISO 8859 which is 8-bits
+        // but it supports latin characters.
+        // So what needs to be done is to parse the prolog and retrieve
+        // the exact encoding from it.
 
         final int[] s = new int[4];
 
