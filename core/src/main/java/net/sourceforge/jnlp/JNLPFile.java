@@ -804,7 +804,7 @@ public class JNLPFile {
             //if (location != null)
             //  location = new URL(location, "."); // remove filename
 
-            Node root = XMLParser.getRootNode(input, parserSettings.isMalformedXmlAllowed());
+            Node root = XMLParser.getRootNode(input, parserSettings.getParserType());
             Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information

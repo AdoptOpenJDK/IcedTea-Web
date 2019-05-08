@@ -79,7 +79,7 @@ public class ParserSettings {
     }
 
     /** @return true if parsing malformed xml is allowed */
-    public ParserType isMalformedXmlAllowed() {
+    public ParserType getParserType() {
         return malformedXmlAllowed ? MALFORMED : NORMAL;
     }
 

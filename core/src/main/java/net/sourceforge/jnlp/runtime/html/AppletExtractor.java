@@ -94,7 +94,7 @@ public class AppletExtractor {
 
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
-            if (ps != null && ps.isMalformedXmlAllowed() == MALFORMED){
+            if (ps != null && ps.getParserType() == MALFORMED){
                 MalformedXMLParser parser = new MalformedXMLParser();
                 return parser.xmlizeInputStream(is);
             } else {
