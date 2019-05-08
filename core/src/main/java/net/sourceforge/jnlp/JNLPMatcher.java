@@ -39,6 +39,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +87,8 @@ public final class JNLPMatcher {
             throw new JNLPMatcherException("Launching JNLP file is null.");
 
         try {
-            this.appTemplateNode = Parser.getRootNode(appTemplate, p);
-            this.launchJNLPNode = Parser.getRootNode(launchJNLP, p);
+            this.appTemplateNode = XMLParser.getRootNode(appTemplate, p.isMalformedXmlAllowed());
+            this.launchJNLPNode = XMLParser.getRootNode(launchJNLP, p.isMalformedXmlAllowed());
             this.isTemplate = isTemplate;
         } catch (Exception e) {
             throw new JNLPMatcherException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);

@@ -35,6 +35,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -871,7 +872,7 @@ public class JNLPFile {
             //if (location != null)
             //  location = new URL(location, "."); // remove filename
 
-            Node root = Parser.getRootNode(input, parserSettings);
+            Node root = XMLParser.getRootNode(input, parserSettings.isMalformedXmlAllowed());
             Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information

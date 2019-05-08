@@ -26,6 +26,14 @@
             <artifactId>tagsoup</artifactId>
             <version>1.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>icedtea-web-test-extensions</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
