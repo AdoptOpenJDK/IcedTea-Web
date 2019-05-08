@@ -50,6 +50,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
+
 /**
  * Test how well the parser deals with malformed xml
  */
@@ -76,7 +79,7 @@ public class ParserMalformedXmlTest {
     @Test
     public void testMissingXmlDeclaration() throws ParseException {
         String malformedJnlp = originalJnlp.replaceFirst("<\\?xml.*\\?>", "");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), MALFORMED);
     }
 
     @Test
@@ -84,31 +87,31 @@ public class ParserMalformedXmlTest {
     @KnownToFail
     public void testMalformedArguments() throws ParseException {
         String malformedJnlp = originalJnlp.replace("arg2</argument", "arg2<argument");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), MALFORMED);
     }
 
     @Test
     public void testTagNotClosed() throws ParseException {
         String malformedJnlp = originalJnlp.replace("</jnlp>", "<jnlp>");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), MALFORMED);
     }
 
     @Test
     public void testUnquotedAttributes() throws ParseException {
         String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), true);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), MALFORMED);
     }
 
     @Test(expected = ParseException.class)
     public void testTagNotClosedNoTagSoup() throws ParseException {
         String malformedJnlp = originalJnlp.replace("</jnlp>", "<jnlp>");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), false);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), NORMAL);
     }
 
     @Test(expected = ParseException.class)
     public void testUnquotedAttributesNoTagSoup() throws ParseException {
         String malformedJnlp = originalJnlp.replace("'jnlp.jnlp'", "jnlp.jnlp");
-        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), false);
+        XMLParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()), NORMAL);
     }
 
     @Bug(id = "PR2690")
@@ -116,14 +119,14 @@ public class ParserMalformedXmlTest {
     public void testXmlBomTagSoupOff() throws ParseException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("jnlps/EFBBBF.jnlp");
         Assert.assertNotNull(is);
-        XMLParser.getRootNode(is, false);
+        XMLParser.getRootNode(is, NORMAL);
     }
 
     @Test
     public void testXmlBomTagSoupOn() throws ParseException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("jnlps/EFBBBF.jnlp");
         Assert.assertNotNull(is);
-        XMLParser.getRootNode(is, true);
+        XMLParser.getRootNode(is, MALFORMED);
     }
 
 }

@@ -36,7 +36,6 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.ccil.cowan.tagsoup.XMLWriter;
@@ -52,6 +51,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 
 /**
  * An specialized {@link XMLParser} that uses TagSoup[1] to parse
@@ -90,6 +91,7 @@ public class MalformedXMLParser extends XMLParser {
      * @throws ParseException if an exception occurs while parsing the input
      */
     public InputStream xmlizeInputStream(final InputStream original) throws ParseException {
+        ParseException.setUsed(MALFORMED);
         try(final ByteArrayOutputStream out = new ByteArrayOutputStream()){
             final HTMLSchema schema = new HTMLSchema();
             final XMLReader reader = new Parser();
@@ -109,12 +111,7 @@ public class MalformedXMLParser extends XMLParser {
             return new ByteArrayInputStream(out.toByteArray());
         } catch (final SAXException | IOException e1) {
             throw new ParseException("Invalid XML document syntax.", e1);
-        } catch (final NoClassDefFoundError  e2) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);
-            ParseException.setUsed(null);
-            return original;
         }
-
     }
 
 }

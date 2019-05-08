@@ -16,6 +16,6 @@
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-public enum UsedParsers {
+public enum ParserType {
     MALFORMED, NORMAL
 }

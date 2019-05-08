@@ -40,6 +40,7 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParserType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -82,6 +83,6 @@ public class ParserSettingsTest {
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
 
         Assert.assertEquals(settings.isStrict(), optionParser.hasOption(CommandLineOptions.STRICT));
-        Assert.assertEquals(settings.isMalformedXmlAllowed(), !optionParser.hasOption(CommandLineOptions.XML));
+        Assert.assertEquals(settings.isMalformedXmlAllowed() == ParserType.MALFORMED, !optionParser.hasOption(CommandLineOptions.XML));
     }
 }
