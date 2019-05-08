@@ -60,6 +60,8 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
+
 /**
  * This class is taking HTML document url as input, try to sanitize with
  * tagsoup, if available - and then finds and applet declarations here. Then it
@@ -92,7 +94,7 @@ public class AppletExtractor {
 
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
-            if (ps != null && ps.isMalformedXmlAllowed()){
+            if (ps != null && ps.isMalformedXmlAllowed() == MALFORMED){
                 MalformedXMLParser parser = new MalformedXMLParser();
                 return parser.xmlizeInputStream(is);
             } else {

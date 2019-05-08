@@ -54,6 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_16BE;
 import static java.nio.charset.StandardCharsets.UTF_16LE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
 
 /**
@@ -76,20 +77,13 @@ public class XMLParser {
      *
      * @throws ParseException if the JNLP file is invalid
      */
-    public static Node getRootNode(InputStream input, boolean malformedXmlAllowed) throws ParseException {
+    public static Node getRootNode(InputStream input, ParserType parserToUse) throws ParseException {
         try {
-            XMLParser parser = getParserInstance(malformedXmlAllowed);
+            ParseException.setUsed(parserToUse);
+            final XMLParser parser = parserToUse == MALFORMED ? new MalformedXMLParser() : new XMLParser();
             return parser.getRootNode(input);
         } catch (Exception e) {
             throw new ParseException(R("PBadXML"), e);
-        }
-    }
-
-    public static XMLParser getParserInstance(boolean malformedXmlAllowed) {
-        if (malformedXmlAllowed) {
-            return new MalformedXMLParser();
-        } else {
-            return new XMLParser();
         }
     }
 

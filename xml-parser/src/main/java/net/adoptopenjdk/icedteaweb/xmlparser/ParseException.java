@@ -28,15 +28,14 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
  */
 public class ParseException extends Exception {
 
-    private static UsedParsers expected;
-
-    private static UsedParsers used;
+    private static ParserType used;
 
     // todo: add meaningful information, such as the invalid
     // element, parse position, etc.
 
     /**
      * Create a parse exception with the specified message.
+     *
      * @param message to be shown in exception
      */
     public ParseException(final String message) {
@@ -46,8 +45,9 @@ public class ParseException extends Exception {
     /**
      * Create a parse exception with the specified message and
      * cause.
+     *
      * @param message to be used by exception
-     * @param cause cause of exception
+     * @param cause   cause of exception
      */
     public ParseException(final String message, final Throwable cause) {
         super(getParserSettingsMessage() + message, cause);
@@ -57,11 +57,7 @@ public class ParseException extends Exception {
         super(getParserSettingsMessage(), cause);
     }
 
-    public static void setExpected(final UsedParsers ex) {
-        expected = ex;
-    }
-
-    public static void setUsed(final UsedParsers us) {
+    public static void setUsed(final ParserType us) {
         used = us;
     }
 
@@ -70,20 +66,11 @@ public class ParseException extends Exception {
                 + " "
                 + Translator.R("TAGSOUPtail")
                 + " ";
-        if (expected == UsedParsers.NORMAL && used == UsedParsers.NORMAL) {
+        if (used == ParserType.NORMAL) {
             //warn about xml mode
-            return Translator.R("TAGSOUPnotUsed", CommandLineOptions.XML.getOption())+tail;
+            return Translator.R("TAGSOUPnotUsed", CommandLineOptions.XML.getOption()) + tail;
         }
-        if (expected == UsedParsers.MALFORMED && used != UsedParsers.MALFORMED) {
-            //warn about TagSoup
-            return Translator.R("TAGSOUPbroken") + tail;
-        }
-// TODO: find a solution for debug switch
-//        if (JNLPRuntime.isDebug()) {
-//            return expected + " " + used + "; ";
-//        } else {
-            return "";
-//        }
+        return "";
     }
 
 }

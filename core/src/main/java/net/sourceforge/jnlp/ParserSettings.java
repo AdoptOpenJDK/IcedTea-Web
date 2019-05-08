@@ -39,6 +39,10 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParserType;
+
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
 
 /**
  * Contains settings to be used by the Parser while parsing JNLP files.
@@ -75,8 +79,8 @@ public class ParserSettings {
     }
 
     /** @return true if parsing malformed xml is allowed */
-    public boolean isMalformedXmlAllowed() {
-        return malformedXmlAllowed;
+    public ParserType isMalformedXmlAllowed() {
+        return malformedXmlAllowed ? MALFORMED : NORMAL;
     }
 
     /** @return true if strict parsing mode is to be used */
