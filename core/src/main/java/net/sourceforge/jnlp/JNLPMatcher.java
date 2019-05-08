@@ -87,8 +87,8 @@ public final class JNLPMatcher {
             throw new JNLPMatcherException("Launching JNLP file is null.");
 
         try {
-            this.appTemplateNode = XMLParser.getRootNode(appTemplate, p.isMalformedXmlAllowed());
-            this.launchJNLPNode = XMLParser.getRootNode(launchJNLP, p.isMalformedXmlAllowed());
+            this.appTemplateNode = XMLParser.getRootNode(appTemplate, p.getParserType());
+            this.launchJNLPNode = XMLParser.getRootNode(launchJNLP, p.getParserType());
             this.isTemplate = isTemplate;
         } catch (Exception e) {
             throw new JNLPMatcherException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);

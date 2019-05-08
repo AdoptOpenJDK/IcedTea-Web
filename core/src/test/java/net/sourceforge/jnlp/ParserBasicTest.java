@@ -78,7 +78,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         }
         ParserSettings defaultParser = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
-        root = XMLParser.getRootNode(jnlpStream, defaultParser.isMalformedXmlAllowed());
+        root = XMLParser.getRootNode(jnlpStream, defaultParser.getParserType());
         parser = new Parser(new DummyJNLPFile(), null, root, defaultParser);
     }
 
@@ -239,7 +239,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         }
         ParserSettings defaultParser = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        Node omega = XMLParser.getRootNode(jnlpStream, defaultParser.isMalformedXmlAllowed());
+        Node omega = XMLParser.getRootNode(jnlpStream, defaultParser.getParserType());
         Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParser);
         ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
         JARDesc[] r = resources.getJARs();
