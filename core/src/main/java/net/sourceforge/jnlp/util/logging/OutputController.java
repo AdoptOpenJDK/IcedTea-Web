@@ -36,12 +36,9 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.OutputUtils;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +58,9 @@ import static java.util.Objects.requireNonNull;
  * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
  * 
  */
-public class OutputController {
+public class OutputController extends BasicOutputController {
 
     private final static Logger LOG = LoggerFactory.getLogger(OutputController.class);
-
-    private static final String NULL_OBJECT = "Trying to log null object";
 
     private final PrintStreamLogger outLog;
     private final PrintStreamLogger errLog;
@@ -255,23 +250,7 @@ public class OutputController {
         this.errLog.setStream(err);
     }
 
-    public void log(OutputControllerLevel level, String s) {
-        log(level, (Object) s);
-    }
-
-
-    private void log(OutputControllerLevel level, Object o) {
-        String s ="";
-        if (o == null) {
-            s = NULL_OBJECT;
-        } else if (o instanceof Throwable) {
-            s = OutputUtils.exceptionToString((Throwable) o);
-        } else {
-            s=o.toString();
-        }
-        log(new JavaMessage(new Header(level, false), s));
-    }
-
+    @Override
     public synchronized void log(MessageWithHeader l){
         messageQue.add(l);
         this.notifyAll();
