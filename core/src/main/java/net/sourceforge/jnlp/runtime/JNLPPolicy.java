@@ -176,7 +176,14 @@ public class JNLPPolicy extends Policy {
                 sourcePath.startsWith(jreExtDir.getRawPath())) {
             return true;
         }
-
+        
+        // check to see if source protocol is a Java System Library protocol
+        if (sourceProtocol.equalsIgnoreCase("jrt"))
+        {
+            // jrt protocls are only for system code return true 
+            return true; 
+        }        
+        
         return false;
     }
 
