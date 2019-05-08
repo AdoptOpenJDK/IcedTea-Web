@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,13 +32,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLe
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import net.sourceforge.jnlp.util.LocaleUtils.Match;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -55,7 +55,6 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.jar.Attributes;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
@@ -88,10 +87,6 @@ public class JNLPFile {
     public static final String SPEC_ATTRIBUTE = "spec";
     public static final String VERSION_ATTRIBUTE = "version";
 
-    public enum ManifestBoolean {
-        TRUE, FALSE, UNDEFINED
-    }
-   
 
     // todo: save the update policy, then if file was not updated
     // then do not check resources for being updated.
@@ -161,7 +156,7 @@ public class JNLPFile {
     final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
     
     /** important manifests' attributes */
-    private final ManifestsAttributes manifestsAttributes = new ManifestsAttributes();
+    private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
     public static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
 
@@ -388,7 +383,7 @@ public class JNLPFile {
         if (jnlpTitle == null && manifestTitle != null) {
             return manifestTitle;
         }
-        String mainClass = getManifestsAttributes().getMainClass();
+        String mainClass = getManifestAttributesReader().getMainClass();
         return mainClass;
     }
 
@@ -401,8 +396,8 @@ public class JNLPFile {
     }
 
     public String getTitleFromManifest() {
-        String inManifestTitle = getManifestsAttributes().getApplicationName();
-        if (inManifestTitle == null && getManifestsAttributes().isLoader()) {
+        String inManifestTitle = getManifestAttributesReader().getApplicationName();
+        if (inManifestTitle == null && getManifestAttributesReader().isLoader()) {
             LOG.warn(TITLE_NOT_FOUND);
         }
         return inManifestTitle;
@@ -961,200 +956,10 @@ public class JNLPFile {
         missingSignedJNLP = true;
     }
 
-    public ManifestsAttributes getManifestsAttributes() {
-        return manifestsAttributes;
+    public ManifestAttributesReader getManifestAttributesReader() {
+        return manifestAttributesReader;
     }
-    
-    
-    public class ManifestsAttributes {
 
-        public static final String APP_NAME = "Application-Name";
-        public static final String CALLER_ALLOWABLE = "Caller-Allowable-Codebase";
-        public static final String APP_LIBRARY_ALLOWABLE = "Application-Library-Allowable-Codebase";
-        public static final String PERMISSIONS = "Permissions";
-        public static final String CODEBASE = "Codebase";
-        public static final String TRUSTED_ONLY = "Trusted-Only";
-        public static final String TRUSTED_LIBRARY = "Trusted-Library";
-        public static final String ENTRY_POINT="Entry-Point";
-        
-        private JNLPClassLoader loader;
-
-
-        public void setLoader(JNLPClassLoader loader) {
-            this.loader = loader;
-        }
-
-        public boolean isLoader() {
-            return loader != null;
-        }
-        
-        
-
-        /**
-         * main class can be defined outside of manifest.
-         * This method is mostly for completeness
-         * @return main-class as it is specified in application
-         */
-        public String getMainClass(){
-            if (loader == null) {
-                LOG.debug("Jars not ready to provide main class");
-                return null;    
-            }
-            return loader.getMainClass();
-        }
-        
-         /**
-         *
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
-         * @return values of Entry-Points attribute
-         */
-        public String[] getEntryPoints() {
-            return splitEntryPoints(getEntryPointString());
-        }
-        
-        public String getEntryPointString() {
-            return getAttribute(ENTRY_POINT);
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
-         * @return value of Application-Name manifest attribute
-         */
-        public String getApplicationName(){
-            return getAttribute(APP_NAME);
-        }
-        
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#caller_allowable
-         * @return values of Caller-Allowable-Codebase manifest attribute
-         */
-        public ClasspathMatcher.ClasspathMatchers getCallerAllowableCodebase() {
-            return getCodeBaseMatchersAttribute(CALLER_ALLOWABLE, false);
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_library
-         * @return values of Application-Library-Allowable-Codebase manifest attribute
-         */
-        public ClasspathMatcher.ClasspathMatchers getApplicationLibraryAllowableCodebase() {
-            return getCodeBaseMatchersAttribute(APP_LIBRARY_ALLOWABLE, true);
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
-         * @return values of Codebase manifest attribute
-         */
-        public ClasspathMatcher.ClasspathMatchers getCodebase() {
-            return getCodeBaseMatchersAttribute(CODEBASE, false);
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_only
-         * @return value of Trusted-Only manifest attribute
-         */
-        public ManifestBoolean isTrustedOnly() {
-            return processBooleanAttribute(TRUSTED_ONLY);
-
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#trusted_library
-         * @return value of Trusted-Library manifest attribute
-         */
-        public ManifestBoolean isTrustedLibrary() {
-            return processBooleanAttribute(TRUSTED_LIBRARY);
-
-        }
-
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
-         * @return value of Permissions manifest attribute
-         */
-        public ManifestBoolean isSandboxForced() {
-            final String permissionLevel = getManifestPermissionsAttribute();
-            if (permissionLevel == null) {
-                return ManifestBoolean.UNDEFINED;
-            } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
-                return ManifestBoolean.TRUE;
-            } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
-                return ManifestBoolean.FALSE;
-            } else {
-                throw new IllegalArgumentException(
-                        String.format("Unknown value of %s attribute %s. Expected %s or %s", PERMISSIONS, permissionLevel,
-                                AppletPermissionLevel.SANDBOX.getValue(), AppletPermissionLevel.ALL.getValue())
-                );
-            }
-        }
-        /**
-         * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#permissions
-         * @return plain string values of Permissions manifest attribute
-         */
-        public String permissionsToString() {
-            final String s = getManifestPermissionsAttribute();
-            if (s == null) {
-                return "Not defined";
-            } else if (s.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
-                return s.trim();
-            } else if (s.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
-                return s.trim();
-            } else {
-                return "illegal";
-            }
-        }
-
-        String getManifestPermissionsAttribute() {
-            return getAttribute(PERMISSIONS);
-        }
-
-        /**
-         * get custom attribute.
-         */
-        String getAttribute(String name) {
-            return getAttribute(new Attributes.Name(name));
-        }
-
-        /**
-         * get standard attribute
-         * @param name name of the manifest attribute to find in application
-         * @return  plain attribute value
-         */
-        public String getAttribute(Attributes.Name name) {
-            if (loader == null) {
-                LOG.debug("Jars not ready to provide attribute {}", name);
-                return null;
-            }
-            return loader.checkForAttributeInJars(Arrays.asList(getResources().getJARs()), name);
-        }
-
-        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(String s, boolean includePath) {
-            return getCodeBaseMatchersAttribute(new Attributes.Name(s), includePath);
-        }
-
-        public ClasspathMatcher.ClasspathMatchers getCodeBaseMatchersAttribute(Attributes.Name name, boolean includePath) {
-            String s = getAttribute(name);
-            if (s == null) {
-                return null;
-            }
-            return ClasspathMatcher.ClasspathMatchers.compile(s, includePath);
-        }
-
-        private ManifestBoolean processBooleanAttribute(String id) throws IllegalArgumentException {
-            String s = getAttribute(id);
-            if (s == null) {
-                return ManifestBoolean.UNDEFINED;
-            } else {
-                s = s.toLowerCase().trim();
-                switch (s) {
-                    case "true":
-                        return  ManifestBoolean.TRUE;
-                    case "false":
-                        return ManifestBoolean.FALSE;
-                    default:
-                        throw new IllegalArgumentException("Unknown value of " + id + " attribute " + s + ". Expected true or false");
-                }
-            }
-        }
-    }
 
     public String createJnlpVendorValue() {
         final String location;
@@ -1204,18 +1009,6 @@ public class JNLPFile {
         } else {
             return basicTitle;            
         }
-    }
-    
-    //not private for testing purposes
-    static String[] splitEntryPoints(String entryPointString) {
-        if (entryPointString == null || entryPointString.trim().isEmpty()) {
-            return null;
-        }
-        String[] result = entryPointString.trim().split("\\s+");
-        if (result.length == 0) {
-            return null;
-        }
-        return result;
     }
 }
 

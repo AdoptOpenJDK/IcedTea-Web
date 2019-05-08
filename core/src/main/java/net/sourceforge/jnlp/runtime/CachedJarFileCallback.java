@@ -38,8 +38,8 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
@@ -58,6 +58,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.Attributes;
 
 /**
  * Invoked by URLJarFile to get a JarFile corresponding to a URL.
@@ -112,7 +113,7 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
                 // Blank out the class-path because:
                 // 1) Web Start does not support it
                 // 2) For the plug-in, we want to cache files from class-path so we do it manually
-                returnFile.getManifest().getMainAttributes().putValue("Class-Path", "");
+                returnFile.getManifest().getMainAttributes().putValue(Attributes.Name.CLASS_PATH.toString(), "");
 
                 LOG.debug("Class-Path attribute cleared for {}", returnFile.getName());
                 

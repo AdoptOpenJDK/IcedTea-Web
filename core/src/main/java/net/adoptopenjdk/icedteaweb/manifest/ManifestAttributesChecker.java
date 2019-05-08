@@ -1,5 +1,6 @@
 /* 
 Copyright (C) 2011 Red Hat, Inc.
+Copyright (C) 2019 Karakun AG
 
 This file is part of IcedTea.
 
@@ -34,7 +35,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp.runtime;
+package net.adoptopenjdk.icedteaweb.manifest;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
@@ -46,12 +47,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPFile.ManifestBoolean;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
@@ -77,7 +78,7 @@ public class ManifestAttributesChecker {
     private final SecurityDelegate securityDelegate;
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
-            final SigningState signing, final SecurityDelegate securityDelegate) throws LaunchException {
+            final SigningState signing, final SecurityDelegate securityDelegate) {
         this.security = security;
         this.file = file;
         this.signing = signing;
@@ -94,7 +95,7 @@ public class ManifestAttributesChecker {
         ENTRYPOINT
     }
 
-    void checkAll() throws LaunchException {
+    public void checkAll() throws LaunchException {
         List<MANIFEST_ATTRIBUTES_CHECK> attributesCheck = getAttributesCheck();
         if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.NONE)) {
             LOG.warn(R("MACDisabledMessage"));
@@ -151,7 +152,8 @@ public class ManifestAttributesChecker {
         }
         return manifestAttributesCheckList;
     }
-    /*
+
+    /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
      */
     private void checkEntryPoint() throws LaunchException {
@@ -166,7 +168,7 @@ public class ManifestAttributesChecker {
             LOG.debug("Entry-Point can not be checked now, because of unknown main class.");
             return;
         }
-        final String[] eps = file.getManifestsAttributes().getEntryPoints();
+        final String[] eps = file.getManifestAttributesReader().getEntryPoints();
         String mainClass = file.getEntryPointDesc().getMainClass();
         if (eps == null) {
             LOG.debug("Entry-Point manifest attribute for yours '{}' not found. Continuing.", mainClass);
@@ -178,14 +180,14 @@ public class ManifestAttributesChecker {
                 return;
             }
         }
-        throw new LaunchException("None of the entry points specified: '" + file.getManifestsAttributes().getEntryPointString() + "' matched the main class " + mainClass + " and applet is signed. This is a security error and the app will not be launched.");
+        throw new LaunchException("None of the entry points specified: '" + file.getManifestAttributesReader().getEntryPoint() + "' matched the main class " + mainClass + " and applet is signed. This is a security error and the app will not be launched.");
     }
 
     /**
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#trusted_only
      */
     private void checkTrustedOnlyAttribute() throws LaunchException {
-        final ManifestBoolean trustedOnly = file.getManifestsAttributes().isTrustedOnly();
+        final ManifestBoolean trustedOnly = file.getManifestAttributesReader().isTrustedOnly();
         if (trustedOnly == ManifestBoolean.UNDEFINED) {
             LOG.debug("Trusted Only manifest attribute not found. Continuing.");
             return;
@@ -218,7 +220,7 @@ public class ManifestAttributesChecker {
         final String signedMsg;
         if (isFullySigned && !isSandboxed) {
             signedMsg = R("STOAsignedMsgFully");
-        } else if (isFullySigned && isSandboxed) {
+        } else if (isFullySigned) {
             signedMsg = R("STOAsignedMsgAndSandbox");
         } else {
             signedMsg = R("STOAsignedMsgPartiall");
@@ -239,7 +241,7 @@ public class ManifestAttributesChecker {
         }
         final Object securityType = security.getSecurityType();
         final URL codebase = UrlUtils.guessCodeBase(file);
-        final ClasspathMatchers codebaseAtt = file.getManifestsAttributes().getCodebase();
+        final ClasspathMatchers codebaseAtt = file.getManifestAttributesReader().getCodebase();
         if (codebaseAtt == null) {
             LOG.warn(R("CBCheckNoEntry"));
             return;
@@ -255,7 +257,7 @@ public class ManifestAttributesChecker {
                 LOG.info(R("CBCheckOkSignedOk"));
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestsAttributes().getCodebase().toString(), codebase));
+                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestAttributesReader().getCodebase().toString(), codebase));
                 } else {
                     LOG.error(R("CBCheckSignedFail"));
                 }
@@ -269,11 +271,11 @@ public class ManifestAttributesChecker {
      */
     private void checkPermissionsAttribute() throws LaunchException {
         if (securityDelegate.getRunInSandbox()) {
-            LOG.warn("The 'Permissions' attribute of this application is '{}'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.", file.getManifestsAttributes().permissionsToString());
+            LOG.warn("The 'Permissions' attribute of this application is '{}'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.", permissionsToString());
             return;
         }
 
-        final ManifestBoolean sandboxForced = file.getManifestsAttributes().isSandboxForced();
+        final ManifestBoolean sandboxForced = isSandboxForced();
         // If the attribute is not specified in the manifest, prompt the user. Oracle's spec says that the
         // attribute is required, but this breaks a lot of existing applets. Therefore, when on the highest
         // security level, we refuse to run these applets. On the standard security level, we ask. And on the
@@ -305,11 +307,11 @@ public class ManifestAttributesChecker {
         } else { // JNLP
             if (isNoneOrDefault(requestedPermissionLevel)) {
                 if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                    LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", file.getManifestsAttributes().permissionsToString());
+                    LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
                     securityDelegate.setRunInSandbox();
                 }
                 if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
-                    LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", file.getManifestsAttributes().permissionsToString());
+                    LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
                     securityDelegate.setRunInSandbox();
                 }
             }
@@ -326,11 +328,11 @@ public class ManifestAttributesChecker {
 
     private void validateRequestedPermissionLevelMatchesManifestPermissions(final AppletPermissionLevel requested, final ManifestBoolean sandboxForced) throws LaunchException {
         if (requested == AppletPermissionLevel.ALL && sandboxForced != ManifestBoolean.FALSE) {
-            throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
+            throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
 
         if (requested == AppletPermissionLevel.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
-            throw new LaunchException("The 'permissions' attribute is '" + file.getManifestsAttributes().permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
+            throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
     }
 
@@ -339,14 +341,14 @@ public class ManifestAttributesChecker {
         URL codebase = file.getCodeBase();
         URL documentBase = null;
         if (file instanceof PluginBridge) {
-            documentBase = ((PluginBridge) file).getSourceLocation();
+            documentBase = file.getSourceLocation();
         }
         if (documentBase == null) {
             documentBase = file.getCodeBase();
         }
 
         //cases
-        Set<URL> usedUrls = new HashSet<URL>();
+        Set<URL> usedUrls = new HashSet<>();
         URL sourceLocation = file.getSourceLocation();
         ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
         if (sourceLocation != null) {
@@ -403,10 +405,9 @@ public class ManifestAttributesChecker {
         }
         
         ClasspathMatchers att = null;
-        if (signing == SigningState.NONE) {
-            //for unsigned app we are ignoring value in manifest (may be faked)
-        } else {
-            att = file.getManifestsAttributes().getApplicationLibraryAllowableCodebase();
+        if (signing != SigningState.NONE) {
+            // we only consider values in manifest for signed apps (as they may be faked)
+            att = file.getManifestAttributesReader().getApplicationLibraryAllowableCodebase();
         }
         if (att == null) {
             final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
@@ -453,5 +454,35 @@ public class ManifestAttributesChecker {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return documentBase;
+    }
+
+    private String permissionsToString() {
+        final String value = file.getManifestAttributesReader().getPermissions();
+        if (value == null) {
+            return "Not defined";
+        } else if (value.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
+            return value.trim();
+        } else if (value.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
+            return value.trim();
+        } else {
+            return "illegal";
+        }
+    }
+
+    private ManifestBoolean isSandboxForced() {
+        final String permissionLevel = file.getManifestAttributesReader().getPermissions();
+        if (permissionLevel == null) {
+            return ManifestBoolean.UNDEFINED;
+        } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
+            return ManifestBoolean.TRUE;
+        } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
+            return ManifestBoolean.FALSE;
+        } else {
+            throw new IllegalArgumentException(
+                    String.format("Unknown value of %s attribute %s. Expected %s or %s",
+                            ManifestAttributes.PERMISSIONS.toString(), permissionLevel,
+                            AppletPermissionLevel.SANDBOX.getValue(), AppletPermissionLevel.ALL.getValue())
+            );
+        }
     }
 }

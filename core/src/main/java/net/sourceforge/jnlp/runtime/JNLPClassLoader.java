@@ -15,7 +15,6 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -29,6 +28,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
@@ -862,7 +863,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void initializeManifestAttributesChecker() throws LaunchException {
         if (mac == null) {
-            file.getManifestsAttributes().setLoader(this);
+            file.getManifestAttributesReader().setLoader(this);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
         }
     }
@@ -877,50 +878,6 @@ public class JNLPClassLoader extends URLClassLoader {
             codebase = file.getResources().getMainJAR().getLocation();
         }
         return codebase;
-    }
-
-    /**
-     * *
-     * Checks for the jar that contains the attribute.
-     *
-     * @param jars Jars that are checked to see if they contain the main class
-     * @param name attribute to be found
-     * @return value of attribute if found
-     */
-    public String checkForAttributeInJars(List<JARDesc> jars, Attributes.Name name) {
-        if (jars.isEmpty()) {
-            return null;
-        }
-
-        // Check main jar
-        JARDesc mainJarDesc = ResourcesDesc.getMainJAR(jars);
-        String result = getManifestAttribute(mainJarDesc.getLocation(), name);
-
-        if (result != null) {
-            return result;
-        }
-
-        // Check first jar
-        JARDesc firstJarDesc = jars.get(0);
-        result = getManifestAttribute(firstJarDesc.getLocation(), name);
-
-        if (result != null) {
-            return result;
-        }
-
-        // Still not found? Iterate and set if only 1 was found
-        for (JARDesc jarDesc : jars) {
-            String attributeInThisJar = getManifestAttribute(jarDesc.getLocation(), name);
-            if (attributeInThisJar != null) {
-                if (result == null) { // first main class
-                    result = attributeInThisJar;
-                } else { // There is more than one main class. Set to null and break.
-                    result = null;
-                    break;
-                }
-            }
-        }
-        return result;
     }
 
     /**
@@ -945,7 +902,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // The main class may be specified in the manifest
         if (mainClass == null) {
-            mainClass = checkForAttributeInJars(jars, Attributes.Name.MAIN_CLASS);
+            mainClass = file.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
         }
 
         final String desiredJarEntryName = mainClass + ".class";
@@ -980,50 +937,6 @@ public class JNLPClassLoader extends URLClassLoader {
                  */
             }
         }
-    }
-
-    /**
-     * Gets the name of the main method if specified in the manifest
-     *
-     * @param location The JAR location
-     * @return the main class name, null if there isn't one of if there was an
-     * error
-     */
-    String getMainClassName(URL location) {
-        return getManifestAttribute(location, Attributes.Name.MAIN_CLASS);
-    }
-
-    /**
-     * Gets the name of the main method if specified in the manifest
-     *
-     * @param location The JAR location
-     * @param attribute name of the attribute to find
-     * @return the attribute value, null if there isn't one of if there was an
-     * error
-     */
-    public String getManifestAttribute(URL location, Attributes.Name attribute) {
-
-        String attributeValue = null;
-        File f = tracker.getCacheFile(location);
-
-        if (f != null) {
-            JarFile mainJar = null;
-            try {
-                mainJar = new JarFile(f);
-                Manifest manifest = mainJar.getManifest();
-                if (manifest == null || manifest.getMainAttributes() == null) {
-                    //yes, jars without manifest exists
-                    return null;
-                }
-                attributeValue = manifest.getMainAttributes().getValue(attribute);
-            } catch (IOException ioe) {
-                attributeValue = null;
-            } finally {
-                StreamUtils.closeSilently(mainJar);
-            }
-        }
-
-        return attributeValue;
     }
 
     /**
@@ -1411,7 +1324,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                 // If jnlp_href is used, the app should be treated similarly to when
                                 // it is run from javaws as a webstart.
                                 if (file instanceof PluginBridge && !((PluginBridge) file).useJNLPHref()) {
-                                    classpaths.addAll(getClassPathsFromManifest(mf, jar.getLocation().getPath()));
+                                    classpaths.addAll(ManifestAttributesReader.getClassPaths(mf, jar.getLocation()));
                                 }
 
                                 JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);
@@ -2118,44 +2031,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    /**
-     * Returns a set of paths that indicate the Class-Path entries in the
-     * manifest file. The paths are rooted in the same directory as the
-     * originalJarPath.
-     *
-     * @param mf the manifest
-     * @param originalJarPath the remote/original path of the jar containing the
-     * manifest
-     * @return a Set of String where each string is a path to the jar on the
-     * original jar's classpath.
-     */
-    private Set<String> getClassPathsFromManifest(Manifest mf, String originalJarPath) {
-        Set<String> result = new HashSet<>();
-        if (mf != null) {
-            // extract the Class-Path entries from the manifest and split them
-            String classpath = mf.getMainAttributes().getValue("Class-Path");
-            if (classpath == null || classpath.trim().length() == 0) {
-                return result;
-            }
-            String[] paths = classpath.split(" +");
-            for (String path : paths) {
-                if (path.trim().length() == 0) {
-                    continue;
-                }
-                // we want to search for jars in the same subdir on the server
-                // as the original jar that contains the manifest file, so find
-                // out its subdirectory and use that as the dir
-                String dir = "";
-                int lastSlash = originalJarPath.lastIndexOf("/");
-                if (lastSlash != -1) {
-                    dir = originalJarPath.substring(0, lastSlash + 1);
-                }
-                String fullPath = dir + path;
-                result.add(fullPath);
-            }
-        }
-        return result;
-    }
+
 
     /**
      * Increments loader use count by 1
@@ -2714,4 +2590,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
+    public ResourceTracker getTracker() {
+        return tracker;
+    }
 }

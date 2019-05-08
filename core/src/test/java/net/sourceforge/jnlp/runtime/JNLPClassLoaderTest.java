@@ -148,7 +148,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             assertNoFileLeak(new Runnable() {
                 @Override
                 public void run() {
-                    assertEquals("DummyClass", classLoader.getMainClassName(jnlpFile.getJarLocation()));
+                    assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker()));
                 }
             });
         }
@@ -168,7 +168,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             assertNoFileLeak(new Runnable() {
                 @Override
                 public void run() {
-                    assertEquals(null, classLoader.getMainClassName(jnlpFile.getJarLocation()));
+                    assertEquals(null, jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker()));
                 }
             });
         }
@@ -214,9 +214,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
-                assertEquals("rh", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
-                assertEquals("DummyClass", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                assertEquals("it", classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                assertEquals("rh", jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
+                assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+                assertEquals("it", jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
             }
         });
     }
@@ -235,9 +235,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         assertNoFileLeak(new Runnable() {
             @Override
             public void run() {
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_VENDOR));
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
+                assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+                assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
             }
         });
     }
@@ -283,15 +283,15 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             @Override
             public void run() {
                 //defined twice
-                assertEquals(null, classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_VENDOR));
+                assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.IMPLEMENTATION_VENDOR, Arrays.asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
                 //defined twice, but one in main jar
-                assertEquals("DummyClass1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.MAIN_CLASS));
+                assertEquals("DummyClass1", jnlpFile.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.MAIN_CLASS, Arrays.asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
                 //defined not in main jar 
-                assertEquals("it", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_TITLE));
+                assertEquals("it", jnlpFile.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.IMPLEMENTATION_TITLE, Arrays.asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
                 //not defined
-                assertEquals(null, classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_VENDOR_ID));
+                assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.IMPLEMENTATION_VENDOR_ID, Arrays.asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
                 //defined in first jar
-                assertEquals("some url1", classLoader.checkForAttributeInJars(Arrays.asList(jnlpFile.getJarDescs()), Attributes.Name.IMPLEMENTATION_URL));
+                assertEquals("some url1", jnlpFile.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.IMPLEMENTATION_URL, Arrays.asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
             }
         });
     }
@@ -314,8 +314,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
                 @Override
                 public void run() {
                     try {
-                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.MAIN_CLASS));
-                        assertEquals(null, classLoader.getManifestAttribute(jnlpFile.getJarLocation(), Attributes.Name.IMPLEMENTATION_TITLE));
+                        assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+                        assertEquals(null, jnlpFile.getManifestAttributesReader().getAttributeFromJar(Attributes.Name.IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
                     } catch (Exception e) {
                         exs[0] = e;
                     }

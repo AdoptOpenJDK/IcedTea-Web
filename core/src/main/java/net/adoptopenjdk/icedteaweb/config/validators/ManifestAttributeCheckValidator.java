@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.sourceforge.jnlp.runtime.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 
 public class ManifestAttributeCheckValidator extends MultipleStringValueValidator {
 

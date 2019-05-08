@@ -40,9 +40,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributes;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestBoolean;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
@@ -97,23 +99,22 @@ public class JNLPFileTest extends NoStdOutErrTest {
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader); //classloader set, but no att specified
 
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT)));
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationName());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getCodebase());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getPermissions());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString())));
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString())));
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString())));
 
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getMainClass());
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getApplicationName());
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase());
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getCallerAllowableCodebase());
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestsAttributes().getCodebase());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getMainClass());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationName());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase());
+        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getCodebase());
+        Assert.assertEquals("no classloader attached, should be null", ManifestBoolean.UNDEFINED, jnlpFile.getManifestAttributesReader().isTrustedLibrary());
+        Assert.assertEquals("no classloader attached, should be null", ManifestBoolean.UNDEFINED, jnlpFile.getManifestAttributesReader().isTrustedOnly());
     }
 
     @Test
@@ -126,11 +127,11 @@ public class JNLPFileTest extends NoStdOutErrTest {
         File jarLocation7 = new File(tempDirectory, "test7.jar");
         Manifest manifest6 = new Manifest();
         manifest6.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass1"); //see DummyJNLPFileWithJar constructor with int
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME), "DummyClass1 title");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT), "main1 main2");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE), "*.com  https://*.cz");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE), "*.net  ftp://*uu.co.uk");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE), "*.com *.net *.cz *.co.uk");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString()), "DummyClass1 title");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString()), "main1 main2");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.APPLICATION_LIBRARY_ALLOWABLE_CODEBASE.toString()), "*.com  https://*.cz");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.CALLER_ALLOWABLE_CODEBASE.toString()), "*.net  ftp://*uu.co.uk");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.CODEBASE.toString()), "*.com *.net *.cz *.co.uk");
         /*
          *  "sandbox" or "all-permissions"
          */
@@ -141,40 +142,39 @@ public class JNLPFileTest extends NoStdOutErrTest {
          * they are completely unsigned. This *may* be only be an issue with DummyJNLPFiles.
          */
         // manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS), "sandbox"); /* commented due to DummyJNLP being "signed" */
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS), "all-permissions");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY), "false");
-        manifest6.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY), "false");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.PERMISSIONS.toString()), "all-permissions");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString()), "false");
+        manifest6.getMainAttributes().put(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString()), "false");
 
         Manifest manifest7 = new Manifest(); //6 must e main
         manifest7.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass2");
         /*
          *  "sandbox" or "all-permissions"
          */
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS), "erroneous one");
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY), "erroneous one");
-        manifest7.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY), "erroneous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(ManifestAttributes.PERMISSIONS.toString()), "erroneous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString()), "erroneous one");
+        manifest7.getMainAttributes().put(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString()), "erroneous one");
 
         FileTestUtils.createJarWithContents(jarLocation6, manifest6);
         FileTestUtils.createJarWithContents(jarLocation7, manifest7);
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(1, jarLocation7, jarLocation6); //jar 6 should be main. Jar 7 have wrong items, but they are never loaded as in main jar are the correct one
         final DummyJNLPFileWithJar errorJnlpFile = new DummyJNLPFileWithJar(0, jarLocation7); //jar 7 should be main
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getApplicationName());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString())));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_LIBRARY_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CALLER_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name((ManifestAttributes.CODEBASE.toString()))));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.PERMISSIONS.toString())));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString())));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString())));
 
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getApplicationName());
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase());
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getCallerAllowableCodebase());
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getCodebase());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertEquals("no classloader attached, should be null", JNLPFile.ManifestBoolean.UNDEFINED, jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getApplicationName());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getCodebase());
+        Assert.assertEquals("no classloader attached, should be null", ManifestBoolean.UNDEFINED, jnlpFile.getManifestAttributesReader().isTrustedLibrary());
+        Assert.assertEquals("no classloader attached, should be null", ManifestBoolean.UNDEFINED, jnlpFile.getManifestAttributesReader().isTrustedOnly());
 
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS); //jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader);
@@ -189,61 +189,53 @@ public class JNLPFileTest extends NoStdOutErrTest {
         }
         Assert.assertNotNull(ex);
 
-        Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
-        Assert.assertEquals("main1 main2", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT)));
-        Assert.assertEquals("*.com  https://*.cz", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
-        Assert.assertEquals("*.net  ftp://*uu.co.uk", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
-        Assert.assertEquals("*.com *.net *.cz *.co.uk", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
+        Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString())));
+        Assert.assertEquals("main1 main2", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString())));
+        Assert.assertEquals("*.com  https://*.cz", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_LIBRARY_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertEquals("*.net  ftp://*uu.co.uk", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CALLER_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertEquals("*.com *.net *.cz *.co.uk", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CODEBASE.toString())));
         // Assert.assertEquals(SecurityDesc.RequestedPermissionLevel.SANDBOX.toHtmlString(), jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS))); /* commented due to DummyJNLP being "signed" */
-        Assert.assertEquals(AppletPermissionLevel.ALL.getValue(), jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
-        Assert.assertEquals("false", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
-        Assert.assertEquals("false", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
+        Assert.assertEquals(AppletPermissionLevel.ALL.getValue(), jnlpFile.getManifestAttributesReader().getPermissions());
+        Assert.assertEquals("false", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString())));
+        Assert.assertEquals("false", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString())));
 
 
-        Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
-        Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.ENTRY_POINT)));
-        Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_LIBRARY_ALLOWABLE)));
-        Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CALLER_ALLOWABLE)));
-        Assert.assertNull(errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.PERMISSIONS)));
-        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_LIBRARY)));
-        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.TRUSTED_ONLY)));
+        Assert.assertNull(errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString())));
+        Assert.assertNull(errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString())));
+        Assert.assertNull(errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_LIBRARY_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertNull(errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CALLER_ALLOWABLE_CODEBASE.toString())));
+        Assert.assertNull(errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CODEBASE.toString())));
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestAttributesReader().getPermissions());
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_LIBRARY.toString())));
+        Assert.assertEquals("erroneous one", errorJnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString())));
 
-        Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestsAttributes().getApplicationName());
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase().matches(new URL("http://aa.com")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase().matches(new URL("https://aa.cz")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase().matches(new URL("https://aa.com")));
-        Assert.assertEquals(false, jnlpFile.getManifestsAttributes().getApplicationLibraryAllowableCodebase().matches(new URL("http://aa.cz")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCallerAllowableCodebase().matches(new URL("http://aa.net")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCallerAllowableCodebase().matches(new URL("ftp://aa.uu.co.uk")));
-        Assert.assertEquals(false, jnlpFile.getManifestsAttributes().getCallerAllowableCodebase().matches(new URL("http://aa.uu.co.uk")));
-        Assert.assertEquals("*.com *.net *.cz *.co.uk", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.CODEBASE)));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("http://aa.com")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("ftp://aa.bb.net")));
-        Assert.assertEquals(true, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("https://x.net")));
-        Assert.assertEquals(false, jnlpFile.getManifestsAttributes().getCodebase().matches(new URL("http://aa.bb/com")));
+        Assert.assertEquals("DummyClass1 title", jnlpFile.getManifestAttributesReader().getApplicationName());
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase().matches(new URL("http://aa.com")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase().matches(new URL("https://aa.cz")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase().matches(new URL("https://aa.com")));
+        Assert.assertEquals(false, jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase().matches(new URL("http://aa.cz")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase().matches(new URL("http://aa.net")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase().matches(new URL("ftp://aa.uu.co.uk")));
+        Assert.assertEquals(false, jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase().matches(new URL("http://aa.uu.co.uk")));
+        Assert.assertEquals("*.com *.net *.cz *.co.uk", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.CODEBASE.toString())));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getCodebase().matches(new URL("http://aa.com")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getCodebase().matches(new URL("ftp://aa.bb.net")));
+        Assert.assertEquals(true, jnlpFile.getManifestAttributesReader().getCodebase().matches(new URL("https://x.net")));
+        Assert.assertEquals(false, jnlpFile.getManifestAttributesReader().getCodebase().matches(new URL("http://aa.bb/com")));
         // Assert.assertEquals(JNLPFile.ManifestBoolean.TRUE, jnlpFile.getManifestsAttributes().isSandboxForced()); /* commented due to DummyJNLP being "signed" */
-        Assert.assertEquals(JNLPFile.ManifestBoolean.FALSE, jnlpFile.getManifestsAttributes().isSandboxForced());
-        Assert.assertEquals(JNLPFile.ManifestBoolean.FALSE, jnlpFile.getManifestsAttributes().isTrustedLibrary());
-        Assert.assertEquals(JNLPFile.ManifestBoolean.FALSE, jnlpFile.getManifestsAttributes().isTrustedOnly());
+        Assert.assertEquals(ManifestBoolean.FALSE, jnlpFile.getManifestAttributesReader().isTrustedLibrary());
+        Assert.assertEquals(ManifestBoolean.FALSE, jnlpFile.getManifestAttributesReader().isTrustedOnly());
 
         ex = null;
         try {
-            errorJnlpFile.getManifestsAttributes().isSandboxForced();
+            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestAttributesReader().isTrustedLibrary());
         } catch (Exception e) {
             ex = e;
         }
         Assert.assertNotNull(ex);
         ex = null;
         try {
-            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().isTrustedLibrary());
-        } catch (Exception e) {
-            ex = e;
-        }
-        Assert.assertNotNull(ex);
-        ex = null;
-        try {
-            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestsAttributes().isTrustedOnly());
+            Assert.assertEquals("erroneous one", errorJnlpFile.getManifestAttributesReader().isTrustedOnly());
         } catch (Exception e) {
             ex = e;
         }
@@ -281,7 +273,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
         //first jar
         Manifest manifest5 = new Manifest();
         manifest5.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_URL, "some url1"); //see DummyJNLPFileWithJar constructor with int
-        manifest5.getMainAttributes().put(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME), "Manifested Name");
+        manifest5.getMainAttributes().put(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString()), "Manifested Name");
 
 
         FileTestUtils.createJarWithContents(jarLocation1, manifest1);
@@ -291,13 +283,13 @@ public class JNLPFileTest extends NoStdOutErrTest {
         FileTestUtils.createJarWithContents(jarLocation5, manifest5);
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(3, jarLocation5, jarLocation3, jarLocation4, jarLocation1, jarLocation2); //jar 1 should be main
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getMainClass());
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.MAIN_CLASS));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getMainClass());
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.MAIN_CLASS));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
+        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString())));
 
         Assert.assertNull(jnlpFile.getTitleFromJnlp());
         Assert.assertNull(jnlpFile.getTitleFromManifest());
@@ -317,18 +309,18 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader);
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getMainClass());
-        Assert.assertNull("defined twice, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.MAIN_CLASS));
-        Assert.assertNull("not defined, should be null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
+        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getMainClass());
+        Assert.assertNull("defined twice, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
+        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
+        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.MAIN_CLASS));
+        Assert.assertNull("not defined, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR_ID));
+        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
+        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString())));
         //correct values are also tested in JnlpClassloaderTest
-        Assert.assertEquals("classloader attached, should be not null", "it", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
-        Assert.assertEquals("classloader attached, should be not null", "DummyClass1", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.MAIN_CLASS));
-        Assert.assertEquals("classloader attached, should be not null", "some url1", jnlpFile.getManifestsAttributes().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
-        Assert.assertEquals("classloader attached, should be not null", "Manifested Name", jnlpFile.getManifestsAttributes().getAttribute(new Attributes.Name(JNLPFile.ManifestsAttributes.APP_NAME)));
+        Assert.assertEquals("classloader attached, should be not null", "it", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
+        Assert.assertEquals("classloader attached, should be not null", "DummyClass1", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.MAIN_CLASS));
+        Assert.assertEquals("classloader attached, should be not null", "some url1", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_URL));
+        Assert.assertEquals("classloader attached, should be not null", "Manifested Name", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.APPLICATION_NAME.toString())));
 
         Assert.assertNull(jnlpFile.getTitleFromJnlp());
         Assert.assertEquals("Manifested Name", jnlpFile.getTitleFromManifest());

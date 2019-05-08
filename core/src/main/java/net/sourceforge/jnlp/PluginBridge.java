@@ -313,7 +313,7 @@ public final class PluginBridge extends JNLPFile {
         }
         //specification is recommending  main class instead of html parameter
         //http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#app_name
-        String mainClass = getManifestsAttributes().getMainClass();
+        String mainClass = getManifestAttributesReader().getMainClass();
         if (mainClass != null) {
             return mainClass;
         }

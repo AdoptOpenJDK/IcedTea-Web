@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.config.validators;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 import java.io.File;
@@ -47,8 +48,9 @@ public class ValidatorUtils {
 
     public final static String DELIMITER = ",";
 
-    public static String[] splitCombination(final String val) {
-        return val.split(DELIMITER);
+    public static String[] splitCombination(final String value) {
+        Assert.requireNonNull(value, "value");
+        return value.split(DELIMITER);
     }
 
     public static String verifyFileOrCommand(final String value) {
