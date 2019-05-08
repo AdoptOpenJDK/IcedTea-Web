@@ -54,6 +54,7 @@ import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,14 +79,13 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDe
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.SECURITY_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNode;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNodes;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredURL;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getSpanText;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNode;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNodes;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getSpanText;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getURL;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -231,7 +231,27 @@ public final class Parser {
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base, strict);
+    }
 
+    /**
+     * Returns a URL with a trailing / appended to it if there is no trailing
+     * slash on the specified URL.
+     */
+    private URL addSlash(final URL source) {
+        if (source == null) {
+            return null;
+        }
+
+        final String urlString = source.toExternalForm();
+        if (!urlString.endsWith("/")) {
+            try {
+                return new URL(urlString + "/");
+            } catch (MalformedURLException ex) {
+                throw new IllegalArgumentException("Could not add slash to malformed URL: " + urlString, ex);
+            }
+        }
+
+        return source;
     }
 
     /**

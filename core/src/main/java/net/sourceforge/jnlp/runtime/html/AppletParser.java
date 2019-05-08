@@ -41,8 +41,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import org.w3c.dom.Element;
@@ -96,7 +97,7 @@ public class AppletParser {
         if (inHtmlCodebase != null && inHtmlCodebase.trim().isEmpty()) {
             inHtmlCodebase = ".";
         }
-        URL u = XMLParser.getURL(inHtmlCodebase, "In html " + source.getNodeName() + "'s codebase", docBase, false);
+        URL u = NodeUtils.getURL(inHtmlCodebase, "In html " + source.getNodeName() + "'s codebase", docBase, false);
         if (!u.toExternalForm().endsWith("/")) {
             u = new URL(u.toExternalForm() + "/");
         }
