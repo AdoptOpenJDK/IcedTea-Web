@@ -754,6 +754,7 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an application.
+     *
      * @throws UnsupportedOperationException if there is no application information
      */
     public ApplicationDesc getApplication() {
@@ -765,6 +766,7 @@ public class JNLPFile {
 
     /**
      * @return the launch information for a component.
+     *
      * @throws UnsupportedOperationException if there is no component information
      */
     public ComponentDesc getComponent() {
@@ -776,6 +778,7 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an installer.
+     *
      * @throws UnsupportedOperationException if there is no installer information
      */
     public InstallerDesc getInstaller() {
