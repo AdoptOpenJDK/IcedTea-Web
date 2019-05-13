@@ -160,6 +160,7 @@ public class CacheUtil {
         }
 
         OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Clearing cache directory: " + cacheDir);
+        synchronized (lruHandler) {
         lruHandler.lock();
         try {
             cacheDir = cacheDir.getCanonicalFile();
@@ -175,6 +176,7 @@ public class CacheUtil {
             throw new RuntimeException(e);
         } finally {
             lruHandler.unlock();
+        }
         }
         return true;
     }
@@ -202,9 +204,11 @@ public class CacheUtil {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, Translator.R("BXSingleCacheMoreThenOneId", application));
         }
         OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("BXSingleCacheFileCount", files));
-        CacheLRUWrapper.getInstance().lock();
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        synchronized (lruHandler) {
+        lruHandler.lock();
         try {
-            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+            Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
                 @Override
                 public boolean test(Path t) {
                     return Files.isRegularFile(t);
@@ -233,7 +237,8 @@ public class CacheUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            CacheLRUWrapper.getInstance().unlock();
+            lruHandler.unlock();
+        }
         }
         return true;
     }
@@ -319,10 +324,12 @@ public class CacheUtil {
       * @return 
       */
       public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
-        CacheLRUWrapper.getInstance().lock();
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        synchronized (lruHandler) {
+        lruHandler.lock();
         final List<CacheId> r = new ArrayList<>();
         try {
-            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+            Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
                 @Override
                 public boolean test(Path t) {
                     return Files.isRegularFile(t);
@@ -361,7 +368,8 @@ public class CacheUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            CacheLRUWrapper.getInstance().unlock();
+            lruHandler.unlock();
+        }
         }
         return r;
     }
@@ -808,6 +816,7 @@ public class CacheUtil {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<>();
             HashSet<String> remove = new HashSet<>();
+            synchronized (lruHandler) {
             try {
                 lruHandler.lock();
                 lruHandler.load();
@@ -878,6 +887,7 @@ public class CacheUtil {
                 lruHandler.store();
             } finally {
                 lruHandler.unlock();
+            }
             }
             removeSetOfDirectories(remove);
         }
