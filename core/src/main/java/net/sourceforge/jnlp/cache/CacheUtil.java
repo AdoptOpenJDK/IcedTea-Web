@@ -22,24 +22,8 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jnlp.DownloadServiceListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -61,8 +45,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,21 +61,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.jnlp.DownloadServiceListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
@@ -196,21 +163,23 @@ public class CacheUtil {
             return false;
         }
         LOG.debug("Clearing cache directory: {}", cacheDir);
-        lruHandler.lock();
-        try {
-            cacheDir = cacheDir.getCanonicalFile();
-            // remove windows shortcuts before cache dir is gone
-            if (OsUtil.isWindows()) {
-                removeWindowsShortcuts("ALL");
+        synchronized (lruHandler) {
+            lruHandler.lock();
+            try {
+                cacheDir = cacheDir.getCanonicalFile();
+                // remove windows shortcuts before cache dir is gone
+                if (OsUtil.isWindows()) {
+                    removeWindowsShortcuts("ALL");
+                }
+                FileUtils.recursiveDelete(cacheDir, cacheDir);
+                cacheDir.mkdir();
+                lruHandler.clearLRUSortedEntries();
+                lruHandler.store();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                lruHandler.unlock();
             }
-            FileUtils.recursiveDelete(cacheDir, cacheDir);
-            cacheDir.mkdir();
-            lruHandler.clearLRUSortedEntries();
-            lruHandler.store();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lruHandler.unlock();
         }
         return true;
     }
@@ -238,38 +207,41 @@ public class CacheUtil {
             LOG.error(Translator.R("BXSingleCacheMoreThenOneId", application));
         }
         LOG.info(Translator.R("BXSingleCacheFileCount", files));
-        CacheLRUWrapper.getInstance().lock();
-        try {
-            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
-                @Override
-                public boolean test(Path t) {
-                    return Files.isRegularFile(t);
-                }
-            }).forEach(new Consumer<Path>() {
-                @Override
-                public void accept(Path path) {
-                    if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
-                        PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                        // if jnlp-path in .info equals path of app to delete mark to delete
-                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                        if (application.equalsIgnoreCase(jnlpPath) || application.equalsIgnoreCase(getDomain(path))) {
-                            pf.setProperty("delete", "true");
-                            pf.store();
-                            LOG.info("marked for deletion: {}", path);
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        synchronized (lruHandler) {
+            lruHandler.lock();
+            try {
+                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+                    @Override
+                    public boolean test(Path t) {
+                        return Files.isRegularFile(t);
+                    }
+                }).forEach(new Consumer<Path>() {
+                    @Override
+                    public void accept(Path path) {
+                        if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                            // if jnlp-path in .info equals path of app to delete mark to delete
+                            String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                            if (application.equalsIgnoreCase(jnlpPath) || application.equalsIgnoreCase(getDomain(path))) {
+                                pf.setProperty("delete", "true");
+                                pf.store();
+                                LOG.info("marked for deletion: {}", path);
+                            }
                         }
                     }
+                });
+                if (OsUtil.isWindows()) {
+                    removeWindowsShortcuts(application.toLowerCase());
                 }
-            });
-            if (OsUtil.isWindows()) {
-                removeWindowsShortcuts(application.toLowerCase());
-            }
-            // clean the cache of entries now marked for deletion
-            cleanCache();
+                // clean the cache of entries now marked for deletion
+                cleanCache();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            CacheLRUWrapper.getInstance().unlock();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                lruHandler.unlock();
+            }
         }
         return true;
     }
@@ -356,51 +328,54 @@ public class CacheUtil {
      * @return
      */
     public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
-        CacheLRUWrapper.getInstance().lock();
-        final List<CacheId> r = new ArrayList<>();
-        try {
-            Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
-                @Override
-                public boolean test(Path t) {
-                    return Files.isRegularFile(t);
-                }
-            }).forEach(new Consumer<Path>() {
-                @Override
-                public void accept(Path path) {
-                    if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
-                        PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                        if (jnlpPath) {
-                            // if jnlp-path in .info equals path of app to delete mark to delete
-                            String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                            if (jnlpPath != null && jnlpPath.matches(filter)) {
-                                CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
-                                if (!r.contains(jnlpPathId)) {
-                                    r.add(jnlpPathId);
-                                    jnlpPathId.populate();
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        synchronized (lruHandler) {
+            lruHandler.lock();
+            final List<CacheId> r = new ArrayList<>();
+            try {
+                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
+                    @Override
+                    public boolean test(Path t) {
+                        return Files.isRegularFile(t);
+                    }
+                }).forEach(new Consumer<Path>() {
+                    @Override
+                    public void accept(Path path) {
+                        if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                            if (jnlpPath) {
+                                // if jnlp-path in .info equals path of app to delete mark to delete
+                                String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                                if (jnlpPath != null && jnlpPath.matches(filter)) {
+                                    CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
+                                    if (!r.contains(jnlpPathId)) {
+                                        r.add(jnlpPathId);
+                                        jnlpPathId.populate();
 
+                                    }
                                 }
                             }
-                        }
-                        if (domain) {
-                            String domain = getDomain(path);
-                            if (domain != null && domain.matches(filter)) {
-                                CacheId domainId = new CacheDomainId(domain);
-                                if (!r.contains(domainId)) {
-                                    r.add(domainId);
-                                    domainId.populate();
+                            if (domain) {
+                                String domain = getDomain(path);
+                                if (domain != null && domain.matches(filter)) {
+                                    CacheId domainId = new CacheDomainId(domain);
+                                    if (!r.contains(domainId)) {
+                                        r.add(domainId);
+                                        domainId.populate();
 
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            CacheLRUWrapper.getInstance().unlock();
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                lruHandler.unlock();
+            }
+            return r;
         }
-        return r;
     }
 
     /**
@@ -849,78 +824,80 @@ public class CacheUtil {
             // First we want to figure out which stuff we need to delete.
             HashSet<String> keep = new HashSet<>();
             HashSet<String> remove = new HashSet<>();
-            try {
-                lruHandler.lock();
-                lruHandler.load();
-
-                long maxSize = -1; // Default
+            synchronized (lruHandler) {
                 try {
-                    maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE));
-                } catch (NumberFormatException nfe) {
-                }
+                    lruHandler.lock();
+                    lruHandler.load();
 
-                maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
-                long curSize = 0;
-
-                for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
-                    // Check if the item is contained in cacheOrder.
-                    final String key = e.getKey();
-                    final String path = e.getValue();
-
-                    File file = new File(path);
-                    PropertiesFile pf = new PropertiesFile(new File(path + CacheDirectory.INFO_SUFFIX));
-                    boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
-
-                    /*
-                     * This will get me the root directory specific to this cache item.
-                     * Example:
-                     *  cacheDir = /home/user1/.icedtea/cache
-                     *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
-                     *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
-                     *  then rstr becomes: /home/user1/.icedtea/cache/0
-                     */
-                    String rStr = file.getPath().substring(lruHandler.getCacheDir().getFullPath().length());
-                    rStr = lruHandler.getCacheDir().getFullPath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
-                    long len = file.length();
-
-                    if (keep.contains(file.getPath().substring(rStr.length()))) {
-                        lruHandler.removeEntry(key);
-                        continue;
+                    long maxSize = -1; // Default
+                    try {
+                        maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE));
+                    } catch (NumberFormatException nfe) {
                     }
 
-                    /*
-                     * we remove entries from our lru if any of the following condition is met.
-                     * Conditions:
-                     *  - delete: file has been marked for deletion.
-                     *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
-                     *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
-                     *  on disk would exceed the maximum size.
-                     */
-                    if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
-                        lruHandler.removeEntry(key);
-                        remove.add(rStr);
-                        continue;
-                    }
+                    maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
+                    long curSize = 0;
 
-                    curSize += len;
-                    keep.add(file.getPath().substring(rStr.length()));
+                    for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
+                        // Check if the item is contained in cacheOrder.
+                        final String key = e.getKey();
+                        final String path = e.getValue();
 
-                    for (File f : file.getParentFile().listFiles()) {
-                        if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
-                            try {
-                                FileUtils.recursiveDelete(f, f);
-                            } catch (IOException e1) {
-                                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
-                            }
+                        File file = new File(path);
+                        PropertiesFile pf = new PropertiesFile(new File(path + CacheDirectory.INFO_SUFFIX));
+                        boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
+
+                        /*
+                         * This will get me the root directory specific to this cache item.
+                         * Example:
+                         *  cacheDir = /home/user1/.icedtea/cache
+                         *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
+                         *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
+                         *  then rstr becomes: /home/user1/.icedtea/cache/0
+                         */
+                        String rStr = file.getPath().substring(lruHandler.getCacheDir().getFullPath().length());
+                        rStr = lruHandler.getCacheDir().getFullPath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
+                        long len = file.length();
+
+                        if (keep.contains(file.getPath().substring(rStr.length()))) {
+                            lruHandler.removeEntry(key);
+                            continue;
                         }
 
+                        /*
+                         * we remove entries from our lru if any of the following condition is met.
+                         * Conditions:
+                         *  - delete: file has been marked for deletion.
+                         *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
+                         *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
+                         *  on disk would exceed the maximum size.
+                         */
+                        if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
+                            lruHandler.removeEntry(key);
+                            remove.add(rStr);
+                            continue;
+                        }
+
+                        curSize += len;
+                        keep.add(file.getPath().substring(rStr.length()));
+
+                        for (File f : file.getParentFile().listFiles()) {
+                            if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
+                                try {
+                                    FileUtils.recursiveDelete(f, f);
+                                } catch (IOException e1) {
+                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
+                                }
+                            }
+
+                        }
                     }
+                    lruHandler.store();
+                } finally {
+                    lruHandler.unlock();
                 }
-                lruHandler.store();
-            } finally {
-                lruHandler.unlock();
+                removeSetOfDirectories(remove);
             }
-            removeSetOfDirectories(remove);
         }
     }
 
