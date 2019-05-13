@@ -287,20 +287,4 @@ public class JNLPFileTest extends NoStdOutErrTest{
         JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false, false, false));
         Assert.assertEquals(ApplicationPermissionLevel.J2EE, jnlpFile.getApplicationPermissionLevel());
     }
-    
-    @Test
-    public void WindowsWithNameAreRecognized(){
-        boolean r = JNLPFile.stringMatches("Windows", new String[]{"Windows 7"});
-        Assert.assertTrue(r);
-        boolean rr = JNLPFile.stringMatches("Windows", new String[]{"Windows"});
-        Assert.assertTrue(rr);
-        boolean rrr = JNLPFile.stringMatches("Windows 7", new String[]{"Windows"});
-        Assert.assertTrue(rrr);
-        boolean rrrr = JNLPFile.stringMatches("CrapSystem", new String[]{null});
-        Assert.assertFalse(rrrr);
-        boolean rrrrr = JNLPFile.stringMatches("CrapSystem", new String[]{});
-        Assert.assertTrue(rrrrr);
-        boolean rrrrrr = JNLPFile.stringMatches("CrapSystem", null);
-        Assert.assertTrue(rrrrrr);
-    }
 }

@@ -8,6 +8,8 @@ import static java.util.Collections.singletonList;
 
 public class StringUtils {
 
+    private static final String WHITESPACE_CHARACTER_SEQUENCE = "\\s+";
+
     private StringUtils() {
         // do not instantiate
     }
@@ -66,5 +68,37 @@ public class StringUtils {
         }
         lines.add(tmp);
         return lines;
+    }
+
+    /**
+     * Checks whether the first part of the given prefixString is a prefix for any of the strings
+     * in the specified array.
+     * If the {@code prefixString} contains multiple words separated by a space character, the
+     * first word is taken as prefix for comparison.
+     *
+     * @param prefixString the prefixString string
+     * @param available the strings to test
+     * @return true if the first part of the given prefixString is a prefix for any of the strings
+     * in the specified array or the specified array is empty or null, false otherwise
+     */
+    public static boolean hasPrefixMatch(final String prefixString, final String[] available) {
+        Assert.requireNonBlank(prefixString, "prefixString");
+
+        if (available == null || available.length == 0){
+            return true;
+        }
+
+        for (final String candidate : available) {
+            final String trimmedPrefix = prefixString.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
+            String trimmedCandidate = null;
+            if (candidate != null) {
+                trimmedCandidate = candidate.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
+            }
+            if (trimmedCandidate != null && trimmedCandidate.startsWith(trimmedPrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
