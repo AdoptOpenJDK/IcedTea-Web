@@ -47,7 +47,7 @@ import static java.util.Optional.empty;
  * For details see:<br/>
  * <a href="https://www.w3.org/TR/xml/#sec-guessing">XML - Appendix F</a>
  */
-public class BomAndXmlReader extends Reader {
+public class XmlStreamReader extends Reader {
 
     // '\uFEFF' (byte order marker) byte arrays for detecting encodings
 
@@ -120,11 +120,11 @@ public class BomAndXmlReader extends Reader {
     /**
      * Constructor UTF-8 default encoding.
      * This constructor is equivalent to calling:<br/>
-     * {@code new BomAndXmlReader(in, StandardCharsets.UTF_8)}
+     * {@code new XmlStreamReader(in, StandardCharsets.UTF_8)}
      *
      * @param in an input stream with XML content.
      */
-    public BomAndXmlReader(final InputStream in) throws IOException {
+    public XmlStreamReader(final InputStream in) throws IOException {
         this(in, StandardCharsets.UTF_8);
     }
 
@@ -135,7 +135,7 @@ public class BomAndXmlReader extends Reader {
      * @param defaultEncoding the encoding to use if no encoding
      *                        can be derived from the content of the stream
      */
-    public BomAndXmlReader(final InputStream in, final Charset defaultEncoding) throws IOException {
+    public XmlStreamReader(final InputStream in, final Charset defaultEncoding) throws IOException {
         requireNonNull(in);
         requireNonNull(defaultEncoding);
 
@@ -315,7 +315,7 @@ public class BomAndXmlReader extends Reader {
      * otherwise the encoding's canonical name is returned.
      *
      * <p> If this instance was created with the {@link
-     * #BomAndXmlReader(InputStream, Charset)} constructor then the returned
+     * #XmlStreamReader(InputStream, Charset)} constructor then the returned
      * name, being unique for the encoding, may differ from the name passed to
      * the constructor. This method will return <code>null</code> if the
      * stream has been closed.
