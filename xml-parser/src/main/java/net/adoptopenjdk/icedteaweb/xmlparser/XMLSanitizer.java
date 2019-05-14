@@ -16,10 +16,9 @@
 
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
-import java.io.IOException;
-import java.io.PipedReader;
-import java.io.PipedWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 class XMLSanitizer {
@@ -32,24 +31,9 @@ class XMLSanitizer {
      * @return  A new reader for the sanitized xml
      */
     static Reader sanitizeXml(final Reader in) {
-        try {
-            final PipedWriter pw = new PipedWriter();
-            final PipedReader pr = new PipedReader(pw);
-            new Thread(() -> {
-                try {
-                    sanitizeInput(in, pw);
-                } finally {
-                    try {
-                        pw.close();
-                    } catch (IOException ignored) {
-                        // ignored
-                    }
-                }
-            }).start();
-            return pr;
-        } catch (IOException e) {
-            throw new RuntimeException("failed to setup piped reader/writer", e);
-        }
+        final StringWriter out = new StringWriter();
+        sanitizeInput(in, out);
+        return new StringReader(out.toString());
     }
 
     private static void sanitizeInput(final Reader in, final Writer out) {
