@@ -58,6 +58,7 @@ import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -634,16 +635,14 @@ public class JNLPFile {
 
                 for (ResourcesDesc rescDesc : resources) {
                     boolean hasUsableLocale = false;
-                    for (Match match : Match.values()) {
+                    for (final Match match : Match.values()) {
                         hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
                     }
                     if (hasUsableLocale
-                            && stringMatches(os, rescDesc.getOS())
-                            && stringMatches(arch, rescDesc.getArch())) {
-                        List<T> ll = rescDesc.getResources(launchType);
+                            && hasPrefixMatch(os, rescDesc.getOS())
+                            && hasPrefixMatch(arch, rescDesc.getArch())) {
+                        final List<T> ll = rescDesc.getResources(launchType);
                         result.addAll(ll);
-                    } else {
-                        //those are skipped
                     }
                 }
 
@@ -686,8 +685,8 @@ public class JNLPFile {
                 hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
             }
             if (hasUsableLocale
-                    && stringMatches(os, rescDesc.getOS())
-                    && stringMatches(arch, rescDesc.getArch())) {
+                    && hasPrefixMatch(os, rescDesc.getOS())
+                    && hasPrefixMatch(arch, rescDesc.getArch())) {
                 matchingResources.add(rescDesc);
             }
         }
@@ -791,37 +790,6 @@ public class JNLPFile {
         defaultOS = os;
         defaultArch = arch;
         defaultLocale = locale;
-    }
-
-    /**
-     * @return whether the string is a prefix for any of the strings
-     * in the specified array.
-     *
-     * @param prefixStr the prefix string
-     * @param available the strings to test
-     * @return true if prefixStr is a prefix of any strings in
-     * available, or if available is empty or null.
-     */
-    static boolean stringMatches(String prefixStr, String[] available) {
-        if (available == null || available.length == 0){
-            return true;
-        }
-
-        for (String candidate : available) {
-            String trimmedPrefix = null;
-            if (prefixStr != null) {
-                trimmedPrefix = prefixStr.split("\\s+")[0];
-            }
-            String trimmedCandidate = null;
-            if (candidate != null) {
-                trimmedCandidate = candidate.split("\\s+")[0];
-            }
-            if (trimmedCandidate != null && trimmedCandidate.startsWith(trimmedPrefix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

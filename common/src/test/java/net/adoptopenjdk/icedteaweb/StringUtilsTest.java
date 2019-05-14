@@ -1,10 +1,12 @@
 package net.adoptopenjdk.icedteaweb;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.adoptopenjdk.icedteaweb.StringUtils.splitIntoMultipleLines;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
@@ -105,5 +107,60 @@ public class StringUtilsTest {
             // then
             assertThat(result, hasItems(longString));
         });
+    }
+
+    @Test
+    public void prefixShouldBeIncludedInArrayOfStrings() {
+        boolean result = hasPrefixMatch("Windows", new String[]{"Linux", "MacOS", "Windows10-beta"});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("Windows", new String[]{"Windows"});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("  Windows  ", new String[]{"Windows"});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("Windows  ", new String[]{"Windows    "});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("Windows 7", new String[]{"Windows7"}); // just compare the first prefix token
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("MacOS", new String[]{});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("MacOS", null);
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void prefixShouldNotBeIncludedInArrayOfStrings() {
+        boolean result = hasPrefixMatch("MacOS", new String[]{"Linux", "Windows", null});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Win7", new String[]{"Win 7", "Win 7.1", "Windows10"});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Windows Mobile", new String[]{"Mobile"});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Windows 7", new String[]{"7"});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Windows 7", new String[]{"windows"});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Windows  ", new String[]{" Windows    "});
+        org.junit.Assert.assertFalse(result);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testHasPrefixMatchWithNullPrefixString() {
+        hasPrefixMatch(null, new String[]{"windows"});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testHasPrefixMatchWithEmptyPrefixString() {
+        hasPrefixMatch("", new String[]{"windows"});
     }
 }
