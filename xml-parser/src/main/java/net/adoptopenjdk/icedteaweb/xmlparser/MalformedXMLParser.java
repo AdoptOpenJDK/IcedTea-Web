@@ -45,11 +45,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
@@ -57,29 +57,14 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 /**
  * An specialized {@link XMLParser} that uses TagSoup[1] to parse
  * malformed XML
- *
+ * <p>
  * Used by net.sourceforge.jnlp.Parser
- *
+ * <p>
  * [1] http://home.ccil.org/~cowan/XML/tagsoup/
  */
 public class MalformedXMLParser extends XMLParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(MalformedXMLParser.class);
-
-    /**
-     * Parses the data from an {@link InputStream} to create a XML tree.
-     * Returns a {@link Node} representing the root of the tree.
-     *
-     * @param input the {@link InputStream} to read data from
-     * @return root node of document
-     * @throws ParseException if an exception occurs while parsing the input
-     */
-    @Override
-    public Node getRootNode(final InputStream input) throws ParseException {
-        LOG.info("Using MalformedXMLParser");
-        final InputStream xmlInput = xmlizeInputStream(input);
-        return super.getRootNode(xmlInput);
-    }
 
     /**
      * Reads malformed XML from the InputStream original and returns a new
@@ -90,9 +75,10 @@ public class MalformedXMLParser extends XMLParser {
      * version of the input XML
      * @throws ParseException if an exception occurs while parsing the input
      */
-    public InputStream xmlizeInputStream(final InputStream original) throws ParseException {
+    public Reader preprocessXml(final Reader original) throws ParseException {
+        LOG.info("Using MalformedXMLParser");
         ParseException.setUsed(MALFORMED);
-        try(final ByteArrayOutputStream out = new ByteArrayOutputStream()){
+        try {
             final HTMLSchema schema = new HTMLSchema();
             final XMLReader reader = new Parser();
 
@@ -103,12 +89,12 @@ public class MalformedXMLParser extends XMLParser {
             reader.setFeature(Parser.ignorableWhitespaceFeature, true);
             reader.setFeature(Parser.ignoreBogonsFeature, false);
 
-            final Writer writer = new OutputStreamWriter(out);
+            final Writer writer = new StringWriter();
             final XMLWriter xmlWriter = new XMLWriter(writer);
             reader.setContentHandler(xmlWriter);
             final InputSource s = new InputSource(original);
             reader.parse(s);
-            return new ByteArrayInputStream(out.toByteArray());
+            return new StringReader(writer.toString());
         } catch (final SAXException | IOException e1) {
             throw new ParseException("Invalid XML document syntax.", e1);
         }

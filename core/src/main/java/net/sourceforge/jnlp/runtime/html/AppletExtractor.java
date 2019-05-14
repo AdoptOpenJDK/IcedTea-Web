@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.xmlparser.BomAndXmlReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
@@ -56,6 +57,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,30 +95,42 @@ public class AppletExtractor {
         return html;
     }
 
-    private InputStream cleanStreamIfPossible(InputStream is) {
+    private Reader cleanStreamIfPossible(InputStream is) throws IOException {
         try {
             if (ps != null && ps.getParserType() == MALFORMED){
-                MalformedXMLParser parser = new MalformedXMLParser();
-                return parser.xmlizeInputStream(is);
+                final MalformedXMLParser parser = new MalformedXMLParser();
+                return parser.preprocessXml(new BomAndXmlReader(is));
             } else {
                 LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
             }
         } catch (Exception ex) {
             LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
         }
-        return is;
+        return new BomAndXmlReader(is);
     }   
 
     public List<Element> findAppletsOnPage() {
         try{
-        return findAppletsOnPageImpl(openDocument(cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS))));
+            final Reader reader = cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS));
+            final String input = readAll(reader);
+            return findAppletsOnPageImpl(openDocument(input));
         } catch (SAXException sex) {
             throw new RuntimeException(new ParseException(sex));
         } catch (IOException | ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
+    private String readAll(Reader reader) throws IOException {
+        final char[] arr = new char[8 * 1024];
+        final StringBuilder buffer = new StringBuilder();
+        int numCharsRead;
+        while ((numCharsRead = reader.read(arr, 0, arr.length)) != -1) {
+            buffer.append(arr, 0, numCharsRead);
+        }
+        return buffer.toString();
+    }
+
     private List<Element> findAppletsOnPageImpl(Document doc) throws ParserConfigurationException, SAXException, IOException {
         LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
@@ -132,9 +147,9 @@ public class AppletExtractor {
         });
     }
 
-    private Document openDocument(InputStream is) throws SAXException, ParserConfigurationException, IOException {
+    private Document openDocument(String input) throws SAXException, ParserConfigurationException, IOException {
         LOG.debug("Reading {}", html.toExternalForm());
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
         doc.getDocumentElement().normalize();
         return doc;
     }
