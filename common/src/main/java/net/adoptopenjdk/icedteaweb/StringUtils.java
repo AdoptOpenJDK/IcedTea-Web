@@ -72,7 +72,9 @@ public class StringUtils {
 
     /**
      * Checks whether the first part of the given prefixString is a prefix for any of the strings
-     * in the specified array.
+     * in the specified array. If no array is specified (empty or null) it is considered to be a
+     * match.
+     *
      * If the {@code prefixString} contains multiple words separated by a space character, the
      * first word is taken as prefix for comparison.
      *
@@ -88,8 +90,9 @@ public class StringUtils {
             return true;
         }
 
+        final String trimmedPrefix = prefixString.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
+
         for (final String candidate : available) {
-            final String trimmedPrefix = prefixString.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
             String trimmedCandidate = null;
             if (candidate != null) {
                 trimmedCandidate = candidate.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
