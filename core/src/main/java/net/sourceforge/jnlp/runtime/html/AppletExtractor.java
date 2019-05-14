@@ -38,9 +38,9 @@ package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.xmlparser.BomAndXmlReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlStreamReader;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -57,7 +57,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.LinkedList;
@@ -99,14 +98,14 @@ public class AppletExtractor {
         try {
             if (ps != null && ps.getParserType() == MALFORMED){
                 final MalformedXMLParser parser = new MalformedXMLParser();
-                return parser.preprocessXml(new BomAndXmlReader(is));
+                return parser.preprocessXml(new XmlStreamReader(is));
             } else {
                 LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
             }
         } catch (Exception ex) {
             LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
         }
-        return new BomAndXmlReader(is);
+        return new XmlStreamReader(is);
     }   
 
     public List<Element> findAppletsOnPage() {

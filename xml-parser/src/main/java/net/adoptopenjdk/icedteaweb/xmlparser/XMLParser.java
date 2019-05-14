@@ -68,7 +68,7 @@ public class XMLParser {
      */
     public final Node getRootNode(final InputStream input) throws ParseException {
         try {
-            final Reader reader = new BomAndXmlReader(input);
+            final Reader reader = new XmlStreamReader(input);
             // Clean the jnlp xml file of all comments before passing it to the parser.
             final XMLElement xml = new XMLElement();
             xml.parseFromReader(sanitizeXml(preprocessXml(reader)));
