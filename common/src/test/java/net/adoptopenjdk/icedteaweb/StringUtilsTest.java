@@ -117,6 +117,12 @@ public class StringUtilsTest {
         result = hasPrefixMatch("Windows", new String[]{"Windows"});
         org.junit.Assert.assertTrue(result);
 
+        result = hasPrefixMatch("  Windows  ", new String[]{"Windows"});
+        org.junit.Assert.assertTrue(result);
+
+        result = hasPrefixMatch("Windows  ", new String[]{"Windows    "});
+        org.junit.Assert.assertTrue(result);
+
         result = hasPrefixMatch("Windows 7", new String[]{"Windows7"}); // just compare the first prefix token
         org.junit.Assert.assertTrue(result);
 
@@ -142,6 +148,9 @@ public class StringUtilsTest {
         org.junit.Assert.assertFalse(result);
 
         result = hasPrefixMatch("Windows 7", new String[]{"windows"});
+        org.junit.Assert.assertFalse(result);
+
+        result = hasPrefixMatch("Windows  ", new String[]{" Windows    "});
         org.junit.Assert.assertFalse(result);
     }
 
