@@ -56,6 +56,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -75,10 +77,11 @@ public class ParserBasicTest extends NoStdOutErrTest {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        ParserSettings defaultParser = new ParserSettings();
+        ParserSettings defaultParserSettings = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
-        root = Parser.getRootNode(jnlpStream, defaultParser);
-        parser = new Parser(new DummyJNLPFile(), null, root, defaultParser);
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
+        root = xmlParser.getRootNode(jnlpStream);
+        parser = new Parser(new DummyJNLPFile(), null, root, defaultParserSettings);
     }
 
     @Test
@@ -236,10 +239,11 @@ public class ParserBasicTest extends NoStdOutErrTest {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        ParserSettings defaultParser = new ParserSettings();
+        ParserSettings defaultParserSettings = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        Node omega = Parser.getRootNode(jnlpStream, defaultParser);
-        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParser);
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
+        Node omega = xmlParser.getRootNode(jnlpStream);
+        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParserSettings);
         ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
         JARDesc[] r = resources.getJARs();
         // we ensures that also in j2se hars ar eloaded.it is 7 withutt them.

@@ -40,6 +40,7 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParserType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,7 +58,7 @@ public class ParserSettingsTest {
         ParserSettings.setGlobalParserSettings(settings);
         globalSettings = ParserSettings.getGlobalParserSettings();
         Assert.assertEquals(settings.isStrict(), globalSettings.isStrict());
-        Assert.assertEquals(settings.isMalformedXmlAllowed(), globalSettings.isMalformedXmlAllowed());
+        Assert.assertEquals(settings.getParserType(), globalSettings.getParserType());
         Assert.assertEquals(settings.isExtensionAllowed(), globalSettings.isExtensionAllowed());
     }
 
@@ -71,7 +72,7 @@ public class ParserSettingsTest {
 
         Assert.assertEquals(settings.isStrict(), globalSettings.isStrict());
         Assert.assertEquals(settings.isExtensionAllowed(), globalSettings.isExtensionAllowed());
-        Assert.assertEquals(settings.isMalformedXmlAllowed(), globalSettings.isMalformedXmlAllowed());
+        Assert.assertEquals(settings.getParserType(), globalSettings.getParserType());
     }
 
     @Test
@@ -82,6 +83,6 @@ public class ParserSettingsTest {
         ParserSettings settings = ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
 
         Assert.assertEquals(settings.isStrict(), optionParser.hasOption(CommandLineOptions.STRICT));
-        Assert.assertEquals(settings.isMalformedXmlAllowed(), !optionParser.hasOption(CommandLineOptions.XML));
+        Assert.assertEquals(settings.getParserType() == ParserType.MALFORMED, !optionParser.hasOption(CommandLineOptions.XML));
     }
 }

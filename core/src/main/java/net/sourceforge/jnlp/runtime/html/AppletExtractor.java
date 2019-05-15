@@ -37,13 +37,14 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlStreamReader;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Parser;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -56,10 +57,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.io.Reader;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+
+import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 
 /**
  * This class is taking HTML document url as input, try to sanitize with
@@ -78,10 +81,10 @@ public class AppletExtractor {
         "embed", "EMBED", "Embed"};
     private final ParserSettings ps;
 
-    public AppletExtractor(URL html) {
+    public AppletExtractor(final URL html) {
         this(html, null);
     }
-    public AppletExtractor(URL html, ParserSettings ps) {
+    public AppletExtractor(final URL html, final ParserSettings ps) {
         JNLPRuntime.saveHistory(html.toExternalForm());
         this.html = html;
         this.ps = ps;
@@ -91,32 +94,43 @@ public class AppletExtractor {
         return html;
     }
 
-    private InputStream cleanStreamIfPossible(InputStream is) {
+    private Reader cleanStreamIfPossible(final InputStream is) throws IOException {
         try {
-            if (ps != null && ps.isMalformedXmlAllowed()){
-                Object parser = Parser.getParserInstance(ps);
-                Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
-                return (InputStream) m.invoke(null, is);
+            if (ps != null && ps.getParserType() == MALFORMED){
+                final MalformedXMLParser parser = new MalformedXMLParser();
+                return parser.preprocessXml(new XmlStreamReader(is));
             } else {
                 LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
             }
         } catch (Exception ex) {
             LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
         }
-        return is;
+        return new XmlStreamReader(is);
     }   
 
     public List<Element> findAppletsOnPage() {
         try{
-        return findAppletsOnPageImpl(openDocument(cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS))));
+            final Reader reader = cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS));
+            final String input = readAll(reader);
+            return findAppletsOnPageImpl(openDocument(input));
         } catch (SAXException sex) {
             throw new RuntimeException(new ParseException(sex));
         } catch (IOException | ParserConfigurationException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
-    private List<Element> findAppletsOnPageImpl(Document doc) throws ParserConfigurationException, SAXException, IOException {
+
+    private String readAll(Reader reader) throws IOException {
+        final char[] arr = new char[8 * 1024];
+        final StringBuilder buffer = new StringBuilder();
+        int numCharsRead;
+        while ((numCharsRead = reader.read(arr, 0, arr.length)) != -1) {
+            buffer.append(arr, 0, numCharsRead);
+        }
+        return buffer.toString();
+    }
+
+    private List<Element> findAppletsOnPageImpl(final Document doc) throws ParserConfigurationException, SAXException, IOException {
         LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
         //search for embed/object
@@ -126,15 +140,15 @@ public class AppletExtractor {
         return findElements(APPLETS, doc.getDocumentElement(), new ElementValidator() {
 
             @Override
-            public boolean isElementValid(Element e) {
+            public boolean isElementValid(final Element e) {
                 return isApplet(e);
             }
         });
     }
 
-    private Document openDocument(InputStream is) throws SAXException, ParserConfigurationException, IOException {
+    private Document openDocument(final String input) throws SAXException, ParserConfigurationException, IOException {
         LOG.debug("Reading {}", html.toExternalForm());
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
         doc.getDocumentElement().normalize();
         return doc;
     }
@@ -143,13 +157,13 @@ public class AppletExtractor {
     //search for 
     //OBJECT classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
     //<object codetype="application/x-java-applet" height="120" width="81"
-    private static boolean isApplet(Element eElement) {
+    private static boolean isApplet(final Element eElement) {
         if (eElement.getNodeName().toLowerCase().equals("applet")) {
             return true;
         } else {
-            String type = eElement.getAttribute("type");
-            String codeType = eElement.getAttribute("codetype");
-            String classid = eElement.getAttribute("classid");
+            final String type = eElement.getAttribute("type");
+            final String codeType = eElement.getAttribute("codetype");
+            final String classid = eElement.getAttribute("classid");
             if ((type != null && type.toLowerCase().contains("application/x-java-applet"))
                     || (codeType != null && codeType.toLowerCase().contains("application/x-java-applet"))
                     || (classid != null && classid.equalsIgnoreCase("clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"))) {
@@ -159,16 +173,16 @@ public class AppletExtractor {
         return false;
     }
 
-    static List<Element> findElements(String[] elements, Element doc, ElementValidator elementValidator) {
-        List<Element> found = new LinkedList();
-        for (String key : elements) {
-            NodeList nList = doc.getElementsByTagName(key);
+    static List<Element> findElements(final String[] elements, final Element doc, final ElementValidator elementValidator) {
+        final List<Element> found = new LinkedList<>();
+        for (final String key : elements) {
+            final NodeList nList = doc.getElementsByTagName(key);
             for (int temp = 0; temp < nList.getLength(); temp++) {
 
-                Node nNode = nList.item(temp);
+                final Node nNode = nList.item(temp);
                 LOG.debug("Found in html: {}", nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
+                    final Element eElement = (Element) nNode;
                     if (elementValidator.isElementValid(eElement)) {
                         found.add(eElement);
                     }

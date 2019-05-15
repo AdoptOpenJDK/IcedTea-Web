@@ -49,15 +49,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,14 +79,13 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDe
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.SECURITY_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNode;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNodes;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredURL;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getSpanText;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNode;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNodes;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getSpanText;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getURL;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -235,7 +231,27 @@ public final class Parser {
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base, strict);
+    }
 
+    /**
+     * Returns a URL with a trailing / appended to it if there is no trailing
+     * slash on the specified URL.
+     */
+    private URL addSlash(final URL source) {
+        if (source == null) {
+            return null;
+        }
+
+        final String urlString = source.toExternalForm();
+        if (!urlString.endsWith("/")) {
+            try {
+                return new URL(urlString + "/");
+            } catch (MalformedURLException ex) {
+                throw new IllegalArgumentException("Could not add slash to malformed URL: " + urlString, ex);
+            }
+        }
+
+        return source;
     }
 
     /**
@@ -1090,64 +1106,6 @@ public final class Parser {
         } else {
             return new Version(version);
         }
-    }
-
-    public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
-    public static final String NORMAL_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.XMLParser";
-
-    /**
-     * @return the root node from the XML document in the specified input
-     * stream.
-     *
-     * @throws ParseException if the JNLP file is invalid
-     */
-    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
-        try {
-            Object parser = getParserInstance(settings);
-            Method m = parser.getClass().getMethod("getRootNode", InputStream.class);
-            return (Node) m.invoke(parser, input);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof ParseException) {
-                throw (ParseException) (e.getCause());
-            }
-            throw new ParseException(R("PBadXML"), e);
-        } catch (Exception e) {
-            throw new ParseException(R("PBadXML"), e);
-        }
-    }
-
-    public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String className;
-        if (settings.isMalformedXmlAllowed()) {
-            className = MALFORMED_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.MALFORMED);
-        } else {
-            className = NORMAL_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.NORMAL);
-        }
-
-        Class<?> klass;
-        Object instance;
-
-        try {
-            klass = Class.forName(className);
-            instance = klass.newInstance();
-            //catch both, for case that tagsoup was removed after build
-        } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            klass = Class.forName(NORMAL_PARSER_CLASS);
-            instance = klass.newInstance();
-        }
-
-        switch (instance.getClass().getName()) {
-            case MALFORMED_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.MALFORMED);
-                break;
-            case NORMAL_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.NORMAL);
-                break;
-        }
-        return instance;
     }
 
     private String getOptionalMainClass(Node node) {
