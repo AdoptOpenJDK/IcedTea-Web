@@ -27,6 +27,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -73,10 +74,19 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.I
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HREF_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.ARCH_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.EXTENSION_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.J2SE_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.JAR_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.JAVA_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.NATIVELIB_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.OS_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.PACKAGE_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.PROPERTY_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.RESOURCES_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.SECURITY_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getAttribute;
@@ -230,7 +240,7 @@ public final class Parser {
         }
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
-        fileLocation = getURL(root, "href", this.base, strict);
+        fileLocation = getURL(root, JNLPFile.HREF_ATTRIBUTE, this.base, strict);
     }
 
     /**
@@ -358,7 +368,7 @@ public final class Parser {
     public List<ResourcesDesc> getResources(final Node parent, final boolean j2se)
             throws ParseException {
         final List<ResourcesDesc> result = new ArrayList<>();
-        final Node resources[] = getChildNodes(parent, ResourcesDesc.RESOURCES_ELEMENT);
+        final Node resources[] = getChildNodes(parent, RESOURCES_ELEMENT);
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
@@ -384,8 +394,8 @@ public final class Parser {
         final ResourcesDesc resources
                 = new ResourcesDesc(file,
                         getLocales(node),
-                        splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
-                        splitString(getAttribute(node, ResourcesDesc.ARCH_ATTRIBUTE, null)));
+                        splitString(getAttribute(node, OS_ATTRIBUTE, null)),
+                        splitString(getAttribute(node, ARCH_ATTRIBUTE, null)));
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -393,13 +403,13 @@ public final class Parser {
             final String name = child.getNodeName().getName();
 
             // check for nativelib but no trusted environment
-            if ("nativelib".equals(name)) {
+            if (NATIVELIB_ELEMENT.equals(name)) {
                 if (!isTrustedEnvironment()) {
                     throw new ParseException(R("PUntrustedNative"));
                 }
             }
 
-            if ("j2se".equals(name) || "java".equals(name)) {
+            if (J2SE_ELEMENT.equals(name) || JAVA_ELEMENT.equals(name)) {
                 if (getChildNode(root, ComponentDesc.COMPONENT_DESC_ELEMENT) != null) {
                     if (strict) {
                         throw new ParseException(R("PExtensionHasJ2SE"));
@@ -412,7 +422,7 @@ public final class Parser {
                 }
             }
 
-            if ("jar".equals(name) || "nativelib".equals(name)) {
+            if (JAR_ELEMENT.equals(name) || NATIVELIB_ELEMENT.equals(name)) {
                 JARDesc jar = getJAR(child);
 
                 // check for duplicate main entries
@@ -428,15 +438,15 @@ public final class Parser {
                 resources.addResource(jar);
             }
 
-            if ("extension".equals(name)) {
+            if (EXTENSION_ELEMENT.equals(name)) {
                 resources.addResource(getExtension(child));
             }
 
-            if ("property".equals(name)) {
+            if (PROPERTY_ELEMENT.equals(name)) {
                 resources.addResource(getProperty(child));
             }
 
-            if ("package".equals(name)) {
+            if (PACKAGE_ELEMENT.equals(name)) {
                 resources.addResource(getPackage(child));
             }
 
@@ -452,18 +462,18 @@ public final class Parser {
      * @param node the j2se/java node
      * @throws ParseException if the JNLP file is invalid
      */
-    private JREDesc getJRE(Node node) throws ParseException {
-        Version version = getVersion(node, "version", null);
-        URL location = getURL(node, "href", base, strict);
+    private JREDesc getJRE(final Node node) throws ParseException {
+        final Version version = getVersion(node, "version", null);
+        final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
         String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
             JvmUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }
-        String initialHeap = getAttribute(node, "initial-heap-size", null);
-        String maxHeap = getAttribute(node, "max-heap-size", null);
-        List<ResourcesDesc> resources = getResources(node, true);
+        final String initialHeap = getAttribute(node, "initial-heap-size", null);
+        final String maxHeap = getAttribute(node, "max-heap-size", null);
+        final List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
         getRequiredAttribute(node, "version", null, strict);
@@ -477,13 +487,13 @@ public final class Parser {
      * @param node the jar or nativelib node
      * @throws ParseException if the JNLP file is invalid
      */
-    private JARDesc getJAR(Node node) throws ParseException {
-        boolean nativeJar = "nativelib".equals(node.getNodeName().getName());
-        URL location = getRequiredURL(node, "href", base, strict);
-        Version version = getVersion(node, "version", null);
-        String part = getAttribute(node, "part", null);
-        boolean main = "true".equals(getAttribute(node, "main", "false"));
-        boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
+    private JARDesc getJAR(final Node node) throws ParseException {
+        boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
+        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
+        final Version version = getVersion(node, "version", null);
+        final String part = getAttribute(node, "part", null);
+        final boolean main = "true".equals(getAttribute(node, "main", "false"));
+        final boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
 
         if (nativeJar && main) {
             if (strict) {
@@ -501,16 +511,16 @@ public final class Parser {
      * @param node the extension node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ExtensionDesc getExtension(Node node) throws ParseException {
-        String name = getAttribute(node, "name", null);
-        Version version = getVersion(node, "version", null);
-        URL location = getRequiredURL(node, "href", base, strict);
+    private ExtensionDesc getExtension(final Node node) throws ParseException {
+        final String name = getAttribute(node, "name", null);
+        final Version version = getVersion(node, "version", null);
+        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
 
-        ExtensionDesc ext = new ExtensionDesc(name, version, location);
+        final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        Node dload[] = getChildNodes(node, "ext-download");
+        final Node dload[] = getChildNodes(node, "ext-download");
         for (Node dload1 : dload) {
-            boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
+            final boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
             ext.addPart(getRequiredAttribute(dload1, "ext-part", null, strict), getAttribute(dload1, "part", null), lazy);
         }
 
@@ -635,7 +645,7 @@ public final class Parser {
                 addInfo(informationDesc, child, kind, getSpanText(child, false));
             }
             if (HOMEPAGE_ELEMENT.equals(name)) {
-                addInfo(informationDesc, child, null, getRequiredURL(child, HREF_ATTRIBUTE, base, strict));
+                addInfo(informationDesc, child, null, getRequiredURL(child, HomepageDesc.HREF_ATTRIBUTE, base, strict));
             }
             if (IconDesc.ICON_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, getAttribute(child, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()), getIcon(child));

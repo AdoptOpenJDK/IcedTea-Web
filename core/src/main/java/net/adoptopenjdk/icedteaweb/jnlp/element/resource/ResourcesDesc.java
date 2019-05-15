@@ -16,18 +16,22 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.sourceforge.jnlp.JNLPFile;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import net.sourceforge.jnlp.JNLPFile;
 
 import static java.util.Arrays.asList;
 
 /**
  * The resources element specifies all the resources that are part of the application, such as
  * Java class files, native libraries, and system properties.
+ *
+ * @implSpec See <b>JSR-56, Section 4 Application Resources</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.7 $
@@ -37,6 +41,15 @@ public class ResourcesDesc {
     public static final String RESOURCES_ELEMENT = "resources";
     public static final String OS_ATTRIBUTE = "os";
     public static final String ARCH_ATTRIBUTE = "arch";
+
+    public static final String NATIVELIB_ELEMENT = "nativelib";
+    public static final String JAR_ELEMENT = "jar";
+    public static final String J2SE_ELEMENT = "j2se";
+    public static final String JAVA_ELEMENT = "java";
+    public static final String EXTENSION_ELEMENT = "extension";
+    public static final String PROPERTY_ELEMENT = "property";
+    public static final String PACKAGE_ELEMENT = "package";
+    public static final String HREF_ATTRIBUTE = "href";
 
     /**
      * the locales of these resources

@@ -89,6 +89,7 @@ public class JNLPFile {
     public static final String JNLP_ROOT_ELEMENT = "jnlp";
     public static final String SPEC_ATTRIBUTE = "spec";
     public static final String VERSION_ATTRIBUTE = "version";
+    public static final String HREF_ATTRIBUTE = "href";
 
 
     // todo: save the update policy, then if file was not updated
