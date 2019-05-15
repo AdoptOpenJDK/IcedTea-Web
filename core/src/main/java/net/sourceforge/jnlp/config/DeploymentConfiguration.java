@@ -182,9 +182,7 @@ public final class DeploymentConfiguration {
                 systemProperties.putAll(loadProperties(ConfigType.SYSTEM, systemPropertiesFile,
                         systemPropertiesMandatory));
             }
-            if (systemProperties != null) {
-                mergeMaps(initialProperties, systemProperties);
-            }
+            mergeMaps(initialProperties, systemProperties);
         }
 
         /* need a copy of the original when we have to save */
@@ -377,9 +375,9 @@ public final class DeploymentConfiguration {
 
         LOG.info("Loading system configuration from: {}", configFile);
 
-        final Map<String, Setting<String>> systemConfiguration = new HashMap<>();
+        final Map<String, Setting<String>> systemConfiguration;
         try {
-            systemConfiguration.putAll(parsePropertiesFile(configFile));
+            systemConfiguration = new HashMap<>(parsePropertiesFile(configFile));
         } catch (final IOException e) {
             LOG.error("No System level " + ConfigurationConstants.DEPLOYMENT_CONFIG_FILE + " found.", e);
             return false;
@@ -416,22 +414,27 @@ public final class DeploymentConfiguration {
     }
 
     /**
-     * Loads the properties file, if one exists
+     * Loads the properties from the given file into a map of {@link Setting}s. If the given properties file does not
+     * exist or the URL is invalid and not mandatory, an empty Map is returned. If the file is considered to be
+     * mandatory but does not exist, a ConfigurationException is thrown.
      *
      * @param type the ConfigType to load
      * @param file the File to load Properties from
      * @param mandatory indicates if reading this file is mandatory
      *
-     * @throws ConfigurationException if the file is mandatory but cannot be read
+     * @throws ConfigurationException if the file is mandatory but does not exist or cannot be read properly
      */
-    private Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
+    static Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
-            LOG.info("No {} level {} found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
-            if (!mandatory) {
-                return null;
+            final String message = String.format("No %s level %s found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
+            if (mandatory) {
+                final ConfigurationException configurationException = new ConfigurationException(message);
+                LOG.error(message, configurationException);
+                throw configurationException;
             } else {
-                throw new ConfigurationException();
+                LOG.warn(message);
+                return new HashMap<>();
             }
         }
 
@@ -439,13 +442,15 @@ public final class DeploymentConfiguration {
         try {
             return parsePropertiesFile(file);
         } catch (final IOException e) {
-            if (mandatory){
-                final ConfigurationException ce = new ConfigurationException("Exception during loading of " + file + " which is mandatory to read");
-                ce.initCause(e);
-                throw ce;
+            final String message = String.format("Exception during loading of mandatory properties file '%s'.", file);
+            if (mandatory) {
+                final ConfigurationException configurationException = new ConfigurationException(message);
+                configurationException.initCause(e);
+                LOG.error(message, e);
+                throw configurationException;
             }
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            return null;
+            LOG.warn(message);
+            return new HashMap<>();
         }
     }
 
@@ -475,6 +480,9 @@ public final class DeploymentConfiguration {
                     .get(key).getValue();
             if(!Objects.equals(newValue, oldValue)) {
                 toSave.setProperty(key, newValue);
+                if (currentConfiguration.get(key).isLocked()) {
+                    toSave.setProperty(key + ".locked", "");
+                }
             }
         }
 
@@ -507,7 +515,7 @@ public final class DeploymentConfiguration {
      * @param propertiesFile the file to read Properties from
      * @throws IOException if an IO problem occurs
      */
-    private Map<String, Setting<String>> parsePropertiesFile(final URL propertiesFile) throws IOException {
+    private static Map<String, Setting<String>> parsePropertiesFile(final URL propertiesFile) throws IOException {
         final Map<String, Setting<String>> result = new HashMap<>();
 
         final Properties properties = new Properties();
@@ -562,6 +570,7 @@ public final class DeploymentConfiguration {
                 if (!destValue.isLocked()) {
                     destValue.setSource(srcValue.getSource());
                     destValue.setValue(srcValue.getValue());
+                    destValue.setLocked(srcValue.isLocked());
                 }
             }
         }
