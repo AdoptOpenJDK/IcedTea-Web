@@ -10,7 +10,7 @@ import java.util.List;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
- * ...
+ * Utilities method for {@link Node}.
  */
 public class NodeUtils {
     /**
@@ -39,7 +39,7 @@ public class NodeUtils {
             child = child.getNextSibling();
         }
 
-        return result.toArray(new Node[result.size()]);
+        return result.toArray(new Node[0]);
     }
 
     /**

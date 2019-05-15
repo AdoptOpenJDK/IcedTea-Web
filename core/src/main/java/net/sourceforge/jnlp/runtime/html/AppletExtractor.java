@@ -81,10 +81,10 @@ public class AppletExtractor {
         "embed", "EMBED", "Embed"};
     private final ParserSettings ps;
 
-    public AppletExtractor(URL html) {
+    public AppletExtractor(final URL html) {
         this(html, null);
     }
-    public AppletExtractor(URL html, ParserSettings ps) {
+    public AppletExtractor(final URL html, final ParserSettings ps) {
         JNLPRuntime.saveHistory(html.toExternalForm());
         this.html = html;
         this.ps = ps;
@@ -94,7 +94,7 @@ public class AppletExtractor {
         return html;
     }
 
-    private Reader cleanStreamIfPossible(InputStream is) throws IOException {
+    private Reader cleanStreamIfPossible(final InputStream is) throws IOException {
         try {
             if (ps != null && ps.getParserType() == MALFORMED){
                 final MalformedXMLParser parser = new MalformedXMLParser();
@@ -130,7 +130,7 @@ public class AppletExtractor {
         return buffer.toString();
     }
 
-    private List<Element> findAppletsOnPageImpl(Document doc) throws ParserConfigurationException, SAXException, IOException {
+    private List<Element> findAppletsOnPageImpl(final Document doc) throws ParserConfigurationException, SAXException, IOException {
         LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
         //search for embed/object
@@ -140,15 +140,15 @@ public class AppletExtractor {
         return findElements(APPLETS, doc.getDocumentElement(), new ElementValidator() {
 
             @Override
-            public boolean isElementValid(Element e) {
+            public boolean isElementValid(final Element e) {
                 return isApplet(e);
             }
         });
     }
 
-    private Document openDocument(String input) throws SAXException, ParserConfigurationException, IOException {
+    private Document openDocument(final String input) throws SAXException, ParserConfigurationException, IOException {
         LOG.debug("Reading {}", html.toExternalForm());
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
+        final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
         doc.getDocumentElement().normalize();
         return doc;
     }
@@ -157,13 +157,13 @@ public class AppletExtractor {
     //search for 
     //OBJECT classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
     //<object codetype="application/x-java-applet" height="120" width="81"
-    private static boolean isApplet(Element eElement) {
+    private static boolean isApplet(final Element eElement) {
         if (eElement.getNodeName().toLowerCase().equals("applet")) {
             return true;
         } else {
-            String type = eElement.getAttribute("type");
-            String codeType = eElement.getAttribute("codetype");
-            String classid = eElement.getAttribute("classid");
+            final String type = eElement.getAttribute("type");
+            final String codeType = eElement.getAttribute("codetype");
+            final String classid = eElement.getAttribute("classid");
             if ((type != null && type.toLowerCase().contains("application/x-java-applet"))
                     || (codeType != null && codeType.toLowerCase().contains("application/x-java-applet"))
                     || (classid != null && classid.equalsIgnoreCase("clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"))) {
@@ -173,16 +173,16 @@ public class AppletExtractor {
         return false;
     }
 
-    static List<Element> findElements(String[] elements, Element doc, ElementValidator elementValidator) {
-        List<Element> found = new LinkedList();
-        for (String key : elements) {
-            NodeList nList = doc.getElementsByTagName(key);
+    static List<Element> findElements(final String[] elements, final Element doc, final ElementValidator elementValidator) {
+        final List<Element> found = new LinkedList<>();
+        for (final String key : elements) {
+            final NodeList nList = doc.getElementsByTagName(key);
             for (int temp = 0; temp < nList.getLength(); temp++) {
 
-                Node nNode = nList.item(temp);
+                final Node nNode = nList.item(temp);
                 LOG.debug("Found in html: {}", nNode.getNodeName());
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
+                    final Element eElement = (Element) nNode;
                     if (elementValidator.isElementValid(eElement)) {
                         found.add(eElement);
                     }

@@ -77,11 +77,11 @@ public class ParserBasicTest extends NoStdOutErrTest {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        ParserSettings defaultParser = new ParserSettings();
+        ParserSettings defaultParserSettings = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/basic.jnlp");
-        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
         root = xmlParser.getRootNode(jnlpStream);
-        parser = new Parser(new DummyJNLPFile(), null, root, defaultParser);
+        parser = new Parser(new DummyJNLPFile(), null, root, defaultParserSettings);
     }
 
     @Test
@@ -239,11 +239,11 @@ public class ParserBasicTest extends NoStdOutErrTest {
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        ParserSettings defaultParser = new ParserSettings();
+        ParserSettings defaultParserSettings = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
         Node omega = xmlParser.getRootNode(jnlpStream);
-        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParser);
+        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParserSettings);
         ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
         JARDesc[] r = resources.getJARs();
         // we ensures that also in j2se hars ar eloaded.it is 7 withutt them.
