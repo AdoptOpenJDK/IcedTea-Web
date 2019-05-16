@@ -469,14 +469,14 @@ public final class Parser {
     private JREDesc getJRE(final Node node) throws ParseException {
         final Version version = getVersion(node, JREDesc.VERSION_ATTRIBUTE, null);
         final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
-        String vmArgs = getAttribute(node, "java-vm-args", null);
+        String vmArgs = getAttribute(node, JREDesc.JAVA_VM_ARGS_ATTRIBUTE, null);
         try {
             JvmUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }
-        final String initialHeap = getAttribute(node, "initial-heap-size", null);
-        final String maxHeap = getAttribute(node, "max-heap-size", null);
+        final String initialHeap = getAttribute(node, JREDesc.INITIAL_HEAP_SIZE_ATTRIBUTE, null);
+        final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
         final List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
@@ -525,7 +525,7 @@ public final class Parser {
         final Node dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
         for (Node dload1 : dload) {
             final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
-            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, "part", null), lazy);
+            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, ExtensionDesc.PART_ATTRIBUTE, null), lazy);
         }
 
         return ext;

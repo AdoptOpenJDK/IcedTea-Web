@@ -46,6 +46,7 @@ public class ExtensionDesc {
 
     public static final String NAME_ATTRIBUTE = "name";
     public static final String VERSION_ATTRIBUTE = "version";
+    public static final String PART_ATTRIBUTE = "part";
 
     /** the extension name */
     private final String name;
