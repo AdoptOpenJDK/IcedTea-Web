@@ -16,8 +16,9 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
-import java.net.URL;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+
+import java.net.URL;
 
 /**
  * The JAR element.
@@ -27,6 +28,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
  * @version $Revision: 1.6 $
  */
 public class JARDesc {
+    public static final String DOWNLOAD_ATTRIBUTE = "download";
 
     /** the location of the JAR file */
     private final URL location;
