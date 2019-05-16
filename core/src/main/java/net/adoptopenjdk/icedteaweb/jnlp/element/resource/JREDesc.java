@@ -159,7 +159,7 @@ public class JREDesc {
         String heapSizeLower = realHeapSize.toLowerCase();
         Matcher heapMatcher = heapPattern.matcher(heapSizeLower);
         if (!heapMatcher.matches()) {
-            throw new ParseException(R("PBadHeapSize", realHeapSize));
+            throw new ParseException("Invalid value for heap size (" + realHeapSize + ")");
         }
         return realHeapSize;
     }

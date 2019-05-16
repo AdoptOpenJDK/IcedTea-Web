@@ -183,7 +183,7 @@ public class CertificateUtils {
                     // Verify against this entry
                     String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
-                        LOG.debug(Translator.R("LCertFoundIn", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode())));
+                        LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode()));
                         return true;
                     } // else continue
                 }

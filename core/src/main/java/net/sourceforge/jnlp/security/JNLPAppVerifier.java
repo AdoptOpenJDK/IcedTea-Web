@@ -48,8 +48,6 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 public class JNLPAppVerifier implements AppVerifier {
 
     @Override
@@ -131,8 +129,8 @@ public class JNLPAppVerifier implements AppVerifier {
             }
         }
 
-        throw new LaunchException(null, null, R("LSFatal"), R("LCLaunching"),
-                R("LCancelOnUserRequest"), "");
+        throw new LaunchException(null, null, "Fatal", "Launch Error",
+                "Cancelled on user request.", "");
     }
 
     /**

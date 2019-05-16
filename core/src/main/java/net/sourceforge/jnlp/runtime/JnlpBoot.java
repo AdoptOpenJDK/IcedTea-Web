@@ -75,7 +75,7 @@ public final class JnlpBoot {
             JNLPRuntime.exit(1);
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            Boot.fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
+            Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
         }
         return true;
     }

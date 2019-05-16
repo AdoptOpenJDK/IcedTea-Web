@@ -181,7 +181,7 @@ public final class SwingUtils {
                         window = new JWindow().getOwner();
                         window.setName("getOrCreateWindowOwner");
                     } catch (Exception ex) {
-                        LOG.error(Translator.R("HEADLESS_MISCONFIGURED"), ex);
+                        LOG.error("Headless check failed. You are forced to run without any graphics. IcedTea-Web can run like this, but your app probably not. This is likely bug in your system.", ex);
                     }
                 }
             });

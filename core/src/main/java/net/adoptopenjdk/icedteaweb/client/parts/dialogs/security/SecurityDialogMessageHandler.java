@@ -114,7 +114,7 @@ public class SecurityDialogMessageHandler implements Runnable {
 
         final SecurityDialog dialog = new SecurityDialog(message.dialogType,
                 message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
-        
+
         if (processAutomatedAnswers(message, dialog)){
             return;
         }
@@ -129,7 +129,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             UnsignedAppletTrustConfirmation.updateAppletAction(found.getFile(), action, null, (Class<RememberableDialog>) found.getClass());
             unlockMessagesClient(message);
         } else {
-            
+
             if (!shouldPromptUser()) {
                 message.userResponse =  dialog.getDefaultNegativeAnswer();
                 unlockMessagesClient(message);
@@ -158,7 +158,7 @@ public class SecurityDialogMessageHandler implements Runnable {
 
     private void processMessageInGui(final SecurityDialog dialog, final RememberableDialog found, final SecurityDialogMessage message) {
         dialog.getViwableDialog().addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (found == null) {
@@ -169,7 +169,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                 }
                 unlockMessagesClient(message);
             }
-            
+
         });
         dialog.getViwableDialog().show();
     }
@@ -224,7 +224,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, eex);
                     keepGoing = false;
                 } catch (IllegalArgumentException eeex){
-                    LOG.error(Translator.R("HDwrongValue"), eeex);
+                    LOG.error("Probably wrong value?", eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -264,8 +264,8 @@ public class SecurityDialogMessageHandler implements Runnable {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
-    
-    
+
+
     /**
      * Returns whether the current runtime configuration allows prompting user
      * for security warnings.
@@ -281,7 +281,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             }
         });
     }
-    
+
      /**
      * Returns whether the current runtime configuration is headless
      *

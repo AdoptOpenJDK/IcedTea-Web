@@ -63,7 +63,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
@@ -190,7 +189,7 @@ public class CacheUtil {
             return false;
         }
 
-        LOG.warn(Translator.R("BXSingleCacheCleared", application));
+        LOG.warn("Clearing cache for: {}", application);
         List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
@@ -201,12 +200,12 @@ public class CacheUtil {
             }
         }
         if (found == 0) {
-            LOG.error(Translator.R("BXSingleCacheClearNotFound", application));
+            LOG.error("No ID matching {} found!", application);
         }
         if (found > 1) {
-            LOG.error(Translator.R("BXSingleCacheMoreThenOneId", application));
+            LOG.error("More then one ID is matching {}!", application);
         }
-        LOG.info(Translator.R("BXSingleCacheFileCount", files));
+        LOG.info("Alerting: {} of files ", files);
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             lruHandler.lock();
@@ -248,7 +247,7 @@ public class CacheUtil {
 
     public static boolean checkToClearCache() {
         if (!okToClearCache()) {
-            LOG.error(R("CCannotClearCache"));
+            LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
             return false;
         }
         return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
@@ -430,7 +429,7 @@ public class CacheUtil {
     public static boolean isCurrent(URL source, Version version, long lastModified) {
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         try {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
@@ -456,7 +455,7 @@ public class CacheUtil {
      */
     public static boolean isCached(URL source, Version version) {
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
@@ -503,7 +502,7 @@ public class CacheUtil {
         // ensure that version is an version id not version string
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         File cacheFile = null;
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();

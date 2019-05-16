@@ -83,7 +83,7 @@ public class UnsignedAppletTrustConfirmation {
     /**
      * Gets the remembered decision, first checking the user policy for an ALWAYS/NEVER,
      * and then the global policy.
-     * 
+     *
      * @param file the plugin file
      * @param id of wonted  action
      * @return the remembered decision
@@ -116,8 +116,8 @@ public class UnsignedAppletTrustConfirmation {
 
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, JNLPFile file, Class<? extends RememberableDialog> id) {
         return actionStorage.getMatchingItem(
-                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(), 
-                UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbableCodeBase(), true /* encode local files */).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(),
+                UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbableCodeBase(), true /* encode local files */).toString(),
                 toRelativePaths(getJars(file), file.getNotNullProbableCodeBase().toExternalForm()), id);
     }
 
@@ -147,9 +147,9 @@ public class UnsignedAppletTrustConfirmation {
             UrlRegEx codebaseRegex = null;
             UrlRegEx documentbaseRegex = null;
             List<String> archiveMatches = null;
-            
+
             if (rememberForCodeBase != null) {
-                
+
                 codebaseRegex = UrlRegEx.quote(codebase.toExternalForm());
 
                 if (!rememberForCodeBase) {
@@ -159,7 +159,7 @@ public class UnsignedAppletTrustConfirmation {
                     documentbaseRegex = UrlRegEx.quoteAndStar(UrlUtils.stripFile(documentbase)); // Match any from codebase and sourceFile "base"
                 }
             }
-            
+
             /* Update, if entry exists */
             if (oldEntry != null) {
                 oldEntry.getAppletSecurityActions().setAction(id, behaviour);
@@ -174,12 +174,12 @@ public class UnsignedAppletTrustConfirmation {
             }
               if (rememberForCodeBase == null){
                   throw new RuntimeException("Trying to create new entry without codebase. That's forbidden.");
-              } 
+              }
                               /* Else, create a new entry */
             UnsignedAppletActionEntry entry = new UnsignedAppletActionEntry(
                     AppletSecurityActions.fromAction(id, behaviour),
                     new Date(),
-                    documentbaseRegex, 
+                    documentbaseRegex,
                     codebaseRegex,
                     archiveMatches
             );
@@ -206,7 +206,7 @@ public class UnsignedAppletTrustConfirmation {
 
         if (unsignedAppletsAreForbidden()) {
             LOG.debug("Not running unsigned applet at {} because unsigned applets are disallowed by security policy.", file.getCodeBase());
-            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletPolicyDenied"));
+            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was unsigned.", "The applet was unsigned.PolicyDenied");
         }
 
         if (!unsignedConfirmationIsRequired()) {
@@ -219,7 +219,7 @@ public class UnsignedAppletTrustConfirmation {
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || !warningResponse.compareValue(Primitive.YES)) {
-            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LUnsignedApplet"), R("LUnsignedAppletUserDenied"));
+            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was unsigned.", "The applet was unsigned.UserDenied");
         }
 
     }
@@ -235,11 +235,11 @@ public class UnsignedAppletTrustConfirmation {
         YesNoSandbox warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
-        
+
         if (warningResponse == null || warningResponse.compareValue(Primitive.NO)) {
-            throw new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LPartiallySignedApplet"), R("LPartiallySignedAppletUserDenied"));
+            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was partially signed.", "The applet was partially signed.UserDenied");
         }
-        
+
         //this is due to possible YesNoSandboxLimited
         if (YesNoSandbox.sandbox().compareValue(warningResponse)) {
             securityDelegate.setRunInSandbox();

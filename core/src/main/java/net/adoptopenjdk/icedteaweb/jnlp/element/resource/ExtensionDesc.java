@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 /**
  * The extension element.
  *
@@ -143,7 +141,7 @@ public class ExtensionDesc {
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())
-                throw new ParseException(R("JInvalidExtensionDescriptor", name, location));
+                throw new ParseException("Extension does not refer to a component or installer (name=" + name + ", location=" + location + "). ");
         }
 
     }
