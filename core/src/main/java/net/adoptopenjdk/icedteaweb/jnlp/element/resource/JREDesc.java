@@ -34,6 +34,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
+    public static final String VERSION_ATTRIBUTE = "version";
     public static final String HREF_ATTRIBUTE = "href";
 
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");

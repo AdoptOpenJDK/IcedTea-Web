@@ -30,6 +30,7 @@ import java.net.URL;
 public class JARDesc {
     public static final String DOWNLOAD_ATTRIBUTE = "download";
 
+    public static final String VERSION_ATTRIBUTE = "version";
     /** the location of the JAR file */
     private final URL location;
 

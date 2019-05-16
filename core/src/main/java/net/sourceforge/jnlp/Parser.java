@@ -467,7 +467,7 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private JREDesc getJRE(final Node node) throws ParseException {
-        final Version version = getVersion(node, "version", null);
+        final Version version = getVersion(node, JREDesc.VERSION_ATTRIBUTE, null);
         final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
         String vmArgs = getAttribute(node, "java-vm-args", null);
         try {
@@ -494,7 +494,7 @@ public final class Parser {
     private JARDesc getJAR(final Node node) throws ParseException {
         boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
         final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
-        final Version version = getVersion(node, "version", null);
+        final Version version = getVersion(node, JARDesc.VERSION_ATTRIBUTE, null);
         final String part = getAttribute(node, "part", null);
         final boolean main = "true".equals(getAttribute(node, "main", "false"));
         final boolean lazy = LAZY.getValue().equals(getAttribute(node, JARDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
@@ -516,8 +516,8 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private ExtensionDesc getExtension(final Node node) throws ParseException {
-        final String name = getAttribute(node, "name", null);
-        final Version version = getVersion(node, "version", null);
+        final String name = getAttribute(node, ExtensionDesc.NAME_ATTRIBUTE, null);
+        final Version version = getVersion(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
         final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);

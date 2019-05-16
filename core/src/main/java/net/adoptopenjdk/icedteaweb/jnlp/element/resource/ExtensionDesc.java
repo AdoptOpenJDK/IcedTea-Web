@@ -44,6 +44,9 @@ public class ExtensionDesc {
     public static final String DOWNLOAD_ATTRIBUTE = "download";
     public static final String EXT_PART_ATTRIBUTE = "ext-part";
 
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String VERSION_ATTRIBUTE = "version";
+
     /** the extension name */
     private final String name;
 
