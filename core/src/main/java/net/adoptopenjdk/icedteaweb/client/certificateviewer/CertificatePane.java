@@ -417,9 +417,17 @@ public class CertificatePane extends JPanel {
                             final KeyStore caks = KeyStores.
                                 getKeyStore(currentKeyStoreLevel, 
                                             KeyStores.Type.CA_CERTS).getKs();
+                            final int caksSize = caks.size();
                             CertificateUtils.addPKCS12ToKeyStore(
                                 chooser.getSelectedFile(), ks, password, caks);
-                            storeKeyStore(caks, KeyStores.Type.CA_CERTS);
+                            if (caks.size() > caksSize) {
+                                final int i = JOptionPane.showConfirmDialog(parent,
+                                                    R("CVImportCaMessage"),
+                                                    R("CVImportCaTitle"),
+                                                    JOptionPane.YES_NO_OPTION);
+                                if (i == 0)
+                                    storeKeyStore(caks, KeyStores.Type.CA_CERTS);
+                            }
                         } else {
                             return;
                         }
