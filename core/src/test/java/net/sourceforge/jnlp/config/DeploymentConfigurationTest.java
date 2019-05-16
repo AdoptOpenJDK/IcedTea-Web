@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.PluginBridgeTest;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
+import net.sourceforge.jnlp.config.DeploymentConfiguration.ConfigType;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
@@ -52,9 +53,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 public class DeploymentConfigurationTest extends NoStdOutErrTest {
@@ -79,6 +83,30 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         config.copyTo(target);
 
         assertTrue(!target.isEmpty());
+    }
+
+    @Test
+    public void loadEmptyDeploymentPropertiesFile() throws ConfigurationException, IOException {
+        final File f = File.createTempFile("emptyDeployment", "properties");
+        f.deleteOnExit();
+
+        final Map<String, Setting<String>> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
+
+        Assert.assertThat(properties.keySet(), is(empty()));
+    }
+
+    @Test
+    public void loadNonExistentOptionalDeploymentPropertiesFile() throws ConfigurationException, IOException {
+        final File f = new File("nonExistentDeployment.properties");
+        final Map<String, Setting<String>> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
+
+        Assert.assertThat(properties.keySet(), is(empty()));
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void loadNonExistentMandatoryDeploymentPropertiesFile() throws ConfigurationException, IOException {
+        final File f = new File("nonExistentDeployment.properties");
+        DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), true);
     }
 
     @Test
