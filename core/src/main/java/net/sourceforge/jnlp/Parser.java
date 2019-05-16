@@ -34,6 +34,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
@@ -493,7 +494,7 @@ public final class Parser {
         final Version version = getVersion(node, "version", null);
         final String part = getAttribute(node, "part", null);
         final boolean main = "true".equals(getAttribute(node, "main", "false"));
-        final boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
+        final boolean lazy = DownloadStrategy.LAZY.getValue().equals(getAttribute(node, "download", DownloadStrategy.EAGER.getValue()));
 
         if (nativeJar && main) {
             if (strict) {
@@ -520,7 +521,7 @@ public final class Parser {
 
         final Node dload[] = getChildNodes(node, "ext-download");
         for (Node dload1 : dload) {
-            final boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
+            final boolean lazy = DownloadStrategy.LAZY.getValue().equals(getAttribute(dload1, "download", DownloadStrategy.LAZY.getValue()));
             ext.addPart(getRequiredAttribute(dload1, "ext-part", null, strict), getAttribute(dload1, "part", null), lazy);
         }
 
