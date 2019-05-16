@@ -16,17 +16,18 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.JNLPFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -37,8 +38,11 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.8 $
  */
 public class ExtensionDesc {
-
     private final static Logger LOG = LoggerFactory.getLogger(ExtensionDesc.class);
+
+    public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
+    public static final String DOWNLOAD_ATTRIBUTE = "download";
+    public static final String EXT_PART_ATTRIBUTE = "ext-part";
 
     /** the extension name */
     private final String name;

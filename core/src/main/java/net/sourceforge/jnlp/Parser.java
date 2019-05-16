@@ -77,6 +77,10 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.LAZY;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_DOWNLOAD_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_PART_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.ARCH_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.EXTENSION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.J2SE_ELEMENT;
@@ -493,7 +497,7 @@ public final class Parser {
         final Version version = getVersion(node, "version", null);
         final String part = getAttribute(node, "part", null);
         final boolean main = "true".equals(getAttribute(node, "main", "false"));
-        final boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
+        final boolean lazy = LAZY.getValue().equals(getAttribute(node, JARDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
 
         if (nativeJar && main) {
             if (strict) {
@@ -518,10 +522,10 @@ public final class Parser {
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        final Node dload[] = getChildNodes(node, "ext-download");
+        final Node dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
         for (Node dload1 : dload) {
-            final boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
-            ext.addPart(getRequiredAttribute(dload1, "ext-part", null, strict), getAttribute(dload1, "part", null), lazy);
+            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
+            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, "part", null), lazy);
         }
 
         return ext;
