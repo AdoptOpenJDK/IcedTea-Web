@@ -524,7 +524,7 @@ public final class Parser {
 
         final Node dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
         for (Node dload1 : dload) {
-            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, LAZY.getValue()));
+            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
             ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, "part", null), lazy);
         }
 
