@@ -480,7 +480,7 @@ public final class Parser {
         final List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
-        getRequiredAttribute(node, "version", null, strict);
+        getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
 
         return new JREDesc(new JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
     }
