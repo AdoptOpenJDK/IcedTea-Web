@@ -16,12 +16,13 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -33,7 +34,8 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
-    
+    public static final String HREF_ATTRIBUTE = "href";
+
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
     /** the platform version or the product version if location is not null */
