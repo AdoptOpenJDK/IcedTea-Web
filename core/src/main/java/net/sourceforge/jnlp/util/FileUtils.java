@@ -210,7 +210,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                LOG.error(R("RCantDeleteFile", eMsg == null ? f : eMsg));
+                LOG.error("RCantDeleteFile", eMsg == null ? f : eMsg);
             }
         }
     }
@@ -238,11 +238,11 @@ public final class FileUtils {
 
         if (isDir) {
             if (!tempFile.mkdir()) {
-                throw new IOException(R("RCantCreateDir", tempFile));
+                throw new IOException("RCantCreateDir "+tempFile);
             }
         } else {
             if (!tempFile.createNewFile()) {
-                throw new IOException(R("RCantCreateFile", tempFile));
+                throw new IOException("RCantCreateFile "+tempFile);
             }
         }
 
@@ -296,28 +296,28 @@ public final class FileUtils {
         } else {
         // remove all permissions
         if (!tempFile.setExecutable(false, false)) {
-            throw new IOException(R("RRemoveXPermFailed", tempFile));
+            throw new IOException("RRemoveXPermFailed "+tempFile);
         }
         if (!tempFile.setReadable(false, false)) {
-            throw new IOException(R("RRemoveRPermFailed", tempFile));
+            throw new IOException("RRemoveRPermFailed "+tempFile);
         }
         if (!tempFile.setWritable(false, false)) {
-            throw new IOException(R("RRemoveWPermFailed", tempFile));
+            throw new IOException("RRemoveWPermFailed "+tempFile);
         }
 
         // allow owner to read
         if (!tempFile.setReadable(true, true)) {
-            throw new IOException(R("RGetRPermFailed", tempFile));
+            throw new IOException("RGetRPermFailed "+tempFile);
         }
 
         // allow owner to write
         if (writableByOwner && !tempFile.setWritable(true, true)) {
-            throw new IOException(R("RGetWPermFailed", tempFile));
+            throw new IOException("RGetWPermFailed "+tempFile);
         }
 
         // allow owner to enter directories
         if (isDir && !tempFile.setExecutable(true, true)) {
-            throw new IOException(R("RGetXPermFailed", tempFile));
+            throw new IOException("RGetXPermFailed "+tempFile);
         }
         }
 
@@ -325,7 +325,7 @@ public final class FileUtils {
         // opened the file right after it was created might still be able to
         // read the data.
         if (!tempFile.renameTo(file)) {
-            throw new IOException(R("RCantRename", tempFile, file));
+            throw new IOException("RCantRename "+tempFile+file);
         }
     }
 
@@ -474,7 +474,7 @@ public final class FileUtils {
 
     /**
      * This will return a lock to the file specified.
-     * 
+     *
      * @param path File path to file we want to lock.
      * @param shared Specify if the lock will be a shared lock.
      * @param allowBlock Specify if we should block when we can not get the

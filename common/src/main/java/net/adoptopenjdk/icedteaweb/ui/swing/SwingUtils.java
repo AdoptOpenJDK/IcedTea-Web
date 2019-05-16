@@ -181,7 +181,7 @@ public final class SwingUtils {
                         window = new JWindow().getOwner();
                         window.setName("getOrCreateWindowOwner");
                     } catch (Exception ex) {
-                        LOG.error(Translator.R("HEADLESS_MISCONFIGURED"), ex);
+                        LOG.error("HEADLESS_MISCONFIGURED", ex);
                     }
                 }
             });

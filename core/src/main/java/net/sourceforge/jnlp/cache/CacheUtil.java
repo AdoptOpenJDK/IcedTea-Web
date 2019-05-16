@@ -221,7 +221,7 @@ public class CacheUtil {
             return false;
         }
 
-        LOG.warn(Translator.R("BXSingleCacheCleared", application));
+        LOG.warn("BXSingleCacheCleared", application);
         List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
@@ -232,12 +232,12 @@ public class CacheUtil {
             }
         }
         if (found == 0) {
-            LOG.error(Translator.R("BXSingleCacheClearNotFound", application));
+            LOG.error("BXSingleCacheClearNotFound", application);
         }
         if (found > 1) {
-            LOG.error(Translator.R("BXSingleCacheMoreThenOneId", application));
+            LOG.error("BXSingleCacheMoreThenOneId", application);
         }
-        LOG.info(Translator.R("BXSingleCacheFileCount", files));
+        LOG.info("BXSingleCacheFileCount", files);
         CacheLRUWrapper.getInstance().lock();
         try {
             Files.walk(Paths.get(CacheLRUWrapper.getInstance().getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
@@ -276,7 +276,7 @@ public class CacheUtil {
 
     public static boolean checkToClearCache() {
         if (!okToClearCache()) {
-            LOG.error(R("CCannotClearCache"));
+            LOG.error("CCannotClearCache");
             return false;
         }
         return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
@@ -455,7 +455,7 @@ public class CacheUtil {
     public static boolean isCurrent(URL source, Version version, long lastModified) {
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException("CNotCacheable "+source);
 
         try {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
@@ -481,7 +481,7 @@ public class CacheUtil {
      */
     public static boolean isCached(URL source, Version version) {
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException("CNotCacheable "+source);
 
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
@@ -528,7 +528,7 @@ public class CacheUtil {
         // ensure that version is an version id not version string
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException(R("CNotCacheable", source));
+            throw new IllegalArgumentException("CNotCacheable "+source);
 
         File cacheFile = null;
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();

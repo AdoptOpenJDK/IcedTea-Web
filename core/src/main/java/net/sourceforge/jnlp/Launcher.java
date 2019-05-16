@@ -89,7 +89,7 @@ public class Launcher {
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
-    
+
     public static final String KEY_JAVAWS_LOCATION = "icedtea-web.bin.location";
 
     /**
@@ -152,7 +152,7 @@ public class Launcher {
      */
     public void setUpdatePolicy(UpdatePolicy policy) {
         if (policy == null) {
-            throw new IllegalArgumentException(R("LNullUpdatePolicy"));
+            throw new IllegalArgumentException("LNullUpdatePolicy");
         }
 
         this.updatePolicy = policy;
@@ -266,7 +266,7 @@ public class Launcher {
             tg.join();
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
-            throw launchWarning(new LaunchException(file, ex, R("LSMinor"), R("LCSystem"), R("LThreadInterrupted"), R("LThreadInterruptedInfo")));
+            throw launchWarning(new LaunchException(file, ex, "LSMinor", "LCSystem", "LThreadInterrupted", "LThreadInterruptedInfo"));
         }
 
         if (tg.getException() != null) {
@@ -353,7 +353,7 @@ public class Launcher {
             // allows empty param, not sure about validity of that.
             int equals = input.indexOf("=");
             if (equals == -1) {
-                throw launchError(new LaunchException(R("BBadParam", input)));
+                throw launchError(new LaunchException("BBadParam "+input));
             }
 
             String name = input.substring(0, equals);
@@ -375,9 +375,9 @@ public class Launcher {
         }
     }
 
-  
+
     /**
-     * Launches the JNLP file in a new JVM instance. 
+     * Launches the JNLP file in a new JVM instance.
      * All streams are properly redirected.
      *
      * @param vmArgs the arguments to pass to the new JVM. Can be empty but
@@ -397,7 +397,7 @@ public class Launcher {
             updatedArgs.add(file.getFileLocation().toString());
         }
         else {
-            launchError(new LaunchException(file, null, R("LSFatal"), R("LCExternalLaunch"), R("LNullLocation"), R("LNullLocationInfo")));
+            launchError(new LaunchException(file, null, "LSFatal", "LCExternalLaunch", "LNullLocation", "LNullLocationInfo"));
         }
 
         launchExternal(vmArgs, updatedArgs);
@@ -445,9 +445,9 @@ public class Launcher {
             Process p =pb.start();
             StreamUtils.waitForSafely(p);
         } catch (NullPointerException ex) {
-            throw launchError(new LaunchException(null, null, R("LSFatal"), R("LCExternalLaunch"), R("LNetxJarMissing"), R("LNetxJarMissingInfo")));
+            throw launchError(new LaunchException(null, null, "LSFatal", "LCExternalLaunch", "LNetxJarMissing", "LNetxJarMissingInfo"));
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCExternalLaunch"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
+            throw launchError(new LaunchException(null, ex, "LSFatal", "LCExternalLaunch", "LCouldNotLaunch", "LCouldNotLaunchInfo"));
         }
     }
 
@@ -457,7 +457,7 @@ public class Launcher {
     private JNLPFile fromUrl(URL location) throws LaunchException {
         try {
             JNLPFile file = new JNLPFile(location, parserSettings);
-            
+
             boolean isLocal = false;
             boolean haveHref = false;
             if ("file".equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
@@ -469,7 +469,7 @@ public class Launcher {
             if (!isLocal && haveHref){
                 //this is case when remote file have href to different file
                 if (!location.equals(file.getSourceLocation())){
-                    //mark local true, so the following condition will be true and 
+                    //mark local true, so the following condition will be true and
                     //new jnlp file will be downloaded
                     isLocal = true;
                     //maybe this check is to strict, and will force redownload to often
@@ -492,7 +492,7 @@ public class Launcher {
                 throw (LaunchException) ex; // already sent to handler when first thrown
             } else {
                 // IO and Parse
-                throw launchError(new LaunchException(null, ex, R("LSFatal"), R("LCReadError"), R("LCantRead"), R("LCantReadInfo")));
+                throw launchError(new LaunchException(null, ex, "LSFatal", "LCReadError", "LCantRead", "LCantReadInfo"));
             }
         }
     }
@@ -506,7 +506,7 @@ public class Launcher {
      */
     protected ApplicationInstance launchApplication(JNLPFile file) throws LaunchException {
         if (!file.isApplication()) {
-            throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplication"), R("LNotApplicationInfo")));
+            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplication", "LNotApplicationInfo"));
         }
 
         try {
@@ -558,7 +558,7 @@ public class Launcher {
             }
 
             LOG.info("Starting application [{}] ...", mainName);
-            
+
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
             Method main = mainClass.getMethod("main", new Class<?>[] { String[].class });
@@ -585,7 +585,7 @@ public class Launcher {
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")));
+            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"));
         }
     }
 
@@ -640,9 +640,9 @@ public class Launcher {
      */
     protected ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
+            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplet", "LNotAppletInfo"));
         }
-      
+
         if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
             if (!JNLPRuntime.isHeadless()) {
                 SplashScreen sp = SplashScreen.getSplashScreen();
@@ -654,7 +654,7 @@ public class Launcher {
         if (handler != null) {
             handler.launchInitialized(file);
         }
-        
+
         AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
@@ -664,11 +664,11 @@ public class Launcher {
             return applet;
         } catch (InstanceExistsException ieex) {
             LOG.error("Single instance applet is already running.", ieex);
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
+            throw launchError(new LaunchException(file, ieex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LSingleInstanceExists"), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
+            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"), applet);
         }finally{
             if (handler != null) {
                 handler.launchStarting(applet);
@@ -686,7 +686,7 @@ public class Launcher {
      */
     protected ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCClient"), R("LNotApplet"), R("LNotAppletInfo")));
+            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplet", "LNotAppletInfo"));
         }
         AppletInstance applet = null;
         try {
@@ -697,11 +697,11 @@ public class Launcher {
 
         } catch (InstanceExistsException ieex) {
             LOG.info("Single instance applet is already running.");
-            throw launchError(new LaunchException(file, ieex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LSingleInstanceExists")), applet);
+            throw launchError(new LaunchException(file, ieex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LSingleInstanceExists"), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCLaunching"), R("LCouldNotLaunch"), R("LCouldNotLaunchInfo")), applet);
+            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"), applet);
         }
     }
 
@@ -715,7 +715,7 @@ public class Launcher {
     protected ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
-        throw launchError(new LaunchException(file, null, R("LSFatal"), R("LCNotSupported"), R("LNoInstallers"), R("LNoInstallersInfo")));
+        throw launchError(new LaunchException(file, null, "LSFatal", "LCNotSupported", "LNoInstallers", "LNoInstallersInfo"));
     }
 
     /**
@@ -744,7 +744,7 @@ public class Launcher {
 
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
-            // appletInstance is needed by ServiceManager when looking up 
+            // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
             if (cont == null) {
@@ -773,10 +773,10 @@ public class Launcher {
             // Finish setting up appletInstance.
             appletInstance.setApplet(applet);
             appletInstance.getAppletEnvironment().setApplet(applet);
-            
+
             return appletInstance;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")), appletInstance);
+            throw launchError(new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplet", "LInitAppletInfo"), appletInstance);
         }
     }
 
@@ -805,7 +805,7 @@ public class Launcher {
 
             return applet;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplet"), R("LInitAppletInfo")));
+            throw launchError(new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplet", "LInitAppletInfo"));
         }
     }
 
@@ -825,7 +825,7 @@ public class Launcher {
 
             return app;
         } catch (Exception ex) {
-            throw new LaunchException(file, ex, R("LSFatal"), R("LCInit"), R("LInitApplication"), R("LInitApplicationInfo"));
+            throw new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplication", "LInitApplicationInfo");
         }
     }
 
@@ -856,7 +856,7 @@ public class Launcher {
     private LaunchException launchError(LaunchException ex) {
         return launchError(ex, null);
     }
-    
+
     private LaunchException launchError(LaunchException ex, AppletInstance applet) {
         if (applet != null) {
             SplashUtils.showErrorCaught(ex, applet);

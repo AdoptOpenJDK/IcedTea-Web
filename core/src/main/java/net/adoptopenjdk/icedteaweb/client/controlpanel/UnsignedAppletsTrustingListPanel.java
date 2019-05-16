@@ -616,13 +616,13 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                     Pattern p = Pattern.compile(unsignedAppletActionEntry.getDocumentBase().getRegEx());
                     p.matcher("someInput").find();
                 } else {
-                    throw new RuntimeException(Translator.R("APPEXTSECguiPanelEmptyDoc"));
+                    throw new RuntimeException("APPEXTSECguiPanelEmptyDoc");
                 }
                 if (unsignedAppletActionEntry.getCodeBase() != null && !unsignedAppletActionEntry.getCodeBase().getRegEx().trim().isEmpty()) {
                     Pattern p = Pattern.compile(unsignedAppletActionEntry.getCodeBase().getRegEx());
                     p.matcher("someInput").find();
                 } else {
-                    throw new RuntimeException(Translator.R("APPEXTSECguiPanelEmptyCode"));
+                    throw new RuntimeException("APPEXTSECguiPanelEmptyCode");
                 }
                 UnsignedAppletActionEntry.createArchivesString(UnsignedAppletActionEntry.createArchivesList(UnsignedAppletActionEntry.createArchivesString(unsignedAppletActionEntry.getArchives())));
             }
@@ -800,7 +800,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                         return (JFrame) parent;
                     }
                     parent=parent.getParent();
-                    
+
                 }
                 return null;
             }

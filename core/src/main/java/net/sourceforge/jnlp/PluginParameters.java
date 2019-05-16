@@ -58,7 +58,7 @@ public class PluginParameters {
                 && this.parameters.get("object") == null
                 //If code/object parameters are missing, we can still determine the main-class name from the jnlp file passed using jnlp_href
                 && this.parameters.get("jnlp_href") == null) {
-            throw new PluginParameterException(R("BNoCodeOrObjectApplet"));
+            throw new PluginParameterException("BNoCodeOrObjectApplet");
         }
     }
 
@@ -161,12 +161,12 @@ public class PluginParameters {
     }
 
     public String getUniqueKey(URL codebase) {
-        /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html, 
+        /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html,
         * classloaders are shared iff these properties match:
         * codebase, cache_archive, java_archive, archive
-        * 
+        *
         * To achieve this, we create the unique key based on those 4 values,
-        * always in the same order. The initial "<NAME>=" parts ensure a 
+        * always in the same order. The initial "<NAME>=" parts ensure a
         * bad tag cannot trick the loader into getting shared with another.
         */
         return "codebase=" + codebase.toExternalForm() + "cache_archive="
@@ -175,7 +175,7 @@ public class PluginParameters {
     }
 
     /**
-     * Replace an attribute with its 'java_'-prefixed version.      
+     * Replace an attribute with its 'java_'-prefixed version.
      * Note that java_* aliases override older names:
      * http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-nav
      */
@@ -190,7 +190,7 @@ public class PluginParameters {
     /**
      * Creates the underlying hash table with the proper overrides. Ensure all
      * keys are lowercase consistently.
-     * 
+     *
      * @param rawParams the properties, before parameter aliasing rules.
      * @return the resulting parameter table
      */

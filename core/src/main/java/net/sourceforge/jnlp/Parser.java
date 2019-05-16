@@ -216,7 +216,7 @@ public final class Parser {
 
         // ensure it's a JNLP node
         if (root == null || !root.getNodeName().getName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
-            throw new ParseException(R("PInvalidRoot"));
+            throw new ParseException("PInvalidRoot");
         }
 
         // JNLP tag information
@@ -277,7 +277,7 @@ public final class Parser {
         while (child != null) {
             if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
-                    throw new ParseException(R("PTwoUpdates"));
+                    throw new ParseException("PTwoUpdates");
                 }
 
                 final Node node = child;
@@ -346,7 +346,7 @@ public final class Parser {
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
-            throw new ParseException(R("PNoResources"));
+            throw new ParseException("PNoResources");
         }
         for (final Node resource : resources) {
             result.add(getResourcesDesc(resource, j2se));
@@ -379,20 +379,20 @@ public final class Parser {
             // check for nativelib but no trusted environment
             if ("nativelib".equals(name)) {
                 if (!isTrustedEnvironment()) {
-                    throw new ParseException(R("PUntrustedNative"));
+                    throw new ParseException("PUntrustedNative");
                 }
             }
 
             if ("j2se".equals(name) || "java".equals(name)) {
                 if (getChildNode(root, ComponentDesc.COMPONENT_DESC_ELEMENT) != null) {
                     if (strict) {
-                        throw new ParseException(R("PExtensionHasJ2SE"));
+                        throw new ParseException("PExtensionHasJ2SE");
                     }
                 }
                 if (!j2se) {
                     resources.addResource(getJRE(child));
                 } else {
-                    throw new ParseException(R("PInnerJ2SE"));
+                    throw new ParseException("PInnerJ2SE");
                 }
             }
 
@@ -403,7 +403,7 @@ public final class Parser {
                 if (jar.isMain()) {
                     if (mainFlag == true) {
                         if (strict) {
-                            throw new ParseException(R("PTwoMains"));
+                            throw new ParseException("PTwoMains");
                         }
                     }
                     mainFlag = true;
@@ -471,7 +471,7 @@ public final class Parser {
 
         if (nativeJar && main) {
             if (strict) {
-                throw new ParseException(R("PNativeHasMain"));
+                throw new ParseException("PNativeHasMain");
             }
         }
 
@@ -612,7 +612,7 @@ public final class Parser {
                 String kind = getAttribute(child, DescriptionDesc.KIND_ATTRIBUTE, DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
-                        throw new ParseException(R("PTwoDescriptions", kind));
+                        throw new ParseException("PTwoDescriptions "+kind);
                     }
                 }
                 descriptionsUsed.add(kind);
@@ -629,7 +629,7 @@ public final class Parser {
             }
             if ("sharing-allowed".equals(name)) {
                 if (strict && !allowExtensions) {
-                    throw new ParseException(R("PSharing"));
+                    throw new ParseException("PSharing");
                 }
                 addInfo(informationDesc, child, null, Boolean.TRUE);
             }
@@ -705,7 +705,7 @@ public final class Parser {
         // test for too many security elements
         if (nodes.length > 1) {
             if (strict) {
-                throw new ParseException(R("PTwoSecurity"));
+                throw new ParseException("PTwoSecurity");
             }
         }
 
@@ -722,7 +722,7 @@ public final class Parser {
             type = SecurityDesc.J2EE_PERMISSIONS;
             applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
         } else if (strict) {
-            throw new ParseException(R("PEmptySecurity"));
+            throw new ParseException("PEmptySecurity");
         }
 
         if (base != null) {
@@ -764,7 +764,7 @@ public final class Parser {
                 + getChildNodes(parent, APPLICATION_DESC_ELEMENT).length
                 + getChildNodes(parent, JAVAFX_DESC_ELEMENT).length
                 + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
-            throw new ParseException(R("PTwoDescriptors"));
+            throw new ParseException("PTwoDescriptors");
         }
 
         Node child = parent.getFirstChild();
@@ -812,9 +812,9 @@ public final class Parser {
             height = Integer.parseInt(getRequiredAttribute(node, "height", "100", strict));
         } catch (NumberFormatException nfe) {
             if (width <= 0) {
-                throw new ParseException(R("PBadWidth"));
+                throw new ParseException("PBadWidth");
             }
-            throw new ParseException(R("PBadWidth"));
+            throw new ParseException("PBadWidth");
         }
 
         // read params
@@ -861,7 +861,7 @@ public final class Parser {
     ComponentDesc getComponent(final Node parent) throws ParseException {
 
         if (1 < getChildNodes(parent, ComponentDesc.COMPONENT_DESC_ELEMENT).length) {
-            throw new ParseException(R("PTwoDescriptors"));
+            throw new ParseException("PTwoDescriptors");
         }
 
         Node child = parent.getFirstChild();
@@ -925,13 +925,13 @@ public final class Parser {
                 switch (name) {
                     case "desktop":
                         if (showOnDesktop && strict) {
-                            throw new ParseException(R("PTwoDesktops"));
+                            throw new ParseException("PTwoDesktops");
                         }
                         showOnDesktop = true;
                         break;
                     case "menu":
                         if (menu != null && strict) {
-                            throw new ParseException(R("PTwoMenus"));
+                            throw new ParseException("PTwoMenus");
                         }
                         menu = getMenu(child);
                         break;
@@ -978,19 +978,19 @@ public final class Parser {
                 switch (name) {
                     case RelatedContentDesc.TITLE_ELEMENT:
                         if (title != null && strict) {
-                            throw new ParseException(R("PTwoTitles"));
+                            throw new ParseException("PTwoTitles");
                         }
                         title = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.DESCRIPTION_ELEMENT:
                         if (description != null && strict) {
-                            throw new ParseException(R("PTwoDescriptions"));
+                            throw new ParseException("PTwoDescriptions");
                         }
                         description = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.ICON_ELEMENT:
                         if (icon != null && strict) {
-                            throw new ParseException(R("PTwoIcons"));
+                            throw new ParseException("PTwoIcons");
                         }
                         icon = getIcon(child);
                         break;
@@ -1110,9 +1110,9 @@ public final class Parser {
             if (e.getCause() instanceof ParseException) {
                 throw (ParseException) (e.getCause());
             }
-            throw new ParseException(R("PBadXML"), e);
+            throw new ParseException("PBadXML "+ e);
         } catch (Exception e) {
-            throw new ParseException(R("PBadXML"), e);
+            throw new ParseException("PBadXML "+ e);
         }
     }
 

@@ -51,7 +51,7 @@ public class AppletsFilter {
 
     private List<Element> getAppletElements() throws ParserConfigurationException, SAXException, IOException {
         if (found.isEmpty()) {
-            throw new RuntimeException(Translator.R("HTMLnoneFound"));
+            throw new RuntimeException("HTMLnoneFound");
         }
         List<Integer> id = sanitizeFilter();
         List<Element> r = new ArrayList<>(found.size());
@@ -69,7 +69,7 @@ public class AppletsFilter {
         List<Integer> r = new ArrayList<>(found.size());
         if (ids.isEmpty()) {
             if (found.size() > 1) {
-                LOG.info(Translator.R("HTMLmoreThenOne", found.size()));
+                LOG.info("HTMLmoreThenOne", found.size());
             }
             r.add(0);
             return r;

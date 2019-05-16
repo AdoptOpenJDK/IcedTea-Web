@@ -425,8 +425,8 @@ public class JNLPClassLoader extends URLClassLoader {
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
         JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
 
-        // If security level is 'high' or greater, we must check if the user allows unsigned applets 
-        // when the JNLPClassLoader is created. We do so here, because doing so in the constructor 
+        // If security level is 'high' or greater, we must check if the user allows unsigned applets
+        // when the JNLPClassLoader is created. We do so here, because doing so in the constructor
         // causes unwanted side-effects for some applets. However, if the loader has been tagged
         // with "runInSandbox", then we do not show this dialog - since this tag indicates that
         // the user was already shown a CertWarning dialog and has chosen to run the applet sandboxed.
@@ -491,7 +491,7 @@ public class JNLPClassLoader extends URLClassLoader {
         synchronized (getUniqueKeyLock(uniqueKey)) {
             JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
 
-            // A null baseloader implies that no loader has been created 
+            // A null baseloader implies that no loader has been created
             // for this codebase/jnlp yet. Create one.
             if (baseLoader == null
                     || (file.isApplication()
@@ -739,8 +739,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                LaunchException ex = new LaunchException(null, null, R("LSFatal"),
-                        R("LCInit"), R("LFatalVerification"), R("LFatalVerificationInfo") + ": " + e.getMessage());
+                LaunchException ex = new LaunchException(null, null, "LSFatal",
+                        "LCInit", "LFatalVerification", "LFatalVerificationInfo" + ": " + e.getMessage());
                 consultCertificateSecurityException(ex);
             }
 
@@ -772,10 +772,10 @@ public class JNLPClassLoader extends URLClassLoader {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, extCnfe);
-                            throw new LaunchException(file, extCnfe, R("LSFatal"), R("LCInit"), R("LCantDetermineMainClass"), R("LCantDetermineMainClassInfo"));
+                            throw new LaunchException(file, extCnfe, "LSFatal", "LCInit", "LCantDetermineMainClass", "LCantDetermineMainClassInfo");
                         }
                     } else {
-                        throw new LaunchException(file, null, R("LSFatal"), R("LCInit"), R("LCantDetermineMainClass"), R("LCantDetermineMainClassInfo"));
+                        throw new LaunchException(file, null, "LSFatal", "LCInit", "LCantDetermineMainClass", "LCantDetermineMainClassInfo");
                     }
                 }
 
@@ -1022,8 +1022,8 @@ public class JNLPClassLoader extends URLClassLoader {
              * Throws LaunchException if signed JNLP file fails to be verified
              * or fails to match the launching JNLP file
              */
-            LaunchException ex = new LaunchException(file, null, R("LSFatal"), R("LCClient"),
-                    R("LSignedJNLPFileDidNotMatch"), R(e.getMessage()));
+            LaunchException ex = new LaunchException(file, null, "LSFatal", "LCClient",
+                    "LSignedJNLPFileDidNotMatch", e.getMessage());
             consultCertificateSecurityException(ex);
             /*
              * Throwing this exception will fail to initialize the application
@@ -1257,7 +1257,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                         String extractedJarLocation = localFile + ".nested/" + je.getName();
                                         File parentDir = new File(extractedJarLocation).getParentFile();
                                         if (!parentDir.isDirectory() && !parentDir.mkdirs()) {
-                                            throw new RuntimeException(R("RNestedJarExtration"));
+                                            throw new RuntimeException("RNestedJarExtration");
                                         }
                                         FileOutputStream extractedJar = new FileOutputStream(extractedJarLocation);
                                         InputStream is = jarFile.getInputStream(je);
@@ -1432,7 +1432,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
 
-        // Result is still null. Return what the codebaseloader 
+        // Result is still null. Return what the codebaseloader
         // has (which returns null if it is not loaded there either)
         if (codeBaseLoader != null) {
             return codeBaseLoader.findLoadedClassFromParent(name);
@@ -1610,9 +1610,9 @@ public class JNLPClassLoader extends URLClassLoader {
             jars.add(desc);
 
             // Decide what level of security this jar should have
-            // The verification and security setting functions rely on 
+            // The verification and security setting functions rely on
             // having AllPermissions as those actions normally happen
-            // during initialization. We therefore need to do those 
+            // during initialization. We therefore need to do those
             // actions as privileged.
             AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
                 @Override
@@ -1633,9 +1633,9 @@ public class JNLPClassLoader extends URLClassLoader {
             CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
 
         } catch (Exception e) {
-            // Do nothing. This code is called by loadClass which cannot 
-            // throw additional exceptions. So instead, just ignore it. 
-            // Exception => jar will not get added to classpath, which will 
+            // Do nothing. This code is called by loadClass which cannot
+            // throw additional exceptions. So instead, just ignore it.
+            // Exception => jar will not get added to classpath, which will
             // result in CNFE from loadClass.
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
@@ -1810,8 +1810,8 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
 
-        // Add resources from codebase (only if nothing was found above, 
-        // otherwise the server will get hammered) 
+        // Add resources from codebase (only if nothing was found above,
+        // otherwise the server will get hammered)
         if (lresources.isEmpty() && codeBaseLoader != null) {
             e = codeBaseLoader.findResources(name);
             while (e.hasMoreElements()) {
@@ -1966,7 +1966,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
         if (sec == null) {
-            LOG.info(Translator.R("LNoSecInstance", source.toString()));
+            LOG.info("LNoSecInstance", source.toString());
         }
         return sec;
     }
@@ -2022,7 +2022,7 @@ public class JNLPClassLoader extends URLClassLoader {
             throw new IllegalArgumentException("addToPathLoader only accepts path based URLs");
         }
 
-        // If there is no loader yet, create one, else add it to the 
+        // If there is no loader yet, create one, else add it to the
         // existing one (happens when called from merge())
         if (codeBaseLoader == null) {
             codeBaseLoader = new CodeBaseClassLoader(new URL[]{u}, this);
@@ -2349,17 +2349,17 @@ public class JNLPClassLoader extends URLClassLoader {
              */ if (!runInSandbox && !classLoader.getSigning()
                     && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                 if (classLoader.jcv.allJarsSigned()) {
-                    LaunchException ex = new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LSignedJNLPAppDifferentCerts"), R("LSignedJNLPAppDifferentCertsInfo"));
+                    LaunchException ex = new LaunchException(classLoader.file, null, "LSFatal", "LCClient", "LSignedJNLPAppDifferentCerts", "LSignedJNLPAppDifferentCertsInfo");
                     consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 } else {
-                    LaunchException ex = new LaunchException(classLoader.file, null, R("LSFatal"), R("LCClient"), R("LUnsignedJarWithSecurity"), R("LUnsignedJarWithSecurityInfo"));;
+                    LaunchException ex = new LaunchException(classLoader.file, null, "LSFatal", "LCClient", "LUnsignedJarWithSecurity", "LUnsignedJarWithSecurityInfo");
                     consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 }
             } else return consultResult(codebaseHost);
         }
-        
+
         private SecurityDesc consultResult(URL codebaseHost){
             if (!runInSandbox && classLoader.getSigning()) {
                 return classLoader.file.getSecurity();
@@ -2388,7 +2388,7 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException {
             if (runInSandbox && classLoader.security != null
                     && !classLoader.jarLocationSecurityMap.isEmpty()) {
-                throw new LaunchException(classLoader.file, null, R("LSFatal"), R("LCInit"), R("LRunInSandboxError"), R("LRunInSandboxErrorInfo"));
+                throw new LaunchException(classLoader.file, null, "LSFatal", "LCInit", "LRunInSandboxError", "LRunInSandboxErrorInfo");
             }
 
             JNLPRuntime.reloadPolicy();

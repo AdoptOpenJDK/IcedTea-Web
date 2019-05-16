@@ -96,7 +96,7 @@ public class CommandLine {
         try {
             config.load(false);
         } catch (ConfigurationException | MalformedURLException e) {
-            LOG.error(R("RConfigurationFatal"), e);
+            LOG.error("RConfigurationFatal", e);
         }
     }
 
@@ -189,7 +189,7 @@ public class CommandLine {
         unknownProperties.removeAll(all.keySet());
         if (unknownProperties.size() > 0) {
             for (String property : unknownProperties) {
-                LOG.info(R("CLUnknownProperty", property));
+                LOG.info("CLUnknownProperty", property);
             }
             return ERROR;
         }
@@ -268,7 +268,7 @@ public class CommandLine {
             try {
                 old.getValidator().validate(value);
             } catch (IllegalArgumentException e) {
-                LOG.error(R("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues()), e);
+                LOG.error("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues(), e);
                 return ERROR;
             }
         }
@@ -304,7 +304,7 @@ public class CommandLine {
             if (args.size() > 1) {
                 for (String arg : args) {
                     if (!arg.equals("all")) {
-                        LOG.info(R("CLUnknownCommand", arg));
+                        LOG.info("CLUnknownCommand", arg);
                     }
                 }
             }
@@ -320,7 +320,7 @@ public class CommandLine {
         } else {
             for (String key : args) {
                 if (!all.containsKey(key)) {
-                    LOG.info(R("CLUnknownProperty", key));
+                    LOG.info("CLUnknownProperty", key);
                     return ERROR;
                 } else {
                     Setting<String> setting = all.get(key);
@@ -367,7 +367,7 @@ public class CommandLine {
         for (String key : args) {
             Setting<String> value = all.get(key);
             if (value == null) {
-                LOG.info(R("CLNoInfo"));
+                LOG.info("CLNoInfo");
             } else {
                 OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
                 OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
@@ -415,12 +415,12 @@ public class CommandLine {
 
         boolean allValid = true;
         for (Setting<String> setting : validator.getIncorrectSetting()) {
-            LOG.info(R("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues()));
+            LOG.info("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues());
             allValid = false;
         }
 
         for (Setting<String> setting : validator.getUnrecognizedSetting()) {
-            LOG.info(R("CLUnknownProperty", setting.getName()));
+            LOG.info("CLUnknownProperty", setting.getName());
             allValid = false;
         }
 
@@ -444,12 +444,12 @@ public class CommandLine {
         int val;
         if (hasUnrecognizedCommands()) {
             for (String unknown : optionParser.getMainArgs()) {
-                LOG.info(R("CLUnknownCommand", unknown));
+                LOG.info("CLUnknownCommand", unknown);
             }
             handleHelpCommand();
             val = ERROR;
         } else if (getNumberOfOptions() > 1) {
-            LOG.info(R("CLUnexpectedNumberOfCommands"));
+            LOG.info("CLUnexpectedNumberOfCommands");
             val = handleHelpCommand();
         } else if (optionParser.hasOption(CommandLineOptions.LIST)) {
             val = handleListCommand();

@@ -86,7 +86,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     /** this exception prevents exiting the JVM */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-    new SecurityException(R("RShutdown"));
+    new SecurityException("RShutdown");
 
     /** weak list of windows created */
     private WeakList<Window> weakWindows = new WeakList<Window>();
@@ -157,7 +157,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     public void setExitClass(Class<?> exitClass) throws IllegalStateException {
         if (this.exitClass != null) {
-            throw new IllegalStateException(R("RExitTaken"));
+            throw new IllegalStateException("RExitTaken");
         }
 
         this.exitClass = exitClass;
@@ -275,7 +275,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
         if (!JNLPRuntime.isWebstartApplication() &&
                 ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {
-            throw new SecurityException(R("RCantReplaceSM"));
+            throw new SecurityException("RCantReplaceSM");
         }
 
         try {
@@ -286,7 +286,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             //                if (!"getClassLoader".equals(name)) {
             //                    ApplicationInstance app = getApplication();
             //                    if (app != null && !app.isRunning())
-            //                        throw new SecurityException(R("RDenyStopped"));
+            //                        throw new SecurityException("RDenyStopped");
             //                }
             //            }
 
@@ -412,7 +412,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // but when they really call, stop only the app instead of the JVM
         ApplicationInstance app = getApplication(Thread.currentThread(), stack, 0);
         if (app == null) {
-            throw new SecurityException(R("RExitNoApp"));
+            throw new SecurityException("RExitNoApp");
         }
 
         app.destroy();

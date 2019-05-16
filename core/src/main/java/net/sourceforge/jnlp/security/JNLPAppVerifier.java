@@ -131,7 +131,7 @@ public class JNLPAppVerifier implements AppVerifier {
             }
         }
 
-        throw new LaunchException(null, null, R("LSFatal"), R("LCLaunching"),
+        throw new LaunchException(null, null, "LSFatal", "LCLaunching",
                 R("LCancelOnUserRequest"), "");
     }
 

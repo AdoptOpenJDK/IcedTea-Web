@@ -60,27 +60,27 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 /**
  * This class helps maintain the ordering of most recently use items across
  * multiple jvm instances.
- * 
+ *
  */
 public class CacheLRUWrapper {
 
     private final static Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
-    
+
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
      * recently used items. The items are to be kept with key = (current time
      * accessed) followed by folder of item. value = path to file.
      */
-    
+
     private final InfrastructureFileDescriptor recentlyUsedPropertiesFile;
     private final InfrastructureFileDescriptor cacheDir;
     private final File windowsShortcutList;
-    
+
     public CacheLRUWrapper() {
         this(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
-    
-        
+
+
     /**
      * testing constructor
      * @param recentlyUsed file to be used as recently_used file
@@ -99,17 +99,17 @@ public class CacheLRUWrapper {
             }
         }
     }
-    
+
     /**
      * Returns an instance of the policy.
-     * 
+     *
      * @return an instance of the policy
      */
     public static CacheLRUWrapper getInstance() {
         return  CacheLRUWrapperHolder.INSTANCE;
     }
 
-    
+
     private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
     /**
      * @return the recentlyUsedPropertiesFile
@@ -119,7 +119,7 @@ public class CacheLRUWrapper {
             //no properties file yet, create it
             cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
             return cachedRecentlyUsedPropertiesFile;
-        } 
+        }
         if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())){
             //The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
             return cachedRecentlyUsedPropertiesFile;
@@ -132,7 +132,7 @@ public class CacheLRUWrapper {
             cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
             return cachedRecentlyUsedPropertiesFile;
         }
-        
+
     }
 
     /**
@@ -145,14 +145,14 @@ public class CacheLRUWrapper {
     public File getWindowsShortcutList() {
         return windowsShortcutList;
     }
-    
+
     /**
      * @return the recentlyUsedFile
      */
     public InfrastructureFileDescriptor getRecentlyUsedFile() {
         return recentlyUsedPropertiesFile;
     }
-    
+
    private static class CacheLRUWrapperHolder{
        private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
    }
@@ -162,14 +162,14 @@ public class CacheLRUWrapper {
      */
     public synchronized void load() {
         boolean loaded = getRecentlyUsedPropertiesFile().load();
-        /* 
+        /*
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new LruCacheException());
-            LOG.info(R("CFakeCache"));
+            LOG.info("CFakeCache");
             store();
-            LOG.info(R("CFakedCache"));
+            LOG.info("CFakedCache");
         }
     }
 
@@ -209,7 +209,7 @@ public class CacheLRUWrapper {
                 modified = true;
             }
         }
-        
+
         return modified;
     }
 
@@ -227,7 +227,7 @@ public class CacheLRUWrapper {
 
     /**
      * This adds a new entry to file.
-     * 
+     *
      * @param key key we want path to be associated with.
      * @param path path to cache item.
      * @return true if we successfully added to map, false otherwise.
@@ -243,7 +243,7 @@ public class CacheLRUWrapper {
 
     /**
      * This removed an entry from our map.
-     * 
+     *
      * @param key key we want to remove.
      * @return true if we successfully removed key from map, false otherwise.
      */
@@ -264,7 +264,7 @@ public class CacheLRUWrapper {
 
     /**
      * This updates the given key to reflect it was recently accessed.
-     * 
+     *
      * @param oldKey Key we wish to update.
      * @return true if we successfully updated value, false otherwise.
      */
@@ -283,7 +283,7 @@ public class CacheLRUWrapper {
 
     /**
      * Return a copy of the keys available.
-     * 
+     *
      * @return List of Strings sorted by ascending order.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -326,7 +326,7 @@ public class CacheLRUWrapper {
 
     /**
      * Return the value of given key.
-     * 
+     *
      * @param key key of property
      * @return value of given key, null otherwise.
      */
@@ -345,7 +345,7 @@ public class CacheLRUWrapper {
     /**
      * Generate a key given the path to file. May or may not generate the same
      * key given same path.
-     * 
+     *
      * @param path Path to generate a key with.
      * @return String representing the a key.
      */

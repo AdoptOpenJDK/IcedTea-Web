@@ -353,7 +353,7 @@ public class PolicyEditor extends JPanel {
                 }
             }
         };
-        
+
         openDefaultButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
@@ -497,7 +497,7 @@ public class PolicyEditor extends JPanel {
                 AboutDialog.display(modal, TextsProvider.POLICY_EDITOR, AboutDialog.ShowPage.HELP);
             }
         };
-        
+
         aboutItwButtonAction = new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -578,7 +578,7 @@ public class PolicyEditor extends JPanel {
         }
         return true;
     }
-    
+
     public void setFile(final String filepath) {
         if (filepath != null) {
             policyEditorController.setFile(new File(filepath));
@@ -1148,7 +1148,7 @@ public class PolicyEditor extends JPanel {
         fileMenu.add(saveAsItem);
 
         fileMenu.addSeparator();
-        
+
         final JMenuItem exitItem = new JMenuItem(R("PEExitMenuItem"));
         setButtonMnemonic(exitItem, R("PEExitMenuItemMnemonic"));
         setMenuItemAccelerator(exitItem, R("PEExitMenuItemAccelerator"));
@@ -1233,7 +1233,7 @@ public class PolicyEditor extends JPanel {
         //setButtonMnemonic(aboutPolicyEditorItem, R("PEAboutPolicyEditorItemMnemonic"));
         aboutITW.addActionListener(editor.aboutItwButtonAction);
         helpMenu.add(aboutITW);
-        
+
         final JMenuItem policyEditorHelpItem = new JMenuItem(R("PEPolicyEditorHelpItem"));
         setButtonMnemonic(policyEditorHelpItem, R("PEPolicyEditorHelpItemMnemonic"));
         policyEditorHelpItem.addActionListener(editor.policyEditorHelpButtonAction);
@@ -1473,10 +1473,10 @@ public class PolicyEditor extends JPanel {
         final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
-            LOG.debug(R("PECouldNotOpen"));
+            LOG.debug("PECouldNotOpen");
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            LOG.debug(R("RFileReadOnly"));
+            LOG.debug("RFileReadOnly");
         }
 
         try {
@@ -1533,7 +1533,7 @@ public class PolicyEditor extends JPanel {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, fnfe);
                     FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 } catch (final IOException | PolicyParser.ParsingException e) {
-                    LOG.error(R("RCantOpenFile", policyEditorController.getFile().getPath()), e);
+                    LOG.error("RCantOpenFile", policyEditorController.getFile().getPath(), e);
                     FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
                 }
                 return null;
@@ -1667,7 +1667,7 @@ public class PolicyEditor extends JPanel {
     /**
      * Detect if the policy settings have changed, either on-disk or in-app.
      * If an on-disk change has occurred, update the Md5.
-     * @return The user's choice (Yes/No/Cancel - see JOptionPane constants). 
+     * @return The user's choice (Yes/No/Cancel - see JOptionPane constants).
      * "Cancel" if the file hasn't changed but the user has made modifications
      * to the settings. "No" otherwise
      */
@@ -1721,7 +1721,7 @@ public class PolicyEditor extends JPanel {
         SwingUtils.setup();
 
         final CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getPolicyEditorOptions());
-        
+
         if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             JNLPRuntime.setDebug(true);
         }
@@ -1770,7 +1770,7 @@ public class PolicyEditor extends JPanel {
             try {
                 new URL(codebase);
             } catch (final MalformedURLException e) {
-                throw new IllegalArgumentException(R("PEInvalidUrl", codebase), e);
+                throw new IllegalArgumentException("PEInvalidUrl"+codebase, e);
             }
             return codebase;
         } else {
@@ -1782,7 +1782,7 @@ public class PolicyEditor extends JPanel {
         if (optionParser.hasOption(CommandLineOptions.SIGNEDBY)) {
             final String signedBy = optionParser.getParam(CommandLineOptions.SIGNEDBY);
             if (signedBy.isEmpty()) {
-                throw new IllegalArgumentException(R("PESignedByEmpty"));
+                throw new IllegalArgumentException("PESignedByEmpty");
             } else {
                 return signedBy;
             }
@@ -1809,9 +1809,9 @@ public class PolicyEditor extends JPanel {
         final boolean hasFileArgument = optionParser.hasOption(CommandLineOptions.FILE);
         final boolean hasMainArgument = optionParser.mainArgExists();
         if ((hasFileArgument && openDefaultFile) || (hasMainArgument && openDefaultFile)) {
-            throw new IllegalArgumentException(R("PEDefaultFileFilePathSpecifiedError"));
+            throw new IllegalArgumentException("PEDefaultFileFilePathSpecifiedError");
         } else if (hasFileArgument && hasMainArgument) {
-            throw new IllegalArgumentException(R("PEMainArgAndFileSwitchSpecifiedError"));
+            throw new IllegalArgumentException("PEMainArgAndFileSwitchSpecifiedError");
         }
 
         String filepath = null;

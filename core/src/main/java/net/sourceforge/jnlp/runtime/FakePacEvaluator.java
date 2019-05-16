@@ -53,7 +53,7 @@ public class FakePacEvaluator implements PacEvaluator {
 
     @Override
     public String getProxies(URL url) {
-        LOG.error(R("RPRoxyPacNotSupported"));
+        LOG.error("RPRoxyPacNotSupported");
         return "DIRECT";
     }
 }

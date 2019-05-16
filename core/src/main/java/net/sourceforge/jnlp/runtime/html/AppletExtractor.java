@@ -98,13 +98,13 @@ public class AppletExtractor {
                 Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
             } else {
-                LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
+                LOG.warn("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption());
             }
         } catch (Exception ex) {
-            LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
+            LOG.error("TAGSOUPhtmlBroken", ex);
         }
         return is;
-    }   
+    }
 
     public List<Element> findAppletsOnPage() {
         try{
@@ -115,13 +115,13 @@ public class AppletExtractor {
             throw new RuntimeException(ex);
         }
     }
-    
+
     private List<Element> findAppletsOnPageImpl(Document doc) throws ParserConfigurationException, SAXException, IOException {
         LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
         //search for embed/object
-        //<embed type="application/x-java-applet" 
-        //<object type="application/x-java-applet" 
+        //<embed type="application/x-java-applet"
+        //<object type="application/x-java-applet"
         //warning all searches are case sensitive
         return findElements(APPLETS, doc.getDocumentElement(), new ElementValidator() {
 
@@ -140,7 +140,7 @@ public class AppletExtractor {
     }
 
     //warning, even application/x-java-applet;jpi-version=1.5.0_07 and more blah blah  can be in type, so of embed/object start with
-    //search for 
+    //search for
     //OBJECT classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
     //<object codetype="application/x-java-applet" height="120" width="81"
     private static boolean isApplet(Element eElement) {

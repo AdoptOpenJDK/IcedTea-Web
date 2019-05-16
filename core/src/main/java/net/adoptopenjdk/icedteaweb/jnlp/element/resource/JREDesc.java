@@ -33,7 +33,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
-    
+
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
     /** the platform version or the product version if location is not null */
@@ -147,7 +147,7 @@ public class JREDesc {
         String heapSizeLower = realHeapSize.toLowerCase();
         Matcher heapMatcher = heapPattern.matcher(heapSizeLower);
         if (!heapMatcher.matches()) {
-            throw new ParseException(R("PBadHeapSize", realHeapSize));
+            throw new ParseException("PBadHeapSize "+realHeapSize);
         }
         return realHeapSize;
     }

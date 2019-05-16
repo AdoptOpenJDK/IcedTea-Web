@@ -305,7 +305,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.exit(1);
         }
 
-        LOG.info("{}: {}", R("BFileLoc"), location);
+        LOG.info("{}: {}", "BFileLoc", location);
 
         URL url = null;
 
@@ -357,7 +357,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
-                //clear one app 
+                //clear one app
                 CacheUtil.listCacheIds(optionArgs.get(0), true, true);
             } else {
                 // clear all cache
@@ -375,7 +375,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.CLEARCACHE)) {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
-                //clear one app 
+                //clear one app
                 CacheUtil.clearCache(optionArgs.get(0), true, true);
             } else {
                 // clear all cache

@@ -171,7 +171,7 @@ class KeystorePasswordAttempter {
                 if (i + 1 == localPasses.size()) {
                     String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), (i + 1));
                     LOG.info(s1);
-                    LOG.info(Translator.R("KSinvalidPassword"));
+                    LOG.info("KSinvalidPassword");
                     if (JNLPRuntime.isHeadless()) {
                         OutputController.getLogger().printOutLn(s1 + "\n" + Translator.R("KSheadlesWarning"));
                         String s = OutputController.getLogger().readLine();

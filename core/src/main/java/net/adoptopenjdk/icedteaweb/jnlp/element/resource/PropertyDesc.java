@@ -29,7 +29,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class PropertyDesc {
 
     /**
-     * 
+     *
      * @param prop - the property to be parsed from format key=value
      * @return new PropertyDesc based on parsed key=value, though composed from key and value
      * @throws net.sourceforge.jnlp.LaunchException if creations fails
@@ -38,7 +38,7 @@ public class PropertyDesc {
         // allows empty property, not sure about validity of that.
         int equals = prop.indexOf("=");
         if (equals == -1) {
-            throw new LaunchException(R("BBadProp", prop));
+            throw new LaunchException("BBadProp "+prop);
         }
         final String key = prop.substring(0, equals);
         final String value = prop.substring(equals + 1, prop.length());

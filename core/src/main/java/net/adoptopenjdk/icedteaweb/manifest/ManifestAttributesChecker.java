@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (C) 2011 Red Hat, Inc.
 Copyright (C) 2019 Karakun AG
 
@@ -98,42 +98,42 @@ public class ManifestAttributesChecker {
     public void checkAll() throws LaunchException {
         List<MANIFEST_ATTRIBUTES_CHECK> attributesCheck = getAttributesCheck();
         if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.NONE)) {
-            LOG.warn(R("MACDisabledMessage"));
+            LOG.warn("MACDisabledMessage");
         } else {
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.TRUSTED) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkTrustedOnlyAttribute();
             } else {
-                LOG.warn(R("MACCheckSkipped", "Trusted-Only", "TRUSTED"));
+                LOG.warn("MACCheckSkipped", "Trusted-Only", "TRUSTED");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.CODEBASE) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkCodebaseAttribute();
             } else {
-                LOG.warn(R("MACCheckSkipped", "Codebase", "CODEBASE"));
+                LOG.warn("MACCheckSkipped", "Codebase", "CODEBASE");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkPermissionsAttribute();
             } else {
-                LOG.warn(R("MACCheckSkipped", "Permissions", "PERMISSIONS"));
+                LOG.warn("MACCheckSkipped", "Permissions", "PERMISSIONS");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALAC) ||
                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkApplicationLibraryAllowableCodebaseAttribute();
             } else {
-                LOG.warn(R("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC"));
+                LOG.warn("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC");
             }
-            
+
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ENTRYPOINT)
                     || attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkEntryPoint();
             } else {
-                LOG.warn(R("MACCheckSkipped", "Entry-Point", "ENTRYPOINT"));
+                LOG.warn("MACCheckSkipped", "Entry-Point", "ENTRYPOINT");
             }
 
         }
@@ -227,7 +227,7 @@ public class ManifestAttributesChecker {
         }
         LOG.debug("Trusted Only manifest attribute is \"true\". {} and requests permission level: {}", signedMsg, securityType);
         if (!(isFullySigned && requestsCorrectPermissions)) {
-            throw new LaunchException(R("STrustedOnlyAttributeFailure", signedMsg, securityType));
+            throw new LaunchException("STrustedOnlyAttributeFailure"+signedMsg+securityType);
         }
     }
 
@@ -236,30 +236,30 @@ public class ManifestAttributesChecker {
      */
     private void checkCodebaseAttribute() throws LaunchException {
         if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
-            LOG.warn(R("CBCheckFile"));
+            LOG.warn("CBCheckFile");
             return;
         }
         final Object securityType = security.getSecurityType();
         final URL codebase = UrlUtils.guessCodeBase(file);
         final ClasspathMatchers codebaseAtt = file.getManifestAttributesReader().getCodebase();
         if (codebaseAtt == null) {
-            LOG.warn(R("CBCheckNoEntry"));
+            LOG.warn("CBCheckNoEntry");
             return;
         }
         if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
             if (codebaseAtt.matches(codebase)) {
-                LOG.info(R("CBCheckUnsignedPass"));
+                LOG.info("CBCheckUnsignedPass");
             } else {
-                LOG.error(R("CBCheckUnsignedFail"));
+                LOG.error("CBCheckUnsignedFail");
             }
         } else {
             if (codebaseAtt.matches(codebase)) {
-                LOG.info(R("CBCheckOkSignedOk"));
+                LOG.info("CBCheckOkSignedOk");
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException(R("CBCheckSignedAppletDontMatchException", file.getManifestAttributesReader().getCodebase().toString(), codebase));
+                    throw new LaunchException("CBCheckSignedAppletDontMatchException"+file.getManifestAttributesReader().getCodebase().toString()+codebase);
                 } else {
-                    LOG.error(R("CBCheckSignedFail"));
+                    LOG.error("CBCheckSignedFail");
                 }
             }
         }
@@ -403,7 +403,7 @@ public class ManifestAttributesChecker {
             LOG.debug("All applications resources ({}) are from codebase/documentbase {}/{}, skipping Application-Library-Allowable-Codebase Attribute check.", usedUrls.toArray(new URL[0])[0], codebase, documentBase);
             return;
         }
-        
+
         ClasspathMatchers att = null;
         if (signing != SigningState.NONE) {
             // we only consider values in manifest for signed apps (as they may be faked)
@@ -433,7 +433,7 @@ public class ManifestAttributesChecker {
             LOG.debug("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, and was allowed to run by the user or user's security settings.");
         }
     }
-    
+
     //package private for testing
     //not perfect but ok for use case
     static URL stripDocbase(URL documentBase) {

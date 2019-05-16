@@ -180,7 +180,7 @@ public class PluginAppVerifier implements AppVerifier {
                 }
             }
             if (!trustFoundOrApproved) {
-                throw new LaunchException(null, null, R("LSFatal"),
+                throw new LaunchException(null, null, "LSFatal",
                     R("LCLaunching"), R("LCancelOnUserRequest"), "");
             }
         }

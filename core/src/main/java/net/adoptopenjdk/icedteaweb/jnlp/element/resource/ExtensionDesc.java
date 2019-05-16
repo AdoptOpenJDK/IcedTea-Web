@@ -135,7 +135,7 @@ public class ExtensionDesc {
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())
-                throw new ParseException(R("JInvalidExtensionDescriptor", name, location));
+                throw new ParseException("JInvalidExtensionDescriptor "+name+location);
         }
 
     }

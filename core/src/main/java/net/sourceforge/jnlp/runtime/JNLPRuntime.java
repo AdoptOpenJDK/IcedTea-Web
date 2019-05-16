@@ -164,27 +164,27 @@ public class JNLPRuntime {
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
-    
+
     /** flag keeping rest of jnlpruntime live that javaws was lunched as -html */
     private static boolean html=false;
 
     /** all security dialogs will be consumed and we will pretend the Sandbox NumberOfArguments was chosen */
     private static boolean trustNone = false;
-    
+
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
     private static boolean allowRedirect = false;;
-    
+
     /** when this is true, ITW will not attempt any inet connections and will work only with what is in cache*/
     private static boolean offlineForced = false;
 
     private static Boolean onlineDetected = null;
 
 
-    /** 
+    /**
      * Header is not checked and so eg
      * <a href="https://en.wikipedia.org/wiki/Gifar">gifar</a> exploit is
      * possible.<br/>
-     * However if jar file is a bit corrupted, then it sometimes can work so 
+     * However if jar file is a bit corrupted, then it sometimes can work so
      * this switch can disable the header check.
      * @see <a href="https://en.wikipedia.org/wiki/Gifar">Gifar attack</a>
      */
@@ -243,7 +243,7 @@ public class JNLPRuntime {
                 //where deployment.system.config points is not readable
                 throw new RuntimeException(getConfiguration().getLoadingException());
             }
-            LOG.warn(R("RConfigurationError")+": "+getConfiguration().getLoadingException().getMessage());
+            LOG.warn("RConfigurationError"+": "+getConfiguration().getLoadingException().getMessage());
         }
 
         isWebstartApplication = isApplication;
@@ -301,7 +301,7 @@ public class JNLPRuntime {
         ProxySelector.setDefault(proxySelector);
 
         // Restrict access to netx classes
-        Security.setProperty("package.access", 
+        Security.setProperty("package.access",
                              Security.getProperty("package.access")+",net.sourceforge.jnlp");
 
         URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
@@ -447,7 +447,7 @@ public class JNLPRuntime {
 
         return true;
     }
-   
+
     /**
      * see <a href="https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java">Double-checked locking in Java</a>
      * for cases how not to do lazy initialization
@@ -464,12 +464,12 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                LOG.info(R("RConfigurationError"));
+                LOG.info("RConfigurationError");
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             }catch(Exception t){
-                LOG.error(R("RFailingToDefault"), t);
+                LOG.error("RFailingToDefault", t);
                 if (!JNLPRuntime.isHeadless()){
                     JOptionPane.showMessageDialog(null, R("RFailingToDefault")+"\n"+t.toString());
                 }
@@ -532,7 +532,7 @@ public class JNLPRuntime {
         checkInitialized();
         headless = enabled;
     }
-    
+
     public static void setAllowRedirect(boolean enabled) {
         checkInitialized();
         allowRedirect = enabled;
@@ -541,7 +541,7 @@ public class JNLPRuntime {
     public static boolean isAllowRedirect() {
         return allowRedirect;
     }
-    
+
 
     /**
      * Sets whether we will verify code signing.
@@ -647,7 +647,7 @@ public class JNLPRuntime {
         debug = enabled;
     }
 
-  
+
     /**
      * Sets the default update policy.
      *
@@ -757,7 +757,7 @@ public class JNLPRuntime {
                         }
                     } catch (HeadlessException ex) {
                         headless = true;
-                        LOG.error(Translator.R("HEADLESS_MISCONFIGURED"), ex);
+                        LOG.error("HEADLESS_MISCONFIGURED", ex);
                     }
                 }
             }
@@ -819,7 +819,7 @@ public class JNLPRuntime {
                 fileLock.release(); // We can release now, since we hold another lock.
                 fileLock = temp; // Keep the new lock so we can release later.
             }
-            
+
             if (fileLock != null && fileLock.isShared()) {
                 LOG.debug("Acquired shared lock on {} to indicate javaws is running", netxRunningFile);
             }
@@ -924,7 +924,7 @@ public class JNLPRuntime {
     private static String getHistory() {
         return history;
     }
-    
-    
+
+
 
 }

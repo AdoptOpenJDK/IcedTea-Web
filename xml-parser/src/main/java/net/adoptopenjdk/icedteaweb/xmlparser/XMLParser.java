@@ -90,7 +90,7 @@ public class XMLParser {
             xml.parseFromReader(sanitizeXml(isr));
             return new Node(xml);
         } catch (Exception ex) {
-            throw new ParseException(R("PBadXML"), ex);
+            throw new ParseException("PBadXML "+ ex);
         }
     }
 
@@ -264,7 +264,7 @@ public class XMLParser {
 
         if (result == null || result.length() == 0) {
             if (strict || defaultValue == null) {
-                throw new ParseException(R("PNeedsAttribute", node.getNodeName().getName(), name));
+                throw new ParseException("PNeedsAttribute "+node.getNodeName().getName()+name);
             }
         }
 
@@ -338,7 +338,7 @@ public class XMLParser {
                 // check for going above the codebase
                 if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
                     if (strict) {
-                        throw new ParseException(R("PUrlNotInCodebase", nodeName, href, base));
+                        throw new ParseException("PUrlNotInCodebase "+nodeName+href+base);
                     }
                 }
                 return result;
@@ -346,9 +346,9 @@ public class XMLParser {
 
         } catch (MalformedURLException ex) {
             if (base == null) {
-                throw new ParseException(R("PBadNonrelativeUrl", nodeName, href));
+                throw new ParseException("PBadNonrelativeUrl "+nodeName+href);
             } else {
-                throw new ParseException(R("PBadRelativeUrl", nodeName, href, base));
+                throw new ParseException("PBadRelativeUrl "+nodeName+href+base);
             }
         }
     }
