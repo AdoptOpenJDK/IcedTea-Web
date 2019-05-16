@@ -430,7 +430,7 @@ public final class DeploymentConfiguration {
             final String message = String.format("No %s level %s found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
             if (mandatory) {
                 final ConfigurationException configurationException = new ConfigurationException(message);
-                LOG.error(message, configurationException);
+                LOG.error(message);
                 throw configurationException;
             } else {
                 LOG.warn(message);
