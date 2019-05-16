@@ -1,7 +1,10 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.testing.AnnotationConditionChecker;
+import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -21,6 +24,7 @@ public class TeeOutputStreamTest {
     private static final String EOL = System.getProperty(LINE_SEPARATOR);
 
     private static final String[] TEST_STRINGS = new String[]{
+            "Hello,\n\r\nWorld",
             "Hel你好lo \n World!",
             "ÆÆÆÆÆHello!\r",
             "नमस्तHello!\r",
@@ -28,6 +32,9 @@ public class TeeOutputStreamTest {
             "He\n\n\\llo chào",
             "He\n\n\\llo chào"
     };
+
+    @Rule
+    public AnnotationConditionChecker acc = new AnnotationConditionChecker();
 
     private TeeOutputStream tos;
     private List<String> loggedMessages;
@@ -64,6 +71,7 @@ public class TeeOutputStreamTest {
     }
 
     @Test
+    @WindowsIssue
     public void testPrint() {
         for (String s : TEST_STRINGS) {
             assertUnmodifiedByPrint(s);
@@ -72,6 +80,7 @@ public class TeeOutputStreamTest {
     }
 
     @Test
+    @WindowsIssue
     public void testWriteByteArrayString() {
         for (String s : TEST_STRINGS) {
             assertUnmodifiedByWrite(s);
@@ -80,6 +89,7 @@ public class TeeOutputStreamTest {
     }
 
     @Test
+    @WindowsIssue
     public void testWriteByteArrayStringInUtf8() { //last character missing
         for (String s : TEST_STRINGS) {
             assertUnmodifiedByWriteInUtf8(s);
