@@ -16,18 +16,18 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.JNLPFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -38,44 +38,39 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @version $Revision: 1.8 $
  */
 public class ExtensionDesc {
-
     private final static Logger LOG = LoggerFactory.getLogger(ExtensionDesc.class);
 
-    /**
-     * the extension name
-     */
+    public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
+    public static final String DOWNLOAD_ATTRIBUTE = "download";
+    public static final String EXT_PART_ATTRIBUTE = "ext-part";
+
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String VERSION_ATTRIBUTE = "version";
+    public static final String PART_ATTRIBUTE = "part";
+
+    /** the extension name */
     private final String name;
 
-    /**
-     * the required extension version
-     */
+    /** the required extension version */
     private final Version version;
 
-    /**
-     * the location of the extension JNLP file
-     */
+    /** the location of the extension JNLP file */
     private final URL location;
 
-    /**
-     * the JNLPFile the extension refers to
-     */
+    /** the JNLPFile the extension refers to */
     private JNLPFile file;
 
-    /**
-     * map from ext-part to local part
-     */
+    /** map from ext-part to local part */
     private final Map<String, String> extToPart = new HashMap<>();
 
-    /**
-     * eager ext parts
-     */
+    /** eager ext parts */
     private final List<String> eagerExtParts = new ArrayList<>();
 
     /**
      * Create an extension descriptor.
      *
-     * @param name     the extension name
-     * @param version  the required version of the extension JNLPFile
+     * @param name the extension name
+     * @param version the required version of the extension JNLPFile
      * @param location the location of the extension JNLP file
      */
     public ExtensionDesc(String name, Version version, URL location) {
@@ -91,8 +86,8 @@ public class ExtensionDesc {
      * lazy value is false or the part is empty or null.
      *
      * @param extPart the part name in the extension file
-     * @param part    the part name in the main file
-     * @param lazy    whether to load the part before launching
+     * @param part the part name in the main file
+     * @param lazy whether to load the part before launching
      */
     public void addPart(String extPart, String part, boolean lazy) {
         extToPart.put(extPart, part);
@@ -136,9 +131,9 @@ public class ExtensionDesc {
      * Resolves the extension by creating a JNLPFile from the file
      * specified by the extension's location property.
      *
-     * @throws IOException    if the extension JNLPFile could not be resolved.
+     * @throws IOException if the extension JNLPFile could not be resolved.
      * @throws ParseException if the extension JNLPFile could not be
-     *                        parsed or was not a component or installer descriptor.
+     * parsed or was not a component or installer descriptor.
      */
     public void resolve() throws ParseException, IOException {
         if (file == null) {
@@ -148,7 +143,7 @@ public class ExtensionDesc {
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())
-                throw new ParseException("JInvalidExtensionDescriptor " + name + location);
+                throw new ParseException("JInvalidExtensionDescriptor "+name+location);
         }
 
     }
