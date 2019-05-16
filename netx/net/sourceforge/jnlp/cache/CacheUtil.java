@@ -324,10 +324,10 @@ public class CacheUtil {
       * @return 
       */
       public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
+        final List<CacheId> r = new ArrayList<>();
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
         lruHandler.lock();
-        final List<CacheId> r = new ArrayList<>();
         try {
             Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
                 @Override

@@ -105,10 +105,10 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         String absoluteLocation = "http://absolute.href.com/test.jnlp";
         PluginParameters params = createValidParamObject();
         params.put("jnlp_href", absoluteLocation);
-        MockJnlpFileFactory mockCreator = new MockJnlpFileFactory();
+        MockJNLPCreator mockCreator = new MockJNLPCreator();
 
         // when
-        new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
+        PluginBridge pb = new PluginBridge(codeBase, null, "", "", 0, 0, params, mockCreator);
 
         // then
         CacheUtil.clearCache();
