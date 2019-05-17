@@ -1,4 +1,6 @@
 # IcedTeaWeb
+[![Build Status](https://travis-ci.com/AdoptOpenJDK/IcedTea-Web.svg?branch=master)](https://travis-ci.com/AdoptOpenJDK/IcedTea-Web)
+
 This repository contains all sources of IcedTeaWeb. 
 
 ## About IcedTeaWeb
