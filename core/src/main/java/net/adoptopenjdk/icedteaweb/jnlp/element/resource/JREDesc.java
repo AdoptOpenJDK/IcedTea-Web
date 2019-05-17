@@ -28,13 +28,23 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 
 /**
- * The J2SE/Java element.
+ * The java element (or the j2se element) (sub-element of resources) specifies what Java Runtime Environment (JRE)
+ * versions an application is supported on, as well as standard parameters to the Java Virtual Machine.
+ * Several JREs can be specified in the JNLP file, which indicates a prioritized list of the supported JREs,
+ * with the most preferred version first.
+ *
+ * @implSpec See <b>JSR-56, Section 4.6 Java Runtime Environment</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
+    public static final String VERSION_ATTRIBUTE = "version";
     public static final String HREF_ATTRIBUTE = "href";
+    public static final String JAVA_VM_ARGS_ATTRIBUTE = "java-vm-args";
+    public static final String INITIAL_HEAP_SIZE_ATTRIBUTE = "initial-heap-size";
+    public static final String MAX_HEAP_SIZE_ATTRIBUTE = "max-heap-size";
 
     private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
 
