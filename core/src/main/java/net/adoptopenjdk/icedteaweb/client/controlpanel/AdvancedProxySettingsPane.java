@@ -18,8 +18,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -55,16 +56,18 @@ public class AdvancedProxySettingsPane extends JPanel {
     private final DeploymentConfiguration config;
 
     /** List of properties used by this panel */
-    public static String[] properties = { "deployment.proxy.http.host",
-            "deployment.proxy.http.port",
-            "deployment.proxy.https.host",
-            "deployment.proxy.https.port",
-            "deployment.proxy.ftp.host",
-            "deployment.proxy.ftp.port",
-            "deployment.proxy.socks.host",
-            "deployment.proxy.socks.port",
-            "deployment.proxy.same",
-            "deployment.proxy.override.hosts" };
+    private String[] properties = {
+        ConfigurationConstants.KEY_PROXY_HTTP_HOST,
+        ConfigurationConstants.KEY_PROXY_HTTP_PORT,
+        ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
+        ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
+        ConfigurationConstants.KEY_PROXY_FTP_HOST,
+        ConfigurationConstants.KEY_PROXY_FTP_PORT,
+        ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
+        ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
+        ConfigurationConstants.KEY_PROXY_SAME,
+        ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS
+    };
     private String[] fields = new String[properties.length];
 
     private JComponent defaultFocusComponent = null;
