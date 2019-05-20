@@ -37,6 +37,7 @@ publishInternalLib "$COMMON_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$JNLPAPI_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$XMLPARSER_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$CLIENTS_SRC" "$ITW_TARGET_DIR"
+publishInternalLib "$JNLPSERVER_SRC" "$ITW_TARGET_DIR"
 
 publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
