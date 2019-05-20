@@ -331,17 +331,17 @@ public class Defaults {
                 },
                 /* cache and optional package repository */
                 {
-                        "deployment.cache.max.size",
+                        ConfigurationConstants.KEY_CACHE_MAX_SIZE,
                         ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE),
                         "-1"
                 },
                 {
-                        "deployment.cache.jarcompression",
+                        ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED,
                         ValidatorFactory.createRangedIntegerValidator(0, 10),
                         String.valueOf(0)
                 },
                 {
-                        "deployment.javapi.cache.enabled",
+                        ConfigurationConstants.KEY_CACHE_ENABLED,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 },
