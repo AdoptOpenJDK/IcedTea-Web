@@ -21,7 +21,6 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +42,11 @@ import java.util.List;
  */
 class XPersistenceService implements PersistenceService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XPersistenceService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XPersistenceService.class);
 
     // todo: recheck delete, etc to make sure security is tight
 
-    protected XPersistenceService() {
+    XPersistenceService() {
     }
 
     /**
@@ -57,13 +56,13 @@ class XPersistenceService implements PersistenceService {
      *
      * @throws MalformedURLException if the application cannot access the location
      */
-    protected void checkLocation(URL location) throws MalformedURLException {
+    private void checkLocation(URL location) throws MalformedURLException {
         ApplicationInstance app = JNLPRuntime.getApplication();
         if (app == null)
             throw new MalformedURLException("Cannot determine the current application.");
 
         URL source = app.getJNLPFile().getCodeBase();
-        
+
         if (!source.getHost().equalsIgnoreCase(location.getHost())
                 && !ServiceUtil.isSigned(app)) // Allow trusted application to have access to data from a different host
             throw new MalformedURLException(
@@ -78,10 +77,10 @@ class XPersistenceService implements PersistenceService {
         else
             requestPath = "";
 
-          LOG.debug("codebase path: {}", source.getFile());
-          LOG.debug("request path: {}", requestPath);
+        LOG.debug("codebase path: {}", source.getFile());
+        LOG.debug("request path: {}", requestPath);
 
-        if (!source.getFile().startsWith(requestPath) 
+        if (!source.getFile().startsWith(requestPath)
                 && !ServiceUtil.isSigned(app)) // Allow trusted application to have access to data below source URL path
             throw new MalformedURLException(
                     "Cannot access data below source URL path.");
@@ -92,22 +91,21 @@ class XPersistenceService implements PersistenceService {
      *
      * @return the file
      */
-    protected File toCacheFile(URL location) throws MalformedURLException {
-        String pcache =  PathsAndFiles.PCACHE_DIR.getFullPath();
+    private File toCacheFile(URL location) {
+        String pcache = PathsAndFiles.PCACHE_DIR.getFullPath();
         return CacheUtil.urlToPath(location, pcache);
     }
 
     /**
-     *
      * @return the maximum size of storage that got granted, in bytes
      * @throws MalformedURLException if the application cannot access the location
      */
-    public long create(URL location, long maxsize) throws MalformedURLException, IOException {
+    public long create(URL location, long maxsize) throws IOException {
         checkLocation(location);
 
         File file = toCacheFile(location);
         FileUtils.createParentDir(file, "Persistence store for "
-                    + location.toString());
+                + location.toString());
 
         if (file.exists())
             throw new IOException("File already exists.");
@@ -118,20 +116,18 @@ class XPersistenceService implements PersistenceService {
     }
 
     /**
-     *
      * @throws MalformedURLException if the application cannot access the location
      */
-    public void delete(URL location) throws MalformedURLException, IOException {
+    public void delete(URL location) throws IOException {
         checkLocation(location);
 
         FileUtils.deleteWithErrMesg(toCacheFile(location), " tocache");
     }
 
     /**
-     *
      * @throws MalformedURLException if the application cannot access the location
      */
-    public FileContents get(URL location) throws MalformedURLException, IOException, FileNotFoundException {
+    public FileContents get(URL location) throws IOException {
         checkLocation(location);
 
         File file = toCacheFile(location);
@@ -140,38 +136,40 @@ class XPersistenceService implements PersistenceService {
                     + location.toString() + " is not found.");
         }
         FileUtils.createParentDir(file, "Persistence store for "
-                    + location.toString());
+                + location.toString());
 
         return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class, new XFileContents(file));
     }
 
     /**
-     *
      * @throws MalformedURLException if the application cannot access the location
      */
-    public String[] getNames(URL location) throws MalformedURLException, IOException {
+    public String[] getNames(URL location) throws IOException {
         checkLocation(location);
 
         File file = toCacheFile(location);
         if (!file.isDirectory())
             return new String[0];
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         // check whether this is right: only add files and not directories.
-        File entries[] = file.listFiles();
-        for (int i = 0; i < entries.length; i++)
-            if (entries[i].isFile())
-                result.add(entries[i].getName());
+        File[] entries = file.listFiles();
+        if (entries == null) {
+            return new String[0];
+        }
 
-        return result.toArray(new String[result.size()]);
+        for (File entry : entries)
+            if (entry.isFile())
+                result.add(entry.getName());
+
+        return result.toArray(new String[0]);
     }
 
     /**
-     *
      * @throws MalformedURLException if the application cannot access the location
      */
-    public int getTag(URL location) throws MalformedURLException, IOException {
+    public int getTag(URL location) throws IOException {
         checkLocation(location);
 
         // todo: actually implement tags
@@ -183,10 +181,9 @@ class XPersistenceService implements PersistenceService {
     }
 
     /**
-     *
      * @throws MalformedURLException if the application cannot access the location
      */
-    public void setTag(URL location, int tag) throws MalformedURLException, IOException {
+    public void setTag(URL location, int tag) throws IOException {
         checkLocation(location);
 
         // todo: actually implement tags
