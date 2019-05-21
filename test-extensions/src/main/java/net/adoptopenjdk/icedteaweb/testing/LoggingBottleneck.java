@@ -60,10 +60,11 @@ public class LoggingBottleneck {
      * default singleton
      */
     private static LoggingBottleneck loggingBottleneck;
-    private static final File DEFAULT_LOG_FILE = new File("ServerAccess-logs.xml");
-    private static final File DEFAULT_STDERR_FILE = new File("stderr.log");
-    private static final File DEFAULT_STDOUT_FILE = new File("stdout.log");
-    private static final File DEFAULT_STDLOGS_FILE = new File("all.log");
+    private static final File LOG_DIR = new File("target/logs");
+    private static final File DEFAULT_LOG_FILE = new File(LOG_DIR, "ServerAccess-logs.xml");
+    private static final File DEFAULT_STDERR_FILE = new File(LOG_DIR, "stderr.log");
+    private static final File DEFAULT_STDOUT_FILE = new File(LOG_DIR, "stdout.log");
+    private static final File DEFAULT_STDLOGS_FILE = new File(LOG_DIR, "all.log");
     private static final String LOGS_ELEMENT = "logs";
     private static final String CLASSLOG_ELEMENT = "classlog";
     private static final String CLASSNAME_ATTRIBUTE = "className";
@@ -83,6 +84,10 @@ public class LoggingBottleneck {
      */
     private final Map<String, Map<String, TestsLogs>> processLogs = Collections.synchronizedMap(new HashMap<String, Map<String, TestsLogs>>(1000));
     private boolean added = false;
+
+    static {
+        LOG_DIR.mkdirs();
+    }
 
     synchronized public static LoggingBottleneck getDefaultLoggingBottleneck() {
         if (loggingBottleneck == null) {

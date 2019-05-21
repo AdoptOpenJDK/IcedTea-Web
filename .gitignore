@@ -1,11 +1,7 @@
 .DS_Store
 .idea
-.idea
-*/*.iml
 *.iml
-*/target/**
+*/target
 
-*.log
-ServerAccess-logs.xml
 launchers/build.log
 launchers/rust-launcher/Cargo.lock
