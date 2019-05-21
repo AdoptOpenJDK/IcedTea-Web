@@ -15,31 +15,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.services;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.StringTokenizer;
-import javax.jnlp.BasicService;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
@@ -55,6 +30,30 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jnlp.BasicService;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.StringTokenizer;
+
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -66,9 +65,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 class XBasicService implements BasicService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XBasicService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XBasicService.class);
 
-    protected XBasicService() {
+    XBasicService() {
     }
 
     /**
@@ -79,10 +78,10 @@ class XBasicService implements BasicService {
      */
     @Override
     public URL getCodeBase() {
-        ApplicationInstance app = JNLPRuntime.getApplication();
+        final ApplicationInstance app = JNLPRuntime.getApplication();
 
         if (app != null) {
-            JNLPFile file = app.getJNLPFile();
+            final JNLPFile file = app.getJNLPFile();
 
             // return the codebase.
             if (file.getCodeBase() != null) {
@@ -90,7 +89,7 @@ class XBasicService implements BasicService {
             }
 
             // else return the main JAR's URL.
-            JARDesc mainJar = file.getResources().getMainJAR();
+            final JARDesc mainJar = file.getResources().getMainJAR();
             if (mainJar != null) {
                 return mainJar.getLocation();
             }
@@ -111,8 +110,7 @@ class XBasicService implements BasicService {
      */
     @Override
     public boolean isOffline() {
-
-        URL url = findFirstURLFromJNLPFile();
+        final URL url = findFirstURLFromJNLPFile();
         JNLPRuntime.detectOnline(url);
         return !JNLPRuntime.isOnline();
     }
@@ -123,43 +121,40 @@ class XBasicService implements BasicService {
      */
     private URL findFirstURLFromJNLPFile() {
 
-        ApplicationInstance app = JNLPRuntime.getApplication();
+        final ApplicationInstance app = JNLPRuntime.getApplication();
 
         if (app != null) {
-            JNLPFile jnlpFile = app.getJNLPFile();
+            final JNLPFile jnlpFile = app.getJNLPFile();
 
-            URL sourceURL = jnlpFile.getSourceLocation();
+            final URL sourceURL = jnlpFile.getSourceLocation();
             if (sourceURL != null) {
                 return sourceURL;
             }
 
-            URL codeBaseURL = jnlpFile.getCodeBase();
+            final URL codeBaseURL = jnlpFile.getCodeBase();
             if (codeBaseURL != null) {
                 return codeBaseURL;
             }
 
-            InformationDesc informationDesc = jnlpFile.getInformation();
-            URL homePage = informationDesc.getHomepage();
+            final InformationDesc informationDesc = jnlpFile.getInformation();
+            final URL homePage = informationDesc.getHomepage();
             if (homePage != null) {
                 return homePage;
             }
 
-            JARDesc[] jarDescs = jnlpFile.getResources().getJARs();
-            for (JARDesc jarDesc : jarDescs) {
-                return jarDesc.getLocation();
+            final JARDesc[] jarDescs = jnlpFile.getResources().getJARs();
+            if (jarDescs.length > 0) {
+                return jarDescs[0].getLocation();
             }
         }
 
         // this section is only reached if the jnlp file has no jars.
         // that doesn't seem very likely.
-        URL arbitraryURL;
         try {
-            arbitraryURL = new URL("http://icedtea.classpath.org");
+            return new URL("http://icedtea.classpath.org");
         } catch (MalformedURLException malformedURL) {
             throw new RuntimeException(malformedURL);
         }
-
-        return arbitraryURL;
     }
 
     /**
@@ -177,7 +172,7 @@ class XBasicService implements BasicService {
      * @return whether the document was opened
      */
     @Override
-    public boolean showDocument(URL url) {
+    public boolean showDocument(final URL url) {
         try {
 //        if (url.toString().endsWith(".jnlp")) {
 //            try {
@@ -192,11 +187,11 @@ class XBasicService implements BasicService {
 // ALWAYS-ASK, or directly via BROWSER of deployment.browser.path , it still should be better then it was
 // in all cases, the mime recognition is much harder then .jnlp suffix
 
-            String urls = url.toExternalForm();
+            final String urls = url.toExternalForm();
             LOG.debug("showDocument for: {}", urls);
 
-            DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            String command = config.getProperty(ConfigurationConstants.KEY_BROWSER_PATH);
+            final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            final String command = config.getProperty(ConfigurationConstants.KEY_BROWSER_PATH);
             //for various debugging
             //command=DeploymentConfiguration.ALWAYS_ASK;
             if (command != null) {
@@ -204,22 +199,18 @@ class XBasicService implements BasicService {
                 return exec(command, urls);
             }
             if (System.getenv(ConfigurationConstants.BROWSER_ENV_VAR) != null) {
-                command = System.getenv(ConfigurationConstants.BROWSER_ENV_VAR);
+                final String cmd = System.getenv(ConfigurationConstants.BROWSER_ENV_VAR);
                 LOG.debug("variable {} located. Using: {}", ConfigurationConstants.BROWSER_ENV_VAR, command);
-                return exec(command, urls);
+                return exec(cmd, urls);
             }
+
             if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
-                command = promptForCommand(urls, false);
-                return exec(command, urls);
+                final String cmd = promptForCommand(urls, false);
+                return exec(cmd, urls);
             } else {
-                if (Desktop.isDesktopSupported()) {
-                    LOG.debug("using default browser");
-                    Desktop.getDesktop().browse(url.toURI());
-                    return true;
-                } else {
-                    LOG.debug("dont know what to do");
-                    return false;
-                }
+                LOG.debug("using default browser");
+                Desktop.getDesktop().browse(url.toURI());
+                return true;
             }
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -228,7 +219,7 @@ class XBasicService implements BasicService {
     }
 
     //cmd form user can contains spaces, quotes and so... now we are relying on default dummy impl
-    private boolean exec(String cmd, String url) {
+    private boolean exec(final String cmd, final String url) {
         try {
             if (cmd == null || cmd.length() == 0) {
                 return false;
@@ -236,16 +227,22 @@ class XBasicService implements BasicService {
             if (url == null || url.length() == 0) {
                 return false;
             }
+
+            final String runCmd;
             if (cmd.equals(ConfigurationConstants.ALWAYS_ASK)) {
-                cmd = promptForCommand(url, true);
+                runCmd = promptForCommand(url, true);
+            } else {
+                runCmd = cmd;
             }
-            if (cmd.equals(ConfigurationConstants.INTERNAL_HTML)) {
+
+            if (runCmd.equals(ConfigurationConstants.INTERNAL_HTML)) {
                 LinkingBrowser.createFrame(url, false, JFrame.DISPOSE_ON_CLOSE);
                 return true;
             }
+
             //copypasted from exec
-            StringTokenizer st = new StringTokenizer(cmd + " " + url);
-            String[] cmdarray = new String[st.countTokens()];
+            final StringTokenizer st = new StringTokenizer(runCmd + " " + url);
+            final String[] cmdarray = new String[st.countTokens()];
             for (int i = 0; st.hasMoreTokens(); i++) {
                 cmdarray[i] = st.nextToken();
             }
@@ -268,15 +265,15 @@ class XBasicService implements BasicService {
         }
     }
 
-    private String promptForCommand(final String targetUrl, boolean aa) throws IOException {
+    private String promptForCommand(final String targetUrl, final boolean aa) throws IOException {
         final String message = DeploymentConfiguration.VVPossibleBrowserValues();
-        String title = R("RBrowserLocationPromptTitle");
+        final String title = R("RBrowserLocationPromptTitle");
         if (JNLPRuntime.isHeadless()) {
             OutputController.getLogger().printOutLn(message);
             OutputController.getLogger().printOutLn("*** " + targetUrl + " ***");
             OutputController.getLogger().printOutLn(title);
-            String entered = OutputController.getLogger().readLine();
-            String verification = ValidatorUtils.verifyFileOrCommand(entered);
+            final String entered = OutputController.getLogger().readLine();
+            final String verification = ValidatorUtils.verifyFileOrCommand(entered);
             if (verification == null) {
                 OutputController.getLogger().printOutLn(R("VVBrowserVerificationFail"));
             } else {
@@ -293,63 +290,57 @@ class XBasicService implements BasicService {
 
     private static class PromptUrl extends JDialog {
 
-        JTextField value = new JTextField("firefox");
-        JLabel verification = new JLabel("?");
+        final JTextField value = new JTextField("firefox");
+        final JLabel verification = new JLabel("?");
         private WindowListener cl = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 value.setText("");
             }
         };
-        JCheckBox save = new JCheckBox(R("PESaveChanges"));
+        final JCheckBox save = new JCheckBox(R("PESaveChanges"));
         private boolean ask;
 
-        public PromptUrl() {
+        PromptUrl() {
             super((JDialog) null, R("RBrowserLocationPromptTitle"), true);
         }
 
-        public void arrange(String url, boolean ask) {
+        void arrange(final String url, final boolean ask) {
             this.ask = ask;
-            JPanel top = new JPanel(new GridLayout(2, 1));
-            JPanel bottom = new JPanel(new GridLayout(5, 1));
+            final JPanel top = new JPanel(new GridLayout(2, 1));
+            final JPanel bottom = new JPanel(new GridLayout(5, 1));
             this.setLayout(new BorderLayout());
             this.add(top, BorderLayout.NORTH);
             this.add(bottom, BorderLayout.SOUTH);
             top.add(new JLabel("<html><b>" + R("RBrowserLocationPromptTitle")));
-            JTextField urlField = new JTextField(url);
+            final JTextField urlField = new JTextField(url);
             urlField.setEditable(false);
             top.add(urlField);
             final JTextArea ta = new JTextArea(DeploymentConfiguration.VVPossibleBrowserValues());
             ta.setEditable(false);
             ta.setLineWrap(true);
             ta.setWrapStyleWord(false);
-            JScrollPane scrollableTa=new JScrollPane(ta);
+            final JScrollPane scrollableTa = new JScrollPane(ta);
             scrollableTa.setHorizontalScrollBar(null);
             this.add(scrollableTa);
             bottom.add(value);
             bottom.add(verification);
-            JButton ok = new JButton(R("ButOk"));
-            ok.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (save.isSelected()) {
-                        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_BROWSER_PATH, value.getText());
-                        try {
-                            JNLPRuntime.getConfiguration().save();
-                        } catch (IOException ex) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                        }
+            final JButton ok = new JButton(R("ButOk"));
+            ok.addActionListener(e -> {
+                if (save.isSelected()) {
+                    JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_BROWSER_PATH, value.getText());
+                    try {
+                        JNLPRuntime.getConfiguration().save();
+                    } catch (IOException ex) {
+                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
-                    PromptUrl.this.dispose();
                 }
+                PromptUrl.this.dispose();
             });
-            JButton cancel = new JButton(R("ButCancel"));
-            cancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cl.windowClosing(null);
-                    PromptUrl.this.dispose();
-                }
+            final JButton cancel = new JButton(R("ButCancel"));
+            cancel.addActionListener(e -> {
+                cl.windowClosing(null);
+                PromptUrl.this.dispose();
             });
             bottom.add(save);
             bottom.add(ok);
@@ -367,22 +358,22 @@ class XBasicService implements BasicService {
             value.getDocument().addDocumentListener(new DocumentListener() {
 
                 @Override
-                public void insertUpdate(DocumentEvent e) {
+                public void insertUpdate(final DocumentEvent e) {
                     check();
                 }
 
                 @Override
-                public void removeUpdate(DocumentEvent e) {
+                public void removeUpdate(final DocumentEvent e) {
                     check();
                 }
 
                 @Override
-                public void changedUpdate(DocumentEvent e) {
+                public void changedUpdate(final DocumentEvent e) {
                     check();
                 }
 
                 private void check() {
-                    String result = ValidatorUtils.verifyFileOrCommand(value.getText());
+                    final String result = ValidatorUtils.verifyFileOrCommand(value.getText());
                     if (result == null) {
                         verification.setForeground(Color.red);
                         verification.setText(R("VVBrowserVerificationFail"));
