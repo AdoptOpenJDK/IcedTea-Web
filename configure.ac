@@ -1,4 +1,4 @@
-AC_INIT([icedtea-web],[1.8.1pre],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
+AC_INIT([icedtea-web],[1.8.1],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AC_CONFIG_FILES([Makefile netx.manifest])
 AM_MAINTAINER_MODE([enable])
@@ -102,8 +102,8 @@ AC_ARG_WITH([itw-libs],
 if test "x$build_windows" = xyes ; then
   if test x"$ITW_LIBS" = xnone -o x"$ITW_LIBS" = x; then
       ITW_LIBS="BUNDLED"
-      echo  -n "On Windows, presetting missing --with-itw-libs ITW_LIBS to $ITW_LIBS. " 
-      echo  -n "On Windows, DISTRIBUTION nor BOTH do not have much sense... " 
+      echo  -n "On Windows, presetting missing --with-itw-libs ITW_LIBS to $ITW_LIBS. "
+      echo  -n "On Windows, DISTRIBUTION nor BOTH do not have much sense... "
   fi
 fi
 AC_MSG_RESULT(${ITW_LIBS})
@@ -223,16 +223,16 @@ IT_FIND_OPTIONAL_JAR([wixgen], WIXGEN, [/usr/share/java/wixgen.jar $WIX_TOOLSET_
 echo -n "checking for MSI deps... "
 if test "x$WIX_TOOLSET_DIR" = "x" ; then
   if test "x$WIXGEN_JAR" = "x" ; then
-    echo  "No WiX tools, nor wixgen jar, correct - build on linux or on windows witout MSI" 
+    echo  "No WiX tools, nor wixgen jar, correct - build on linux or on windows witout MSI"
   else
-    echo  "No WiX tools, but wixgen jar - wixgen jar will do its job, but is useless. No MSI can be generated" 
+    echo  "No WiX tools, but wixgen jar - wixgen jar will do its job, but is useless. No MSI can be generated"
   fi
 else
   if test "x$WIXGEN_JAR" = "x" ; then
-    echo  "WiX tools, but no wixgen jar, fatal. You need wixgen.jar from https://github.com/akashche/wixgen" 
+    echo  "WiX tools, but no wixgen jar, fatal. You need wixgen.jar from https://github.com/akashche/wixgen"
     exit 1
   else
-    echo  "WiX tools and wixgen jar - build on windows with MSI generation support" 
+    echo  "WiX tools and wixgen jar - build on windows with MSI generation support"
   fi
 fi
 
@@ -255,6 +255,6 @@ am__fastdepCXX="#"
 echo "destroyed!"
 else
 echo "no"
-fi 
+fi
 
 AC_OUTPUT

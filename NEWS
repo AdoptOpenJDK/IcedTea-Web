@@ -8,7 +8,10 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
-New in release 1.8.1 (YYYY-MM-DD):
+New in release 1.8.1 (2019-05-21):
+* backport deadlock fix from #219
+* handle jnlp filename with space for shortcuts (#180)
+* use ico-file instead of png-file as itw-icon and use it as default icon 
 
 New in release 1.8 (2019-03-12):
 * added support for javafx-desc and so allwong run of pure-javafx only applications
@@ -38,9 +41,9 @@ New in release 1.7 (2017-07-19):
 * PR2669 - remove bash-specific syntax from top level Makefile.am
 * PR2489 - various NPEs when codebase is null
 * PR2855 - configure.ac: Remove unnecessary checks for libX11 and zlib
-* PR878 - (http-511) Handle HTTP error 511 Network Authentication Required (standard secure proxy authentification/captive portal detection) 
-* PR1190 - unuseable javaws cache handling 
-* PR3227 - can not save file with query longer then (together with name) then 255 chars 
+* PR878 - (http-511) Handle HTTP error 511 Network Authentication Required (standard secure proxy authentification/captive portal detection)
+* PR1190 - unuseable javaws cache handling
+* PR3227 - can not save file with query longer then (together with name) then 255 chars
 * comments in deployment.properties now should persists load/save
 * fixed bug in caching of files with query
 * fixed issues with recreating of existing shortcut
@@ -49,7 +52,7 @@ New in release 1.7 (2017-07-19):
 * RH1231441 Unable to read the text of the buttons of the security dialogue
 * Fixed RH1233697 icedtea-web: applet origin spoofing
 * Fixed RH1233667 icedtea-web: unexpected permanent authorization of unsigned applets
-* FIXED PR3263 - Cannot retrieve JavaScript Engine using ScriptEngineManager.getEngineByName 
+* FIXED PR3263 - Cannot retrieve JavaScript Engine using ScriptEngineManager.getEngineByName
 * fixed fatal impact of initialization error of FileLog
 * MissingALACAdialog made available also for unsigned applications (but ignoring actual manifest value) and fixed
 * more dialogs got remember me possibility
@@ -75,7 +78,7 @@ New in release 1.7 (2017-07-19):
   - support for SignedBy and Principals along with existing Codebase
 * Plugin
   - RH1273691 - Escaped equals signs in deployment.properties not un-escaped when used
-  - PR2746 - IcedTea-Web Plugin 1.6.1: net.sourceforge.jnlp.LaunchException 
+  - PR2746 - IcedTea-Web Plugin 1.6.1: net.sourceforge.jnlp.LaunchException
   - PR2714 - IcedTea-Web plugin sends uninitialized memory garbage across a pipe when NPN_GetValueForURL call fails
   - PR3198 - Error in webmin
   - PR2968 - IcedTea-Web crashes on Dell EqualLogic SAN
