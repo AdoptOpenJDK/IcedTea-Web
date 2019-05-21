@@ -514,10 +514,10 @@ public final class Parser {
      * @return the Package element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
-    private PackageDesc getPackage(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", null, strict);
-        String part = getRequiredAttribute(node, "part", "", strict);
-        boolean recursive = getAttribute(node, "recursive", "false").equals("true");
+    private PackageDesc getPackage(final Node node) throws ParseException {
+        final String name = getRequiredAttribute(node, PackageDesc.NAME_ATTRIBUTE, null, strict);
+        final String part = getRequiredAttribute(node, PackageDesc.PART_ATTRIBUTE, "", strict);
+        final boolean recursive = getAttribute(node, PackageDesc.RECURSIVE_ATTRIBUTE, "false").equals("true");
 
         return new PackageDesc(name, part, recursive);
     }
