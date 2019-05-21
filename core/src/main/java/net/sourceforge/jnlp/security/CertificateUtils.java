@@ -124,11 +124,13 @@ public class CertificateUtils {
         }
     }
 
-    public static void addPKCS12ToKeyStore(File file, KeyStore ks, char[] password)
+    public static void addPKCS12ToKeyStore(File file, KeyStore ks, char[] password, KeyStore cauks)
             throws Exception {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(bis, password);
+        final KeyStore casks = KeyStores.getKeyStore(
+                    KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getKs();
 
         Enumeration<String> aliasList = keyStore.aliases();
 
@@ -137,6 +139,16 @@ public class CertificateUtils {
             Certificate[] certChain = keyStore.getCertificateChain(alias);
             Key key = keyStore.getKey(alias, password);
             addPKCS12ToKeyStore(certChain, key, ks);
+            // certificate authorities
+            for (int i = 1; i < certChain.length; i++) {
+                try {
+                    // does this certificate already exist in system keystore?
+                    if (casks.getCertificateAlias(certChain[i]) == null)
+                        addToKeyStore((X509Certificate)certChain[i], cauks);
+                } catch (ClassCastException cce) {
+                    LOG.warn("CA in input file is not an X509 Certificate");
+                }
+            }
         }
     }
 

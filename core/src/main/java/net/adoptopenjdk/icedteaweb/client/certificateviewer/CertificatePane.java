@@ -46,9 +46,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -410,20 +414,27 @@ public class CertificatePane extends JPanel {
                     if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                         char[] password = getPassword(R("CVImportPasswordMessage"));
                         if (password != null) {
+                            final KeyStore caks = KeyStores.
+                                getKeyStore(currentKeyStoreLevel, 
+                                            KeyStores.Type.CA_CERTS).getKs();
+                            final int caksSize = caks.size();
                             CertificateUtils.addPKCS12ToKeyStore(
-                                       chooser.getSelectedFile(), ks, password);
+                                chooser.getSelectedFile(), ks, password, caks);
+                            if (caks.size() > caksSize) {
+                                final int i = JOptionPane.showConfirmDialog(parent,
+                                                    R("CVImportCaMessage"),
+                                                    R("CVImportCaTitle"),
+                                                    JOptionPane.YES_NO_OPTION);
+                                if (i == 0)
+                                    storeKeyStore(caks, KeyStores.Type.CA_CERTS);
+                            }
                         } else {
                             return;
                         }
                     } else {
                         CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
                     }
-                    File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
-                    if (!keyStoreFile.isFile()) {
-                        FileUtils.createRestrictedFile(keyStoreFile, true);
-                    }
-
-                    SecurityUtil.storeKeyStore(ks, keyStoreFile);
+                    storeKeyStore(ks, currentKeyStoreType);
 
                     repopulateTables();
                 } catch (Exception ex) {
@@ -432,6 +443,18 @@ public class CertificatePane extends JPanel {
                 }
             }
         }
+        
+        private void storeKeyStore(KeyStore ks, KeyStores.Type keyStoreType)
+                throws KeyStoreException, IOException, 
+                       NoSuchAlgorithmException, CertificateException {
+            final File keyStoreFile = KeyStores.getKeyStoreLocation(
+                                currentKeyStoreLevel, keyStoreType).getFile();
+            if (!keyStoreFile.isFile()) {
+                FileUtils.createRestrictedFile(keyStoreFile, true);
+            }
+
+            SecurityUtil.storeKeyStore(ks, keyStoreFile);
+        }   
     }
 
     private class ExportButtonListener implements ActionListener {
