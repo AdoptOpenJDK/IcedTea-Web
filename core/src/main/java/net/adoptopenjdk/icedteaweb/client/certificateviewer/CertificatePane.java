@@ -414,19 +414,17 @@ public class CertificatePane extends JPanel {
                     if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                         char[] password = getPassword(R("CVImportPasswordMessage"));
                         if (password != null) {
-                            final KeyStore caks = KeyStores.
-                                getKeyStore(currentKeyStoreLevel, 
-                                            KeyStores.Type.CA_CERTS).getKs();
+                            final KeyStore caks = KeyStores.getKeyStore(currentKeyStoreLevel, KeyStores.Type.CA_CERTS).getKs();
                             final int caksSize = caks.size();
-                            CertificateUtils.addPKCS12ToKeyStore(
-                                chooser.getSelectedFile(), ks, password, caks);
+                            CertificateUtils.addPKCS12ToKeyStore(chooser.getSelectedFile(), ks, password, caks);
                             if (caks.size() > caksSize) {
                                 final int i = JOptionPane.showConfirmDialog(parent,
                                                     R("CVImportCaMessage"),
                                                     R("CVImportCaTitle"),
                                                     JOptionPane.YES_NO_OPTION);
-                                if (i == 0)
+                                if (i == JOptionPane.YES_OPTION) {
                                     storeKeyStore(caks, KeyStores.Type.CA_CERTS);
+                                }
                             }
                         } else {
                             return;
