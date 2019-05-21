@@ -19,12 +19,18 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 import java.util.Objects;
 
 /**
- * The package element.
+ * The package element can be used to indicate to the JNLP Client which packages are implemented in which JAR files.
+ *
+ * @implSpec See <b>JSR-56, Section 4.5 Package Element</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.6 $
  */
 public class PackageDesc {
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String PART_ATTRIBUTE = "part";
+    public static final String RECURSIVE_ATTRIBUTE = "recursive";
 
     private static final String ASTERIX_SUFFIX = ".*";
     /** the package name */
