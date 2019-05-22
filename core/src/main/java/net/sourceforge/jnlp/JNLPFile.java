@@ -86,10 +86,13 @@ public class JNLPFile {
     private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
 
     public static final String JNLP_ROOT_ELEMENT = "jnlp";
+
     public static final String SPEC_ATTRIBUTE = "spec";
     public static final String VERSION_ATTRIBUTE = "version";
     public static final String HREF_ATTRIBUTE = "href";
+    public static final String CODEBASE_ATTRIBUTE = "codebase";
 
+    public static final String SPEC_VERSION_DEFAULT = "1.0+";
 
     // todo: save the update policy, then if file was not updated
     // then do not check resources for being updated.
