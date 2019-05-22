@@ -18,12 +18,13 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.information;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import net.adoptopenjdk.icedteaweb.Assert;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
@@ -49,7 +50,11 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 
 public class InformationDesc {
     public static final String INFORMATION_ELEMENT = "information";
+
+    // TODO: missing the information element attributes os and arch (defined since spec version 1.5.0)
+
     public static final String LOCALE_ATTRIBUTE = "locale";
+
     public static final String TITLE_ELEMENT = "title";
     public static final String VENDOR_ELEMENT = "vendor";
     public static final String OFFLINE_ALLOWED_ELEMENT = "offline-allowed";
