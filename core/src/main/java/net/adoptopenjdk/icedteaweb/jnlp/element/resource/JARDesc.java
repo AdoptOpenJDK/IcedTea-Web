@@ -28,9 +28,13 @@ import java.net.URL;
  * @version $Revision: 1.6 $
  */
 public class JARDesc {
-    public static final String DOWNLOAD_ATTRIBUTE = "download";
-
     public static final String VERSION_ATTRIBUTE = "version";
+    public static final String MAIN_ATTRIBUTE = "main";
+    public static final String DOWNLOAD_ATTRIBUTE = "download";
+    public static final String PART_ATTRIBUTE = "part";
+
+    // TODO: missing the jar element attribute "size" (defined since spec version 1.0)
+
     /** the location of the JAR file */
     private final URL location;
 

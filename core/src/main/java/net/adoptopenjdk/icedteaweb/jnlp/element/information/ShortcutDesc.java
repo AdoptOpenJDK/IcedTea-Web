@@ -21,6 +21,12 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 public final class ShortcutDesc {
     public static final String SHORTCUT_ELEMENT = "shortcut";
+    public static final String DESKTOP_ELEMENT = "desktop";
+    public static final String MENU_ELEMENT = "menu";
+
+    public static final String ONLINE_ATTRIBUTE = "online";
+
+    // TODO: missing the shortcut attribute "install" (defined since spec version 7.0)
 
     /** Never create a shortcut */
     public static final String CREATE_NEVER = "NEVER";

@@ -21,12 +21,19 @@ import net.sourceforge.jnlp.LaunchException;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
- * The property element.
+ * The property element describes a name/value pair that is available to the launched application
+ * as a system property.
+ *
+ * @implSpec See <b>JSR-56, Section 4.2 Setting System Properties</b>
+ * for a detailed specification of this class.
  *
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.6 $
  */
 public class PropertyDesc {
+
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String VALUE_ATTRIBUTE = "value";
 
     /**
      * @param prop - the property to be parsed from format key=value

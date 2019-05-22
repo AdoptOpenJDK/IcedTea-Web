@@ -34,6 +34,7 @@ import java.util.List;
 public class ApplicationDesc implements EntryPoint {
     public static final String APPLICATION_DESC_ELEMENT = "application-desc";
     public static final String JAVAFX_DESC_ELEMENT = "javafx-desc";
+    public static final String ARGUMENT_ELEMENT = "argument";
 
     /**
      * The type of application supported by the JNLP Client. The optional attribute indicates the type of
