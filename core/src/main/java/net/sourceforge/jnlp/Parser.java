@@ -100,6 +100,8 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredAttribu
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredURL;
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getSpanText;
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getURL;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_ATTRIBUTE;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_VERSION_DEFAULT;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -230,7 +232,7 @@ public final class Parser {
         }
 
         // JNLP tag information
-        this.spec = getVersion(root, JNLPFile.SPEC_ATTRIBUTE, "1.0+");
+        this.spec = getVersion(root, SPEC_ATTRIBUTE, SPEC_VERSION_DEFAULT);
 
         try {
             this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
