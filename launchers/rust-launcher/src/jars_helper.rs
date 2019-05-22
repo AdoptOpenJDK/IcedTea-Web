@@ -70,7 +70,7 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
         }
     }
     //first local dir - if allowed
-    if current_libsearch == ItwLibSearch::BUNDLED {
+    if current_libsearch == ItwLibSearch::BUNDLED || current_libsearch == ItwLibSearch::EMBEDDED {
         let pgmdir = dirs_paths_helper::current_program_parent();
         let pgmparent: std::path::PathBuf = match pgmdir.parent() {
             Some(s) => {
@@ -90,7 +90,7 @@ fn resolve_jar(full_hardcoded_path: &str, logger: &os_access::Os) -> std::path::
         }
     }
     //then installed dirs, if allowd
-    if current_libsearch == ItwLibSearch::DISTRIBUTION || current_libsearch == ItwLibSearch::EMBEDDED {
+    if current_libsearch == ItwLibSearch::DISTRIBUTION {
         let candidate = std::path::PathBuf::from(full_hardcoded_path);
         if dirs_paths_helper::is_file(&candidate) {
             logger.log(&dirs_paths_helper::path_to_string(&candidate));

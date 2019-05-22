@@ -53,11 +53,9 @@ pub fn get_slfapi() -> &'static str { SLFAPI_JAR.unwrap_or("SLFAPI_JAR-dev-unspe
 
 pub fn get_slfsimple() ->  &'static str { SLFSIMPLE_JAR.unwrap_or("SLFSIMPLE_JAR-dev-unspecified") }
 
-
 pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 
 pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
-
 
 pub fn get_mslinks() -> Option<&'static str> { sanitize(MSLINKS_JAR) }
 
@@ -107,6 +105,16 @@ impl FromStr for ItwLibSearch {
             return Ok(ItwLibSearch::DISTRIBUTION);
         }
         return Err(ParseItwLibSearch { _priv: () })
+    }
+}
+
+impl std::fmt::Display for ItwLibSearch {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ItwLibSearch::BUNDLED => write!(f, "BUNDLED"),
+            ItwLibSearch::DISTRIBUTION => write!(f, "DISTRIBUTION"),
+            ItwLibSearch::EMBEDDED => write!(f, "EMBEDDED"),
+        }
     }
 }
 

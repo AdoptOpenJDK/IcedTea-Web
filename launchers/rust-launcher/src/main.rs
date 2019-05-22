@@ -92,6 +92,9 @@ fn main() {
         os = get_os(is_debug_on(), true);
     }
     os.log(&dirs_paths_helper::path_to_string(&dirs_paths_helper::current_program()));
+    let mut info1 = String::new();
+    write!(&mut info1, "itw-rust-debug: itw mode: {}", hardcoded_paths::get_libsearch(&os)).expect("unwrap failed");
+    os.log(&info1);
     let java_dir = utils::find_jre(&os);
     let mut info2 = String::new();
     write!(&mut info2, "selected jre: {}", java_dir.display()).expect("unwrap failed");
