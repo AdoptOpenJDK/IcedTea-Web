@@ -90,7 +90,7 @@ fn sanitize(candidate: Option<&'static str>)  -> Option<&'static str> {
 pub enum ItwLibSearch {
     BUNDLED,
     DISTRIBUTION,
-    BOTH,
+    EMBEDDED //like BUNDLED, but with affect on jre path
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -101,8 +101,8 @@ impl FromStr for ItwLibSearch {
     type Err = ParseItwLibSearch;
 
     fn from_str(sstr: &str) -> Result<ItwLibSearch, ParseItwLibSearch> {
-        if sstr == "BOTH" {
-            return Ok(ItwLibSearch::BOTH);
+        if sstr == "EMBEDDED" {
+            return Ok(ItwLibSearch::EMBEDDED);
         }
         if sstr == "BUNDLED" {
             return Ok(ItwLibSearch::BUNDLED);
@@ -111,6 +111,16 @@ impl FromStr for ItwLibSearch {
             return Ok(ItwLibSearch::DISTRIBUTION);
         }
         return Err(ParseItwLibSearch { _priv: () })
+    }
+}
+
+impl std::fmt::Display for ItwLibSearch {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ItwLibSearch::BUNDLED => write!(f, "BUNDLED"),
+            ItwLibSearch::DISTRIBUTION => write!(f, "DISTRIBUTION"),
+            ItwLibSearch::EMBEDDED => write!(f, "EMBEDDED"),
+        }
     }
 }
 
@@ -123,7 +133,7 @@ pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
             }
             _err => {
                 let mut info = String::new();
-                write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or BOTH", result_of_override_var);
+                write!(&mut info, "ITW-LIBS provided, but have invalid value of {}. Use BUNDLED, DISTRIBUTION or EMBEDDED", result_of_override_var);
                 logger.important(&info);
             }
         }
@@ -177,13 +187,13 @@ mod tests {
 
     #[test]
     fn get_itwlibsearch_in_enumeration() {
-        assert_eq!(super::get_itwlibsearch() == "BOTH" || super::get_itwlibsearch() == "BUNDLED" || super::get_itwlibsearch() == "DISTRIBUTION", true);
+        assert_eq!(super::get_itwlibsearch() == "EMBEDDED" || super::get_itwlibsearch() == "BUNDLED" || super::get_itwlibsearch() == "DISTRIBUTION", true);
     }
 
     #[test]
     fn itw_libsearch_to_enum_test() {
         assert!(super::ItwLibSearch::from_str("BUNDLED") == Ok(super::ItwLibSearch::BUNDLED));
-        assert!(super::ItwLibSearch::from_str("BOTH") == Ok(super::ItwLibSearch::BOTH));
+        assert!(super::ItwLibSearch::from_str("EMBEDDED") == Ok(super::ItwLibSearch::EMBEDDED));
         assert!(super::ItwLibSearch::from_str("DISTRIBUTION") == Ok(super::ItwLibSearch::DISTRIBUTION));
         assert!(super::ItwLibSearch::from_str("") == Err(super::ParseItwLibSearch { _priv: () }));
     }

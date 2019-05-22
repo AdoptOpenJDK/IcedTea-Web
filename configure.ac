@@ -111,8 +111,8 @@ AC_SUBST(ITW_LIBS)
 if test x"$ITW_LIBS" = xnone -o x"$ITW_LIBS" = x; then
     AC_MSG_ERROR([missing --with-itw-libs; mandatory on linux. Use BUNDLED, DISTRIBUTION or BOTH. use BOTH with care. ])
 fi
-if test ! "$ITW_LIBS" = BUNDLED -a ! "$ITW_LIBS" = DISTRIBUTION -a ! "$ITW_LIBS" = BOTH; then
-    AC_MSG_ERROR([incorrect --with-itw-libs; mandatory are BUNDLED, DISTRIBUTION or BOTH ])
+if test ! "$ITW_LIBS" = BUNDLED -a ! "$ITW_LIBS" = DISTRIBUTION -a ! "$ITW_LIBS" = EMBEDDED; then
+    AC_MSG_ERROR([incorrect --with-itw-libs; mandatory are BUNDLED, DISTRIBUTION or EMBEDDED ])
 fi
 
 IT_CHECK_WITH_GCJ

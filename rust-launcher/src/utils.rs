@@ -33,7 +33,32 @@ pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
                     return java_home;
                 }
                 Err(_e) => {
-                    os.log("itw-rust-debug: nothing");
+                    os.log("itw-rust-debug: nothing (likely correct)");
+                    if hardcoded_paths::get_libsearch(os) == hardcoded_paths::ItwLibSearch::EMBEDDED {
+                        os.log("itw-rust-debug: trying embedded JDK");
+                        let mut embed_path1 = dirs_paths_helper::current_program_parent().clone();
+                        embed_path1.push("..");
+                        let mut embed_java = embed_path1.clone();
+                        embed_java.push("bin");
+                        embed_java.push("java");
+                        if embed_java.exists() {
+                            os.log("itw-rust-debug: found and using");
+                            return embed_path1;
+                        }
+                        let mut embed_path2 = dirs_paths_helper::current_program_parent().clone();
+                        embed_path2.push("..");
+                        embed_path2.push("..");
+                        embed_java = embed_path2.clone();
+                        embed_java.push("bin");
+                        embed_java.push("java");
+                        if embed_java.exists() {
+                            os.log("itw-rust-debug: found and using");
+                            return embed_path2;
+                        }
+                        let mut info1 = String::new();
+                        write!(&mut info1, "You have EMBEDDED jre build, however {}  nor {} is valid jre/jdk!", embed_path1.to_str().expect("unwrap failed"), embed_path2.to_str().expect("unwrap failed")).expect("unwrap failed");
+                        os.important(&info1);
+                    }
                     os.log("itw-rust-debug: trying jdk from registry");
                     match os.get_registry_java() {
                         Some(path) => {
@@ -77,8 +102,8 @@ fn get_jdk_from_path_conditionally_testable(system_path: Option<OsString>, libse
         os.log("itw-rust-debug: skipping jdk from path, your build is distribution");
         None
     } else {
-        if libsearch == hardcoded_paths::ItwLibSearch::BOTH {
-            os.important("your build is done as BOTH distribution and bundled, jdk from PATH may be not what you want!");
+        if libsearch == hardcoded_paths::ItwLibSearch::EMBEDDED {
+            os.important("your build is done as EMBEDDED, jdk from PATH may be not what you want!");
         }
         get_jdk_from_given_path_testable(system_path, os)
     }
@@ -160,13 +185,13 @@ pub mod tests_utils {
                    None);
         assert_eq!(super::get_jdk_from_path_conditionally_testable(None, hardcoded_paths::ItwLibSearch::BUNDLED, &TestLogger::create_new()),
                    None);
-        assert_eq!(super::get_jdk_from_path_conditionally_testable(None, hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new()),
+        assert_eq!(super::get_jdk_from_path_conditionally_testable(None, hardcoded_paths::ItwLibSearch::EMBEDDED, &TestLogger::create_new()),
                    None);
         assert_eq!(super::get_jdk_from_path_conditionally_testable(Some(fo::from("/some/bad/path")), hardcoded_paths::ItwLibSearch::DISTRIBUTION, &TestLogger::create_new()),
                    None);
         assert_eq!(super::get_jdk_from_path_conditionally_testable(Some(fo::from("/some/bad/path")), hardcoded_paths::ItwLibSearch::BUNDLED, &TestLogger::create_new()),
                    None);
-        assert_eq!(super::get_jdk_from_path_conditionally_testable(Some(fo::from("/some/bad/path")), hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new()),
+        assert_eq!(super::get_jdk_from_path_conditionally_testable(Some(fo::from("/some/bad/path")), hardcoded_paths::ItwLibSearch::EMBEDDED, &TestLogger::create_new()),
                    None);
     }
 
@@ -177,7 +202,7 @@ pub mod tests_utils {
         master_dir.push("bin");
         let v1 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::DISTRIBUTION, &TestLogger::create_new());
         let v2 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BUNDLED, &TestLogger::create_new());
-        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new());
+        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::EMBEDDED, &TestLogger::create_new());
         debuggable_remove_dir(&master_dir);
         assert_eq!(None, v1);
         assert_eq!(Some(top_dir.clone()), v2);
@@ -189,7 +214,7 @@ pub mod tests_utils {
         let master_dir = fake_jre(false);
         let v1 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::DISTRIBUTION, &TestLogger::create_new());
         let v2 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BUNDLED, &TestLogger::create_new());
-        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new());
+        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::EMBEDDED, &TestLogger::create_new());
         debuggable_remove_dir(&master_dir);
         assert_eq!(None, v1);
         assert_eq!(None, v2);
@@ -206,7 +231,7 @@ pub mod tests_utils {
         File::create(&fake_jre).expect("File created");
         let v1 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::DISTRIBUTION, &TestLogger::create_new());
         let v2 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BUNDLED, &TestLogger::create_new());
-        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::BOTH, &TestLogger::create_new());
+        let v3 = super::get_jdk_from_path_conditionally_testable(Some(fo::from(master_dir.clone())), hardcoded_paths::ItwLibSearch::EMBEDDED, &TestLogger::create_new());
         debuggable_remove_dir(&master_dir);
         assert_eq!(None, v1);
         let parent = dirs_paths_helper::canonicalize(&std::path::PathBuf::from(master_dir.parent().expect("just created"))).expect("canonicalize failed");

@@ -76,7 +76,7 @@ impl Default for AdvancedLogging {
     fn default() -> AdvancedLogging {
         AdvancedLogging {
             log_to_file: false,
-            log_target_file: std::path::PathBuf::from("undeffined"),
+            log_target_file: std::path::PathBuf::from("undefined"),
             log_to_stdstreams: true,
             log_to_system: true,
         }
