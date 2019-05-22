@@ -33,9 +33,31 @@ pub fn find_jre(os: &os_access::Os) -> std::path::PathBuf {
                     return java_home;
                 }
                 Err(_e) => {
-                    os.log("itw-rust-debug: nothing");
+                    os.log("itw-rust-debug: nothing (likely correct)");
                     if hardcoded_paths::get_libsearch(os) == hardcoded_paths::ItwLibSearch::EMBEDDED {
-                        // TODO determine embedded JRE
+                        os.log("itw-rust-debug: trying embedded JDK");
+                        let mut embed_path1 = dirs_paths_helper::current_program_parent().clone();
+                        embed_path1.push("..");
+                        let mut embed_java = embed_path1.clone();
+                        embed_java.push("bin");
+                        embed_java.push("java");
+                        if embed_java.exists() {
+                            os.log("itw-rust-debug: found and using");
+                            return embed_path1;
+                        }
+                        let mut embed_path2 = dirs_paths_helper::current_program_parent().clone();
+                        embed_path2.push("..");
+                        embed_path2.push("..");
+                        embed_java = embed_path2.clone();
+                        embed_java.push("bin");
+                        embed_java.push("java");
+                        if embed_java.exists() {
+                            os.log("itw-rust-debug: found and using");
+                            return embed_path2;
+                        }
+                        let mut info1 = String::new();
+                        write!(&mut info1, "You have EMBEDDED jre build, however {}  nor {} is valid jre/jdk!", embed_path1.to_str().expect("unwrap failed"), embed_path2.to_str().expect("unwrap failed")).expect("unwrap failed");
+                        os.important(&info1);
                     }
                     os.log("itw-rust-debug: trying jdk from registry");
                     match os.get_registry_java() {
