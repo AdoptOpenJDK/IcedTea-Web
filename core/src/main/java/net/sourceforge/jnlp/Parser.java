@@ -77,6 +77,9 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.DESKTOP_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.MENU_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.ONLINE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.LAZY;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_DOWNLOAD_ELEMENT;
@@ -100,6 +103,8 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredAttribu
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredURL;
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getSpanText;
 import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getURL;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_ATTRIBUTE;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_VERSION_DEFAULT;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -230,7 +235,7 @@ public final class Parser {
         }
 
         // JNLP tag information
-        this.spec = getVersion(root, JNLPFile.SPEC_ATTRIBUTE, "1.0+");
+        this.spec = getVersion(root, SPEC_ATTRIBUTE, SPEC_VERSION_DEFAULT);
 
         try {
             this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
@@ -495,8 +500,8 @@ public final class Parser {
         boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
         final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
         final Version version = getVersion(node, JARDesc.VERSION_ATTRIBUTE, null);
-        final String part = getAttribute(node, "part", null);
-        final boolean main = "true".equals(getAttribute(node, "main", "false"));
+        final String part = getAttribute(node, JARDesc.PART_ATTRIBUTE, null);
+        final boolean main = "true".equals(getAttribute(node, JARDesc.MAIN_ATTRIBUTE, "false"));
         final boolean lazy = LAZY.getValue().equals(getAttribute(node, JARDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
 
         if (nativeJar && main) {
@@ -537,9 +542,9 @@ public final class Parser {
      * @param node the property node
      * @throws ParseException if the JNLP file is invalid
      */
-    private PropertyDesc getProperty(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", null, strict);
-        String value = getRequiredAttribute(node, "value", "", strict);
+    private PropertyDesc getProperty(final Node node) throws ParseException {
+        final String name = getRequiredAttribute(node, PropertyDesc.NAME_ATTRIBUTE, null, strict);
+        final String value = getRequiredAttribute(node, PropertyDesc.VALUE_ATTRIBUTE, "", strict);
 
         return new PropertyDesc(name, value);
     }
@@ -830,16 +835,16 @@ public final class Parser {
      * TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
     private AppletDesc getApplet(final Node node) throws ParseException {
-        final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"), strict);
+        final String name = getRequiredAttribute(node, AppletDesc.NAME_ATTRIBUTE, R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
-        final URL docbase = getURL(node, "documentbase", base, strict);
+        final URL docbase = getURL(node, AppletDesc.DOCUMENTBASE_ATTRIBUTE, base, strict);
         final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
         int height = 0;
 
         try {
-            width = Integer.parseInt(getRequiredAttribute(node, "width", "100", strict));
-            height = Integer.parseInt(getRequiredAttribute(node, "height", "100", strict));
+            width = Integer.parseInt(getRequiredAttribute(node, AppletDesc.WIDTH_ATTRIBUTE, "100", strict));
+            height = Integer.parseInt(getRequiredAttribute(node, AppletDesc.HEIGHT_ATTRIBUTE, "100", strict));
         } catch (NumberFormatException nfe) {
             if (width <= 0) {
                 throw new ParseException(R("PBadWidth"));
@@ -848,7 +853,7 @@ public final class Parser {
         }
 
         // read params
-        final Node params[] = getChildNodes(node, "param");
+        final Node params[] = getChildNodes(node, AppletDesc.PARAM_ELEMENT);
         for (final Node param : params) {
             paramMap.put(getRequiredAttribute(param, "name", null, strict), getRequiredAttribute(param, "value", "", strict));
         }
@@ -871,7 +876,7 @@ public final class Parser {
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
         // read parameters
-        final Node args[] = getChildNodes(node, "argument");
+        final Node args[] = getChildNodes(node, ApplicationDesc.ARGUMENT_ELEMENT);
         for (Node arg : args) {
             //argsList.add( args[i].getNodeValue() );
             //This approach was not finding the argument text
@@ -938,10 +943,10 @@ public final class Parser {
     /**
      * @return the shortcut descriptor.
      */
-    private ShortcutDesc getShortcut(Node node) throws ParseException {
+    private ShortcutDesc getShortcut(final Node node) throws ParseException {
 
-        String online = getAttribute(node, "online", "true");
-        boolean shortcutIsOnline = Boolean.valueOf(online);
+        final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
+        final boolean shortcutIsOnline = Boolean.valueOf(online);
 
         boolean showOnDesktop = false;
         MenuDesc menu = null;
@@ -949,17 +954,17 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            final String name = child.getNodeName().getName();
 
             if (null != name) {
                 switch (name) {
-                    case "desktop":
+                    case DESKTOP_ELEMENT:
                         if (showOnDesktop && strict) {
                             throw new ParseException(R("PTwoDesktops"));
                         }
                         showOnDesktop = true;
                         break;
-                    case "menu":
+                    case MENU_ELEMENT:
                         if (menu != null && strict) {
                             throw new ParseException(R("PTwoMenus"));
                         }
@@ -971,7 +976,7 @@ public final class Parser {
             child = child.getNextSibling();
         }
 
-        ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
+        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
         if (menu != null) {
             shortcut.setMenu(menu);
         }

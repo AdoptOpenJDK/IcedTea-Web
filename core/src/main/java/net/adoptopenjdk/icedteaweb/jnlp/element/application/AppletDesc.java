@@ -39,6 +39,11 @@ public class AppletDesc implements EntryPoint {
 
     private final static Logger LOG = LoggerFactory.getLogger(AppletDesc.class);
     public static final String APPLET_DESC_ELEMENT = "applet-desc";
+    public static final String DOCUMENTBASE_ATTRIBUTE = "documentbase";
+    public static final String PARAM_ELEMENT = "param";
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String WIDTH_ATTRIBUTE = "width";
+    public static final String HEIGHT_ATTRIBUTE = "height";
 
     /** Name of the Applet. This is available to the Applet through the AppletContext. */
     private final String name;

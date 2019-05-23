@@ -1485,15 +1485,15 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
-        Node root = xmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
-        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        final Node root = xmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", JNLPFile.JNLP_ROOT_ELEMENT, root.getNodeName().getName());
+        final MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         ParseException eex = null;
         //non codebase element is unaffected
-        URL u = NodeUtils.getURL(root, "aaa", null, defaultParser.isStrict());
+        final URL u = NodeUtils.getURL(root, "aaa", null, defaultParser.isStrict());
         Assert.assertEquals(null, u);
         try {
-            NodeUtils.getURL(root, "codebase", null, defaultParser.isStrict());
+            NodeUtils.getURL(root, JNLPFile.CODEBASE_ATTRIBUTE, null, defaultParser.isStrict());
         } catch (ParseException ex) {
             eex = ex;
         }
