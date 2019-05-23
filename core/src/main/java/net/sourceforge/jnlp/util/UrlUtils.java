@@ -272,32 +272,6 @@ public class UrlUtils {
         return s;
     }
 
-    /**
-     * both urls are processed by sanitizeLastSlash before actual equals. So
-     * protocol://som.url/some/path/ is same as protocol://som.url/some/path. Even
-     * protocol://som.url/some/path\ is same as protocol://som.url/some/path/
-     *
-     * @param u1 first url to compare
-     * @param u2 second
-     * @return true if urls are equals no matter of trailing slash
-     */
-    public static boolean equalsIgnoreLastSlash(final URL u1, final URL u2) {
-        try {
-            if (u1 == null && u2 == null) {
-                return true;
-            }
-            if (u1 == null && u2 != null) {
-                return false;
-            }
-            if (u1 != null && u2 == null) {
-                return false;
-            }
-            return Objects.equals(sanitizeLastSlash(u1), sanitizeLastSlash(u2));
-        } catch (final MalformedURLException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     public static URL guessCodeBase(final JNLPFile file) {
         if (file.getCodeBase() != null) {
             return file.getCodeBase();
@@ -338,6 +312,45 @@ public class UrlUtils {
             }
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+        }
+        return false;
+    }
+    /**
+     * Checks whether <code>url</code> is relative (or equal) to <code>codebaseUrl</code>.
+     * both urls are processed by sanitizeLastSlash before actual equals. So
+     * protocol://som.url/some/path/ is same as protocol://som.url/some/path. Even
+     * protocol://som.url/some/path\ is same as protocol://som.url/some/path/
+     *
+     * This method returns false in case <code>url</code> contains parent directory notation "..".
+     * See JNLP specification version 9, 3.4: 'A relative URL cannot contain parent directory notations, such as "..". It must denote a file that is stored in a subdirectory of the codebase.'
+     * @param url the url to check
+     * @param codebaseUrl the url to check against
+     * @return true if <code>url</code> is relative to <code>codebaseUrl</code>
+     */
+    public static boolean urlRelativeTo(URL url, URL codebaseUrl) {
+        if (codebaseUrl == url) {
+            return true;
+        }
+        if (codebaseUrl == null || url == null) {
+            return false;
+        }
+        try {
+            URL nu = sanitizeLastSlash(normalizeUrl(url));
+            URL nup = sanitizeLastSlash(normalizeUrl(codebaseUrl));
+            if (!getHostAndPort(nu).equals(getHostAndPort(nup))) {
+                return false;
+            }
+            if (!nu.getProtocol().equals(nup.getProtocol())) {
+                return false;
+            }
+            if (nu.getPath().contains("..")) {
+                return false;
+            }
+            if (nu.getPath().startsWith(nup.getPath())) {
+                return true;
+            }
+        } catch (MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return false;
     }
