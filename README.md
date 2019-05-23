@@ -4,7 +4,7 @@
 This repository contains all sources of IcedTeaWeb. 
 
 ## About IcedTeaWeb
-IcedTeaWeb is an open source implementation of [JSR-56](http://www.jcp.org/en/jsr/detail?id=56) that is better know as Java Web Start.
+IcedTeaWeb is an open source implementation of [JSR-56](http://www.jcp.org/en/jsr/detail?id=56) that is better known as Java Web Start.
 
 ## Development origin
 The project was formerly hosted as part of the [icedtea.classpath.org](https://icedtea.classpath.org) project but moved to github.
