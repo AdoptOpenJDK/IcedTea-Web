@@ -38,11 +38,46 @@
     </dependencies>
 
     <build>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>SimpleJavaApplication</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/testcase1/applications/SimpleJavaApplication.class</include>
+                            </includes>
+                            <finalName>App</finalName>
+                            <classifier>SimpleJavaApplication</classifier>
+                            <outputDirectory>
+                                ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/testcase1/resources
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

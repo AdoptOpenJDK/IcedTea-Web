@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" href="SimpleJavaApplication.jnlp" codebase=".">
+    <information>
+        <title>Simple Java Application</title>
+        <vendor>IcedTea</vendor>
+        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
+        <description>This is a simple java application</description>
+        <offline/>
+    </information>
+
+    <update check="always" policy="always"/>
+
+    <resources>
+        <j2se version="1.8+"/>
+        <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
+    </resources>
+
+    <application-desc main-class="net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication">
+    </application-desc>
+</jnlp>
