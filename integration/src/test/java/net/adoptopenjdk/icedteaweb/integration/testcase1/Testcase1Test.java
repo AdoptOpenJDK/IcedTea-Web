@@ -1,10 +1,16 @@
 package net.adoptopenjdk.icedteaweb.integration.testcase1;
 
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -12,8 +18,16 @@ import java.net.URL;
  *
  */
 public class Testcase1Test {
+    @Rule
+    public EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+
     @Before
-    public void BeforeEach() {
+    public void BeforeEach() throws IOException {
+        final File tempHome = temporaryFolder.newFolder();
+        environmentVariables.set(ConfigurationConstants.XDG_CONFIG_HOME_VAR, tempHome.getAbsolutePath());
         // modify .appletTrustSettings to prevent warning dialog??
         // redirect config root via system property
     }
