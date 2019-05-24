@@ -70,7 +70,7 @@
                                 <resource>
                                     <directory>${project.build.testOutputDirectory}</directory>
                                     <includes>
-                                        <include>**/*.class</include>
+                                        <include>**/applications/*.class</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
