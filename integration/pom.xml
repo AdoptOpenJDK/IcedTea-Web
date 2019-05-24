@@ -35,13 +35,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -52,6 +45,7 @@
                 <excludes>
                     <exclude>**/*.java</exclude>
                 </excludes>
+                <filtering>false</filtering>
             </testResource>
         </testResources>
 
@@ -63,6 +57,31 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <outputDirectory>${build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.testOutputDirectory}</directory>
+                                    <includes>
+                                        <include>**/*.class</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -70,10 +89,10 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <phase>process-test-resources</phase>
+                        <phase>process-test-classes</phase>
                         <configuration>
                             <includes>
-                                <include>**/testcase1/applications/SimpleJavaApplication.class</include>
+                                <include>**/testcase1/**/*.class</include>
                             </includes>
                             <finalName>App</finalName>
                             <classifier>SimpleJavaApplication</classifier>

@@ -10,7 +10,6 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -23,10 +22,11 @@ public class Testcase1Test {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    private File tempHome;
 
     @Before
-    public void BeforeEach() throws IOException {
-        final File tempHome = temporaryFolder.newFolder();
+    public void BeforeEach() {
+        tempHome = temporaryFolder.getRoot();
         environmentVariables.set(ConfigurationConstants.XDG_CONFIG_HOME_VAR, tempHome.getAbsolutePath());
         // modify .appletTrustSettings to prevent warning dialog??
         // redirect config root via system property
@@ -38,7 +38,7 @@ public class Testcase1Test {
         // delete config root via system property
     }
 
-    @Test(timeout=5000)
+    @Test(timeout=10_000)
     public void testSuccessfullyLaunchSimpleJavaApplication() {
         final URL jnlpFile = getClass().getResource("SimpleJavaApplication.jnlp");
 
