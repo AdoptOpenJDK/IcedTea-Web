@@ -25,6 +25,7 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -455,22 +456,17 @@ public class ResourceDownloader implements Runnable {
 
     private void extractGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
         LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
-        byte[] buf = new byte[1024];
-        int rlen;
 
-        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                .getCacheFile(compressedLocation, version)))) {
-            InputStream inputStream = new BufferedInputStream(gzInputStream);
+        final File compressedFile = CacheUtil.getCacheFile(compressedLocation, version);
+        final File uncompressedFile = CacheUtil.getCacheFile(uncompressedLocation, version);
 
-            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(CacheUtil
-                    .getCacheFile(uncompressedLocation, version)));
+        final byte[] content;
+        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(compressedFile))) {
+            content = IOUtils.readContent(gzInputStream);
+        }
 
-            while (-1 != (rlen = inputStream.read(buf))) {
-                outputStream.write(buf, 0, rlen);
-            }
-
-            outputStream.close();
-            inputStream.close();
+        try (final OutputStream out = new FileOutputStream(uncompressedFile)) {
+            IOUtils.writeContent(out, content);
         }
     }
 

@@ -1,86 +1,62 @@
 package net.adoptopenjdk.icedteaweb.integration.testcase1;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingPermissionsAttributePanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UrlRegEx;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
+import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
 import net.sourceforge.jnlp.runtime.Boot;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.net.URL;
-import java.util.Date;
-
-import static net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction.ALWAYS;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.head;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
 
 /**
  * TODO: Scenario Description
- *
  */
-public class Testcase1Test {
-    @Rule
-    public EnvironmentVariables environmentVariables = new EnvironmentVariables();
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+public class Testcase1Test implements IntegrationTest {
 
-    private URL jnlpUrl;
-    private File tempHome;
+    private static final String JNLP_NAME = "SimpleJavaApplication.jnlp";
+    private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
+
+    @Rule
+    public TemporaryItwHome tmpItwHome = new TemporaryItwHome();
+    @Rule
+    public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
+
+    private String jnlpUrl;
 
     @Before
     public void BeforeEach() throws Exception {
-        jnlpUrl = getClass().getResource("SimpleJavaApplication.jnlp");
-        tempHome = temporaryFolder.newFolder("config");
-        environmentVariables.set(ConfigurationConstants.XDG_CONFIG_HOME_VAR, tempHome.getAbsolutePath());
 
-        final String source = new File(jnlpUrl.toURI()).getParentFile().toURI().toURL().toExternalForm();
-        final AppletSecurityActions securityActions = new AppletSecurityActions();
-        securityActions.setAction(MissingPermissionsAttributePanel.class, new SavedRememberAction(ALWAYS, "YES"));
-        securityActions.setAction(MissingALACAttributePanel.class, new SavedRememberAction(ALWAYS, "YES"));
+        // setup server
+        wireMock.stubFor(head(urlEqualTo("/" + JNLP_NAME)).willReturn(
+                ok()
+        ));
+        wireMock.stubFor(get(urlEqualTo("/" + JNLP_NAME)).willReturn(
+                aResponse().withBody(fileContent(JNLP_NAME, replace(PORT).with(wireMock.port())))
+        ));
 
-        final UnsignedAppletActionEntry unsignedAppletActionEntry = new UnsignedAppletActionEntry(
-                securityActions,
-                new Date(1558708474622L),
-                UrlRegEx.quoteAndStar(source),
-                UrlRegEx.quote(source),
-                null);
+        wireMock.stubFor(head(urlEqualTo("/resources/" + JAR_NAME)).willReturn(
+                ok()
+        ));
+        wireMock.stubFor(get(urlEqualTo("/resources/" + JAR_NAME)).willReturn(
+                aResponse().withBody(fileContent("resources/" + JAR_NAME))
+        ));
 
-        final File configHome = new File(tempHome, "icedtea-web");
-        final File trustSettings = new File(configHome, ".appletTrustSettings");
-        configHome.mkdirs();
-        trustSettings.createNewFile();
-
-        try (final FileWriter writer = new FileWriter(trustSettings)) {
-            writer.write(UnsignedAppletActionStorageImpl.versionPrefix + " " + UnsignedAppletActionStorageImpl.currentVersion + " - generated\n");
-            unsignedAppletActionEntry.write(writer);
-            writer.flush();
-        }
-
-        // modify .appletTrustSettings to prevent warning dialog??
-        // redirect config root via system property
+        // setup itw config
+        jnlpUrl = "http://localhost:" + wireMock.port() + "/" + JNLP_NAME;
+        tmpItwHome.createTrustSettings(jnlpUrl);
     }
 
-    @After
-    public void AfterEach() {
-        // restore .appletTrustSettings to prevent warning dialog??
-        // delete config root via system property
-    }
-
-    @Test(timeout=5_000)
+    @Test(timeout = 5_000)
     public void testSuccessfullyLaunchSimpleJavaApplication() {
-        final URL jnlpFile = getClass().getResource("SimpleJavaApplication.jnlp");
-
-        // final String[] args = {"-jnlp", jnlpFile.getPath(), "-verbose", "-nosecurity", "-Xnofork", "-headless"};
-        final String[] args = {"-jnlp", jnlpFile.getPath(), "-verbose", "-nosecurity", "-Xnofork"};
+        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
 
         Boot.main(args);
     }

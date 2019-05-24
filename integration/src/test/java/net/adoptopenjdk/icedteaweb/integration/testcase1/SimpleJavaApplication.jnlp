@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" href="SimpleJavaApplication.jnlp" codebase=".">
+<jnlp spec="1.0" codebase="http://localhost:${PORT}">
     <information>
         <title>Simple Java Application</title>
         <vendor>IcedTea</vendor>

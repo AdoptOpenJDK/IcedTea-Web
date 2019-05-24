@@ -104,4 +104,15 @@ public class StringUtils {
 
         return false;
     }
+
+    public static String substringBeforeLast(String s, String separator) {
+        if (s == null || separator == null || separator.isEmpty() || s.isEmpty()) {
+            return s;
+        }
+        final int idx = s.lastIndexOf(separator);
+        if (idx < 0) {
+            return s;
+        }
+        return s.substring(0, idx);
+    }
 }
