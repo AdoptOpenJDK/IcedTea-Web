@@ -33,7 +33,7 @@ impl Validator for JreValidator {
     fn get_fail_message(&self, key: &str, value: &str, file: &Option<std::path::PathBuf>) -> String {
         let mut res = String::new();
         write!(&mut res, "Your custom JRE {} read from {} under key {} is not valid.", value, file.clone().expect("jre path should be loaded").display(), key).expect("unwrap failed");
-        write!(&mut res, " Trying other config files, then using default ({}, {}, registry or JAVA_HOME) in attempt to start. Please fix this.", hardcoded_paths::get_java(), hardcoded_paths::get_jre()).expect("unwrap failed");
+        write!(&mut res, " Trying other config files, then using default ({}, {}, registry or JAVA_HOME) in attempt to start. Please fix this.", hardcoded_paths::get_jre(), hardcoded_paths::get_jre()).expect("unwrap failed");
         return res;
     }
 }
