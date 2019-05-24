@@ -19,7 +19,11 @@ MAINCLASS=LoadedViaMetaInfIndexList
 MAINCLASS_JAR_UNSIGNED=LoadedViaMetaInfIndexListUnsigned.jar
 MAINCLASS_JAR_SIGNED=LoadedViaMetaInfIndexListSigned.jar
 
-TMPDIR:=$(shell mktemp -d)
+ifeq ($(OS), Windows_NT)
+	TMPDIR:=$(shell cygpath -p -m $(shell mktemp -d))
+else
+	TMPDIR:=$(shell mktemp -d)
+endif
 
 prepare-reproducer: 
 	echo PREPARING REPRODUCER $(TESTNAME) in $(TMPDIR)

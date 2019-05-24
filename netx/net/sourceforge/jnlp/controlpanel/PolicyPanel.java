@@ -55,7 +55,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -64,6 +63,7 @@ import net.sourceforge.jnlp.security.policyeditor.PolicyEditor.PolicyEditorWindo
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * Implements a Policy Settings panel for the itweb-settings control panel.
@@ -264,7 +264,7 @@ public class PolicyPanel extends NamedBorderPanel {
         public void actionPerformed(final ActionEvent event) {
             try {
                 final URL fileUrl = new URL(fileUrlString);
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         launchPolicyTool(frame, fileUrl.getPath());
@@ -290,7 +290,7 @@ public class PolicyPanel extends NamedBorderPanel {
         public void actionPerformed(final ActionEvent event) {
             try {
                 final URL fileUrl = new URL(fileUrlString);
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         launchSimplePolicyEditor(fileUrl.getPath());

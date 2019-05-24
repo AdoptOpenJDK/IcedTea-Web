@@ -44,7 +44,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -101,6 +100,7 @@ import net.sourceforge.jnlp.security.dialogs.remember.AppletSecurityActions;
 import net.sourceforge.jnlp.security.dialogs.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 public class UnsignedAppletsTrustingListPanel extends JPanel {
 
@@ -146,7 +146,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         final String defaultFileName2 = "terrorList2";
         final String defaultFile1 = defaultDir + defaultFileName1;
         final String defaultFile2 = defaultDir + defaultFileName2;
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {

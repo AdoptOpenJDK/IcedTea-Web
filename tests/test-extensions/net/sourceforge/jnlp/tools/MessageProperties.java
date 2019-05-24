@@ -71,7 +71,8 @@ public class MessageProperties {
      * @param locale the localization of Messages.properties to search
      * @param key
      * @return the message corresponding to the given key from the specified localization
-     * @throws IOException if the specified Messages localization is unavailable
+     * 
+     * can throw wrapped IOException if the specified Messages localization is unavailable
      */
     public static String getMessage(Locale locale, String key) {
         ResourceBundle bundle = PropertyResourceBundle.getBundle(resourcePath, locale);

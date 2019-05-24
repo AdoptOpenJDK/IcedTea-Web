@@ -48,7 +48,7 @@ import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
- * This class is wrapper arround <information> tag which should
+ * This class is wrapper arround the *information* tag element which should
  * javaws provide from source jnlp file
  */
 public class InformationElement {

@@ -59,7 +59,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -68,9 +67,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import java.awt.Window;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -104,6 +106,7 @@ public class CertificatePane extends JPanel {
         };
 
     JTabbedPane tabbedPane;
+    JTextField certPath = new JTextField();
     private final JTable userTable;
     private final JTable systemTable;
     private JComboBox<CertificateType> certificateTypeCombo;
@@ -113,16 +116,16 @@ public class CertificatePane extends JPanel {
     /** JComponents that should be disbled for system store */
     private final List<JComponent> disableForSystem;
 
-    private JDialog parent;
+    private Window parent;
     private JComponent defaultFocusComponent = null;
 
     /**
      * The Current KeyStore. Only one table/tab is visible for interaction to
      * the user. This KeyStore corresponds to that.
      */
-    private KeyStore keyStore = null;
+    private KeyStores.KeyStoreWithPath keyStore = null;
 
-    public CertificatePane(JDialog parent) {
+    public CertificatePane(Window parent) {
         super();
         this.parent = parent;
 
@@ -229,8 +232,11 @@ public class CertificatePane extends JPanel {
         }
 
         tablePanel.add(tabbedPane, BorderLayout.CENTER);
-        tablePanel.add(buttonPanel, BorderLayout.SOUTH);
-
+        JPanel buttonPanelWrapper = new JPanel(new BorderLayout());
+        certPath.setEditable(false);
+        buttonPanelWrapper.add(certPath, BorderLayout.CENTER);
+        buttonPanelWrapper.add(buttonPanel, BorderLayout.EAST);
+        tablePanel.add(buttonPanelWrapper, BorderLayout.SOUTH);
         main.add(certificateTypePanel, BorderLayout.NORTH);
         main.add(tablePanel, BorderLayout.CENTER);
 
@@ -241,6 +247,11 @@ public class CertificatePane extends JPanel {
             closeButton.addActionListener(new CloseButtonListener());
             defaultFocusComponent = closeButton;
             closePanel.add(closeButton, BorderLayout.EAST);
+            
+            JButton openAll = new JButton(R("ButLunchFullItwSettings"));
+            openAll.addActionListener(new FullSettingsButtonListener());
+            closePanel.add(openAll, BorderLayout.WEST);
+            
             main.add(closePanel, BorderLayout.SOUTH);
         }
 
@@ -259,9 +270,9 @@ public class CertificatePane extends JPanel {
         try {
 
             //Get all of the X509Certificates and put them into an ArrayList
-            aliases = keyStore.aliases();
+            aliases = keyStore.getKs().aliases();
             while (aliases.hasMoreElements()) {
-                Certificate c = keyStore.getCertificate(aliases.nextElement());
+                Certificate c = keyStore.getKs().getCertificate(aliases.nextElement());
                 if (c instanceof X509Certificate) {
                     certs.add((X509Certificate) c);
                 }
@@ -289,8 +300,20 @@ public class CertificatePane extends JPanel {
     private void repopulateTables() {
         initializeKeyStore();
         readKeyStore();
+        try {
+            File src = new File(keyStore.getPath());
+            File resolved = src.getCanonicalFile();
+            if (resolved.equals(src)) {
+                certPath.setText(keyStore.getPath());
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, keyStore.getPath());
+            } else {
+                certPath.setText(keyStore.getPath() + " -> " + resolved.getCanonicalPath());
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, keyStore.getPath() + " -> " + resolved.getCanonicalPath());
+            }
+        } catch (Exception ex) {
+            OutputController.getLogger().log(ex);
+        }
         DefaultTableModel tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
-
         userTable.setModel(tableModel);
 
         tableModel = new DefaultTableModel(issuedToAndBy, columnNames);
@@ -380,7 +403,7 @@ public class CertificatePane extends JPanel {
             int returnVal = chooser.showOpenDialog(parent);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
-                    KeyStore ks = keyStore;
+                    KeyStore ks = keyStore.getKs();
                     if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                         char[] password = getPassword(R("CVImportPasswordMessage"));
                         if (password != null) {
@@ -428,16 +451,16 @@ public class CertificatePane extends JPanel {
                     JFileChooser chooser = new JFileChooser();
                     int returnVal = chooser.showOpenDialog(parent);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        String alias = keyStore.getCertificateAlias(certs
+                        String alias = keyStore.getKs().getCertificateAlias(certs
                                                         .get(selectedRow));
                         if (alias != null) {
                             if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                                 char[] password = getPassword(R("CVExportPasswordMessage"));
                                 if (password != null) {
-                                    CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStore, password);
+                                    CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStore.getKs(), password);
                                 }
                             } else {
-                                Certificate c = keyStore.getCertificate(alias);
+                                Certificate c = keyStore.getKs().getCertificate(alias);
                                 PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
                                 CertificateUtils.dump(c, ps);
                             }
@@ -469,7 +492,7 @@ public class CertificatePane extends JPanel {
                 int selectedRow = table.getSelectedRow();
 
                 if (selectedRow != -1) {
-                    String alias = keyStore.getCertificateAlias(certs.get(selectedRow));
+                    String alias = keyStore.getKs().getCertificateAlias(certs.get(selectedRow));
                     if (alias != null) {
 
                         int i = JOptionPane.showConfirmDialog(parent,
@@ -477,12 +500,12 @@ public class CertificatePane extends JPanel {
                                                         R("CVRemoveConfirmTitle"),
                                                         JOptionPane.YES_NO_OPTION);
                         if (i == 0) {
-                            keyStore.deleteEntry(alias);
+                            keyStore.getKs().deleteEntry(alias);
                             File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                             if (!keyStoreFile.isFile()) {
                                 FileUtils.createRestrictedFile(keyStoreFile, true);
                             }
-                            SecurityUtil.storeKeyStore(keyStore, keyStoreFile);
+                            SecurityUtil.storeKeyStore(keyStore.getKs(), keyStoreFile);
                         }
                     }
                     repopulateTables();
@@ -520,7 +543,22 @@ public class CertificatePane extends JPanel {
     private class CloseButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            parent.dispose();
+            JNLPRuntime.exit(0);
+        }
+    }
+    
+    private class FullSettingsButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                net.sourceforge.jnlp.controlpanel.ControlPanel.main(new String[0]);
+                parent.dispose();    
+            } catch (Exception ex) {
+                OutputController.getLogger().log(ex);
+                JOptionPane.showMessageDialog(parent, ex);
+
+            }
         }
     }
 

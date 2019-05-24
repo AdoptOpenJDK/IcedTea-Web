@@ -30,13 +30,13 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import net.sourceforge.jnlp.ShortcutDesc;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.controlpanel.desktopintegrationeditor.FreeDesktopIntegrationEditorFrame;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * This class provides the panel that allows the user to set whether they want
@@ -79,7 +79,7 @@ public class DesktopShortcutPanel extends NamedBorderPanel implements ItemListen
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtils.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {

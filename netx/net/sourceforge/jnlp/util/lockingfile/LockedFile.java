@@ -94,7 +94,13 @@ public class LockedFile {
      */
     synchronized public static LockedFile getInstance(File file) {
         if (!instanceCache.containsKey(file)) {
-            instanceCache.put(file, new LockedFile(file));
+            LockedFile l;
+            if (JNLPRuntime.isWindows()) {
+                l = new WindowsLockedFile(file);
+            } else {
+                l = new LockedFile(file);
+            }
+            instanceCache.put(file, l);
         }
 
         return instanceCache.get(file);
@@ -110,12 +116,10 @@ public class LockedFile {
     }
 
     /**
-     * Lock access to the file. Lock is reentrant.
+     * Lock access to the file.Lock is reentrant.
+     * @throws java.io.IOException
      */
     public void lock() throws IOException {
-        if (JNLPRuntime.isWindows()) {
-            return;
-        }
         // Create if does not already exist, cannot lock non-existing file
         if (!isReadOnly()) {
             this.file.createNewFile();
@@ -150,13 +154,18 @@ public class LockedFile {
     }
 
     /**
-     * Unlock access to the file. Lock is reentrant. Does not do anything if not holding the lock.
+     * Unlock access to the file.Lock is reentrant. Does not do anything if not holding the lock.
+     * @throws java.io.IOException
      */
     public void unlock() throws IOException {
-        if (JNLPRuntime.isWindows() || !this.threadLock.isHeldByCurrentThread()) {
+        if (!this.threadLock.isHeldByCurrentThread()) {
             return;
         }
         boolean releaseProcessLock = (this.threadLock.getHoldCount() == 1);
+        unlockImpl(releaseProcessLock);
+    }
+
+    protected void unlockImpl(boolean releaseProcessLock) throws IOException {
         try {
             if (releaseProcessLock) {
                 if (this.processLock != null){
@@ -179,5 +188,30 @@ public class LockedFile {
 
     public boolean isHeldByCurrentThread() {
         return this.threadLock.isHeldByCurrentThread();
+    }
+
+    private static class WindowsLockedFile extends LockedFile {
+
+        public WindowsLockedFile(File file) {
+            super(file);
+        }
+
+        /*Comment why itis different*/
+        @Override
+        public void lock() throws IOException {
+            if (!isReadOnly()) {
+                super.file.createNewFile();
+            }
+            super.threadLock.lock();
+        }
+
+        /*Comment why itis different*/
+        @Override
+        public void unlock() throws IOException {
+            if (!super.threadLock.isHeldByCurrentThread()) {
+                return;
+            }
+            unlockImpl(false);
+        }
     }
 }

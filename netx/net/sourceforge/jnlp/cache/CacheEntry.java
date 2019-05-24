@@ -39,6 +39,7 @@ public class CacheEntry {
     private static final String KEY_CONTENT_ORIGINAL_LENGTH = "content-original-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
     private static final String KEY_LAST_UPDATED = "last-updated";
+    public static final String KEY_JNLP_PATH = "jnlp-path";
 
     /** the remote resource location */
     private final URL location;
@@ -68,7 +69,7 @@ public class CacheEntry {
      */
     PropertiesFile readCacheEntryInfo() {
         File infoFile = CacheUtil.getCacheFile(location, version);
-        infoFile = new File(infoFile.getPath() + ".info"); // replace with something that can't be clobbered
+        infoFile = new File(infoFile.getPath() + CacheDirectory.INFO_SUFFIX); // replace with something that can't be clobbered
 
         return new PropertiesFile(infoFile, R("CAutoGen"));
     }
@@ -107,6 +108,10 @@ public class CacheEntry {
         setLongKey(KEY_CONTENT_LENGTH, length);
     }
 
+    public void setJnlpPath(String jnlpPath) {
+    	properties.setProperty(KEY_JNLP_PATH, jnlpPath);
+    }
+    
     /**
      * Return the length of the original content that was cached. May be different
      * from the actual cache entry size due to (de)compression.

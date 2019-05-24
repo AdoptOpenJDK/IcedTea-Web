@@ -4,6 +4,7 @@ Please keep this list in alphabetical order.
 Lillian Angel <langel@redhat.com>
 Andrew Azores <aazores@redhat.com>
 Deepak Bhole <dbhole@redhat.com>
+Laurent Bourgès <bourges.laurent@gmail.com>
 Adam Buchta <adbuch7@gmail.com>
 Ricardo Martín Camarero <rickyepoderi@yahoo.es>
 Marcin Cieslak <marcin.cieslak@gmail.com>
@@ -11,9 +12,11 @@ Danesh Dadachanji <ddadacha@redhat.com>
 Adam Domurad <adomurad@redhat.com>
 Lukasz Dracz <ldracz@redhat.com>
 Thomas Fitzsimmons <fitzsim@redhat.com>
-Michał Górny < mgorny@gentoo.org >
+Olesya Gerasimenko <gammaray@basealt.ru>
+Michał Górny <mgorny@gentoo.org>
 Mark Greenwood <mark@dcs.shef.ac.uk>
 Tereza Hlavackova <hlavackova.tereza@gmail.com>
+Lars Herschke <lhersch@dssgmbh.de>
 Peter Hatina <phatina@redhat.com>
 Andrew John Hughes <ahughes@redhat.com>
 Jie Kang <jkang@redhat.com>
@@ -35,6 +38,7 @@ Ville Skyttä <ville.skytta@iki.fi>
 Fridrich Strba <fridrich.strba@suse.com>
 Andrew Su <asu@redhat.com>
 Joshua Sumali <jsumali@redhat.com>
+Joel Tesdall <jtesdall@mapcon.com>
 Michal Vala <mvala@redhat.com>
 Jiri Vanek <jvanek@redhat.com>
 Tomáš Votava <tomcacolca@gmail.com>
@@ -43,6 +47,5 @@ Jacob Wisor  <gitne@excite.co.jp>
 Man Lung Wong <mwong@redhat.com>
 
 This project also includes code from the following projects:
-
 OpenJDK <http://openjdk.java.net/>
 Netx <http://jnlp.sourceforge.net/netx/>

@@ -66,7 +66,7 @@ public class ParserCornerCases {
         Assert.assertTrue(target.getContent().contains("<entry key=\"key\">value</entry>"));
 
         Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("argument", node.getNodeName());
+        Assert.assertEquals("argument", node.getNodeName().getName());
         String contents = node.getNodeValue();
         Assert.assertTrue(contents.contains("xml"));
         Assert.assertTrue(contents.contains("DOCTYPE"));
@@ -94,7 +94,7 @@ public class ParserCornerCases {
 
         Node node = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
         node = node.getFirstChild().getFirstChild();
-        Assert.assertEquals("argument", node.getNodeName());
+        Assert.assertEquals("argument", node.getNodeName().getName());
         String contents = node.getNodeValue();
         Assert.assertTrue(contents.contains("xml"));
         Assert.assertTrue(contents.contains("DOCTYPE"));

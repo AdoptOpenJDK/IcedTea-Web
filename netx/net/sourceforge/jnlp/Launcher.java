@@ -40,11 +40,11 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
 
-import javax.swing.SwingUtilities;
 import javax.swing.text.html.parser.ParserDelegator;
 import net.sourceforge.jnlp.splashscreen.SplashUtils;
 import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 import sun.awt.SunToolkit;
 
@@ -83,6 +83,8 @@ public class Launcher {
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
+    
+    public static final String KEY_JAVAWS_LOCATION = "icedtea-web.bin.location";
 
     /**
      * Create a launcher with the runtime's default update policy
@@ -422,7 +424,7 @@ public class Launcher {
             List<String> commands = new LinkedList<>();
 
             // this property is set by the javaws launcher to point to the javaws binary
-            String pathToWebstartBinary = System.getProperty("icedtea-web.bin.location");
+            String pathToWebstartBinary = System.getProperty(KEY_JAVAWS_LOCATION);
             commands.add(pathToWebstartBinary);
             // use -Jargument format to pass arguments to the JVM through the launcher
             for (String arg : vmArgs) {
@@ -549,12 +551,15 @@ public class Launcher {
                         R("LCantDetermineMainClassInfo")));
             }
 
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Starting application [" + mainName + "] ...");
+            
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
             Method main = mainClass.getMethod("main", new Class<?>[] { String[].class });
             String args[] = file.getApplication().getArguments();
 
-            SwingUtilities.invokeAndWait(new Runnable() {
+            // create EDT within application context:
+            SwingUtils.callOnAppContext(new Runnable() {
                 // dummy method to force Event Dispatch Thread creation
                 @Override
                 public void run() {

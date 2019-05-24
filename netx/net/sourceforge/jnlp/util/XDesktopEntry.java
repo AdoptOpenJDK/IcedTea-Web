@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -37,10 +38,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.filechooser.FileSystemView;
 
 import net.sourceforge.jnlp.IconDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.OptionsDefinitions;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.CacheUtil;
@@ -76,8 +77,9 @@ import net.sourceforge.jnlp.security.dialogresults.AccessWarningPaneComplexRetur
  
  * @author (not so proudly) Jiri Vanek
  */
-public class XDesktopEntry {
 
+public class XDesktopEntry implements GenericDesktopEntry {
+ 
     public static final String JAVA_ICON_NAME = "javaws";
 
     private JNLPFile file = null;
@@ -110,7 +112,7 @@ public class XDesktopEntry {
      * @param isSigned whether the app is signed
      * @return reader with desktop shortcut specification
      */
-    public Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+     Reader getContentsAsReader(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
 
         File generatedJnlp = null;
         if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.ShortcutResult.Shortcut.JNLP_HREF)) {
@@ -200,10 +202,10 @@ public class XDesktopEntry {
         
     }
     
-    private String getJavaWsBin() {
+    public static String getJavaWsBin() {
         //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
         //absolute - works in case of self built
-        String exec = System.getProperty("icedtea-web.bin.location");
+        String exec = System.getProperty(Launcher.KEY_JAVAWS_LOCATION);
         String pathResult = findOnPath(new String[]{"javaws", System.getProperty("icedtea-web.bin.name")});
         if (pathResult != null) {
             return pathResult;
@@ -267,11 +269,11 @@ public class XDesktopEntry {
     /**
      * @return the size of the icon (in pixels) for the desktop shortcut
      */
-    public int getIconSize() {
+    private int getIconSize() {
         return iconSize;
     }
 
-    public File getShortcutTmpFile() {
+    File getShortcutTmpFile() {
         String userTmp = PathsAndFiles.TMP_DIR.getFullPath();
         File shortcutFile = new File(userTmp + File.separator + getDesktopIconFileName());
         return shortcutFile;
@@ -283,7 +285,7 @@ public class XDesktopEntry {
      * @param size the size (in pixels) of the icon to use. Commonly used sizes
      *        are of 16, 22, 32, 48, 64 and 128
      */
-    public void setIconSize(int size) {
+    private void setIconSize(int size) {
         iconSize = size;
     }
 
@@ -293,6 +295,7 @@ public class XDesktopEntry {
      * @param desktop how to create on desktop
      * @param isSigned if it is signed
      */
+    @Override
     public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
         boolean isDesktop = false;
         if (desktop != null && desktop.isCreate()) {
@@ -398,6 +401,7 @@ public class XDesktopEntry {
     }
 
 
+    @Override
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
         //TODO TODO TODO TODO TODO TODO TODO TODO 
         //check existing jnlp files
@@ -408,8 +412,9 @@ public class XDesktopEntry {
 
     }
 
+    @Override
     public File getGeneratedJnlpFileName() {
-        String name = FileUtils.sanitizeFileName(file.createJnlpTitle());
+        String name = FileUtils.sanitizeFileName(file.createNameForDesktopFile());
         while (name.endsWith(".jnlp")) {
             name = name.substring(0, name.length() - 5);
         }
@@ -450,16 +455,7 @@ public class XDesktopEntry {
                 cantCache();
             }
         } else {
-            //try favicon.ico
-            try {
-                URL favico = new URL(
-                        file.getCodeBase().getProtocol(),
-                        file.getCodeBase().getHost(),
-                        file.getCodeBase().getPort(),
-                        "/" + FAVICON);
-                JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
-                //this MAY throw npe, if url (specified in jnlp) points to 404
-                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
+                URL urlLocation = getFavIconUrl(file);
                 if (urlLocation == null) {
                     cantCache();
                 }
@@ -467,10 +463,7 @@ public class XDesktopEntry {
                 if (!location.startsWith("file:")) {
                     cantCache();
                 }
-            } catch (IOException ex) {
-                //favicon 404 or similar
-                OutputController.getLogger().log(ex);
-            }
+
         }
         if (location != null) {
             String origLocation = location.substring("file:".length());
@@ -482,7 +475,7 @@ public class XDesktopEntry {
             File source = new File(origLocation);
             String targetName = source.getName();
             if (targetName.equals(FAVICON)) {
-                targetName = file.getCodeBase().getHost() + ".ico";
+                targetName = file.getNotNullProbalbeCodeBase().getHost() + ".ico";
             }
             File target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
             Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -490,32 +483,100 @@ public class XDesktopEntry {
             OutputController.getLogger().log(OutputController.Level.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
         }
     }
+    
+    static String getFavIcon(JNLPFile file) {
+        URL u = getFavIconUrl(file);
+        if (u == null){
+            return null;
+        } else {
+            return u.toString();
+        }
+    }
+    static List<String> possibleFavIconLocations(String path) {
+        while (path.endsWith("/") || path.endsWith("\\")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        List<String> r = new ArrayList<>();
+        do {
+            r.add(path);
+            int last = Math.max(path.lastIndexOf("\\"), path.lastIndexOf("/"));
+            if (last >= 0) {
+                path = path.substring(0, last);
+            }
+        } while (path.contains("/") || path.contains("\\"));
+        if (!r.contains("")) {
+            r.add("");
+        }
+        return r;
+    }
+    
+    private static URL favUrl(String delimiter, String path, JNLPFile file) throws MalformedURLException {
+        return new URL(
+                file.getNotNullProbalbeCodeBase().getProtocol(),
+                file.getNotNullProbalbeCodeBase().getHost(),
+                file.getNotNullProbalbeCodeBase().getPort(),
+                path + delimiter + FAVICON);
+    }
+
+    private static URL getFavIconUrl(JNLPFile file) {
+        try {
+            for (String path : possibleFavIconLocations(file.getNotNullProbalbeCodeBase().getPath())) {
+                URL favico = favUrl("/", path, file);
+                //JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
+                //this MAY throw npe, if url (specified in jnlp) points to 404
+                //the below works just fine
+                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
+                if (urlLocation != null) {
+                    return urlLocation;
+                }
+            }
+            //the icon is much more likely to be found behind / then behinf \/ 
+            //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
+            for (String path : possibleFavIconLocations(file.getNotNullProbalbeCodeBase().getPath())) {
+                URL favico = favUrl("\\", path, file);
+                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
+                if (urlLocation != null) {
+                    return urlLocation;
+                }
+            }
+        } catch (Exception ex) {
+            //favicon 404 or similar
+            OutputController.getLogger().log(ex);
+        }
+        return null;
+    }
 
     private void cantCache() throws NonFileProtocolException {
         throw new NonFileProtocolException("Unable to cache icon");
     }
 
     private String getDesktopIconName() {
-        return sanitize(file.createJnlpTitle());
+        return getDesktopIconName(file);
+    }
+    
+    static String getDesktopIconName(JNLPFile file) {
+        return sanitize(file.createNameForDesktopFile());
     }
 
+    @Override
     public File getDesktopIconFile() {
             return new File(getDesktop(), getDesktopIconFileName());
     }
-    public static File getDesktop(){
-        if (JNLPRuntime.isWindows()) {
-            FileSystemView filesys = FileSystemView.getFileSystemView();
-            return filesys.getHomeDirectory();
-        } else {
-            return new File(findFreedesktopOrgDesktopPathCatch());
-        }
+    
+    static File getDesktop() {
+        return new File(findFreedesktopOrgDesktopPathCatch());
     }
 
+    @Override
     public File getLinuxMenuIconFile() {
         return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
     }
     
-    private String getDesktopIconFileName() {
+    @Override
+    public String getDesktopIconFileName() {
         return getDesktopIconName() + ".desktop";
     }
 
@@ -622,5 +683,15 @@ public class XDesktopEntry {
             }
         }
 
+    }
+    
+     @Override
+    public void createShortcutOnWindowsDesktop() throws IOException {
+        throw new UnsupportedOperationException("not suported on linux like systems");
+    }
+
+    @Override
+    public void createWindowsMenu() throws IOException {
+        throw new UnsupportedOperationException("not suported on linux like systems");
     }
 }

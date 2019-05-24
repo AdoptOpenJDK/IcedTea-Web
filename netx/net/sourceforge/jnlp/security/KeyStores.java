@@ -33,8 +33,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
-
+ */
 package net.sourceforge.jnlp.security;
 
 import java.io.File;
@@ -64,8 +63,26 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  */
 public final class KeyStores {
 
-    /* this gets turned into user-readable strings, see toUserReadableString */
+    public static class KeyStoreWithPath {
 
+        private final KeyStore ks;
+        private final String path;
+
+        public KeyStoreWithPath(KeyStore ks, String path) {
+            this.ks = ks;
+            this.path = path;
+        }
+
+        public KeyStore getKs() {
+            return ks;
+        }
+
+        public String getPath() {
+            return path;
+        }
+    }
+
+    /* this gets turned into user-readable strings, see toUserReadableString */
     public enum Level {
         USER,
         SYSTEM,
@@ -79,10 +96,10 @@ public final class KeyStores {
         CLIENT_CERTS,
     }
 
-    public static final Map<Integer,String> keystoresPaths=new HashMap<>();
+    public static final Map<Integer, String> keystoresPaths = new HashMap<>();
 
     private static final String KEYSTORE_TYPE = "JKS";
-  
+
     /**
      * Returns a KeyStore corresponding to the appropriate level level (user or
      * system) and type.
@@ -92,7 +109,7 @@ public final class KeyStores {
      * @param type the type of KeyStore desired
      * @return a KeyStore containing certificates from the appropriate
      */
-    public static final KeyStore getKeyStore(Level level, Type type) {
+    public static final KeyStoreWithPath getKeyStore(Level level, Type type) {
         boolean create;
         if (level == Level.USER) {
             create = true;
@@ -112,7 +129,7 @@ public final class KeyStores {
      * @param create true if keystore can be created
      * @return a KeyStore containing certificates from the appropriate
      */
-    public static final KeyStore getKeyStore(Level level, Type type, boolean create) {
+    private static final KeyStoreWithPath getKeyStore(Level level, Type type, boolean create) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new AllPermission());
@@ -124,11 +141,11 @@ public final class KeyStores {
             ks = createKeyStoreFromFile(new File(location), create);
             //hashcode is used instead of instance so when no references are left
             //to keystore, then this will not be blocker for garbage collection
-            keystoresPaths.put(ks.hashCode(),location);
+            keystoresPaths.put(ks.hashCode(), location);
         } catch (Exception e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
         }
-        return ks;
+        return new KeyStoreWithPath(ks, location);
     }
 
     public static String getPathToKeystore(int k) {
@@ -148,22 +165,22 @@ public final class KeyStores {
     public static final KeyStore[] getCertKeyStores() {
         List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE certificates */
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* System-level certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.CERTS);
+        ks = getKeyStore(Level.SYSTEM, Type.CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level JSSE certificates */
-        ks = getKeyStore(Level.USER, Type.JSSE_CERTS);
+        ks = getKeyStore(Level.USER, Type.JSSE_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level certificates */
-        ks = getKeyStore(Level.USER, Type.CERTS);
+        ks = getKeyStore(Level.USER, Type.CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -179,22 +196,22 @@ public final class KeyStores {
     public static final KeyStore[] getCAKeyStores() {
         List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE CA certificates */
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* System-level CA certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.CA_CERTS);
+        ks = getKeyStore(Level.SYSTEM, Type.CA_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level JSSE CA certificates */
-        ks = getKeyStore(Level.USER, Type.JSSE_CA_CERTS);
+        ks = getKeyStore(Level.USER, Type.JSSE_CA_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level CA certificates */
-        ks = getKeyStore(Level.USER, Type.CA_CERTS);
+        ks = getKeyStore(Level.USER, Type.CA_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -211,12 +228,12 @@ public final class KeyStores {
     public static KeyStore[] getClientKeyStores() {
         List<KeyStore> result = new ArrayList<>();
 
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS);
+        KeyStore ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
 
-        ks = getKeyStore(Level.USER, Type.CLIENT_CERTS);
+        ks = getKeyStore(Level.USER, Type.CLIENT_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -225,7 +242,8 @@ public final class KeyStores {
     }
 
     /**
-     * Returns the location of a KeyStore corresponding to the given level and type.
+     * Returns the location of a KeyStore corresponding to the given level and
+     * type.
      *
      * @param level the specified level of the key store to be returned.
      * @param type the specified type of the key store to be returned.
@@ -242,7 +260,7 @@ public final class KeyStores {
                     case JSSE_CERTS:
                         return PathsAndFiles.SYS_JSSECERT;
                     case CERTS:
-                         return PathsAndFiles.SYS_CERT;
+                        return PathsAndFiles.SYS_CERT;
                     case CLIENT_CERTS:
                         return PathsAndFiles.SYS_CLIENTCERT;
                 }

@@ -104,4 +104,37 @@ public class CacheUtilTest {
         final File expected = new File("/tmp/https/example.com/applet/applet.php");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
+    
+    @Test
+    public void CacheID(){
+        CacheUtil.CacheId cj11 = new CacheUtil.CacheJnlpId("a");
+        CacheUtil.CacheId cj12 = new CacheUtil.CacheJnlpId("a");
+        CacheUtil.CacheId cj2 = new CacheUtil.CacheJnlpId("b");
+        CacheUtil.CacheId cj31 = new CacheUtil.CacheJnlpId(null);
+        CacheUtil.CacheId cj32 = new CacheUtil.CacheJnlpId(null);
+        CacheUtil.CacheId cd11 = new CacheUtil.CacheDomainId("a");
+        CacheUtil.CacheId cd12 = new CacheUtil.CacheDomainId("a");
+        CacheUtil.CacheId cd2 = new CacheUtil.CacheDomainId("b");
+        CacheUtil.CacheId cd31 = new CacheUtil.CacheDomainId(null);
+        CacheUtil.CacheId cd32 = new CacheUtil.CacheDomainId(null);
+        
+        Assert.assertEquals(cj11, cj11);
+        Assert.assertEquals(cj11, cj12);
+        Assert.assertEquals(cd11, cd11);
+        Assert.assertEquals(cd11, cd12);
+        Assert.assertEquals(cj31, cj31);
+        Assert.assertEquals(cj31, cj32);
+        Assert.assertEquals(cd31, cd31);
+        Assert.assertEquals(cd31, cd32);
+        
+        Assert.assertNotEquals(cj11, cj2);
+        Assert.assertNotEquals(cj11, cj31);
+        Assert.assertNotEquals(cd11, cd2);
+        Assert.assertNotEquals(cd11, cd31);
+        
+        Assert.assertNotEquals(cj11, cd11);
+        Assert.assertNotEquals(cj2, cd2);
+        Assert.assertNotEquals(cj31, cd31);
+        Assert.assertNotEquals(cj32, cd32);
+    }
 }

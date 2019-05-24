@@ -63,6 +63,7 @@ import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.logging.ConsoleOutputPaneModel;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.swing.SwingUtils;
 
 public class FreeDesktopIntegrationEditorFrame extends JFrame {
 
@@ -213,8 +214,7 @@ public class FreeDesktopIntegrationEditorFrame extends JFrame {
     }
 
     public static void main(String args[]) {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 new FreeDesktopIntegrationEditorFrame().setVisible(true);

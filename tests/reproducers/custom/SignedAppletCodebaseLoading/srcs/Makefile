@@ -8,7 +8,11 @@ JAR=$(EXPORTED_JAR)
 JARSIGNER=$(EXPORTED_JARSIGNER)
 JARSIGNER_CMD=$(JARSIGNER) -keystore $(TOP_BUILD_DIR)/$(PRIVATE_KEYSTORE_NAME) -storepass $(PRIVATE_KEYSTORE_PASS) -keypass $(PRIVATE_KEYSTORE_PASS)
 
-TMPDIR:=$(shell mktemp -d)
+ifeq ($(OS), Windows_NT)
+	TMPDIR:=$(shell cygpath -p -m $(shell mktemp -d))
+else
+	TMPDIR:=$(shell mktemp -d)
+endif
 
 prepare-reproducer:
 	echo PREPARING REPRODUCER $(TESTNAME)

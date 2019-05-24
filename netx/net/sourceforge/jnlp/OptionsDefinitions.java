@@ -53,7 +53,8 @@ public class OptionsDefinitions {
         //javaws control-options
         ABOUT("-about", "BOAbout"),
         VIEWER("-viewer", "BOViewer"),
-        CLEARCACHE("-Xclearcache", "BXclearcache"),
+        CLEARCACHE("-Xclearcache", "BXclearcache", NumberOfArguments.NONE_OR_ONE),
+        LISTCACHEIDS("-Xcacheids", "BXcacheids", NumberOfArguments.NONE_OR_ONE),
         LICENSE("-license", "BOLicense"),
         HELP1("-help", "BOHelp1"),
         //javaws run-options
@@ -148,6 +149,7 @@ public class OptionsDefinitions {
         NONE("NOAnone"),
         ONE("NOAone"),
         ONE_OR_MORE("NOAonemore"),
+        NONE_OR_ONE("NOAnonorone"),
         EVEN_NUMBER_SUPPORTS_EQUALS_CHAR("NOAevennumber");
 
         String messageKey;
@@ -194,6 +196,7 @@ public class OptionsDefinitions {
             OPTIONS.ABOUT,
             OPTIONS.VIEWER,
             OPTIONS.CLEARCACHE,
+            OPTIONS.LISTCACHEIDS,
             OPTIONS.LICENSE,
             OPTIONS.HELP1}
         );
@@ -234,12 +237,18 @@ public class OptionsDefinitions {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args[0].equals(TextsProvider.JAVAWS)) {
-            printOptions(getJavaWsOptions());
-        } else if (args[0].equals(TextsProvider.ITWEB_SETTINGS)) {
-            printOptions(getItwsettingsCommands());
-        } else if (args[0].equals(TextsProvider.POLICY_EDITOR)) {
-            printOptions(getPolicyEditorOptions());
+        switch (args[0]) {
+            case TextsProvider.JAVAWS:
+                printOptions(getJavaWsOptions());
+                break;
+            case TextsProvider.ITWEB_SETTINGS:
+                printOptions(getItwsettingsCommands());
+                break;
+            case TextsProvider.POLICY_EDITOR:
+                printOptions(getPolicyEditorOptions());
+                break;
+            default:
+                break;
         }
     }
 

@@ -25,11 +25,14 @@ import java.util.List;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.io.*;
+import javax.jnlp.ServiceManager;
 import javax.swing.*;
 
 import net.sourceforge.jnlp.*;
+import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.splashscreen.SplashController;
 import net.sourceforge.jnlp.util.*;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * The applet environment including stub, context, and frame.  The
@@ -188,7 +191,7 @@ public class AppletEnvironment implements AppletContext, AppletStub {
             }
 
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
+                SwingUtils.callOnAppContext(new Runnable() {
                     @Override
                     public void run() {
                         // do first because some applets need to be displayed before
@@ -284,23 +287,23 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     }
 
     /**
-     * Not implemented yet.
      * @param uRL url of document
      */
     @Override
     public void showDocument(java.net.URL uRL) {
         checkDestroyed();
-
+        ServiceUtil.getBasicService().showDocument(uRL);
     }
 
     /**
      * Not implemented yet.
      * @param uRL source of document
-     * @param str who know what
+     * @param str _self, _parent, _top, _blank or "name". Have sense only for applets. Not implemented for our javaws world
      */
     @Override
     public void showDocument(java.net.URL uRL, java.lang.String str) {
         checkDestroyed();
+        ServiceUtil.getBasicService().showDocument(uRL);
 
     }
 
@@ -375,8 +378,12 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     @Override
     public URL getDocumentBase() {
         checkDestroyed();
-
-        return file.getApplet().getDocumentBase();
+        URL db = file.getApplet().getDocumentBase();
+        if (db == null) {
+            return getCodeBase();
+        } else {
+            return db;
+        }
     }
 
     // FIXME: Sun's applet code forces all parameters to lower case.

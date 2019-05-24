@@ -52,6 +52,6 @@ public interface DownloadService2 {
     public DownloadService2.ResourceSpec[] getCachedResources(
             javax.jnlp.DownloadService2.ResourceSpec resourceSpec);
 
-    public DownloadService2.ResourceSpec[] getUpdateAvaiableReosurces(
+    public DownloadService2.ResourceSpec[] getUpdateAvailableResources(
             javax.jnlp.DownloadService2.ResourceSpec resourceSpec);
 }

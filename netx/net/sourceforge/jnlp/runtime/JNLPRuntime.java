@@ -19,6 +19,8 @@ package net.sourceforge.jnlp.runtime;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -48,7 +50,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.swing.JOptionPane;
-import javax.swing.JWindow;
 import javax.swing.UIManager;
 import javax.swing.text.html.parser.ParserDelegator;
 
@@ -272,7 +273,7 @@ public class JNLPRuntime {
         try {
             SSLSocketFactory sslSocketFactory;
             SSLContext context = SSLContext.getInstance("SSL");
-            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS);
+            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS).getKs();
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             SecurityUtil.initKeyManagerFactory(kmf, ks);
             TrustManager[] trust = new TrustManager[] { getSSLSocketTrustManager() };
@@ -736,16 +737,24 @@ public class JNLPRuntime {
         //if (GraphicsEnvironment.isHeadless()) // jdk1.4+ only
         //    headless = true;
         try {
-            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))){
+            if ("true".equalsIgnoreCase(System.getProperty("java.awt.headless"))) {
                 headless = true;
             }
             if (!headless) {
-                try {
-                    new JWindow().getOwner();
-                } catch (Exception ex) {
-                    headless = true;
-                    OutputController.getLogger().log(ex);
-                    OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                boolean noCheck = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.IGNORE_HEADLESS_CHECK));
+                if (noCheck) {
+                    headless = false;
+                    OutputController.getLogger().log(DeploymentConfiguration.IGNORE_HEADLESS_CHECK + " set to " + noCheck + ". Avoding headless check.");
+                } else {
+                    try {
+                        if (GraphicsEnvironment.isHeadless()) {
+                            throw new HeadlessException();
+                        }
+                    } catch (HeadlessException ex) {
+                        headless = true;
+                        OutputController.getLogger().log(ex);
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, Translator.R("HEADLESS_MISSCONFIGURED"));
+                    }
                 }
             }
         } catch (SecurityException ex) {
@@ -766,6 +775,7 @@ public class JNLPRuntime {
      * @return {@code true} if running on a Unix or Unix-like system (including
      * Linux and *BSD)
      */
+    @Deprecated
     public static boolean isUnix() {
         String sep = System.getProperty("file.separator");
         return (sep != null && sep.equals("/"));

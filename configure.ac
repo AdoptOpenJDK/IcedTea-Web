@@ -1,4 +1,4 @@
-AC_INIT([icedtea-web],[1.7],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
+AC_INIT([icedtea-web],[1.7.3pre],[distro-pkg-dev@openjdk.java.net], [icedtea-web], [http://icedtea.classpath.org/wiki/IcedTea-Web])
 AM_INIT_AUTOMAKE([1.9 tar-pax foreign])
 AC_CONFIG_FILES([Makefile netx.manifest])
 AM_MAINTAINER_MODE([enable])
@@ -13,8 +13,6 @@ cd $abs_top_builddir
 AC_SUBST(abs_top_srcdir)
 
 AC_CANONICAL_HOST
-AC_PROG_CC
-AC_PROG_CXX
 IT_SET_ARCH_SETTINGS
 
 IT_CP_SUPPORTS_REFLINK
@@ -41,6 +39,13 @@ if test x"$BIN_BASH" = x ; then
     AC_MSG_ERROR([/bin/bash is used in runtime and for about generation. Dying sooner rather then later])
 fi
 
+IT_CHECK_MODULARJDK_ARGS
+
+#shell launchers are only opinion for 1.7
+AM_CONDITIONAL([ENABLE_SHELL_LAUNCHERS], [true])
+#native launchers do not exists in 1.7
+AM_CONDITIONAL([ENABLE_NATIVE_LAUNCHERS], [false])
+
 build_linux=no
 build_windows=no
 case "${host_os}" in
@@ -56,6 +61,15 @@ case "${host_os}" in
 esac
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
+
+# the images built with this switch on linux, are not exactly windows friendly (see removed jars in make log, which are made in favor of clean linux build)
+AC_MSG_CHECKING([whether to include also bat lunchers during linux build])
+AC_ARG_ENABLE([bats-on-linux],
+	      [AS_HELP_STRING([--enable-bats-on-linux],
+	      		      [enable generation of windows legacy bat launchers during linux build with legacy shell launchers. This is for subjects, who wish to do an custom build for windows and linuxes/mac users together. Preparation of rest of the ITW then require a bit of love. This switch is not exactly supported option.])],
+	      [WINDOWS_OR_INCLUDE_BATS="${enableval}"], [WINDOWS_OR_INCLUDE_BATS='no'])
+AM_CONDITIONAL([WINDOWS_OR_INCLUDE_BATS], [test "x$WINDOWS_OR_INCLUDE_BATS" = "xyes" -o "$build_windows" = "yes" ])
+AC_MSG_RESULT(${WINDOWS_OR_INCLUDE_BATS})
 
 IT_CHECK_WITH_GCJ
 FIND_TOOL([ZIP], [zip])
@@ -95,7 +109,6 @@ IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEMANAGER, [java.net.CookieManager], [some.pkg],
 IT_CHECK_FOR_CLASS(JAVA_NET_HTTPCOOKIE, [java.net.HttpCookie], [some.pkg], [])
 IT_CHECK_FOR_CLASS(JAVA_NET_COOKIEHANDLER, [java.net.CookieHandler], [some.pkg], [])
 # in jdk9, those classes are using internal apis, must be enabled via module cheats
-IT_CHECK_FOR_CLASS(SUN_SECURITY_PROVIDER_X509FACTORY, [sun.security.provider.X509Factory], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_SECURITYCONSTANTS, [sun.security.util.SecurityConstants], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_UTIL_HOSTNAMECHECKER, [sun.security.util.HostnameChecker], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_SECURITY_X509_X500NAME, [sun.security.x509.X500Name], [some.pkg], [$JAVA_BASE])
@@ -156,6 +169,7 @@ IT_FIND_OPTIONAL_JAR([asm], ASM,
     [/usr/share/java/objectweb-asm4/asm-all.jar /usr/share/java/objectweb-asm4/asm-all-4.0.jar /usr/share/java/objectweb-asm/asm-all.jar])
 
 IT_CHECK_FOR_TAGSOUP
+IT_CHECK_FOR_MSLINKS
 
 if test "x$build_windows" = xyes ; then
   IT_CHECK_FOR_WIX
@@ -184,5 +198,19 @@ AC_SUBST(bashcompdir)
 
 AC_CONFIG_FILES([jrunscript], [chmod u+x jrunscript])
 AC_CONFIG_FILES([build.properties])
+
+# this is nasty hack to make GCC trully optional
+echo -n "destroying gcc config? ... "
+if test "x${enable_native_plugin}" = "xno" ; then
+am__fastdepCC_TRUE="#"
+am__fastdepCC_FALSE="#"
+am__fastdepCC="#"
+am__fastdepCXX_TRUE="#"
+am__fastdepCXX_FALSE="#"
+am__fastdepCXX="#"
+echo "destroyed!"
+else
+echo "no"
+fi 
 
 AC_OUTPUT

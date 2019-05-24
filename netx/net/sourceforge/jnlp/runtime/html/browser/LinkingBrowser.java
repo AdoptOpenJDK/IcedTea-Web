@@ -46,7 +46,6 @@ import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.util.logging.JavaConsole;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 public class LinkingBrowser extends JTabbedPane {
 
@@ -92,11 +91,15 @@ public class LinkingBrowser extends JTabbedPane {
         BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(getConfiguration());
         proxySelector.initialize();
         ProxySelector.setDefault(proxySelector);
+        createFrame(url, socket, JFrame.EXIT_ON_CLOSE);
+    }
+
+    public static void createFrame(String url, boolean socket, int action) {
         HtmlBrowserPanel.warn();
         JFrame f = new JFrame();
         f.add(new LinkingBrowser(url, socket));
         f.pack();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setDefaultCloseOperation(action);
         f.setVisible(true);
     }
 

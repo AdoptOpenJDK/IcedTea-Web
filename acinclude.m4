@@ -47,6 +47,14 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
 	        SYSTEM_JDK_DIR=
               ])
   if test -z "${SYSTEM_JDK_DIR}"; then
+    AM_COND_IF([WINDOWS], [
+      # does not work, use which instead
+      # AC_CHECK_PROGS([SYSTEM_JAVA_IN_PATH], [java.exe]) 
+      SYSTEM_JAVA_IN_PATH=$(which javac 2>&AS_MESSAGE_LOG_FD)      
+      if test x"${SYSTEM_JAVA_IN_PATH}" != x ; then
+        SYSTEM_JDK_DIR=$(dirname $(dirname ${SYSTEM_JAVA_IN_PATH}))
+      fi
+    ] , [
     for dir in /etc/alternatives/java_sdk \
                /usr/lib/jvm/java-1.9.0-openjdk \
                /usr/lib/jvm/icedtea9 \
@@ -64,15 +72,8 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_JDK],
 	 break
        fi
     done
-  fi
-  AM_COND_IF([WINDOWS], [
-    # does not work, use which instead
-    # AC_CHECK_PROGS([SYSTEM_JAVA_IN_PATH], [java.exe]) 
-    SYSTEM_JAVA_IN_PATH=$(which java 2>&AS_MESSAGE_LOG_FD)
-    if test x"${SYSTEM_JAVA_IN_PATH}" != x ; then
-      SYSTEM_JDK_DIR=$(dirname $(dirname ${SYSTEM_JAVA_IN_PATH}))
-    fi
   ])
+  fi
   if ! test -d "${SYSTEM_JDK_DIR}"; then
     AC_MSG_ERROR("A JDK home directory could not be found. ${SYSTEM_JDK_DIR}")
   else
@@ -418,6 +419,8 @@ dnl Check for plugin support headers and libraries.
 dnl FIXME: use unstable
 AC_REQUIRE([IT_CHECK_NATIVE_PLUGIN])
 if test "x${enable_native_plugin}" = "xyes" ; then
+  AC_PROG_CC
+  AC_PROG_CXX
   PKG_CHECK_MODULES(GLIB, glib-2.0)
   AC_SUBST(GLIB_CFLAGS)
   AC_SUBST(GLIB_LIBS)
@@ -488,6 +491,43 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_TAGSOUP],
   fi
   AC_SUBST(TAGSOUP_JAR)
   AM_CONDITIONAL([HAVE_TAGSOUP], [test x$TAGSOUP_JAR != xno -a x$TAGSOUP_JAR != x ])
+])
+
+
+AC_DEFUN_ONCE([IT_CHECK_FOR_MSLINKS],
+[
+  AC_MSG_CHECKING([for mslinks])
+  AC_ARG_WITH([mslinks],
+             [AS_HELP_STRING([--with-mslinks],
+                             [mslinks.jar])],
+             [
+                MSLINKS_JAR=${withval}
+             ],
+             [
+                MSLINKS_JAR=
+             ])
+  if test -z "${MSLINKS_JAR}"; then
+    for dir in /usr/share/java /usr/local/share/java ; do
+      if test -f $dir/mslinks.jar; then
+        MSLINKS_JAR=$dir/mslinks.jar
+	    break
+      fi
+    done
+  fi
+  AM_COND_IF([WINDOWS], [
+    MSLINKS_JAR=$(cygpath -m ${MSLINKS_JAR})
+  ])
+  AC_MSG_RESULT(${MSLINKS_JAR})
+  AM_COND_IF([WINDOWS], [
+    if test -z "${MSLINKS_JAR}"; then
+      AC_MSG_RESULT(**********************************************)
+      AC_MSG_RESULT(*  Warning you are building without mslinks  *)
+      AC_MSG_RESULT(* Your windows desktop integration will fail *)
+      AC_MSG_RESULT(**********************************************)
+    fi
+  ])
+  AC_SUBST(MSLINKS_JAR)
+  AM_CONDITIONAL([HAVE_MSLINKS], [test x$MSLINKS_JAR != xno -a x$MSLINKS_JAR != x ])
 ])
 
 dnl Generic macro to check for a Java class
@@ -795,10 +835,16 @@ AC_DEFUN_ONCE([IT_CHECK_JAVA_VERSION],
 [
   AC_REQUIRE([IT_FIND_JAVA])
   AC_MSG_CHECKING([JDK version])
-  JAVA_VERSION=`$JAVA -version 2>&1`
+  JAVA_VERSION=`$JAVA -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f1`
+  if test "${JAVA_VERSION}" -eq "1"; then
+    JAVA_VERSION=`$JAVA -version 2>&1 | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f2`
+  fi
   AC_MSG_RESULT($JAVA_VERSION)
-  HAVE_JAVA8=`if echo $JAVA_VERSION | grep -q -e 1.8.0 ; then echo yes ; fi`
-  HAVE_JAVA9=`if echo $JAVA_VERSION | grep -q -e 1.9.0 -e \"9 -e "build 9" ; then echo yes ; fi `
+  if test "${JAVA_VERSION}" -eq "8"; then
+    HAVE_JAVA8="yes"
+  elif test "$JAVA_VERSION" -ge "9"; then
+    HAVE_JAVA9="yes"
+  fi
   if test -z "$HAVE_JAVA8" -a -z "$HAVE_JAVA9"; then
     AC_MSG_ERROR([JDK8 or newer is required, detected was: $JAVA_VERSION])
   fi
@@ -1117,4 +1163,19 @@ AC_DEFUN_ONCE([IT_CHECK_FOR_WIX],
     AC_MSG_RESULT(${WIX_TOOLSET_DIR})
     AC_SUBST(WIX_TOOLSET_DIR)
   fi
+])
+
+AC_DEFUN([IT_CHECK_MODULARJDK_ARGS],
+[
+  AC_MSG_CHECKING([where to place file with modular switches])
+  AC_ARG_WITH([modularjdk-file],
+	      [AS_HELP_STRING(--with-modularjdk-file,directory where file with arguments for modualr jdk willbe installed)],
+  [
+    MODULARJDK_ARGS_DIR="${withval}"
+  ],
+  [ 
+    MODULARJDK_ARGS_DIR="${bindir}"
+  ])
+  AC_MSG_RESULT([${MODULARJDK_ARGS_DIR}])
+  AC_SUBST([MODULARJDK_ARGS_DIR])
 ])

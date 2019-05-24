@@ -44,7 +44,9 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.sourceforge.jnlp.InformationDesc;
@@ -226,7 +228,7 @@ public class XDesktopEntryTest {
 
     @Test
     public void desktopPath() {
-            Assert.assertTrue(XDesktopEntry.getDesktop().getAbsolutePath().startsWith(System.getProperty("user.home")));;
+        Assert.assertTrue(XDesktopEntry.getDesktop().getAbsolutePath().startsWith(System.getProperty("user.home")));;
     }
 
     private static void envToString() {
@@ -249,6 +251,69 @@ public class XDesktopEntryTest {
         File f3 = xde.getLinuxMenuIconFile();
         Assert.assertEquals(f1.getName(), f2.getName());
         Assert.assertEquals(f2.getName(), f3.getName());
+    }
+
+    @Test
+    public void testPosibleFavIConPathparents() throws IOException {
+        List<String> commonResult = new ArrayList<>();
+        commonResult.add("/best/path/file");
+        commonResult.add("/best/path");
+        commonResult.add("/best");
+        commonResult.add("");
+        String path = "/best/path/file";
+        List<String> r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        path = "best/path/file";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        path = "best/path/file/";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        path = "/best/path/file/";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        commonResult = new ArrayList<>();
+        commonResult.add("/best\\path\\file");
+        commonResult.add("/best\\path");
+        commonResult.add("/best");
+        commonResult.add("");
+        path = "best\\path\\file";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        path = "best\\path\\file\\";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        path = "/best\\path\\file\\";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        commonResult = new ArrayList<>();
+        commonResult.add("/");
+        commonResult.add("");
+        path = "";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        commonResult = new ArrayList<>();
+        commonResult.add("/ ");
+        commonResult.add("");
+        path = " ";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        commonResult = new ArrayList<>();
+        commonResult.add("/");
+        commonResult.add("");
+        path = "/";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
+        commonResult = new ArrayList<>();
+        commonResult.add("/not/best\\path/file\\path");
+        commonResult.add("/not/best\\path/file");
+        commonResult.add("/not/best\\path");
+        commonResult.add("/not/best");
+        commonResult.add("/not");
+        commonResult.add("");
+        path = "not/best\\path/file\\path";
+        r = XDesktopEntry.possibleFavIconLocations(path);
+        Assert.assertEquals(r,commonResult);
     }
 
     private void testHtmlOccurences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.ShortcutResult.Shortcut type, int occurences) throws Exception {

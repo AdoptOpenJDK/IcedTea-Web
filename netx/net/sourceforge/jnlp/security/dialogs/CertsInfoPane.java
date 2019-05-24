@@ -185,25 +185,28 @@ public class CertsInfoPane extends SecurityDialogPanel {
             return jdkIndependentHexEncoderImpl(signature);
         } catch (Exception ex) {
             String s = "Failed to encode signature: " + ex.toString();
-            OutputController.getLogger().log(s);
+            OutputController.getLogger().log(OutputController.Level.WARNING_ALL, s);
+            OutputController.getLogger().log(ex);
             return s;
         }
     }
 
     private String jdkIndependentHexEncoderImpl(byte[] signature) throws Exception {
-        // jdk8 is using sun.misc.HexDumpEncoder, 
-        // jdk9 is using sun.security.util.HexDumpEncoder
-        Class clazz;
         try {
-            clazz = Class.forName("sun.security.util.HexDumpEncoder");
-        } catch (ClassNotFoundException ex) {
-            OutputController.getLogger().log("Using jdk8's HexDumpEncoder");
-            clazz = Class.forName("sun.misc.HexDumpEncoder");
+            OutputController.getLogger().log("trying jdk9's HexDumpEncoder");
+            Class clazz = Class.forName("sun.security.util.HexDumpEncoder");
+            Object encoder = clazz.newInstance();
+            Method m = clazz.getDeclaredMethod("encodeBuffer", byte[].class);
+            //convert our signature into a nice human-readable form.
+            return (String) m.invoke(encoder, signature);
+        } catch (Exception ex) {
+                OutputController.getLogger().log("trying jdk8's HexDumpEncoder");
+                Class clazz = Class.forName("sun.misc.HexDumpEncoder");
+                Object encoder = clazz.newInstance();
+                Method m = clazz.getMethod("encode", byte[].class);
+                //convert our signature into a nice human-readable form.
+                return (String) m.invoke(encoder, signature);
         }
-        Object encoder  = clazz.newInstance();
-        Method m = clazz.getDeclaredMethod("encodeBuffer", byte[].class);
-        //convert our signature into a nice human-readable form.
-        return (String) m.invoke(encoder, signature);
     }
 
     /**

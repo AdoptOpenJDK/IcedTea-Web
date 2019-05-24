@@ -67,7 +67,7 @@ public class ParserTest extends NoStdOutErrTest {
         String data = "<jnlp></jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -82,11 +82,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -105,7 +105,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -135,7 +135,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -162,7 +162,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -185,7 +185,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -216,7 +216,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -247,7 +247,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -277,7 +277,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -306,7 +306,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -334,10 +334,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -361,10 +361,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -385,10 +385,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
@@ -409,10 +409,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
@@ -431,11 +431,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -454,11 +454,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -493,7 +493,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -516,7 +516,7 @@ public class ParserTest extends NoStdOutErrTest {
         String data = "<jnlp></jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -531,11 +531,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -554,10 +554,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
+        Parser parser = new Parser(file, null, root, strictParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -580,7 +580,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -607,7 +607,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -630,7 +630,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -661,7 +661,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -692,7 +692,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -722,7 +722,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -751,7 +751,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -779,10 +779,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -806,10 +806,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -830,10 +830,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
@@ -854,10 +854,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
@@ -876,11 +876,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -899,11 +899,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -938,7 +938,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_COUNTRY_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -961,7 +961,7 @@ public class ParserTest extends NoStdOutErrTest {
         String data = "<jnlp></jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -976,11 +976,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -999,10 +999,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
+        Parser parser = new Parser(file, null, root, strictParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -1021,9 +1021,9 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
+        Parser parser = new Parser(file, null, root, strictParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
 
@@ -1045,7 +1045,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -1068,7 +1068,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -1099,7 +1099,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -1130,7 +1130,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -1156,7 +1156,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
         List<InformationDesc> infoDescs = parser.getInfo(root);
@@ -1184,10 +1184,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -1211,10 +1211,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly three info descs should be found", infoDescs.size() == 3);
@@ -1235,10 +1235,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
@@ -1259,10 +1259,10 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
@@ -1281,11 +1281,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -1304,11 +1304,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
-        Parser parser = new Parser(file, null, root, defaultParser);
-        List<InformationDesc> infoDescs = new ArrayList<InformationDesc>();
+        Parser parser = new Parser(file, null, root, strictParser);
+        List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInfo(root));
 
         Assert.assertTrue("Exactly one info desc should be found", infoDescs.size() == 1);
@@ -1343,7 +1343,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>\n";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser);
@@ -1371,7 +1371,7 @@ public class ParserTest extends NoStdOutErrTest {
                 "</jnlp>";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1390,7 +1390,7 @@ public class ParserTest extends NoStdOutErrTest {
                 "</jnlp>";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1408,7 +1408,7 @@ public class ParserTest extends NoStdOutErrTest {
                 "</jnlp>";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         URL overwrittenCodebase = new URL("http://icedtea.classpath.org");
 
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
@@ -1427,7 +1427,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
         MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
         Parser parser = new Parser(file, null, root, defaultParser, null);
         ParseException eex = null;
@@ -1453,7 +1453,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1461,7 +1461,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict also ok
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, defaultParser, null);
         String main2 = parser2.getLauncher(root2).getMainClass();
@@ -1478,7 +1478,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1486,7 +1486,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict also ok
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         String main2 = parser2.getLauncher(root2).getMainClass();
@@ -1503,7 +1503,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         parser1.getLauncher(root1).getMainClass();
@@ -1520,7 +1520,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1528,7 +1528,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict also ok
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         String main2 = parser2.getLauncher(root2).getMainClass();
@@ -1546,7 +1546,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1554,7 +1554,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict throws
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getLauncher(root2).getMainClass();
@@ -1570,7 +1570,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1578,7 +1578,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict throws
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getLauncher(root2).getMainClass();
@@ -1594,7 +1594,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1602,7 +1602,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict throws
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getLauncher(root2).getMainClass();
@@ -1617,7 +1617,7 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</jnlp>";
 
         Node root1 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), defaultParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getLauncher(root1).getMainClass();
@@ -1625,7 +1625,7 @@ public class ParserTest extends NoStdOutErrTest {
         
         //strict throws
         Node root2 = Parser.getRootNode(new ByteArrayInputStream(data.getBytes()), strictParser);
-        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName());
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getLauncher(root2).getMainClass();

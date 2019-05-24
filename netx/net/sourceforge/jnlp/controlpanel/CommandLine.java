@@ -21,6 +21,7 @@ package net.sourceforge.jnlp.controlpanel;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.OptionParser;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * Encapsulates a command line interface to the deployment configuration.
@@ -85,7 +87,7 @@ public class CommandLine {
         config = new DeploymentConfiguration();
         try {
             config.load(false);
-        } catch (ConfigurationException e) {
+        } catch (ConfigurationException | MalformedURLException e) {
             OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, R("RConfigurationFatal"));
             OutputController.getLogger().log(e);
         }
@@ -495,6 +497,9 @@ public class CommandLine {
      * @throws java.lang.Exception when it goes wrong
      */
     public static void main(String[] args) throws Exception {
+        // setup Swing EDT tracing:
+        SwingUtils.setup();
+
         try {
             OptionParser optionParser = new OptionParser(args, OptionsDefinitions.getItwsettingsCommands());
             if (optionParser.hasOption(OptionsDefinitions.OPTIONS.DETAILS) || optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)){

@@ -46,6 +46,8 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import javax.swing.JDialog;
+import java.awt.Window;
+import net.sourceforge.swing.SwingUtils;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
@@ -65,7 +67,6 @@ import net.sourceforge.jnlp.security.dialogs.SecurityDialogPanel;
 import net.sourceforge.jnlp.security.dialogs.SingleCertInfoPane;
 import net.sourceforge.jnlp.security.dialogs.ViwableDialog;
 import net.sourceforge.jnlp.security.dialogs.apptrustwarningpanel.AppTrustWarningDialog;
-import net.sourceforge.jnlp.util.ScreenFinder;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -216,7 +217,7 @@ public class SecurityDialog {
      * @param parent the parent pane.
      */
     public static void showSingleCertInfoDialog(X509Certificate c,
-                        JDialog parent) {
+                        Window parent) {
         SecurityDialog dialog = new SecurityDialog(DialogType.SINGLE_CERT_INFO, c);
         dialog.getViwableDialog().setLocationRelativeTo(parent);
         dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
@@ -227,12 +228,20 @@ public class SecurityDialog {
     private void initDialog() {
         String dialogTitle = createTitle();
 
+        // Note: ViwableDialog methods are defered until show():
         getViwableDialog().setTitle(dialogTitle);
         getViwableDialog().setModalityType(ModalityType.MODELESS);
 
         getViwableDialog().setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        installPanel();
+        // Initialize panel now as its constructor may call getViwableDialog() defered methods
+        // to modify dialog state:  
+        SwingUtils.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                installPanel();
+            }
+        });
 
         getViwableDialog().pack();
         getViwableDialog().centerDialog();
@@ -251,11 +260,14 @@ public class SecurityDialog {
 
             @Override
             public void windowOpened(WindowEvent e) {
-                if (e.getSource() instanceof SecurityDialog) {
-                    SecurityDialog dialog = (SecurityDialog) e.getSource();
-                    dialog.getViwableDialog().setResizable(true);
-                    dialog.setValue(null);
-                }
+                getViwableDialog().setResizable(true);
+                SecurityDialog.this.setValue(null);
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {
+                // called if the user closes the window directly (dispose on close)
+                // always dispose() to unlock message processing
+                getViwableDialog().dispose();
             }
         };
         getViwableDialog().addWindowListener(adapter);

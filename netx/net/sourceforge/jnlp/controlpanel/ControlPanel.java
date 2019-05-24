@@ -45,7 +45,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -55,10 +54,12 @@ import javax.swing.event.ListSelectionListener;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.controlpanel.JVMPanel.JvmValidationResult;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.security.viewer.CertificatePane;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * This is the control panel for Java. It provides a GUI for modifying the
@@ -118,7 +119,7 @@ public class ControlPanel extends JFrame {
         add(topPanel, BorderLayout.PAGE_START);
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
     }
 
@@ -184,7 +185,7 @@ public class ControlPanel extends JFrame {
                 if (validationResult!= JOptionPane.OK_OPTION){
                     return;
                 }
-                ControlPanel.this.dispose();
+                JNLPRuntime.exit(0);
             }
         });
         buttons.add(okButton);
@@ -211,7 +212,7 @@ public class ControlPanel extends JFrame {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ControlPanel.this.dispose();
+                JNLPRuntime.exit(0);
             }
         });
         buttons.add(cancelButton);
@@ -418,8 +419,7 @@ public class ControlPanel extends JFrame {
             // ignore; not a big deal
         }
 
-
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final ControlPanel editor = new ControlPanel(config);

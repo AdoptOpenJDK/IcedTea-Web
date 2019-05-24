@@ -47,6 +47,7 @@ import sun.awt.SunToolkit;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 import net.sourceforge.jnlp.runtime.html.browser.LinkingBrowser;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * This is the main entry point for the JNLP client. The main method parses the
@@ -89,12 +90,21 @@ public final class Boot implements PrivilegedAction<Void> {
 
     private static OptionParser optionParser;
 
+    public static OptionParser getOptionParser() {
+        return optionParser;
+    }
+    
+    
+
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
      * @param argsIn launching arguments
      */
     public static void main(String[] argsIn) throws UnevenParameterException {
+        // setup Swing EDT tracing:
+        SwingUtils.setup();
+
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
 
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
@@ -113,9 +123,11 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VIEWER)) {
             try {
                 CertificateViewer.main(null);
-                JNLPRuntime.exit(0);
             } catch (Exception e) {
                 OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            } finally {
+                //no matter what happens, terminate
+                return;
             }
         }
 
@@ -186,7 +198,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.REDIRECT)) {
             JNLPRuntime.setAllowRedirect(true);
         }
-        
+
         //if it is browser go by ots own, otherwise procedd with normal ITW logic
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.BROWSER)) {
             String url = optionParser.getParam(OptionsDefinitions.OPTIONS.BROWSER);
@@ -234,7 +246,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     static String fixJnlpProtocol(String param) {
         //remove jnlp: for case like jnlp:https://some.app/file.jnlp
-        if (param.matches("^jnlp[s]?:.*://.*")){
+        if (param.matches("^jnlp[s]?:.*://.*")) {
             param = param.replaceFirst("^jnlp[s]?:", "");
         }
         //transalte jnlp://some.app/file.jnlp to http/https
@@ -336,6 +348,18 @@ public final class Boot implements PrivilegedAction<Void> {
         JNLPRuntime.setOfflineForced(optionParser.hasOption(OptionsDefinitions.OPTIONS.OFFLINE));
         JNLPRuntime.initialize(true);
 
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.LISTCACHEIDS)) {
+            List<String> optionArgs = optionParser.getMainArgs();
+            if (optionArgs.size() > 0) {
+                //clear one app 
+                CacheUtil.listCacheIds(optionArgs.get(0), true, true);
+            } else {
+                // clear all cache
+                CacheUtil.listCacheIds(".*", true, true);
+            }
+            return null;
+        }
+
         /*
          * FIXME
          * This should have been done with the rest of the argument parsing
@@ -343,7 +367,14 @@ public final class Boot implements PrivilegedAction<Void> {
          * and baseDir is initialized here
          */
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.CLEARCACHE)) {
-            CacheUtil.clearCache();
+            List<String> optionArgs = optionParser.getMainArgs();
+            if (optionArgs.size() > 0) {
+                //clear one app 
+                CacheUtil.clearCache(optionArgs.get(0), true, true);
+            } else {
+                // clear all cache
+                CacheUtil.clearCache();
+            }
             return null;
         }
 

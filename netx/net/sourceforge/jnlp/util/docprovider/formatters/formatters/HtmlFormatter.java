@@ -33,8 +33,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
-*/
-
+ */
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
 import java.util.Date;
@@ -43,14 +42,15 @@ import java.util.Set;
 import java.util.TreeMap;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-
 public class HtmlFormatter extends ReplacingTextFormatter {
 
     private final Map<String, String> content = new TreeMap<>();
     private final boolean allowContext;
     private final boolean allowLogo;
     private final boolean includeXmlHeader;
-    public  static final String SUFFIX = "html";
+    private final String lT = "&#60";
+    private final String gT = "&#62";
+    public static final String SUFFIX = "html";
 
     @Override
     public String process(String s) {
@@ -58,7 +58,6 @@ public class HtmlFormatter extends ReplacingTextFormatter {
         return s;
     }
 
-    
     public HtmlFormatter(boolean allowContext, boolean allowLogo, boolean includeXmlHeader) {
         this.allowContext = allowContext;
         this.allowLogo = allowLogo;
@@ -146,7 +145,7 @@ public class HtmlFormatter extends ReplacingTextFormatter {
 
     @Override
     public String getFileSuffix() {
-        return "."+SUFFIX;
+        return "." + SUFFIX;
     }
 
     @Override
@@ -182,4 +181,30 @@ public class HtmlFormatter extends ReplacingTextFormatter {
         return "<li><b>" + key + " </b> - " + process(value) + "</li>";
     }
 
+    @Override
+    public String getAdressLink(String s) {
+        String emailDelBracket = s.replaceAll(".*<", "");
+        String adress = emailDelBracket.replaceAll(">.*", "");
+        if (s.contains("@")) {
+            String name = s.replaceAll("<.*", "").trim();
+            return "<a href=\"mailto:" + antiSpam(adress) + "\" target=\"_top\">" + name + "</a>";
+        } else {
+            return s.replaceAll("<.*>", "<a href=\"" + adress + "\">" + adress + "</a>");
+        }
+    }
+
+    @Override
+    public String replaceLtGtCharacters(String s) {
+        String replaceLt = s.replaceAll("<", lT);
+        String replaceLtGt = replaceLt.replaceAll(">", gT);
+        return replaceLtGt;
+    }
+
+    private static String antiSpam(String adress) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < adress.length(); x++) {
+            sb.append(adress.charAt(x)).append(" ");
+        }
+        return sb.toString().trim();
+    }
 }

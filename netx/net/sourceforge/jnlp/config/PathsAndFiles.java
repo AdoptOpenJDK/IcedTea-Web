@@ -62,6 +62,7 @@ public class PathsAndFiles {
     public static final String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
     public static final String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";
     private static final String XDG_DATA_HOME = "XDG_DATA_HOME";
+    private static final String WINDIR = "WINDIR";
     private static final String TMP_PROP = "java.io.tmpdir";
     private static final String HOME_PROP = "user.home";
     private static final String JAVA_PROP = "java.home";
@@ -362,8 +363,25 @@ public class PathsAndFiles {
 
     private static class SystemCofigFileDescriptor extends InfrastructureFileDescriptor {
 
+        private static final String windowsPathSuffix = File.separator + "Sun" + File.separator + "Java";
+        private static final String unixPathSuffix = File.separator + "etc" + File.separator + ".java";
+
+        private static String getSystemConfigDir() {
+            if (JNLPRuntime.isWindows()) {
+                return System.getenv(WINDIR) + windowsPathSuffix;
+            } else {
+                return unixPathSuffix;
+            }
+        }
+
+        @Override
+        public String getSystemPathStubAcronym() {
+            //note the hardcoded % instead of VARIABLE (actuall leading to idea, that docs, when generated on windows may not make sense)
+            return "{" + "%" + WINDIR + windowsPathSuffix + " or " + unixPathSuffix + "}";
+        }
+
         private SystemCofigFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, File.separator + "etc" + File.separator + ".java", description, target);
+            super(fileName, pathSub, getSystemConfigDir(), description, target);
         }
 
     }

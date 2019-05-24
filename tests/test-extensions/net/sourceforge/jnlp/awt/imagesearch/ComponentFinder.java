@@ -104,8 +104,8 @@ public class ComponentFinder {
      * 
      * @param icon
      * @param iconPosition
-     * @param appletWidth
-     * @param appletHeight
+     * @param windowWidth
+     * @param windowHeight
      * @param screenshot
      * @return Rectangle rectangle where the applet resides
      */

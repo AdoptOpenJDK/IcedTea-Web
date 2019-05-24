@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.util.logging.OutputController;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
@@ -102,7 +101,7 @@ public class OptionParser {
     }
 
     private boolean isOneArgumentNotFull(final ParsedOption lastOption) {
-        return lastOption.getOption().hasOneArgument() && lastOption.getParams().size() == 0;
+        return lastOption.getOption().hasOneArgument() && lastOption.getParams().isEmpty();
     }
 
     private boolean oneOrMoreArguments(final ParsedOption lastOption) {
@@ -143,10 +142,7 @@ public class OptionParser {
     }
 
     private boolean isOption(String input) {
-        if (argumentToOption(input) != null) {
-            return true;
-        }
-        return false;
+        return argumentToOption(input) != null;
     }
 
     protected static boolean stringEqualsOption(String input, OptionsDefinitions.OPTIONS opt) {
@@ -169,10 +165,7 @@ public class OptionParser {
     }
 
     public boolean mainArgExists() {
-        if (mainArgumentList.size() > 0) {
-            return true;
-        }
-        return false;
+        return mainArgumentList.size() > 0;
     }
 
     public String getMainArg() {

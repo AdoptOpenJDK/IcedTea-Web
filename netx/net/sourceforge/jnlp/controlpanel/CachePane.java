@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileLock;
@@ -46,10 +46,12 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -58,6 +60,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.sourceforge.jnlp.cache.CacheDirectory;
+import net.sourceforge.jnlp.cache.CacheEntry;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -65,24 +68,26 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.StreamUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.ui.NonEditableTableModel;
+import net.sourceforge.swing.SwingUtils;
 
 public class CachePane extends JPanel {
     final JDialog parent;
     final DeploymentConfiguration config;
-    private final String location;
     private JComponent defaultFocusComponent;
-    DirectoryNode root;
     String[] columns = {
             Translator.R("CVCPColName"),
             Translator.R("CVCPColPath"),
             Translator.R("CVCPColType"),
             Translator.R("CVCPColDomain"),
             Translator.R("CVCPColSize"),
-            Translator.R("CVCPColLastModified") };
+            Translator.R("CVCPColLastModified"),
+        CacheEntry.KEY_JNLP_PATH
+    };
     JTable cacheTable;
-    private JButton deleteButton, refreshButton, doneButton, cleanAll;
+    private JButton deleteButton, refreshButton, doneButton, cleanAll, infoButton;
 
     /**
      * Creates a new instance of the CachePane.
@@ -94,8 +99,6 @@ public class CachePane extends JPanel {
         super(new BorderLayout());
         this.parent = parent;
         this.config = config;
-        location = PathsAndFiles.CACHE_DIR.getFullPath(config);
-
         addComponents();
     }
 
@@ -117,9 +120,11 @@ public class CachePane extends JPanel {
                 // If no row has been selected, disable the delete button, else enable it
                 if (cacheTable.getSelectionModel().isSelectionEmpty()) {
                     deleteButton.setEnabled(false);
+                    infoButton.setEnabled(false);
                 }
                 else {
                     deleteButton.setEnabled(true);
+                    infoButton.setEnabled(true);
                 }
             }
         });
@@ -189,6 +194,34 @@ public class CachePane extends JPanel {
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
         List<JButton> buttons = new ArrayList<>();
+
+        this.infoButton = new JButton(Translator.R("ButMoreInformation"));
+        infoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog jd = new JDialog(parent, true);
+                JTextArea t = new JTextArea();
+                t.setEditable(false);
+                
+                int row = cacheTable.getSelectedRow();
+                try {
+                    int modelRow = cacheTable.convertRowIndexToModel(row);
+                    DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
+                    File selectedFile = fileNode.getFile();
+                    File infoFile = new File(selectedFile + CacheDirectory.INFO_SUFFIX);
+                    String info = StreamUtils.readStreamAsString(new FileInputStream(infoFile), true);
+                    t.setText(info);
+                } catch (Exception ex) {
+                    t.setText(ex.toString());
+                }
+                jd.add(t);
+                jd.setSize(300, 300);
+                jd.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                jd.setVisible(true);
+            }
+        });
+        infoButton.setEnabled(false);
+        buttons.add(infoButton);
 
         this.deleteButton = new JButton(Translator.R("CVCPButDelete"));
         deleteButton.addActionListener(new ActionListener() {
@@ -267,7 +300,7 @@ public class CachePane extends JPanel {
      * @see CachePane#cacheTable
      */
     private  void invokeLaterDelete() {
-        EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -339,8 +372,7 @@ public class CachePane extends JPanel {
     }
 
     private void invokeLaterDeleteAll() {
-        EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -362,7 +394,7 @@ public class CachePane extends JPanel {
      * @see CachePane#populateTable
      */
     final void invokeLaterPopulateTable() {
-        EventQueue.invokeLater(new Runnable() {
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -373,6 +405,7 @@ public class CachePane extends JPanel {
                         cacheTable.setBackground(SystemColor.control);
                         // No data in cacheTable, so nothing to delete
                         deleteButton.setEnabled(false);
+                        infoButton.setEnabled(false);                        
                     } else {
                         cacheTable.setEnabled(true);
                         cacheTable.setBackground(SystemColor.text);
@@ -399,7 +432,7 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            for (Object[] v : generateData(root)) {
+            for (Object[] v : generateData()) {
                 tableModel.addRow(v);
             }
         } catch (Exception exception) {
@@ -410,29 +443,35 @@ public class CachePane extends JPanel {
         }
     }
 
+   
     /**
      * This creates the data for the table.
-     * 
-     * @param root The location of cache data.
-     * @return ArrayList containing an Object array of data for each row in the table.
+     *
+     * @return ArrayList containing an Object array of data for each row in the
+     * table.
      */
-    private ArrayList<Object[]> generateData(DirectoryNode root) {
-        root = new DirectoryNode("Root", location, null);
+    public static ArrayList<Object[]> generateData() {
+        DirectoryNode root = new DirectoryNode("Root", PathsAndFiles.CACHE_DIR.getFile(), null);
         CacheDirectory.getDirStructure(root);
         ArrayList<Object[]> data = new ArrayList<>();
 
         for (DirectoryNode identifier : root.getChildren()) {
             for (DirectoryNode type : identifier.getChildren()) {
                 for (DirectoryNode domain : type.getChildren()) {
+                    //after domain, there is optional port dir. It is skipped here (as is skipped path on domain)
                     for (DirectoryNode leaf : CacheDirectory.getLeafData(domain)) {
                         final File f = leaf.getFile();
+                        PropertiesFile pf = new PropertiesFile(new File(f.toString() + CacheDirectory.INFO_SUFFIX));
+                        // if jnlp-path in .info equals path of app to delete mark to delete
+                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
                         Object[] o = {
                             leaf,
                             f.getParentFile(),
                             type,
                             domain,
                             f.length(),
-                            new Date(f.lastModified())
+                            new Date(f.lastModified()),
+                            jnlpPath
                         };
                         data.add(o);
                     }
@@ -457,6 +496,7 @@ public class CachePane extends JPanel {
         parent.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         // Disable dialog and buttons while operating
         deleteButton.setEnabled(false);
+        infoButton.setEnabled(false);
         refreshButton.setEnabled(false);
         doneButton.setEnabled(false);
         cleanAll.setEnabled(false);
@@ -467,6 +507,7 @@ public class CachePane extends JPanel {
         // If nothing selected then keep deleteButton disabled
         if (!cacheTable.getSelectionModel().isSelectionEmpty()) {
             deleteButton.setEnabled(true);
+            infoButton.setEnabled(true);
         }
         // Enable buttons
         refreshButton.setEnabled(true);

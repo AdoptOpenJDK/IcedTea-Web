@@ -1562,11 +1562,15 @@ plugin_get_java_version ()
   command_line[2] = NULL;
 
   if ( standard_error != NULL ){
-    if(strstr(standard_error, "\"9") != NULL) {
-      PLUGIN_DEBUG ("detected 9\n");
-      PLUGIN_DEBUG ("plugin_get_java_version return\n");
-      return 9;
-    }
+    int major = 0;
+    int minor = 0;
+    sscanf(standard_error, "%*s %*s \"%d.%d", &major, &minor);
+    if (major == 1)
+      major = minor;
+
+    PLUGIN_DEBUG ("detected version %d\n", major);
+    PLUGIN_DEBUG ("plugin_get_java_version return\n");
+    return major;
   }
   PLUGIN_DEBUG ("detected 8 (or generally non nine)\n");
   PLUGIN_DEBUG ("plugin_get_java_version return\n");
@@ -1588,7 +1592,8 @@ const char *knownExports[]{
     "java.naming/com.sun.jndi.toolkit.url=ALL-UNNAMED,java.desktop",
     "java.desktop/sun.applet=ALL-UNNAMED,java.desktop",
     "java.base/sun.security.action=ALL-UNNAMED,java.desktop",
-    "java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop"
+    "java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop",
+    "java.desktop/sun.applet=ALL-UNNAMED,jdk.jsobject"
 };
 
 NPError

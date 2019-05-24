@@ -46,6 +46,7 @@ import javax.swing.text.html.HTMLDocument;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
+import net.sourceforge.swing.SwingUtils;
 
 public class ConsoleOutputPane extends JPanel implements Observer {
     
@@ -188,8 +189,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
             @Override
             public final void mouseClicked(final MouseEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public final void run() {
                         try {
@@ -213,8 +213,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 if (e.getKeyCode() != KeyEvent.VK_CONTEXT_MENU) {
                     return;
                 }
-                EventQueue.invokeLater(new Runnable() {
-
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public final void run() {
                         try {
@@ -283,8 +282,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             return;
         }
         done.set(false);
-        EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public final void run() {
                 try {
@@ -683,8 +681,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
             @Override
             public final void actionPerformed(final ActionEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public final void run() {
                         try {
@@ -706,8 +703,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
             @Override
             public final void actionPerformed(final ActionEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public final void run() {
                         try {
@@ -730,8 +726,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
             @Override
             public final void actionPerformed(final ActionEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-
+                SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public final void run() {
                         try {
@@ -903,8 +898,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     }
 
     public static final void main(final String args[]) {
-        EventQueue.invokeLater(new Runnable() {
-
+        SwingUtils.invokeLater(new Runnable() {
             @Override
             public final void run() {
                 final JFrame dialog = new JFrame();

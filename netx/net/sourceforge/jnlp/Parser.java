@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 package net.sourceforge.jnlp;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
@@ -30,29 +29,29 @@ import java.util.regex.Pattern;
 import net.sourceforge.jnlp.SecurityDesc.RequestedPermissionLevel;
 import net.sourceforge.jnlp.UpdateDesc.Check;
 import net.sourceforge.jnlp.UpdateDesc.Policy;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
- * Contains methods to parse an XML document into a JNLPFile.
- * Implements JNLP specification version 1.0.
+ * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
+ * specification version 1.0.
  *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell
+ * (JAM)</a> - initial author
  * @version $Revision: 1.13 $
  */
 public final class Parser {
-    
+
     private static String CODEBASE = "codebase";
     private static String MAINCLASS = "main-class";
     private static final Pattern anyWhiteSpace = Pattern.compile("\\s");
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
-
     // Currently uses the Nano XML parse.  Search for "SAX" or
     // "TINY" or "NANO" and uncomment those blocks and comment the
     // active ones (if any) to switch XML parsers.  Also
     // (un)comment appropriate Node class at end of this file and
     // do a clean build.
-
     /**
      * Ensure consistent error handling.
      */
@@ -69,80 +68,96 @@ public final class Parser {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, exception);
         }
     };
-    */
-
+     */
     // fix: some descriptors need to use the jnlp file at a later
     // date and having file ref lets us pass it to their
     // constructors
     //
-    /** the file reference */
+    /**
+     * the file reference
+     */
     private final JNLPFile file; // do not use (uninitialized)
 
-    /** the root node */
+    /**
+     * the root node
+     */
     private final Node root;
 
-    /** the specification version */
+    /**
+     * the specification version
+     */
     private final Version spec;
 
-    /** the base URL that all hrefs are relative to */
+    /**
+     * the base URL that all hrefs are relative to
+     */
     private final URL base;
 
-    /** the codebase URL */
+    /**
+     * the codebase URL
+     */
     private URL codebase;
 
-    /** the file URL */
+    /**
+     * the file URL
+     */
     private final URL fileLocation;
 
-    /** whether to throw errors on non-fatal errors. */
+    /**
+     * whether to throw errors on non-fatal errors.
+     */
     private final boolean strict; // if strict==true parses a file with no error then strict==false should also
 
-    /** whether to allow extensions to the JNLP specification */
-    private final boolean allowExtensions; // true if extensions to JNLP spec are ok
-    
     /**
-     * Create a parser for the JNLP file. If the location
-     * parameters is not null it is used as the default codebase
-     * (does not override value of jnlp element's href
-     * attribute).
+     * whether to allow extensions to the JNLP specification
+     */
+    private final boolean allowExtensions; // true if extensions to JNLP spec are ok
+
+    /**
+     * Create a parser for the JNLP file. If the location parameters is not null
+     * it is used as the default codebase (does not override value of jnlp
+     * element's href attribute).
      * <p>
-     * The root node may be normalized as a side effect of this
-     * constructor.
+     * The root node may be normalized as a side effect of this constructor.
      * </p>
+     *
      * @param file the (uninitialized) file reference
-     * @param base if codebase is not specified, a default base for relative URLs
+     * @param base if codebase is not specified, a default base for relative
+     * URLs
      * @param root the root node
      * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
-    Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
-	this(file, base, root, settings, null);
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings) throws ParseException {
+        this(file, base, root, settings, null);
     }
 
     /**
-     * Create a parser for the JNLP file. If the location
-     * parameters is not null it is used as the default codebase
-     * (does not override value of jnlp element's href
-     * attribute).
+     * Create a parser for the JNLP file. If the location parameters is not null
+     * it is used as the default codebase (does not override value of jnlp
+     * element's href attribute).
      * <p>
-     * The root node may be normalized as a side effect of this
-     * constructor.
+     * The root node may be normalized as a side effect of this constructor.
      * </p>
+     *
      * @param file the (uninitialized) file reference
-     * @param base if codebase is not specified, a default base for relative URLs
+     * @param base if codebase is not specified, a default base for relative
+     * URLs
      * @param root the root node
      * @param settings the parser settings to use when parsing the JNLP file
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
      */
-    Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
+    public Parser(JNLPFile file, URL base, Node root, ParserSettings settings, URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
         this.strict = settings.isStrict();
         this.allowExtensions = settings.isExtensionAllowed();
 
         // ensure it's a JNLP node
-        if (root == null || !root.getNodeName().equals("jnlp"))
+        if (root == null || !root.getNodeName().getName().equals("jnlp")) {
             throw new ParseException(R("PInvalidRoot"));
+        }
 
         // JNLP tag information
         this.spec = getVersion(root, "spec", "1.0+");
@@ -154,7 +169,9 @@ public final class Parser {
         }
 
         if (this.codebase == null) // Codebase is overwritten if codebase was not specified in file or if parsing of it failed
+        {
             this.codebase = codebase;
+        }
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
         fileLocation = getURL(root, "href", this.base);
@@ -165,6 +182,7 @@ public final class Parser {
 
     /**
      * Returns the file version.
+     *
      * @return version of file
      */
     public Version getFileVersion() {
@@ -173,6 +191,7 @@ public final class Parser {
 
     /**
      * Returns the file location.
+     *
      * @return url of source file
      */
     public URL getFileLocation() {
@@ -188,7 +207,7 @@ public final class Parser {
 
     /**
      * @return the specification version.
-     *  
+     *
      */
     public Version getSpecVersion() {
         return spec;
@@ -198,7 +217,7 @@ public final class Parser {
         UpdateDesc updateDesc = null;
         Node child = parent.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().equals("update")) {
+            if (child.getNodeName().getName().equals("update")) {
                 if (strict && updateDesc != null) {
                     throw new ParseException(R("PTwoUpdates"));
                 }
@@ -254,16 +273,15 @@ public final class Parser {
     //
     // This section loads the resources elements
     //
-
     /**
-     * @return all of the ResourcesDesc elements under the specified
-     * node (jnlp or j2se).
+     * @return all of the ResourcesDesc elements under the specified node (jnlp
+     * or j2se).
      *
      * @param parent the parent node (either jnlp or j2se)
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    List<ResourcesDesc> getResources(Node parent, boolean j2se)
+    public List<ResourcesDesc> getResources(Node parent, boolean j2se)
             throws ParseException {
         List<ResourcesDesc> result = new ArrayList<>();
         Node resources[] = getChildNodes(parent, "resources");
@@ -285,34 +303,39 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    private  ResourcesDesc getResourcesDesc(Node node, boolean j2se) throws ParseException {
+    private ResourcesDesc getResourcesDesc(Node node, boolean j2se) throws ParseException {
         boolean mainFlag = false; // if found a main tag
 
         // create resources
-        ResourcesDesc resources =
-                new ResourcesDesc(file,
-                              getLocales(node),
-                              splitString(getAttribute(node, "os", null)),
-                              splitString(getAttribute(node, "arch", null)));
+        ResourcesDesc resources
+                = new ResourcesDesc(file,
+                        getLocales(node),
+                        splitString(getAttribute(node, "os", null)),
+                        splitString(getAttribute(node, "arch", null)));
 
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
             // check for nativelib but no trusted environment
-            if ("nativelib".equals(name))
-                if (!isTrustedEnvironment())
+            if ("nativelib".equals(name)) {
+                if (!isTrustedEnvironment()) {
                     throw new ParseException(R("PUntrustedNative"));
+                }
+            }
 
             if ("j2se".equals(name) || "java".equals(name)) {
-                if (getChildNode(root, "component-desc") != null)
-                    if (strict)
+                if (getChildNode(root, "component-desc") != null) {
+                    if (strict) {
                         throw new ParseException(R("PExtensionHasJ2SE"));
-                if (!j2se)
+                    }
+                }
+                if (!j2se) {
                     resources.addResource(getJRE(child));
-                else
+                } else {
                     throw new ParseException(R("PInnerJ2SE"));
+                }
             }
 
             if ("jar".equals(name) || "nativelib".equals(name)) {
@@ -331,14 +354,17 @@ public final class Parser {
                 resources.addResource(jar);
             }
 
-            if ("extension".equals(name))
+            if ("extension".equals(name)) {
                 resources.addResource(getExtension(child));
+            }
 
-            if ("property".equals(name))
+            if ("property".equals(name)) {
                 resources.addResource(getProperty(child));
+            }
 
-            if ("package".equals(name))
+            if ("package".equals(name)) {
                 resources.addResource(getPackage(child));
+            }
 
             child = child.getNextSibling();
         }
@@ -378,16 +404,18 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private JARDesc getJAR(Node node) throws ParseException {
-        boolean nativeJar = "nativelib".equals(node.getNodeName());
+        boolean nativeJar = "nativelib".equals(node.getNodeName().getName());
         URL location = getRequiredURL(node, "href", base);
         Version version = getVersion(node, "version", null);
         String part = getAttribute(node, "part", null);
         boolean main = "true".equals(getAttribute(node, "main", "false"));
         boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
 
-        if (nativeJar && main)
-            if (strict)
+        if (nativeJar && main) {
+            if (strict) {
                 throw new ParseException(R("PNativeHasMain"));
+            }
+        }
 
         return new JARDesc(location, version, part, lazy, main, nativeJar, true);
 
@@ -445,47 +473,39 @@ public final class Parser {
     //
     // This section loads the information elements
     //
-
     /**
      * Make sure a title and vendor are present and nonempty and localized as
      * best matching as possible for the JVM's current locale. Fallback to a
-     * generalized title and vendor otherwise. If none is found, throw an exception.
+     * generalized title and vendor otherwise. If none is found, throw an
+     * exception.
      *
-     * Additionally prints homepage, description, title and vendor to stdout
-     * if in Debug mode.
+     * Additionally prints homepage, description, title and vendor to stdout if
+     * in Debug mode.
+     *
      * @throws RequiredElementException
      */
     void checkForInformation() throws RequiredElementException {
         OutputController.getLogger().log("Homepage: " + file.getInformation().getHomepage());
         OutputController.getLogger().log("Description: " + file.getInformation().getDescription());
-
-        String title = file.getTitle();
-        String vendor = file.getVendor();
-
-        if (title == null || title.trim().isEmpty())
-            throw new MissingTitleException();
-        else OutputController.getLogger().log("Acceptable title tag found, contains: " + title);
-
-        if (vendor == null || vendor.trim().isEmpty())
-            throw new MissingVendorException();
-        else OutputController.getLogger().log("Acceptable vendor tag found, contains: " + vendor);
+        file.getTitle(strict);
+        file.getVendor(strict);
     }
 
     /**
-     * @return all of the information elements under the specified
-     * node.
+     * @return all of the information elements under the specified node.
      *
      * @param parent the parent node (jnlp)
      * @throws ParseException if the JNLP file is invalid
      */
-    List<InformationDesc> getInfo(Node parent)
+    public List<InformationDesc> getInfo(Node parent)
             throws ParseException {
         List<InformationDesc> result = new ArrayList<>();
         Node info[] = getChildNodes(parent, "information");
 
         // ensure that there are at least one information section present
-        if (info.length == 0)
+        if (info.length == 0) {
             throw new MissingInformationException();
+        }
 
         // create objects from the info sections
         for (Node infoNode : info) {
@@ -501,7 +521,7 @@ public final class Parser {
      * @param node the information node
      * @throws ParseException if the JNLP file is invalid
      */
-     InformationDesc getInformationDesc(Node node) throws ParseException {
+    InformationDesc getInformationDesc(Node node) throws ParseException {
         List<String> descriptionsUsed = new ArrayList<>();
 
         // locale
@@ -513,30 +533,38 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
-            if ("title".equals(name))
+            if ("title".equals(name)) {
                 addInfo(info, child, null, getSpanText(child, false));
-            if ("vendor".equals(name))
+            }
+            if ("vendor".equals(name)) {
                 addInfo(info, child, null, getSpanText(child, false));
+            }
             if ("description".equals(name)) {
                 String kind = getAttribute(child, "kind", "default");
-                if (descriptionsUsed.contains(kind))
-                    if (strict)
+                if (descriptionsUsed.contains(kind)) {
+                    if (strict) {
                         throw new ParseException(R("PTwoDescriptions", kind));
+                    }
+                }
 
                 descriptionsUsed.add(kind);
                 addInfo(info, child, kind, getSpanText(child, false));
             }
-            if ("homepage".equals(name))
+            if ("homepage".equals(name)) {
                 addInfo(info, child, null, getRequiredURL(child, "href", base));
-            if ("icon".equals(name))
+            }
+            if ("icon".equals(name)) {
                 addInfo(info, child, getAttribute(child, "kind", "default"), getIcon(child));
-            if ("offline-allowed".equals(name))
+            }
+            if ("offline-allowed".equals(name)) {
                 addInfo(info, child, null, Boolean.TRUE);
+            }
             if ("sharing-allowed".equals(name)) {
-                if (strict && !allowExtensions)
+                if (strict && !allowExtensions) {
                     throw new ParseException(R("PSharing"));
+                }
                 addInfo(info, child, null, Boolean.TRUE);
             }
             if ("association".equals(name)) {
@@ -566,10 +594,11 @@ public final class Parser {
     protected void addInfo(InformationDesc info, Node node, String mod, Object value) {
         String modStr = (mod == null) ? "" : "-" + mod;
 
-        if (node == null)
+        if (node == null) {
             return;
+        }
 
-        info.addItem(node.getNodeName() + modStr, value);
+        info.addItem(node.getNodeName().getName() + modStr, value);
     }
 
     /**
@@ -592,22 +621,23 @@ public final class Parser {
     //
     // This section loads the security descriptor element
     //
-
     /**
-     * @return the security descriptor element.  If no security
-     * element was specified in the JNLP file then a SecurityDesc
-     * with applet permissions is returned.
+     * @return the security descriptor element. If no security element was
+     * specified in the JNLP file then a SecurityDesc with applet permissions is
+     * returned.
      *
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    SecurityDesc getSecurity(Node parent) throws ParseException {
+    public SecurityDesc getSecurity(Node parent) throws ParseException {
         Node nodes[] = getChildNodes(parent, "security");
 
         // test for too many security elements
-        if (nodes.length > 1)
-            if (strict)
+        if (nodes.length > 1) {
+            if (strict) {
                 throw new ParseException(R("PTwoSecurity"));
+            }
+        }
 
         Object type = SecurityDesc.SANDBOX_PERMISSIONS;
         RequestedPermissionLevel requestedPermissionLevel = RequestedPermissionLevel.NONE;
@@ -633,16 +663,17 @@ public final class Parser {
     }
 
     /**
-     * Returns whether the JNLP file requests a trusted execution
-     * environment.
+     * Returns whether the JNLP file requests a trusted execution environment.
      */
     private boolean isTrustedEnvironment() {
         Node security = getChildNode(root, "security");
 
-        if (security != null)
+        if (security != null) {
             if (getChildNode(security, "all-permissions") != null
-                    || getChildNode(security, "j2ee-application-client-permissions") != null)
+                    || getChildNode(security, "j2ee-application-client-permissions") != null) {
                 return true;
+            }
+        }
 
         return false;
     }
@@ -650,7 +681,6 @@ public final class Parser {
     //
     // This section loads the launch descriptor element
     //
-
     /**
      * @return the launch descriptor element, either AppletDesc,
      * ApplicationDesc, or InstallerDesc.
@@ -658,23 +688,31 @@ public final class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    LaunchDesc getLauncher(Node parent) throws ParseException {
+    public LaunchDesc getLauncher(Node parent) throws ParseException {
         // check for other than one application type
         if (1 < getChildNodes(parent, "applet-desc").length
                 + getChildNodes(parent, "application-desc").length
-                + getChildNodes(parent, "installer-desc").length)
+                + getChildNodes(parent, "javafx-desc").length
+                + getChildNodes(parent, "installer-desc").length) {
             throw new ParseException(R("PTwoDescriptors"));
+        }
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
-            if ("applet-desc".equals(name))
+            if ("applet-desc".equals(name)) {
                 return getApplet(child);
-            if ("application-desc".equals(name))
-                return getApplication(child);
-            if ("installer-desc".equals(name))
+            }
+            if ("application-desc".equals(name)) {
+                return getApplication(child, false);
+            }
+            if ("installer-desc".equals(name)) {
                 return getInstaller(child);
+            }
+            if ("javafx-desc".equals(name)) {
+                return getApplication(child, true);
+            }
 
             child = child.getNextSibling();
         }
@@ -682,6 +720,8 @@ public final class Parser {
         // not reached
         return null;
     }
+    
+    
 
     /**
      * @param node
@@ -701,8 +741,9 @@ public final class Parser {
             width = Integer.parseInt(getRequiredAttribute(node, "width", "100"));
             height = Integer.parseInt(getRequiredAttribute(node, "height", "100"));
         } catch (NumberFormatException nfe) {
-            if (width <= 0)
+            if (width <= 0) {
                 throw new ParseException(R("PBadWidth"));
+            }
             throw new ParseException(R("PBadWidth"));
         }
 
@@ -721,13 +762,12 @@ public final class Parser {
      * @param node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ApplicationDesc getApplication(Node node) throws ParseException {
+    private ApplicationDesc getApplication(Node node, boolean isFx) throws ParseException {
         String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
-
         // read parameters
         Node args[] = getChildNodes(node, "argument");
         for (Node arg : args) {
@@ -738,7 +778,7 @@ public final class Parser {
 
         String argStrings[] = argsList.toArray(new String[argsList.size()]);
 
-        return new ApplicationDesc(main, argStrings);
+        return new ApplicationDesc(main, argStrings, isFx);
     }
 
     /**
@@ -754,10 +794,11 @@ public final class Parser {
 
         Node child = parent.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
-            if ("component-desc".equals(name))
+            if ("component-desc".equals(name)) {
                 return new ComponentDesc();
+            }
 
             child = child.getNextSibling();
         }
@@ -801,19 +842,23 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
-            if (null != name) switch (name) {
-                case "desktop":
-                    if (showOnDesktop && strict) {
-                        throw new ParseException(R("PTwoDesktops"));
-                    }   showOnDesktop = true;
-                    break;
-                case "menu":
-                    if (menu != null && strict) {
-                        throw new ParseException(R("PTwoMenus"));
-                    }   menu = getMenu(child);
-                    break;
+            if (null != name) {
+                switch (name) {
+                    case "desktop":
+                        if (showOnDesktop && strict) {
+                            throw new ParseException(R("PTwoDesktops"));
+                        }
+                        showOnDesktop = true;
+                        break;
+                    case "menu":
+                        if (menu != null && strict) {
+                            throw new ParseException(R("PTwoMenus"));
+                        }
+                        menu = getMenu(child);
+                        break;
+                }
             }
 
             child = child.getNextSibling();
@@ -850,24 +895,29 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName();
+            String name = child.getNodeName().getName();
 
-            if (null != name) switch (name) {
-                case "title":
-                    if (title != null && strict) {
-                        throw new ParseException(R("PTwoTitles"));
-                    }   title = getSpanText(child, false);
-                    break;
-                case "description":
-                    if (description != null && strict) {
-                        throw new ParseException(R("PTwoDescriptions"));
-                    }   description = getSpanText(child, false);
-                    break;
-                case "icon":
-                    if (icon != null && strict) {
-                        throw new ParseException(R("PTwoIcons"));
-                    }   icon = getIcon(child);
-                    break;
+            if (null != name) {
+                switch (name) {
+                    case "title":
+                        if (title != null && strict) {
+                            throw new ParseException(R("PTwoTitles"));
+                        }
+                        title = getSpanText(child, false);
+                        break;
+                    case "description":
+                        if (description != null && strict) {
+                            throw new ParseException(R("PTwoDescriptions"));
+                        }
+                        description = getSpanText(child, false);
+                        break;
+                    case "icon":
+                        if (icon != null && strict) {
+                            throw new ParseException(R("PTwoIcons"));
+                        }
+                        icon = getIcon(child);
+                        break;
+                }
             }
 
             child = child.getNextSibling();
@@ -883,16 +933,16 @@ public final class Parser {
     }
 
     // other methods
-
     /**
-     * @return an array of substrings seperated by spaces (spaces
-     * escaped with backslash do not separate strings).  This method
-     * splits strings as per the spec except that it does replace
-     * escaped other characters with their own value.
+     * @return an array of substrings seperated by spaces (spaces escaped with
+     * backslash do not separate strings). This method splits strings as per the
+     * spec except that it does replace escaped other characters with their own
+     * value.
      */
     private String[] splitString(String source) {
-        if (source == null)
+        if (source == null) {
             return new String[0];
+        }
 
         List<String> result = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(source, " ");
@@ -904,18 +954,20 @@ public final class Parser {
             while (true) {
                 part.append(st.nextToken());
 
-                if (st.hasMoreTokens() && part.charAt(part.length() - 1) == '\\')
+                if (st.hasMoreTokens() && part.charAt(part.length() - 1) == '\\') {
                     part.setCharAt(part.length() - 1, ' '); // join with the space
-                else
+                } else {
                     break; // bizarre while format gets \ at end of string right (no extra space added at end)
+                }
             }
 
             // delete \ quote chars
-            for (int i = part.length(); i-- > 0;)
-                // sweet syntax for reverse loop
-                if (part.charAt(i) == '\\')
+            for (int i = part.length(); i-- > 0;) // sweet syntax for reverse loop
+            {
+                if (part.charAt(i) == '\\') {
                     part.deleteCharAt(i--); // and skip previous char so \\ becomes \
-
+                }
+            }
             result.add(part.toString());
         }
 
@@ -929,13 +981,14 @@ public final class Parser {
      */
     private Locale[] getLocales(Node node) {
         List<Locale> locales = new ArrayList<>();
-        String localeParts[] =
-                splitString(getAttribute(node, "locale", ""));
+        String localeParts[]
+                = splitString(getAttribute(node, "locale", ""));
 
         for (String localePart : localeParts) {
             Locale l = getLocale(localePart);
-            if (l != null)
+            if (l != null) {
                 locales.add(l);
+            }
         }
 
         return locales.toArray(new Locale[locales.size()]);
@@ -948,8 +1001,9 @@ public final class Parser {
      * @return locale of document
      */
     public Locale getLocale(String localeStr) {
-        if (localeStr.length() < 2)
+        if (localeStr.length() < 2) {
             return null;
+        }
 
         String language = localeStr.substring(0, 2);
         String country = (localeStr.length() < 5) ? "" : localeStr.substring(3, 5);
@@ -965,7 +1019,7 @@ public final class Parser {
      * "&lt;description&gt;text&lt;/description&gt;".
      *
      * @param node the node with text under it
-     * @return 
+     * @return
      * @throws ParseException if the JNLP file is invalid
      */
     private String getSpanText(Node node) throws ParseException {
@@ -974,9 +1028,9 @@ public final class Parser {
 
     /**
      * Returns the implied text under a node, for example "text" in
-     * "&lt;description&gt;text&lt;/description&gt;". If preserveSpacing is false,
-     * sequences of whitespace characters are turned into a single
-     * space character.
+     * "&lt;description&gt;text&lt;/description&gt;". If preserveSpacing is
+     * false, sequences of whitespace characters are turned into a single space
+     * character.
      *
      * @param node the node with text under it
      * @param preserveSpacing if true, preserve whitespace
@@ -984,19 +1038,18 @@ public final class Parser {
      */
     private String getSpanText(Node node, boolean preserveSpacing)
             throws ParseException {
-        if (node == null)
+        if (node == null) {
             return null;
+        }
 
         // NANO
         String val = node.getNodeValue();
         if (preserveSpacing) {
             return val;
+        } else if (val == null) {
+            return null;
         } else {
-            if (val == null) {
-                return null;
-            } else {
-                return val.replaceAll("\\s+", " ");
-            }
+            return val.replaceAll("\\s+", " ");
         }
 
         /* TINY
@@ -1005,13 +1058,13 @@ public final class Parser {
         if (child == null) {
             if (strict)
                 // not sure if this is an error or whether "" is proper
-                throw new ParseException("No text specified (node="+node.getNodeName()+")");
+                throw new ParseException("No text specified (node="+node.getNodeName().getName()+")");
             else
                 return "";
         }
 
         return child.getNodeValue();
-        */
+         */
     }
 
     /**
@@ -1019,10 +1072,11 @@ public final class Parser {
      */
     private static Node getChildNode(Node node, String name) {
         Node[] result = getChildNodes(node, name);
-        if (result.length == 0)
+        if (result.length == 0) {
             return null;
-        else
+        } else {
             return result[0];
+        }
     }
 
     /**
@@ -1033,8 +1087,9 @@ public final class Parser {
 
         Node child = node.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().equals(name))
+            if (child.getNodeName().getName().equals(name)) {
                 result.add(child);
+            }
             child = child.getNextSibling();
         }
 
@@ -1042,12 +1097,13 @@ public final class Parser {
     }
 
     /**
-     * Returns a URL with a trailing / appended to it if there is no
-     * trailing slash on the specifed URL.
+     * Returns a URL with a trailing / appended to it if there is no trailing
+     * slash on the specifed URL.
      */
     private URL addSlash(URL source) {
-        if (source == null)
+        if (source == null) {
             return null;
+        }
 
         if (!source.toString().endsWith("/")) {
             try {
@@ -1060,8 +1116,8 @@ public final class Parser {
     }
 
     /**
-     * @return the same result as getURL except that a
-     * ParseException is thrown if the attribute is null or empty.
+     * @return the same result as getURL except that a ParseException is thrown
+     * if the attribute is null or empty.
      *
      * @param node the node
      * @param name the attribute containing an href
@@ -1077,17 +1133,16 @@ public final class Parser {
     }
 
     /**
-     * @return a URL object from a href string relative to the
-     * code base. If the href denotes a relative URL, it must
-     * reference a location that is a subdirectory of the
-     * codebase.
+     * @return a URL object from a href string relative to the code base. If the
+     * href denotes a relative URL, it must reference a location that is a
+     * subdirectory of the codebase.
      *
      * @param node the node
      * @param name the attribute containing an href
      * @param base the base URL
      * @throws ParseException if the JNLP file is invalid
      */
-    URL getURL(Node node, String name, URL base) throws ParseException {
+    public URL getURL(Node node, String name, URL base) throws ParseException {
         String href;
         if (CODEBASE.equals(name)) {
             href = getCleanAttribute(node, name);
@@ -1099,17 +1154,17 @@ public final class Parser {
         } else {
             href = getAttribute(node, name, null);
         }
-        return getURL(href, node.getNodeName(), base, strict);
+        return getURL(href, node.getNodeName().getName(), base, strict);
     }
-    
+
     public static URL getURL(String href, String nodeName, URL base, boolean strict) throws ParseException {
-         if (href == null) {
+        if (href == null) {
             return null; // so that code can throw an exception if attribute was required
         }
         try {
-            if (base == null)
+            if (base == null) {
                 return new URL(href);
-            else {
+            } else {
                 try {
                     return new URL(href);
                 } catch (MalformedURLException ex) {
@@ -1119,7 +1174,7 @@ public final class Parser {
                 URL result = new URL(base, href);
 
                 // check for going above the codebase
-                if (!result.toString().startsWith(base.toString()) &&  !base.toString().startsWith(result.toString())){
+                if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
                     if (strict) {
                         throw new ParseException(R("PUrlNotInCodebase", nodeName, href, base));
                     }
@@ -1128,16 +1183,16 @@ public final class Parser {
             }
 
         } catch (MalformedURLException ex) {
-            if (base == null)
+            if (base == null) {
                 throw new ParseException(R("PBadNonrelativeUrl", nodeName, href));
-            else
+            } else {
                 throw new ParseException(R("PBadRelativeUrl", nodeName, href, base));
+            }
         }
     }
 
     /**
-     * @return a Version from the specified attribute and default
-     * value.
+     * @return a Version from the specified attribute and default value.
      *
      * @param node the node
      * @param name the attribute
@@ -1146,14 +1201,16 @@ public final class Parser {
      */
     private Version getVersion(Node node, String name, String defaultValue) {
         String version = getAttribute(node, name, defaultValue);
-        if (version == null)
+        if (version == null) {
             return null;
-        else
+        } else {
             return new Version(version);
+        }
     }
 
     /**
      * Check that the VM args are valid and safe
+     *
      * @param vmArgs a string containing the args
      * @throws ParseException if the VM arguments are invalid or dangerous
      */
@@ -1191,76 +1248,75 @@ public final class Parser {
     /**
      * Returns an array of valid (ie safe and supported) arguments for the JVM
      *
-     * Based on http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
+     * Based on
+     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
      */
     private String[] getValidVMArguments() {
-        return new String[] {
-                "-d32", /* use a 32-bit data model if available */
-                "-client", /* to select the client VM */
-                "-server", /* to select the server VM */
-                "-verbose", /* enable verbose output */
-                "-version", /* print product version and exit */
-                "-showversion", /* print product version and continue */
-                "-help", /* print this help message */
-                "-X", /* print help on non-standard options */
-                "-ea", /* enable assertions */
-                "-enableassertions", /* enable assertions */
-                "-da", /* disable assertions */
-                "-disableassertions", /* disable assertions */
-                "-esa", /* enable system assertions */
-                "-enablesystemassertions", /* enable system assertions */
-                "-dsa", /* disable system assertione */
-                "-disablesystemassertions", /* disable system assertione */
-                "-Xmixed", /* mixed mode execution (default) */
-                "-Xint", /* interpreted mode execution only */
-                "-Xnoclassgc", /* disable class garbage collection */
-                "-Xincgc", /* enable incremental garbage collection */
-                "-Xbatch", /* disable background compilation */
-                "-Xprof", /* output cpu profiling data */
-                "-Xdebug", /* enable remote debugging */
-                "-Xfuture", /* enable strictest checks, anticipating future default */
-                "-Xrs", /* reduce use of OS signals by Java/VM (see documentation) */
-                "-XX:+ForceTimeHighResolution", /* use high resolution timer */
-                "-XX:-ForceTimeHighResolution", /* use low resolution (default) */
-        };
+        return new String[]{
+            "-d32", /* use a 32-bit data model if available */
+            "-client", /* to select the client VM */
+            "-server", /* to select the server VM */
+            "-verbose", /* enable verbose output */
+            "-version", /* print product version and exit */
+            "-showversion", /* print product version and continue */
+            "-help", /* print this help message */
+            "-X", /* print help on non-standard options */
+            "-ea", /* enable assertions */
+            "-enableassertions", /* enable assertions */
+            "-da", /* disable assertions */
+            "-disableassertions", /* disable assertions */
+            "-esa", /* enable system assertions */
+            "-enablesystemassertions", /* enable system assertions */
+            "-dsa", /* disable system assertione */
+            "-disablesystemassertions", /* disable system assertione */
+            "-Xmixed", /* mixed mode execution (default) */
+            "-Xint", /* interpreted mode execution only */
+            "-Xnoclassgc", /* disable class garbage collection */
+            "-Xincgc", /* enable incremental garbage collection */
+            "-Xbatch", /* disable background compilation */
+            "-Xprof", /* output cpu profiling data */
+            "-Xdebug", /* enable remote debugging */
+            "-Xfuture", /* enable strictest checks, anticipating future default */
+            "-Xrs", /* reduce use of OS signals by Java/VM (see documentation) */
+            "-XX:+ForceTimeHighResolution", /* use high resolution timer */
+            "-XX:-ForceTimeHighResolution", /* use low resolution (default) */};
     }
 
     /**
      * Returns an array containing the starts of valid (ie safe and supported)
      * arguments for the JVM
      *
-     * Based on http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
+     * Based on
+     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
      */
     private String[] getValidStartingVMArguments() {
-        return new String[] {
-                "-ea", /* enable assertions for classes */
-                "-enableassertions", /* enable assertions for classes */
-                "-da", /* disable assertions for classes */
-                "-disableassertions", /* disable assertions for classes */
-                "-verbose", /* enable verbose output */
-                "-Xms", /* set initial Java heap size */
-                "-Xmx", /* set maximum Java heap size */
-                "-Xss", /* set java thread stack size */
-                "-XX:NewRatio", /* set Ratio of new/old gen sizes */
-                "-XX:NewSize", /* set initial size of new generation */
-                "-XX:MaxNewSize", /* set max size of new generation */
-                "-XX:PermSize", /* set initial size of permanent gen */
-                "-XX:MaxPermSize", /* set max size of permanent gen */
-                "-XX:MaxHeapFreeRatio", /* heap free percentage (default 70) */
-                "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
-                "-XX:UseSerialGC", /* use serial garbage collection */
-                "-XX:ThreadStackSize", /* thread stack size (in KB) */
-                "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
-                "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
-                "-XX:MaxDirectMemorySize",
-
-        };
+        return new String[]{
+            "-ea", /* enable assertions for classes */
+            "-enableassertions", /* enable assertions for classes */
+            "-da", /* disable assertions for classes */
+            "-disableassertions", /* disable assertions for classes */
+            "-verbose", /* enable verbose output */
+            "-Xms", /* set initial Java heap size */
+            "-Xmx", /* set maximum Java heap size */
+            "-Xss", /* set java thread stack size */
+            "-XX:NewRatio", /* set Ratio of new/old gen sizes */
+            "-XX:NewSize", /* set initial size of new generation */
+            "-XX:MaxNewSize", /* set max size of new generation */
+            "-XX:PermSize", /* set initial size of permanent gen */
+            "-XX:MaxPermSize", /* set max size of permanent gen */
+            "-XX:MaxHeapFreeRatio", /* heap free percentage (default 70) */
+            "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
+            "-XX:UseSerialGC", /* use serial garbage collection */
+            "-XX:ThreadStackSize", /* thread stack size (in KB) */
+            "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
+            "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
+            "-XX:MaxDirectMemorySize",};
     }
 
     /**
-     * @return the same result as getAttribute except that if strict
-     * mode is enabled or the default value is null a parse
-     * exception is thrown instead of returning the default value.
+     * @return the same result as getAttribute except that if strict mode is
+     * enabled or the default value is null a parse exception is thrown instead
+     * of returning the default value.
      *
      * @param node the node
      * @param name the attribute
@@ -1270,19 +1326,22 @@ public final class Parser {
     private String getRequiredAttribute(Node node, String name, String defaultValue) throws ParseException {
         String result = getAttribute(node, name, null);
 
-        if (result == null || result.length() == 0)
-            if (strict || defaultValue == null)
-                throw new ParseException(R("PNeedsAttribute", node.getNodeName(), name));
+        if (result == null || result.length() == 0) {
+            if (strict || defaultValue == null) {
+                throw new ParseException(R("PNeedsAttribute", node.getNodeName().getName(), name));
+            }
+        }
 
-        if (result == null)
+        if (result == null) {
             return defaultValue;
-        else
+        } else {
             return result;
+        }
     }
 
     /**
-     * @return an attribute or the specified defaultValue if there is
-     * no such attribute.
+     * @return an attribute or the specified defaultValue if there is no such
+     * attribute.
      *
      * @param node the node
      * @param name the attribute
@@ -1305,32 +1364,31 @@ public final class Parser {
         return result;
     }
 
-    
     public static final String MALFORMED_PARSER_CLASS = "net.sourceforge.jnlp.MalformedXMLParser";
     public static final String NORMAL_PARSER_CLASS = "net.sourceforge.jnlp.XMLParser";
+
     /**
-     * @return the root node from the XML document in the specified
-     * input stream.
+     * @return the root node from the XML document in the specified input
+     * stream.
      *
      * @throws ParseException if the JNLP file is invalid
      */
-    static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
+    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
         try {
             Object parser = getParserInstance(settings);
             Method m = parser.getClass().getMethod("getRootNode", InputStream.class);
             return (Node) m.invoke(parser, input);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof ParseException) {
-                throw (ParseException)(e.getCause());
+                throw (ParseException) (e.getCause());
             }
             throw new ParseException(R("PBadXML"), e);
         } catch (Exception e) {
             throw new ParseException(R("PBadXML"), e);
         }
     }
-    
 
-     public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         String className;
         if (settings.isMalformedXmlAllowed()) {
             className = MALFORMED_PARSER_CLASS;
@@ -1364,7 +1422,7 @@ public final class Parser {
         return instance;
     }
 
-  private String getOptionalMainClass(Node node) {
+    private String getOptionalMainClass(Node node) {
         try {
             return getMainClass(node, false);
         } catch (ParseException ex) {
@@ -1401,7 +1459,7 @@ public final class Parser {
                 OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Invlaid char in main-class: '" + main.charAt(0) + "'");
             }
             for (int i = 1; i < main.length(); i++) {
-                if (main.charAt(i)=='.'){
+                if (main.charAt(i) == '.') {
                     //dot connects identifiers
                     continue;
                 }

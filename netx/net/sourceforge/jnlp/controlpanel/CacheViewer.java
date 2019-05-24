@@ -34,6 +34,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.Translator;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.ScreenFinder;
+import net.sourceforge.swing.SwingUtils;
 
 /**
  * This class will provide a visual way of viewing cache.
@@ -55,6 +56,8 @@ public class CacheViewer extends JDialog {
      */
     public CacheViewer(DeploymentConfiguration config) {
         super((Frame) null, dialogTitle, true); // Don't need a parent.
+        this.setName("CacheViewer");
+        SwingUtils.info(this);
         this.config = config;
         if (config == null) {
             throw new IllegalArgumentException("config: " + config);
