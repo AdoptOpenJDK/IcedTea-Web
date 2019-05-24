@@ -13,6 +13,7 @@ const COMMON_JAR: Option<&'static str> = option_env!("COMMON_JAR");
 const JNLPAPI_JAR: Option<&'static str> = option_env!("JNLPAPI_JAR");
 const XMLPARSER_JAR: Option<&'static str> = option_env!("XMLPARSER_JAR");
 const CLIENTS_JAR: Option<&'static str> = option_env!("CLIENTS_JAR");
+const JNLPSERVER_JAR: Option<&'static str> = option_env!("JNLPSERVER_JAR");
 const TAGSOUP_JAR: Option<&'static str> = option_env!("TAGSOUP_JAR");
 const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
 const SLFAPI_JAR: Option<&'static str> = option_env!("SLFAPI_JAR");
@@ -44,17 +45,17 @@ pub fn get_xmlparser() -> &'static str { XMLPARSER_JAR.unwrap_or("XMLPARSER_JAR-
 
 pub fn get_clientsjar() -> &'static str { CLIENTS_JAR.unwrap_or("CLIENTS_JAR-dev-unspecified") }
 
+pub fn get_jnlpserver() -> &'static str { JNLPSERVER_JAR.unwrap_or("JNLPSERVER_JAR-dev-unspecified") }
+
 pub fn get_itwlibsearch() -> &'static str { ITW_LIBS.unwrap_or("ITW_LIBS-dev-unspecified") }
 
 pub fn get_slfapi() -> &'static str { SLFAPI_JAR.unwrap_or("SLFAPI_JAR-dev-unspecified") }
 
 pub fn get_slfsimple() ->  &'static str { SLFSIMPLE_JAR.unwrap_or("SLFSIMPLE_JAR-dev-unspecified") }
 
-
 pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 
 pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
-
 
 pub fn get_mslinks() -> Option<&'static str> { sanitize(MSLINKS_JAR) }
 
@@ -107,6 +108,16 @@ impl FromStr for ItwLibSearch {
     }
 }
 
+impl std::fmt::Display for ItwLibSearch {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ItwLibSearch::BUNDLED => write!(f, "BUNDLED"),
+            ItwLibSearch::DISTRIBUTION => write!(f, "DISTRIBUTION"),
+            ItwLibSearch::EMBEDDED => write!(f, "EMBEDDED"),
+        }
+    }
+}
+
 pub fn get_libsearch(logger: &os_access::Os) -> ItwLibSearch {
     let itw_libs_override = env::var("ITW_LIBS");
     match itw_libs_override {
@@ -151,6 +162,7 @@ mod tests {
         assert_ne!(String::from(super::get_common()).trim(), String::from("COMMON_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_xmlparser()).trim(), String::from("XMLPARSER_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_clientsjar()).trim(), String::from("CLIENTS_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_jnlpserver()).trim(), String::from("JNLPSERVER_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from("JNLPAPI_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from("ITW_LIBS-dev-unspecified"));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from("MODULARJDK_ARGS_LOCATION-dev-unspecified"));
@@ -165,6 +177,7 @@ mod tests {
         assert_ne!(String::from(super::get_common()).trim(), String::from(""));
         assert_ne!(String::from(super::get_xmlparser()).trim(), String::from(""));
         assert_ne!(String::from(super::get_clientsjar()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_jnlpserver()).trim(), String::from(""));
         assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from(""));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from(""));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from(""));
