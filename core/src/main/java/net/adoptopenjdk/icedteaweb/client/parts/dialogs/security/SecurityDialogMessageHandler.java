@@ -79,7 +79,9 @@ public class SecurityDialogMessageHandler implements Runnable {
 
     private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogMessageHandler.class);
 
-    /** the queue of incoming messages to show security dialogs */
+    /**
+     * the queue of incoming messages to show security dialogs
+     */
     private BlockingQueue<SecurityDialogMessage> queue = new LinkedBlockingQueue<>();
 
     /**
@@ -108,20 +110,20 @@ public class SecurityDialogMessageHandler implements Runnable {
      * </p>
      *
      * @param message the message indicating what type of security dialog to
-     * show
+     *                show
      */
     protected void handleMessage(final SecurityDialogMessage message) {
 
         final SecurityDialog dialog = new SecurityDialog(message.dialogType,
                 message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
 
-        if (processAutomatedAnswers(message, dialog)){
+        if (processAutomatedAnswers(message, dialog)) {
             return;
         }
 
         final RememberableDialog found = RememberDialog.getInstance().findRememberablePanel(dialog.getSecurityDialogPanel());
         SavedRememberAction action = null;
-        if (found!=null){
+        if (found != null) {
             action = RememberDialog.getInstance().getRememberedState(found);
         }
         if (action != null && action.isRemember()) {
@@ -131,7 +133,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         } else {
 
             if (!shouldPromptUser()) {
-                message.userResponse =  dialog.getDefaultNegativeAnswer();
+                message.userResponse = dialog.getDefaultNegativeAnswer();
                 unlockMessagesClient(message);
             } else if (isHeadless()) {
                 processMessageInHeadless(dialog, message);
@@ -144,12 +146,12 @@ public class SecurityDialogMessageHandler implements Runnable {
 
     private boolean processAutomatedAnswers(final SecurityDialogMessage message, final SecurityDialog dialog) {
         if (isXtrustNone()) {
-            message.userResponse =  dialog.getDefaultNegativeAnswer();
+            message.userResponse = dialog.getDefaultNegativeAnswer();
             unlockMessagesClient(message);
             return true;
         }
         if (isXtrustAll()) {
-            message.userResponse =  dialog.getDefaultPositiveAnswer();
+            message.userResponse = dialog.getDefaultPositiveAnswer();
             unlockMessagesClient(message);
             return true;
         }
@@ -180,28 +182,28 @@ public class SecurityDialogMessageHandler implements Runnable {
             boolean repeatAll = true;
             do {
                 try {
-                    if (repeatAll){
+                    if (repeatAll) {
                         OutputController.getLogger().printOutLn(dialog.getText());
                     }
                     OutputController.getLogger().printOutLn(Translator.R("HeadlessDialogues"));
                     OutputController.getLogger().printOutLn(dialog.helpToStdIn());
                     String s = OutputController.getLogger().readLine();
                     if (s == null) {
-                         throw new IOException("Stream closed");
+                        throw new IOException("Stream closed");
                     }
                     if (s.trim().toLowerCase().equals("exit")) {
                         JNLPRuntime.exit(0);
                     }
                     boolean codebase = false;
                     boolean remember = false;
-                    if (s.startsWith("RC ")){
+                    if (s.startsWith("RC ")) {
                         codebase = true;
                         remember = true;
-                        s=s.substring(3);
+                        s = s.substring(3);
                     }
-                    if (s.startsWith("R ")){
+                    if (s.startsWith("R ")) {
                         remember = true;
-                        s=s.substring(2);
+                        s = s.substring(2);
                     }
                     message.userResponse = dialog.readFromStdIn(s);
                     keepGoing = false;
@@ -223,7 +225,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                 } catch (IOException eex) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, eex);
                     keepGoing = false;
-                } catch (IllegalArgumentException eeex){
+                } catch (IllegalArgumentException eeex) {
                     LOG.error("HDwrongValue", eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
@@ -245,7 +247,8 @@ public class SecurityDialogMessageHandler implements Runnable {
             msg.lock.release();
         }
     }
-        /**
+
+    /**
      * Post a message to the security event queue. This message will be picked
      * up by the security thread and used to show the appropriate security
      * dialog.
@@ -282,7 +285,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         });
     }
 
-     /**
+    /**
      * Returns whether the current runtime configuration is headless
      *
      * @return true X is used
@@ -296,7 +299,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         });
     }
 
-     /**
+    /**
      * Returns whether the current runtime configuration is trustAll
      *
      * @return true if xtrustall was specified
@@ -310,7 +313,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         });
     }
 
-     /**
+    /**
      * Returns whether the current runtime configuration is trustNone
      *
      * @return true if xtrustnone was specified

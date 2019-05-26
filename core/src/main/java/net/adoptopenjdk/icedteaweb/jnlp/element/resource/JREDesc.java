@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
@@ -34,36 +35,48 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class JREDesc {
 
-    private static final Pattern heapPattern= Pattern.compile("\\d+[kmg]?");
+    private static final Pattern heapPattern = Pattern.compile("\\d+[kmg]?");
 
-    /** the platform version or the product version if location is not null */
+    /**
+     * the platform version or the product version if location is not null
+     */
     private final JreVersion version;
 
-    /** the location of a JRE product or null */
+    /**
+     * the location of a JRE product or null
+     */
     private final URL location;
 
-    /** initial heap size */
+    /**
+     * initial heap size
+     */
     private final String initialHeapSize;
 
-    /** maximum head size */
+    /**
+     * maximum head size
+     */
     private final String maximumHeapSize;
 
-    /** args to pass to the vm */
+    /**
+     * args to pass to the vm
+     */
     private final String vmArgs;
 
-    /** list of ResourceDesc objects */
+    /**
+     * list of ResourceDesc objects
+     */
     private final List<ResourcesDesc> resources;
 
     /**
      * Create a JRE descriptor.
      *
-     * @param version the platform version or the product version
-     * if location is not null
-     * @param location the location of a JRE product or null
-     * @param vmArgs arguments to VM
+     * @param version         the platform version or the product version
+     *                        if location is not null
+     * @param location        the location of a JRE product or null
+     * @param vmArgs          arguments to VM
      * @param initialHeapSize initial heap size
      * @param maximumHeapSize maximum head size
-     * @param resources list of ResourceDesc objects
+     * @param resources       list of ResourceDesc objects
      * @throws ParseException is something goes wrong
      */
     public JREDesc(final JreVersion version, final URL location,
@@ -133,6 +146,7 @@ public class JREDesc {
 
     /**
      * Check for valid heap size string
+     *
      * @return trimmed heapSize if correct
      * @throws ParseException if heapSize is invalid
      */
@@ -147,7 +161,7 @@ public class JREDesc {
         String heapSizeLower = realHeapSize.toLowerCase();
         Matcher heapMatcher = heapPattern.matcher(heapSizeLower);
         if (!heapMatcher.matches()) {
-            throw new ParseException("PBadHeapSize "+realHeapSize);
+            throw new ParseException("PBadHeapSize: " + realHeapSize);
         }
         return realHeapSize;
     }

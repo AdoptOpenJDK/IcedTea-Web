@@ -72,14 +72,20 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     public static final int BROWSER_PROXY_TYPE_MANUAL = 1;
     public static final int BROWSER_PROXY_TYPE_PAC = 2;
     public static final int BROWSER_PROXY_TYPE_NONE2 = 3;
-    /** use gconf, WPAD and then env (and possibly others)*/
+    /**
+     * use gconf, WPAD and then env (and possibly others)
+     */
     public static final int BROWSER_PROXY_TYPE_AUTO = 4;
-    /** use env variables */
+    /**
+     * use env variables
+     */
     public static final int BROWSER_PROXY_TYPE_SYSTEM = 5;
 
     private int browserProxyType = BROWSER_PROXY_TYPE_NONE;
     private URL browserAutoConfigUrl;
-    /** Whether the http proxy should be used for http, https, ftp and socket protocols */
+    /**
+     * Whether the http proxy should be used for http, https, ftp and socket protocols
+     */
     private Boolean browserUseSameProxy;
     private String browserHttpProxyHost;
     private int browserHttpProxyPort;
@@ -232,7 +238,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      */
     private List<Proxy> getFromBrowserPAC(URI uri) {
         if (browserAutoConfigUrl == null || uri.getScheme().equals("socket")) {
-            return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
+            return Arrays.asList(new Proxy[]{Proxy.NO_PROXY});
         }
 
         List<Proxy> proxies = new ArrayList<Proxy>();

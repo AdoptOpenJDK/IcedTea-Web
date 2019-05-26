@@ -86,6 +86,7 @@ public class CommandLine {
 
     /**
      * Creates a new instance
+     *
      * @param optionParser used to parse applications arguments
      */
     public CommandLine(CommandLineOptionsParser optionParser) {
@@ -195,7 +196,7 @@ public class CommandLine {
         }
         for (String key : args) {
             String value = all.get(key).getValue();
-            OutputController.getLogger().printOutLn(key+": "+value);
+            OutputController.getLogger().printOutLn(key + ": " + value);
         }
         return SUCCESS;
     }
@@ -251,7 +252,7 @@ public class CommandLine {
         try {
             config.save();
         } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE,  e);
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return ERROR;
         }
 
@@ -313,7 +314,7 @@ public class CommandLine {
         Map<String, Setting<String>> all = config.getRaw();
 
         if (resetAll) {
-            for (String aKey: all.keySet()) {
+            for (String aKey : all.keySet()) {
                 Setting<String> setting = all.get(aKey);
                 setting.setValue(setting.getDefaultValue());
             }
@@ -499,6 +500,7 @@ public class CommandLine {
 
     /**
      * The starting point of the program
+     *
      * @param args the command line arguments to this program
      */
     public static void main(String[] args) {
@@ -507,14 +509,14 @@ public class CommandLine {
 
         try {
             CommandLineOptionsParser optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getItwsettingsCommands());
-            if (optionParser.hasOption(CommandLineOptions.DETAILS) || optionParser.hasOption(CommandLineOptions.VERBOSE)){
+            if (optionParser.hasOption(CommandLineOptions.DETAILS) || optionParser.hasOption(CommandLineOptions.VERBOSE)) {
                 JNLPRuntime.setDebug(true);
             }
             if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
                 JNLPRuntime.setHeadless(true);
             }
             if (args.length == 0) {
-                ControlPanel.main(new String[] {});
+                ControlPanel.main(new String[]{});
             } else {
                 CommandLine cli = new CommandLine(optionParser);
                 int result = cli.handle();

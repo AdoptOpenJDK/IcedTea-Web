@@ -33,7 +33,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class represents a Lock for single instance jnlp applications
- *
+ * <p>
  * The lock is per-session, per user.
  *
  * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
@@ -133,12 +133,12 @@ class SingleInstanceLock {
 
         if (!baseDir.isDirectory()) {
             if (!baseDir.getParentFile().isDirectory() && !baseDir.getParentFile().mkdirs()) {
-                throw new RuntimeException("RNoLockDir "+ baseDir);
+                throw new RuntimeException("RNoLockDir " + baseDir);
             }
             try {
                 FileUtils.createRestrictedDirectory(baseDir);
             } catch (IOException e) {
-                throw new RuntimeException("RNoLockDir "+ baseDir);
+                throw new RuntimeException("RNoLockDir " + baseDir);
             }
         }
 
@@ -183,7 +183,7 @@ class SingleInstanceLock {
 
     /**
      * Returns a string identifying this display.
-     *
+     * <p>
      * Implementation note: On systems with X support, this is the DISPLAY
      * variable
      *

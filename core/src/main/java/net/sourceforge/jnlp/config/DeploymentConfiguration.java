@@ -51,7 +51,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Manages the various properties and configuration related to deployment.
- *
+ * <p>
  * See:
  * http://download.oracle.com/javase/1.5.0/docs/guide/deployment/deployment-guide/properties.html
  */
@@ -68,22 +68,34 @@ public final class DeploymentConfiguration {
         SYSTEM, USER
     }
 
-    /** is it mandatory to load the system properties? */
+    /**
+     * is it mandatory to load the system properties?
+     */
     private boolean systemPropertiesMandatory = false;
 
-    /** The system's subdirResult deployment.config file */
+    /**
+     * The system's subdirResult deployment.config file
+     */
     private URL systemPropertiesFile = null;
 
-    /** Source of always right and only path to file (even if underlying path changes) */
+    /**
+     * Source of always right and only path to file (even if underlying path changes)
+     */
     private final InfrastructureFileDescriptor userDeploymentFileDescriptor;
 
-    /** The user's subdirResult deployment.config file */
+    /**
+     * The user's subdirResult deployment.config file
+     */
     private File userPropertiesFile = null;
 
-    /** the current deployment properties */
+    /**
+     * the current deployment properties
+     */
     private final Map<String, Setting<String>> currentConfiguration;
 
-    /** the deployment properties that cannot be changed */
+    /**
+     * the deployment properties that cannot be changed
+     */
     private final Map<String, Setting<String>> unchangeableConfiguration;
 
     public DeploymentConfiguration() {
@@ -154,7 +166,7 @@ public final class DeploymentConfiguration {
      * Generally, it will try to continue and ignore errors it finds (such as file not found).
      *
      * @param fixIssues If true, fix issues that are discovered when reading configuration by
-     * resorting to the default values
+     *                  resorting to the default values
      * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load(final boolean fixIssues) throws ConfigurationException, MalformedURLException {
@@ -214,6 +226,7 @@ public final class DeploymentConfiguration {
 
     /**
      * Copies the current configuration into the target
+     *
      * @param target properties where to copy actual ones
      */
     public void copyTo(final Properties target) {
@@ -279,7 +292,7 @@ public final class DeploymentConfiguration {
      * Sets the value of corresponding to the key. If the value has been marked
      * as locked, it is not changed
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value to be associated with the key
      */
     public void setProperty(final String key, final String value) {
@@ -404,8 +417,8 @@ public final class DeploymentConfiguration {
             LOG.info("Using System level {} : {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (final MalformedURLException e) {
-            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm(), e);
-            if (systemPropertiesMandatory){
+            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
+            if (systemPropertiesMandatory) {
                 final ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
                 throw ce;
@@ -418,10 +431,9 @@ public final class DeploymentConfiguration {
     /**
      * Loads the properties file, if one exists
      *
-     * @param type the ConfigType to load
-     * @param file the File to load Properties from
+     * @param type      the ConfigType to load
+     * @param file      the File to load Properties from
      * @param mandatory indicates if reading this file is mandatory
-     *
      * @throws ConfigurationException if the file is mandatory but cannot be read
      */
     private Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
@@ -439,7 +451,7 @@ public final class DeploymentConfiguration {
         try {
             return parsePropertiesFile(file);
         } catch (final IOException e) {
-            if (mandatory){
+            if (mandatory) {
                 final ConfigurationException ce = new ConfigurationException("Exception during loading of " + file + " which is mandatory to read");
                 ce.initCause(e);
                 throw ce;
@@ -452,7 +464,7 @@ public final class DeploymentConfiguration {
     /**
      * Saves all properties that are not part of default or system properties
      *
-     * @throws IOException if unable to save the file
+     * @throws IOException           if unable to save the file
      * @throws IllegalStateException if save() is called before load()
      */
     public void save() throws IOException {
@@ -473,16 +485,16 @@ public final class DeploymentConfiguration {
                     : unchangeableConfiguration.get(key).getValue();
             final String newValue = currentConfiguration.get(key) == null ? null : currentConfiguration
                     .get(key).getValue();
-            if(!Objects.equals(newValue, oldValue)) {
+            if (!Objects.equals(newValue, oldValue)) {
                 toSave.setProperty(key, newValue);
             }
         }
 
         final File backupPropertiesFile = new File(userPropertiesFile.toString() + ".old");
         if (userPropertiesFile.isFile()) {
-            if (backupPropertiesFile.exists()){
+            if (backupPropertiesFile.exists()) {
                 final boolean result = backupPropertiesFile.delete();
-                if(!result){
+                if (!result) {
                     LOG.info("Failed to delete backup properties file {} silently continuing.", backupPropertiesFile);
                 }
             }
@@ -550,7 +562,7 @@ public final class DeploymentConfiguration {
      * in finalMap
      *
      * @param finalMap the destination for putting values
-     * @param srcMap the source for reading key value pairs
+     * @param srcMap   the source for reading key value pairs
      */
     private void mergeMaps(final Map<String, Setting<String>> finalMap, final Map<String, Setting<String>> srcMap) {
         for (String key : srcMap.keySet()) {
@@ -571,8 +583,8 @@ public final class DeploymentConfiguration {
      * Dumps the configuration to the PrintStream
      *
      * @param config a map of key,value pairs representing the configuration to
-     * dump
-     * @param out the PrintStream to write data to
+     *               dump
+     * @param out    the PrintStream to write data to
      */
     @SuppressWarnings("unused")
     private static void dumpConfiguration(final Map<String, Setting<String>> config, final PrintStream out) {
@@ -599,10 +611,10 @@ public final class DeploymentConfiguration {
                 s = s.trim();
                 if (s.startsWith("#")) {
                     final String decommented = s.substring(1);
-                    if (decommented.isEmpty()){
+                    if (decommented.isEmpty()) {
                         continue;
                     }
-                    if (decommented.equals(ConfigurationConstants.DEPLOYMENT_COMMENT)){
+                    if (decommented.equals(ConfigurationConstants.DEPLOYMENT_COMMENT)) {
                         continue;
                     }
                     //there is always also date
@@ -612,7 +624,7 @@ public final class DeploymentConfiguration {
                     } catch (Exception ex) {
                         //we really don't care, failure is our decision point
                     }
-                    if (dd == null){
+                    if (dd == null) {
                         r.append(decommented).append("\n");
                     }
                 }

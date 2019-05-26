@@ -20,6 +20,7 @@ import java.awt.Window;
 import java.net.SocketPermission;
 import java.security.AccessControlException;
 import java.security.Permission;
+
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -81,21 +82,31 @@ class JNLPSecurityManager extends AWTSecurityManager {
     // another way for different apps to have different properties
     // in java.lang.System with the same names.
 
-    /** only class that can exit the JVM, if set */
+    /**
+     * only class that can exit the JVM, if set
+     */
     private Object exitClass = null;
 
-    /** this exception prevents exiting the JVM */
+    /**
+     * this exception prevents exiting the JVM
+     */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-    new SecurityException("RShutdown");
+            new SecurityException("RShutdown");
 
-    /** weak list of windows created */
+    /**
+     * weak list of windows created
+     */
     private WeakList<Window> weakWindows = new WeakList<Window>();
 
-    /** weak list of applications corresponding to window list */
+    /**
+     * weak list of applications corresponding to window list
+     */
     private WeakList<ApplicationInstance> weakApplications =
             new WeakList<ApplicationInstance>();
 
-    /** Sets whether or not exit is allowed (in the context of the plugin, this is always false) */
+    /**
+     * Sets whether or not exit is allowed (in the context of the plugin, this is always false)
+     */
     private boolean exitAllowed = true;
 
     /**
@@ -176,7 +187,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * call from event dispatch thread).
      */
     protected ApplicationInstance getApplication(Window window) {
-        for (int i = weakWindows.size(); i-- > 0;) {
+        for (int i = weakWindows.size(); i-- > 0; ) {
             Window w = weakWindows.get(i);
             if (w == null) {
                 weakWindows.remove(i);
@@ -228,6 +239,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
     /**
      * Returns the JNLPClassLoader associated with the given ClassLoader, or
      * null.
+     *
      * @param cl a ClassLoader
      * @return JNLPClassLoader or null
      */
@@ -299,6 +311,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     /**
      * Asks the user whether or not to grant permission.
+     *
      * @param perm the permission to be granted
      * @return true if the permission was granted, false otherwise.
      */
@@ -307,7 +320,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         ApplicationInstance app = getApplication();
         if (app != null && !app.isSigned()) {
             if (perm instanceof SocketPermission
-                                && ServiceUtil.checkAccess(AccessType.NETWORK, perm.getName())) {
+                    && ServiceUtil.checkAccess(AccessType.NETWORK, perm.getName())) {
                 return true;
             }
         }
@@ -317,6 +330,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     /**
      * Adds a permission to the JNLPClassLoader.
+     *
      * @param perm the permission to add to the JNLPClassLoader
      */
     private void addPermission(Permission perm) {
@@ -326,7 +340,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
             cl.addPermission(perm);
             if (JNLPRuntime.isDebug()) {
                 if (cl.getSecurity() == null) {
-                    if (cl.getPermissions(null).implies(perm)){
+                    if (cl.getPermissions(null).implies(perm)) {
                         LOG.warn("Added permission: {}", perm);
                     } else {
                         LOG.warn("Unable to add permission: {}", perm);
@@ -454,12 +468,12 @@ class JNLPSecurityManager extends AWTSecurityManager {
     /**
      * Tests if a client can get access to the AWT event queue. This version allows
      * complete access to the EventQueue for its own AppContext-specific EventQueue.
-     *
+     * <p>
      * FIXME there are probably huge security implications for this. Eg:
      * http://hg.openjdk.java.net/jdk7/awt/jdk/rev/8022709a306d
      *
-     * @exception  SecurityException  if the caller does not have
-     *             permission to access the AWT event queue.
+     * @throws SecurityException if the caller does not have
+     *                           permission to access the AWT event queue.
      */
     @Override
     public void checkAwtEventQueueAccess() {

@@ -60,7 +60,6 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 /**
  * This class helps maintain the ordering of most recently use items across
  * multiple jvm instances.
- *
  */
 public class CacheLRUWrapper {
 
@@ -83,8 +82,9 @@ public class CacheLRUWrapper {
 
     /**
      * testing constructor
+     *
      * @param recentlyUsed file to be used as recently_used file
-     * @param cacheDir dir with cache
+     * @param cacheDir     dir with cache
      */
     CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
         recentlyUsedPropertiesFile = recentlyUsed;
@@ -106,11 +106,12 @@ public class CacheLRUWrapper {
      * @return an instance of the policy
      */
     public static CacheLRUWrapper getInstance() {
-        return  CacheLRUWrapperHolder.INSTANCE;
+        return CacheLRUWrapperHolder.INSTANCE;
     }
 
 
-    private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
+    private PropertiesFile cachedRecentlyUsedPropertiesFile = null;
+
     /**
      * @return the recentlyUsedPropertiesFile
      */
@@ -120,7 +121,7 @@ public class CacheLRUWrapper {
             cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
             return cachedRecentlyUsedPropertiesFile;
         }
-        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())){
+        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())) {
             //The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
             return cachedRecentlyUsedPropertiesFile;
         } else {
@@ -153,9 +154,9 @@ public class CacheLRUWrapper {
         return recentlyUsedPropertiesFile;
     }
 
-   private static class CacheLRUWrapperHolder{
-       private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
-   }
+    private static class CacheLRUWrapperHolder {
+        private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
+    }
 
     /**
      * Update map for keeping track of recently used items.
@@ -178,10 +179,10 @@ public class CacheLRUWrapper {
      *
      * @return true, if cache was corrupted and affected entry removed
      */
-    private boolean checkData () {
+    private boolean checkData() {
         boolean modified = false;
         Set<Entry<Object, Object>> q = getRecentlyUsedPropertiesFile().entrySet();
-        for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext();) {
+        for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext(); ) {
             Entry<Object, Object> currentEntry = it.next();
 
             final String key = (String) currentEntry.getKey();
@@ -215,6 +216,7 @@ public class CacheLRUWrapper {
 
     /**
      * Write file to disk.
+     *
      * @return true if properties were successfully stored, false otherwise
      */
     public synchronized boolean store() {
@@ -228,7 +230,7 @@ public class CacheLRUWrapper {
     /**
      * This adds a new entry to file.
      *
-     * @param key key we want path to be associated with.
+     * @param key  key we want path to be associated with.
      * @param path path to cache item.
      * @return true if we successfully added to map, false otherwise.
      */

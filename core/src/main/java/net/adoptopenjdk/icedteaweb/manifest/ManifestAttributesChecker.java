@@ -78,7 +78,7 @@ public class ManifestAttributesChecker {
     private final SecurityDelegate securityDelegate;
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
-            final SigningState signing, final SecurityDelegate securityDelegate) {
+                                     final SigningState signing, final SecurityDelegate securityDelegate) {
         this.security = security;
         this.file = file;
         this.signing = signing;
@@ -123,7 +123,7 @@ public class ManifestAttributesChecker {
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALAC) ||
-                   attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkApplicationLibraryAllowableCodebaseAttribute();
             } else {
                 LOG.warn("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC");
@@ -144,7 +144,7 @@ public class ManifestAttributesChecker {
         String[] attributesCheck = splitCombination(deploymentProperty);
         List<MANIFEST_ATTRIBUTES_CHECK> manifestAttributesCheckList = new ArrayList<>();
         for (String attribute : attributesCheck) {
-            for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute  : MANIFEST_ATTRIBUTES_CHECK.values()) {
+            for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute : MANIFEST_ATTRIBUTES_CHECK.values()) {
                 if (manifestAttribute.toString().equals(attribute)) {
                     manifestAttributesCheckList.add(manifestAttribute);
                 }
@@ -227,7 +227,8 @@ public class ManifestAttributesChecker {
         }
         LOG.debug("Trusted Only manifest attribute is \"true\". {} and requests permission level: {}", signedMsg, securityType);
         if (!(isFullySigned && requestsCorrectPermissions)) {
-            throw new LaunchException("STrustedOnlyAttributeFailure"+signedMsg+securityType);
+            throw new LaunchException("STrustedOnlyAttributeFailure: " + "Signed Msg: " + signedMsg +
+                    "Security Type: " + securityType);
         }
     }
 
@@ -257,7 +258,10 @@ public class ManifestAttributesChecker {
                 LOG.info("CBCheckOkSignedOk");
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException("CBCheckSignedAppletDontMatchException"+file.getManifestAttributesReader().getCodebase().toString()+codebase);
+                    throw new LaunchException("CBCheckSignedAppletDontMatchException" +
+                            "Manifest Codebase: " +
+                            file.getManifestAttributesReader().getCodebase().toString() +
+                            "Codebase: " + codebase);
                 } else {
                     LOG.error("CBCheckSignedFail");
                 }
@@ -447,7 +451,7 @@ public class ManifestAttributesChecker {
         if (i <= 8 || i >= s.length()) {
             return documentBase;
         }
-        s = s.substring(0, i+1);
+        s = s.substring(0, i + 1);
         try {
             documentBase = new URL(s);
         } catch (MalformedURLException ex) {

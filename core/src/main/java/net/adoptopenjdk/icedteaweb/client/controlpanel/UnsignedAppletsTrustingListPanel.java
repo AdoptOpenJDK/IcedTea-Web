@@ -173,6 +173,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             }
         });
     }
+
     private final UnsignedAppletsTrustingListPanel self;
 
     public UnsignedAppletsTrustingListPanel(File globalSettings, File customSettings, DeploymentConfiguration conf) {
@@ -182,7 +183,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         globalModel = new UnsignedAppletActionTableModel(globalBackEnd);
         customFilter = new ByPermanencyFilter(customModel);
         globalFilter = new ByPermanencyFilter(globalModel);
-        self=this;
+        self = this;
         this.conf = conf;
         reloadGui();
     }
@@ -258,8 +259,8 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
         @Override
         public final Component getListCellRendererComponent(final JList<?> list,
-                final Object value, final int index, final boolean isSelected,
-                final boolean cellHasFocus) {
+                                                            final Object value, final int index, final boolean isSelected,
+                                                            final boolean cellHasFocus) {
             if (value != null) {
                 setToolTipText(value.toString());
             }
@@ -277,10 +278,10 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         globalTable = createTable(globalModel);
         helpButton = new JButton();
         mainPolicyComboBox = new JComboBox<>(new AppletSecurityLevel[]{
-            AppletSecurityLevel.DENY_ALL,
-            AppletSecurityLevel.DENY_UNSIGNED,
-            AppletSecurityLevel.ASK_UNSIGNED,
-            AppletSecurityLevel.ALLOW_UNSIGNED
+                AppletSecurityLevel.DENY_ALL,
+                AppletSecurityLevel.DENY_UNSIGNED,
+                AppletSecurityLevel.ASK_UNSIGNED,
+                AppletSecurityLevel.ALLOW_UNSIGNED
         });
         mainPolicyComboBox.setSelectedItem(AppletSecurityLevel.getDefault());
         mainPolicyComboBox.setRenderer(comboRendererWithToolTips);
@@ -364,21 +365,21 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         globalBehaviourLabel.setText(Translator.R("APPEXTSECguiPanelGlobalBehaviourCaption"));
 
         deleteTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[]{
-            Translator.R("APPEXTSECguiPanelDeleteMenuSelected"),
-            Translator.R("APPEXTSECguiPanelDeleteMenuAllA"),
-            Translator.R("APPEXTSECguiPanelDeleteMenuAllN"),
-            Translator.R("APPEXTSECguiPanelDeleteMenuAlly"),
-            Translator.R("APPEXTSECguiPanelDeleteMenuAlln"),
-            Translator.R("APPEXTSECguiPanelDeleteMenuAllAll")}));
+                Translator.R("APPEXTSECguiPanelDeleteMenuSelected"),
+                Translator.R("APPEXTSECguiPanelDeleteMenuAllA"),
+                Translator.R("APPEXTSECguiPanelDeleteMenuAllN"),
+                Translator.R("APPEXTSECguiPanelDeleteMenuAlly"),
+                Translator.R("APPEXTSECguiPanelDeleteMenuAlln"),
+                Translator.R("APPEXTSECguiPanelDeleteMenuAllAll")}));
         deleteTypeComboBox.setRenderer(comboRendererWithToolTips);
         viewFilter.setModel(new DefaultComboBoxModel<>(new String[]{
-            Translator.R("APPEXTSECguiPanelShowOnlyPermanent"),
-            Translator.R("APPEXTSECguiPanelShowOnlyTemporal"),
-            Translator.R("APPEXTSECguiPanelShowAll"),
-            Translator.R("APPEXTSECguiPanelShowOnlyPermanentA"),
-            Translator.R("APPEXTSECguiPanelShowOnlyPermanentN"),
-            Translator.R("APPEXTSECguiPanelShowOnlyTemporalY"),
-            Translator.R("APPEXTSECguiPanelShowOnlyTemporalN")}));
+                Translator.R("APPEXTSECguiPanelShowOnlyPermanent"),
+                Translator.R("APPEXTSECguiPanelShowOnlyTemporal"),
+                Translator.R("APPEXTSECguiPanelShowAll"),
+                Translator.R("APPEXTSECguiPanelShowOnlyPermanentA"),
+                Translator.R("APPEXTSECguiPanelShowOnlyPermanentN"),
+                Translator.R("APPEXTSECguiPanelShowOnlyTemporalY"),
+                Translator.R("APPEXTSECguiPanelShowOnlyTemporalN")}));
         viewFilter.setRenderer(comboRendererWithToolTips);
         deleteButton.setText(Translator.R("APPEXTSECguiPanelDeleteButton"));
         deleteButton.setToolTipText(Translator.R("APPEXTSECguiPanelDeleteButtonToolTip"));
@@ -454,55 +455,55 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup().addContainerGap()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(mainTabPanel, GroupLayout.Alignment.LEADING, 0, 583, Short.MAX_VALUE)
-                                .addComponent(globalBehaviourLabel, GroupLayout.Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(securityLevelLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(mainPolicyComboBox, 0, 474, Short.MAX_VALUE))
-                                .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(addRowButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(validateTableButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(testUrlButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
-                                        .addComponent(moveRowDownButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(moveRowUpButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(deleteButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(deleteTypeComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(invertSelectionButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(askBeforeActionCheckBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(filterRegexesCheckBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                                                        .addComponent(viewFilter, 0, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE))).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(helpButton, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup().addContainerGap()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addComponent(mainTabPanel, GroupLayout.Alignment.LEADING, 0, 583, Short.MAX_VALUE)
+                                        .addComponent(globalBehaviourLabel, GroupLayout.Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addComponent(securityLevelLabel, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(mainPolicyComboBox, 0, 474, Short.MAX_VALUE))
+                                        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addComponent(addRowButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(validateTableButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(testUrlButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
+                                                .addComponent(moveRowDownButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(moveRowUpButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(deleteButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(deleteTypeComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(invertSelectionButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(askBeforeActionCheckBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(filterRegexesCheckBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
+                                                                .addComponent(viewFilter, 0, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE))).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(helpButton, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE))).addContainerGap()));
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup().addContainerGap()
-                        .addComponent(globalBehaviourLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(securityLevelLabel)
-                                .addComponent(mainPolicyComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(deleteButton)
-                                                .addComponent(deleteTypeComboBox)
-                                                .addComponent(invertSelectionButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(askBeforeActionCheckBox)
-                                                .addComponent(filterRegexesCheckBox)
-                                                .addComponent(viewFilter)))
-                                .addComponent(helpButton, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(mainTabPanel, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(addRowButton)
-                                .addComponent(validateTableButton)
-                                .addComponent(testUrlButton)
-                                .addComponent(moveRowUpButton)
-                                .addComponent(moveRowDownButton)).addContainerGap()));
+                        .addGroup(layout.createSequentialGroup().addContainerGap()
+                                .addComponent(globalBehaviourLabel).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(securityLevelLabel)
+                                        .addComponent(mainPolicyComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(deleteButton)
+                                                        .addComponent(deleteTypeComboBox)
+                                                        .addComponent(invertSelectionButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(askBeforeActionCheckBox)
+                                                        .addComponent(filterRegexesCheckBox)
+                                                        .addComponent(viewFilter)))
+                                        .addComponent(helpButton, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(mainTabPanel, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(addRowButton)
+                                        .addComponent(validateTableButton)
+                                        .addComponent(testUrlButton)
+                                        .addComponent(moveRowUpButton)
+                                        .addComponent(moveRowDownButton)).addContainerGap()));
 
         JPanel userPanel = new JPanel(new BorderLayout());
         JPanel globalPanel = new JPanel(new BorderLayout());
@@ -795,11 +796,11 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
 
             private JFrame grabParentFrame(Component self) {
                 Container parent = self.getParent();
-                while (parent!=null){
-                    if (parent instanceof  JFrame){
+                while (parent != null) {
+                    if (parent instanceof JFrame) {
                         return (JFrame) parent;
                     }
-                    parent=parent.getParent();
+                    parent = parent.getParent();
 
                 }
                 return null;
@@ -1079,6 +1080,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             }
 
         }
+
         public static final ShowAll showAll = new ShowAll();
         public static final ShowPermanents showPermanents = new ShowPermanents();
         public static final ShowPermanentA showPermanentA = new ShowPermanentA();

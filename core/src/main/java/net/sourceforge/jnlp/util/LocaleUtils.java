@@ -2,6 +2,7 @@ package net.sourceforge.jnlp.util;
 
 import java.util.Locale;
 import java.util.Objects;
+
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
@@ -11,7 +12,7 @@ public class LocaleUtils {
 
     public static final String EMPTY_STRING = "";
 
-    public enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
+    public enum Match {LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED}
 
     /**
      * Returns a {@link Locale} from a locale string. Each locale is specified by a language identifier,
@@ -25,7 +26,7 @@ public class LocaleUtils {
      */
     public static Locale getLocale(final String localeString) throws ParseException {
         if (Objects.isNull(localeString) || localeString.length() < 2) {
-            throw new ParseException("PIllegalLocale "+localeString);
+            throw new ParseException("PIllegalLocale: " + localeString);
         }
 
         final String language = localeString.substring(0, 2);
@@ -48,9 +49,9 @@ public class LocaleUtils {
      * codes are compared; for example, a requested locale of
      * Locale("","","") would always return true.
      *
-     * @param requested the requested locale
+     * @param requested  the requested locale
      * @param matchLevel the depth with which to match locales.
-     * @param available the available locales
+     * @param available  the available locales
      * @return {@code true} if {@code requested} matches any of {@code available}, or if
      * {@code available} is empty or {@code null}.
      * @see Locale

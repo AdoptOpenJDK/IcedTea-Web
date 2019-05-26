@@ -75,7 +75,7 @@ public class PluginParameters {
         return Collections.unmodifiableMap(parameters);
     }
 
-    public  Map<String, String> getUnderlyingMap() {
+    public Map<String, String> getUnderlyingMap() {
         return parameters;
     }
 
@@ -162,13 +162,13 @@ public class PluginParameters {
 
     public String getUniqueKey(URL codebase) {
         /* According to http://download.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/applet-compatibility.html,
-        * classloaders are shared iff these properties match:
-        * codebase, cache_archive, java_archive, archive
-        *
-        * To achieve this, we create the unique key based on those 4 values,
-        * always in the same order. The initial "<NAME>=" parts ensure a
-        * bad tag cannot trick the loader into getting shared with another.
-        */
+         * classloaders are shared iff these properties match:
+         * codebase, cache_archive, java_archive, archive
+         *
+         * To achieve this, we create the unique key based on those 4 values,
+         * always in the same order. The initial "<NAME>=" parts ensure a
+         * bad tag cannot trick the loader into getting shared with another.
+         */
         return "codebase=" + codebase.toExternalForm() + "cache_archive="
                 + getCacheArchive() + "java_archive=" + getJavaArchive()
                 + "archive=" + getArchive();
@@ -180,7 +180,7 @@ public class PluginParameters {
      * http://java.sun.com/j2se/1.4.2/docs/guide/plugin/developer_guide/using_tags.html#in-nav
      */
     static void ensureJavaPrefixTakesPrecedence(Map<String, String> params,
-            String attribute) {
+                                                String attribute) {
         String javaPrefixAttribute = params.get("java_" + attribute);
         if (javaPrefixAttribute != null) {
             params.put(attribute, javaPrefixAttribute);

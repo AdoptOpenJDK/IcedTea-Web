@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
@@ -85,7 +86,7 @@ public class UnsignedAppletTrustConfirmation {
      * and then the global policy.
      *
      * @param file the plugin file
-     * @param id of wonted  action
+     * @param id   of wonted  action
      * @return the remembered decision
      */
     public static UnsignedAppletActionEntry getStoredEntry(JNLPFile file, Class<? extends RememberableDialog> id) {
@@ -106,6 +107,7 @@ public class UnsignedAppletTrustConfirmation {
             return userEntry;
         }
     }
+
     public static ExecuteAppletAction getStoredAction(JNLPFile file, Class<? extends RememberableDialog> id) {
         UnsignedAppletActionEntry x = getStoredEntry(file, id);
         if (x != null) {
@@ -172,10 +174,10 @@ public class UnsignedAppletTrustConfirmation {
                 userActionStorage.update(oldEntry);
                 return;
             }
-              if (rememberForCodeBase == null){
-                  throw new RuntimeException("Trying to create new entry without codebase. That's forbidden.");
-              }
-                              /* Else, create a new entry */
+            if (rememberForCodeBase == null) {
+                throw new RuntimeException("Trying to create new entry without codebase. That's forbidden.");
+            }
+            /* Else, create a new entry */
             UnsignedAppletActionEntry entry = new UnsignedAppletActionEntry(
                     AppletSecurityActions.fromAction(id, behaviour),
                     new Date(),
@@ -225,7 +227,7 @@ public class UnsignedAppletTrustConfirmation {
     }
 
     public static void checkPartiallySignedWithUserIfRequired(SecurityDelegate securityDelegate, JNLPFile file,
-            CertVerifier certVerifier) throws LaunchException {
+                                                              CertVerifier certVerifier) throws LaunchException {
 
         if (!unsignedConfirmationIsRequired()) {
             LOG.debug("Running partially signed applet at {} does not require confirmation according to security policy.", file.getCodeBase());

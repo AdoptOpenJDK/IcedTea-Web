@@ -89,7 +89,6 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS
- *
  */
 public class JavaConsole implements ObservableMessagesProvider {
 
@@ -529,7 +528,7 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void run() {
                 // avoid too much processing if already processed:
-                synchronized(observable) {
+                synchronized (observable) {
                     if (observable.hasChanged() || (Boolean.TRUE.equals(force))) {
                         observable.notifyObservers(force);
                     }

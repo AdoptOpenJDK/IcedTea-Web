@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jnlp.DownloadServiceListener;
+
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
@@ -80,6 +81,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.jnlp.DownloadServiceListener;
+
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -446,8 +448,8 @@ public class CacheUtil {
      * cache and it is up to date.  This method may not return
      * immediately.
      *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
+     * @param source       the source {@link URL}
+     * @param version      the versions to check for
      * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
@@ -455,7 +457,7 @@ public class CacheUtil {
     public static boolean isCurrent(URL source, Version version, long lastModified) {
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("CNotCacheable "+source);
+            throw new IllegalArgumentException("CNotCacheable: " + source);
 
         try {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
@@ -481,7 +483,7 @@ public class CacheUtil {
      */
     public static boolean isCached(URL source, Version version) {
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("CNotCacheable "+source);
+            throw new IllegalArgumentException("CNotCacheable: " + source);
 
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
@@ -528,7 +530,7 @@ public class CacheUtil {
         // ensure that version is an version id not version string
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("CNotCacheable "+source);
+            throw new IllegalArgumentException("CNotCacheable: " + source);
 
         File cacheFile = null;
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();

@@ -181,10 +181,10 @@ public final class Parser {
      * The root node may be normalized as a side effect of this constructor.
      * </p>
      *
-     * @param file the (uninitialized) file reference
-     * @param base if codebase is not specified, a default base for relative
-     * URLs
-     * @param root the root node
+     * @param file     the (uninitialized) file reference
+     * @param base     if codebase is not specified, a default base for relative
+     *                 URLs
+     * @param root     the root node
      * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
@@ -200,10 +200,10 @@ public final class Parser {
      * The root node may be normalized as a side effect of this constructor.
      * </p>
      *
-     * @param file the (uninitialized) file reference
-     * @param base if codebase is not specified, a default base for relative
-     * URLs
-     * @param root the root node
+     * @param file     the (uninitialized) file reference
+     * @param base     if codebase is not specified, a default base for relative
+     *                 URLs
+     * @param root     the root node
      * @param settings the parser settings to use when parsing the JNLP file
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
@@ -265,7 +265,6 @@ public final class Parser {
 
     /**
      * @return the specification version.
-     *
      */
     public Version getSpecVersion() {
         return spec;
@@ -299,7 +298,7 @@ public final class Parser {
                         break;
                 }
 
-                final  String policyString = getAttribute(node, UpdateDesc.POLICY_ATTRIBUTE, UpdatePolicy.ALWAYS.getValue());
+                final String policyString = getAttribute(node, UpdateDesc.POLICY_ATTRIBUTE, UpdatePolicy.ALWAYS.getValue());
                 final UpdatePolicy policy;
                 switch (policyString) {
                     case "always":
@@ -331,12 +330,12 @@ public final class Parser {
     //
     // This section loads the resources elements
     //
+
     /**
+     * @param parent the parent node (either jnlp or j2se)
+     * @param j2se   true if the resources are located under a j2se or java node
      * @return all of the ResourcesDesc elements under the specified node (jnlp
      * or j2se).
-     *
-     * @param parent the parent node (either jnlp or j2se)
-     * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
     public List<ResourcesDesc> getResources(final Node parent, final boolean j2se)
@@ -355,10 +354,9 @@ public final class Parser {
     }
 
     /**
-     * @return the ResourcesDesc element at the specified node.
-     *
      * @param node the resources node
      * @param j2se true if the resources are located under a j2se or java node
+     * @return the ResourcesDesc element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private ResourcesDesc getResourcesDesc(final Node node, final boolean j2se) throws ParseException {
@@ -367,9 +365,9 @@ public final class Parser {
         // create resources
         final ResourcesDesc resources
                 = new ResourcesDesc(file,
-                        getLocales(node),
-                        splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
-                        splitString(getAttribute(node, ResourcesDesc.ARCH_ATTRIBUTE, null)));
+                getLocales(node),
+                splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
+                splitString(getAttribute(node, ResourcesDesc.ARCH_ATTRIBUTE, null)));
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -431,9 +429,8 @@ public final class Parser {
     }
 
     /**
-     * @return the JRE element at the specified node.
-     *
      * @param node the j2se/java node
+     * @return the JRE element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private JREDesc getJRE(Node node) throws ParseException {
@@ -480,9 +477,8 @@ public final class Parser {
     }
 
     /**
-     * @return the Extension element at the specified node.
-     *
      * @param node the extension node
+     * @return the Extension element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private ExtensionDesc getExtension(Node node) throws ParseException {
@@ -502,9 +498,8 @@ public final class Parser {
     }
 
     /**
-     * @return the Property element at the specified node.
-     *
      * @param node the property node
+     * @return the Property element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private PropertyDesc getProperty(Node node) throws ParseException {
@@ -515,9 +510,8 @@ public final class Parser {
     }
 
     /**
-     * @return the Package element at the specified node.
-     *
      * @param node the package node
+     * @return the Package element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private PackageDesc getPackage(Node node) throws ParseException {
@@ -531,12 +525,13 @@ public final class Parser {
     //
     // This section loads the information elements
     //
+
     /**
      * Make sure a title and vendor are present and nonempty and localized as
      * best matching as possible for the JVM's current locale. Fallback to a
      * generalized title and vendor otherwise. If none is found, throw an
      * exception.
-     *
+     * <p>
      * Additionally prints homepage, description, title and vendor to stdout if
      * in Debug mode.
      *
@@ -544,7 +539,7 @@ public final class Parser {
      */
     void checkForInformation() throws RequiredElementException {
         LOG.info("Homepage: {}", file.getInformation().getHomepage());
-       LOG.info("Description: {}", file.getInformation().getDescription());
+        LOG.info("Description: {}", file.getInformation().getDescription());
         file.getTitle(strict);
         file.getVendor(strict);
     }
@@ -560,7 +555,6 @@ public final class Parser {
      * @param parent the parent node containing the information elements in the order specified in the JNLP file
      * @return all of the information elements under the specified node.
      * @throws ParseException if the JNLP file is invalid
-     *
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
@@ -587,7 +581,6 @@ public final class Parser {
      * @param node the node containing the information element as specified in the JNLP file
      * @return the information element at the specified node.
      * @throws ParseException if the JNLP file is invalid
-     *
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
@@ -612,7 +605,7 @@ public final class Parser {
                 String kind = getAttribute(child, DescriptionDesc.KIND_ATTRIBUTE, DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
-                        throw new ParseException("PTwoDescriptions "+kind);
+                        throw new ParseException("PTwoDescriptions: " + kind);
                     }
                 }
                 descriptionsUsed.add(kind);
@@ -652,9 +645,9 @@ public final class Parser {
     /**
      * Adds a key,value pair to the information object.
      *
-     * @param info the information object
-     * @param node node name to be used as the key
-     * @param mod key name appended with "-"+mod if not null
+     * @param info  the information object
+     * @param node  node name to be used as the key
+     * @param mod   key name appended with "-"+mod if not null
      * @param value the info object to add (icon or string)
      */
     protected void addInfo(InformationDesc info, Node node, String mod, Object value) {
@@ -668,9 +661,8 @@ public final class Parser {
     }
 
     /**
-     * @return the icon element at the specified node.
-     *
      * @param node the icon node
+     * @return the icon element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
     private IconDesc getIcon(Node node) throws ParseException {
@@ -691,12 +683,12 @@ public final class Parser {
     //
     // This section loads the security descriptor element
     //
+
     /**
+     * @param parent the parent node
      * @return the security descriptor element. If no security element was
      * specified in the JNLP file then a SecurityDesc with applet permissions is
      * returned.
-     *
-     * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
     public SecurityDesc getSecurity(final Node parent) throws ParseException {
@@ -751,12 +743,10 @@ public final class Parser {
     /**
      * Load the entry point descriptor element.
      *
-     * @return the entry point descriptor element
      * @param parent the parent node
+     * @return the entry point descriptor element
      * @throws ParseException if the JNLP file is invalid
-     *
      * @see EntryPoint
-     *
      */
     public EntryPoint getEntryPointDesc(final Node parent) throws ParseException {
         // check for other than one application type
@@ -794,10 +784,9 @@ public final class Parser {
     /**
      * @param node
      * @return the applet descriptor.
-     *
      * @throws ParseException if the JNLP file is invalid
-     *
-     * TODO: parse and set {@link AppletDesc#getProgressClass()}
+     *                        <p>
+     *                        TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
     private AppletDesc getApplet(final Node node) throws ParseException {
         final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"), strict);
@@ -827,12 +816,11 @@ public final class Parser {
     }
 
     /**
-     * @return the application descriptor.
-     *
      * @param node
+     * @return the application descriptor.
      * @throws ParseException if the JNLP file is invalid
-     *
-     * TODO: parse and set {@link ApplicationDesc#getProgressClass()}
+     *                        <p>
+     *                        TODO: parse and set {@link ApplicationDesc#getProgressClass()}
      */
     private ApplicationDesc getApplication(final ApplicationType applicationType, final Node node) throws ParseException {
         String main = getMainClass(node, false);
@@ -889,8 +877,8 @@ public final class Parser {
     }
 
     /**
-     * @return the association descriptor.
      * @param node
+     * @return the association descriptor.
      * @throws ParseException
      */
     private AssociationDesc getAssociation(final Node node) throws ParseException {
@@ -1009,6 +997,7 @@ public final class Parser {
     }
 
     // other methods
+
     /**
      * @return an array of substrings separated by spaces (spaces escaped with
      * backslash do not separate strings). This method splits strings as per the
@@ -1038,7 +1027,7 @@ public final class Parser {
             }
 
             // delete \ quote chars
-            for (int i = part.length(); i-- > 0;) // sweet syntax for reverse loop
+            for (int i = part.length(); i-- > 0; ) // sweet syntax for reverse loop
             {
                 if (part.charAt(i) == '\\') {
                     part.deleteCharAt(i--); // and skip previous char so \\ becomes \
@@ -1056,7 +1045,6 @@ public final class Parser {
      *
      * @param node the node with a locale attribute
      * @return the Locale object(s) from a node's locale attribute.
-     *
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
@@ -1076,10 +1064,8 @@ public final class Parser {
 
 
     /**
-     * @return a Version from the specified attribute and default value.
-     *
-     * @param node the node
-     * @param name the attribute
+     * @param node         the node
+     * @param name         the attribute
      * @param defaultValue default if no such attribute
      * @return a Version, or null if no such attribute and default is null
      */
@@ -1098,7 +1084,6 @@ public final class Parser {
     /**
      * @return the root node from the XML document in the specified input
      * stream.
-     *
      * @throws ParseException if the JNLP file is invalid
      */
     public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
@@ -1110,9 +1095,9 @@ public final class Parser {
             if (e.getCause() instanceof ParseException) {
                 throw (ParseException) (e.getCause());
             }
-            throw new ParseException("PBadXML "+ e);
+            throw new ParseException("PBadXML: " + e.getLocalizedMessage());
         } catch (Exception e) {
-            throw new ParseException("PBadXML "+ e);
+            throw new ParseException("PBadXML: " + e.getLocalizedMessage());
         }
     }
 

@@ -41,6 +41,7 @@ import java.security.cert.CertPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
@@ -61,12 +62,12 @@ public class PluginAppVerifier implements AppVerifier {
 
         boolean allPublishersTrusted = true;
 
-        for(String jarName : signedJars.keySet()) {
+        for (String jarName : signedJars.keySet()) {
             int numbSignableEntries = signedJars.get(jarName);
             boolean publisherTrusted = false;
 
             for (CertInformation certInfo : certs.values()) {
-                if(certInfo.isSignerOfJar(jarName)
+                if (certInfo.isSignerOfJar(jarName)
                         && numbSignableEntries == certInfo.getNumJarEntriesSigned(jarName)
                         && certInfo.isPublisherAlreadyTrusted()) {
                     publisherTrusted = true;
@@ -81,16 +82,16 @@ public class PluginAppVerifier implements AppVerifier {
 
     @Override
     public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars) {
+                                    Map<String, Integer> signedJars) {
 
         boolean allRootCAsTrusted = true;
 
-        for(String jarName : signedJars.keySet()) {
+        for (String jarName : signedJars.keySet()) {
             int numbSignableEntries = signedJars.get(jarName);
             boolean rootCATrusted = false;
 
             for (CertInformation certInfo : certs.values()) {
-                if(certInfo.isSignerOfJar(jarName)
+                if (certInfo.isSignerOfJar(jarName)
                         && numbSignableEntries == certInfo.getNumJarEntriesSigned(jarName)
                         && certInfo.isRootInCacerts()) {
                     rootCATrusted = true;
@@ -105,16 +106,16 @@ public class PluginAppVerifier implements AppVerifier {
 
     @Override
     public boolean isFullySigned(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars) {
+                                 Map<String, Integer> signedJars) {
 
         boolean isFullySigned = true;
 
-        for(String jarName : signedJars.keySet()) {
+        for (String jarName : signedJars.keySet()) {
             int numbSignableEntries = signedJars.get(jarName);
             boolean isSigned = false;
 
             for (CertInformation certInfo : certs.values()) {
-                if(certInfo.isSignerOfJar(jarName)
+                if (certInfo.isSignerOfJar(jarName)
                         && numbSignableEntries == certInfo.getNumJarEntriesSigned(jarName)) {
                     isSigned = true;
                     break;
@@ -181,7 +182,7 @@ public class PluginAppVerifier implements AppVerifier {
             }
             if (!trustFoundOrApproved) {
                 throw new LaunchException(null, null, "LSFatal",
-                    R("LCLaunching"), R("LCancelOnUserRequest"), "");
+                        R("LCLaunching"), R("LCancelOnUserRequest"), "");
             }
         }
     }
@@ -189,12 +190,13 @@ public class PluginAppVerifier implements AppVerifier {
     /**
      * Build a list of all the CertPaths that were detected in the provided
      * JCV, placing them in the most trusted possible order.
+     *
      * @param jcv The verifier containing the CertPaths to examine.
      * @return A list of CertPaths sorted in the following order: Signers with
-     *   1. Already trusted publishers
-     *   2. Roots in the CA store and have no signing issues
-     *   3. Roots in the CA store but have signing issues
-     *   4. Everything else
+     * 1. Already trusted publishers
+     * 2. Roots in the CA store and have no signing issues
+     * 3. Roots in the CA store but have signing issues
+     * 4. Everything else
      */
     public List<CertPath> buildCertPathsList(JarCertVerifier jcv) {
         List<CertPath> certPathsList = jcv.getCertsList();

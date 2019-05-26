@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author jvanek
  */
 public class AppletsFilter {
@@ -43,7 +42,7 @@ public class AppletsFilter {
             Element element = appletElement.get(i);
             AppletParser ap = new AppletParser(element, docBase);
             aps.add(ap);
-            LOG.debug("added: {}", aps.size()-1);
+            LOG.debug("added: {}", aps.size() - 1);
             LOG.debug(ap.toString());
         }
         return aps;
@@ -81,7 +80,7 @@ public class AppletsFilter {
             return r;
         }
         for (int i = 0; i < ids.size(); i++) {
-            Integer id  = null;
+            Integer id = null;
             try {
                 id = Integer.parseInt(ids.get(i));
             } catch (NumberFormatException ex) {

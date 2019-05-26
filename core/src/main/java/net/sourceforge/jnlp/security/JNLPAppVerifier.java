@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.security;
 
 import java.security.cert.CertPath;
 import java.util.Map;
+
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
@@ -70,7 +71,7 @@ public class JNLPAppVerifier implements AppVerifier {
 
     @Override
     public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars) {
+                                    Map<String, Integer> signedJars) {
         int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
         for (CertInformation certInfo : certs.values()) {
             Map<String, Integer> certSignedJars = certInfo.getSignedJars();
@@ -85,7 +86,7 @@ public class JNLPAppVerifier implements AppVerifier {
 
     @Override
     public boolean isFullySigned(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars) {
+                                 Map<String, Integer> signedJars) {
         int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
         for (CertPath cPath : certs.keySet()) {
             // If this cert has signed everything, return true
@@ -137,7 +138,8 @@ public class JNLPAppVerifier implements AppVerifier {
 
     /**
      * Find out if the CertPath with the given info has fully signed the app.
-     * @param info The information regarding the CertPath in question
+     *
+     * @param info                 The information regarding the CertPath in question
      * @param sumOfSignableEntries The total number of signable entries in the app.
      * @return True if the signer has fully signed this app.
      */

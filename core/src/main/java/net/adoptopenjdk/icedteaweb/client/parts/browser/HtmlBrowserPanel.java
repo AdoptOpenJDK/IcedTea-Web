@@ -79,7 +79,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * this class intentionally NOT cache any content, but always load data. Its
  * original use case was to to implement http proxy logging. And there reloads
  * really matters.
- *
  */
 public class HtmlBrowserPanel extends JPanel {
 
@@ -106,6 +105,7 @@ public class HtmlBrowserPanel extends JPanel {
     public void addDocumentChangedListener(DocumentChangedListener i) {
         documentChangedListeners.add(i);
     }
+
     List<DocumentChangedListener> documentChangedListeners = new ArrayList<>();
 
     public URL getUrl() {
@@ -226,7 +226,8 @@ public class HtmlBrowserPanel extends JPanel {
                 });
                 p.add(jim);
             }
-            b.removeAll();;
+            b.removeAll();
+            ;
             b.setComponentPopupMenu(p);
             sb.append("</ol></html>");
             b.setToolTipText(sb.toString());
@@ -246,15 +247,15 @@ public class HtmlBrowserPanel extends JPanel {
     private final JToggleButton viewSourceButton = new JToggleButton(Translator.R("BrowserSource"));
     private final JCheckBox socketCheckbox = new JCheckBox(Translator.R("BrowserSocket"));
     private final JComboBox<Charset> encodingBox = new JComboBox<>(new Charset[]{
-        null,
-        US_ASCII,
-        UTF_8,
-        ISO_8859_1,
-        UTF_16,
-        UTF_16BE,
-        UTF_16LE
+            null,
+            US_ASCII,
+            UTF_8,
+            ISO_8859_1,
+            UTF_16,
+            UTF_16BE,
+            UTF_16LE
 
-});
+    });
 
     private static final String TEXTPLAIN = "text/plain";
     private static final String TEXTHTML = "text/html";
@@ -325,7 +326,7 @@ public class HtmlBrowserPanel extends JPanel {
         String[] result;
         if (isUseSocket()) {
             LOG.debug("Using socket connection");
-            Charset ch = (Charset)(encodingBox.getSelectedItem());
+            Charset ch = (Charset) (encodingBox.getSelectedItem());
             if (ch == null) {
                 result = UrlUtils.loadUrlWithInvalidHeader(url);
             } else {
@@ -334,7 +335,7 @@ public class HtmlBrowserPanel extends JPanel {
         } else {
             LOG.debug("Using URLconnection");
             String s;
-            Charset ch = (Charset)(encodingBox.getSelectedItem());
+            Charset ch = (Charset) (encodingBox.getSelectedItem());
             if (ch == null) {
                 s = UrlUtils.loadUrl(url);
             } else {
@@ -349,12 +350,12 @@ public class HtmlBrowserPanel extends JPanel {
         current = new State(url, result[0], result[2]);
         if (source) {
             currentHtml = new JEditorPane(TEXTPLAIN, current.getSource());
-            if (encodingBox.getSelectedItem()!=null){
+            if (encodingBox.getSelectedItem() != null) {
                 currentHtml.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
             }
         } else {
             currentHtml = new JEditorPane(TEXTHTML, current.getHtml());
-            if (encodingBox.getSelectedItem()!=null){
+            if (encodingBox.getSelectedItem() != null) {
                 currentHtml.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
             }
             ((HTMLDocument) currentHtml.getDocument()).setBase(current.url);

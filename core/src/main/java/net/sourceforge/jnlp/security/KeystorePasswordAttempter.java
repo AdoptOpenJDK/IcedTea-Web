@@ -130,6 +130,7 @@ class KeystorePasswordAttempter {
         abstract String getId();
 
     }
+
     //static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()), new AlmightyPassword());
     static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()));
     private final List<SavedPassword> passes;
@@ -144,8 +145,8 @@ class KeystorePasswordAttempter {
         SavedPassword successfulKey = successfulPerKeystore.get(operation.ks);
         Exception firstEx = null;
         String messages = "";
-        List<SavedPassword>  localPasses = new ArrayList<>();
-        if (successfulKey != null){
+        List<SavedPassword> localPasses = new ArrayList<>();
+        if (successfulKey != null) {
             //successful must be first. If it is not, then writing to keystore by illegal password, will kill keystore's integrity
             localPasses.add(successfulKey);
         }
@@ -159,7 +160,7 @@ class KeystorePasswordAttempter {
                 Key result = operation.operateKeystore(pass.pass);
                 //ok we were successful
                 //save the loading password for storing purposes (and another reading too)
-                 successfulPerKeystore.put(operation.ks, pass);
+                successfulPerKeystore.put(operation.ks, pass);
                 return result;
             } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
                 if (firstEx == null) {

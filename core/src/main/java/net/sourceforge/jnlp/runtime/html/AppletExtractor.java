@@ -73,14 +73,15 @@ public class AppletExtractor {
 
     private final URL html;
     private static final String[] APPLETS = new String[]{
-        "applet", "APPLET", "Applet",
-        "object", "OBJECT", "Object",
-        "embed", "EMBED", "Embed"};
+            "applet", "APPLET", "Applet",
+            "object", "OBJECT", "Object",
+            "embed", "EMBED", "Embed"};
     private final ParserSettings ps;
 
     public AppletExtractor(URL html) {
         this(html, null);
     }
+
     public AppletExtractor(URL html, ParserSettings ps) {
         JNLPRuntime.saveHistory(html.toExternalForm());
         this.html = html;
@@ -93,7 +94,7 @@ public class AppletExtractor {
 
     private InputStream cleanStreamIfPossible(InputStream is) {
         try {
-            if (ps != null && ps.isMalformedXmlAllowed()){
+            if (ps != null && ps.isMalformedXmlAllowed()) {
                 Object parser = Parser.getParserInstance(ps);
                 Method m = parser.getClass().getMethod("xmlizeInputStream", InputStream.class);
                 return (InputStream) m.invoke(null, is);
@@ -107,8 +108,8 @@ public class AppletExtractor {
     }
 
     public List<Element> findAppletsOnPage() {
-        try{
-        return findAppletsOnPageImpl(openDocument(cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS))));
+        try {
+            return findAppletsOnPageImpl(openDocument(cleanStreamIfPossible(JNLPFile.openURL(html, null, UpdatePolicy.ALWAYS))));
         } catch (SAXException sex) {
             throw new RuntimeException(new ParseException(sex));
         } catch (IOException | ParserConfigurationException ex) {

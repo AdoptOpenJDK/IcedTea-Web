@@ -99,6 +99,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions.Group;
@@ -246,10 +247,10 @@ public class PolicyEditor extends JPanel {
                     className.setText(entry.getDisplayClass());
                     principalName.setText(entry.getDisplayName());
                     final int option = JOptionPane.showConfirmDialog(
-                        null,
-                        new Object[]{R("PEPrincipalClassNameInputLabel"), className, R("PEPrincipalPrincipalNameInputLabel"), principalName},
-                        R("PEEditPrincipal"),
-                        JOptionPane.OK_CANCEL_OPTION
+                            null,
+                            new Object[]{R("PEPrincipalClassNameInputLabel"), className, R("PEPrincipalPrincipalNameInputLabel"), principalName},
+                            R("PEEditPrincipal"),
+                            JOptionPane.OK_CANCEL_OPTION
                     );
                     if (option == JOptionPane.OK_OPTION) {
                         principals.removeElement(entry);
@@ -409,10 +410,10 @@ public class PolicyEditor extends JPanel {
                 }
                 final PrincipalsPanel panel = new PrincipalsPanel(getSelectedPolicyIdentifier().getPrincipals());
                 final int option = JOptionPane.showConfirmDialog(
-                    null,
-                    new Object[]{ R("PEPrincipalsInputLabel"), panel },
-                    R("PEEntryPrompt"),
-                    JOptionPane.OK_CANCEL_OPTION
+                        null,
+                        new Object[]{R("PEPrincipalsInputLabel"), panel},
+                        R("PEEntryPrompt"),
+                        JOptionPane.OK_CANCEL_OPTION
                 );
                 if (option == JOptionPane.OK_OPTION) {
                     modifyPrincipals(getSelectedPolicyIdentifier(), panel.getPrincipals());
@@ -546,7 +547,6 @@ public class PolicyEditor extends JPanel {
     }
 
     /**
-     *
      * @param async use asynchronous saving, which displays a progress dialog, or use synchronous, which blocks the
      *              EDT but allows for eg the on-disk file to be changed without resorting to a busy-wait loop
      * @return false iff the user wishes to cancel the operation and keep the current editor state
@@ -820,6 +820,7 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Check if the PolicyEditor instance has been visually closed
+     *
      * @return if the PolicyEditor instance has been closed
      */
     public boolean isClosed() {
@@ -836,6 +837,7 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Add a new identifier to the editor's model.
+     *
      * @param identifier to be added
      */
     public void addNewEntry(final PolicyIdentifier identifier) {
@@ -928,6 +930,7 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Remove an identifier from the editor's model
+     *
      * @param identifier to be removed
      */
     public void removeIdentifier(final PolicyIdentifier identifier) {
@@ -988,6 +991,7 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Copy an entry to the system clipboard
+     *
      * @param identifier the identifier to copy
      */
     public void copyEntry(final PolicyIdentifier identifier) {
@@ -1053,6 +1057,7 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Update the checkboxes to show the permissions granted to the specified identifier
+     *
      * @param identifier whose permissions to display
      */
     private void updateCheckboxes(final PolicyIdentifier identifier) {
@@ -1094,7 +1099,8 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Set a mnemonic key for a menu item or button
-     * @param button the component for which to set a mnemonic
+     *
+     * @param button   the component for which to set a mnemonic
      * @param mnemonic the mnemonic to set
      */
     private static void setButtonMnemonic(final AbstractButton button, final String mnemonic) {
@@ -1667,6 +1673,7 @@ public class PolicyEditor extends JPanel {
     /**
      * Detect if the policy settings have changed, either on-disk or in-app.
      * If an on-disk change has occurred, update the Md5.
+     *
      * @return The user's choice (Yes/No/Cancel - see JOptionPane constants).
      * "Cancel" if the file hasn't changed but the user has made modifications
      * to the settings. "No" otherwise
@@ -1711,10 +1718,11 @@ public class PolicyEditor extends JPanel {
 
     /**
      * Start a Policy Editor instance.
+     *
      * @param args "-file $FILENAME" and/or "-codebase $CODEBASE" are accepted flag/value pairs.
-     * -file specifies a file path to be opened by the editor. If none is provided, the default
-     * policy file location for the user is opened.
-     * -help will print a help message and immediately return (no editor instance opens)
+     *             -file specifies a file path to be opened by the editor. If none is provided, the default
+     *             policy file location for the user is opened.
+     *             -help will print a help message and immediately return (no editor instance opens)
      */
     public static void main(final String[] args) {
         // setup Swing EDT tracing:
@@ -1770,7 +1778,7 @@ public class PolicyEditor extends JPanel {
             try {
                 new URL(codebase);
             } catch (final MalformedURLException e) {
-                throw new IllegalArgumentException("PEInvalidUrl"+codebase, e);
+                throw new IllegalArgumentException(e.getLocalizedMessage());
             }
             return codebase;
         } else {
@@ -1795,7 +1803,7 @@ public class PolicyEditor extends JPanel {
         if (optionParser.hasOption(CommandLineOptions.PRINCIPALS)) {
             final List<String> rawPrincipals = optionParser.getParams(CommandLineOptions.PRINCIPALS);
             final Set<PolicyParser.PrincipalEntry> principals = new HashSet<>();
-            for (int i = 0; i < rawPrincipals.size(); i+= 2) {
+            for (int i = 0; i < rawPrincipals.size(); i += 2) {
                 principals.add(new PolicyParser.PrincipalEntry(rawPrincipals.get(i), rawPrincipals.get(i + 1)));
             }
             return principals;
@@ -1843,6 +1851,7 @@ public class PolicyEditor extends JPanel {
     /**
      * Create a new PolicyEditor instance without passing argv. The returned instance is not
      * yet set visible.
+     *
      * @param filepath a policy file to open at start, or null if no file to load
      * @return a reference to a new PolicyEditor instance
      */

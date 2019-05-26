@@ -103,7 +103,6 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
 
-
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *

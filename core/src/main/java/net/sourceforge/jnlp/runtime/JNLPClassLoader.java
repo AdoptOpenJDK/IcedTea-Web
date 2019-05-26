@@ -263,7 +263,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /**
      * True if the jar with the main class has been found
-     *
      */
     private boolean foundMainJar = false;
 
@@ -286,7 +285,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Create a new JNLPClassLoader from the specified file.
      *
-     * @param file the JNLP file
+     * @param file   the JNLP file
      * @param policy update policy of loader
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
@@ -297,14 +296,13 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Create a new JNLPClassLoader from the specified file.
      *
-     * @param file the JNLP file
-     * @param policy the UpdatePolicy for this class loader
-     * @param mainName name of the application's main class
+     * @param file           the JNLP file
+     * @param policy         the UpdatePolicy for this class loader
+     * @param mainName       name of the application's main class
      * @param enableCodeBase switch whether this classloader can search in
-     * codebase or not
+     *                       codebase or not
      * @throws net.sourceforge.jnlp.LaunchException when need to kill an app
-     * comes.
-     *
+     *                                              comes.
      */
     protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
@@ -416,8 +414,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloaders can also be constructed simply to merge its resources into
      * another classloader.
      *
-     * @param file the file to load classes for
-     * @param policy the update policy to use when downloading resources
+     * @param file     the file to load classes for
+     * @param policy   the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
     private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
@@ -462,10 +460,10 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns a JNLP classloader for the specified JNLP file.
      *
-     * @param file the file to load classes for
-     * @param policy the update policy to use when downloading resources
+     * @param file           the file to load classes for
+     * @param policy         the update policy to use when downloading resources
      * @param enableCodeBase true if codebase can be searched (ok for
-     * applets,false for apps)
+     *                       applets,false for apps)
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
@@ -476,11 +474,11 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns a JNLP classloader for the specified JNLP file.
      *
-     * @param file the file to load classes for
-     * @param policy the update policy to use when downloading resources
-     * @param mainName Overrides the main class name of the application
+     * @param file           the file to load classes for
+     * @param policy         the update policy to use when downloading resources
+     * @param mainName       Overrides the main class name of the application
      * @param enableCodeBase ue if codebase can be searched (ok for
-     * applets,false for apps)
+     *                       applets,false for apps)
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
@@ -524,16 +522,16 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns a JNLP classloader for the JNLP file at the specified location.
      *
-     * @param location the file's location
-     * @param uniqueKey key to manage applets/applications in shared vm
-     * @param version the file's version
-     * @param settings settings of parser
-     * @param policy the update policy to use when downloading resources
-     * @param mainName Overrides the main class name of the application
+     * @param location       the file's location
+     * @param uniqueKey      key to manage applets/applications in shared vm
+     * @param version        the file's version
+     * @param settings       settings of parser
+     * @param policy         the update policy to use when downloading resources
+     * @param mainName       Overrides the main class name of the application
      * @param enableCodeBase whether to enable codebase search or not
      * @return classloader of this appp
-     * @throws java.io.IOException when IO fails
-     * @throws ParseException when parsing fails
+     * @throws java.io.IOException                  when IO fails
+     * @throws ParseException                       when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
     public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy, String mainName, boolean enableCodeBase)
@@ -888,7 +886,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param jars Jars that are checked to see if they contain the main class
      * @throws LaunchException Thrown if the signed JNLP file, within the main
-     * jar, fails to be verified or does not match
+     *                         jar, fails to be verified or does not match
      */
     void checkForMain(List<JARDesc> jars) throws LaunchException {
 
@@ -966,7 +964,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jarDesc JARDesc of jar
      * @param jarFile the jar file
      * @throws LaunchException thrown if the signed JNLP file, within the main
-     * jar, fails to be verified or does not match
+     *                         jar, fails to be verified or does not match
      */
     private void verifySignedJNLP(JARDesc jarDesc, JarFile jarFile)
             throws LaunchException {
@@ -1461,7 +1459,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * with more than one Java applet, potentially also causing the browser
      * process to hang. More information in the mailing list archives:
      * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
-     *
+     * <p>
      * Affected fields: available, classpaths, jarIndexes, jarEntries,
      * jarLocationSecurityMap
      */
@@ -1572,7 +1570,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Adds a new JARDesc into this classloader.
      *
-     * @param desc the JARDesc for the new jar
+     * @param desc         the JARDesc for the new jar
      * @param updatePolicy the UpdatePolicy for the resource
      */
     private void addNewJar(final JARDesc desc, UpdatePolicy updatePolicy) {
@@ -1652,11 +1650,11 @@ public class JNLPClassLoader extends URLClassLoader {
                     final String fName = name;
                     return AccessController.doPrivileged(
                             new PrivilegedExceptionAction<Class<?>>() {
-                        @Override
-                        public Class<?> run() throws ClassNotFoundException {
-                            return JNLPClassLoader.super.findClass(fName);
-                        }
-                    }, getAccessControlContextForClassLoading());
+                                @Override
+                                public Class<?> run() throws ClassNotFoundException {
+                                    return JNLPClassLoader.super.findClass(fName);
+                                }
+                            }, getAccessControlContextForClassLoading());
                 } else {
                     return loader.findClass(name);
                 }
@@ -1782,11 +1780,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 try {
                     e = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<Enumeration<URL>>() {
-                        @Override
-                        public Enumeration<URL> run() throws IOException {
-                            return JNLPClassLoader.super.findResources(fName);
-                        }
-                    }, getAccessControlContextForClassLoading());
+                                @Override
+                                public Enumeration<URL> run() throws IOException {
+                                    return JNLPClassLoader.super.findResources(fName);
+                                }
+                            }, getAccessControlContextForClassLoading());
                 } catch (PrivilegedActionException pae) {
                 }
             } else {
@@ -1797,15 +1795,15 @@ public class JNLPClassLoader extends URLClassLoader {
             try {
                 lresources.addAll(AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Collection<URL>>() {
-                    @Override
-                    public Collection<URL> run() {
-                        List<URL> resources = new ArrayList<>();
-                        while (fURLEnum != null && fURLEnum.hasMoreElements()) {
-                            resources.add(fURLEnum.nextElement());
-                        }
-                        return resources;
-                    }
-                }, getAccessControlContextForClassLoading()));
+                            @Override
+                            public Collection<URL> run() {
+                                List<URL> resources = new ArrayList<>();
+                                while (fURLEnum != null && fURLEnum.hasMoreElements()) {
+                                    resources.add(fURLEnum.nextElement());
+                                }
+                                return resources;
+                            }
+                        }, getAccessControlContextForClassLoading()));
             } catch (PrivilegedActionException pae) {
             }
         }
@@ -1852,7 +1850,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @return the classloader that resources were added to, or null
      * @throws LaunchException Thrown if the signed JNLP file, within the main
-     * jar, fails to be verified or does not match
+     *                         jar, fails to be verified or does not match
      */
     protected JNLPClassLoader addNextResource() throws LaunchException {
         if (available.isEmpty()) {
@@ -1878,6 +1876,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     // this part compatibility with previous classloader
+
     /**
      * @return title if available. Substitutions if not.
      * @deprecated
@@ -2032,7 +2031,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
 
-
     /**
      * Increments loader use count by 1
      *
@@ -2090,8 +2088,8 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Downloads and initializes jars into this loader.
      *
-     * @param ref Path of the launch or extension JNLP File containing the
-     * resource. If null, main JNLP's file location will be used instead.
+     * @param ref  Path of the launch or extension JNLP File containing the
+     *             resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the path.
      * @throws LaunchException
      */
@@ -2108,10 +2106,10 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Manages DownloadService jars which are not mentioned in the JNLP file
      *
-     * @param ref Path to the resource.
+     * @param ref     Path to the resource.
      * @param version The version of resource. If null, no version is specified.
-     * @param action The action to perform with the resource. Either
-     * DOWNLOADTOCACHE, REMOVEFROMCACHE, or CHECKCACHE.
+     * @param action  The action to perform with the resource. Either
+     *                DOWNLOADTOCACHE, REMOVEFROMCACHE, or CHECKCACHE.
      * @return true if CHECKCACHE and the resource is cached.
      */
     boolean manageExternalJars(URL ref, String version, DownloadAction action) {
@@ -2151,7 +2149,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     /**
      * Decrements loader use count by 1
-     *
+     * <p>
      * If count reaches 0, loader is removed from list of available loaders
      *
      * @throws SecurityException if caller is not trusted
@@ -2178,12 +2176,12 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns an appropriate AccessControlContext for loading classes in the
      * running instance.
-     *
+     * <p>
      * The default context during class-loading only allows connection to
      * codebase. However applets are allowed to load jars from arbitrary
      * locations and the codebase only access falls short if a class from one
      * location needs a class from another.
-     *
+     * <p>
      * Given protected access since CodeBaseClassloader uses this function too.
      *
      * @return The appropriate AccessControlContext for loading classes for this
@@ -2336,16 +2334,16 @@ public class JNLPClassLoader extends URLClassLoader {
                             codebaseHost);
                 }
             } else /*
-                 * Various combinations of the jars being signed and <security> tags being
-                 * present are possible. They are treated as follows
-                 *
-                 * Jars          JNLP File         Result
-                 *
-                 * Signed        <security>        Appropriate Permissions
-                 * Signed        no <security>     Sandbox
-                 * Unsigned      <security>        Error
-                 * Unsigned      no <security>     Sandbox
-                 *
+             * Various combinations of the jars being signed and <security> tags being
+             * present are possible. They are treated as follows
+             *
+             * Jars          JNLP File         Result
+             *
+             * Signed        <security>        Appropriate Permissions
+             * Signed        no <security>     Sandbox
+             * Unsigned      <security>        Error
+             * Unsigned      no <security>     Sandbox
+             *
              */ if (!runInSandbox && !classLoader.getSigning()
                     && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                 if (classLoader.jcv.allJarsSigned()) {
@@ -2360,7 +2358,7 @@ public class JNLPClassLoader extends URLClassLoader {
             } else return consultResult(codebaseHost);
         }
 
-        private SecurityDesc consultResult(URL codebaseHost){
+        private SecurityDesc consultResult(URL codebaseHost) {
             if (!runInSandbox && classLoader.getSigning()) {
                 return classLoader.file.getSecurity();
             } else {
@@ -2488,12 +2486,12 @@ public class JNLPClassLoader extends URLClassLoader {
             try {
                 return AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Class<?>>() {
-                    public Class<?> run() throws ClassNotFoundException {
-                        Class<?> c = CodeBaseClassLoader.super.findClass(name);
-                        parentJNLPClassLoader.checkPartialSigningWithUser();
-                        return c;
-                    }
-                }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                            public Class<?> run() throws ClassNotFoundException {
+                                Class<?> c = CodeBaseClassLoader.super.findClass(name);
+                                parentJNLPClassLoader.checkPartialSigningWithUser();
+                                return c;
+                            }
+                        }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
             } catch (PrivilegedActionException pae) {
                 notFoundResources.put(name, super.getURLs());
                 throw new ClassNotFoundException("Could not find class " + name, pae);
@@ -2516,7 +2514,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         /**
          * Returns the output of super.findLoadedClass().
-         *
+         * <p>
          * The method is renamed because ClassLoader.findLoadedClass() is final
          *
          * @param name The name of the class to find
@@ -2572,10 +2570,10 @@ public class JNLPClassLoader extends URLClassLoader {
                     final String fName = name;
                     url = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<URL>() {
-                        public URL run() {
-                            return CodeBaseClassLoader.super.findResource(fName);
-                        }
-                    }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                                public URL run() {
+                                    return CodeBaseClassLoader.super.findResource(fName);
+                                }
+                            }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
                 } catch (PrivilegedActionException pae) {
                 }
 

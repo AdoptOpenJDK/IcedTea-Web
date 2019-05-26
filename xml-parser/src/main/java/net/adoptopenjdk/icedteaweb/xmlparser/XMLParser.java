@@ -58,7 +58,7 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
 
 /**
  * A gateway to the actual implementation of the parsers.
- *
+ * <p>
  * Used by net.sourceforge.jnlp.Parser
  */
 public class XMLParser {
@@ -90,7 +90,7 @@ public class XMLParser {
             xml.parseFromReader(sanitizeXml(isr));
             return new Node(xml);
         } catch (Exception ex) {
-            throw new ParseException("PBadXML "+ ex);
+            throw new ParseException("PBadXML: " + ex.getLocalizedMessage());
         }
     }
 
@@ -191,7 +191,7 @@ public class XMLParser {
      * false, sequences of whitespace characters are turned into a single space
      * character.
      *
-     * @param node the node with text under it
+     * @param node            the node with text under it
      * @param preserveSpacing if true, preserve whitespace
      */
     public static String getSpanText(final Node node, final boolean preserveSpacing) {
@@ -222,7 +222,7 @@ public class XMLParser {
             try {
                 return new URL(source.toString() + "/");
             } catch (MalformedURLException ex) {
-                throw new IllegalArgumentException("Could not add slash to malformed URL: "+ source.toString(), ex);
+                throw new IllegalArgumentException("Could not add slash to malformed URL: " + source.toString(), ex);
             }
         }
 
@@ -230,12 +230,11 @@ public class XMLParser {
     }
 
     /**
+     * @param node         the node
+     * @param name         the attribute
+     * @param defaultValue default if no such attribute
      * @return an attribute or the specified defaultValue if there is no such
      * attribute.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default if no such attribute
      */
     public static String getAttribute(final Node node, final String name, final String defaultValue) {
         Assert.requireNonNull(node, "node");
@@ -250,13 +249,12 @@ public class XMLParser {
     }
 
     /**
+     * @param node         the node
+     * @param name         the attribute
+     * @param defaultValue default value
      * @return the same result as getAttribute except that if strict mode is
      * enabled or the default value is null a parse exception is thrown instead
      * of returning the default value.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default value
      * @throws ParseException if the attribute does not exist or is empty
      */
     public static String getRequiredAttribute(final Node node, final String name, final String defaultValue, final boolean strict) throws ParseException {
@@ -264,7 +262,9 @@ public class XMLParser {
 
         if (result == null || result.length() == 0) {
             if (strict || defaultValue == null) {
-                throw new ParseException("PNeedsAttribute "+node.getNodeName().getName()+name);
+                throw new ParseException("PNeedsAttribute: " +
+                        "Node name: " + node.getNodeName().getName() +
+                        "Name: " + name);
             }
         }
 
@@ -276,12 +276,11 @@ public class XMLParser {
     }
 
     /**
-     * @return the same result as getURL except that a ParseException is thrown
-     * if the attribute is null or empty.
-     *
      * @param node the node
      * @param name the attribute containing an href
      * @param base the base URL
+     * @return the same result as getURL except that a ParseException is thrown
+     * if the attribute is null or empty.
      * @throws ParseException if the JNLP file is invalid
      */
     public static URL getRequiredURL(final Node node, final String name, final URL base, final boolean strict) throws ParseException {
@@ -293,13 +292,12 @@ public class XMLParser {
     }
 
     /**
-     * @return a URL object from a href string relative to the code base. If the
-     * href denotes a relative URL, it must reference a location that is a
-     * subdirectory of the codebase.
-     *
      * @param node the node
      * @param name the attribute containing an href
      * @param base the base URL
+     * @return a URL object from a href string relative to the code base. If the
+     * href denotes a relative URL, it must reference a location that is a
+     * subdirectory of the codebase.
      * @throws ParseException if the JNLP file is invalid
      */
     public static URL getURL(final Node node, final String name, final URL base, final boolean strict) throws ParseException {
@@ -338,7 +336,10 @@ public class XMLParser {
                 // check for going above the codebase
                 if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
                     if (strict) {
-                        throw new ParseException("PUrlNotInCodebase "+nodeName+href+base);
+                        throw new ParseException("PUrlNotInCodebase: " +
+                                "Node name: " + nodeName +
+                                "Href: " + href +
+                                "Base: " + base);
                     }
                 }
                 return result;
@@ -346,9 +347,14 @@ public class XMLParser {
 
         } catch (MalformedURLException ex) {
             if (base == null) {
-                throw new ParseException("PBadNonrelativeUrl "+nodeName+href);
+                throw new ParseException("PBadNonrelativeUrl: " +
+                        "Node Name: " + nodeName +
+                        "Href: " + href);
             } else {
-                throw new ParseException("PBadRelativeUrl "+nodeName+href+base);
+                throw new ParseException("PBadRelativeUrl: " +
+                        "Node Name: " + nodeName +
+                        "Href: " + href +
+                        "Base: " + base);
             }
         }
     }
