@@ -60,6 +60,7 @@ import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -404,9 +405,9 @@ public class JNLPFile {
             throw new MissingTitleException();
         }
         if (title.trim().isEmpty()) {
-            LOG.warn("PMissingElement " + "PMissingTitle");
-            title = "PMissingMandatorySubstitution " + "PMissingTitle";
-            LOG.warn("PMissingMandatoryWarning " + "PMissingTitle" + ": {}", title);
+            LOG.warn("Missing Element and Missing Title");
+            title = "Missing Mandatory Substitution and Missing Title";
+            LOG.warn("Missing Mandatory Warning and MissingTitle" + ": {}", title);
         } else {
             LOG.info("Acceptable title tag found, contains: {}", title);
         }
@@ -469,9 +470,9 @@ public class JNLPFile {
             throw new MissingVendorException();
         }
         if (vendor.trim().isEmpty()) {
-            LOG.warn("PMissingElement " + "PMissingVendor");
-            vendor = "PMissingMandatorySubstitution " + "PMissingVendor";
-            LOG.warn("PMissingMandatoryWarning " + "PMissingVendor" + ": " + vendor);
+            LOG.warn("Missing Element and Missing Vendor");
+            vendor = "Missing Mandatory Substitution and Missing Vendor";
+            LOG.warn("Missing Mandatory Warning and MissingVendor" + ": " + vendor);
         } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
@@ -679,16 +680,14 @@ public class JNLPFile {
 
                 for (ResourcesDesc rescDesc : resources) {
                     boolean hasUsableLocale = false;
-                    for (Match match : Match.values()) {
+                    for (final Match match : Match.values()) {
                         hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
                     }
                     if (hasUsableLocale
-                            && stringMatches(os, rescDesc.getOS())
-                            && stringMatches(arch, rescDesc.getArch())) {
-                        List<T> ll = rescDesc.getResources(launchType);
+                            && hasPrefixMatch(os, rescDesc.getOS())
+                            && hasPrefixMatch(arch, rescDesc.getArch())) {
+                        final List<T> ll = rescDesc.getResources(launchType);
                         result.addAll(ll);
-                    } else {
-                        //those are skipped
                     }
                 }
 
@@ -731,8 +730,8 @@ public class JNLPFile {
                 hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
             }
             if (hasUsableLocale
-                    && stringMatches(os, rescDesc.getOS())
-                    && stringMatches(arch, rescDesc.getArch())) {
+                    && hasPrefixMatch(os, rescDesc.getOS())
+                    && hasPrefixMatch(arch, rescDesc.getArch())) {
                 matchingResources.add(rescDesc);
             }
         }
@@ -760,7 +759,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an application.
-     *
      * @throws UnsupportedOperationException if there is no application information
      */
     public ApplicationDesc getApplication() {
@@ -772,7 +770,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for a component.
-     *
      * @throws UnsupportedOperationException if there is no component information
      */
     public ComponentDesc getComponent() {
@@ -784,7 +781,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an installer.
-     *
      * @throws UnsupportedOperationException if there is no installer information
      */
     public InstallerDesc getInstaller() {
@@ -836,34 +832,6 @@ public class JNLPFile {
         defaultOS = os;
         defaultArch = arch;
         defaultLocale = locale;
-    }
-
-    /**
-     * @param prefixStr the prefix string
-     * @param available the strings to test
-     * @return true if prefixStr is a prefix of any strings in
-     * available, or if available is empty or null.
-     */
-    static boolean stringMatches(String prefixStr, String[] available) {
-        if (available == null || available.length == 0) {
-            return true;
-        }
-
-        for (String candidate : available) {
-            String trimmedPrefix = null;
-            if (prefixStr != null) {
-                trimmedPrefix = prefixStr.split("\\s+")[0];
-            }
-            String trimmedCandidate = null;
-            if (candidate != null) {
-                trimmedCandidate = candidate.split("\\s+")[0];
-            }
-            if (trimmedCandidate != null && trimmedCandidate.startsWith(trimmedPrefix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

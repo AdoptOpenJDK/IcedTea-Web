@@ -75,9 +75,9 @@ public class AppletExtractor {
 
     private final URL html;
     private static final String[] APPLETS = new String[]{
-        "applet", "APPLET", "Applet",
-        "object", "OBJECT", "Object",
-        "embed", "EMBED", "Embed"};
+            "applet", "APPLET", "Applet",
+            "object", "OBJECT", "Object",
+            "embed", "EMBED", "Embed"};
     private final ParserSettings ps;
 
     public AppletExtractor(final URL html) {
