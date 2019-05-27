@@ -8,13 +8,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.head;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static java.nio.file.Files.find;
 import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
+import static org.junit.Assert.assertTrue;
 
 /**
  * TODO: Scenario Description
@@ -55,9 +62,17 @@ public class Testcase1Test implements IntegrationTest {
     }
 
     @Test(timeout = 5_000)
-    public void testSuccessfullyLaunchSimpleJavaApplication() {
+    public void testSuccessfullyLaunchSimpleJavaApplication() throws IOException {
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
 
         Boot.main(args);
+
+        // control cache content
+        try (Stream<Path> stream = find(Paths.get(tmpItwHome.getCacheHome().getAbsolutePath() + "/cache"), 100,
+                (path, attr) -> path.getFileName().toString().equals(JAR_NAME))) {
+            assertTrue(stream.findAny().isPresent());
+        }
+
+        // control application output
     }
 }
