@@ -29,6 +29,10 @@ public class MapBuilder {
         return with(Integer.toString(value));
     }
 
+    public MapBuilder with(Class<?> value) {
+        return with(value.getName());
+    }
+
     public MapBuilder with(String value) {
         map.put(nextKey, value);
         return this;

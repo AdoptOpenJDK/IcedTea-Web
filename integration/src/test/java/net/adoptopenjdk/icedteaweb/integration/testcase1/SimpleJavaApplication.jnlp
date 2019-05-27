@@ -15,6 +15,6 @@
         <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
     </resources>
 
-    <application-desc main-class="net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication">
+    <application-desc main-class="${MAIN_CLASS}">
     </application-desc>
 </jnlp>

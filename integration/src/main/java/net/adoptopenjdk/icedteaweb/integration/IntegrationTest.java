@@ -16,6 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public interface IntegrationTest {
 
     String PORT = "PORT";
+    String MAIN_CLASS = "MAIN_CLASS";
 
     default byte[] fileContent(String file) throws IOException {
         try (final InputStream in = getClass().getResourceAsStream(file)) {

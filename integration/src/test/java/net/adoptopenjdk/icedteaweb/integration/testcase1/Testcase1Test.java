@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.testcase1;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
+import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,7 +47,10 @@ public class Testcase1Test implements IntegrationTest {
                 ok()
         ));
         wireMock.stubFor(get(urlEqualTo("/" + JNLP_NAME)).willReturn(
-                aResponse().withBody(fileContent(JNLP_NAME, replace(PORT).with(wireMock.port())))
+                aResponse().withBody(fileContent(JNLP_NAME,
+                        replace(PORT).with(wireMock.port())
+                                .and(MAIN_CLASS).with(SimpleJavaApplication.class))
+                )
         ));
 
         wireMock.stubFor(head(urlEqualTo("/resources/" + JAR_NAME)).willReturn(
