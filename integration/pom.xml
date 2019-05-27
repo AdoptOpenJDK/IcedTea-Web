@@ -67,7 +67,7 @@
                         </goals>
                         <phase>process-test-classes</phase>
                         <configuration>
-                            <outputDirectory>${build.outputDirectory}</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.build.testOutputDirectory}</directory>
