@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -64,6 +65,11 @@ public class IOUtils {
         copy(inputStream, outputStream);
         return outputStream.toByteArray();
     }
+
+    public static String readContentAsString(final InputStream inputStream, final Charset encoding) throws IOException {
+        return new String(readContent(inputStream), encoding);
+    }
+
 
     public static void writeContent(final OutputStream outputStream, final byte[] rawData) throws IOException {
         Assert.requireNonNull(outputStream, "outputStream");

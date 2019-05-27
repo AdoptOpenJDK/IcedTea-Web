@@ -4,15 +4,16 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
 import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
+import java.io.InputStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -20,8 +21,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.head;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static java.nio.file.Files.find;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
+import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.HELLO_FILE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -72,11 +79,9 @@ public class Testcase1Test implements IntegrationTest {
         Boot.main(args);
 
         // control cache content
-        try (Stream<Path> stream = find(Paths.get(tmpItwHome.getCacheHome().getAbsolutePath() + "/cache"), 100,
-                (path, attr) -> path.getFileName().toString().equals(JAR_NAME))) {
-            assertTrue(stream.findAny().isPresent());
-        }
+        assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
 
         // control application output
+        assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
     }
 }
