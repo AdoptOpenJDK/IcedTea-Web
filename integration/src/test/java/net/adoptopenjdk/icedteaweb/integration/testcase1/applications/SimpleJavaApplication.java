@@ -11,6 +11,25 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * This class represents a basic IcedTea-Web managed application. It is intended to be launched by integration
+ * tests to test the launching and application environment of IcedTea-Web (see the launch sequence description
+ * in JSR-56, section 5.1 Launch Sequence for details).
+ *
+ * <p></p>
+ *
+ * The basic functionality of this class is intended to test the proper download, update and execution according
+ * to the definitions in the JNLP files used by the integration tests.
+ *
+ * <p></p>
+ *
+ * Functionality provided:
+ * <ul>
+ * <li> store the system properties to a file using {@link PersistenceService} </li>
+ * <li> store the system environment to a file using {@link PersistenceService}</li>
+ * <li> store this program's arguments to a file using {@link PersistenceService}</li>
+ * </ul>
+ */
 public class SimpleJavaApplication {
 
     public static final String HELLO_FILE = "hello.txt";

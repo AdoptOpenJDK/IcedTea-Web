@@ -4,7 +4,7 @@
         <title>Simple Java Application</title>
         <vendor>IcedTea</vendor>
         <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
-        <description>This is a simple java application</description>
+        <description>This is a simple java application with properties</description>
         <offline/>
     </information>
 
@@ -18,7 +18,5 @@
     </resources>
 
     <application-desc main-class="${MAIN_CLASS}">
-        <argument>argument1</argument>
-        <argument>argument2 with spaces</argument>
     </application-desc>
 </jnlp>
