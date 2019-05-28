@@ -105,7 +105,7 @@ public class StringUtils {
         return false;
     }
 
-    public static String substringBeforeLast(String s, String separator) {
+    public static String substringBeforeLast(final String s, final String separator) {
         if (s == null || separator == null || separator.isEmpty() || s.isEmpty()) {
             return s;
         }
