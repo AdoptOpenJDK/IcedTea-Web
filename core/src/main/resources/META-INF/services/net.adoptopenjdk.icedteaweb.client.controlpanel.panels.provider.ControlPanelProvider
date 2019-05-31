@@ -1,0 +1,10 @@
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.DebugSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.DesktopSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.JvmSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.NetworkSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.PolicySettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.SecuritySettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.UnsignedAppletsTrustingListPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.AboutPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.CacheSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.CertificatesSettingsPanelProvider

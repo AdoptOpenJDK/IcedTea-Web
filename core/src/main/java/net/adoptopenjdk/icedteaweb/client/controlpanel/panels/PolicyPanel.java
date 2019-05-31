@@ -34,9 +34,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.adoptopenjdk.icedteaweb.client.controlpanel;
+package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditorWindow;
@@ -50,7 +51,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Component;
@@ -64,6 +64,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
@@ -76,26 +77,21 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class PolicyPanel extends NamedBorderPanel {
 
-    private final static Logger LOG = LoggerFactory.getLogger(PolicyPanel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PolicyPanel.class);
 
     private PolicyEditorWindow policyEditor = null;
-    private final DeploymentConfiguration config;
 
-    public PolicyPanel(final JFrame frame, final DeploymentConfiguration config) {
+    public PolicyPanel(final DeploymentConfiguration config) {
         super(R("CPHeadPolicy"), new GridBagLayout());
-        this.config = config;
-        addComponents(frame);
-    }
 
-    private void addComponents(final JFrame frame) {
-        JLabel aboutLabel = new JLabel("<html>" + R("CPPolicyDetail") + "</html>");
+        final JLabel aboutLabel = new JLabel("<html>" + R("CPPolicyDetail") + "</html>");
 
         final String fileUrlString = PathsAndFiles.JAVA_POLICY.getFullPath(config);
         final JButton simpleEditorButton = new JButton(R("CPButSimpleEditor"));
-        simpleEditorButton.addActionListener(new LaunchSimplePolicyEditorAction(frame, fileUrlString));
+        simpleEditorButton.addActionListener(new LaunchSimplePolicyEditorAction(fileUrlString));
 
         final JButton advancedEditorButton = new JButton(R("CPButAdvancedEditor"));
-        advancedEditorButton.addActionListener(new LaunchPolicyToolAction(frame, fileUrlString));
+        advancedEditorButton.addActionListener(new LaunchPolicyToolAction(fileUrlString));
 
         final String pathPart = localFilePathFromUrlString(fileUrlString);
         simpleEditorButton.setToolTipText(R("CPPolicyTooltip", FileUtils.displayablePath(pathPart, 60)));
@@ -139,26 +135,26 @@ public class PolicyPanel extends NamedBorderPanel {
 
     /**
      * Launch the policytool for a specified file path
-     * @param frame a {@link JFrame} to act as parent to warning dialogs which may appear
+     * @param parentComponent a {@link Component} to act as parent to warning dialogs which may appear
      * @param filePath a {@link String} representing the path to the file to be opened
      */
-    private static void launchPolicyTool(final JFrame frame, final String filePath) {
+    private static void launchPolicyTool(final Component parentComponent, final String filePath) {
         try {
             final File policyFile = new File(filePath).getCanonicalFile();
             final OpenFileResult result = FileUtils.testFilePermissions(policyFile);
             if (result == OpenFileResult.SUCCESS) {
-                policyToolLaunchHelper(frame, filePath);
+                policyToolLaunchHelper(parentComponent, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
                 LOG.warn("Opening user JNLP policy read-only");
-                FileDialogFactory.showReadOnlyDialog(frame);
-                policyToolLaunchHelper(frame, filePath);
+                FileDialogFactory.showReadOnlyDialog(parentComponent);
+                policyToolLaunchHelper(parentComponent, filePath);
             } else {
                 LOG.error("Could not open user JNLP policy");
-                FileDialogFactory.showCouldNotOpenFileDialog(frame, policyFile.getPath(), result);
+                FileDialogFactory.showCouldNotOpenFileDialog(parentComponent, policyFile.getPath(), result);
             }
         } catch (IOException e) {
             LOG.error("Could not open user JNLP policy", e);
-            FileDialogFactory.showCouldNotOpenFilepathDialog(frame, filePath);
+            FileDialogFactory.showCouldNotOpenFilepathDialog(parentComponent, filePath);
         }
     }
 
@@ -187,10 +183,10 @@ public class PolicyPanel extends NamedBorderPanel {
      * We do this in a new {@link Thread} to ensure that the fallback launch does not
      * block the AWT thread, and neither does ProcessBuilder#start() in case it happens
      * to be synchronous on the current system.
-     * @param frame a {@link JFrame} to act as parent to warning dialogs which may appear
+     * @param parentComponent a {@link Component} to act as parent to warning dialogs which may appear
      * @param filePath a {@link String} representing the path to the file to be opened
      */
-    private static void policyToolLaunchHelper(final JFrame frame, final String filePath) {
+    private static void policyToolLaunchHelper(final Component parentComponent, final String filePath) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +200,7 @@ public class PolicyPanel extends NamedBorderPanel {
                         reflectivePolicyToolLaunch(filePath);
                     } catch (Exception e) {
                         LOG.error("Could not open user JNLP policy", e);
-                        FileDialogFactory.showCouldNotOpenDialog(frame, R("CPPolicyEditorNotFound"));
+                        FileDialogFactory.showCouldNotOpenDialog(parentComponent, R("CPPolicyEditorNotFound"));
                     }
                 }
             }
@@ -251,57 +247,56 @@ public class PolicyPanel extends NamedBorderPanel {
         }
     }
 
+
+    private Component getParentComponentOfSource(final ActionEvent event) {
+        return Optional.ofNullable(event)
+                .map(e -> e.getSource())
+                .filter(s -> s instanceof Component)
+                .map(s -> (Component) s)
+                .orElse(null);
+    }
+
     /**
      * Implements the action to be performed when the "Advanced" button is clicked
      */
     private class LaunchPolicyToolAction implements ActionListener {
-        private final JFrame frame;
+
         private final String fileUrlString;
 
-        public LaunchPolicyToolAction(final JFrame frame, final String fileUrlString) {
+        public LaunchPolicyToolAction(final String fileUrlString) {
             this.fileUrlString = fileUrlString;
-            this.frame = frame;
         }
 
         @Override
         public void actionPerformed(final ActionEvent event) {
+            final Component parentComponent = getParentComponentOfSource(event);
             try {
                 final URL fileUrl = new URL(fileUrlString);
-                SwingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        launchPolicyTool(frame, fileUrl.getPath());
-                    }
-                });
+                SwingUtils.invokeLater(() -> launchPolicyTool(parentComponent, fileUrl.getPath()));
             } catch (MalformedURLException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                FileDialogFactory.showCouldNotOpenFilepathDialog(frame, fileUrlString);
+                FileDialogFactory.showCouldNotOpenFilepathDialog(parentComponent, fileUrlString);
             }
         }
     }
 
     private class LaunchSimplePolicyEditorAction implements ActionListener {
-        private final JFrame frame;
+
         private final String fileUrlString;
 
-        public LaunchSimplePolicyEditorAction(final JFrame frame, final String fileUrlString) {
+        public LaunchSimplePolicyEditorAction(final String fileUrlString) {
             this.fileUrlString = fileUrlString;
-            this.frame = frame;
         }
 
         @Override
         public void actionPerformed(final ActionEvent event) {
             try {
                 final URL fileUrl = new URL(fileUrlString);
-                SwingUtils.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        launchSimplePolicyEditor(fileUrl.getPath());
-                    }
-                });
+                SwingUtils.invokeLater(() -> launchSimplePolicyEditor(fileUrl.getPath()));
             } catch (MalformedURLException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                FileDialogFactory.showCouldNotOpenFilepathDialog(frame, fileUrlString);
+                final Component parentComponent = getParentComponentOfSource(event);
+                FileDialogFactory.showCouldNotOpenFilepathDialog(parentComponent, fileUrlString);
             }
         }
     }

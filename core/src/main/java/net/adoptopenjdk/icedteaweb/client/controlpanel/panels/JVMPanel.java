@@ -34,10 +34,12 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.adoptopenjdk.icedteaweb.client.controlpanel;
+package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.DocumentAdapter;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -87,13 +89,13 @@ public class JVMPanel extends NamedBorderPanel {
     private File lastPath = new File("/usr/lib/jvm/java/jre/");
     JTextField testFieldArgumentsExec;
 
-    JVMPanel(DeploymentConfiguration config) {
+    public JVMPanel(DeploymentConfiguration config) {
         super(Translator.R("CPHeadJVMSettings"), new GridBagLayout());
         this.config = config;
         addComponents();
     }
 
-    void resetTestFieldArgumentsExec() {
+    public void resetTestFieldArgumentsExec() {
         testFieldArgumentsExec.setText("");
     }
 
