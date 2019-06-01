@@ -132,8 +132,8 @@ public class JNLPAppVerifier implements AppVerifier {
             }
         }
 
-        throw new LaunchException(null, null, "LSFatal", "LCLaunching",
-                R("LCancelOnUserRequest"), "");
+        throw new LaunchException(null, null, "Fatal", "Launch Error",
+                "Cancelled on user request.", "");
     }
 
     /**

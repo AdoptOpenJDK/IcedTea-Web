@@ -50,7 +50,7 @@ public class AppletsFilter {
 
     private List<Element> getAppletElements() throws ParserConfigurationException, SAXException, IOException {
         if (found.isEmpty()) {
-            throw new RuntimeException("HTMLnoneFound");
+            throw new RuntimeException("No applet found on this html page (supported are object, embed and applet tags)");
         }
         List<Integer> id = sanitizeFilter();
         List<Element> r = new ArrayList<>(found.size());
@@ -68,7 +68,7 @@ public class AppletsFilter {
         List<Integer> r = new ArrayList<>(found.size());
         if (ids.isEmpty()) {
             if (found.size() > 1) {
-                LOG.info("HTMLmoreThenOne", found.size());
+                LOG.info("More then one ({}) applets found. Using  first. You can specify ''all'' or numbers to specify applets you want to run.", found.size());
             }
             r.add(0);
             return r;

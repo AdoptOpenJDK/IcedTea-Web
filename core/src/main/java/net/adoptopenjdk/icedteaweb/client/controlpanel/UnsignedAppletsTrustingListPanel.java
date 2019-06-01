@@ -617,13 +617,13 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
                     Pattern p = Pattern.compile(unsignedAppletActionEntry.getDocumentBase().getRegEx());
                     p.matcher("someInput").find();
                 } else {
-                    throw new RuntimeException("APPEXTSECguiPanelEmptyDoc");
+                    throw new RuntimeException("All document-bases must be full");
                 }
                 if (unsignedAppletActionEntry.getCodeBase() != null && !unsignedAppletActionEntry.getCodeBase().getRegEx().trim().isEmpty()) {
                     Pattern p = Pattern.compile(unsignedAppletActionEntry.getCodeBase().getRegEx());
                     p.matcher("someInput").find();
                 } else {
-                    throw new RuntimeException("APPEXTSECguiPanelEmptyCode");
+                    throw new RuntimeException("All code-bases must be full");
                 }
                 UnsignedAppletActionEntry.createArchivesString(UnsignedAppletActionEntry.createArchivesList(UnsignedAppletActionEntry.createArchivesString(unsignedAppletActionEntry.getArchives())));
             }

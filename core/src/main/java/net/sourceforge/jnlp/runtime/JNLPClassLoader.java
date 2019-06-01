@@ -737,8 +737,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                LaunchException ex = new LaunchException(null, null, "LSFatal",
-                        "LCInit", "LFatalVerification", "LFatalVerificationInfo" + ": " + e.getMessage());
+                LaunchException ex = new LaunchException(null, null, "Fatal",
+                        "Initialization Error", "A fatal error occurred while trying to verify jars.", "An exception has been thrown in class JarCertVerifier. Being unable to read the cacerts or trusted.certs files could be a possible cause for this exception." + ": " + e.getMessage());
                 consultCertificateSecurityException(ex);
             }
 
@@ -770,10 +770,10 @@ public class JNLPClassLoader extends URLClassLoader {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, extCnfe);
-                            throw new LaunchException(file, extCnfe, "LSFatal", "LCInit", "LCantDetermineMainClass", "LCantDetermineMainClassInfo");
+                            throw new LaunchException(file, extCnfe, "Fatal", "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
                         }
                     } else {
-                        throw new LaunchException(file, null, "LSFatal", "LCInit", "LCantDetermineMainClass", "LCantDetermineMainClassInfo");
+                        throw new LaunchException(file, null, "Fatal", "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
                     }
                 }
 
@@ -1020,7 +1020,7 @@ public class JNLPClassLoader extends URLClassLoader {
              * Throws LaunchException if signed JNLP file fails to be verified
              * or fails to match the launching JNLP file
              */
-            LaunchException ex = new LaunchException(file, null, "LSFatal", "LCClient",
+            LaunchException ex = new LaunchException(file, null, "Fatal", "Application Error",
                     "LSignedJNLPFileDidNotMatch", e.getMessage());
             consultCertificateSecurityException(ex);
             /*
@@ -1255,7 +1255,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                         String extractedJarLocation = localFile + ".nested/" + je.getName();
                                         File parentDir = new File(extractedJarLocation).getParentFile();
                                         if (!parentDir.isDirectory() && !parentDir.mkdirs()) {
-                                            throw new RuntimeException("RNestedJarExtration");
+                                            throw new RuntimeException("Unable to extract nested jar.");
                                         }
                                         FileOutputStream extractedJar = new FileOutputStream(extractedJarLocation);
                                         InputStream is = jarFile.getInputStream(je);
@@ -1965,7 +1965,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
         if (sec == null) {
-            LOG.info("LNoSecInstance", source.toString());
+            LOG.info("Error: No security instance for {0}. The application may have trouble continuing", source.toString());
         }
         return sec;
     }
@@ -2347,11 +2347,11 @@ public class JNLPClassLoader extends URLClassLoader {
              */ if (!runInSandbox && !classLoader.getSigning()
                     && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                 if (classLoader.jcv.allJarsSigned()) {
-                    LaunchException ex = new LaunchException(classLoader.file, null, "LSFatal", "LCClient", "LSignedJNLPAppDifferentCerts", "LSignedJNLPAppDifferentCertsInfo");
+                    LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
                     consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 } else {
-                    LaunchException ex = new LaunchException(classLoader.file, null, "LSFatal", "LCClient", "LUnsignedJarWithSecurity", "LUnsignedJarWithSecurityInfo");
+                    LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
                     consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 }
@@ -2386,7 +2386,7 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException {
             if (runInSandbox && classLoader.security != null
                     && !classLoader.jarLocationSecurityMap.isEmpty()) {
-                throw new LaunchException(classLoader.file, null, "LSFatal", "LCInit", "LRunInSandboxError", "LRunInSandboxErrorInfo");
+                throw new LaunchException(classLoader.file, null, "Fatal", "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
             }
 
             JNLPRuntime.reloadPolicy();

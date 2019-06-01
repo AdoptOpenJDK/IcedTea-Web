@@ -329,9 +329,9 @@ public final class DeploymentConfiguration {
         for (final String key : initial.keySet()) {
             final Setting<String> s = initial.get(key);
             if (!(s.getName().equals(key))) {
-                LOG.info("DCInternal", "key " + key + " does not match setting name " + s.getName());
+                LOG.info("Internal error: {}", "key " + key + " does not match setting name " + s.getName());
             } else if (!defaults.containsKey(key)) {
-                LOG.info("DCUnknownSettingWithName", key);
+                LOG.info("Property \"{}\" is unknown.", key);
             } else {
                 final ValueValidator checker = defaults.get(key).getValidator();
                 if (checker == null) {
@@ -341,7 +341,7 @@ public final class DeploymentConfiguration {
                 try {
                     checker.validate(s.getValue());
                 } catch (final IllegalArgumentException e) {
-                    LOG.error("DCIncorrectValue", key, s.getValue(), checker.getPossibleValues(), e);
+                    LOG.error("Property \"{}\" has incorrect value \"{}\". Possible values {}.", key, s.getValue(), checker.getPossibleValues(), e);
                     s.setValue(s.getDefaultValue());
                 }
             }

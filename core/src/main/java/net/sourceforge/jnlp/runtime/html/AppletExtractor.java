@@ -99,10 +99,10 @@ public class AppletExtractor {
                 final MalformedXMLParser parser = new MalformedXMLParser();
                 return parser.preprocessXml(new XmlStreamReader(is));
             } else {
-                LOG.warn("TAGSOUP Html Not Used...", CommandLineOptions.XML.getOption());
+                LOG.warn("Tagsoup''s html2xml cleaning is Disabled. Remove {}. Parsing will probably fail.", CommandLineOptions.XML.getOption());
             }
         } catch (Exception ex) {
-            LOG.error("TAGSOUP Html Broken...", ex);
+            LOG.error("Tagsoup''s html2xml cleaning not loaded. Install tagsoup (and build ITW against). Parsing will probably fail.", ex);
         }
         return new XmlStreamReader(is);
     }

@@ -278,7 +278,7 @@ public class JavaConsole implements ObservableMessagesProvider {
                 printMemoryInfo();
                 LOG.info("Performing Garbage Collection....");
                 System.gc();
-                LOG.info("ButDone");
+                LOG.info("Done");
                 printMemoryInfo();
                 updateModel();
             }
@@ -291,9 +291,9 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                LOG.info("CONSOLErunningFinalizers");
+                LOG.info("Running finalization....");
                 Runtime.getRuntime().runFinalization();
-                LOG.info("ButDone");
+                LOG.info("Done");
                 printMemoryInfo();
                 updateModel();
             }
@@ -457,10 +457,10 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void printClassLoaders() {
         if (classLoaderInfoProvider == null) {
-            LOG.debug("CONSOLEnoClassLoaders");
+            LOG.debug("No Classloader info exists in system");
         } else {
             LOG.debug(" ----");
-            LOG.debug("CONSOLEclassLoaders" + ": ");
+            LOG.debug("Available Classloaders" + ": ");
             Set<String> loaders = classLoaderInfoProvider.getLoaderInfo().keySet();
             for (String loader : loaders) {
                 LOG.debug(loader + "\n"
@@ -473,10 +473,10 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void printMemoryInfo() {
         LOG.info(" ----- ");
-        LOG.info("  " + "CONSOLEmemoryInfo" + ":");
-        LOG.info("   " + "CONSOLEmemoryMax" + ":   " + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
-        LOG.info("    " + "CONSOLEmemoryTotal" + ": " + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
-        LOG.info("    " + "CONSOLEmemoryFree" + ":  " + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
+        LOG.info("  " + "Memory Info" + ":");
+        LOG.info("   " + "Max Memory" + ":   " + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
+        LOG.info("    " + "Total Memory" + ": " + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
+        LOG.info("    " + "Free Memory" + ":  " + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
         LOG.info(" ----");
 
     }
@@ -485,7 +485,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
         Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
-            LOG.info("CONSOLEthread" + " " + key.getId() + ": " + key.getName());
+            LOG.info("Thread" + " " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
                 LOG.info("  " + element);
             }

@@ -190,7 +190,7 @@ public class CacheUtil {
             return false;
         }
 
-        LOG.warn("BX Single Cache Cleared...", application);
+        LOG.warn("Clearing cache for: {}", application);
         List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
@@ -201,12 +201,12 @@ public class CacheUtil {
             }
         }
         if (found == 0) {
-            LOG.error("BXSingleCache: Clear Not Found...", application);
+            LOG.error("No ID matching {} found!", application);
         }
         if (found > 1) {
-            LOG.error("BXSingleCache: More Then One Id...", application);
+            LOG.error("More then one ID is matching {}!", application);
         }
-        LOG.info("BXSingleCache: FileCount is ", files);
+        LOG.info("Alerting: {} of files ", files);
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             lruHandler.lock();
@@ -248,7 +248,7 @@ public class CacheUtil {
 
     public static boolean checkToClearCache() {
         if (!okToClearCache()) {
-            LOG.error("Cannot Clear Cache...");
+            LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
             return false;
         }
         return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
@@ -430,7 +430,7 @@ public class CacheUtil {
     public static boolean isCurrent(URL source, Version version, long lastModified) {
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("Not Cacheable: "+source);
+            throw new IllegalArgumentException("{} is not a cacheable resource" + source);
 
         try {
             CacheEntry entry = new CacheEntry(source, version); // could pool this
@@ -456,7 +456,7 @@ public class CacheUtil {
      */
     public static boolean isCached(URL source, Version version) {
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("Not Cacheable: "+source);
+            throw new IllegalArgumentException("{0} is not a cacheable resource" + source);
 
         CacheEntry entry = new CacheEntry(source, version); // could pool this
         boolean result = entry.isCached();
@@ -503,7 +503,7 @@ public class CacheUtil {
         // ensure that version is an version id not version string
 
         if (!isCacheable(source, version))
-            throw new IllegalArgumentException("Not Cacheable: "+source);
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         File cacheFile = null;
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();

@@ -1478,10 +1478,10 @@ public class PolicyEditor extends JPanel {
         final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
-            LOG.debug("PECouldNotOpen");
+            LOG.debug("Unable to open policy file");
         }
         if (ofr == OpenFileResult.CANT_WRITE) {
-            LOG.debug("RFileReadOnly");
+            LOG.debug("Opening file in read-only mode");
         }
 
         try {
@@ -1536,10 +1536,10 @@ public class PolicyEditor extends JPanel {
                     policyEditorController.openAndParsePolicyFile();
                 } catch (final FileNotFoundException fnfe) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, fnfe);
-                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("Unable to open policy file"));
                 } catch (final IOException | PolicyParser.ParsingException e) {
                     LOG.error("RCantOpenFile", policyEditorController.getFile().getPath(), e);
-                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("PECouldNotOpen"));
+                    FileDialogFactory.showCouldNotOpenDialog(PolicyEditor.this, R("Unable to open policy file"));
                 }
                 return null;
             }
@@ -1777,7 +1777,7 @@ public class PolicyEditor extends JPanel {
             try {
                 new URL(codebase);
             } catch (final MalformedURLException e) {
-                throw new IllegalArgumentException(e.getLocalizedMessage());
+                throw new IllegalArgumentException("Invalid URL: {}" + codebase, e);
             }
             return codebase;
         } else {
@@ -1789,7 +1789,7 @@ public class PolicyEditor extends JPanel {
         if (optionParser.hasOption(CommandLineOptions.SIGNEDBY)) {
             final String signedBy = optionParser.getParam(CommandLineOptions.SIGNEDBY);
             if (signedBy.isEmpty()) {
-                throw new IllegalArgumentException("PESignedByEmpty");
+                throw new IllegalArgumentException("SignedBy cannot be empty");
             } else {
                 return signedBy;
             }
@@ -1816,9 +1816,9 @@ public class PolicyEditor extends JPanel {
         final boolean hasFileArgument = optionParser.hasOption(CommandLineOptions.FILE);
         final boolean hasMainArgument = optionParser.mainArgExists();
         if ((hasFileArgument && openDefaultFile) || (hasMainArgument && openDefaultFile)) {
-            throw new IllegalArgumentException("PEDefaultFileFilePathSpecifiedError");
+            throw new IllegalArgumentException("Either -file (or simply a main argument) or -defaultfile may be specified, but not both");
         } else if (hasFileArgument && hasMainArgument) {
-            throw new IllegalArgumentException("PEMainArgAndFileSwitchSpecifiedError");
+            throw new IllegalArgumentException("Either -file (or simply a main argument) or -defaultfile may be specified, but not both");
         }
 
         String filepath = null;

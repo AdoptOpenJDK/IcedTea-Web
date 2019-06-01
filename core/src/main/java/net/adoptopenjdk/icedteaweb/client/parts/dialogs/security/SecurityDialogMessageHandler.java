@@ -226,7 +226,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, eex);
                     keepGoing = false;
                 } catch (IllegalArgumentException eeex) {
-                    LOG.error("HDwrongValue", eeex);
+                    LOG.error("Probably wrong value?", eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

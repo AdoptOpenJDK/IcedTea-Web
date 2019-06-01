@@ -97,7 +97,7 @@ public class CommandLine {
         try {
             config.load(false);
         } catch (ConfigurationException | MalformedURLException e) {
-            LOG.error("RConfigurationFatal", e);
+            LOG.error("Headless check failed. You are forced to run without any graphics. IcedTea-Web can run like this, but your app probably not. This is likely bug in your systemERROR: a fatal error has occurred while loading configuration. Perhaps a global configuration was required but could not be found", e);
         }
     }
 
@@ -190,7 +190,7 @@ public class CommandLine {
         unknownProperties.removeAll(all.keySet());
         if (unknownProperties.size() > 0) {
             for (String property : unknownProperties) {
-                LOG.info("CLUnknownProperty", property);
+                LOG.info("Unknown property-name {}", property);
             }
             return ERROR;
         }
@@ -269,7 +269,7 @@ public class CommandLine {
             try {
                 old.getValidator().validate(value);
             } catch (IllegalArgumentException e) {
-                LOG.error("CLIncorrectValue", old.getName(), value, old.getValidator().getPossibleValues(), e);
+                LOG.error("Property {} has incorrect value {}. Possible values {}.", old.getName(), value, old.getValidator().getPossibleValues(), e);
                 return ERROR;
             }
         }
@@ -305,7 +305,7 @@ public class CommandLine {
             if (args.size() > 1) {
                 for (String arg : args) {
                     if (!arg.equals("all")) {
-                        LOG.info("CLUnknownCommand", arg);
+                        LOG.info("Unknown command {}", arg);
                     }
                 }
             }
@@ -321,7 +321,7 @@ public class CommandLine {
         } else {
             for (String key : args) {
                 if (!all.containsKey(key)) {
-                    LOG.info("CLUnknownProperty", key);
+                    LOG.info("Unknown property-name {}", key);
                     return ERROR;
                 } else {
                     Setting<String> setting = all.get(key);
@@ -368,7 +368,7 @@ public class CommandLine {
         for (String key : args) {
             Setting<String> value = all.get(key);
             if (value == null) {
-                LOG.info("CLNoInfo");
+                LOG.info("No information available (is this a valid option?).");
             } else {
                 OutputController.getLogger().printOutLn(R("CLDescription", value.getDescription()));
                 OutputController.getLogger().printOutLn(R("CLValue", value.getValue()));
@@ -416,12 +416,12 @@ public class CommandLine {
 
         boolean allValid = true;
         for (Setting<String> setting : validator.getIncorrectSetting()) {
-            LOG.info("CLIncorrectValue", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues());
+            LOG.info("Property {} has incorrect value {}. Possible values {}.", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues());
             allValid = false;
         }
 
         for (Setting<String> setting : validator.getUnrecognizedSetting()) {
-            LOG.info("CLUnknownProperty", setting.getName());
+            LOG.info("Unknown property-name {}", setting.getName());
             allValid = false;
         }
 
@@ -445,12 +445,12 @@ public class CommandLine {
         int val;
         if (hasUnrecognizedCommands()) {
             for (String unknown : optionParser.getMainArgs()) {
-                LOG.info("CLUnknownCommand", unknown);
+                LOG.info("Unknown command {}", unknown);
             }
             handleHelpCommand();
             val = ERROR;
         } else if (getNumberOfOptions() > 1) {
-            LOG.info("CLUnexpectedNumberOfCommands");
+            LOG.info("Itweb-settings can only run one command at a time.");
             val = handleHelpCommand();
         } else if (optionParser.hasOption(CommandLineOptions.LIST)) {
             val = handleListCommand();

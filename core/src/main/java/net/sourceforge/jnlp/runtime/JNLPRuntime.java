@@ -288,7 +288,7 @@ public class JNLPRuntime {
                 //where deployment.system.config points is not readable
                 throw new RuntimeException(getConfiguration().getLoadingException());
             }
-            LOG.warn("RConfigurationError" + ": " + getConfiguration().getLoadingException().getMessage());
+            LOG.warn("Fatal error while reading the configuration, continuing with empty. Please fix" + ": " + getConfiguration().getLoadingException().getMessage());
         }
 
         isWebstartApplication = isApplication;
@@ -509,12 +509,12 @@ public class JNLPRuntime {
                 config.load();
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
-                LOG.info("RConfigurationError");
+                LOG.info("Fatal error while reading the configuration, continuing with empty. Please fix");
                 //mark this exceptionas we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             } catch (Exception t) {
-                LOG.error("RFailingToDefault", t);
+                LOG.error("Failing to default configuration", t);
                 if (!JNLPRuntime.isHeadless()) {
                     JOptionPane.showMessageDialog(null, R("RFailingToDefault") + "\n" + t.toString());
                 }
@@ -804,7 +804,7 @@ public class JNLPRuntime {
                         }
                     } catch (HeadlessException ex) {
                         headless = true;
-                        LOG.error("HEADLESS_MISCONFIGURED", ex);
+                        LOG.error("Headless check failed. You are forced to run without any graphics. IcedTea-Web can run like this, but your app probably not. This is likely bug in your system.", ex);
                     }
                 }
             }

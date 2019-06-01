@@ -223,7 +223,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                LOG.error("RCantDeleteFile", eMsg == null ? f : eMsg);
+                LOG.error("Cant delete file {}", eMsg == null ? f : eMsg);
             }
         }
     }
@@ -252,11 +252,11 @@ public final class FileUtils {
 
         if (isDir) {
             if (!tempFile.mkdir()) {
-                throw new IOException("RCantCreateDir " + tempFile);
+                throw new IOException("Cant create directory {} " + tempFile);
             }
         } else {
             if (!tempFile.createNewFile()) {
-                throw new IOException("RCantCreateFile " + tempFile);
+                throw new IOException("Cant create file {} " + tempFile);
             }
         }
 
@@ -310,28 +310,28 @@ public final class FileUtils {
         } else {
             // remove all permissions
             if (!tempFile.setExecutable(false, false)) {
-                throw new IOException("RRemoveXPermFailed: " + tempFile);
+                throw new IOException("Removing execute permissions on file {} failed " + tempFile);
             }
             if (!tempFile.setReadable(false, false)) {
-                throw new IOException("RRemoveRPermFailed: " + tempFile);
+                throw new IOException("Removing read permission on file {} failed " + tempFile);
             }
             if (!tempFile.setWritable(false, false)) {
-                throw new IOException("RRemoveWPermFailed: " + tempFile);
+                throw new IOException("Removing write permissions on file {} failed " + tempFile);
             }
 
             // allow owner to read
             if (!tempFile.setReadable(true, true)) {
-                throw new IOException("RGetRPermFailed: " + tempFile);
+                throw new IOException("Acquiring read permissions on file {} failed" + tempFile);
             }
 
             // allow owner to write
             if (writableByOwner && !tempFile.setWritable(true, true)) {
-                throw new IOException("RGetWPermFailed: " + tempFile);
+                throw new IOException("Acquiring write permissions on file {} failed" + tempFile);
             }
 
             // allow owner to enter directories
             if (isDir && !tempFile.setExecutable(true, true)) {
-                throw new IOException("RGetXPermFailed: " + tempFile);
+                throw new IOException("Acquiring execute permissions on file {} failed" + tempFile);
             }
         }
 
@@ -339,7 +339,7 @@ public final class FileUtils {
         // opened the file right after it was created might still be able to
         // read the data.
         if (!tempFile.renameTo(file)) {
-            throw new IOException("RCantRename: " + tempFile + file);
+            throw new IOException("Cant rename {} to {}" + tempFile + file);
         }
     }
 

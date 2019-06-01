@@ -44,7 +44,7 @@ public class PropertyDesc {
         // allows empty property, not sure about validity of that.
         int equals = prop.indexOf("=");
         if (equals == -1) {
-            throw new LaunchException("BBadProp: " + prop);
+            throw new LaunchException("Incorrect property format" +prop+" (should be key=value): ");
         }
         final String key = prop.substring(0, equals);
         final String value = prop.substring(equals + 1, prop.length());

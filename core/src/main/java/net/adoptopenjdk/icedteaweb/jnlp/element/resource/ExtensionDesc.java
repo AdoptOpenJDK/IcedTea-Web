@@ -152,7 +152,7 @@ public class ExtensionDesc {
 
             // check for it being an extension descriptor
             if (!file.isComponent() && !file.isInstaller())
-                throw new ParseException("Invalid Extension Descriptor: " + name + location);
+                throw new ParseException("Extension does not refer to a component or installer (name={}, location={}). " + name + location);
         }
 
     }

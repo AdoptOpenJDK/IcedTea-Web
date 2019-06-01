@@ -98,42 +98,42 @@ public class ManifestAttributesChecker {
     public void checkAll() throws LaunchException {
         List<MANIFEST_ATTRIBUTES_CHECK> attributesCheck = getAttributesCheck();
         if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.NONE)) {
-            LOG.warn("MACDisabledMessage");
+            LOG.warn("Manifest attribute checks are disabled.");
         } else {
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.TRUSTED) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkTrustedOnlyAttribute();
             } else {
-                LOG.warn("MACCheckSkipped", "Trusted-Only", "TRUSTED");
+                LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Trusted-Only", "TRUSTED");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.CODEBASE) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkCodebaseAttribute();
             } else {
-                LOG.warn("MACCheckSkipped", "Codebase", "CODEBASE");
+                LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Codebase", "CODEBASE");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkPermissionsAttribute();
             } else {
-                LOG.warn("MACCheckSkipped", "Permissions", "PERMISSIONS");
+                LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Permissions", "PERMISSIONS");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALAC) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkApplicationLibraryAllowableCodebaseAttribute();
             } else {
-                LOG.warn("MACCheckSkipped", "Application Library Allowable Codebase", "ALAC");
+                LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Application Library Allowable Codebase", "ALAC");
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ENTRYPOINT)
                     || attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkEntryPoint();
             } else {
-                LOG.warn("MACCheckSkipped", "Entry-Point", "ENTRYPOINT");
+                LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Entry-Point", "ENTRYPOINT");
             }
 
         }
@@ -227,7 +227,7 @@ public class ManifestAttributesChecker {
         }
         LOG.debug("Trusted Only manifest attribute is \"true\". {} and requests permission level: {}", signedMsg, securityType);
         if (!(isFullySigned && requestsCorrectPermissions)) {
-            throw new LaunchException("STrustedOnlyAttributeFailure: " + "Signed Msg: " + signedMsg +
+            throw new LaunchException("This application specifies Trusted-only as True in its Manifest. {} and requests permission level: {}. This is not allowed.: " + "Signed Msg: " + signedMsg +
                     "Security Type: " + securityType);
         }
     }
@@ -237,33 +237,33 @@ public class ManifestAttributesChecker {
      */
     private void checkCodebaseAttribute() throws LaunchException {
         if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
-            LOG.warn("CBCheckFile");
+            LOG.warn("The application is a local file. Codebase validation is disabled. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             return;
         }
         final Object securityType = security.getSecurityType();
         final URL codebase = UrlUtils.guessCodeBase(file);
         final ClasspathMatchers codebaseAtt = file.getManifestAttributesReader().getCodebase();
         if (codebaseAtt == null) {
-            LOG.warn("CBCheckNoEntry");
+            LOG.warn("This application does not specify a Codebase in its manifest. Please verify with the applet''s vendor. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             return;
         }
         if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
             if (codebaseAtt.matches(codebase)) {
-                LOG.info("CBCheckUnsignedPass");
+                LOG.info("Codebase matches codebase manifest attribute, but application is unsigned. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             } else {
-                LOG.error("CBCheckUnsignedFail");
+                LOG.error("The application''s codebase does NOT match the codebase specified in its manifest, but the application is unsigned. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             }
         } else {
             if (codebaseAtt.matches(codebase)) {
-                LOG.info("CBCheckOkSignedOk");
+                LOG.info("Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             } else {
                 if (file instanceof PluginBridge) {
-                    throw new LaunchException("CBCheckSignedAppletDontMatchException" +
+                    throw new LaunchException("Signed applets are not allowed to run when their actual Codebase does not match the Codebase specified in their manifest. Expected: {}. Actual: {}. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details." +
                             "Manifest Codebase: " +
                             file.getManifestAttributesReader().getCodebase().toString() +
                             "Codebase: " + codebase);
                 } else {
-                    LOG.error("CBCheckSignedFail");
+                    LOG.error("Application Codebase does NOT match the Codebase specified in the application''s manifest, and this application is signed. You are strongly discouraged from running this application. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
                 }
             }
         }

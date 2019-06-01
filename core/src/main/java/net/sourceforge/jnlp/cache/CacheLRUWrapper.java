@@ -168,9 +168,9 @@ public class CacheLRUWrapper {
          */
         if (loaded && checkData()) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new LruCacheException());
-            LOG.info("CFakeCache");
+            LOG.info("Cache is corrupt. Fixing.");
             store();
-            LOG.info("CFakedCache");
+            LOG.info("Cache was corrupt and has been fixed. It is strongly recommended that you run ''javaws -Xclearcache'' and rerun your application as soon as possible. You can also use via itw-settings Cache -> View files -> Purge");
         }
     }
 

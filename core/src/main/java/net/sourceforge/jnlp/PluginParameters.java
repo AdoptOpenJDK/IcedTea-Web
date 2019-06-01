@@ -58,7 +58,7 @@ public class PluginParameters {
                 && this.parameters.get("object") == null
                 //If code/object parameters are missing, we can still determine the main-class name from the jnlp file passed using jnlp_href
                 && this.parameters.get("jnlp_href") == null) {
-            throw new PluginParameterException("BNoCodeOrObjectApplet");
+            throw new PluginParameterException("Applet tag must specify a ''code'' or ''object'' or ''jnlp_href'' attribute.");
         }
     }
 

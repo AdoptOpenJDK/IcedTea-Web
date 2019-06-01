@@ -133,12 +133,12 @@ class SingleInstanceLock {
 
         if (!baseDir.isDirectory()) {
             if (!baseDir.getParentFile().isDirectory() && !baseDir.getParentFile().mkdirs()) {
-                throw new RuntimeException("RNoLockDir " + baseDir);
+                throw new RuntimeException("Unable to create locks directory ({}) " + baseDir);
             }
             try {
                 FileUtils.createRestrictedDirectory(baseDir);
             } catch (IOException e) {
-                throw new RuntimeException("RNoLockDir " + baseDir);
+                throw new RuntimeException("Unable to create locks directory ({}) " + baseDir);
             }
         }
 

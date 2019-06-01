@@ -164,7 +164,7 @@ public class Launcher {
      */
     public void setUpdatePolicy(UpdatePolicy policy) {
         if (policy == null) {
-            throw new IllegalArgumentException("LNullUpdatePolicy");
+            throw new IllegalArgumentException("Update policy cannot be null.");
         }
 
         this.updatePolicy = policy;
@@ -278,7 +278,7 @@ public class Launcher {
             tg.join();
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
-            throw launchWarning(new LaunchException(file, ex, "LSMinor", "LCSystem", "LThreadInterrupted", "LThreadInterruptedInfo"));
+            throw launchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
         }
 
         if (tg.getException() != null) {
@@ -367,7 +367,7 @@ public class Launcher {
             // allows empty param, not sure about validity of that.
             int equals = input.indexOf("=");
             if (equals == -1) {
-                throw launchError(new LaunchException("BBadParam: " + input));
+                throw launchError(new LaunchException("Incorrect parameter format " + input + " (should be name=value)"));
             }
 
             String name = input.substring(0, equals);
@@ -409,7 +409,7 @@ public class Launcher {
         } else if (file.getSourceLocation() != null) {
             updatedArgs.add(file.getFileLocation().toString());
         } else {
-            launchError(new LaunchException(file, null, "LSFatal", "LCExternalLaunch", "LNullLocation", "LNullLocationInfo"));
+            launchError(new LaunchException(file, null, "Fatal", "External Launch Error", "LNullLocation", "LNullLocationInfo"));
         }
 
         launchExternal(vmArgs, updatedArgs);
@@ -458,9 +458,9 @@ public class Launcher {
             Process p = pb.start();
             StreamUtils.waitForSafely(p);
         } catch (NullPointerException ex) {
-            throw launchError(new LaunchException(null, null, "LSFatal", "LCExternalLaunch", "LNetxJarMissing", "LNetxJarMissingInfo"));
+            throw launchError(new LaunchException(null, null, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, "LSFatal", "LCExternalLaunch", "LCouldNotLaunch", "LCouldNotLaunchInfo"));
+            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -505,7 +505,7 @@ public class Launcher {
                 throw (LaunchException) ex; // already sent to handler when first thrown
             } else {
                 // IO and Parse
-                throw launchError(new LaunchException(null, ex, "LSFatal", "LCReadError", "LCantRead", "LCantReadInfo"));
+                throw launchError(new LaunchException(null, ex, "Fatal", "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
             }
         }
     }
@@ -520,7 +520,7 @@ public class Launcher {
      */
     protected ApplicationInstance launchApplication(JNLPFile file) throws LaunchException {
         if (!file.isApplication()) {
-            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplication", "LNotApplicationInfo"));
+            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
         }
 
         try {
@@ -567,8 +567,8 @@ public class Launcher {
 
             if (mainName == null) {
                 throw launchError(new LaunchException(file, null,
-                        R("LSFatal"), R("LCClient"), R("LCantDetermineMainClass"),
-                        R("LCantDetermineMainClassInfo")));
+                        "Fatal", "Application Error", "Unknown Main-Class.",
+                        "Could not determine the main class for this application."));
             }
 
             LOG.info("Starting application [{}] ...", mainName);
@@ -599,7 +599,7 @@ public class Launcher {
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"));
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -654,7 +654,7 @@ public class Launcher {
      */
     protected ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplet", "LNotAppletInfo"));
+            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
 
         if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
@@ -678,11 +678,11 @@ public class Launcher {
             return applet;
         } catch (InstanceExistsException ieex) {
             LOG.error("Single instance applet is already running.", ieex);
-            throw launchError(new LaunchException(file, ieex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LSingleInstanceExists"), applet);
+            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"), applet);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."), applet);
         } finally {
             if (handler != null) {
                 handler.launchStarting(applet);
@@ -701,7 +701,7 @@ public class Launcher {
      */
     protected ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, "LSFatal", "LCClient", "LNotApplet", "LNotAppletInfo"));
+            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
         AppletInstance applet = null;
         try {
@@ -712,11 +712,11 @@ public class Launcher {
 
         } catch (InstanceExistsException ieex) {
             LOG.info("Single instance applet is already running.");
-            throw launchError(new LaunchException(file, ieex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LSingleInstanceExists"), applet);
+            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."), applet);
         } catch (LaunchException lex) {
             throw launchError(lex, applet);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "LSFatal", "LCLaunching", "LCouldNotLaunch", "LCouldNotLaunchInfo"), applet);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."), applet);
         }
     }
 
@@ -731,7 +731,7 @@ public class Launcher {
     protected ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
-        throw launchError(new LaunchException(file, null, "LSFatal", "LCNotSupported", "LNoInstallers", "LNoInstallersInfo"));
+        throw launchError(new LaunchException(file, null, "Fatal", "Unsupported Feature", "Installers not supported.", "JNLP installer files are not yet supported."));
     }
 
     /**
@@ -792,7 +792,7 @@ public class Launcher {
 
             return appletInstance;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplet", "LInitAppletInfo"), appletInstance);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."), appletInstance);
         }
     }
 
@@ -822,7 +822,7 @@ public class Launcher {
 
             return applet;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplet", "LInitAppletInfo"));
+            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."));
         }
     }
 
@@ -843,7 +843,7 @@ public class Launcher {
 
             return app;
         } catch (Exception ex) {
-            throw new LaunchException(file, ex, "LSFatal", "LCInit", "LInitApplication", "LInitApplicationInfo");
+            throw new LaunchException(file, ex, "Fatal", "Initialization Error", "LInitApplication", "LInitApplicationInfo");
         }
     }
 
@@ -975,8 +975,8 @@ public class Launcher {
                         application = launchInstaller(file);
                     } else {
                         throw launchError(new LaunchException(file, null,
-                                R("LSFatal"), R("LCClient"), R("LNotLaunchable"),
-                                R("LNotLaunchableInfo")));
+                                "Fatal", "Application Error", "Not a launchable JNLP file.",
+                                "File must be a JNLP application, applet, or installer type."));
                     }
                 }
             } catch (LaunchException ex) {

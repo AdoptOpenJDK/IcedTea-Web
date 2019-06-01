@@ -304,7 +304,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.exit(1);
         }
 
-        LOG.info("{}: {}", "BFileLoc", location);
+        LOG.info("{}: {}", "JNLP file location", location);
 
         URL url = null;
 

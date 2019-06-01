@@ -27,6 +27,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -49,15 +50,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.xmlparser.UsedParsers;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,20 +74,37 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.I
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HREF_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.DESKTOP_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.MENU_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.ONLINE_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.LAZY;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_DOWNLOAD_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_PART_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.ARCH_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.EXTENSION_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.J2SE_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.JAR_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.JAVA_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.NATIVELIB_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.OS_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.PACKAGE_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.PROPERTY_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.RESOURCES_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc.SECURITY_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc.UPDATE_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.addSlash;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNode;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getChildNodes;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredAttribute;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getRequiredURL;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getSpanText;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLParser.getURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNode;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNodes;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredAttribute;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getRequiredURL;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getSpanText;
+import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getURL;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_ATTRIBUTE;
+import static net.sourceforge.jnlp.JNLPFile.SPEC_VERSION_DEFAULT;
 
 /**
  * Contains methods to parse an XML document into a JNLPFile. Implements JNLP
@@ -216,11 +231,11 @@ public final class Parser {
 
         // ensure it's a JNLP node
         if (root == null || !root.getNodeName().getName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
-            throw new ParseException("PInvalidRoot");
+            throw new ParseException("Root element is not a jnlp element.");
         }
 
         // JNLP tag information
-        this.spec = getVersion(root, JNLPFile.SPEC_ATTRIBUTE, "1.0+");
+        this.spec = getVersion(root, SPEC_ATTRIBUTE, SPEC_VERSION_DEFAULT);
 
         try {
             this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
@@ -234,8 +249,28 @@ public final class Parser {
         }
 
         this.base = (this.codebase != null) ? this.codebase : base; // if codebase not specified use default codebase
-        fileLocation = getURL(root, "href", this.base, strict);
+        fileLocation = getURL(root, JNLPFile.HREF_ATTRIBUTE, this.base, strict);
+    }
 
+    /**
+     * Returns a URL with a trailing / appended to it if there is no trailing
+     * slash on the specified URL.
+     */
+    private URL addSlash(final URL source) {
+        if (source == null) {
+            return null;
+        }
+
+        final String urlString = source.toExternalForm();
+        if (!urlString.endsWith("/")) {
+            try {
+                return new URL(urlString + "/");
+            } catch (MalformedURLException ex) {
+                throw new IllegalArgumentException("Could not add slash to malformed URL: " + urlString, ex);
+            }
+        }
+
+        return source;
     }
 
     /**
@@ -276,7 +311,7 @@ public final class Parser {
         while (child != null) {
             if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
-                    throw new ParseException("PTwoUpdates");
+                    throw new ParseException("Only one update element is allowed");
                 }
 
                 final Node node = child;
@@ -341,11 +376,11 @@ public final class Parser {
     public List<ResourcesDesc> getResources(final Node parent, final boolean j2se)
             throws ParseException {
         final List<ResourcesDesc> result = new ArrayList<>();
-        final Node resources[] = getChildNodes(parent, ResourcesDesc.RESOURCES_ELEMENT);
+        final Node resources[] = getChildNodes(parent, RESOURCES_ELEMENT);
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
-            throw new ParseException("PNoResources");
+            throw new ParseException("No No resources element specified.");
         }
         for (final Node resource : resources) {
             result.add(getResourcesDesc(resource, j2se));
@@ -365,9 +400,9 @@ public final class Parser {
         // create resources
         final ResourcesDesc resources
                 = new ResourcesDesc(file,
-                getLocales(node),
-                splitString(getAttribute(node, ResourcesDesc.OS_ATTRIBUTE, null)),
-                splitString(getAttribute(node, ResourcesDesc.ARCH_ATTRIBUTE, null)));
+                        getLocales(node),
+                        splitString(getAttribute(node, OS_ATTRIBUTE, null)),
+                        splitString(getAttribute(node, ARCH_ATTRIBUTE, null)));
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -375,33 +410,33 @@ public final class Parser {
             final String name = child.getNodeName().getName();
 
             // check for nativelib but no trusted environment
-            if ("nativelib".equals(name)) {
+            if (NATIVELIB_ELEMENT.equals(name)) {
                 if (!isTrustedEnvironment()) {
-                    throw new ParseException("PUntrustedNative");
+                    throw new ParseException("nativelib element cannot be specified unless a trusted environment is requested.");
                 }
             }
 
-            if ("j2se".equals(name) || "java".equals(name)) {
+            if (J2SE_ELEMENT.equals(name) || JAVA_ELEMENT.equals(name)) {
                 if (getChildNode(root, ComponentDesc.COMPONENT_DESC_ELEMENT) != null) {
                     if (strict) {
-                        throw new ParseException("PExtensionHasJ2SE");
+                        throw new ParseException("j2se element cannot be specified in a component extension file.");
                     }
                 }
                 if (!j2se) {
                     resources.addResource(getJRE(child));
                 } else {
-                    throw new ParseException("PInnerJ2SE");
+                    throw new ParseException("j2se element cannot be specified within a j2se element.");
                 }
             }
 
-            if ("jar".equals(name) || "nativelib".equals(name)) {
+            if (JAR_ELEMENT.equals(name) || NATIVELIB_ELEMENT.equals(name)) {
                 JARDesc jar = getJAR(child);
 
                 // check for duplicate main entries
                 if (jar.isMain()) {
                     if (mainFlag == true) {
                         if (strict) {
-                            throw new ParseException("PTwoMains");
+                            throw new ParseException("Duplicate main attribute specified on a resources element (there can be only one)");
                         }
                     }
                     mainFlag = true;
@@ -410,15 +445,15 @@ public final class Parser {
                 resources.addResource(jar);
             }
 
-            if ("extension".equals(name)) {
+            if (EXTENSION_ELEMENT.equals(name)) {
                 resources.addResource(getExtension(child));
             }
 
-            if ("property".equals(name)) {
+            if (PROPERTY_ELEMENT.equals(name)) {
                 resources.addResource(getProperty(child));
             }
 
-            if ("package".equals(name)) {
+            if (PACKAGE_ELEMENT.equals(name)) {
                 resources.addResource(getPackage(child));
             }
 
@@ -433,18 +468,18 @@ public final class Parser {
      * @return the JRE element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
-    private JREDesc getJRE(Node node) throws ParseException {
-        Version version = getVersion(node, "version", null);
-        URL location = getURL(node, "href", base, strict);
-        String vmArgs = getAttribute(node, "java-vm-args", null);
+    private JREDesc getJRE(final Node node) throws ParseException {
+        final Version version = getVersion(node, JREDesc.VERSION_ATTRIBUTE, null);
+        final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
+        String vmArgs = getAttribute(node, JREDesc.JAVA_VM_ARGS_ATTRIBUTE, null);
         try {
             JvmUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }
-        String initialHeap = getAttribute(node, "initial-heap-size", null);
-        String maxHeap = getAttribute(node, "max-heap-size", null);
-        List<ResourcesDesc> resources = getResources(node, true);
+        final String initialHeap = getAttribute(node, JREDesc.INITIAL_HEAP_SIZE_ATTRIBUTE, null);
+        final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
+        final List<ResourcesDesc> resources = getResources(node, true);
 
         // require version attribute
         getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
@@ -458,17 +493,17 @@ public final class Parser {
      * @param node the jar or nativelib node
      * @throws ParseException if the JNLP file is invalid
      */
-    private JARDesc getJAR(Node node) throws ParseException {
-        boolean nativeJar = "nativelib".equals(node.getNodeName().getName());
-        URL location = getRequiredURL(node, "href", base, strict);
-        Version version = getVersion(node, "version", null);
-        String part = getAttribute(node, "part", null);
-        boolean main = "true".equals(getAttribute(node, "main", "false"));
-        boolean lazy = "lazy".equals(getAttribute(node, "download", "eager"));
+    private JARDesc getJAR(final Node node) throws ParseException {
+        boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
+        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
+        final Version version = getVersion(node, JARDesc.VERSION_ATTRIBUTE, null);
+        final String part = getAttribute(node, JARDesc.PART_ATTRIBUTE, null);
+        final boolean main = "true".equals(getAttribute(node, JARDesc.MAIN_ATTRIBUTE, "false"));
+        final boolean lazy = LAZY.getValue().equals(getAttribute(node, JARDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
 
         if (nativeJar && main) {
             if (strict) {
-                throw new ParseException("PNativeHasMain");
+                throw new ParseException("main attribute cannot be specified on a nativelib element.");
             }
         }
 
@@ -481,17 +516,17 @@ public final class Parser {
      * @return the Extension element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
-    private ExtensionDesc getExtension(Node node) throws ParseException {
-        String name = getAttribute(node, "name", null);
-        Version version = getVersion(node, "version", null);
-        URL location = getRequiredURL(node, "href", base, strict);
+    private ExtensionDesc getExtension(final Node node) throws ParseException {
+        final String name = getAttribute(node, ExtensionDesc.NAME_ATTRIBUTE, null);
+        final Version version = getVersion(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
+        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
 
-        ExtensionDesc ext = new ExtensionDesc(name, version, location);
+        final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        Node dload[] = getChildNodes(node, "ext-download");
+        final Node dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
         for (Node dload1 : dload) {
-            boolean lazy = "lazy".equals(getAttribute(dload1, "download", "eager"));
-            ext.addPart(getRequiredAttribute(dload1, "ext-part", null, strict), getAttribute(dload1, "part", null), lazy);
+            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
+            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, ExtensionDesc.PART_ATTRIBUTE, null), lazy);
         }
 
         return ext;
@@ -502,9 +537,9 @@ public final class Parser {
      * @return the Property element at the specified node.
      * @throws ParseException if the JNLP file is invalid
      */
-    private PropertyDesc getProperty(Node node) throws ParseException {
-        String name = getRequiredAttribute(node, "name", null, strict);
-        String value = getRequiredAttribute(node, "value", "", strict);
+    private PropertyDesc getProperty(final Node node) throws ParseException {
+        final String name = getRequiredAttribute(node, PropertyDesc.NAME_ATTRIBUTE, null, strict);
+        final String value = getRequiredAttribute(node, PropertyDesc.VALUE_ATTRIBUTE, "", strict);
 
         return new PropertyDesc(name, value);
     }
@@ -605,14 +640,14 @@ public final class Parser {
                 String kind = getAttribute(child, DescriptionDesc.KIND_ATTRIBUTE, DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
-                        throw new ParseException("PTwoDescriptions: " + kind);
+                        throw new ParseException("Duplicate description elements of kind "+kind+" are illegal.");
                     }
                 }
                 descriptionsUsed.add(kind);
                 addInfo(informationDesc, child, kind, getSpanText(child, false));
             }
             if (HOMEPAGE_ELEMENT.equals(name)) {
-                addInfo(informationDesc, child, null, getRequiredURL(child, HREF_ATTRIBUTE, base, strict));
+                addInfo(informationDesc, child, null, getRequiredURL(child, HomepageDesc.HREF_ATTRIBUTE, base, strict));
             }
             if (IconDesc.ICON_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, getAttribute(child, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()), getIcon(child));
@@ -622,7 +657,7 @@ public final class Parser {
             }
             if ("sharing-allowed".equals(name)) {
                 if (strict && !allowExtensions) {
-                    throw new ParseException("PSharing");
+                    throw new ParseException("sharing-allowed element is illegal in a standard JNLP file");
                 }
                 addInfo(informationDesc, child, null, Boolean.TRUE);
             }
@@ -697,7 +732,7 @@ public final class Parser {
         // test for too many security elements
         if (nodes.length > 1) {
             if (strict) {
-                throw new ParseException("PTwoSecurity");
+                throw new ParseException("Only one security element allowed per JNLP file.");
             }
         }
 
@@ -714,7 +749,7 @@ public final class Parser {
             type = SecurityDesc.J2EE_PERMISSIONS;
             applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
         } else if (strict) {
-            throw new ParseException("PEmptySecurity");
+            throw new ParseException("security element specified but does not contain a permissions element.");
         }
 
         if (base != null) {
@@ -754,7 +789,7 @@ public final class Parser {
                 + getChildNodes(parent, APPLICATION_DESC_ELEMENT).length
                 + getChildNodes(parent, JAVAFX_DESC_ELEMENT).length
                 + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
-            throw new ParseException("PTwoDescriptors");
+            throw new ParseException("Only one application-desc element allowed per JNLP file.");
         }
 
         Node child = parent.getFirstChild();
@@ -789,25 +824,25 @@ public final class Parser {
      *                        TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
     private AppletDesc getApplet(final Node node) throws ParseException {
-        final String name = getRequiredAttribute(node, "name", R("PUnknownApplet"), strict);
+        final String name = getRequiredAttribute(node, AppletDesc.NAME_ATTRIBUTE, R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
-        final URL docbase = getURL(node, "documentbase", base, strict);
+        final URL docbase = getURL(node, AppletDesc.DOCUMENTBASE_ATTRIBUTE, base, strict);
         final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
         int height = 0;
 
         try {
-            width = Integer.parseInt(getRequiredAttribute(node, "width", "100", strict));
-            height = Integer.parseInt(getRequiredAttribute(node, "height", "100", strict));
+            width = Integer.parseInt(getRequiredAttribute(node, AppletDesc.WIDTH_ATTRIBUTE, "100", strict));
+            height = Integer.parseInt(getRequiredAttribute(node, AppletDesc.HEIGHT_ATTRIBUTE, "100", strict));
         } catch (NumberFormatException nfe) {
             if (width <= 0) {
-                throw new ParseException("PBadWidth");
+                throw new ParseException("Invalid applet width.");
             }
-            throw new ParseException("PBadWidth");
+            throw new ParseException("Invalid applet width.");
         }
 
         // read params
-        final Node params[] = getChildNodes(node, "param");
+        final Node params[] = getChildNodes(node, AppletDesc.PARAM_ELEMENT);
         for (final Node param : params) {
             paramMap.put(getRequiredAttribute(param, "name", null, strict), getRequiredAttribute(param, "value", "", strict));
         }
@@ -829,7 +864,7 @@ public final class Parser {
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
         // read parameters
-        final Node args[] = getChildNodes(node, "argument");
+        final Node args[] = getChildNodes(node, ApplicationDesc.ARGUMENT_ELEMENT);
         for (Node arg : args) {
             //argsList.add( args[i].getNodeValue() );
             //This approach was not finding the argument text
@@ -849,7 +884,7 @@ public final class Parser {
     ComponentDesc getComponent(final Node parent) throws ParseException {
 
         if (1 < getChildNodes(parent, ComponentDesc.COMPONENT_DESC_ELEMENT).length) {
-            throw new ParseException("PTwoDescriptors");
+            throw new ParseException("Only one application-desc element allowed per JNLP file.");
         }
 
         Node child = parent.getFirstChild();
@@ -896,10 +931,10 @@ public final class Parser {
     /**
      * @return the shortcut descriptor.
      */
-    private ShortcutDesc getShortcut(Node node) throws ParseException {
+    private ShortcutDesc getShortcut(final Node node) throws ParseException {
 
-        String online = getAttribute(node, "online", "true");
-        boolean shortcutIsOnline = Boolean.valueOf(online);
+        final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
+        final boolean shortcutIsOnline = Boolean.valueOf(online);
 
         boolean showOnDesktop = false;
         MenuDesc menu = null;
@@ -907,19 +942,19 @@ public final class Parser {
         // step through the elements
         Node child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            final String name = child.getNodeName().getName();
 
             if (null != name) {
                 switch (name) {
-                    case "desktop":
+                    case DESKTOP_ELEMENT:
                         if (showOnDesktop && strict) {
-                            throw new ParseException("PTwoDesktops");
+                            throw new ParseException("Only one desktop element allowed");
                         }
                         showOnDesktop = true;
                         break;
-                    case "menu":
+                    case MENU_ELEMENT:
                         if (menu != null && strict) {
-                            throw new ParseException("PTwoMenus");
+                            throw new ParseException("Only one menu element allowed");
                         }
                         menu = getMenu(child);
                         break;
@@ -929,7 +964,7 @@ public final class Parser {
             child = child.getNextSibling();
         }
 
-        ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
+        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
         if (menu != null) {
             shortcut.setMenu(menu);
         }
@@ -966,19 +1001,19 @@ public final class Parser {
                 switch (name) {
                     case RelatedContentDesc.TITLE_ELEMENT:
                         if (title != null && strict) {
-                            throw new ParseException("PTwoTitles");
+                            throw new ParseException("Only one title element allowed");
                         }
                         title = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.DESCRIPTION_ELEMENT:
                         if (description != null && strict) {
-                            throw new ParseException("PTwoDescriptions");
+                            throw new ParseException("Duplicate description elements of kind {0} are illegal.");
                         }
                         description = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.ICON_ELEMENT:
                         if (icon != null && strict) {
-                            throw new ParseException("PTwoIcons");
+                            throw new ParseException("Only one icon element allowed");
                         }
                         icon = getIcon(child);
                         break;
@@ -1076,63 +1111,6 @@ public final class Parser {
         } else {
             return new Version(version);
         }
-    }
-
-    public static final String MALFORMED_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser";
-    public static final String NORMAL_PARSER_CLASS = "net.adoptopenjdk.icedteaweb.xmlparser.XMLParser";
-
-    /**
-     * @return the root node from the XML document in the specified input
-     * stream.
-     * @throws ParseException if the JNLP file is invalid
-     */
-    public static Node getRootNode(InputStream input, ParserSettings settings) throws ParseException {
-        try {
-            Object parser = getParserInstance(settings);
-            Method m = parser.getClass().getMethod("getRootNode", InputStream.class);
-            return (Node) m.invoke(parser, input);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof ParseException) {
-                throw (ParseException) (e.getCause());
-            }
-            throw new ParseException("PBadXML: " + e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new ParseException("PBadXML: " + e.getLocalizedMessage());
-        }
-    }
-
-    public static Object getParserInstance(ParserSettings settings) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String className;
-        if (settings.isMalformedXmlAllowed()) {
-            className = MALFORMED_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.MALFORMED);
-        } else {
-            className = NORMAL_PARSER_CLASS;
-            ParseException.setExpected(UsedParsers.NORMAL);
-        }
-
-        Class<?> klass;
-        Object instance;
-
-        try {
-            klass = Class.forName(className);
-            instance = klass.newInstance();
-            //catch both, for case that tagsoup was removed after build
-        } catch (ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            klass = Class.forName(NORMAL_PARSER_CLASS);
-            instance = klass.newInstance();
-        }
-
-        switch (instance.getClass().getName()) {
-            case MALFORMED_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.MALFORMED);
-                break;
-            case NORMAL_PARSER_CLASS:
-                ParseException.setUsed(UsedParsers.NORMAL);
-                break;
-        }
-        return instance;
     }
 
     private String getOptionalMainClass(Node node) {

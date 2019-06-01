@@ -91,7 +91,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      * this exception prevents exiting the JVM
      */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-            new SecurityException("RShutdown");
+            new SecurityException("This exception to prevent shutdown of JVM, but the process has been terminated.");
 
     /**
      * weak list of windows created
@@ -168,7 +168,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     public void setExitClass(Class<?> exitClass) throws IllegalStateException {
         if (this.exitClass != null) {
-            throw new IllegalStateException("RExitTaken");
+            throw new IllegalStateException("Exit class already set and caller is not exit class.");
         }
 
         this.exitClass = exitClass;
@@ -287,7 +287,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
         if (!JNLPRuntime.isWebstartApplication() &&
                 ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {
-            throw new SecurityException("RCantReplaceSM");
+            throw new SecurityException("Changing the SecurityManager is not allowed.");
         }
 
         try {

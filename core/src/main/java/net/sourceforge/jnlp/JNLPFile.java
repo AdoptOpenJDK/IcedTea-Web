@@ -368,7 +368,7 @@ public class JNLPFile {
      */
     public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
         if (location == null || policy == null)
-            throw new IllegalArgumentException("NullParameter");
+            throw new IllegalArgumentException("Null Parameter");
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
@@ -405,9 +405,9 @@ public class JNLPFile {
             throw new MissingTitleException();
         }
         if (title.trim().isEmpty()) {
-            LOG.warn("Missing Element and Missing Title");
-            title = "Missing Mandatory Substitution and Missing Title";
-            LOG.warn("Missing Mandatory Warning and MissingTitle" + ": {}", title);
+            LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
+            title = "Corrupted or missing title. Do not trust this application!";
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + ": {}", title);
         } else {
             LOG.info("Acceptable title tag found, contains: {}", title);
         }
@@ -470,9 +470,9 @@ public class JNLPFile {
             throw new MissingVendorException();
         }
         if (vendor.trim().isEmpty()) {
-            LOG.warn("Missing Element and Missing Vendor");
-            vendor = "Missing Mandatory Substitution and Missing Vendor";
-            LOG.warn("Missing Mandatory Warning and MissingVendor" + ": " + vendor);
+            LOG.warn("The vendor section has not been specified for your locale nor does a default value exist in the JNLP file.");
+            vendor = "Corrupted or missing vendor. Do not trust this application!";
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor"+ ": " + vendor);
         } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
@@ -752,7 +752,7 @@ public class JNLPFile {
      */
     public AppletDesc getApplet() {
         if (!isApplet())
-            throw new UnsupportedOperationException("JNotApplet");
+            throw new UnsupportedOperationException("File is not an applet.");
 
         return (AppletDesc) entryPointDesc;
     }
@@ -763,7 +763,7 @@ public class JNLPFile {
      */
     public ApplicationDesc getApplication() {
         if (!isApplication())
-            throw new UnsupportedOperationException("JNotApplication");
+            throw new UnsupportedOperationException("File is not an application.");
 
         return (ApplicationDesc) entryPointDesc;
     }
@@ -774,7 +774,7 @@ public class JNLPFile {
      */
     public ComponentDesc getComponent() {
         if (!isComponent())
-            throw new UnsupportedOperationException("JNotComponent");
+            throw new UnsupportedOperationException("File is not a component.");
 
         return component;
     }
@@ -785,7 +785,7 @@ public class JNLPFile {
      */
     public InstallerDesc getInstaller() {
         if (!isInstaller())
-            throw new UnsupportedOperationException("NotInstaller");
+            throw new UnsupportedOperationException("File is not an installer.");
 
         return (InstallerDesc) entryPointDesc;
     }
