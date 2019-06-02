@@ -32,7 +32,6 @@ import net.sourceforge.jnlp.util.ImageResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.naming.ConfigurationException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,7 +42,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -53,9 +51,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -76,36 +72,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class ControlPanel extends JFrame {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ControlPanel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ControlPanel.class);
 
-    private JVMPanel jvmPanel;
-
-    /**
-     * Class for keeping track of the panels and their associated text.
-     * 
-     * @author @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
-     * 
-     */
-    private static class SettingsPanel {
-        final String value;
-        final JPanel panel;
-
-        public SettingsPanel(String value, JPanel panel) {
-            this.value = value;
-            this.panel = panel;
-        }
-
-        public JPanel getPanel() {
-            return panel;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    private DeploymentConfiguration config = null;
+    private final DeploymentConfiguration config;
 
     /**
      * Creates a new instance of the ControlPanel.
@@ -114,7 +83,7 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    public ControlPanel(DeploymentConfiguration config) {
+    private ControlPanel(DeploymentConfiguration config) {
         super();
         setTitle(Translator.R("CPHead"));
         setIconImages(ImageResources.INSTANCE.getApplicationImages());
@@ -183,7 +152,7 @@ public class ControlPanel extends JFrame {
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
-        List<JButton> buttons = new ArrayList<JButton>();
+        List<JButton> buttons = new ArrayList<>();
 
         JButton okButton = new JButton(Translator.R("ButOk"));
         okButton.addActionListener(e -> {
@@ -243,7 +212,7 @@ public class ControlPanel extends JFrame {
         serviceLoader.iterator().forEachRemaining(p -> {
             final String name = p.getName();
             if (p.isActive()) {
-                if (providers.stream().filter(provider -> Objects.equals(provider.getName(), name)).findAny().isPresent()) {
+                if (providers.stream().anyMatch(provider -> Objects.equals(provider.getName(), name))) {
                     throw new IllegalStateException("More than 1 view provider for control panel with name " + name + " found!");
                 }
                 LOG.debug("Adding view {} to control panel", name);
@@ -255,20 +224,18 @@ public class ControlPanel extends JFrame {
 
 
         final Map<String, JComponent> panels = providers.stream()
-                .sorted(Comparator.comparingInt(p -> p.getOrder()))
-                .collect(Collectors.toMap(p -> p.getName(), p -> p.createPanel(config), (u, v) -> {
+                .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
+                .collect(Collectors.toMap(ControlPanelProvider::getName, p -> p.createPanel(config), (u, v) -> {
                     throw new IllegalStateException(String.format("Duplicate key %s", u));
                 }, LinkedHashMap::new));
 
         final CardLayout cardLayout = new CardLayout();
         final JPanel settingsPanel = new JPanel(cardLayout);
         final Dimension minDimension = panels.values().stream()
-                .map(c -> c.getMinimumSize())
+                .map(JComponent::getMinimumSize)
                 .reduce((a, b) -> new Dimension(Math.max(a.width, b.width), Math.max(a.height, b.height)))
                 .orElse(new Dimension());
-        panels.entrySet().forEach(e -> {
-            final String name = e.getKey();
-            final JComponent component = e.getValue();
+        panels.forEach((name, component) -> {
             component.setPreferredSize(minDimension);
             settingsPanel.add(component, name);
             cardLayout.addLayoutComponent(component, name);
@@ -280,9 +247,7 @@ public class ControlPanel extends JFrame {
 
 
         final JList<String> settingsList = new JList<>(panels.keySet().toArray(new String[0]));
-        settingsList.addListSelectionListener(e -> {
-            cardLayout.show(settingsPanel, settingsList.getSelectedValue());
-        });
+        settingsList.addListSelectionListener(e -> cardLayout.show(settingsPanel, settingsList.getSelectedValue()));
         settingsList.setSelectedIndex(0);
         final JScrollPane settingsListScrollPane = new JScrollPane(settingsList);
         settingsListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -293,35 +258,6 @@ public class ControlPanel extends JFrame {
         mainPanel.add(settingsDetailPanel, BorderLayout.CENTER);
         mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         return mainPanel;
-    }
-
-    /**
-     * This is a placeholder panel.
-     * 
-     * @return a placeholder panel
-     * @see JPanel
-     */
-    private JPanel createNotImplementedPanel() {
-
-        JPanel notImplementedPanel = new NamedBorderPanel("Unimplemented");
-        notImplementedPanel.setLayout(new BorderLayout());
-
-        ClassLoader cl = getClass().getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        URL imgUrl = cl.getResource("net/sourceforge/jnlp/resources/warning.png");
-        Image img;
-        try {
-            img = ImageIO.read(imgUrl);
-            ImageIcon icon = new ImageIcon(img);
-            JLabel label = new JLabel("Not Implemented", icon, SwingConstants.CENTER);
-            notImplementedPanel.add(label);
-        } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-        }
-        return notImplementedPanel;
     }
 
     /**
@@ -336,7 +272,7 @@ public class ControlPanel extends JFrame {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         final DeploymentConfiguration config = new DeploymentConfiguration();
         try {
             config.load();
@@ -356,12 +292,9 @@ public class ControlPanel extends JFrame {
             // ignore; not a big deal
         }
 
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final ControlPanel editor = new ControlPanel(config);
-                editor.setVisible(true);
-            }
+        SwingUtils.invokeLater(() -> {
+            final ControlPanel editor = new ControlPanel(config);
+            editor.setVisible(true);
         });
     }
 }
