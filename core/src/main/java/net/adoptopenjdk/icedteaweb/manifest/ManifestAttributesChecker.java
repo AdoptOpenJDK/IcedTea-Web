@@ -390,8 +390,8 @@ public class ManifestAttributesChecker {
 
         boolean allOk = true;
         for (URL u : usedUrls) {
-            if (UrlUtils.equalsIgnoreLastSlash(u, codebase)
-                    && UrlUtils.equalsIgnoreLastSlash(u, stripDocbase(documentBase))) {
+            if (UrlUtils.urlRelativeTo(u, codebase)
+                    && UrlUtils.urlRelativeTo(u, stripDocbase(documentBase))) {
                 LOG.debug("OK - {} is from codebase/docbase.", u.toExternalForm());
             } else {
                 allOk = false;

@@ -171,22 +171,6 @@ public class UrlUtilsTest {
     }
 
     @Test
-    public void testEqualsIgnoreLastSlash() throws Exception {
-        URL u11 = (new URL("http://aa.bb/aaa/bbb////"));
-        URL u22 = (new URL("http://aa.bb/aaa/bbb"));
-        assertTrue(UrlUtils.equalsIgnoreLastSlash(u11, u22));
-        assertTrue(UrlUtils.equalsIgnoreLastSlash(u11, new URL("http://aa.bb/aaa/bbb")));
-
-        URL u1 = (new URL("http://aa.bb/aaa\\bbb\\"));
-        URL u2 = (new URL("http://aa.bb/aaa\\bbb"));
-        assertTrue(UrlUtils.equalsIgnoreLastSlash(u1, u2));
-        assertTrue(UrlUtils.equalsIgnoreLastSlash(u1, new URL("http://aa.bb/aaa\\bbb")));
-
-        assertTrue(UrlUtils.equalsIgnoreLastSlash(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa\\bbb/")));
-        assertFalse(UrlUtils.equalsIgnoreLastSlash(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa/bbb/")));
-    }
-
-    @Test
     public void removeFileName1() throws Exception {
         URL l1 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/jar.jar"));
         assertEquals(l1, new URL("http://aaa.bb/xyz/hchkr"));
@@ -413,5 +397,21 @@ public class UrlUtilsTest {
     public void ensureSlashTailTest3() throws MalformedURLException {
         Assert.assertEquals("http://aa.bb:2/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb:2/aa")).toExternalForm());
         Assert.assertEquals("http://aa.bb/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb/aa/")).toExternalForm());
+    }
+
+    @Test
+    public void urlIsChildTest() throws MalformedURLException {
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/"), new URL("http://a/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/"), new URL("http://a")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a"), new URL("http://a/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a////"), new URL("http://a/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://aa.bb/aaa\\bbb\\"),new URL("http://aa.bb/aaa\\bbb")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa\\bbb/")));
+        assertFalse(UrlUtils.urlRelativeTo(new URL("http://aa.bb/aaa\\bbb\\"), new URL("http://aa.bb/aaa/bbb/")));
+        assertFalse(UrlUtils.urlRelativeTo(new URL("http://a/b/../c.jar"), new URL("http://a/b/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/c.jar"), new URL("http://a/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/b/c.jar"), new URL("http://a/")));
+        assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/b/d/c.jar"), new URL("http://a/b")));
+        assertFalse(UrlUtils.urlRelativeTo(new URL("http://a/b/c.jar"), new URL("https://a/")));
     }
 }
