@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -9,17 +10,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.head;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.find;
-import static org.junit.Assert.assertTrue;
+import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
 
 /**
  * Collection of util methods which cannot be static.
@@ -28,6 +32,29 @@ public interface IntegrationTest {
 
     String PORT = "PORT";
     String MAIN_CLASS = "MAIN_CLASS";
+
+    default String setupServer(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
+        wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
+                ok()
+        ));
+        wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
+                aResponse().withBody(fileContent(jnlpFilename,
+                        replace(PORT).with(wireMock.port())
+                                .and(MAIN_CLASS).with(mainClass))
+                )
+        ));
+
+        for (String resource : resources) {
+            wireMock.stubFor(head(urlEqualTo("/resources/" + resource)).willReturn(
+                    ok()
+            ));
+            wireMock.stubFor(get(urlEqualTo("/resources/" + resource)).willReturn(
+                    aResponse().withBody(fileContent("resources/" + resource))
+            ));
+        }
+
+        return "http://localhost:" + wireMock.port() + "/" + jnlpFilename;
+    }
 
     default byte[] fileContent(String file) throws IOException {
         try (final InputStream in = getClass().getResourceAsStream(file)) {

@@ -14,4 +14,9 @@ install:
 cache:
   directories:
     - $HOME/.m2
-script: mvn clean verify
+
+script:
+  - mvn clean verify -e
+  - cd /home/travis/build/AdoptOpenJDK/IcedTea-Web/integration/target/surefire-reports
+  - ls -la
+  - find * -exec cat {} \;
