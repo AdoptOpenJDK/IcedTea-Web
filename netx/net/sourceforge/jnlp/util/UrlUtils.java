@@ -324,6 +324,43 @@ public class UrlUtils {
         return false;
     }
 
+    /**
+     * Checks whether <code>url</code> is relative to <code>codebaseUrl</code>.
+     *
+     * This method returns false in case <code>url</code> contains parent directory notation "..".
+     * See JNLP specification version 9, 3.4: 'A relative URL cannot contain parent directory notations, such as "..". It must denote a file that is stored in a subdirectory of the codebase.'
+     * @param url the url to check
+     * @param codebaseUrl the url to check against
+     * @return true if <code>url</code> is relative to <code>codebaseUrl</code>
+     */
+    public static boolean urlRelativeTo(URL url, URL codebaseUrl) {
+        if (codebaseUrl == url) {
+            return true;
+        }
+        if (codebaseUrl == null || url == null) {
+            return false;
+        }
+        try {
+            URL nu = sanitizeLastSlash(normalizeUrl(url));
+            URL nup = sanitizeLastSlash(normalizeUrl(codebaseUrl));
+            if (!getHostAndPort(nu).equals(getHostAndPort(nup))) {
+                return false;
+            }
+            if (!nu.getProtocol().equals(nup.getProtocol())) {
+                return false;
+            }
+            if (nu.getPath().contains("..")) {
+                return false;
+            }
+            if (nu.getPath().startsWith(nup.getPath())) {
+                return true;
+            }
+        } catch (MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
+            OutputController.getLogger().log(e);
+        }
+        return false;
+    }
+
     static boolean notNullUrlEquals(URL u1, URL u2) {
         return compareNullableStrings(u1.getProtocol(), u2.getProtocol(), true)
                 && compareNullableStrings(u1.getHost(), u2.getHost(), true)

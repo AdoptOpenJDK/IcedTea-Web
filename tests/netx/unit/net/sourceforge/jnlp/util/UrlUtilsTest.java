@@ -412,4 +412,16 @@ public class UrlUtilsTest {
         Assert.assertEquals("http://aa.bb:2/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb:2/aa")).toExternalForm());
         Assert.assertEquals("http://aa.bb/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb/aa/")).toExternalForm());
     }
+
+    @Test
+    public void urlIsChildTest() throws MalformedURLException {
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/"), new URL("http://a/")));
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/"), new URL("http://a")));
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a"), new URL("http://a/")));
+	Assert.assertFalse(UrlUtils.urlRelativeTo(new URL("http://a/b/../c.jar"), new URL("http://a/b/")));
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/c.jar"), new URL("http://a/")));
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/b/c.jar"), new URL("http://a/")));
+	Assert.assertTrue(UrlUtils.urlRelativeTo(new URL("http://a/b/d/c.jar"), new URL("http://a/b")));
+	Assert.assertFalse(UrlUtils.urlRelativeTo(new URL("http://a/b/c.jar"), new URL("https://a/")));
+    }
 }
