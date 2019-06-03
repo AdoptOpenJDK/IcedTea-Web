@@ -81,6 +81,7 @@ public class UrlUtils {
     public static final String BACKSLASH_REGEX = "\\?";
     public static final String HTTPS = "https";
     public static final String BACKSLASH_N = "\n";
+    public static final String PARENT_DIR = "..";
 
     public static URL normalizeUrlAndStripParams(final URL url, final boolean encodeFileUrls) {
         if (url == null) {
@@ -327,7 +328,7 @@ public class UrlUtils {
      * @param codebaseUrl the url to check against
      * @return true if <code>url</code> is relative to <code>codebaseUrl</code>
      */
-    public static boolean urlRelativeTo(URL url, URL codebaseUrl) {
+    public static boolean urlRelativeTo(final URL url, final URL codebaseUrl) {
         if (codebaseUrl == url) {
             return true;
         }
@@ -335,18 +336,18 @@ public class UrlUtils {
             return false;
         }
         try {
-            URL nu = sanitizeLastSlash(normalizeUrl(url));
-            URL nup = sanitizeLastSlash(normalizeUrl(codebaseUrl));
-            if (!getHostAndPort(nu).equals(getHostAndPort(nup))) {
+            final URL sanUrl = sanitizeLastSlash(normalizeUrl(url));
+            final URL sanCodebase = sanitizeLastSlash(normalizeUrl(codebaseUrl));
+            if (!getHostAndPort(sanUrl).equals(getHostAndPort(sanCodebase))) {
                 return false;
             }
-            if (!nu.getProtocol().equals(nup.getProtocol())) {
+            if (!sanUrl.getProtocol().equals(sanCodebase.getProtocol())) {
                 return false;
             }
-            if (nu.getPath().contains("..")) {
+            if (sanUrl.getPath().contains(PARENT_DIR)) {
                 return false;
             }
-            if (nu.getPath().startsWith(nup.getPath())) {
+            if (sanUrl.getPath().startsWith(sanCodebase.getPath())) {
                 return true;
             }
         } catch (MalformedURLException | UnsupportedEncodingException | URISyntaxException e) {
