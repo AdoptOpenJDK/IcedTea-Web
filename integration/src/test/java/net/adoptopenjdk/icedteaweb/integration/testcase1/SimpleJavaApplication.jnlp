@@ -3,9 +3,7 @@
     <information>
         <title>Simple Java Application</title>
         <vendor>IcedTea</vendor>
-        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
         <description>This is a simple java application</description>
-        <offline/>
     </information>
 
     <update check="always" policy="always"/>
@@ -13,12 +11,7 @@
     <resources>
         <j2se version="1.8+"/>
         <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
-        <property name="key1" value="value1"/>
-        <property name="key2" value="value2"/>
     </resources>
 
-    <application-desc main-class="${MAIN_CLASS}">
-        <argument>argument1</argument>
-        <argument>argument2 with spaces</argument>
-    </application-desc>
+    <application-desc main-class="${MAIN_CLASS}"/>
 </jnlp>

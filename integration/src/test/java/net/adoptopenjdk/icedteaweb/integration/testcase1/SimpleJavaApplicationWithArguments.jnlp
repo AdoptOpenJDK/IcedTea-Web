@@ -3,9 +3,7 @@
     <information>
         <title>Simple Java Application</title>
         <vendor>IcedTea</vendor>
-        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
         <description>This is a simple java application with arguments</description>
-        <offline/>
     </information>
 
     <update check="always" policy="always"/>

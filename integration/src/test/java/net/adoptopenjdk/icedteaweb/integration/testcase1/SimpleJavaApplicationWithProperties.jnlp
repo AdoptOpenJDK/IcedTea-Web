@@ -3,9 +3,7 @@
     <information>
         <title>Simple Java Application</title>
         <vendor>IcedTea</vendor>
-        <homepage href="http://icedtea.classpath.org/wiki/IcedTea-Web#Testing_IcedTea-Web"/>
         <description>This is a simple java application with properties</description>
-        <offline/>
     </information>
 
     <update check="always" policy="always"/>
@@ -17,6 +15,5 @@
         <property name="key2" value="value2"/>
     </resources>
 
-    <application-desc main-class="${MAIN_CLASS}">
-    </application-desc>
+    <application-desc main-class="${MAIN_CLASS}"/>
 </jnlp>
