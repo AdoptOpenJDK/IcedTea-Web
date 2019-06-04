@@ -54,10 +54,10 @@ import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
@@ -196,23 +196,22 @@ public class ControlPanel extends JFrame {
      * @return A panel with all the components in place.
      */
     private JPanel createMainSettingsPanel() {
-        final List<ControlPanelProvider> providers = new ArrayList<>();
+        final Map<String, ControlPanelProvider> providers = new HashMap<>();
         final ServiceLoader<ControlPanelProvider> serviceLoader = ServiceLoader.load(ControlPanelProvider.class);
         serviceLoader.iterator().forEachRemaining(p -> {
             final String name = p.getName();
             if (p.isActive()) {
-                if (providers.stream().anyMatch(provider -> Objects.equals(provider.getName(), name))) {
-                    throw new IllegalStateException("More than 1 view provider for control panel with name " + name + " found!");
+                if (providers.containsKey(name)) {
+                    throw new IllegalStateException("More than 1 active view provider for control panel with name " + name + " found!");
                 }
                 LOG.debug("Adding view {} to control panel", name);
-                providers.add(p);
+                providers.put(p.getName(), p);
             } else {
                 LOG.debug("Won't add view {} to control panel since it is deactivated", name);
             }
         });
 
-
-        final Map<String, JComponent> panels = providers.stream()
+        final Map<String, JComponent> panels = providers.values().stream()
                 .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
                 .collect(Collectors.toMap(ControlPanelProvider::getName, p -> p.createPanel(config), (u, v) -> {
                     throw new IllegalStateException(String.format("Duplicate key %s", u));
