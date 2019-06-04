@@ -156,27 +156,16 @@ public class ControlPanel extends JFrame {
 
         JButton okButton = new JButton(Translator.R("ButOk"));
         okButton.addActionListener(e -> {
+            // TODO: validation of config before saving
             ControlPanel.this.saveConfiguration();
-            int validationResult = validateJdk();
-            if (validationResult != JOptionPane.OK_OPTION) {
-                return;
-            }
             JNLPRuntime.exit(0);
         });
         buttons.add(okButton);
 
         JButton applyButton = new JButton(Translator.R("ButApply"));
         applyButton.addActionListener(e -> {
+            // TODO: validation of config before saving
             ControlPanel.this.saveConfiguration();
-            int validationResult = validateJdk();
-            if (validationResult != JOptionPane.OK_OPTION) {
-                int i = JOptionPane.showConfirmDialog(ControlPanel.this,
-                        Translator.R("CPJVMconfirmReset"),
-                        Translator.R("CPJVMconfirmReset"), JOptionPane.OK_CANCEL_OPTION);
-                if (i == JOptionPane.OK_OPTION) {
-                    //jvmPanel.resetTestFieldArgumentsExec();
-                }
-            }
         });
         buttons.add(applyButton);
 
