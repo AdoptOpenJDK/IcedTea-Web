@@ -8,10 +8,12 @@ import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.adoptopenjdk.icedteaweb.StringUtils.splitIntoMultipleLines;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.blankOrNullString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 
 /**
@@ -162,5 +164,35 @@ public class StringUtilsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testHasPrefixMatchWithEmptyPrefixString() {
         hasPrefixMatch("", new String[]{"windows"});
+    }
+
+    @Test
+    public void testSubstringBeforeLast() {
+        String source = StringUtils.substringBeforeLast("https://domain.com/substringtest", "/");
+        Assert.assertThat(source, equalTo("https://domain.com"));
+
+        source = StringUtils.substringBeforeLast("https://domain.com/substringtest/", "/");
+        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
+    }
+
+   @Test
+    public void testSubstringBeforeLastWithNoStringMatch() {
+        String source = StringUtils.substringBeforeLast("no slash", "/");
+        Assert.assertThat(source, equalTo("no slash"));
+
+        source = StringUtils.substringBeforeLast("", "/");
+        Assert.assertThat(source, is(blankOrNullString()));
+
+        source = StringUtils.substringBeforeLast(null, "/");
+        Assert.assertThat(source, is(blankOrNullString()));
+    }
+
+    @Test
+    public void testSubstringBeforeLastWithInvalidSeparator() {
+        String source = StringUtils.substringBeforeLast("https://domain.com/substringtest", "");
+        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
+
+        source = StringUtils.substringBeforeLast("https://domain.com/substringtest", null);
+        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
     }
 }

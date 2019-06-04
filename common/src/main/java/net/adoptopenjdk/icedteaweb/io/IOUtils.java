@@ -2,9 +2,11 @@ package net.adoptopenjdk.icedteaweb.io;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -52,12 +54,27 @@ public class IOUtils {
             outputStream.write(buffer, 0, len);
             finalLength = finalLength  + len;
         }
+        outputStream.flush();
         return finalLength;
     }
+
+    public static byte[] readContent(final InputStream inputStream) throws IOException {
+        Assert.requireNonNull(inputStream, "inputStream");
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        copy(inputStream, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    public static String readContentAsString(final InputStream inputStream, final Charset encoding) throws IOException {
+        return new String(readContent(inputStream), encoding);
+    }
+
 
     public static void writeContent(final OutputStream outputStream, final byte[] rawData) throws IOException {
         Assert.requireNonNull(outputStream, "outputStream");
         Assert.requireNonNull(rawData, "rawData");
+
         outputStream.write(rawData);
         outputStream.flush();
     }
