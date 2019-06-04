@@ -34,10 +34,12 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.adoptopenjdk.icedteaweb.client.controlpanel;
+package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.DocumentAdapter;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -65,39 +67,31 @@ import java.io.File;
 @SuppressWarnings("serial")
 public class JVMPanel extends NamedBorderPanel {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JVMPanel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JVMPanel.class);
 
     public static class JvmValidationResult {
 
-        public static enum STATE {
-
+        public enum STATE {
             EMPTY, NOT_DIR, NOT_VALID_DIR, NOT_VALID_JDK, VALID_JDK;
         }
+
         public final String formattedText;
         public final STATE id;
         private final String stds;
 
-        public JvmValidationResult(String formattedText, STATE id, String stdouts) {
+        JvmValidationResult(String formattedText, STATE id, String stdouts) {
             this.id = id;
             this.formattedText = formattedText;
             this.stds = stdouts;
         }
     }
-    private final DeploymentConfiguration config;
+
+    private final JTextField testFieldArgumentsExec;
     private File lastPath = new File("/usr/lib/jvm/java/jre/");
-    JTextField testFieldArgumentsExec;
 
-    JVMPanel(DeploymentConfiguration config) {
+    public JVMPanel(DeploymentConfiguration config) {
         super(Translator.R("CPHeadJVMSettings"), new GridBagLayout());
-        this.config = config;
-        addComponents();
-    }
 
-    void resetTestFieldArgumentsExec() {
-        testFieldArgumentsExec.setText("");
-    }
-
-    private void addComponents() {
         final JLabel description = new JLabel("<html>" + Translator.R("CPJVMPluginArguments") + "<hr /></html>");
         final JTextField testFieldArguments = new JTextField(25);
 
@@ -224,6 +218,10 @@ public class JVMPanel extends NamedBorderPanel {
         c.gridy++;
         c.weighty++;
         this.add(filler, c);
+    }
+
+    public void resetTestFieldArgumentsExec() {
+        testFieldArgumentsExec.setText("");
     }
 
     public static JvmValidationResult validateJvm(String cmd) {

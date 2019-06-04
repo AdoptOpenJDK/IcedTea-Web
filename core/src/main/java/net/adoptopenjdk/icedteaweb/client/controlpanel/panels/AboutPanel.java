@@ -16,20 +16,22 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package net.adoptopenjdk.icedteaweb.client.controlpanel;
+package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
+import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 /**
  * This class provides a GUI interface which shows some basic information on
