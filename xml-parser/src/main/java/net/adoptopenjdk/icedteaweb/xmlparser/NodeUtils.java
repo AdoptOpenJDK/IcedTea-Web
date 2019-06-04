@@ -111,7 +111,7 @@ public class NodeUtils {
 
         if (result == null || result.length() == 0) {
             if (strict || defaultValue == null) {
-                throw new ParseException(R("PNeedsAttribute", node.getNodeName().getName(), name));
+                throw new ParseException("The "+node.getNodeName().getName()+" element must specify a "+name+" attribute.");
             }
         }
 
@@ -185,7 +185,7 @@ public class NodeUtils {
                 // check for going above the codebase
                 if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
                     if (strict) {
-                        throw new ParseException(R("PUrlNotInCodebase", nodeName, href, base));
+                        throw new ParseException("Relative URL does not specify a subdirectory of the codebase. (node="+nodeName+", href="+href+", base="+base+")");
                     }
                 }
                 return result;
@@ -193,9 +193,9 @@ public class NodeUtils {
 
         } catch (MalformedURLException ex) {
             if (base == null) {
-                throw new ParseException(R("PBadNonrelativeUrl", nodeName, href));
+                throw new ParseException("Invalid non-relative URL (node="+nodeName+", href="+href+")");
             } else {
-                throw new ParseException(R("PBadRelativeUrl", nodeName, href, base));
+                throw new ParseException("Invalid relative URL (node="+nodeName+", href="+href+", base="+base+")");
             }
         }
     }

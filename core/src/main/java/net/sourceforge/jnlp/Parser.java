@@ -231,7 +231,7 @@ public final class Parser {
 
         // ensure it's a JNLP node
         if (root == null || !root.getNodeName().getName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
-            throw new ParseException(R("PInvalidRoot"));
+            throw new ParseException("Root element is not a jnlp element.");
         }
 
         // JNLP tag information
@@ -312,7 +312,7 @@ public final class Parser {
         while (child != null) {
             if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
-                    throw new ParseException(R("PTwoUpdates"));
+                    throw new ParseException("Only one update element is allowed");
                 }
 
                 final Node node = child;
@@ -381,7 +381,7 @@ public final class Parser {
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
-            throw new ParseException(R("PNoResources"));
+            throw new ParseException("No No resources element specified.");
         }
         for (final Node resource : resources) {
             result.add(getResourcesDesc(resource, j2se));
@@ -414,20 +414,20 @@ public final class Parser {
             // check for nativelib but no trusted environment
             if (NATIVELIB_ELEMENT.equals(name)) {
                 if (!isTrustedEnvironment()) {
-                    throw new ParseException(R("PUntrustedNative"));
+                    throw new ParseException("nativelib element cannot be specified unless a trusted environment is requested.");
                 }
             }
 
             if (J2SE_ELEMENT.equals(name) || JAVA_ELEMENT.equals(name)) {
                 if (getChildNode(root, ComponentDesc.COMPONENT_DESC_ELEMENT) != null) {
                     if (strict) {
-                        throw new ParseException(R("PExtensionHasJ2SE"));
+                        throw new ParseException("j2se element cannot be specified in a component extension file.");
                     }
                 }
                 if (!j2se) {
                     resources.addResource(getJRE(child));
                 } else {
-                    throw new ParseException(R("PInnerJ2SE"));
+                    throw new ParseException("j2se element cannot be specified within a j2se element.");
                 }
             }
 
@@ -438,7 +438,7 @@ public final class Parser {
                 if (jar.isMain()) {
                     if (mainFlag == true) {
                         if (strict) {
-                            throw new ParseException(R("PTwoMains"));
+                            throw new ParseException("Duplicate main attribute specified on a resources element (there can be only one)");
                         }
                     }
                     mainFlag = true;
@@ -506,7 +506,7 @@ public final class Parser {
 
         if (nativeJar && main) {
             if (strict) {
-                throw new ParseException(R("PNativeHasMain"));
+                throw new ParseException("main attribute cannot be specified on a nativelib element.");
             }
         }
 
@@ -647,7 +647,7 @@ public final class Parser {
                 String kind = getAttribute(child, DescriptionDesc.KIND_ATTRIBUTE, DescriptionKind.DEFAULT.getValue());
                 if (descriptionsUsed.contains(kind)) {
                     if (strict) {
-                        throw new ParseException(R("PTwoDescriptions", kind));
+                        throw new ParseException("Duplicate description elements of kind " + kind + " are illegal.");
                     }
                 }
                 descriptionsUsed.add(kind);
@@ -664,7 +664,7 @@ public final class Parser {
             }
             if ("sharing-allowed".equals(name)) {
                 if (strict && !allowExtensions) {
-                    throw new ParseException(R("PSharing"));
+                    throw new ParseException("sharing-allowed element is illegal in a standard JNLP file");
                 }
                 addInfo(informationDesc, child, null, Boolean.TRUE);
             }
@@ -740,7 +740,7 @@ public final class Parser {
         // test for too many security elements
         if (nodes.length > 1) {
             if (strict) {
-                throw new ParseException(R("PTwoSecurity"));
+                throw new ParseException("Only one security element allowed per JNLP file.");
             }
         }
 
@@ -757,7 +757,7 @@ public final class Parser {
             type = SecurityDesc.J2EE_PERMISSIONS;
             applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
         } else if (strict) {
-            throw new ParseException(R("PEmptySecurity"));
+            throw new ParseException("security element specified but does not contain a permissions element.");
         }
 
         if (base != null) {
@@ -799,7 +799,7 @@ public final class Parser {
                 + getChildNodes(parent, APPLICATION_DESC_ELEMENT).length
                 + getChildNodes(parent, JAVAFX_DESC_ELEMENT).length
                 + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
-            throw new ParseException(R("PTwoDescriptors"));
+            throw new ParseException("Only one application-desc element allowed per JNLP file.");
         }
 
         Node child = parent.getFirstChild();
@@ -847,9 +847,9 @@ public final class Parser {
             height = Integer.parseInt(getRequiredAttribute(node, AppletDesc.HEIGHT_ATTRIBUTE, "100", strict));
         } catch (NumberFormatException nfe) {
             if (width <= 0) {
-                throw new ParseException(R("PBadWidth"));
+                throw new ParseException("Invalid applet width.");
             }
-            throw new ParseException(R("PBadWidth"));
+            throw new ParseException("Invalid applet width.");
         }
 
         // read params
@@ -896,7 +896,7 @@ public final class Parser {
     ComponentDesc getComponent(final Node parent) throws ParseException {
 
         if (1 < getChildNodes(parent, ComponentDesc.COMPONENT_DESC_ELEMENT).length) {
-            throw new ParseException(R("PTwoDescriptors"));
+            throw new ParseException("Only one application-desc element allowed per JNLP file.");
         }
 
         Node child = parent.getFirstChild();
@@ -960,13 +960,13 @@ public final class Parser {
                 switch (name) {
                     case DESKTOP_ELEMENT:
                         if (showOnDesktop && strict) {
-                            throw new ParseException(R("PTwoDesktops"));
+                            throw new ParseException("Only one desktop element allowed");
                         }
                         showOnDesktop = true;
                         break;
                     case MENU_ELEMENT:
                         if (menu != null && strict) {
-                            throw new ParseException(R("PTwoMenus"));
+                            throw new ParseException("Only one menu element allowed");
                         }
                         menu = getMenu(child);
                         break;
@@ -1013,19 +1013,19 @@ public final class Parser {
                 switch (name) {
                     case RelatedContentDesc.TITLE_ELEMENT:
                         if (title != null && strict) {
-                            throw new ParseException(R("PTwoTitles"));
+                            throw new ParseException("Only one title element allowed");
                         }
                         title = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.DESCRIPTION_ELEMENT:
                         if (description != null && strict) {
-                            throw new ParseException(R("PTwoDescriptions"));
+                            throw new ParseException("Duplicate description elements of kind {0} are illegal.");
                         }
                         description = getSpanText(child, false);
                         break;
                     case RelatedContentDesc.ICON_ELEMENT:
                         if (icon != null && strict) {
-                            throw new ParseException(R("PTwoIcons"));
+                            throw new ParseException("Only one icon element allowed");
                         }
                         icon = getIcon(child);
                         break;

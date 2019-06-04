@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 /**
  * Security manager for JNLP environment. This security manager
  * cannot be replaced as it always denies attempts to replace the
@@ -86,7 +84,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     /** this exception prevents exiting the JVM */
     private SecurityException closeAppEx = // making here prevents huge stack traces
-    new SecurityException(R("RShutdown"));
+            new SecurityException("This exception to prevent shutdown of JVM, but the process has been terminated.");
 
     /** weak list of windows created */
     private WeakList<Window> weakWindows = new WeakList<Window>();
@@ -157,7 +155,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
      */
     public void setExitClass(Class<?> exitClass) throws IllegalStateException {
         if (this.exitClass != null) {
-            throw new IllegalStateException(R("RExitTaken"));
+            throw new IllegalStateException("Exit class already set and caller is not exit class.");
         }
 
         this.exitClass = exitClass;
@@ -275,7 +273,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
         if (!JNLPRuntime.isWebstartApplication() &&
                 ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {
-            throw new SecurityException(R("RCantReplaceSM"));
+            throw new SecurityException("Changing the SecurityManager is not allowed.");
         }
 
         try {
@@ -412,7 +410,7 @@ class JNLPSecurityManager extends AWTSecurityManager {
         // but when they really call, stop only the app instead of the JVM
         ApplicationInstance app = getApplication(Thread.currentThread(), stack, 0);
         if (app == null) {
-            throw new SecurityException(R("RExitNoApp"));
+            throw new SecurityException("Cannot exit the JVM because the current application cannot be determined.");
         }
 
         app.destroy();

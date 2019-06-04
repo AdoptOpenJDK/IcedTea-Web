@@ -25,7 +25,7 @@ public class LocaleUtils {
      */
     public static Locale getLocale(final String localeString) throws ParseException {
         if (Objects.isNull(localeString) || localeString.length() < 2) {
-            throw new ParseException(R("PIllegalLocale", localeString));
+            throw new ParseException("Locale attribute of information element contains illegal locale: " + localeString);
         }
 
         final String language = localeString.substring(0, 2);

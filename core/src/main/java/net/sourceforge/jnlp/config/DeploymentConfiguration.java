@@ -314,9 +314,9 @@ public final class DeploymentConfiguration {
         for (final String key : initial.keySet()) {
             final Setting<String> s = initial.get(key);
             if (!(s.getName().equals(key))) {
-                LOG.info(R("DCInternal", "key " + key + " does not match setting name " + s.getName()));
+                LOG.info("key '{}' does not match setting name '{}'", key, s.getName());
             } else if (!defaults.containsKey(key)) {
-                LOG.info(R("DCUnknownSettingWithName", key));
+                LOG.info("Property '{}' is unknown.", key);
             } else {
                 final ValueValidator checker = defaults.get(key).getValidator();
                 if (checker == null) {
@@ -326,7 +326,7 @@ public final class DeploymentConfiguration {
                 try {
                     checker.validate(s.getValue());
                 } catch (final IllegalArgumentException e) {
-                    LOG.error(R("DCIncorrectValue", key, s.getValue(), checker.getPossibleValues()), e);
+                    LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}.", key, s.getValue(), checker.getPossibleValues(), e);
                     s.setValue(s.getDefaultValue());
                 }
             }
@@ -402,7 +402,7 @@ public final class DeploymentConfiguration {
             LOG.info("Using System level {} : {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (final MalformedURLException e) {
-            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES+ ": " + urlString + "in " + configFile.toExternalForm(), e);
+            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
             if (systemPropertiesMandatory){
                 final ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
@@ -593,10 +593,10 @@ public final class DeploymentConfiguration {
                     + (value.isLocked() ? " [LOCKED]" : ""));
         }
     }
-    
+
     //standard date.toString format
     private static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-    
+
     private static String loadComments(final URL path) {
         final StringBuilder r = new StringBuilder();
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(path.openStream(), StandardCharsets.UTF_8))) {
@@ -629,7 +629,7 @@ public final class DeploymentConfiguration {
         } catch (final Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
-        
+
         return r.toString().trim();
     }
 

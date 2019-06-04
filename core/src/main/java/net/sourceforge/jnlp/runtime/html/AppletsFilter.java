@@ -6,7 +6,6 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -43,7 +42,7 @@ public class AppletsFilter {
             Element element = appletElement.get(i);
             AppletParser ap = new AppletParser(element, docBase);
             aps.add(ap);
-            LOG.debug("added: {}", aps.size()-1);
+            LOG.debug("added: {}", aps.size() - 1);
             LOG.debug(ap.toString());
         }
         return aps;
@@ -51,7 +50,7 @@ public class AppletsFilter {
 
     private List<Element> getAppletElements() throws ParserConfigurationException, SAXException, IOException {
         if (found.isEmpty()) {
-            throw new RuntimeException(Translator.R("HTMLnoneFound"));
+            throw new RuntimeException("No applet found on this html page (supported are object, embed and applet tags)");
         }
         List<Integer> id = sanitizeFilter();
         List<Element> r = new ArrayList<>(found.size());
@@ -69,7 +68,7 @@ public class AppletsFilter {
         List<Integer> r = new ArrayList<>(found.size());
         if (ids.isEmpty()) {
             if (found.size() > 1) {
-                LOG.info(Translator.R("HTMLmoreThenOne", found.size()));
+                LOG.info("More then one ({}) applets found. Using  first. You can specify ''all'' or numbers to specify applets you want to run.", found.size());
             }
             r.add(0);
             return r;

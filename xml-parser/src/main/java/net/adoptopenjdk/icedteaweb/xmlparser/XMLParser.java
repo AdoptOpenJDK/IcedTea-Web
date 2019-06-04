@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.io.Reader;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
 import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
 
@@ -74,7 +73,7 @@ public class XMLParser {
             xml.parseFromReader(sanitizeXml(preprocessXml(reader)));
             return new Node(xml);
         } catch (Exception ex) {
-            throw new ParseException(R("PBadXML"), ex);
+            throw new ParseException("Invalid XML document syntax.", ex);
         }
     }
 

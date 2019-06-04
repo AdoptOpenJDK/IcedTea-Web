@@ -216,7 +216,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
         consoleWindow.setName("JavaConsole");
         SwingUtils.info(consoleWindow);
-        
+
         consoleWindow.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -279,7 +279,7 @@ public class JavaConsole implements ObservableMessagesProvider {
                 printMemoryInfo();
                 LOG.info("Performing Garbage Collection....");
                 System.gc();
-                LOG.info(R("ButDone"));
+                LOG.info("Done");
                 printMemoryInfo();
                 updateModel();
             }
@@ -292,9 +292,9 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void actionPerformed(ActionEvent e) {
                 printMemoryInfo();
-                LOG.info(R("CONSOLErunningFinalizers"));
+                LOG.info("Running finalization....");
                 Runtime.getRuntime().runFinalization();
-                LOG.info(R("ButDone"));
+                LOG.info("Done");
                 printMemoryInfo();
                 updateModel();
             }
@@ -442,7 +442,7 @@ public class JavaConsole implements ObservableMessagesProvider {
     protected void printSystemProperties() {
 
         LOG.info(" ----");
-        LOG.info(R("CONSOLEsystemProperties") + ":");
+        LOG.info("System Properties:");
         LOG.info("");
         Properties p = System.getProperties();
         Set<Object> keys = p.keySet();
@@ -458,10 +458,10 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void printClassLoaders() {
         if (classLoaderInfoProvider == null) {
-            LOG.debug(R("CONSOLEnoClassLoaders"));
+            LOG.debug("No Classloader info exists in system");
         } else {
             LOG.debug(" ----");
-            LOG.debug(R("CONSOLEclassLoaders") + ": ");
+            LOG.debug("Available Classloaders: ");
             Set<String> loaders = classLoaderInfoProvider.getLoaderInfo().keySet();
             for (String loader : loaders) {
                 LOG.debug(loader + "\n"
@@ -474,10 +474,10 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private void printMemoryInfo() {
         LOG.info(" ----- ");
-        LOG.info("  " + R("CONSOLEmemoryInfo") + ":");
-        LOG.info("   " + R("CONSOLEmemoryMax") + ":   " + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
-        LOG.info("    " + R("CONSOLEmemoryTotal") + ": " + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
-        LOG.info("    " + R("CONSOLEmemoryFree") + ":  " + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
+        LOG.info("  Memory Info:");
+        LOG.info("   Max Memory:    " + String.format("%1$10d", Runtime.getRuntime().maxMemory()));
+        LOG.info("    Total Memory: " + String.format("%1$10d", Runtime.getRuntime().totalMemory()));
+        LOG.info("    Free Memory:  " + String.format("%1$10d", Runtime.getRuntime().freeMemory()));
         LOG.info(" ----");
 
     }
@@ -486,7 +486,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
         Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
-            LOG.info(R("CONSOLEthread") + " " + key.getId() + ": " + key.getName());
+            LOG.info("Thread " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
                 LOG.info("  " + element);
             }
@@ -523,7 +523,7 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private synchronized void updateModel(final Boolean force) {
         observable.setChanged();
-        
+
         SwingUtils.invokeLater(new Runnable() {
 
             @Override

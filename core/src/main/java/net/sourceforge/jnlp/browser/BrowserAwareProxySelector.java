@@ -103,7 +103,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         try {
             initFromBrowserConfig();
         } catch (IOException e) {
-            LOG.error(R("RProxyFirefoxNotFound"), e);
+            LOG.error("Unable to use Firefox''s proxy settings. Using \"DIRECT\" as proxy type.", e);
             browserProxyType = PROXY_TYPE_NONE;
         }
     }
@@ -217,7 +217,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
                 if (optionDescription == null) {
                     optionDescription = "Unknown";
                 }
-                LOG.debug(R("RProxyFirefoxOptionNotImplemented", browserProxyType, optionDescription));
+                LOG.debug("Browser proxy option \"{}\" ({}) not supported yet.", browserProxyType, optionDescription);
                 proxies.add(Proxy.NO_PROXY);
         }
 

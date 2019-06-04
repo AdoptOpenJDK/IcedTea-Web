@@ -1,4 +1,4 @@
-/* 
+/*
  Copyright (C) 2012 Red Hat, Inc.
 
  This file is part of IcedTea.
@@ -37,8 +37,8 @@
 package net.adoptopenjdk.icedteaweb.client.parts.browser;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,7 +253,7 @@ public class HtmlBrowserPanel extends JPanel {
         UTF_16,
         UTF_16BE,
         UTF_16LE
-    
+
 });
 
     private static final String TEXTPLAIN = "text/plain";
@@ -326,7 +326,7 @@ public class HtmlBrowserPanel extends JPanel {
         if (isUseSocket()) {
             LOG.debug("Using socket connection");
             Charset ch = (Charset)(encodingBox.getSelectedItem());
-            if (ch == null) { 
+            if (ch == null) {
                 result = UrlUtils.loadUrlWithInvalidHeader(url);
             } else {
                 result = UrlUtils.loadUrlWithInvalidHeader(url, ch);
@@ -335,7 +335,7 @@ public class HtmlBrowserPanel extends JPanel {
             LOG.debug("Using URLconnection");
             String s;
             Charset ch = (Charset)(encodingBox.getSelectedItem());
-            if (ch == null) { 
+            if (ch == null) {
                 s = UrlUtils.loadUrl(url);
             } else {
                 s = UrlUtils.loadUrl(url, ch);
@@ -470,8 +470,8 @@ public class HtmlBrowserPanel extends JPanel {
     }
 
     public static void warn() {
-        LOG.info(Translator.R("BrowserWarningLine1"));
-        LOG.info(Translator.R("BrowserWarningLine2"));
+        LOG.info("WARNING this is html 3.2 comatible browser, not intended for casual web browsing!");
+        LOG.info("Provided without any warranty!");
     }
 
     public static void showStandAloneWindow(String url, boolean socket) {

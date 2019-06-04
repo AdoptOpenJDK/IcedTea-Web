@@ -37,7 +37,6 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.xmlparser.MalformedXMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlStreamReader;
@@ -100,13 +99,13 @@ public class AppletExtractor {
                 final MalformedXMLParser parser = new MalformedXMLParser();
                 return parser.preprocessXml(new XmlStreamReader(is));
             } else {
-                LOG.warn(Translator.R("TAGSOUPhtmlNotUsed", CommandLineOptions.XML.getOption()));
+                LOG.warn("Tagsoup''s html2xml cleaning is Disabled. Remove {}. Parsing will probably fail.", CommandLineOptions.XML.getOption());
             }
         } catch (Exception ex) {
-            LOG.error(Translator.R("TAGSOUPhtmlBroken"), ex);
+            LOG.error("Tagsoup''s html2xml cleaning not loaded. Install tagsoup (and build ITW against). Parsing will probably fail.", ex);
         }
         return new XmlStreamReader(is);
-    }   
+    }
 
     public List<Element> findAppletsOnPage() {
         try{
@@ -134,8 +133,8 @@ public class AppletExtractor {
         LOG.debug("Root element: {}", doc.getDocumentElement().getNodeName());
         //search for applets
         //search for embed/object
-        //<embed type="application/x-java-applet" 
-        //<object type="application/x-java-applet" 
+        //<embed type="application/x-java-applet"
+        //<object type="application/x-java-applet"
         //warning all searches are case sensitive
         return findElements(APPLETS, doc.getDocumentElement(), new ElementValidator() {
 
@@ -154,7 +153,7 @@ public class AppletExtractor {
     }
 
     //warning, even application/x-java-applet;jpi-version=1.5.0_07 and more blah blah  can be in type, so of embed/object start with
-    //search for 
+    //search for
     //OBJECT classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
     //<object codetype="application/x-java-applet" height="120" width="81"
     private static boolean isApplet(final Element eElement) {

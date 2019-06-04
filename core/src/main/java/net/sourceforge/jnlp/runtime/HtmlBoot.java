@@ -194,14 +194,14 @@ public final class HtmlBoot {
 
                             @Override
                             public void windowClosed(WindowEvent e) {
-                                Boot.fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
+                                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
                             }
 
                         });
                     }
                 });
             } else {
-                Boot.fatalError(R("RUnexpected", ex.toString(), ex.getStackTrace()[0]));
+                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
             }
         }
         return true;

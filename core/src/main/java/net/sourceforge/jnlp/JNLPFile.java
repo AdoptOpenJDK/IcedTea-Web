@@ -61,7 +61,6 @@ import java.util.Locale;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * <p>
@@ -161,7 +160,7 @@ public class JNLPFile {
      * List of acceptable properties (not-special)
      */
     final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
-    
+
     /** important manifests' attributes */
     private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
@@ -318,7 +317,7 @@ public class JNLPFile {
 
     /**
      * Open the jnlp file URL from the cache if there, otherwise
-     * download to the cache. 
+     * download to the cache.
      * Unless file is find in cache, this method blocks until it is downloaded.
      * This is the best way in itw how to download and cache file
      * @param location of resource to open
@@ -329,7 +328,7 @@ public class JNLPFile {
      */
     public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
         if (location == null || policy == null)
-            throw new IllegalArgumentException(R("NullParameter"));
+            throw new IllegalArgumentException("Null parameter");
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
@@ -344,7 +343,7 @@ public class JNLPFile {
     /**
      * @return the JNLP file's best localized title. This method returns the same
      * value as InformationDesc.getTitle().
-     * 
+     *
      * Since jdk7 u45, also manifest title, and mainclass are taken to consideration;
      * See PluginBridge
      */
@@ -366,9 +365,9 @@ public class JNLPFile {
             throw new MissingTitleException();
         }
         if (title.trim().isEmpty()) {
-            LOG.warn(R("PMissingElement", R("PMissingTitle")));
-            title = R("PMissingMandatorySubstitution", R("PMissingTitle"));
-            LOG.warn(R("PMissingMandatoryWarning", R("PMissingTitle")) + ": {}", title);
+            LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
+            title = "Corrupted or missing title. Do not trust this application!";
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + ": {}", title);
         } else {
             LOG.info("Acceptable title tag found, contains: {}", title);
         }
@@ -431,9 +430,9 @@ public class JNLPFile {
             throw new MissingVendorException();
         }
         if (vendor.trim().isEmpty()) {
-            LOG.warn(R("PMissingElement", R("PMissingVendor")));
-            vendor = R("PMissingMandatorySubstitution", R("PMissingVendor"));
-            LOG.warn(R("PMissingMandatoryWarning", R("PMissingVendor")) + ": " + vendor);
+            LOG.warn("The vendor section has not been specified for your locale nor does a default value exist in the JNLP file.");
+            vendor = "Corrupted or missing vendor. Do not trust this application!";
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor"+ ": " + vendor);
         } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
@@ -494,12 +493,12 @@ public class JNLPFile {
     public URL getCodeBase() {
         return codeBase;
     }
-    
+
     /**
      * It is not recommended to use this method for internals of itw - use normal getCodeBase rather, as null is expected always except toString calls.
      *
      * If you are not sure, use getCodeBase and check null as you need. See that this method is used mostly for xtendedAppletSecuriyty dialogs.
-     * 
+     *
      * @return the codebase URL for the JNLP file  or url of location of calling file (jnlp, hreffed jnlp, or directly html)
      */
     public URL getNotNullProbableCodeBase() {
@@ -714,7 +713,7 @@ public class JNLPFile {
      */
     public AppletDesc getApplet() {
         if (!isApplet())
-            throw new UnsupportedOperationException(R("JNotApplet"));
+            throw new UnsupportedOperationException("File is not an applet.");
 
         return (AppletDesc) entryPointDesc;
     }
@@ -726,7 +725,7 @@ public class JNLPFile {
      */
     public ApplicationDesc getApplication() {
         if (!isApplication())
-            throw new UnsupportedOperationException(R("JNotApplication"));
+            throw new UnsupportedOperationException("File is not an application.");
 
         return (ApplicationDesc) entryPointDesc;
     }
@@ -738,7 +737,7 @@ public class JNLPFile {
      */
     public ComponentDesc getComponent() {
         if (!isComponent())
-            throw new UnsupportedOperationException(R("JNotComponent"));
+            throw new UnsupportedOperationException("File is not a component.");
 
         return component;
     }
@@ -750,7 +749,7 @@ public class JNLPFile {
      */
     public InstallerDesc getInstaller() {
         if (!isInstaller())
-            throw new UnsupportedOperationException(R("NotInstaller"));
+            throw new UnsupportedOperationException("File is not an installer.");
 
         return (InstallerDesc) entryPointDesc;
     }
@@ -788,7 +787,7 @@ public class JNLPFile {
      * getInformation, getResources, etc.  If unset, the defaults
      * are the properties os.name, os.arch, and the locale returned
      * by Locale.getDefault().
-     * @param os preferred os of resource      
+     * @param os preferred os of resource
      * @param arch preferred arch of resource
      * @param locale preferred locale of resource
      */
@@ -976,13 +975,13 @@ public class JNLPFile {
         }
         return getTitle() + " from " + createJnlpTitleValue();
     }
-    
+
     public String createNameForDesktopFile() {
         String basicTitle = getTitle();
         if (basicTitle == null || basicTitle.trim().isEmpty()) {
             return createJnlpTitleValue().replaceAll(".jnlp$","");
         } else {
-            return basicTitle;            
+            return basicTitle;
         }
     }
 }
