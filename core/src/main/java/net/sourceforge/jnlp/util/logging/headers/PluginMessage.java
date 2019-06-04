@@ -44,46 +44,57 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-public class PluginMessage  implements MessageWithHeader{
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_ALL;
 
-    private final static Logger LOG = LoggerFactory.getLogger(PluginMessage.class);
+public class PluginMessage implements MessageWithHeader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PluginMessage.class);
 
     public final PluginHeader header;
-    public String restOfMessage;
-    public boolean wasError = false;
+    public final String restOfMessage;
+    public final boolean wasError;
 
     public PluginMessage(String orig) {
-        restOfMessage = orig;
-        header = new PluginHeader();
-        String s = orig.trim();
-        PluginHeader p = this.header;
+        boolean wasError;
+        String restOfMessage;
+        PluginHeader header;
         try {
-            p.isC = true;
-            p.application = false;
-            if (s.startsWith("preinit_plugin")) {
-                p.preinit = true;
-            }
-            if (s.startsWith(PluginHeader.PLUGIN_DEBUG) || s.startsWith(PluginHeader.PLUGIN_DEBUG_PREINIT)) {
-                p.level = OutputControllerLevel.MESSAGE_DEBUG;
-            } else if (s.startsWith(PluginHeader.PLUGIN_ERROR) || s.startsWith(PluginHeader.PLUGIN_ERROR_PREINIT)) {
-                p.level = OutputControllerLevel.ERROR_ALL;
-            } else {
-                p.level = OutputControllerLevel.WARNING_ALL;
-            }
-            String[] init = PluginHeader.whiteSpaces.split(s);
-            p.timestamp = new Date(Long.parseLong(init[1]) / 1000);
-            String[] main = PluginHeader.bracketsPattern.split(s);
-            p.user = main[1];
-            p.caller = main[5];
-            p.date = main[4];
-            String[] threads = PluginHeader.threadsPattern.split(main[6]);
-            p.thread1 = threads[2];
-            p.thread2 = threads[4];
-            int i = orig.indexOf(p.thread2);
-            restOfMessage = orig.substring(i + p.thread2.length() + 2); //+": "
+            final String s = orig.trim();
+            final boolean preInit = s.startsWith("preinit_plugin");
+            final String[] init = PluginHeader.whiteSpaces.split(s);
+            final String[] main = PluginHeader.bracketsPattern.split(s);
+
+            final Date timestamp = new Date(Long.parseLong(init[1]) / 1000);
+            final String user = main[1];
+            final String date = main[4];
+            final String caller = main[5];
+            final String[] threads = PluginHeader.threadsPattern.split(main[6]);
+            final String thread1 = threads[2];
+            final String thread2 = threads[4];
+            final OutputControllerLevel level = getLevel(s);
+
+            wasError = false;
+            restOfMessage = orig.substring(orig.indexOf(thread2) + thread2.length() + 2); //+": "
+            header = new PluginHeader(level, timestamp, date, user, caller, thread1, thread2, preInit);
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            this.wasError = true;
+            wasError = true;
+            restOfMessage = orig;
+            header = new PluginHeader();
+        }
+
+        this.wasError = wasError;
+        this.restOfMessage = restOfMessage;
+        this.header = header;
+    }
+
+    private static OutputControllerLevel getLevel(String s) {
+        if (s.startsWith(PluginHeader.PLUGIN_DEBUG) || s.startsWith(PluginHeader.PLUGIN_DEBUG_PREINIT)) {
+            return OutputControllerLevel.MESSAGE_DEBUG;
+        } else if (s.startsWith(PluginHeader.PLUGIN_ERROR) || s.startsWith(PluginHeader.PLUGIN_ERROR_PREINIT)) {
+            return OutputControllerLevel.ERROR_ALL;
+        } else {
+            return WARNING_ALL;
         }
     }
 

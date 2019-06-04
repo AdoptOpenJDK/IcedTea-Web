@@ -50,43 +50,56 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_NAME;
 
 public class Header {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Header.class);
-    private static final String  default_user = System.getProperty(USER_NAME);
-    
-    public String user = default_user;
-    public boolean application = true;
-    public OutputControllerLevel level = OutputControllerLevel.WARNING_ALL;
-    public Date timestamp  = new Date();
-    public String date = timestamp.toString();
-    public boolean isC = false;//false=> java
-    public boolean isClientApp = false;//false=> ITW
-    public String caller = "unknown";
-    public String thread1 = "unknown";
-    public String thread2 = "unknown";
+    private static final Logger LOG = LoggerFactory.getLogger(Header.class);
 
-    //to allow simple inheritance
-    public Header() {
+    static final String default_user = System.getProperty(USER_NAME);
+    static final String unknown = "unknown";
+
+    public final String user;
+    public final boolean application;
+    public final OutputControllerLevel level;
+    public final Date timestamp;
+    public final String date;
+    public final boolean isPlugin;
+    public final boolean isClientApp;
+    public final String caller;
+    public final String thread1;
+    public final String thread2;
+
+    public Header(OutputControllerLevel level) {
+        this(level, false);
     }
 
-    public Header(OutputControllerLevel level, boolean isC) {
-        this(level, Thread.currentThread().getStackTrace(), Thread.currentThread(), isC);   
-    }
-    
-    public Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, boolean isC) {
-        this(level, stack, thread, new Date(), isC);
+    public Header(OutputControllerLevel level, boolean isClientApp) {
+        this(level, new Date(), isClientApp, Thread.currentThread());
     }
 
-    private Header(OutputControllerLevel level, StackTraceElement[] stack, Thread thread, Date d, boolean isC) {
-        this.application = JNLPRuntime.isWebstartApplication();
+    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread) {
+        this(
+                level, // level
+                timestamp, // timestamp
+                timestamp.toString(), // date
+                JNLPRuntime.isWebstartApplication(), // application
+                false, // isPlugin
+                isClientApp, // isClientApp
+                default_user, // user
+                getCallerClass(thread.getStackTrace()), // caller
+                Integer.toHexString(thread.hashCode()), // thread1
+                thread.getName()) // thread2
+        ;
+    }
+
+    protected Header(OutputControllerLevel level, Date timestamp, String date, boolean application, boolean isPlugin, boolean isClientApp, String user, String caller, String thread1, String thread2) {
+        this.user = user;
+        this.application = application;
         this.level = level;
-        this.timestamp = d;
-        this.date = timestamp.toString();
-        this.isC = isC;
-        if (stack != null) {
-            this.caller = getCallerClass(stack);
-        }
-        this.thread1 = Integer.toHexString(thread.hashCode());
-        this.thread2 = thread.getName();
+        this.timestamp = timestamp;
+        this.date = date;
+        this.isPlugin = isPlugin;
+        this.isClientApp = isClientApp;
+        this.caller = caller;
+        this.thread1 = thread1;
+        this.thread2 = thread2;
     }
 
     @Override
@@ -97,27 +110,27 @@ public class Header {
     public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
         StringBuilder sb = new StringBuilder();
         try {
-            if (userb){
+            if (userb) {
                 sb.append("[").append(user).append("]");
             }
-            if(originb){
+            if (originb) {
                 sb.append("[").append(getOrigin()).append("]");
             }
 
             if (levelb && level != null) {
                 sb.append('[').append(level.toString()).append(']');
             }
-            if (dateb){
+            if (dateb) {
                 sb.append('[').append(date).append(']');
             }
             if (callerb && caller != null) {
                 sb.append('[').append(caller).append(']');
             }
-            if (thread1b && thread2b){
+            if (thread1b && thread2b) {
                 sb.append(threadsToString());
-            }else if (thread1b) {
+            } else if (thread1b) {
                 sb.append(thread1ToString());
-            }else if (thread2b) {
+            } else if (thread2b) {
                 sb.append(thread2ToString());
             }
         } catch (Exception ex) {
@@ -146,7 +159,7 @@ public class Header {
         if (application) {
             s = "ITW-JAVAWS";
         } else {
-            if (isC) {
+            if (isPlugin) {
                 s = "ITW-C-PLUGIN";
             } else {
                 s = "ITW-APPLET";

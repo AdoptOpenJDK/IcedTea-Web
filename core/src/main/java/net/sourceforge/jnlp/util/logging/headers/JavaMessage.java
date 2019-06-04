@@ -37,9 +37,7 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
-
-
-public class JavaMessage  implements MessageWithHeader{
+public class JavaMessage implements MessageWithHeader {
 
     private final Header header;
     private final String message;
@@ -48,8 +46,6 @@ public class JavaMessage  implements MessageWithHeader{
         this.header = header;
         this.message = message;
     }
-
-    
 
     @Override
     public String getMessage() {

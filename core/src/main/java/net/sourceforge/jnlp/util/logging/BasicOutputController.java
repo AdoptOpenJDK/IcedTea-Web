@@ -56,7 +56,7 @@ public abstract class BasicOutputController {
 
     public void log(final OutputControllerLevel level, final Object o) {
         final String message = convertToNonNullString(o);
-        log(new JavaMessage(new Header(level, false), message));
+        log(new JavaMessage(new Header(level), message));
     }
 
     private String convertToNonNullString(final Object o) {

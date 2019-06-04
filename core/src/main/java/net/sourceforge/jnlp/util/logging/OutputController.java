@@ -144,7 +144,7 @@ public class OutputController extends BasicOutputController {
         //only java messages handled here, plugin is on his own
         if (LogConfig.getLogConfig().isLogToSysLog() && 
                 (s.getHeader().level.equals(OutputControllerLevel.ERROR_ALL) || s.getHeader().level.equals(OutputControllerLevel.WARNING_ALL)) &&
-                !s.getHeader().isC) {
+                !s.getHeader().isPlugin) {
             //no headers here
             getSystemLog().log(s.getMessage());
         }
