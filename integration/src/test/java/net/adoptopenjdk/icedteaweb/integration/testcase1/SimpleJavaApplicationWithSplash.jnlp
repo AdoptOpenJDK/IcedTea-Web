@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" codebase="http://localhost:${PORT}">
+    <information>
+        <title>Simple Java Application</title>
+        <vendor>IcedTea</vendor>
+        <description>This is a simple java application</description>
+        <icon kind="splash" href="resources/javaws.png"/>
+    </information>
+
+    <update check="always" policy="always"/>
+
+    <resources>
+        <j2se version="1.8+"/>
+        <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
+    </resources>
+
+    <application-desc main-class="${MAIN_CLASS}"/>
+</jnlp>
