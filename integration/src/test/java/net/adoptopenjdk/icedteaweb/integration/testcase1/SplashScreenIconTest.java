@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
  */
 public class SplashScreenIconTest implements IntegrationTest {
     private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
+    private static final String SPLASH_ICON = "javaws.png";
 
     @Rule
     public TemporaryItwHome tmpItwHome = new TemporaryItwHome();
@@ -28,7 +29,7 @@ public class SplashScreenIconTest implements IntegrationTest {
     @Test(timeout = 5_000)
     public void testSplashIcon() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SimpleJavaApplication.class, JAR_NAME, SPLASH_ICON);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -36,6 +37,6 @@ public class SplashScreenIconTest implements IntegrationTest {
         Boot.main(args);
 
         // then
-        assertThat(hasCachedFile(tmpItwHome, "javaws.png"), is(true));
+        assertThat(hasCachedFile(tmpItwHome, SPLASH_ICON), is(true));
     }
 }
