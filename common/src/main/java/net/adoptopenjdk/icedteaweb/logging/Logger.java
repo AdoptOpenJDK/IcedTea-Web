@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.util.logging;
+package net.adoptopenjdk.icedteaweb.logging;
 
 /**
  * Simple logger interface based on SLF4J.

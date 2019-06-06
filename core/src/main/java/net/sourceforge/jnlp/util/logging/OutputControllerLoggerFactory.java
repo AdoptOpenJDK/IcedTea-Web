@@ -1,5 +1,8 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory.LoggerFactoryImpl;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
@@ -13,14 +16,14 @@ import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_AL
 
 /**
  * Factory for creating {@link Logger Loggers} which log to the {@link OutputController}.
+ *
+ * NOTE:
+ * This class is instantiated using reflection from {@link LoggerFactory}.
  */
-public class LoggerFactory {
+@SuppressWarnings("unused")
+public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
 
-    private LoggerFactory() {
-        // do not instantiate this class
-    }
-
-    public static Logger getLogger(Class<?> forClass) {
+    public Logger getLogger(Class<?> forClass) {
         return new OutputControllerLogger(forClass);
     }
 
