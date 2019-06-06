@@ -54,7 +54,7 @@ public class PluginMessage implements MessageWithHeader {
     public final String restOfMessage;
     public final boolean wasError;
 
-    public PluginMessage(String orig) {
+    public PluginMessage(final String orig) {
         boolean wasError;
         String restOfMessage;
         PluginHeader header;
@@ -76,7 +76,7 @@ public class PluginMessage implements MessageWithHeader {
             wasError = false;
             restOfMessage = orig.substring(orig.indexOf(thread2) + thread2.length() + 2); //+": "
             header = new PluginHeader(level, timestamp, date, user, caller, thread1, thread2, preInit);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             wasError = true;
             restOfMessage = orig;
@@ -88,7 +88,7 @@ public class PluginMessage implements MessageWithHeader {
         this.header = header;
     }
 
-    private static OutputControllerLevel getLevel(String s) {
+    private static OutputControllerLevel getLevel(final String s) {
         if (s.startsWith(PluginHeader.PLUGIN_DEBUG) || s.startsWith(PluginHeader.PLUGIN_DEBUG_PREINIT)) {
             return OutputControllerLevel.MESSAGE_DEBUG;
         } else if (s.startsWith(PluginHeader.PLUGIN_ERROR) || s.startsWith(PluginHeader.PLUGIN_ERROR_PREINIT)) {

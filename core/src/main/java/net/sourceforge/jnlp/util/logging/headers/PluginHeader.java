@@ -72,13 +72,7 @@ public class PluginHeader extends Header {
       
     @Override
     public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
-        final String result = super.toString(userb, originb, levelb, dateb, callerb, thread1b, thread2b);
-
-        if (preInit) {
-            return "!" + result;
-        } else {
-            return result;
-        }
+        return preInit ? "!" : "" + super.toString(userb, originb, levelb, dateb, callerb, thread1b, thread2b);
     }
 
     @Override
