@@ -33,7 +33,7 @@ public class SplashScreenIconTest implements IntegrationTest {
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
+        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork"};
         Boot.main(args);
 
         // then
