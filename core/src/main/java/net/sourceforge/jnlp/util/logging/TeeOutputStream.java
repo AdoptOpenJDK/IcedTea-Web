@@ -107,8 +107,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     @Override
     public void log(String s) {
-        JavaMessage  jm = new JavaMessage(new Header(getLevel(), false), s);
-        jm.getHeader().isClientApp = true;
+        JavaMessage  jm = new JavaMessage(new Header(getLevel(), true), s);
         outputController.log(jm);
     }
 

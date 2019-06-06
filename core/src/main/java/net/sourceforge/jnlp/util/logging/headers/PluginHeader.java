@@ -37,11 +37,15 @@ exception statement from your version. *
  */
 package net.sourceforge.jnlp.util.logging.headers;
 
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
+
+import java.util.Date;
 import java.util.regex.Pattern;
+
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_ALL;
 
 public class PluginHeader extends Header {
 
-    public boolean preinit;
     static final String PLUGIN_DEBUG = "plugindebug ";
     static final String PLUGIN_DEBUG_PREINIT = "preinit_plugindebug ";
     static final String PLUGIN_ERROR = "pluginerror ";
@@ -50,7 +54,17 @@ public class PluginHeader extends Header {
     static final Pattern whiteSpaces = Pattern.compile("\\s+");
     static final Pattern threadsPattern = Pattern.compile("\\s+|,\\s*|:");
 
-    
+    public final boolean preInit;
+
+    PluginHeader() {
+        this(WARNING_ALL, new Date(), new Date().toString(), default_user, unknown, unknown, unknown, false);
+    }
+
+    PluginHeader(OutputControllerLevel level, Date timestamp, String date, String user, String caller, String thread1, String thread2, boolean preInit) {
+        super(level, timestamp, date, false, true, false, user, caller, thread1, thread2);
+        this.preInit = preInit;
+    }
+
     @Override
     public String toString() {
         return toString(true, true, true, true, true, true, true);
@@ -58,11 +72,7 @@ public class PluginHeader extends Header {
       
     @Override
     public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
-        if (preinit) {
-            return "!" + super.toString(userb, originb, levelb, dateb, callerb, thread1b, thread2b);
-        } else {
-            return super.toString(userb, originb, levelb, dateb, callerb, thread1b, thread2b);
-        }
+        return preInit ? "!" : "" + super.toString(userb, originb, levelb, dateb, callerb, thread1b, thread2b);
     }
 
     @Override

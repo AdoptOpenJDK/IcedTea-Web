@@ -30,9 +30,9 @@ public class JavaConsoleTest {
         Assert.assertFalse(p1.wasError);
         Assert.assertFalse(p2.wasError);
         Assert.assertFalse(p3.wasError);
-        Assert.assertTrue(p1.header.isC);
-        Assert.assertTrue(p2.header.isC);
-        Assert.assertTrue(p3.header.isC);
+        Assert.assertTrue(p1.header.isPlugin);
+        Assert.assertTrue(p2.header.isPlugin);
+        Assert.assertTrue(p3.header.isPlugin);
         Assert.assertEquals(OutputControllerLevel.MESSAGE_DEBUG, p1.header.level);
         Assert.assertEquals(OutputControllerLevel.WARNING_ALL, p2.header.level);
         Assert.assertEquals(OutputControllerLevel.ERROR_ALL, p3.header.level);
@@ -61,7 +61,7 @@ public class JavaConsoleTest {
     public void CreatePluginHeaderTestNotOK()throws Exception{
         PluginMessage p4 = new PluginMessage(S4);
         Assert.assertTrue(p4.wasError);
-        Assert.assertTrue(p4.header.isC);
+        Assert.assertTrue(p4.header.isPlugin);
         Assert.assertEquals(OutputControllerLevel.WARNING_ALL, p4.header.level);
         Assert.assertTrue(p4.header.date.toString().contains(new Date().toString().substring(0, 16))); //means no Tue Nov 19 09:43:50 :)
         Assert.assertTrue(p4.header.thread1.equals("unknown"));

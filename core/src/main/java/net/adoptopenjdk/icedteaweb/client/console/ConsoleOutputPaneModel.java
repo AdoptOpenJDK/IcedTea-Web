@@ -92,18 +92,14 @@ public class ConsoleOutputPaneModel {
             for (String string : plugin) {
                 origData.add(new PluginMessage(string));
             }
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 1"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 3"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 2"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 4"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_DEBUG, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 9"));
-            JavaMessage m1 = new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app1");
-            JavaMessage m2 = new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "app2");
-            m1.getHeader().isClientApp = true;
-            m2.getHeader().isClientApp = true;
-            origData.add(m1);
-            origData.add(m2);
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false), "message 0 - multilined \n"
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL), "message 1"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_DEBUG), "message 3"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_ALL), "message 2"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_DEBUG), "message 4"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_DEBUG), "message 9"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, true), "app1"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, true), "app2"));
+            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL), "message 0 - multilined \n"
                     + "since beginning\n"
                     + "         later\n"
                     + "again from beginning\n"
@@ -167,8 +163,8 @@ public class ConsoleOutputPaneModel {
 
             if (mark) {
                 sb.append("<div style='color:#");
-                if (messageWithHeader.getHeader().isC && messageWithHeader.getHeader() instanceof PluginHeader) {
-                    if (!((PluginHeader) (messageWithHeader.getHeader())).preinit) {
+                if (messageWithHeader.getHeader().isPlugin && messageWithHeader.getHeader() instanceof PluginHeader) {
+                    if (!((PluginHeader) (messageWithHeader.getHeader())).preInit) {
                         if (messageWithHeader.getHeader().level.isError()) {
                             sb.append(HTMLCOLOR_DIMRED);
                         } else {
@@ -357,18 +353,18 @@ public class ConsoleOutputPaneModel {
         if (!showApp && m.getHeader().isClientApp) {
             return true;
         }
-        if (!showJava && !m.getHeader().isC) {
+        if (!showJava && !m.getHeader().isPlugin) {
             return true;
         }
-        if (!showPlugin && m.getHeader().isC) {
+        if (!showPlugin && m.getHeader().isPlugin) {
             return true;
         }
         if (m.getHeader() instanceof PluginHeader) {
             PluginHeader mm = (PluginHeader) m.getHeader();
-            if (!showPreInit && mm.preinit) {
+            if (!showPreInit && mm.preInit) {
                 return true;
             }
-            if (!showPostInit && !mm.preinit) {
+            if (!showPostInit && !mm.preInit) {
                 return true;
             }
             if (!showIncomplete && m instanceof PluginMessage && ((PluginMessage) (m)).wasError) {

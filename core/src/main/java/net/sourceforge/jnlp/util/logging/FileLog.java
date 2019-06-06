@@ -56,7 +56,7 @@ public final class FileLog  {
     private final static Logger LOG = LoggerFactory.getLogger(FileLog.class);
 
     public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARNING_ALL, Thread.currentThread().getStackTrace(), Thread.currentThread(), false);
+        return new Header(OutputControllerLevel.WARNING_ALL);
     }
 
     private static String getColon() {
