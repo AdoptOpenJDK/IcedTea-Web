@@ -45,11 +45,12 @@ public interface IntegrationTest {
         ));
 
         for (String resource : resources) {
-            wireMock.stubFor(head(urlEqualTo("/resources/" + resource)).willReturn(
+            final String resourcePath = "resources/" + resource;
+            wireMock.stubFor(head(urlEqualTo("/" + resourcePath)).willReturn(
                     ok()
             ));
-            wireMock.stubFor(get(urlEqualTo("/resources/" + resource)).willReturn(
-                    aResponse().withBody(fileContent("resources/" + resource))
+            wireMock.stubFor(get(urlEqualTo("/" + resourcePath)).willReturn(
+                    aResponse().withBody(fileContent(resourcePath))
             ));
         }
 
