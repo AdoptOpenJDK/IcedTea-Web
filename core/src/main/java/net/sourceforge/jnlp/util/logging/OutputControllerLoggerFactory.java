@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.logging.BaseLogger;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory.LoggerFactoryImpl;
@@ -27,7 +28,7 @@ public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
         return new OutputControllerLogger(forClass);
     }
 
-    private static class OutputControllerLogger implements Logger {
+    private static class OutputControllerLogger extends BaseLogger {
 
         private static final OutputController OUTPUT_CONTROLLER = OutputController.getLogger();
         private final Class<?> forClass;
@@ -100,40 +101,6 @@ public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
             final Header header = new Header(level, forClass);
             final MessageWithHeader message = new JavaMessage(header, msg, t);
             OUTPUT_CONTROLLER.log(message);
-        }
-
-        private String expand(String msg, Object[] args) {
-            if (msg == null) {
-                return "null";
-            }
-
-            if (args == null) {
-                return msg;
-            }
-
-            final int argsLength = args.length;
-
-            if (argsLength == 0) {
-                return msg;
-            }
-
-            final StringBuilder result = new StringBuilder();
-            int lastIdx = 0;
-            for (Object arg : args) {
-                final String argString = Objects.toString(arg);
-                final int idx = result.indexOf("{}", lastIdx);
-
-                if (idx < 0) {
-                    break;
-                }
-
-                result.append(msg, lastIdx, idx).append(argString);
-                lastIdx = idx + 2;
-            }
-
-            result.append(msg.substring(lastIdx));
-
-            return result.toString();
         }
     }
 }

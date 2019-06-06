@@ -13,8 +13,7 @@ public class LoggerFactory {
             final Class<?> factoryClass = LoggerFactory.class.getClassLoader().loadClass(FACTORY_CLASS);
             return (LoggerFactoryImpl) factoryClass.newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            return new SystemOutLoggerFactory();
         }
     }
 
