@@ -37,14 +37,26 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
+import net.adoptopenjdk.icedteaweb.LazyLoaded;
+
+import static net.adoptopenjdk.icedteaweb.OutputUtils.exceptionToString;
+
 public class JavaMessage implements MessageWithHeader {
 
     private final Header header;
     private final String message;
+    private final boolean hasThrowable;
+    private final LazyLoaded<String> stackTrace;
 
     public JavaMessage(Header header, String message) {
+        this(header, message, null);
+    }
+
+    public JavaMessage(Header header, String message, Throwable throwable) {
         this.header = header;
         this.message = message;
+        this.hasThrowable = throwable != null;
+        this.stackTrace = new LazyLoaded<>(() -> exceptionToString(throwable));
     }
 
     @Override
@@ -55,5 +67,15 @@ public class JavaMessage implements MessageWithHeader {
     @Override
     public Header getHeader() {
         return header;
+    }
+
+    @Override
+    public boolean hasStackTrace() {
+        return hasThrowable;
+    }
+
+    @Override
+    public String getStackTrace() {
+        return stackTrace.get();
     }
 }
