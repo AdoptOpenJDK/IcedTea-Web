@@ -8,8 +8,6 @@ import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
-import java.util.Objects;
-
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR_ALL;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_ALL;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_DEBUG;
@@ -24,81 +22,81 @@ import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_AL
 @SuppressWarnings("unused")
 public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
 
-    public Logger getLogger(Class<?> forClass) {
+    public Logger getLogger(final Class<?> forClass) {
         return new OutputControllerLogger(forClass);
     }
 
     private static class OutputControllerLogger extends BaseLogger {
 
         private static final OutputController OUTPUT_CONTROLLER = OutputController.getLogger();
-        private final Class<?> forClass;
+        private final String caller;
 
-        private OutputControllerLogger(Class<?> forClass) {
-            this.forClass = forClass;
+        private OutputControllerLogger(final Class<?> forClass) {
+            this.caller = forClass.getName();
         }
 
         @Override
-        public void debug(String msg) {
+        public void debug(final String msg) {
             log(MESSAGE_DEBUG, msg, null);
         }
 
         @Override
-        public void debug(String msg, Object... arguments) {
+        public void debug(final String msg, final Object... arguments) {
             log(MESSAGE_DEBUG, expand(msg, arguments), null);
         }
 
         @Override
-        public void debug(String msg, Throwable t) {
+        public void debug(final String msg, final Throwable t) {
             log(MESSAGE_DEBUG, msg, t);
         }
 
         @Override
-        public void info(String msg) {
+        public void info(final String msg) {
             log(MESSAGE_ALL, msg, null);
         }
 
         @Override
-        public void info(String msg, Object... arguments) {
+        public void info(final String msg, final Object... arguments) {
             log(MESSAGE_ALL, expand(msg, arguments), null);
         }
 
         @Override
-        public void info(String msg, Throwable t) {
+        public void info(final String msg, final Throwable t) {
             log(MESSAGE_ALL, msg, t);
         }
 
         @Override
-        public void warn(String msg) {
+        public void warn(final String msg) {
             log(WARNING_ALL, msg, null);
         }
 
         @Override
-        public void warn(String msg, Object... arguments) {
+        public void warn(final String msg, final Object... arguments) {
             log(WARNING_ALL, expand(msg, arguments), null);
         }
 
         @Override
-        public void warn(String msg, Throwable t) {
+        public void warn(final String msg, final Throwable t) {
             log(WARNING_ALL, msg, t);
         }
 
         @Override
-        public void error(String msg) {
+        public void error(final String msg) {
             log(ERROR_ALL, msg, null);
         }
 
         @Override
-        public void error(String msg, Object... arguments) {
+        public void error(final String msg, final Object... arguments) {
             log(ERROR_ALL, expand(msg, arguments), null);
         }
 
         @Override
-        public void error(String msg, Throwable t) {
+        public void error(final String msg, final Throwable t) {
             log(ERROR_ALL, msg, t);
         }
 
-        private void log(OutputControllerLevel level, String msg, Throwable t) {
-            final Header header = new Header(level, forClass);
+        private void log(final OutputControllerLevel level, final String msg, final Throwable t) {
+            final Header header = new Header(level, caller);
             final MessageWithHeader message = new JavaMessage(header, msg, t);
             OUTPUT_CONTROLLER.log(message);
         }

@@ -21,7 +21,7 @@ public class LoggerFactory {
         // do not instantiate this class
     }
 
-    public static Logger getLogger(Class<?> forClass) {
+    public static Logger getLogger(final Class<?> forClass) {
         return factory.getLogger(forClass);
     }
 

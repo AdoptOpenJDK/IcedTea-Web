@@ -70,8 +70,8 @@ public class Header {
         this(level, false);
     }
 
-    public Header(OutputControllerLevel level, Class<?> callerClass) {
-        this(level, new Date(), false, Thread.currentThread(), callerClass.getName());
+    public Header(OutputControllerLevel level, String caller) {
+        this(level, new Date(), false, Thread.currentThread(), caller);
     }
 
     public Header(OutputControllerLevel level, boolean isClientApp) {

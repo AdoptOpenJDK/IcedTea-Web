@@ -12,84 +12,84 @@ import static net.adoptopenjdk.icedteaweb.OutputUtils.exceptionToString;
 class SystemOutLoggerFactory implements LoggerFactoryImpl {
 
     @Override
-    public Logger getLogger(Class<?> forClass) {
+    public Logger getLogger(final Class<?> forClass) {
         return new SystemOutLogger(forClass);
     }
 
     private static class SystemOutLogger extends BaseLogger {
 
-        private static final String DEBUG = "DEBUG";
-        private static final String INFO = "INFO";
-        private static final String WARNING = "WARNING";
-        private static final String ERROR = "ERROR";
+        private static final String DEBUG =   "[DEBUG  ]";
+        private static final String INFO =    "[INFO   ]";
+        private static final String WARNING = "[WARNING]";
+        private static final String ERROR =   "[ERROR  ]";
 
         private final String forClass;
 
-        public SystemOutLogger(Class<?> forClass) {
+        SystemOutLogger(final Class<?> forClass) {
             this.forClass = forClass.getName();
         }
 
         @Override
-        public void debug(String msg) {
+        public void debug(final String msg) {
             log(DEBUG, msg, null);
         }
 
         @Override
-        public void debug(String msg, Object... arguments) {
+        public void debug(final String msg, final Object... arguments) {
             log(DEBUG, expand(msg, arguments), null);
         }
 
         @Override
-        public void debug(String msg, Throwable t) {
+        public void debug(final String msg, final Throwable t) {
             log(DEBUG, msg, t);
         }
 
         @Override
-        public void info(String msg) {
+        public void info(final String msg) {
             log(INFO, msg, null);
         }
 
         @Override
-        public void info(String msg, Object... arguments) {
+        public void info(final String msg, final Object... arguments) {
             log(INFO, expand(msg, arguments), null);
         }
 
         @Override
-        public void info(String msg, Throwable t) {
+        public void info(final String msg, final Throwable t) {
             log(INFO, msg, t);
         }
 
         @Override
-        public void warn(String msg) {
+        public void warn(final String msg) {
             log(WARNING, msg, null);
         }
 
         @Override
-        public void warn(String msg, Object... arguments) {
+        public void warn(final String msg, final Object... arguments) {
             log(WARNING, expand(msg, arguments), null);
         }
 
         @Override
-        public void warn(String msg, Throwable t) {
+        public void warn(final String msg, final Throwable t) {
             log(WARNING, msg, t);
         }
 
         @Override
-        public void error(String msg) {
+        public void error(final String msg) {
             log(ERROR, msg, null);
         }
 
         @Override
-        public void error(String msg, Object... arguments) {
+        public void error(final String msg, final Object... arguments) {
             log(ERROR, expand(msg, arguments), null);
         }
 
         @Override
-        public void error(String msg, Throwable t) {
+        public void error(final String msg, final Throwable t) {
             log(ERROR, msg, t);
         }
 
-        private void log(String level, String msg, Throwable t) {
+        private void log(final String level, final String msg, final Throwable t) {
             final boolean isMultiLine = msg.contains("\n") || t != null;
 
             final String separator = isMultiLine ? "\n" : " ";
