@@ -37,10 +37,12 @@ exception statement from your version. */
 
 package net.sourceforge.jnlp.util.logging.headers;
 
-
 public interface MessageWithHeader {
 
-    String getMessage();
     Header getHeader();
+    String getMessage();
+    String getStackTrace();
+
+    boolean hasStackTrace();
 
 }

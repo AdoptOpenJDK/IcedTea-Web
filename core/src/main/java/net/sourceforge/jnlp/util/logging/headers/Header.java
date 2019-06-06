@@ -70,11 +70,19 @@ public class Header {
         this(level, false);
     }
 
+    public Header(OutputControllerLevel level, String caller) {
+        this(level, new Date(), false, Thread.currentThread(), caller);
+    }
+
     public Header(OutputControllerLevel level, boolean isClientApp) {
         this(level, new Date(), isClientApp, Thread.currentThread());
     }
 
     private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread) {
+        this(level, timestamp, isClientApp, thread, getCallerClass(thread.getStackTrace()));
+    }
+
+    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String caller) {
         this(
                 level, // level
                 timestamp, // timestamp
@@ -83,7 +91,7 @@ public class Header {
                 false, // isPlugin
                 isClientApp, // isClientApp
                 default_user, // user
-                getCallerClass(thread.getStackTrace()), // caller
+                caller, // caller
                 Integer.toHexString(thread.hashCode()), // thread1
                 thread.getName()) // thread2
         ;

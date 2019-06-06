@@ -39,6 +39,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +55,9 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * 
+ *
  * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
- * 
+ *
  */
 public class OutputController extends BasicOutputController {
 
@@ -99,7 +100,7 @@ public class OutputController extends BasicOutputController {
             consume();
         }
     }
-    
+
     public void close() throws Exception {
         flush();
         if (LogConfig.getLogConfig().isLogToFile()){
@@ -108,66 +109,76 @@ public class OutputController extends BasicOutputController {
     }
 
     private void consume() {
-        MessageWithHeader s = messageQue.get(0);
-        messageQue.remove(0);
-        //filtering is done in console during runtime
+        final MessageWithHeader message = messageQue.remove(0);
+
         if (LogConfig.getLogConfig().isLogToConsole() && javaConsoleInitialized) {
-            JavaConsole.getConsole().addMessage(s);
-        }
-        //clients app's messages are reprinted only to console
-        if (s.getHeader().isClientApp){
-            if (LogConfig.getLogConfig().isLogToFile() && LogConfig.getLogConfig().isLogToFileForClientApp()) {
-                getAppFileLog().log(proceedHeader(s));
-            }
-            return;
-        }
-        if (!JNLPRuntime.isDebug() && (s.getHeader().level == OutputControllerLevel.MESSAGE_DEBUG
-                || s.getHeader().level == OutputControllerLevel.WARNING_DEBUG
-                || s.getHeader().level == OutputControllerLevel.ERROR_DEBUG)) {
-            //filter out debug messages
-            //must be here to prevent deadlock, caused by exception form jnlpruntime, loggers or configs themselves
-            return;
-        }
-        String message = proceedHeader(s);
-        if (LogConfig.getLogConfig().isLogToStreams()) {
-            if (s.getHeader().level.isOutput()) {
-                outLog.log(message);
-            }
-            if (s.getHeader().level.isError()) {
-                errLog.log(message);
-            }
-        }
-        if (LogConfig.getLogConfig().isLogToFile()) {
-            getFileLog().log(message);
-        }
-        //only crucial stuff is going to system log
-        //only java messages handled here, plugin is on his own
-        if (LogConfig.getLogConfig().isLogToSysLog() && 
-                (s.getHeader().level.equals(OutputControllerLevel.ERROR_ALL) || s.getHeader().level.equals(OutputControllerLevel.WARNING_ALL)) &&
-                !s.getHeader().isPlugin) {
-            //no headers here
-            getSystemLog().log(s.getMessage());
+            //filtering is done in console during runtime
+            JavaConsole.getConsole().addMessage(message);
         }
 
+        if (message.getHeader().isClientApp){
+            consumeClientAppMessage(message);
+        } else {
+            consumeItwMessage(message);
+        }
     }
 
-    private String proceedHeader(MessageWithHeader s) {
-        String message = s.getMessage();
-        if (LogConfig.getLogConfig().isEnableHeaders()) {
-            if (message.contains("\n")) {
-                message = s.getHeader().toString() + "\n" + message;
-            } else {
-                message = s.getHeader().toString() + " " + message;
+    private void consumeClientAppMessage(MessageWithHeader message) {
+        final LogConfig logConfig = LogConfig.getLogConfig();
+        if (logConfig.isLogToFile() && logConfig.isLogToFileForClientApp()) {
+            getAppFileLog().log(convertToPrintableString(message, logConfig));
+        }
+    }
+
+    private void consumeItwMessage(MessageWithHeader message) {
+        final LogConfig logConfig = LogConfig.getLogConfig();
+        final Header header = message.getHeader();
+        final OutputControllerLevel level = header.level;
+
+        if (!JNLPRuntime.isDebug() && (level.isDebug())) {
+            return;
+        }
+
+        final String messageString = convertToPrintableString(message, logConfig);
+
+        if (logConfig.isLogToStreams()) {
+            if (level.printToOutStream()) {
+                outLog.log(messageString);
+            }
+            if (level.printToErrStream()) {
+                errLog.log(messageString);
             }
         }
-        return message;
+
+        if (logConfig.isLogToFile()) {
+            getFileLog().log(messageString);
+        }
+
+        //only crucial stuff is going to system log
+        //only java messages handled here, plugin is on his own
+        if (logConfig.isLogToSysLog() && level.isCrucial() && !header.isPlugin) {
+            //no headers here
+            getSystemLog().log(message.getMessage());
+        }
+    }
+
+    private String convertToPrintableString(MessageWithHeader s, LogConfig logConfig) {
+        final boolean withHeaders = logConfig.isEnableHeaders();
+        final boolean withStackTrace = s.hasStackTrace();
+        final boolean isMultiLine = (withHeaders && s.getMessage().contains("\n")) || withStackTrace;
+
+        final String separator = isMultiLine ? "\n" : " ";
+
+        return (withHeaders ? s.getHeader() + separator : "") +
+                s.getMessage() +
+                (withStackTrace ? separator + s.getStackTrace() : "");
     }
 
     private OutputController() {
         this(System.out, System.err);
     }
-    
-    
+
+
     private static class OutputControllerHolder {
 
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
@@ -255,11 +266,11 @@ public class OutputController extends BasicOutputController {
         messageQue.add(l);
         this.notifyAll();
     }
-    
-    
+
+
 
     private static class FileLogHolder {
-        
+
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
         private static volatile SingleStreamLogger INSTANCE = FileLog.createFileLog();
@@ -268,10 +279,10 @@ public class OutputController extends BasicOutputController {
     private SingleStreamLogger getFileLog() {
         return FileLogHolder.INSTANCE;
     }
-    
-    
+
+
     private static class AppFileLogHolder {
-        
+
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
         private static final SingleStreamLogger INSTANCE = FileLog.createAppFileLog();
@@ -338,6 +349,6 @@ public class OutputController extends BasicOutputController {
         }
         return br.readLine();
     }
-    
-    
+
+
 }

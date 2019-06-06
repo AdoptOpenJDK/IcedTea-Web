@@ -99,12 +99,22 @@ public class PluginMessage implements MessageWithHeader {
     }
 
     @Override
+    public Header getHeader() {
+        return header;
+    }
+
+    @Override
     public String getMessage() {
         return restOfMessage;
     }
 
     @Override
-    public Header getHeader() {
-        return header;
+    public boolean hasStackTrace() {
+        return false;
+    }
+
+    @Override
+    public String getStackTrace() {
+        return null;
     }
 }
