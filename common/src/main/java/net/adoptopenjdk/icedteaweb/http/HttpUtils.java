@@ -36,8 +36,8 @@
  */
 package net.adoptopenjdk.icedteaweb.http;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

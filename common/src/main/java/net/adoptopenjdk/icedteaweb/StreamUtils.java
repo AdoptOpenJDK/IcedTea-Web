@@ -37,8 +37,8 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.lang.Process;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
