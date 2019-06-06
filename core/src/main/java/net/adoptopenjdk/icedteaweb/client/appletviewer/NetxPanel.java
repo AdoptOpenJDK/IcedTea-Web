@@ -22,25 +22,26 @@
 
 package net.adoptopenjdk.icedteaweb.client.appletviewer;
 
-import sun.applet.AppletViewerPanelAccess;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import sun.applet.AppletViewerPanelAccess;
 import sun.awt.SunToolkit;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * This panel calls into netx to run an applet, and pipes the display

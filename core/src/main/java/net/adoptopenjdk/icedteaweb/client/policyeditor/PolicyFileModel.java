@@ -36,11 +36,16 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.util.FileUtils;
+import net.sourceforge.jnlp.util.MD5SumWatcher;
+import sun.security.provider.PolicyParser;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -55,12 +60,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.MD5SumWatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.security.provider.PolicyParser;
 
 public class PolicyFileModel {
 

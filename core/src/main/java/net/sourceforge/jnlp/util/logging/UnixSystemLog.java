@@ -38,9 +38,9 @@ package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class UnixSystemLog implements SingleStreamLogger{

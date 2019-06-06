@@ -37,12 +37,12 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.extensions.ExtensionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.awt.Color;
 import java.awt.Font;

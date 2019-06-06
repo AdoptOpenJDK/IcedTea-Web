@@ -22,6 +22,8 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
@@ -30,8 +32,6 @@ import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.util.GenericDesktopEntry;
 import net.sourceforge.jnlp.util.WeakList;
 import net.sourceforge.jnlp.util.XDesktopEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;

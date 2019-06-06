@@ -16,6 +16,29 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.runtime.AppletInstance;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.services.InstanceExistsException;
+import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.JarFile;
+import sun.awt.SunToolkit;
+
+import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
 import java.applet.AppletStub;
 import java.awt.Container;
@@ -27,28 +50,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.text.html.parser.ParserDelegator;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.runtime.AppletInstance;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.services.InstanceExistsException;
-import net.sourceforge.jnlp.services.ServiceUtil;
-import net.sourceforge.jnlp.util.JarFile;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.awt.SunToolkit;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

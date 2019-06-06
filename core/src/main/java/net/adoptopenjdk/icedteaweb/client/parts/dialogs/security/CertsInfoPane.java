@@ -37,12 +37,12 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityUtil;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityUtil;
 import sun.security.x509.CertificateValidity;
 
 import javax.swing.BorderFactory;

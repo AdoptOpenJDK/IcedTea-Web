@@ -1,7 +1,23 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
+
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,22 +33,6 @@ import java.util.Map;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.adoptopenjdk.icedteaweb.http.HttpUtils;
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.runtime.Boot;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;

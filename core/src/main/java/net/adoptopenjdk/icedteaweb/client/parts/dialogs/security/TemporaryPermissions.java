@@ -36,6 +36,12 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PermissionActions;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Permission;
@@ -45,11 +51,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PermissionActions;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TemporaryPermissions {
 

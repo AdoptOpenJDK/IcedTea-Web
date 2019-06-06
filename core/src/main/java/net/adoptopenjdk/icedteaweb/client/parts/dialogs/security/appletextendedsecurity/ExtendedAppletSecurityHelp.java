@@ -35,8 +35,13 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
-import java.awt.Dimension;
-import java.io.IOException;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -44,12 +49,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Dimension;
+import java.io.IOException;
 
 public class ExtendedAppletSecurityHelp extends javax.swing.JDialog implements HyperlinkListener {
 

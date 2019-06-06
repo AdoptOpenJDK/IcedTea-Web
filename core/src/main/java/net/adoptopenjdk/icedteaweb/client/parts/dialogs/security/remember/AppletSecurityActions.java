@@ -37,8 +37,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

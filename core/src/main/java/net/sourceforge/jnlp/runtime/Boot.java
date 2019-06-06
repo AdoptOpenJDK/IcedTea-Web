@@ -24,6 +24,8 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.ParserSettings;
@@ -36,8 +38,6 @@ import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 

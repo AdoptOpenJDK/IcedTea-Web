@@ -6,8 +6,8 @@
 package net.sourceforge.jnlp.runtime.html;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 

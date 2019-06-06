@@ -40,10 +40,10 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 import sun.net.www.protocol.jar.URLJarFileCallBack;
 

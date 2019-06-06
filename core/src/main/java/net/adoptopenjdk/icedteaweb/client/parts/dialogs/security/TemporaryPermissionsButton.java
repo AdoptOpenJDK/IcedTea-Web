@@ -36,6 +36,21 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyIdentifier;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import sun.security.provider.PolicyParser;
+
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
@@ -48,20 +63,6 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
-import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyIdentifier;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.security.provider.PolicyParser;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

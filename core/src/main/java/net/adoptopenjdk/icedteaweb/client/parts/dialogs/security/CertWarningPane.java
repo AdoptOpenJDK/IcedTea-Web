@@ -38,9 +38,13 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PluginBridge;
-import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
@@ -50,11 +54,7 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

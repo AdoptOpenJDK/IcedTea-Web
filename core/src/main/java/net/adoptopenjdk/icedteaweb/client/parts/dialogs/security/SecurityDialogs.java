@@ -36,16 +36,8 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import java.awt.Dialog.ModalityType;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.NetPermission;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import javax.swing.JDialog;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
@@ -60,8 +52,17 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import javax.swing.JDialog;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.NetPermission;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 /**
  * <p>

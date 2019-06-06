@@ -25,6 +25,23 @@
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.CertificateUtils;
+import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.util.JarFile;
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
+import sun.security.x509.NetscapeCertTypeExtension;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,22 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.AppVerifier;
-import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.CertificateUtils;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.util.JarFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.NetscapeCertTypeExtension;
 
 /**
  * The jar certificate verifier utility.

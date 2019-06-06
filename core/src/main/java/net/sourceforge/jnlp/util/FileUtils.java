@@ -20,9 +20,9 @@ import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class contains a few file-related utility functions.

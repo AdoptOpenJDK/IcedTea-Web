@@ -23,7 +23,8 @@ import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.Launcher;
@@ -40,8 +41,6 @@ import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
@@ -81,7 +80,6 @@ import java.util.List;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * <p>

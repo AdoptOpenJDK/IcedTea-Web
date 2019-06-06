@@ -37,6 +37,17 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertVerifier;
+
+import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
@@ -45,16 +56,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
-import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.CertVerifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides methods for showing security warning dialogs for a wide range of

@@ -16,6 +16,22 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.downloadindicator;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.ImageResources;
+
+import javax.jnlp.DownloadServiceListener;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -34,21 +50,6 @@ import java.awt.event.ComponentEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.jnlp.DownloadServiceListener;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ImageResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

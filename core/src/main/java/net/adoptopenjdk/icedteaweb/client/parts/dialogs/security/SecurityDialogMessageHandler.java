@@ -43,11 +43,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Rememb
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.awt.AppContext;
 
 import java.awt.event.ActionEvent;

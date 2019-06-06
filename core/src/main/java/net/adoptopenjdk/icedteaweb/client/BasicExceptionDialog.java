@@ -37,13 +37,16 @@ exception statement from your version. */
 
 package net.adoptopenjdk.icedteaweb.client;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.OutputUtils;
+import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CachePane;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.util.ImageResources;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -54,15 +57,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.OutputUtils;
-import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.adoptopenjdk.icedteaweb.client.controlpanel.CachePane;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.util.ImageResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

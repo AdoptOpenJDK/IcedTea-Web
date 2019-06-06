@@ -19,9 +19,9 @@ package net.sourceforge.jnlp.config;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.spi.IIORegistry;
 import javax.naming.ConfigurationException;

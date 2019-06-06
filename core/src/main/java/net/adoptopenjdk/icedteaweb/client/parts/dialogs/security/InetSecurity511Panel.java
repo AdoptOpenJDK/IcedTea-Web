@@ -37,15 +37,15 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancelSkip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

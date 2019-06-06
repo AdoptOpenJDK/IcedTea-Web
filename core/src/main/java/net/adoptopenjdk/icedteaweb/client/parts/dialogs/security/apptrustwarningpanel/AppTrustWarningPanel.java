@@ -38,20 +38,20 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanel;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SetValueHandler;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SetValueHandler;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.PluginBridge;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

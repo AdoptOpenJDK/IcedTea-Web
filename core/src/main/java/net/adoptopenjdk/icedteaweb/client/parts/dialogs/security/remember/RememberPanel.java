@@ -38,8 +38,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
