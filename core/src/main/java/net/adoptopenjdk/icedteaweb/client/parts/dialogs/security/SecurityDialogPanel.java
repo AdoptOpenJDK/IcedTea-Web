@@ -38,11 +38,11 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.sourceforge.jnlp.security.CertVerifier;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

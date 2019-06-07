@@ -38,10 +38,10 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.io.File;

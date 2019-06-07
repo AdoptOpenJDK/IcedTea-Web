@@ -36,10 +36,9 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;

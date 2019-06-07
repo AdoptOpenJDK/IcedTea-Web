@@ -32,8 +32,8 @@
  statement from your version.*/
 package net.adoptopenjdk.icedteaweb.jdk89access;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import javax.swing.ImageIcon;
 import java.lang.reflect.Method;

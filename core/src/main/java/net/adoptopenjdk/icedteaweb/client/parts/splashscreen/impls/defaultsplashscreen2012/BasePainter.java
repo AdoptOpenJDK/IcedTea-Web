@@ -36,6 +36,19 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InfoItem;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.extensions.ExtensionManager;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -52,18 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InfoItem;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.extensions.ExtensionManager;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BasePainter implements Observer {
 

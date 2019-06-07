@@ -17,8 +17,8 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collections;

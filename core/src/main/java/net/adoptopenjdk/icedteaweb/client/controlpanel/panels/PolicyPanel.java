@@ -41,13 +41,13 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditorWindow;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.Box;
 import javax.swing.JButton;

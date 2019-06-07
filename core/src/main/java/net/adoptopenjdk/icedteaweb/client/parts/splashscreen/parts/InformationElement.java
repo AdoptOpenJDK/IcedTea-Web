@@ -39,17 +39,18 @@ http://docs.oracle.com/javase/6/docs/technotes/guides/javaws/developersguide/syn
  */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 

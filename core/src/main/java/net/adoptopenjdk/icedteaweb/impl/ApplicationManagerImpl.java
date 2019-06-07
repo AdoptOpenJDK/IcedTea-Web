@@ -3,10 +3,10 @@ package net.adoptopenjdk.icedteaweb.impl;
 import net.adoptopenjdk.icedteaweb.Application;
 import net.adoptopenjdk.icedteaweb.ApplicationManager;
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collections;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ApplicationManagerImpl implements ApplicationManager {

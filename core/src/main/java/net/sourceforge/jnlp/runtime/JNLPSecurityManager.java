@@ -16,18 +16,19 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import java.awt.Window;
-import java.net.SocketPermission;
-import java.security.AccessControlException;
-import java.security.Permission;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
+
+import java.awt.Window;
+import java.net.SocketPermission;
+import java.security.AccessControlException;
+import java.security.Permission;
 
 /**
  * Security manager for JNLP environment. This security manager

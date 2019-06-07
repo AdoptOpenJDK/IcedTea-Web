@@ -48,12 +48,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.sourceforge.jnlp.util.LocaleUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;

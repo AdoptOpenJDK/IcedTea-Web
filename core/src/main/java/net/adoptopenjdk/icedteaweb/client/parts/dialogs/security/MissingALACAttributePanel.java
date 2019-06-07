@@ -38,15 +38,15 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanel;
-import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;

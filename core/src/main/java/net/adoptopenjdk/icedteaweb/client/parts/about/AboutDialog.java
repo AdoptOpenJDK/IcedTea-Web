@@ -37,6 +37,18 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.about;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.util.docprovider.TextsProvider;
+import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -47,17 +59,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.sourceforge.jnlp.util.docprovider.TextsProvider;
-import net.sourceforge.jnlp.util.docprovider.formatters.formatters.HtmlFormatter;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -274,4 +275,3 @@ public final class AboutDialog extends JPanel implements Runnable, ActionListene
     }
 }
 
- 

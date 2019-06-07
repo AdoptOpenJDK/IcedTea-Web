@@ -37,6 +37,17 @@ exception statement from your version. */
 
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.util.ImageResources;
+
+import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -45,16 +56,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.io.IOException;
 import java.net.URL;
-import javax.imageio.ImageIO;
-import javax.swing.JDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
-import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.util.ImageResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JNLPSplashScreen extends JDialog {
 

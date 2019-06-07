@@ -16,11 +16,12 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>

@@ -37,6 +37,34 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.certificateviewer;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.CertificateUtils;
+import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.util.FileUtils;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -57,33 +85,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.CertificateUtils;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

@@ -23,14 +23,14 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel.JvmValidationResult;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.ControlPanelProvider;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import javax.swing.ImageIcon;

@@ -37,12 +37,12 @@ exception statement from your version.
 package net.sourceforge.jnlp.browser;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPProxySelector;
 import net.sourceforge.jnlp.runtime.PacEvaluator;
 import net.sourceforge.jnlp.runtime.PacEvaluatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,8 +54,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * A ProxySelector which can read proxy settings from a browser's

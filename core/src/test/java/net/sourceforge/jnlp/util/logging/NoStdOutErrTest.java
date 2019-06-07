@@ -37,11 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.io.PrintStream;

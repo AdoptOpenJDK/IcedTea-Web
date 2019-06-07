@@ -18,9 +18,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

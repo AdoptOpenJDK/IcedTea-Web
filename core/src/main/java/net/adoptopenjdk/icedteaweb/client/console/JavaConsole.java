@@ -37,9 +37,11 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.console;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -47,8 +49,6 @@ import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;

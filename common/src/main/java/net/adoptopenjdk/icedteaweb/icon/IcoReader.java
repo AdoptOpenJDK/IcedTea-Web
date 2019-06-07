@@ -37,8 +37,8 @@
 package net.adoptopenjdk.icedteaweb.icon;
 
 import net.adoptopenjdk.icedteaweb.LazyLoaded;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;

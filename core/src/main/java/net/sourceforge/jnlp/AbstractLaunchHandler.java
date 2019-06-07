@@ -38,9 +38,9 @@ exception statement from your version. */
 package net.sourceforge.jnlp;
 
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLaunchHandler implements LaunchHandler {
 

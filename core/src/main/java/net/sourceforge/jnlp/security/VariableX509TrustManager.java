@@ -39,10 +39,10 @@ package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.security.util.HostnameChecker;
 import sun.security.validator.ValidatorException;
 

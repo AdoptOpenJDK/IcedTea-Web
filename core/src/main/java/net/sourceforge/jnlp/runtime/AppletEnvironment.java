@@ -16,6 +16,18 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.AppletUtils;
+import net.sourceforge.jnlp.util.WeakList;
+
+import javax.swing.ImageIcon;
 import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AppletStub;
@@ -37,17 +49,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.swing.ImageIcon;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
-import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.services.ServiceUtil;
-import net.sourceforge.jnlp.util.AppletUtils;
-import net.sourceforge.jnlp.util.WeakList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The applet environment including stub, context, and frame.  The

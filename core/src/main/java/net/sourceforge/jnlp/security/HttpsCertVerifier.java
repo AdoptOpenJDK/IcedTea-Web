@@ -38,8 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import sun.security.util.DerValue;
 import sun.security.util.HostnameChecker;
 import sun.security.x509.X500Name;

@@ -36,17 +36,14 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
@@ -56,10 +53,12 @@ import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class UnsignedAppletTrustConfirmation {
 

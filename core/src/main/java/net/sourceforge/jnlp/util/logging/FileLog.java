@@ -37,13 +37,13 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import net.sourceforge.jnlp.util.logging.headers.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
