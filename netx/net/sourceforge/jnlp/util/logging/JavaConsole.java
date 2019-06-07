@@ -50,7 +50,10 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,6 +82,7 @@ import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS
@@ -92,10 +96,29 @@ public class JavaConsole implements ObservableMessagesProvider {
     public JavaConsole() {
         //add middleware, which catches client's application stdout/err
         //and will submit it into console
-        System.setErr(new TeeOutputStream(System.err, true));
-        System.setOut(new TeeOutputStream(System.out, false));
+        System.setErr(new TeeOutputStream(providNullStreamIfEnforced(System.err), true));
+        System.setOut(new TeeOutputStream(providNullStreamIfEnforced(System.out), false));
         //internal stdOut/Err are going throughs outLog/errLog
         //when console is off, those tees are not installed
+    }
+
+    private PrintStream providNullStreamIfEnforced(PrintStream defaultOne) {
+        PrintStream p = defaultOne;
+        if (!LogConfig.getLogConfig().isLogToStreams()) {
+            p = new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+
+                }
+
+                @Override
+                public synchronized void write(byte[] b, int off, int len) {
+
+                }
+            });
+
+        }
+        return p;
     }
 
     private void refreshOutputs() {
@@ -206,7 +229,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
         consoleWindow.setName("JavaConsole");
         SwingUtils.info(consoleWindow);
-        
+
         consoleWindow.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -517,13 +540,13 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     private synchronized void updateModel(final Boolean force) {
         observable.setChanged();
-        
+
         SwingUtils.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 // avoid too much processing if already processed:
-                synchronized(observable) {
+                synchronized (observable) {
                     if (observable.hasChanged() || (Boolean.TRUE.equals(force))) {
                         observable.notifyObservers(force);
                     }
