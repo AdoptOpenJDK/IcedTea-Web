@@ -45,7 +45,7 @@ while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer 
   [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
 done
 readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
-readonly PORTABLE_ITW_HOME="`dirname $SCRIPT_DIR`"
+readonly PORTABLE_ITW_HOME=`dirname "$SCRIPT_DIR"`
 BINARY_LOCATION="$SCRIPT_DIR/`basename $SCRIPT_SOURCE`"
 
 
