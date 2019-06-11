@@ -43,6 +43,7 @@ import javax.swing.JDialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -60,23 +61,23 @@ public class ClassFinder extends JDialog {
 
     private final static Logger LOG = LoggerFactory.getLogger(ClassFinder.class);
 
-    public static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
-    public static final String CUSTOM_CLASS_PATH_PROPERTY = "custom.class.path";
-    public static final String BOOT_CLASS_PATH_PROPERTY = "sun.boot.class.path";
+    private static final String JAVA_CLASS_PATH_PROPERTY = "java.class.path";
+    private static final String CUSTOM_CLASS_PATH_PROPERTY = "custom.class.path";
+    private static final String BOOT_CLASS_PATH_PROPERTY = "sun.boot.class.path";
 
-    static public <T> List<Class<? extends T>> findAllMatchingTypes(Class<T> toFind) {
+    public static <T> List<Class<? extends T>> findAllMatchingTypes(Class<T> toFind) {
         List<Class<? extends T>> returnedClasses = new ArrayList<>();
-        Set<Class> foundClasses = walkClassPath(toFind);
-        for (Class<?> clazz : foundClasses) {
+        Set<Class<? extends T>> foundClasses = walkClassPath(toFind);
+        for (Class<? extends T> clazz : foundClasses) {
             if (!clazz.isInterface()) {
-                returnedClasses.add((Class<? extends T>) clazz);
+                returnedClasses.add(clazz);
             }
         }
         return returnedClasses;
     }
 
-    static private Set<Class> walkClassPath(Class toFind) {
-        Set<Class> results = new HashSet<>();
+    private static <T> Set<Class<? extends T>> walkClassPath(Class<T> toFind) {
+        Set<Class<? extends T>> results = new HashSet<>();
         Set<String> classPathRoots = getClassPathRoots();
         for (String classpathEntry : classPathRoots) {
             //need to avoid base jdk jars/modules
@@ -91,11 +92,11 @@ public class ClassFinder extends JDialog {
                     traverse(f.getAbsolutePath(), f, toFind, results);
                 } else {
                     File jar = new File(classpathEntry);
-                    try {
-                        JarInputStream is = new JarInputStream(new FileInputStream(jar));
+                    try (final InputStream fin = new FileInputStream(jar)){
+                        final JarInputStream is = new JarInputStream(fin);
                         JarEntry entry;
                         while ((entry = is.getNextJarEntry()) != null) {
-                            Class c = determine(entry.getName(), toFind);
+                            Class<T> c = determine(entry.getName(), toFind);
                             if (c != null) {
                                 results.add(c);
                             }
@@ -109,7 +110,7 @@ public class ClassFinder extends JDialog {
         return results;
     }
 
-    static private Set<String> getClassPathRoots() {
+    private static Set<String> getClassPathRoots() {
         String classpath1 = System.getProperty(CUSTOM_CLASS_PATH_PROPERTY);
         String classpath2 = System.getProperty(JAVA_CLASS_PATH_PROPERTY);
         String classpath3 = System.getProperty(BOOT_CLASS_PATH_PROPERTY);
@@ -128,8 +129,8 @@ public class ClassFinder extends JDialog {
         return s;
     }
 
-    static private Class determine(String name, Class toFind) {
-        if (name.contains("$")) {
+    private static <T> Class<T> determine(String name, Class<T> toFind) {
+        if (name == null || name.contains("$")) {
             return null;
         }
         try {
@@ -137,9 +138,9 @@ public class ClassFinder extends JDialog {
                 name = name.replace(".class", "");
                 name = name.replace("/", ".");
                 name = name.replace("\\", ".");
-                Class clazz = Class.forName(name);
+                Class<?> clazz = Class.forName(name);
                 if (toFind.isAssignableFrom(clazz)) {
-                    return clazz;
+                    return (Class<T>) clazz;
                 }
             }
         } catch (Throwable ex) {
@@ -149,8 +150,12 @@ public class ClassFinder extends JDialog {
         return null;
     }
 
-    static private void traverse(String root, File current, Class toFind, Set<Class> result) {
+    private static <T> void traverse(String root, File current, Class<T> toFind, Set<Class<? extends T>> result) {
         File[] fs = current.listFiles();
+        if (fs == null) {
+            return;
+        }
+
         for (File f : fs) {
             if (f.isDirectory()) {
                 traverse(root, f, toFind, result);
@@ -160,7 +165,7 @@ public class ClassFinder extends JDialog {
                 while (name.startsWith(File.separator)) {
                     name = name.substring(1);
                 }
-                Class c = determine(name, toFind);
+                Class<T> c = determine(name, toFind);
                 if (c != null) {
                     result.add(c);
                 }
