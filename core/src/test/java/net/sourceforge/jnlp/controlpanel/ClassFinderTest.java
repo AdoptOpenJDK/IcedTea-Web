@@ -35,48 +35,48 @@
  */
 package net.sourceforge.jnlp.controlpanel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ClassFinder;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 public class ClassFinderTest {
 
-    String[] known = new String[]{
-        "UnsignedAppletTrustWarningPanel",
-        "MatchingALACAttributePanel",
-        "PartiallySignedAppTrustWarningPanel",
-        "AppTrustWarningPanel",
-        "AccessWarningPane",
-        "MissingALACAttributePanel",
-        "MissingPermissionsAttributePanel"
+    private static final String PREFIX = "net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.";
+    private final String[] known = new String[]{
+        ".UnsignedAppletTrustWarningPanel",
+        ".MatchingALACAttributePanel",
+        ".PartiallySignedAppTrustWarningPanel",
+        ".AppTrustWarningPanel",
+        ".AccessWarningPane",
+        ".MissingALACAttributePanel",
+        ".MissingPermissionsAttributePanel"
     };
 
     @Test
     public void testFoundClasses() {
-        List<String> kknown = new ArrayList<>(Arrays.asList(known));
-        List<Class<? extends RememberableDialog>> l = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
-        Assert.assertEquals("find matching types: ", 7, l.size());
-        for (Class<? extends RememberableDialog> l1 : l) {
-            Assert.assertTrue(l1.getName().startsWith("net.adoptopenjdk.icedteaweb.client.parts.dialogs.security."));
-        }
-        for (int i = 0; i < kknown.size(); i++) {
-            for (int j = 0; j < l.size(); j++) {
-                if (l.get(j).getName().endsWith(kknown.get(i))) {
-                    l.remove(j);
-                    kknown.remove(i);
-                    i--;
-                    break;
-                }
+        final List<Class<? extends RememberableDialog>> foundTypes = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
 
+        for (final String expected : known) {
+            boolean found = false;
+            for (Class<? extends RememberableDialog> type : foundTypes) {
+                if (type.getName().endsWith(expected)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                Assert.fail("Could not find " + expected + " in " + foundTypes);
             }
         }
-        Assert.assertTrue(l.isEmpty());
-        Assert.assertTrue(kknown.isEmpty());
 
+        for (Class<? extends RememberableDialog> type : foundTypes) {
+            final boolean hasCorrectPrefix = type.getName().startsWith(PREFIX);
+            Assert.assertTrue("Expected " + type + " to be in/below package " + PREFIX, hasCorrectPrefix);
+        }
+
+        Assert.assertEquals("find matching types: ", known.length, foundTypes.size());
     }
 
 }
