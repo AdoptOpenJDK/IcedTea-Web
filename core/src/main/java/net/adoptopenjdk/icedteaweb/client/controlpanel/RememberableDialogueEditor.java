@@ -63,16 +63,16 @@ import java.util.Map;
  *
  *
  */
-public class RemmeberableDialogueEditor extends JDialog {
+public class RememberableDialogueEditor extends JDialog {
 
     private final List<Class<? extends RememberableDialog>> allClasses;
     private final AppletSecurityActions actions;
 
     private AppletSecurityActions result;
-    private final RemmeberableDialogueEditor self;
+    private final RememberableDialogueEditor self;
     private final JFrame frame;
 
-    RemmeberableDialogueEditor(JFrame jFrame, boolean modal, Object dialogs) {
+    RememberableDialogueEditor(JFrame jFrame, boolean modal, Object dialogs) {
         super(jFrame, modal);
         frame=jFrame;
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -89,11 +89,11 @@ public class RemmeberableDialogueEditor extends JDialog {
         getContentPane().removeAll();
         d.setLayout(new GridLayout(0, 4));
 
-        final List<Class<? extends RememberableDialog>> addedableClasses = new ArrayList<>(allClasses);
+        final List<Class<? extends RememberableDialog>> addableClasses = new ArrayList<>(allClasses);
         for (final Map.Entry<String, SavedRememberAction> entry : entries) {
             final String dialog = entry.getKey();
-            for (int i = 0; i < addedableClasses.size(); i++) {
-                final Class<? extends RememberableDialog> get = addedableClasses.get(i);
+            for (int i = 0; i < addableClasses.size(); i++) {
+                final Class<? extends RememberableDialog> get = addableClasses.get(i);
                 String s = get.getSimpleName();
                 if (s.equals(dialog)) {
                     JButton bb = new JButton("-");
@@ -112,10 +112,10 @@ public class RemmeberableDialogueEditor extends JDialog {
                     cbb.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            actions.setAction(entry.getKey(), createRember((ExecuteAppletAction) cbb.getSelectedItem(), entry));
+                            actions.setAction(entry.getKey(), createRemember((ExecuteAppletAction) cbb.getSelectedItem(), entry));
                         }
 
-                        private SavedRememberAction createRember(ExecuteAppletAction nwValue, Map.Entry<String, SavedRememberAction> entry) {
+                        private SavedRememberAction createRemember(ExecuteAppletAction nwValue, Map.Entry<String, SavedRememberAction> entry) {
                             return new SavedRememberAction(nwValue, entry.getValue().getSavedValue());
                         }
                     });
@@ -138,7 +138,7 @@ public class RemmeberableDialogueEditor extends JDialog {
                         }
                     });
                     d.add(expertButton);
-                    addedableClasses.remove(i);
+                    addableClasses.remove(i);
                     i--;
                 }
             }
@@ -151,8 +151,8 @@ public class RemmeberableDialogueEditor extends JDialog {
 
             @Override
             public void setSelectedItem(Object anItem) {
-                for (int i = 0; i < addedableClasses.size(); i++) {
-                    Class<? extends RememberableDialog> get = addedableClasses.get(i);
+                for (int i = 0; i < addableClasses.size(); i++) {
+                    Class<? extends RememberableDialog> get = addableClasses.get(i);
                     if (get.getSimpleName().equals(anItem)) {
                         selected = get.getSimpleName();
                     }
@@ -167,12 +167,12 @@ public class RemmeberableDialogueEditor extends JDialog {
 
             @Override
             public int getSize() {
-                return addedableClasses.size();
+                return addableClasses.size();
             }
 
             @Override
             public String getElementAt(int index) {
-                return addedableClasses.get(index).getSimpleName();
+                return addableClasses.get(index).getSimpleName();
             }
 
             @Override
@@ -199,7 +199,7 @@ public class RemmeberableDialogueEditor extends JDialog {
                 if (cb.getSelectedIndex() < 0) {
                     return;
                 }
-                actions.setAction(addedableClasses.get(cb.getSelectedIndex()), new SavedRememberAction(ExecuteAppletAction.NEVER, ExecuteAppletAction.NEVER.toChar()));
+                actions.setAction(addableClasses.get(cb.getSelectedIndex()), new SavedRememberAction(ExecuteAppletAction.NEVER, ExecuteAppletAction.NEVER.toChar()));
                 recreateGui();
             }
         });

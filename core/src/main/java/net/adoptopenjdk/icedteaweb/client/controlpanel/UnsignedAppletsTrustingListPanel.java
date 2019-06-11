@@ -780,7 +780,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1 & jt.getSelectedRowCount() == 1) {
-                    RemmeberableDialogueEditor d = new RemmeberableDialogueEditor(grabParentFrame(self), true, jt.getModel().getValueAt(jt.convertRowIndexToModel(jt.getSelectedRow()), 0));
+                    RememberableDialogueEditor d = new RememberableDialogueEditor(grabParentFrame(self), true, jt.getModel().getValueAt(jt.convertRowIndexToModel(jt.getSelectedRow()), 0));
                     d.setVisible(true);
                     AppletSecurityActions result = d.getResult();
                     d.dispose();
