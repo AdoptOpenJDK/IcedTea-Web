@@ -107,7 +107,7 @@ public class RemmeberableDialogueEditor extends JDialog {
                     });
                     d.add(bb);
                     d.add(new JLabel(entry.getKey()));
-                    final JComboBox<ExecuteAppletAction> cbb = new JComboBox(ExecuteAppletAction.values());
+                    final JComboBox<ExecuteAppletAction> cbb = new JComboBox<>(ExecuteAppletAction.values());
                     cbb.setSelectedItem(entry.getValue().getAction());
                     cbb.addActionListener(new ActionListener() {
                         @Override
@@ -125,7 +125,7 @@ public class RemmeberableDialogueEditor extends JDialog {
                     expertButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            Object result = JOptionPane.showInputDialog(self.frame, entry.getValue().getSavedValue(), Translator.R("EPEexpertHint"), JOptionPane.YES_NO_OPTION, null, null, entry.getValue().getSavedValue());
+                            Object result = JOptionPane.showInputDialog(self.frame, entry.getValue().getSavedValue(), Translator.R("EPEexpertHint"), JOptionPane.ERROR_MESSAGE, null, null, entry.getValue().getSavedValue());
                             if (result != null) {
                                 String s = result.toString();
                                 if (!s.trim().isEmpty()){
