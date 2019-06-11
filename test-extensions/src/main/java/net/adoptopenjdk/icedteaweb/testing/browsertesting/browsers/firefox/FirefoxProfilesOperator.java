@@ -120,13 +120,19 @@ public class FirefoxProfilesOperator {
     }
 
     public static void copyFile(final File from, final File to) throws IOException {
-        final FileInputStream is = new FileInputStream(from);
-        final FileOutputStream fos = new FileOutputStream(to);
-        final FileChannel f = is.getChannel();
-        try (final FileChannel f2 = fos.getChannel()) {
-            f.transferTo(0, f.size(), f2);
-        } finally {
-            f.close();
+        if (!from.isFile()) {
+            to.delete();
+            return;
+        }
+
+        try (final FileInputStream is = new FileInputStream(from)) {
+            try (final FileOutputStream fos = new FileOutputStream(to)) {
+                try (final FileChannel fIn = is.getChannel()) {
+                    try (final FileChannel fOut = fos.getChannel()) {
+                        fIn.transferTo(0, fIn.size(), fOut);
+                    }
+                }
+            }
         }
     }
 
