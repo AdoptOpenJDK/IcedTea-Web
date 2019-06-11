@@ -59,7 +59,7 @@ public class ClassFinderTest {
     public void testFoundClasses() {
         List<String> kknown = new ArrayList<>(Arrays.asList(known));
         List<Class<? extends RememberableDialog>> l = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
-        Assert.assertTrue(l.size() == 7);
+        Assert.assertEquals("find matching types: ", 7, l.size());
         for (Class<? extends RememberableDialog> l1 : l) {
             Assert.assertTrue(l1.getName().startsWith("net.adoptopenjdk.icedteaweb.client.parts.dialogs.security."));
         }
