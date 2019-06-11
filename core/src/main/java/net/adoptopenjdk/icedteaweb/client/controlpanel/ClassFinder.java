@@ -83,6 +83,7 @@ public class ClassFinder extends JDialog {
             //need to avoid base jdk jars/modules
             if (classpathEntry.toLowerCase().contains("icedtea-web")
                     || classpathEntry.toLowerCase().contains(JAVAWS)
+                    || classpathEntry.toLowerCase().contains("/target/classes")
                     || classpathEntry.toLowerCase().contains("plugin")) {
                 File f = new File(classpathEntry);
                 if (!f.exists()) {
