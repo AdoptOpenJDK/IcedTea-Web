@@ -105,11 +105,12 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             sl.setIconLocation(iconLocation);
             ul.setIconLocation(iconLocation);
         }
-        sl.saveTo(path + "/" + file.getInformation().getTitle()+ ".lnk");
-        ul.saveTo(path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
+        final String link = FileUtils.sanitizeFileName(file.getInformation().getTitle() + ".lnk", '-');
+        sl.saveTo(path + "/" + link);
+        ul.saveTo(path + "/Uninstall " + link);
         // write shortcuts to list
-        manageShortcutList(ManageMode.A, path + "/" + file.getInformation().getTitle() + ".lnk");
-        manageShortcutList(ManageMode.A, path + "/Uninstall " + file.getInformation().getTitle() + ".lnk");
+        manageShortcutList(ManageMode.A, path + "/" + link);
+        manageShortcutList(ManageMode.A, path + "/Uninstall " + link);
     }
 
     private void manageShortcutList(ManageMode mode, String path) throws IOException {
