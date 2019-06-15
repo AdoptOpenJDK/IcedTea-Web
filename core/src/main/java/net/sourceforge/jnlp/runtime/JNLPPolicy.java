@@ -53,21 +53,31 @@ public class JNLPPolicy extends Policy {
 
     private static final Logger LOG = LoggerFactory.getLogger(JNLPPolicy.class);
 
-    /** classes from this source have all permissions */
+    /**
+     * classes from this source have all permissions
+     */
     private static CodeSource shellSource;
 
-    /** classes from this source have all permissions */
+    /**
+     * classes from this source have all permissions
+     */
     private static CodeSource systemSource;
 
-    /** the previous policy */
+    /**
+     * the previous policy
+     */
     private static Policy systemPolicy;
 
     private final URI jreExtDir;
 
-    /** the system level policy for jnlps */
+    /**
+     * the system level policy for jnlps
+     */
     private Policy systemJnlpPolicy = null;
 
-    /** the user-level policy for jnlps */
+    /**
+     * the user-level policy for jnlps
+     */
     private Policy userJnlpPolicy = null;
 
     protected JNLPPolicy() {
@@ -176,18 +186,19 @@ public class JNLPPolicy extends Policy {
                 sourcePath.startsWith(jreExtDir.getRawPath())) {
             return true;
         }
-        
+
         // check to see if source protocol is a Java System Library protocol
         if (sourceProtocol.equalsIgnoreCase("jrt")) {
             // jrt protocols are only for system code return true 
-            return true; 
-        }        
-        
+            return true;
+        }
+
         return false;
     }
 
     /**
      * Constructs a delegate policy based on a config setting
+     *
      * @param key a KEY_* in DeploymentConfiguration
      * @return a policy based on the configuration set by the user
      */
@@ -196,9 +207,10 @@ public class JNLPPolicy extends Policy {
         String policyLocation = config.getProperty(key);
         return getPolicyFromUrl(policyLocation);
     }
-    
+
     /**
      * Loads a policy from a URI
+     *
      * @param policyLocation the URI of the policy
      * @return a policy based on the configuration set by the user
      */
@@ -206,7 +218,12 @@ public class JNLPPolicy extends Policy {
         Policy policy = null;
         if (policyLocation != null) {
             try {
-                URI policyUri = new URI(policyLocation.replace("\\","/"));
+                final URI policyUri;
+                if (policyLocation.startsWith("file://")) {
+                    policyUri = new File(policyLocation).toURI();
+                } else {
+                    policyUri = new URI(policyLocation.replace("\\", "/"));
+                }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
