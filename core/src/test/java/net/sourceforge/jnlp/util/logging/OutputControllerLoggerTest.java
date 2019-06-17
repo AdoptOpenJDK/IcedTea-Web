@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
- * ...
+ * Tests for {@link Logger} provided by {@link OutputControllerLoggerFactory}.
  */
 public class OutputControllerLoggerTest {
 

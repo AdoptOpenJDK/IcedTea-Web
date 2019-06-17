@@ -21,10 +21,9 @@ import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_AL
  */
 @SuppressWarnings("unused")
 public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
-    private static final OutputController OUTPUT_CONTROLLER = OutputController.getLogger();
 
     public Logger getLogger(final Class<?> forClass) {
-        return new OutputControllerLogger(forClass, OUTPUT_CONTROLLER);
+        return new OutputControllerLogger(forClass, OutputController.getLogger());
     }
 
     Logger getLogger(Class<?> forClass, BasicOutputController outputController) {
