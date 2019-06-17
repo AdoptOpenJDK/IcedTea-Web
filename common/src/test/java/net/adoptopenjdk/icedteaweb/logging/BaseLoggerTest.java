@@ -22,7 +22,7 @@ public class BaseLoggerTest {
         assertThat(BaseLogger.doExpand(message, args), is("Message without arguments stay unchanged."));
     }
 
-     @Test
+    @Test
     public void testMessageWitNullArgumentsStaysUnchanged() {
         final String message = "Message with null arguments stay unchanged.";
         final Object[] args = null;
@@ -41,8 +41,24 @@ public class BaseLoggerTest {
     @Test
     public void testMessageWithTwoArgumentExpandsCorrectly() {
         final String message = "This is a message with the arguments {} and {}.";
-        final Object[] args = {"ONE", new Integer(2)};
+        final Object[] args = {"ONE", 2};
 
         assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and 2."));
+    }
+
+    @Test
+    public void testMessageWithTooManyArgumentExpandsCorrectly() {
+        final String message = "This is a message with the arguments {} and {}.";
+        final Object[] args = {"ONE", 2, "abc"};
+
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and 2."));
+    }
+
+    @Test
+    public void testMessageWithTooFewArgumentsExpandsCorrectly() {
+        final String message = "This is a message with the arguments {} and {}.";
+        final Object[] args = {"ONE"};
+
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and {}."));
     }
 }

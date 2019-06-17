@@ -21,18 +21,24 @@ import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_AL
  */
 @SuppressWarnings("unused")
 public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
+    private static final OutputController OUTPUT_CONTROLLER = OutputController.getLogger();
 
     public Logger getLogger(final Class<?> forClass) {
-        return new OutputControllerLogger(forClass);
+        return new OutputControllerLogger(forClass, OUTPUT_CONTROLLER);
+    }
+
+    Logger getLogger(Class<?> forClass, BasicOutputController outputController) {
+        return new OutputControllerLogger(forClass, outputController);
     }
 
     private static class OutputControllerLogger extends BaseLogger {
 
-        private static final OutputController OUTPUT_CONTROLLER = OutputController.getLogger();
+        private final BasicOutputController outputController;
         private final String caller;
 
-        private OutputControllerLogger(final Class<?> forClass) {
+        private OutputControllerLogger(final Class<?> forClass, BasicOutputController outputController) {
             this.caller = forClass.getName();
+            this.outputController = outputController;
         }
 
         @Override
@@ -98,7 +104,7 @@ public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
         private void log(final OutputControllerLevel level, final String msg, final Throwable t) {
             final Header header = new Header(level, caller);
             final MessageWithHeader message = new JavaMessage(header, msg, t);
-            OUTPUT_CONTROLLER.log(message);
+            outputController.log(message);
         }
     }
 }
