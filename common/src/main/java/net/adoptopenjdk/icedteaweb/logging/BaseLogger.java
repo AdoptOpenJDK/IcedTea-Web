@@ -12,7 +12,7 @@ public abstract class BaseLogger implements Logger {
         return doExpand(msg,  args);
     }
 
-    public static String doExpand(final String msg, final Object[] args) {
+    static String doExpand(final String msg, final Object[] args) {
         if (msg == null) {
             return "null";
         }
