@@ -9,6 +9,10 @@ import java.util.Objects;
 public abstract class BaseLogger implements Logger {
 
     protected String expand(final String msg, final Object[] args) {
+        return doExpand(msg,  args);
+    }
+
+    public static String doExpand(final String msg, final Object[] args) {
         if (msg == null) {
             return "null";
         }
@@ -27,7 +31,7 @@ public abstract class BaseLogger implements Logger {
         int lastIdx = 0;
         for (Object arg : args) {
             final String argString = Objects.toString(arg);
-            final int idx = result.indexOf("{}", lastIdx);
+            final int idx = msg.indexOf("{}", lastIdx);
 
             if (idx < 0) {
                 break;
