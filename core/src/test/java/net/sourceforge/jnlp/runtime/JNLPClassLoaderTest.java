@@ -35,15 +35,25 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -52,7 +62,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -137,7 +151,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "test.jar");
 
-        /* Test with main-class in manifest */ {
+        /* Test with main-class in manifest */
+        {
             Manifest manifest = new Manifest();
             manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass");
             FileTestUtils.createJarWithContents(jarLocation, manifest);
@@ -157,7 +172,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     @Test
     @Ignore
     public void getMainClassNameTestEmpty() throws Exception {
-        /* Test with-out any main-class specified */ {
+        /* Test with-out any main-class specified */
+        {
             File tempDirectory = FileTestUtils.createTempDirectory();
             File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation /* No contents */);
@@ -363,4 +379,98 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         }
 
     }
+
+    @Test
+    public void testRelativePathInUrl() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        dir = new File(dir,"base");
+        dir.mkdir();
+        File jar = new File(dir,"j1.jar");
+        File jnlp = new File(dir+"/a/b/up.jnlp");
+        jnlp.getParentFile().mkdirs();
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/up.jnlp");
+        String jnlpString = StreamUtils.readStreamAsString(is, Charset.forName("utf-8"));
+        is.close();
+        jnlpString = jnlpString.replaceAll("8080", ""+port);
+        is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
+        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        Files.write(jnlp.toPath(),jnlpString.getBytes("utf-8"));
+        ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        try {
+            final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/up.jnlp"));
+            final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
+            InputStream is1 = classLoader1.getResourceAsStream("Hello1.class");
+            is1.close();
+            is1 = classLoader1.getResourceAsStream("META-INF/MANIFEST.MF");
+            is1.close();
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/up.jnlp").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/f812acb32c857fd916c842e2bf4fb32b9c3837ef63922b167a7e163305058b7.jar").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            as.stop();
+        }
+
+    }
+
+    @Test
+    public void testEncodedPathIsNotDecodedForCache() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        dir = new File(dir,"base");
+        dir.mkdir();
+        File jar = new File(dir,"j1.jar");
+        File jnlp = new File(dir+"/a/b/upEncoded.jnlp");
+        jnlp.getParentFile().mkdirs();
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/upEncoded.jnlp");
+        String jnlpString = StreamUtils.readStreamAsString(is, Charset.forName("utf-8"));
+        is.close();
+        jnlpString = jnlpString.replaceAll("8080", ""+port);
+        is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
+        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        Files.write(jnlp.toPath(),jnlpString.getBytes("utf-8"));
+        ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        try {
+            final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/upEncoded.jnlp"));
+            final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
+            InputStream is1 = classLoader1.getResourceAsStream("Hello1.class");
+            is1.close();
+            is1 = classLoader1.getResourceAsStream("META-INF/MANIFEST.MF");
+            is1.close();
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/upEncoded.jnlp").exists());
+            //be aware; if decoding ever come in play here, thios will leak out of cache folder. Thus harm user system. See fix for " Fixed bug when relative path (..) could leak up (even out of cache)"
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/%2E%2E/%2E%2E/%2E%2E/base").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            as.stop();
+        }
+
+    }
+
 }
