@@ -266,7 +266,6 @@ pub mod tests_utils {
             return true;
         }
 
-        #[cfg(windows)]
         fn inside_console(&self) -> bool {
             return true;
         }

@@ -27,9 +27,15 @@ pub fn create_java_cmd(os: &Os,jre_dir: &std::path::PathBuf, args: &Vec<String>)
 
 fn spawn_java_process(os: &Os, jre_dir: &std::path::PathBuf, args: &Vec<String>) -> std::process::Child {
     let mut cmd = create_java_cmd(os, jre_dir, args);
-    cmd.stdin(std::process::Stdio::inherit());
-    cmd.stdout(std::process::Stdio::inherit());
-    cmd.stderr(std::process::Stdio::inherit());
+    if os.inside_console() {
+        cmd.stdin(std::process::Stdio::inherit());
+        cmd.stdout(std::process::Stdio::inherit());
+        cmd.stderr(std::process::Stdio::inherit());
+    } else {
+        cmd.stdin(std::process::Stdio::null());
+        cmd.stdout(std::process::Stdio::null());
+        cmd.stderr(std::process::Stdio::null());
+    }
     let res = cmd.spawn();
     match res {
         Ok(child) => child,
@@ -61,7 +67,6 @@ pub trait Os {
     fn get_classpath_separator(&self) -> char;
     fn get_exec_suffixes(&self) -> &'static [&'static str];
     fn is_verbose(&self) -> bool;
-    #[cfg(windows)]
     fn inside_console(&self) -> bool;
 }
 
@@ -114,6 +119,10 @@ impl Os for Linux {
 
     fn is_verbose(&self) -> bool {
         return self.verbose;
+    }
+
+    fn inside_console(&self) -> bool {
+        return true;
     }
 
     fn log(&self, s: &str) {
