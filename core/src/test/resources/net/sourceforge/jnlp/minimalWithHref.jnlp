@@ -1,0 +1,8 @@
+<?xml version='1.0'?>
+<jnlp spec='1.5' codebase='.' href='minimalWithHref.jnlp'>
+  <information>
+    <title>Parsing Test</title>
+    <vendor>IcedTea</vendor>
+  </information>
+  <resources/>
+</jnlp>
