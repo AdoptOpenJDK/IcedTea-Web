@@ -12,6 +12,13 @@
     <name>IcedTeaWeb</name>
     <description>Multi-module for IcedTea-Web.</description>
 
+    <scm>
+        <url>https://github.com/AdoptOpenJDK/IcedTea-Web</url>
+        <connection>scm:git:https://git@github.com:AdoptOpenJDK/IcedTea-Web.git</connection>
+        <developerConnection>scm:git:https://git@github.com:AdoptOpenJDK/IcedTea-Web.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -33,6 +40,7 @@
         <module>integration</module>
         <module>clients</module>
         <module>jnlp-servlet</module>
+        <module>javaws</module>
         <module>launchers</module>
     </modules>
 
