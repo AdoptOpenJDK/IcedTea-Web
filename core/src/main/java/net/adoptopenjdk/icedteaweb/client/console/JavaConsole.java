@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.console;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
@@ -44,11 +43,10 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
-import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
-import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -72,11 +70,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -87,64 +80,80 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import net.sourceforge.jnlp.util.logging.LogConfig;
 
 /**
  * A simple Java console for IcedTeaPlugin and JavaWS
- *
  */
 public class JavaConsole implements ObservableMessagesProvider {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JavaConsole.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JavaConsole.class);
 
-    final private List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<MessageWithHeader>());
-    final private List<ConsoleOutputPane> outputs = new ArrayList<ConsoleOutputPane>();
+    private final List<MessageWithHeader> rawData = Collections.synchronizedList(new ArrayList<>());
+    private final List<ConsoleOutputPane> outputs = new ArrayList<>();
+    private final PublicObservable observable = new PublicObservable();
 
-    public JavaConsole() {
-        //add middleware, which catches client's application stdout/err
-        //and will submit it into console
-        System.setErr(new TeeOutputStream(providNullStreamIfEnforced(System.err), true));
-        System.setOut(new TeeOutputStream(providNullStreamIfEnforced(System.out), false));
-        //internal stdOut/Err are going throughs outLog/errLog
-        //when console is off, those tees are not installed
+    private Dimension lastSize = null;
+    private JDialog consoleWindow = null;
+    private JPanel contentPanel = null;
+    private JPanel outputsPanel = null;
+    private JSpinner numberOfOutputs = null;
+    private boolean initialized = false;
+
+    private JavaConsole() {
+        // add middleware, which catches client's application stdout/err
+        // and will submit it into console
+        System.setErr(teeErrStream(provideNullStreamIfEnforced(System.err)));
+        System.setOut(teeOutStream(provideNullStreamIfEnforced(System.out)));
+
+        // internal stdOut/Err are going through outLog/errLog
+        // when console is off, those tees are not installed
 
         // initialize SwingUtils
         updateModel();
     }
 
-    private PrintStream providNullStreamIfEnforced(PrintStream defaultOne) {
-        PrintStream p = defaultOne;
-        if (!LogConfig.getLogConfig().isLogToStreams()) {
-            p = new PrintStream(new OutputStream() {
-                @Override
-                public void write(int b) throws IOException {
+    private TeeOutputStream teeOutStream(final PrintStream original) {
+        return new TeeOutputStream(original, false);
+    }
 
-                }
+    private TeeOutputStream teeErrStream(final PrintStream original) {
+        return new TeeOutputStream(original, true);
+    }
 
-                @Override
-                public synchronized void write(byte[] b, int off, int len) {
+    private PrintStream provideNullStreamIfEnforced(final PrintStream original) {
 
-                }
-            });
-
+        if (LogConfig.getLogConfig().isLogToStreams()) {
+            return original;
         }
-        return p;
+
+        return new PrintStream(new OutputStream() {
+            @Override
+            public void write(final int b) {
+            }
+
+            @Override
+            public synchronized void write(final byte[] b) {
+            }
+
+            @Override
+            public synchronized void write(final byte[] b, final int off, final int len) {
+            }
+        });
     }
 
     private void refreshOutputs() {
         refreshOutputs(outputsPanel, (Integer) numberOfOutputs.getValue());
     }
 
-    private void refreshOutputs(JPanel pane, int count) {
+    private void refreshOutputs(final JPanel pane, final int count) {
         pane.removeAll();
         while (outputs.size() > count) {
             getObservable().deleteObserver(outputs.get(outputs.size() - 1));
             outputs.remove(outputs.size() - 1);
         }
         while (outputs.size() < count) {
-            ConsoleOutputPane c1 = new ConsoleOutputPane(this);
+            final ConsoleOutputPane c1 = new ConsoleOutputPane(this);
             observable.addObserver(c1);
             outputs.add(c1);
         }
@@ -175,22 +184,6 @@ public class JavaConsole implements ObservableMessagesProvider {
         }
     }
 
-    public static interface ClassLoaderInfoProvider {
-
-        public Map<String, String> getLoaderInfo();
-    }
-
-    private static JavaConsole console;
-
-    private Dimension lastSize;
-    private JDialog consoleWindow;
-    private JPanel contentPanel;
-    private JPanel outputsPanel;
-    private ClassLoaderInfoProvider classLoaderInfoProvider;
-    private JSpinner numberOfOutputs;
-    private PublicObservable observable = new PublicObservable();
-    private boolean initialized = false;
-
     private static class JavaConsoleHolder {
 
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
@@ -206,16 +199,16 @@ public class JavaConsole implements ObservableMessagesProvider {
         return isEnabled(JNLPRuntime.getConfiguration());
     }
 
-    public static boolean isEnabled(DeploymentConfiguration config) {
+    private static boolean isEnabled(final DeploymentConfiguration config) {
         return !ConfigurationConstants.CONSOLE_DISABLE.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
                 && !JNLPRuntime.isHeadless();
     }
 
-    public static boolean canShowOnStartup(boolean isApplication) {
+    public static boolean canShowOnStartup(final boolean isApplication) {
         return canShowOnStartup(isApplication, JNLPRuntime.getConfiguration());
     }
 
-    public static boolean canShowOnStartup(boolean isApplication, DeploymentConfiguration config) {
+    private static boolean canShowOnStartup(final boolean isApplication, final DeploymentConfiguration config) {
         if (!isEnabled(config)) {
             return false;
         }
@@ -235,7 +228,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         }
     }
 
-    private void initializeWindow(Dimension size, JPanel content) {
+    private void initializeWindow(final Dimension size, final JPanel content) {
         consoleWindow = new JDialog((JFrame) null, R("DPJavaConsole"));
         consoleWindow.setName("JavaConsole");
         SwingUtils.info(consoleWindow);
@@ -274,31 +267,30 @@ public class JavaConsole implements ObservableMessagesProvider {
         outputsPanel.setLayout(new BorderLayout());
         contentPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints c;
-        c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.gridheight = 10;
-        c.weighty = 1;
+        final GridBagConstraints c1 = new GridBagConstraints();
+        c1.fill = GridBagConstraints.BOTH;
+        c1.gridheight = 10;
+        c1.weighty = 1;
 
-        contentPanel.add(outputsPanel, c);
+        contentPanel.add(outputsPanel, c1);
 
         /* buttons */
-        c = new GridBagConstraints();
-        c.gridy = 10;
-        c.gridheight = 1;
-        c.weightx = 0.5;
-        c.weighty = 0;
+        final GridBagConstraints c2 = new GridBagConstraints();
+        c2.gridy = 10;
+        c2.gridheight = 1;
+        c2.weightx = 0.5;
+        c2.weighty = 0;
 
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(2, 0, 10, 10));
-        contentPanel.add(buttonPanel, c);
+        contentPanel.add(buttonPanel, c2);
 
-        JButton gcButton = new JButton(R("CONSOLErungc"));
+        final JButton gcButton = new JButton(R("CONSOLErungc"));
         buttonPanel.add(gcButton);
         gcButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printMemoryInfo();
                 LOG.info("Performing Garbage Collection....");
                 System.gc();
@@ -308,12 +300,12 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
-        JButton finalizersButton = new JButton(R("CONSOLErunFinalizers"));
+        final JButton finalizersButton = new JButton(R("CONSOLErunFinalizers"));
         buttonPanel.add(finalizersButton);
         finalizersButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printMemoryInfo();
                 LOG.info("Running finalization....");
                 Runtime.getRuntime().runFinalization();
@@ -323,72 +315,72 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
-        JButton memoryButton = new JButton(R("CONSOLEmemoryInfo"));
+        final JButton memoryButton = new JButton(R("CONSOLEmemoryInfo"));
         buttonPanel.add(memoryButton);
         memoryButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printMemoryInfo();
                 updateModel();
             }
         });
 
-        JButton systemPropertiesButton = new JButton(R("CONSOLEsystemProperties"));
+        final JButton systemPropertiesButton = new JButton(R("CONSOLEsystemProperties"));
         buttonPanel.add(systemPropertiesButton);
         systemPropertiesButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printSystemProperties();
                 updateModel();
             }
         });
 
-        JButton classloadersButton = new JButton(R("CONSOLEclassLoaders"));
+        final JButton classloadersButton = new JButton(R("CONSOLEclassLoaders"));
         buttonPanel.add(classloadersButton);
         classloadersButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printClassLoaders();
                 updateModel();
             }
         });
 
-        JButton threadListButton = new JButton(R("CONSOLEthreadList"));
+        final JButton threadListButton = new JButton(R("CONSOLEthreadList"));
         buttonPanel.add(threadListButton);
         threadListButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 printThreadInfo();
                 updateModel();
             }
         });
 
-        JLabel numberOfOutputsL = new JLabel("  Number of outputs: ");
+        final JLabel numberOfOutputsL = new JLabel("  Number of outputs: ");
         buttonPanel.add(numberOfOutputsL);
         numberOfOutputs = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-        JComponent comp = numberOfOutputs.getEditor();
-        JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
-        DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+        final JComponent comp = numberOfOutputs.getEditor();
+        final JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
+        final DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
         formatter.setCommitsOnValidEdit(true);
         numberOfOutputs.addChangeListener(new ChangeListener() {
 
             @Override
-            public void stateChanged(ChangeEvent e) {
+            public void stateChanged(final ChangeEvent e) {
                 refreshOutputs();
             }
         });
         buttonPanel.add(numberOfOutputs);
 
-        JButton closeButton = new JButton(R("ButClose"));
+        final JButton closeButton = new JButton(R("ButClose"));
         buttonPanel.add(closeButton);
         closeButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 SwingUtils.invokeLater(new Runnable() {
 
                     @Override
@@ -399,12 +391,12 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
-        JButton cleanButton = new JButton(R("CONSOLEClean"));
+        final JButton cleanButton = new JButton(R("CONSOLEClean"));
         buttonPanel.add(cleanButton);
         cleanButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 synchronized (rawData) {
                     rawData.clear();
                     updateModel(true);
@@ -415,11 +407,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         initialized = true;
     }
 
-    public void showConsole() {
-        showConsole(false);
-    }
-
-    public void showConsole(boolean modal) {
+    private void showConsole(final boolean modal) {
         if (!JNLPRuntime.isHeadless()) {
             if (consoleWindow == null || !consoleWindow.isVisible()) {
                 initializeWindow();
@@ -429,7 +417,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         }
     }
 
-    public void hideConsole() {
+    private void hideConsole() {
         //no need to update when hidden
         outputsPanel.removeAll();//??
         getObservable().deleteObservers();
@@ -452,47 +440,20 @@ public class JavaConsole implements ObservableMessagesProvider {
         });
     }
 
-    public void hideConsoleLater() {
-        SwingUtils.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                JavaConsole.getConsole().hideConsole();
-            }
-        });
-    }
-
-    protected void printSystemProperties() {
+    private void printSystemProperties() {
 
         LOG.info(" ----");
         LOG.info("System Properties:");
         LOG.info("");
-        Properties p = System.getProperties();
-        Set<Object> keys = p.keySet();
-        for (Object key : keys) {
+        final Properties p = System.getProperties();
+        for (Object key : p.keySet()) {
             LOG.info(key.toString() + ": " + p.get(key));
         }
         LOG.info(" ----");
     }
 
-    public void setClassLoaderInfoProvider(ClassLoaderInfoProvider clip) {
-        classLoaderInfoProvider = clip;
-    }
-
     private void printClassLoaders() {
-        if (classLoaderInfoProvider == null) {
-            LOG.debug("No Classloader info exists in system");
-        } else {
-            LOG.debug(" ----");
-            LOG.debug("Available Classloaders: ");
-            Set<String> loaders = classLoaderInfoProvider.getLoaderInfo().keySet();
-            for (String loader : loaders) {
-                LOG.debug(loader + "\n"
-                        + "  codebase = "
-                        + classLoaderInfoProvider.getLoaderInfo().get(loader));
-            }
-            LOG.debug(" ----");
-        }
+        LOG.debug("No Classloader info exists in system");
     }
 
     private void printMemoryInfo() {
@@ -506,8 +467,8 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     private void printThreadInfo() {
-        Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-        Set<Thread> keys = map.keySet();
+        final Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+        final Set<Thread> keys = map.keySet();
         for (Thread key : keys) {
             LOG.info("Thread " + key.getId() + ": " + key.getName());
             for (StackTraceElement element : map.get(key)) {
@@ -519,9 +480,9 @@ public class JavaConsole implements ObservableMessagesProvider {
 
     public static void main(String[] args) {
 
-        final JavaConsole cconsole = new JavaConsole();
+        final JavaConsole console = new JavaConsole();
 
-        boolean toShowConsole = true;
+        boolean toShowConsole = false;
 
         for (String arg : args) {
             if ("--show-console".equals(arg)) {
@@ -530,7 +491,7 @@ public class JavaConsole implements ObservableMessagesProvider {
         }
 
         if (toShowConsole) {
-            cconsole.showConsoleLater();
+            console.showConsoleLater();
         }
 
     }
@@ -561,16 +522,6 @@ public class JavaConsole implements ObservableMessagesProvider {
         });
     }
 
-    /**
-     * parse plugin message and add it as header+message to data
-     *
-     * @param s string to be parsed
-     */
-    private void processPluginMessage(String s) {
-        PluginMessage pm = new PluginMessage(s);
-        OutputController.getLogger().log(pm);
-    }
-
     @Override
     public List<MessageWithHeader> getData() {
         return rawData;
@@ -579,45 +530,5 @@ public class JavaConsole implements ObservableMessagesProvider {
     @Override
     public Observable getObservable() {
         return observable;
-    }
-
-    public void createPluginReader(final File file) {
-        LOG.debug("Starting processing of plugin-debug-to-console {}", file.getAbsolutePath());
-        Thread t = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
-                    //never ending loop
-                    while (true) {
-                        try {
-                            String s = br.readLine();
-                            if (s == null) {
-                                break;
-                            }
-                            processPluginMessage(s);
-                        } catch (Exception ex) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                        }
-                    }
-                } catch (Exception ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                    if (br != null) {
-                        try {
-                            br.close();
-                        } catch (Exception exx) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exx);
-                        }
-                    }
-                }
-                LOG.debug("Ended processing of plugin-debug-to-console {}", file.getAbsolutePath());
-            }
-        }, "plugin-debug-to-console reader thread");
-        t.setDaemon(true);
-        t.start();
-
-        LOG.debug("Started processing of plugin-debug-to-console {}", file.getAbsolutePath());
     }
 }
