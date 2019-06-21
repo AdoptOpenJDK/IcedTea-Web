@@ -29,8 +29,6 @@ mkdir -p "$SPLASH_TARGET_DIR"
 
 publishExternalLib "$RHINO_SRC"
 publishExternalLib "$TAGSOUP_SRC"
-publishExternalLib "$SLFAPI_SRC"
-publishExternalLib "$SLFSIMPLE_SRC"
 publishExternalLib "$MSLINKS_SRC"
 publishInternalLib "$CORE_SRC" "$ITW_TARGET_DIR"
 publishInternalLib "$COMMON_SRC" "$ITW_TARGET_DIR"

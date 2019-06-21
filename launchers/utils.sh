@@ -21,8 +21,6 @@ function build() {
   export MAIN_CLASS=$3
   export TAGSOUP_JAR=${RESOURCES_SRC_TO_DEST["$TAGSOUP_SRC"]}
   export RHINO_JAR=${RESOURCES_SRC_TO_DEST["$RHINO_SRC"]}
-  export SLFAPI_JAR=${RESOURCES_SRC_TO_DEST["$SLFAPI_SRC"]}
-  export SLFSIMPLE_JAR=${RESOURCES_SRC_TO_DEST["$SLFSIMPLE_SRC"]}
   export MSLINKS_JAR=${RESOURCES_SRC_TO_DEST["$MSLINKS_SRC"]}
   export JRE
   export ITW_LIBS
@@ -58,8 +56,6 @@ function build() {
       cat $x | sed \
         -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
-        -e "s|[@]SLFAPI_JAR[@]|$SLFAPI_JAR|g" \
-        -e "s|[@]SLFSIMPLE_JAR[@]|$SLFSIMPLE_JAR|g" \
         -e "s|[@]MSLINKS_JAR[@]|$MSLINKS_JAR|g" \
         -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
         -e "s|[@]CORE_JAR[@]|$CORE_JAR|g" \
@@ -147,7 +143,7 @@ function docs() {
   fi
   mkdir -p $langDir
   $JRE/bin/java \
-    -cp `createCp $CORE_SRC $COMMON_SRC $JNLPAPI_SRC $SLFAPI_SRC $SLFSIMPLE_SRC` \
+    -cp `createCp $CORE_SRC $COMMON_SRC $JNLPAPI_SRC` \
     net.sourceforge.jnlp.util.docprovider.TextsProvider \
     $type $ENPARAM $langDir $WIDTH false $VERSION "-authorString=https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors"
   # TODO, genere on fly resource

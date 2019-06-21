@@ -16,8 +16,6 @@ const CLIENTS_JAR: Option<&'static str> = option_env!("CLIENTS_JAR");
 const JNLPSERVER_JAR: Option<&'static str> = option_env!("JNLPSERVER_JAR");
 const TAGSOUP_JAR: Option<&'static str> = option_env!("TAGSOUP_JAR");
 const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
-const SLFAPI_JAR: Option<&'static str> = option_env!("SLFAPI_JAR");
-const SLFSIMPLE_JAR: Option<&'static str> = option_env!("SLFSIMPLE_JAR");
 const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
 const MODULARJDK_ARGS_LOCATION: Option<&'static str> = option_env!("MODULARJDK_ARGS_LOCATION");
 const MSLINKS_JAR: Option<&'static str> = option_env!("MSLINKS_JAR");
@@ -48,10 +46,6 @@ pub fn get_clientsjar() -> &'static str { CLIENTS_JAR.unwrap_or("CLIENTS_JAR-dev
 pub fn get_jnlpserver() -> &'static str { JNLPSERVER_JAR.unwrap_or("JNLPSERVER_JAR-dev-unspecified") }
 
 pub fn get_itwlibsearch() -> &'static str { ITW_LIBS.unwrap_or("ITW_LIBS-dev-unspecified") }
-
-pub fn get_slfapi() -> &'static str { SLFAPI_JAR.unwrap_or("SLFAPI_JAR-dev-unspecified") }
-
-pub fn get_slfsimple() ->  &'static str { SLFSIMPLE_JAR.unwrap_or("SLFSIMPLE_JAR-dev-unspecified") }
 
 pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 
