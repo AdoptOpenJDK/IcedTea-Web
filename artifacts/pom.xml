@@ -52,7 +52,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>itw-no-depts-${project.version}.jar</finalName>
+                            <finalName>itw-no-depts-${project.version}</finalName>
                             <artifactSet>
                                 <includes>
                                     <include>net.adoptopenjdk:*</include>
@@ -77,7 +77,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>itw-all-depts-${project.version}.jar</finalName>
+                            <finalName>itw-all-depts-${project.version}</finalName>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
