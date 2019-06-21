@@ -41,6 +41,7 @@
         <module>clients</module>
         <module>jnlp-servlet</module>
         <module>javaws</module>
+        <module>itw</module>
         <module>launchers</module>
     </modules>
 
