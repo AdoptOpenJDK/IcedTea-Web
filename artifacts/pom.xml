@@ -11,9 +11,9 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>itw</artifactId>
-    <name>ITW</name>
-    <description>Fat jar with all ITW classes but no external dependencies.</description>
+    <artifactId>artifacts</artifactId>
+    <name>ITW Artifacts</name>
+    <description>Creates different jars for running ITW.</description>
 
     <dependencies>
         <dependency>
@@ -46,16 +46,38 @@
                 <version>3.2.1</version>
                 <executions>
                     <execution>
+                        <id>itw-no-depts-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <finalName>itw-no-depts-${project.version}.jar</finalName>
                             <artifactSet>
                                 <includes>
                                     <include>net.adoptopenjdk:*</include>
                                 </includes>
                             </artifactSet>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>net.adoptopenjdk.icedteaweb.client.commandline.CommandLine</mainClass>
+                                    <manifestEntries>
+                                        <Scm-Commit>${buildNumber}</Scm-Commit>
+                                        <Build-Time>${maven.build.timestamp}</Build-Time>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>itw-all-depts-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>itw-all-depts-${project.version}.jar</finalName>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
