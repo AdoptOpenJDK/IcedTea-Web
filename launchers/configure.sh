@@ -113,16 +113,6 @@ if [ "x$TAGSOUP_SRC" == "x" ] ; then
 else
   readonly TAGSOUP_SRC=$TAGSOUP_SRC
 fi
-if [ "x$SLFAPI_SRC" == "x" ] ; then
-  readonly SLFAPI_SRC=`getJar "slf4j-api"`
-else
-  readonly SLFAPI_SRC=$SLFAPI_SRC
-fi
-if [ "x$SLFSIMPLE_SRC" == "x" ] ; then
-  readonly SLFSIMPLE_SRC=`getJar "slf4j-simple"`
-else
-  readonly SLFSIMPLE_SRC=$SLFSIMPLE_SRC
-fi
 if [ "x$MSLINKS_SRC" == "x" ] ; then
   readonly MSLINKS_SRC=`getJar "mslinks"`
 else
