@@ -42,7 +42,6 @@ import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
 import net.adoptopenjdk.icedteaweb.testing.AnnotationConditionChecker;
 import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -260,7 +259,6 @@ public class DirectoryValidatorTest extends NoStdOutErrTest{
 
     }
 
-    @NotNull
     private File createTempDir() throws IOException {
         File f1 = File.createTempFile("test", "testMainDirs");
         assertTrue(f1.delete());

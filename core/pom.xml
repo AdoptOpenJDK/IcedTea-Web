@@ -37,6 +37,12 @@
             <groupId>com.github.vatbub</groupId>
             <artifactId>mslinks</artifactId>
             <version>1.0.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>rhino</groupId>
