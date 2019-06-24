@@ -595,11 +595,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
     
     private static URL favUrl(String delimiter, String path, JNLPFile file) throws MalformedURLException {
+        final String separator = path.endsWith(delimiter) ? "" : delimiter;
         return new URL(
                 file.getNotNullProbableCodeBase().getProtocol(),
                 file.getNotNullProbableCodeBase().getHost(),
                 file.getNotNullProbableCodeBase().getPort(),
-                path + delimiter + FAVICON);
+                path + separator + FAVICON);
     }
 
     private static URL getFavIconUrl(JNLPFile file) {
