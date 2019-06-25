@@ -1979,7 +1979,10 @@ public class JNLPClassLoader extends URLClassLoader {
     private void merge(JNLPClassLoader extLoader) {
 
         try {
-            System.getSecurityManager().checkPermission(new AllPermission());
+            SecurityManager sm = System.getSecurityManager();
+            if (sm != null) {
+                sm.checkPermission(new AllPermission());
+            }
         } catch (SecurityException se) {
             throw new SecurityException("JNLPClassLoader() may only be called from trusted sources!");
         }

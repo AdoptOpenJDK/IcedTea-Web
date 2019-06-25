@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" codebase="http://localhost:${PORT}">
+    <information>
+        <title>Managed Application With Extension Resource</title>
+        <vendor>IcedTea</vendor>
+        <description>This is a managed application with extension resource</description>
+    </information>
+
+    <update check="always" policy="always"/>
+
+    <resources>
+        <j2se version="1.8+"/>
+        <extension name="ComponentExtension" href="ComponentExtension.jnlp"/>
+    </resources>
+
+    <application-desc main-class="${MAIN_CLASS}"/>
+</jnlp>

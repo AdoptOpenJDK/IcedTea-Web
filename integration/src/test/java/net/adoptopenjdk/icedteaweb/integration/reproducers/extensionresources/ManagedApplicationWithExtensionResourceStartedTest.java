@@ -14,28 +14,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.adoptopenjdk.icedteaweb.integration.testcase1;
+package net.adoptopenjdk.icedteaweb.integration.reproducers.extensionresources;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
+import net.adoptopenjdk.icedteaweb.integration.reproducers.extensionresources.applications.ExtensionResourceManagedApplication;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_ENVIRONMENT_FILE;
+import static net.adoptopenjdk.icedteaweb.integration.reproducers.extensionresources.applications.ExtensionResourceManagedApplication.EXTENSION_OUTPUT_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
-/**
- * Test the successful access to a system environment variable by an ITW-managed application.
- */
-public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest {
-    private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
+public class ManagedApplicationWithExtensionResourceStartedTest implements IntegrationTest {
+    private static final String JAR_NAME = "App-ExtensionResourceManagedApplication.jar";
 
     @Rule
     public TemporaryItwHome tmpItwHome = new TemporaryItwHome();
@@ -43,9 +42,9 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testReadingSystemEnvironment() throws IOException {
+    public void testSuccessfullyLaunchApplicationWithExtensionResource() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServer(wireMock, Arrays.asList("ManagedApplicationWithExtensionResource.jnlp", "ComponentExtension.jnlp"), ExtensionResourceManagedApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -53,7 +52,7 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
         Boot.main(args);
 
         // then
-        final String cachedFileAsString = getCachedFileAsString(tmpItwHome, SYSTEM_ENVIRONMENT_FILE);
-        assertThat(cachedFileAsString, containsString("USER"));
+        assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
+        assertThat(getCachedFileAsString(tmpItwHome, EXTENSION_OUTPUT_FILE), startsWith("Simple Java application loaded as extension resource"));
     }
 }
