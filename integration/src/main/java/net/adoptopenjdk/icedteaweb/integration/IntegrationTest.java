@@ -1,3 +1,19 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 package net.adoptopenjdk.icedteaweb.integration;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -10,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,15 +51,21 @@ public interface IntegrationTest {
     String MAIN_CLASS = "MAIN_CLASS";
 
     default String setupServer(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
-        wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
-                ok()
-        ));
-        wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
-                aResponse().withBody(fileContent(jnlpFilename,
-                        replace(PORT).with(wireMock.port())
-                                .and(MAIN_CLASS).with(mainClass))
-                )
-        ));
+        return setupServer(wireMock, Arrays.asList(jnlpFilename), mainClass, resources);
+    }
+
+    default String setupServer(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
+        for (String jnlpFilename : jnlpFilenames) {
+            wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
+                    ok()
+            ));
+            wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
+                    aResponse().withBody(fileContent("jnlps/" + jnlpFilename,
+                            replace(PORT).with(wireMock.port())
+                                    .and(MAIN_CLASS).with(mainClass))
+                    )
+            ));
+        }
 
         for (String resource : resources) {
             final String resourcePath = "resources/" + resource;
@@ -63,7 +86,7 @@ public interface IntegrationTest {
         ));
 
 
-        return "http://localhost:" + wireMock.port() + "/" + jnlpFilename;
+        return "http://localhost:" + wireMock.port() + "/" + jnlpFilenames.get(0);
     }
 
     default byte[] fileContent(String file) throws IOException {
@@ -101,12 +124,12 @@ public interface IntegrationTest {
     }
 
     default Properties getCachedFileAsProperties(TemporaryItwHome tmpItwHome, String fileName) throws IOException {
-            final File helloFile = getCachedFile(tmpItwHome, fileName);
-            final Properties result = new Properties();
-            try (final InputStream inputStream = new FileInputStream(helloFile)) {
-                result.load(inputStream);
-            }
-            return result;
+        final File helloFile = getCachedFile(tmpItwHome, fileName);
+        final Properties result = new Properties();
+        try (final InputStream inputStream = new FileInputStream(helloFile)) {
+            result.load(inputStream);
+        }
+        return result;
     }
 
     default boolean hasCachedFile(TemporaryItwHome tmpItwHome, String fileName) throws IOException {

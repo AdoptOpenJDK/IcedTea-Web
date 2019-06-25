@@ -87,7 +87,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>SimpleJavaApplication</id>
+                        <id>testcase1</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -100,6 +100,24 @@
                             <classifier>SimpleJavaApplication</classifier>
                             <outputDirectory>
                                 ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/testcase1/resources
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>extensionresources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/reproducers/extensionresources/**/*.class</include>
+                            </includes>
+                            <finalName>App</finalName>
+                            <classifier>ExtensionResourceManagedApplication</classifier>
+                            <outputDirectory>
+                                ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/reproducers/extensionresources/resources
                             </outputDirectory>
                         </configuration>
                     </execution>
