@@ -26,7 +26,7 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
     @Rule
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
-    @Test(timeout = 5_000)
+    @Test(timeout = 100_000)
     public void testReadingSystemEnvironment() throws IOException {
         // given
         final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SimpleJavaApplication.class, JAR_NAME);

@@ -54,6 +54,15 @@ public interface IntegrationTest {
             ));
         }
 
+        final String favIconPath = "favicon.ico";
+        wireMock.stubFor(head(urlEqualTo("/" + favIconPath)).willReturn(
+                ok()
+        ));
+        wireMock.stubFor(get(urlEqualTo("/" + favIconPath)).willReturn(
+                aResponse().withBody(fileContent("/javaws.ico"))
+        ));
+
+
         return "http://localhost:" + wireMock.port() + "/" + jnlpFilename;
     }
 

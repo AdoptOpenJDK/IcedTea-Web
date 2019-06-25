@@ -26,7 +26,7 @@ public class SplashScreenIconTest implements IntegrationTest {
     @Rule
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
-    @Test(timeout = 5_000)
+    @Test(timeout = 100_000)
     public void testSplashIcon() throws IOException {
         // given
         final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SimpleJavaApplication.class, JAR_NAME, SPLASH_ICON);
