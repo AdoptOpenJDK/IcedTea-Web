@@ -42,11 +42,13 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLe
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.runtime.JnlpBoot;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -286,5 +288,29 @@ public class JNLPFileTest extends NoStdOutErrTest{
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false, false, false));
         Assert.assertEquals(ApplicationPermissionLevel.J2EE, jnlpFile.getApplicationPermissionLevel());
+    }
+
+    @Test
+    public void testGetSourceLocation() throws IOException, ParseException {
+        ClassLoader cl = JNLPFileTest.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        URL jnlpURL = cl.getResource("net/sourceforge/jnlp/minimal.jnlp");
+        JNLPFile jnlpFile = new JNLPFile(jnlpURL);
+        // no href in JNLP tag: sourceLocation is null
+        Assert.assertNull(jnlpFile.getSourceLocation());
+    }
+    @Test
+    public void testGetSourceLocation2() throws IOException, ParseException {
+        ClassLoader cl = JNLPFileTest.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        String jnlpResourceName = "net/sourceforge/jnlp/minimalWithHref.jnlp";
+        URL jnlpURL = cl.getResource(jnlpResourceName);
+        JNLPFile jnlpFile = new JNLPFile(jnlpURL);
+        Assert.assertNotNull(jnlpFile.getSourceLocation());
+        Assert.assertTrue(jnlpFile.getSourceLocation().getFile().endsWith(jnlpResourceName));
     }
 }
