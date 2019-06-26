@@ -367,10 +367,6 @@ public class ManifestAttributesChecker {
                     }
                 }
             }
-            JNLPFile jnlp = resourcesDesc.getJNLPFile();
-            if (jnlp != null) {
-                usedUrls.add(UrlUtils.removeFileName(jnlp.getSourceLocation()));
-            }
 
         }
         OutputController.getLogger().log("Found alaca URLs to be verified");

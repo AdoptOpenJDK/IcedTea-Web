@@ -114,8 +114,9 @@ public class UnsignedAppletTrustConfirmation {
     }
 
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, JNLPFile file, Class<? extends RememberableDialog> id) {
+        URL location = (file.getSourceLocation() != null) ? file.getSourceLocation() : file.getFileLocation();
         return actionStorage.getMatchingItem(
-                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(), 
+                UrlUtils.normalizeUrlAndStripParams(location, true /* encode local files */).toString(),
                 UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */).toString(), 
                 toRelativePaths(getJars(file), file.getNotNullProbalbeCodeBase().toExternalForm()), id);
     }
@@ -141,7 +142,8 @@ public class UnsignedAppletTrustConfirmation {
             UnsignedAppletActionEntry oldEntry = getMatchingItem(userActionStorage, file, id);
 
             URL codebase = UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbalbeCodeBase(), true /* encode local files */);
-            URL documentbase = UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */);
+            URL location = (file.getSourceLocation() != null) ? file.getSourceLocation() : file.getFileLocation();
+            URL documentbase = UrlUtils.normalizeUrlAndStripParams(location, true /* encode local files */);
 
             UrlRegEx codebaseRegex = null;
             UrlRegEx documentbaseRegex = null;
