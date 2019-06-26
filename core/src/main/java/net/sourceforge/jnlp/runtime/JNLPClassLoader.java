@@ -1253,7 +1253,11 @@ public class JNLPClassLoader extends URLClassLoader {
                                         // (inline loading with "jar:..!/..." path will not work
                                         // with standard classloader methods)
 
-                                        String extractedJarLocation = localFile + ".nested/" + je.getName();
+                                        String name = je.getName();
+                                        if (name.contains("..")){
+                                            name=CacheUtil.hex(name, name);
+                                        }
+                                        String extractedJarLocation = localFile + ".nested/" + name;
                                         File parentDir = new File(extractedJarLocation).getParentFile();
                                         if (!parentDir.isDirectory() && !parentDir.mkdirs()) {
                                             throw new RuntimeException("Unable to extract nested jar.");

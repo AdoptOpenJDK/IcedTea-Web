@@ -473,4 +473,73 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     }
 
+    @Test
+    public void testRelativePathInNestedJars() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        File jar = new File(dir,"jar03_dotdotN1.jar");
+        File jnlp = new File(dir,"jar_03_dotdot_jarN1.jnlp");
+        InputStream is1 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp");
+        InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
+        OutputStream fos1 = new FileOutputStream(jnlp);
+        OutputStream fos2 = new FileOutputStream(jar);
+        StreamUtils.copyStream(is1, fos1);
+        StreamUtils.copyStream(is2, fos2);
+        fos1.flush();;
+        fos2.flush();
+        fos1.close();
+        fos2.close();
+        ServerLauncher as = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        try {
+            //it is invalid jar, so we have to disable checks first
+            final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
+            final JNLPClassLoader classLoader = JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
+
+            //ThreadGroup group = Thread.currentThread().getThreadGroup();
+            //ApplicationInstance app = new ApplicationInstance(jnlpFile, group, classLoader);
+            //classLoader.setApplication(app);
+            //app.initialize();
+
+            //this test is actually not testing mutch. The app must be accessing the nested jar in plugin-like way
+            InputStream is = classLoader.getResourceAsStream("application/abev/nyomtatvanyinfo/1965.teminfo.enyk");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/MANIFEST.MF");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/j1.jar");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/../../jar01_to_be_injected.jar");
+            //the .. is not recognized correctly
+            //is.close();
+            //Class c = classLoader.getClass().forName("Hello1");
+            // in j1.jar
+            is = classLoader.getResourceAsStream("Hello1.class");
+            //is.close(); nested jar is not on defualt CP
+            //in  jar01
+            //c = classLoader.getClass().forName("com.devdaily.FileUtilities");
+            is = classLoader.getResourceAsStream("com/devdaily/FileUtilities.class");
+            // is.close(); nested jar is not on defualt CP
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/jar_03_dotdot_jarN1.jnlp").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar.nested/99a90686bfbe84e3f9dbeed8127bba85672ed73688d3c69191aa1ee70916a.jar").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar.nested/META-INF/j1.jar").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            as.stop();
+        }
+
+    }
+
 }
