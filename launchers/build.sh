@@ -5,6 +5,14 @@ set -x
 set -e
 set -o pipefail
 
+isWindows() {
+  if [[ $( uname ) == *"NT"* ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 ## resolve folder of this script, following all symlinks,
 ## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
@@ -15,7 +23,11 @@ while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer 
   [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
 done
 
-readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+if isWindows; then
+  readonly SCRIPT_DIR="$(cygpath -m $( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd ))"
+else
+  readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+fi
 
 source $SCRIPT_DIR/configure.sh
 source $SCRIPT_DIR/utils.sh
