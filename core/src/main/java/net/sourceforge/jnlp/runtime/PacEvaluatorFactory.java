@@ -68,6 +68,7 @@ public class PacEvaluatorFactory {
         }
 
         if (properties == null) {
+            LOG.debug("Build properties are null, create {}", FakePacEvaluator.class.getSimpleName());
             return new FakePacEvaluator();
         }
 
@@ -94,6 +95,7 @@ public class PacEvaluatorFactory {
             }
         }
 
+        LOG.debug("Rhino-based PAC evaluator not available.");
         return new FakePacEvaluator();
     }
 }

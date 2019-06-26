@@ -98,10 +98,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
     private void parseConfiguration(DeploymentConfiguration config) {
         proxyType = Integer.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE));
 
-        String autoConfigString = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
-        if (autoConfigString != null) {
+        final String autoConfigUrlProperty = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
+
+        if (autoConfigUrlProperty != null) {
             try {
-                autoConfigUrl = new URL(autoConfigString);
+                autoConfigUrl = new URL(autoConfigUrlProperty);
             } catch (MalformedURLException e) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
