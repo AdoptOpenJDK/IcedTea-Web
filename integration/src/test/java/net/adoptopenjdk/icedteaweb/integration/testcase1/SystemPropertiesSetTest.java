@@ -49,11 +49,12 @@ public class SystemPropertiesSetTest implements IntegrationTest {
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
+        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless", "-property", "key3=SystemPropertyAsCommandLineArgument"};
         Boot.main(args);
 
         // then
-        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("value1"));
-        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("value2"));
+        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile1"));
+        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
+        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
     }
 }
