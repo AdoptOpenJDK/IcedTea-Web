@@ -11,8 +11,8 @@
     <resources>
         <j2se version="1.8+"/>
         <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
-        <property name="key1" value="value1"/>
-        <property name="key2" value="value2"/>
+        <property name="key1" value="SystemPropertyViaJnlpFile1"/>
+        <property name="key2" value="System Property Via Jnlp File2"/>
     </resources>
 
     <application-desc main-class="${MAIN_CLASS}"/>
