@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.jar.JarEntry;
+import java.util.regex.Pattern;
 
 /**
  * The jar certificate verifier utility.
@@ -71,6 +72,7 @@ public class JarCertVerifier implements CertVerifier {
     private final static Logger LOG = LoggerFactory.getLogger(JarCertVerifier.class);
 
     private static final String META_INF = "META-INF/";
+    private static final Pattern SIG = Pattern.compile(".*" + META_INF + "SIG-.*");
 
     // prefix for new signature-related files in META-INF directory
     private static final String SIG_PREFIX = META_INF + "SIG-";
@@ -501,12 +503,20 @@ public class JarCertVerifier implements CertVerifier {
 
     /**
      * Returns whether a file is in META-INF, and thus does not require signing.
-     * 
+     * <p>
      * Signature-related files under META-INF include: . META-INF/MANIFEST.MF . META-INF/SIG-* . META-INF/*.SF . META-INF/*.DSA . META-INF/*.RSA
      */
     static boolean isMetaInfFile(String name) {
-        String ucName = name.toUpperCase();
-        return ucName.startsWith(META_INF);
+        if (name.endsWith("class")) {
+            return false;
+        }
+        return name.startsWith(META_INF) && (
+                name.endsWith(".MF") ||
+                name.endsWith(".SF") ||
+                name.endsWith(".DSA") ||
+                name.endsWith(".RSA") ||
+                SIG.matcher(name).matches()
+        );
     }
 
     /**

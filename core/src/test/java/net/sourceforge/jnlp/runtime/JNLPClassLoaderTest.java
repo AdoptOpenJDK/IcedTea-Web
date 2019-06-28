@@ -407,6 +407,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
         try {
             final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/up.jnlp"));
             final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
@@ -421,6 +423,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setTrustAll(trustBackup);
             JNLPRuntime.setSecurityEnabled(securityBAckup);
             JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
             as.stop();
         }
 
@@ -453,6 +456,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK); JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
         try {
             final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/upEncoded.jnlp"));
             final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
@@ -468,6 +472,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setTrustAll(trustBackup);
             JNLPRuntime.setSecurityEnabled(securityBAckup);
             JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
             as.stop();
         }
 
@@ -500,6 +505,11 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustAll(true);
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
+        //fix of "All files, except signaturre files, are now  checked for signatures" make this actually correctly failing ahead of time
+        String ignoreBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, "true");
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
         try {
             //it is invalid jar, so we have to disable checks first
             final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
@@ -537,9 +547,54 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setTrustAll(trustBackup);
             JNLPRuntime.setSecurityEnabled(securityBAckup);
             JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
             as.stop();
         }
 
+    }
+
+    @Test(expected = Exception.class)
+    public void testDifferentSignatureInManifestMf() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        File jar = new File(dir,"jar03_dotdotN1.jar");
+        File jnlp = new File(dir,"jar_03_dotdot_jarN1.jnlp");
+        InputStream is1 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp");
+        InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
+        OutputStream fos1 = new FileOutputStream(jnlp);
+        OutputStream fos2 = new FileOutputStream(jar);
+        StreamUtils.copyStream(is1, fos1);
+        StreamUtils.copyStream(is2, fos2);
+        fos1.flush();;
+        fos2.flush();
+        fos1.close();
+        fos2.close();
+        ServerLauncher as = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        String ignoreBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, "false");
+        try {
+            //it is invalid jar, so we have to disable checks first
+            final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
+            final JNLPClassLoader classLoader = JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
+            as.stop();
+        }
     }
 
 }
