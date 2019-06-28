@@ -71,12 +71,12 @@ else
   readonly ICO_TARGET_DIR=$ICO_TARGET_DIR
 fi
 
-readonly CORE_SRC=`ls $PROJECT_TOP/core/target/icedtea-web-core-*.jar | sort -d | head -n 1`
-readonly COMMON_SRC=`ls $PROJECT_TOP/common/target/icedtea-web-common-*.jar | sort -d | head -n 1`
+readonly CORE_SRC=`ls $PROJECT_TOP/core/target/icedtea-web-core-*.jar | sort -V | head -n 1`
+readonly COMMON_SRC=`ls $PROJECT_TOP/common/target/icedtea-web-common-*.jar | sort -V | head -n 1`
 readonly JNLPAPI_SRC=`ls $PROJECT_TOP/jnlp-api/target/jnlp-api-*.jar`
-readonly XMLPARSER_SRC=`ls $PROJECT_TOP/xml-parser/target/icedtea-web-xml-parser-*.jar | sort -d | head -n 1`
+readonly XMLPARSER_SRC=`ls $PROJECT_TOP/xml-parser/target/icedtea-web-xml-parser-*.jar | sort -V | head -n 1`
 readonly CLIENTS_SRC=`ls $PROJECT_TOP/clients/target/icedtea-web-clients-*.jar`
-readonly JNLPSERVER_SRC=`ls $PROJECT_TOP/jnlp-servlet/target/jnlp-servlet-*.jar | sort -d | head -n 1`
+readonly JNLPSERVER_SRC=`ls $PROJECT_TOP/jnlp-servlet/target/jnlp-servlet-*.jar | sort -V | head -n 1`
 
 if [ "x$MAVEN_REPO" == "x" ] ; then
   readonly MAVEN_REPO=${HOME}/.m2/
