@@ -57,6 +57,9 @@ import java.security.ProtectionDomain;
 public class ApplicationInstance {
 
     private final static Logger LOG = LoggerFactory.getLogger(ApplicationInstance.class);
+    
+    public final static String DEPLOYMENT_SYSPROP = "deployment.javaws";
+    public final static String DEPLOYMENT_SYSPROP_VALUE = "IcedTea-Web";
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -330,7 +333,11 @@ public class ApplicationInstance {
                 for (PropertyDesc propDesc : props) {
                     System.setProperty(propDesc.getKey(), propDesc.getValue());
                 }
-
+                
+                // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible 
+                // for the started application to detect the execution context.
+                System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
+                
                 return null;
             }
         };

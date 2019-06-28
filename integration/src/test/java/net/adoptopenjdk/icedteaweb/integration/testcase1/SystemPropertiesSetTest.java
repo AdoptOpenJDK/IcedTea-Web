@@ -56,5 +56,10 @@ public class SystemPropertiesSetTest implements IntegrationTest {
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile1"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
+        
+        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible 
+        // for the started application to detect the execution context. 
+        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("deployment.javaws"), containsString("IcedTea-Web"));
     }
+    
 }
