@@ -167,7 +167,7 @@ public class CommandLineOptionsParserTest {
         List<String> values = parser.getParams(CommandLineOptions.ARG);
         assertEquals(6, values.size());
         assertTrue(parser.mainArgExists());
-        assertEquals("File.jnlp",parser.getMainArg());
+        assertEquals("File.jnlp", parser.getMainArg());
         assertEquals(0, values.indexOf("blah1"));
         assertEquals(1, values.indexOf("blah2"));
         assertEquals(2, values.indexOf("blah3"));
@@ -180,7 +180,7 @@ public class CommandLineOptionsParserTest {
     public void testMultipleOptionsWithNoArgsCombinedWithMultipleOptions() {
         String[] args = {"-arg", "-update=green", "-version",
                 "-arg", "-about",
-                "-arg", "blah1", "blah2", "blah3","-about", "-arg",
+                "-arg", "blah1", "blah2", "blah3", "-about", "-arg",
                 "blah4", "blah5", "blah6", "File.jnlp", "-headless", "-noupdate"};
         CommandLineOptionsParser parser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
         assertTrue(parser.hasOption(CommandLineOptions.ABOUT));
@@ -206,7 +206,7 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void testSameTagMultipleTimesWithMainArg() {
-        String[] args = {"-headless", "-headless","File.jnlp", "-headless", "-headless", "-headless"};
+        String[] args = {"-headless", "-headless", "File.jnlp", "-headless", "-headless", "-headless"};
         CommandLineOptionsParser parser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
         assertTrue(parser.mainArgExists());
@@ -220,7 +220,7 @@ public class CommandLineOptionsParserTest {
         CommandLineOptionsParser parser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
         assertFalse(parser.mainArgExists());
-        assertEquals("",parser.getMainArg());
+        assertEquals(null, parser.getMainArg());
         assertTrue(parser.hasOption(CommandLineOptions.HEADLESS));
     }
 
@@ -277,7 +277,7 @@ public class CommandLineOptionsParserTest {
         assertTrue(CommandLineOptionsParser.stringEqualsOption("--headless", CommandLineOptions.HEADLESS));
         assertTrue(CommandLineOptionsParser.stringEqualsOption("---headless", CommandLineOptions.HEADLESS));
     }
-    
+
     @Test
     public void testOptionsSyntaxNegative() {
         assertFalse(CommandLineOptionsParser.stringEqualsOption(" -headless", CommandLineOptions.HEADLESS));

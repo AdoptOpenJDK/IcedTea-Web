@@ -36,9 +36,15 @@
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 public class BootTest extends NoStdOutErrTest {
 
@@ -52,4 +58,76 @@ public class BootTest extends NoStdOutErrTest {
         Assert.assertEquals("https://www.com/file.jnlp", Boot.fixJnlpProtocol("jnlps:https://www.com/file.jnlp"));
     }
 
+    @Test
+    public void fixJnlpProtocolTestWithNullArgument() {
+        assertNull(Boot.fixJnlpProtocol(null));
+    }
+
+    @Test
+    public void getValidJnlpFileLocationFromCommandLineArguments() {
+        // given
+        String[] args = {"-nosecurity", "-Xnofork", "-jnlp", "https://www.somedomain.com/some.jnlp"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        // when
+        final String jnlpFileLocation = Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser);
+
+        // then
+        assertThat(jnlpFileLocation, is("https://www.somedomain.com/some.jnlp"));
+    }
+
+    @Test
+    public void getValidJnlpFileLocationFromCommandLineArgumentsWithUnknownExtraArgument() {
+        // given
+        String[] args = {"-nosecurity", "-Xnofork", "-jnlp", "https://www.somedomain.com/some.jnlp", "-unknownExtraArgument"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        // when
+        final String jnlpFileLocation = Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser);
+
+        // then
+        assertThat(jnlpFileLocation, is("https://www.somedomain.com/some.jnlp"));
+    }
+
+    @Test
+    public void getValidJnlpFileLocationFromCommandLineArgumentsWithHtmlArgument() {
+        // given
+        String[] args = {"-nosecurity", "-Xnofork", "-html", "https://www.somedomain.com/some.jnlp"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        // when
+        final String jnlpFileLocation = Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser);
+
+        // then
+        assertThat(jnlpFileLocation, is("https://www.somedomain.com/some.jnlp"));
+    }
+
+    @Test
+    public void getValidJnlpFileLocationFromCommandLineArgumentsWithUnknownExtraArgumentWithoutExplizitJnlpOption() {
+        // given
+        String[] args = {"-nosecurity", "-Xnofork", "https://www.somedomain.com/some.jnlp", "-unknownExtraArgument"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        // when
+        final String jnlpFileLocation = Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser);
+
+        // then
+        assertThat(jnlpFileLocation, is("https://www.somedomain.com/some.jnlp"));
+    }
+
+    @Test
+    public void dontFindJnlpFileLocationInCommandLineArguments() {
+        String[] args = {"-nosecurity", "-Xnofork"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        assertNull(Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser));
+    }
+
+    @Test
+    public void dontFindJnlpFileLocationInCommandLineArgumentsWithExplizitJnlpOption() {
+        String[] args = {"-nosecurity", "-Xnofork", "-jnlp"};
+        CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
+
+        assertNull(Boot.getJnlpFileLocationFromCommandLineArguments(optionsParser));
+    }
 }

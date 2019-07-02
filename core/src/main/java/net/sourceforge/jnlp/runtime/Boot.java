@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -250,6 +251,9 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     static String fixJnlpProtocol(String param) {
+        if (isNull(param) || param.isEmpty()) {
+            return null;
+        }
         //remove jnlp: for case like jnlp:https://some.app/file.jnlp
         if (param.matches("^jnlp[s]?:.*://.*")) {
             param = param.replaceFirst("^jnlp[s]?:", "");
@@ -291,7 +295,7 @@ public final class Boot implements PrivilegedAction<Void> {
      */
     static URL getFileLocation() {
 
-        final String location = getJnlpFileLocationFromCommandLineArguments();
+        final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
 
         if (location == null) {
             handleMessage();
@@ -326,16 +330,16 @@ public final class Boot implements PrivilegedAction<Void> {
      *
      * @return the file location or null if no file location can be found in the command line arguments.
      */
-    private static String getJnlpFileLocationFromCommandLineArguments() {
-        if (optionParser.hasOption(CommandLineOptions.JNLP)) {
-            return fixJnlpProtocol(optionParser.getParam(CommandLineOptions.JNLP));
+    static String getJnlpFileLocationFromCommandLineArguments(final CommandLineOptionsParser commandLineOptionsParser) {
+        if (commandLineOptionsParser.hasOption(CommandLineOptions.JNLP)) {
+            return fixJnlpProtocol(commandLineOptionsParser.getParam(CommandLineOptions.JNLP));
         }
-        else if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            return optionParser.getParam(CommandLineOptions.HTML);
+        else if (commandLineOptionsParser.hasOption(CommandLineOptions.HTML)) {
+            return commandLineOptionsParser.getParam(CommandLineOptions.HTML);
         }
-        else if (optionParser.mainArgExists()) {
+        else if (commandLineOptionsParser.mainArgExists()) {
             // so file location must be in the list of arguments, take the first one as best effort, ignore the others
-            return fixJnlpProtocol(optionParser.getMainArg());
+            return fixJnlpProtocol(commandLineOptionsParser.getMainArg());
         }
         // no file location available as argument
         return null;
