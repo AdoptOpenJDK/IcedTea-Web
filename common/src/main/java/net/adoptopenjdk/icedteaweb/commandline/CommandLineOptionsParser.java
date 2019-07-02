@@ -100,7 +100,7 @@ public class CommandLineOptionsParser {
         if (mainArgumentList.size() > 0) {
             return mainArgumentList.get(0);
         }
-        return "";
+        return null;
     }
 
     public List<String> getMainArgs() {

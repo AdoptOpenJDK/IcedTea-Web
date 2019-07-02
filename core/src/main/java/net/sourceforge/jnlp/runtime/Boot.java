@@ -37,7 +37,6 @@ import net.sourceforge.jnlp.util.docprovider.JavaWsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.optionparser.InvalidArgumentException;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
@@ -52,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.isNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -251,6 +251,9 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     static String fixJnlpProtocol(String param) {
+        if (isNull(param) || param.isEmpty()) {
+            return null;
+        }
         //remove jnlp: for case like jnlp:https://some.app/file.jnlp
         if (param.matches("^jnlp[s]?:.*://.*")) {
             param = param.replaceFirst("^jnlp[s]?:", "");
@@ -292,13 +295,7 @@ public final class Boot implements PrivilegedAction<Void> {
      */
     static URL getFileLocation() {
 
-        String location = null;
-        try {
-            location = getMainFile();
-        } catch (InvalidArgumentException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            fatalError("Invalid argument: " + e);
-        }
+        final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
 
         if (location == null) {
             handleMessage();
@@ -328,24 +325,23 @@ public final class Boot implements PrivilegedAction<Void> {
     }
 
     /**
-     * Gets the JNLP file from the command line arguments, or exits upon error.
+     * Fetch the JNLP file location from command line arguments. If the {@link CommandLineOptionsParser} cannot parse
+     * a {@link CommandLineOptions#JNLP} or a a {@link CommandLineOptions#HTML} it returns the first command argument.
+     *
+     * @return the file location or null if no file location can be found in the command line arguments.
      */
-    private static String getMainFile() throws InvalidArgumentException {
-        if (optionParser.getMainArgs().size() > 1
-                || (optionParser.mainArgExists() && optionParser.hasOption(CommandLineOptions.JNLP))
-                || (optionParser.mainArgExists() && optionParser.hasOption(CommandLineOptions.HTML))
-                || (optionParser.hasOption(CommandLineOptions.JNLP) && optionParser.hasOption(CommandLineOptions.HTML))) {
-            throw new InvalidArgumentException(optionParser.getMainArgs().toString());
-        } else if (optionParser.hasOption(CommandLineOptions.JNLP)) {
-            return fixJnlpProtocol(optionParser.getParam(CommandLineOptions.JNLP));
-        } else if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            return optionParser.getParam(CommandLineOptions.HTML);
-        } else if (optionParser.mainArgExists()) {
-            return fixJnlpProtocol(optionParser.getMainArg());
+    static String getJnlpFileLocationFromCommandLineArguments(final CommandLineOptionsParser commandLineOptionsParser) {
+        if (commandLineOptionsParser.hasOption(CommandLineOptions.JNLP)) {
+            return fixJnlpProtocol(commandLineOptionsParser.getParam(CommandLineOptions.JNLP));
         }
-
-        handleMessage();
-        JNLPRuntime.exit(0);
+        else if (commandLineOptionsParser.hasOption(CommandLineOptions.HTML)) {
+            return commandLineOptionsParser.getParam(CommandLineOptions.HTML);
+        }
+        else if (commandLineOptionsParser.mainArgExists()) {
+            // so file location must be in the list of arguments, take the first one as best effort, ignore the others
+            return fixJnlpProtocol(commandLineOptionsParser.getMainArg());
+        }
+        // no file location available as argument
         return null;
     }
 
