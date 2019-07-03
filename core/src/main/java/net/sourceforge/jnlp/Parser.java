@@ -807,16 +807,16 @@ public final class Parser {
             final String name = child.getNodeName().getName();
 
             if (APPLET_DESC_ELEMENT.equals(name)) {
-                return getApplet(child);
+                return getAppletDesc(child);
             }
             if (APPLICATION_DESC_ELEMENT.equals(name)) {
-                return getApplication(ApplicationType.JAVA, child);
+                return getApplicationDesc(ApplicationType.JAVA, child);
             }
             if (INSTALLER_DESC_ELEMENT.equals(name)) {
-                return getInstaller(child);
+                return getInstallerDesc(child);
             }
             if (JAVAFX_DESC_ELEMENT.equals(name)) {
-                return getApplication(ApplicationType.JAVAFX, child);
+                return getApplicationDesc(ApplicationType.JAVAFX, child);
             }
 
             child = child.getNextSibling();
@@ -831,12 +831,11 @@ public final class Parser {
      * @return the applet descriptor.
      *
      * @throws ParseException if the JNLP file is invalid
-     *
-     * TODO: parse and set {@link AppletDesc#getProgressClass()}
      */
-    private AppletDesc getApplet(final Node node) throws ParseException {
+    AppletDesc getAppletDesc(final Node node) throws ParseException {
         final String name = getRequiredAttribute(node, AppletDesc.NAME_ATTRIBUTE, R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
+        final String progressClass = getAttribute(node, ApplicationDesc.PROGRESS_CLASS_ATTRIBUTE, null);
         final URL docbase = getURL(node, AppletDesc.DOCUMENTBASE_ATTRIBUTE, base, strict);
         final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
@@ -858,7 +857,7 @@ public final class Parser {
             paramMap.put(getRequiredAttribute(param, "name", null, strict), getRequiredAttribute(param, "value", "", strict));
         }
 
-        return new AppletDesc(name, main, docbase, width, height, paramMap);
+        return new AppletDesc(name, main, progressClass, docbase, width, height, paramMap);
     }
 
     /**
@@ -866,10 +865,8 @@ public final class Parser {
      *
      * @param node
      * @throws ParseException if the JNLP file is invalid
-     *
-     * TODO: parse and set {@link ApplicationDesc#getProgressClass()}
      */
-    private ApplicationDesc getApplication(final ApplicationType applicationType, final Node node) throws ParseException {
+    ApplicationDesc getApplicationDesc(final ApplicationType applicationType, final Node node) throws ParseException {
         String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
@@ -883,9 +880,11 @@ public final class Parser {
             argsList.add(getSpanText(arg));
         }
 
+        final String progressClass = getAttribute(node, ApplicationDesc.PROGRESS_CLASS_ATTRIBUTE, null);
+
         final String argStrings[] = argsList.toArray(new String[argsList.size()]);
 
-        return new ApplicationDesc(applicationType, main, argStrings);
+        return new ApplicationDesc(applicationType, main, progressClass, argStrings);
     }
 
     /**
@@ -917,10 +916,11 @@ public final class Parser {
      * @param node
      * @return the installer descriptor.
      */
-    private InstallerDesc getInstaller(Node node) {
-        String main = getOptionalMainClass(node);
+    InstallerDesc getInstallerDesc(final Node node) {
+        final String main = getOptionalMainClass(node);
+        final String progressClass = getAttribute(node, InstallerDesc.PROGRESS_CLASS_ATTRIBUTE, null);
 
-        return new InstallerDesc(main);
+        return new InstallerDesc(main, progressClass);
     }
 
     /**

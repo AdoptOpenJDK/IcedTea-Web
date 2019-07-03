@@ -44,6 +44,7 @@ public class AppletDesc implements EntryPoint {
     public static final String NAME_ATTRIBUTE = "name";
     public static final String WIDTH_ATTRIBUTE = "width";
     public static final String HEIGHT_ATTRIBUTE = "height";
+    public static final String PROGRESS_CLASS_ATTRIBUTE = "progress-class";
 
     /** Name of the Applet. This is available to the Applet through the AppletContext. */
     private final String name;
@@ -56,7 +57,7 @@ public class AppletDesc implements EntryPoint {
 
     /**
      * The name of a class containing an implementation of the {@link javax.jnlp.DownloadServiceListener}
-     * interface of applications.
+     * interface of applications. May be used to indicate download progress.
      */
     private final String progressClass;
 
