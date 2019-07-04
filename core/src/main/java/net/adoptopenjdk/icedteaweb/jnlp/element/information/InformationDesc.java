@@ -51,7 +51,8 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 public class InformationDesc {
     public static final String INFORMATION_ELEMENT = "information";
 
-    // TODO: missing the information element attributes os and arch (defined since spec version 1.5.0)
+    public static final String OS_ATTRIBUTE = "os";
+    public static final String ARCH_ATTRIBUTE = "arch";
 
     public static final String LOCALE_ATTRIBUTE = "locale";
 
@@ -63,6 +64,20 @@ public class InformationDesc {
      * The locales for which the information element should be used.
      */
     final private Locale[] locales;
+
+    /**
+     * Specifies the operating system for which the information element should be considered. If the value is a
+     * prefix of the os.name system property, then the information element can be used. If the attribute is not
+     * specified, it matches all operating systems.
+     */
+    private final String os;
+
+    /**
+     * Specifies the architecure for which the information element should be considered. If the value is a prefix
+     * of the os.arch system property, then the information element can be used. If the attribute is not specified,
+     * it matches all architecures.
+     */
+    private final String arch;
 
     /** the data as list of key,value pairs */
     private List<Object> info;
@@ -85,7 +100,32 @@ public class InformationDesc {
      * @param strict whether parser was strict
      */
     public InformationDesc(final Locale[] locales, final boolean strict) {
+        this(locales, null, null, strict);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
+     * @param os the operating system for which the information element should be considered
+     * @param arch the architecure for which the information element should be considered
+     */
+    public InformationDesc(final Locale[] locales, final String os, final String arch) {
+        this(locales, os, arch, false);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
+     * @param os the operating system for which the information element should be considered
+     * @param arch the architecure for which the information element should be considered
+     * @param strict whether parser was strict
+     */
+    public InformationDesc(final Locale[] locales, final String os, final String arch, final boolean strict) {
         this.locales = locales;
+        this.os = os;
+        this.arch = arch;
         this.strict = strict;
     }
 
@@ -206,6 +246,20 @@ public class InformationDesc {
      */
     public Locale[] getLocales() {
         return locales;
+    }
+
+    /**
+     * @return the operating system for which the information element should be considered
+     */
+    public String getOs() {
+        return os;
+    }
+
+    /**
+     * @return the architecure for which the information element should be considered
+     */
+    public String getArch() {
+        return arch;
     }
 
     /**

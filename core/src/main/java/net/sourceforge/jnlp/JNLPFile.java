@@ -122,7 +122,7 @@ public class JNLPFile {
     protected Version specVersion;
 
     /** information */
-    protected List<InformationDesc> info;
+    protected List<InformationDesc> infos;
 
     protected UpdateDesc update;
 
@@ -528,8 +528,8 @@ public class JNLPFile {
      */
     public InformationDesc getInformation(final Locale locale) {
         boolean strict = false;
-        if (this.info != null) {
-            for (InformationDesc infoDesc : this.info) {
+        if (this.infos != null) {
+            for (InformationDesc infoDesc : this.infos) {
                 if (infoDesc.strict) {
                     strict = true;
                     break;
@@ -542,7 +542,7 @@ public class JNLPFile {
                 List<Object> result = new ArrayList<>();
 
                 for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                    for (InformationDesc infoDesc : JNLPFile.this.infos) {
                         if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
                             result.addAll(infoDesc.getItems(key));
                         }
@@ -558,7 +558,7 @@ public class JNLPFile {
             @Override
             public String getTitle() {
                 for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                    for (InformationDesc infoDesc : JNLPFile.this.infos) {
                         String title = infoDesc.getTitle();
                         if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
                                 && title != null && !"".equals(title)) {
@@ -573,7 +573,7 @@ public class JNLPFile {
             @Override
             public String getVendor() {
                 for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
+                    for (InformationDesc infoDesc : JNLPFile.this.infos) {
                         String vendor = infoDesc.getVendor();
                         if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
                                 && vendor != null && !"".equals(vendor)) {
@@ -817,7 +817,7 @@ public class JNLPFile {
             fileVersion = parser.getFileVersion();
             codeBase = parser.getCodeBase();
             sourceLocation = parser.getFileLocation();
-            info = parser.getInformationDescs(root);
+            infos = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section

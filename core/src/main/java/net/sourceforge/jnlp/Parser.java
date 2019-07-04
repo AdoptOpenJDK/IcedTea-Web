@@ -601,7 +601,7 @@ public final class Parser {
      */
     public List<InformationDesc> getInformationDescs(final Node parent) throws ParseException {
         final List<InformationDesc> result = new ArrayList<>();
-        final Node informationElements[] = getChildNodes(parent, INFORMATION_ELEMENT);
+        final Node[] informationElements = getChildNodes(parent, INFORMATION_ELEMENT);
 
         // ensure that there is at least one information element present in the JNLP file
         if (informationElements.length == 0) {
@@ -630,7 +630,9 @@ public final class Parser {
         final List<String> descriptionsUsed = new ArrayList<>();
 
         // create information
-        InformationDesc informationDesc = new InformationDesc(getLocales(node), strict);
+        final String os = getAttribute(node, InformationDesc.OS_ATTRIBUTE, null);
+        final String arch = getAttribute(node, InformationDesc.ARCH_ATTRIBUTE, null);
+        InformationDesc informationDesc = new InformationDesc(getLocales(node), os, arch, strict);
 
         // step through the elements
         Node child = node.getFirstChild();

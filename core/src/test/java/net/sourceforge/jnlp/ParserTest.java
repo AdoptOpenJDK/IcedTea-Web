@@ -54,6 +54,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static org.hamcrest.CoreMatchers.is;
+
 /** Test various corner cases of the parser */
 public class ParserTest extends NoStdOutErrTest {
 
@@ -1414,6 +1416,39 @@ public class ParserTest extends NoStdOutErrTest {
                 "Generalized_V", file.getVendor());
 
         parser.checkForInformation();
+    }
+
+    @Test
+    public void testTwoInformationDescWithDifferentOsAndArch() throws ParseException {
+        String data = "<jnlp>\n"
+                + "  <information os=\"Win10\" arch=\"i386\">\n"
+                + "    <title>Generalized_T</title>\n"
+                + "    <vendor>Generalized_V</vendor>\n"
+                + "  </information>\n"
+                + "  <information os=\"MacOS\" arch=\"x86_64\">\n"
+                + "    <title>English_T</title>\n"
+                + "    <vendor>English_V</vendor>\n"
+                + "  </information>\n"
+                + "  <information>\n"
+                + "    <title>English_T</title>\n"
+                + "    <vendor>English_V</vendor>\n"
+                + "  </information>\n"
+                + "</jnlp>\n";
+
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root = xmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root.getNodeName().getName());
+        MockJNLPFile file = new MockJNLPFile(ALL_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser);
+        List<InformationDesc> infoDescs = parser.getInformationDescs(root);
+        Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 3);
+
+        Assert.assertThat(infoDescs.get(0).getOs(), is("Win10"));
+        Assert.assertThat(infoDescs.get(0).getArch(), is("i386"));
+        Assert.assertThat(infoDescs.get(1).getOs(), is("MacOS"));
+        Assert.assertThat(infoDescs.get(1).getArch(), is("x86_64"));
+        Assert.assertNull(infoDescs.get(2).getOs());
+        Assert.assertNull(infoDescs.get(2).getArch());
     }
 
     @Test
