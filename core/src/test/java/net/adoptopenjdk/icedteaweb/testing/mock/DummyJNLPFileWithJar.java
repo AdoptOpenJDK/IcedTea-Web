@@ -55,7 +55,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
             jarDescs[i] = makeJarDesc(jarFiles[i], i==main);
 
         }
-        info = new ArrayList<>();
+        infos = new ArrayList<>();
         this.security = new SecurityDesc(this, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
     }
 
@@ -90,8 +90,8 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         return codeBase;
     }
 
-    public void setInfo(final List<InformationDesc> info) {
-        this.info = info;
+    public void setInfo(final List<InformationDesc> infos) {
+        this.infos = infos;
     }
     
     
