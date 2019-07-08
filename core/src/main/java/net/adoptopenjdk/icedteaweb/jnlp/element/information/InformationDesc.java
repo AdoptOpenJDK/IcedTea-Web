@@ -23,8 +23,10 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
@@ -352,5 +354,18 @@ public class InformationDesc {
         info.add(key);
         info.add(value);
     }
+
+    public Map<String, List<Object>> getItems() {
+        final Map<String, List<Object>> result = new HashMap<>();
+
+        for (int i = 0; i < info.size() ; i+=2) {
+            final String key = (String) info.get(i);
+            final Object value = info.get(i+1);
+            result.computeIfAbsent(key, k -> new ArrayList()).add(value);
+        }
+
+        return result;
+    }
+
 
 }

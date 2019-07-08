@@ -579,7 +579,7 @@ public final class Parser {
      */
     void checkForInformation() throws RequiredElementException {
         LOG.info("Homepage: {}", file.getInformation().getHomepage());
-       LOG.info("Description: {}", file.getInformation().getDescription());
+        LOG.info("Description: {}", file.getInformation().getDescription());
         file.getTitle(strict);
         file.getVendor(strict);
     }
