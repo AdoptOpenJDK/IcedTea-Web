@@ -40,7 +40,6 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -49,7 +48,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class JnlpInformationElementTest extends NoStdOutErrTest{
 
@@ -82,9 +83,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN);
 
         // then
-        Assert.assertThat(information.getTitle(), is("Titel"));
-        Assert.assertThat(information.getVendor(), is("Hersteller"));
-        Assert.assertThat(information.getDescription(), is("Beschreibung"));
+        assertThat(information.getTitle(), is("Titel"));
+        assertThat(information.getVendor(), is("Hersteller"));
+        assertThat(information.getDescription(), is("Beschreibung"));
     }
 
     @Test
@@ -112,9 +113,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", null);
 
         // then
-        Assert.assertThat(information.getTitle(), is("Titel"));
-        Assert.assertThat(information.getVendor(), is("Apple"));
-        Assert.assertThat(information.getDescription(), is("Description"));
+        assertThat(information.getTitle(), is("Titel"));
+        assertThat(information.getVendor(), is("Apple"));
+        assertThat(information.getDescription(), is("Description"));
     }
 
     @Test
@@ -142,9 +143,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", null);
 
         // then
-        Assert.assertThat(information.getTitle(), is("Titel"));
-        Assert.assertThat(information.getVendor(), is("Apple"));
-        Assert.assertThat(information.getDescription(), is("Description"));
+        assertThat(information.getTitle(), is("Titel"));
+        assertThat(information.getVendor(), is("Apple"));
+        assertThat(information.getDescription(), is("Description"));
     }
 
     @Test
@@ -174,9 +175,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, "Mac OS X", "x86_64");
 
         // then
-        Assert.assertThat(information.getTitle(), is("MacOS Title"));
-        Assert.assertThat(information.getVendor(), is("Apple"));
-        Assert.assertThat(information.getDescription(), is("Description"));
+        assertThat(information.getTitle(), is("MacOS Title"));
+        assertThat(information.getVendor(), is("Apple"));
+        assertThat(information.getDescription(), is("Description"));
     }
 
     @Test
@@ -202,9 +203,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, "Mac OS X", "x86_64");
 
         // then
-        Assert.assertThat(information.getTitle(), is("Title"));
-        Assert.assertThat(information.getVendor(), is("Vendor"));
-        Assert.assertThat(information.getDescription(), is("Description"));
+        assertThat(information.getTitle(), is("Title"));
+        assertThat(information.getVendor(), is("Vendor"));
+        assertThat(information.getDescription(), is("Description"));
     }
 
     @Test
@@ -229,9 +230,9 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Win", null);
 
         // then
-        Assert.assertThat(information.getTitle(), is("Title"));
-        Assert.assertThat(information.getVendor(), is("Windows"));
-        Assert.assertThat(information.getDescription(), is("Beschreibung"));
+        assertThat(information.getTitle(), is("Title"));
+        assertThat(information.getVendor(), is("Windows"));
+        assertThat(information.getDescription(), is("Beschreibung"));
     }
 
     @Test
@@ -255,9 +256,72 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, null, "x86");
 
         // then
-        Assert.assertThat(information.getTitle(), is("Title"));
-        Assert.assertThat(information.getVendor(), is("Apple"));
-        Assert.assertThat(information.getDescription(), is("Description"));
+        assertThat(information.getTitle(), is("Title"));
+        assertThat(information.getVendor(), is("Apple"));
+        assertThat(information.getDescription(), is("Description"));
+    }
+
+    @Test
+    public void testAssociationsOverwrite() throws MalformedURLException, ParseException {
+        // given
+        final JNLPFile jnlpFile = setUp("<jnlp>\n"
+                + "  <information>\n"
+                + "    <title>Title</title>\n"
+                + "    <association extensions=\"*.html\" mime-type=\"text/html\">"
+                + "      <description>Best browser ever</description>"
+                + "      <icon href=\"icon.gif\"/>"
+                + "    </association>"
+                + "  </information>\n"
+                + "  <information locale=\"en\">\n"
+                + "    <title>English Title</title>\n"
+                + "    <association extensions=\"*.html\" mime-type=\"text/html\">"
+                + "      <description>Best browser ever</description>"
+                + "      <icon href=\"icon.gif\"/>"
+                + "    </association>"
+                + "  </information>\n"
+                + "  <resources>\n"
+                + "  </resources>\n"
+                + "</jnlp>\n"
+        );
+
+        // when
+        final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH);
+
+        // then
+        assertThat(information.getTitle(), is("English Title"));
+        assertThat(information.getAssociations(), arrayWithSize(1));
+    }
+
+
+    @Test
+    public void testAssociationsExtend() throws MalformedURLException, ParseException {
+        // given
+        final JNLPFile jnlpFile = setUp("<jnlp>\n"
+                + "  <information>\n"
+                + "    <title>Title</title>\n"
+                + "    <association extensions=\"*.html\" mime-type=\"text/html\">"
+                + "      <description>Best browser ever</description>"
+                + "      <icon href=\"icon.gif\"/>"
+                + "    </association>"
+                + "  </information>\n"
+                + "  <information locale=\"en\">\n"
+                + "    <title>English Title</title>\n"
+                + "    <association extensions=\"*.htmlx\" mime-type=\"text/htmlx\">"
+                + "      <description>Best browser ever</description>"
+                + "      <icon href=\"icon.gif\"/>"
+                + "    </association>"
+                + "  </information>\n"
+                + "  <resources>\n"
+                + "  </resources>\n"
+                + "</jnlp>\n"
+        );
+
+        // when
+        final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH);
+
+        // then
+        assertThat(information.getTitle(), is("English Title"));
+        assertThat(information.getAssociations(), arrayWithSize(2));
     }
 
 }

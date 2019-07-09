@@ -612,9 +612,10 @@ public class JNLPFile {
 
                             for (String key : items.keySet()) {
                                 if (mergedItems.containsKey(key)) {
-                                    if (!StringUtils.isBlank(items.get(key).get(0).toString())) {
-                                        mergedItems.put(key, items.get(key));
-                                    }
+                                    final List<Object> values = mergedItems.get(key);
+                                    items.get(key).stream()
+                                            .filter(v -> !StringUtils.isBlank(v.toString()))
+                                            .forEach(values::add);
                                 }
                                 else {
                                     mergedItems.put(key, infoDesc.getItems(key));

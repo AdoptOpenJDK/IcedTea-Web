@@ -22,11 +22,15 @@ import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
@@ -290,9 +294,24 @@ public class InformationDesc {
      * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List<Object> associations = getItems(ASSOCIATION_ELEMENT);
+        List<AssociationDesc> associations = (List) getItems(ASSOCIATION_ELEMENT);
 
-        return associations.toArray(new AssociationDesc[associations.size()]);
+        Collections.reverse(associations);
+
+        final Set<ExtensionAndMimeType> alreadySeen = new HashSet<>();
+        final List<AssociationDesc> result = new ArrayList<>();
+
+        for (AssociationDesc association : associations) {
+            final ExtensionAndMimeType key = new ExtensionAndMimeType(association.getExtensions(), association.getMimeType());
+            if (!alreadySeen.contains(key)) {
+                alreadySeen.add(key);
+                result.add(association);
+            }
+        }
+
+        Collections.reverse(result);
+
+        return result.toArray(new AssociationDesc[0]);
     }
 
     /**
@@ -371,4 +390,29 @@ public class InformationDesc {
     }
 
 
+    private static class ExtensionAndMimeType {
+        private final String[] extensions;
+        private final String mimeType;
+
+        private ExtensionAndMimeType(String[] extensions, String mimeType) {
+            this.extensions = extensions;
+            this.mimeType = mimeType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ExtensionAndMimeType that = (ExtensionAndMimeType) o;
+            return Arrays.equals(extensions, that.extensions) &&
+                    mimeType.equals(that.mimeType);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(mimeType);
+            result = 31 * result + Arrays.hashCode(extensions);
+            return result;
+        }
+    }
 }
