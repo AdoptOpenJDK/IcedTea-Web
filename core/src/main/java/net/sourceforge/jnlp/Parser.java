@@ -835,7 +835,7 @@ public final class Parser {
     AppletDesc getAppletDesc(final Node node) throws ParseException {
         final String name = getRequiredAttribute(node, AppletDesc.NAME_ATTRIBUTE, R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
-        final String progressClass = getAttribute(node, ApplicationDesc.PROGRESS_CLASS_ATTRIBUTE, null);
+        final String progressClass = getAttribute(node, AppletDesc.PROGRESS_CLASS_ATTRIBUTE, null);
         final URL docbase = getURL(node, AppletDesc.DOCUMENTBASE_ATTRIBUTE, base, strict);
         final Map<String, String> paramMap = new HashMap<>();
         int width = 0;
