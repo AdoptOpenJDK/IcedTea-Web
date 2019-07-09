@@ -632,7 +632,7 @@ public final class Parser {
         // create information
         final String os = getAttribute(node, InformationDesc.OS_ATTRIBUTE, null);
         final String arch = getAttribute(node, InformationDesc.ARCH_ATTRIBUTE, null);
-        InformationDesc informationDesc = new InformationDesc(getLocales(node), os, arch, strict);
+        final InformationDesc informationDesc = new InformationDesc(getLocales(node), os, arch, strict);
 
         // step through the elements
         Node child = node.getFirstChild();

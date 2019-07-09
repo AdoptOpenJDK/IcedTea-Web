@@ -294,7 +294,7 @@ public class InformationDesc {
      * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List<AssociationDesc> associations = (List) getItems(ASSOCIATION_ELEMENT);
+        final List<AssociationDesc> associations = (List) getItems(ASSOCIATION_ELEMENT);
 
         Collections.reverse(associations);
 
