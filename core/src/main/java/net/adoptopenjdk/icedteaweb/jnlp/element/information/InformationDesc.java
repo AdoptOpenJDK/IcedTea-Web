@@ -39,10 +39,9 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
  * The information element contains information intended to be consumed by the JNLP Client to integrate
  * the application into the desktop, provide user feedback, etc.
  *
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
  * for a detailed specification of this class.
- *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
 
 // There is an understanding between this class and the parser
@@ -81,7 +80,9 @@ public class InformationDesc {
      */
     private final String arch;
 
-    /** the data as list of key,value pairs */
+    /**
+     * the data as list of key,value pairs
+     */
     private List<Object> info;
 
     public final boolean strict;
@@ -99,7 +100,7 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param locales the locales for which the information element should be used
-     * @param strict whether parser was strict
+     * @param strict  whether parser was strict
      */
     public InformationDesc(final Locale[] locales, final boolean strict) {
         this(locales, null, null, strict);
@@ -109,8 +110,8 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param locales the locales for which the information element should be used
-     * @param os the operating system for which the information element should be considered
-     * @param arch the architecure for which the information element should be considered
+     * @param os      the operating system for which the information element should be considered
+     * @param arch    the architecure for which the information element should be considered
      */
     public InformationDesc(final Locale[] locales, final String os, final String arch) {
         this(locales, os, arch, false);
@@ -120,9 +121,9 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param locales the locales for which the information element should be used
-     * @param os the operating system for which the information element should be considered
-     * @param arch the architecure for which the information element should be considered
-     * @param strict whether parser was strict
+     * @param os      the operating system for which the information element should be considered
+     * @param arch    the architecure for which the information element should be considered
+     * @param strict  whether parser was strict
      */
     public InformationDesc(final Locale[] locales, final String os, final String arch, final boolean strict) {
         this.locales = locales;
@@ -173,9 +174,8 @@ public class InformationDesc {
     }
 
     /**
-     * @return the application's description of the specified type.
-     *
      * @param kind one of {@link DescriptionKind}
+     * @return the application's description of the specified type.
      */
     public String getDescription(final DescriptionKind kind) {
         final String result = getDescriptionStrict(kind);
@@ -185,14 +185,13 @@ public class InformationDesc {
             return result;
     }
 
-      /**
-     * @return the application's description of the specified type.
-     *
+    /**
      * @param kind one of {@link DescriptionKind}
+     * @return the application's description of the specified type.
      */
     public String getDescriptionStrict(DescriptionKind kind) {
         return (String) getItem("description-" + kind.getValue());
-        
+
     }
 
     /**
@@ -213,8 +212,8 @@ public class InformationDesc {
      * specified width and height unless there are no other icons
      * available.
      *
-     * @param kind the kind of icon to get
-     * @param width desired width of icon
+     * @param kind   the kind of icon to get
+     * @param width  desired width of icon
      * @param height desired height of icon
      * @return the closest icon by size or null if no icons declared
      */
@@ -270,7 +269,8 @@ public class InformationDesc {
     public boolean isOfflineAllowed() {
         if (strict) {
             return null != getItem(OFFLINE_ALLOWED_ELEMENT);
-        } else {
+        }
+        else {
             // by default itw ignore this switch. Most applications are misusing it
             return true;
         }
@@ -342,7 +342,8 @@ public class InformationDesc {
     /**
      * Add an information item (description, icon, etc) under a
      * specified key name.
-     * @param key key to place value to
+     *
+     * @param key   key to place value to
      * @param value value to be placed to key
      */
     public void addItem(final String key, final Object value) {
@@ -358,10 +359,12 @@ public class InformationDesc {
     public Map<String, List<Object>> getItems() {
         final Map<String, List<Object>> result = new HashMap<>();
 
-        for (int i = 0; i < info.size() ; i+=2) {
-            final String key = (String) info.get(i);
-            final Object value = info.get(i+1);
-            result.computeIfAbsent(key, k -> new ArrayList()).add(value);
+        if (info != null) {
+            for (int i = 0; i < info.size(); i += 2) {
+                final String key = (String) info.get(i);
+                final Object value = info.get(i + 1);
+                result.computeIfAbsent(key, k -> new ArrayList()).add(value);
+            }
         }
 
         return result;

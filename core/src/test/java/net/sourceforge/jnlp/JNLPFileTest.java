@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
@@ -57,7 +56,6 @@ import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
-import static org.hamcrest.core.Is.is;
 
 public class JNLPFileTest extends NoStdOutErrTest{
     Locale jvmLocale = new Locale("en", "CA", "utf8");
@@ -313,42 +311,5 @@ public class JNLPFileTest extends NoStdOutErrTest{
         JNLPFile jnlpFile = new JNLPFile(jnlpURL);
         Assert.assertNotNull(jnlpFile.getSourceLocation());
         Assert.assertTrue(jnlpFile.getSourceLocation().getFile().endsWith(jnlpResourceName));
-    }
-
-    @Test
-    public void testGetInformation() throws MalformedURLException, ParseException {
-        String jnlpContents = "<jnlp>\n"
-                + "  <information>\n"
-                + "    <title>Title</title>\n"
-                + "    <vendor>Vendor</vendor>\n"
-                + "    <description>Description</description>\n"
-                + "  </information>\n"
-                + "  <information locale=\"en\">\n"
-                + "    <title>English title</title>\n"
-                + "    <vendor>English vendor</vendor>\n"
-                + "    <description>English description</description>\n"
-                + "  </information>\n"
-                + "  <information locale=\"en\" os=\"Mac OS X\" arch=\"x86_64\">\n"
-                + "    <title>MacOS English title</title>\n"
-                + "    <vendor>MacOS English vendor</vendor>\n"
-                + "    <description>MacOS English description</description>\n"
-                + "  </information>\n"
-                + "  <resources>\n"
-                + "  </resources>\n"
-                + "</jnlp>\n";
-
-
-        URL codeBase = new URL("http://icedtea.classpath.org");
-        InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
-        JNLPFile jnlpFile = new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
-
-
-        final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, "Mac OS X", "x86_64");
-
-//        Assert.assertThat(information.getOs(), is("x86_64"));
-//        Assert.assertThat(information.getArch(), is("x86_64"));
-        Assert.assertThat(information.getTitle(), is("MacOS English title"));
-        Assert.assertThat(information.getVendor(), is("MacOS English vendor"));
-        Assert.assertThat(information.getDescription(), is("MacOS English description"));
     }
 }

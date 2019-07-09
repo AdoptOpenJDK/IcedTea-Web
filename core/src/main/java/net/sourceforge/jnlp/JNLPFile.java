@@ -573,7 +573,7 @@ public class JNLPFile {
     }
 
     /**
-     * @param locale preferred locale of informations
+     * @param locale preferred locale of information element
      * @return the information section of the JNLP file as viewed
      * through the specified locale.
      */
@@ -582,17 +582,14 @@ public class JNLPFile {
     }
 
     /**
-     * @param locale preferred locale of informations
-     * @param os     preferred os of informations
-     * @param arch   preferred arch of informations
+     * @param locale preferred locale of information element
+     * @param os     preferred os of information element
+     * @param arch   preferred arch of information element
      * @return the information section of the JNLP file as viewed
      * through the specified locale.
      */
     public InformationDesc getInformation(final Locale locale, final String os, final String arch) {
         Objects.requireNonNull(locale, "locale");
-        Objects.requireNonNull(os, "os");
-        Objects.requireNonNull(arch, "arch");
-
 
         boolean strict = false;
         if (this.infos != null) {
@@ -604,21 +601,7 @@ public class JNLPFile {
             }
         }
 
-        final Map<String, List<Object>> mergedItems = new HashMap<>();
-
-        for (InformationDesc infoDesc : JNLPFile.this.infos) {
-            for (Match precision : Match.values()) {
-                if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
-                    if (StringUtils.isBlank(infoDesc.getOs()) ||
-                            os.toLowerCase().startsWith(infoDesc.getOs().toLowerCase())) {
-                        if (StringUtils.isBlank(infoDesc.getArch()) ||
-                                arch.toLowerCase().startsWith(infoDesc.getArch().toLowerCase())) {
-                            mergedItems.putAll(infoDesc.getItems());
-                        }
-                    }
-                }
-            }
-        }
+        final Map<String, List<Object>> mergedItems = getMergedItems(locale, os, arch);
 
         return new InformationDesc(new Locale[]{locale}, os, arch, strict) {
             @Override
@@ -632,6 +615,40 @@ public class JNLPFile {
                 throw new IllegalStateException();
             }
         };
+    }
+
+    private Map<String, List<Object>> getMergedItems(final Locale locale, final String os, final String arch) {
+        Map<String, List<Object>> mergedItems = new HashMap<>();
+
+        final List<Match> matches = Arrays.asList(Match.values());
+        Collections.reverse(matches);
+
+        for (Match precision : matches) {
+            for (InformationDesc infoDesc : JNLPFile.this.infos) {
+                if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
+                    if (StringUtils.isBlank(os) || StringUtils.isBlank(infoDesc.getOs()) ||
+                            (Objects.nonNull(infoDesc.getOs()) && infoDesc.getOs().toLowerCase().startsWith(os.toLowerCase()))) {
+                        if (StringUtils.isBlank(arch) || StringUtils.isBlank(infoDesc.getArch()) ||
+                                (Objects.nonNull(infoDesc.getArch()) && infoDesc.getArch().toLowerCase().startsWith(arch.toLowerCase()))) {
+
+                            final Map<String, List<Object>> items = infoDesc.getItems();
+
+                            for (String key : items.keySet()) {
+                                if (mergedItems.containsKey(key)) {
+                                    if (!StringUtils.isBlank(items.get(key).get(0).toString())) {
+                                        mergedItems.put(key, items.get(key));
+                                    }
+                                }
+                                else {
+                                    mergedItems.put(key, infoDesc.getItems(key));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return mergedItems;
     }
 
     /**
