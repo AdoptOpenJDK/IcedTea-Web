@@ -5,8 +5,6 @@ import java.util.Objects;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 public class LocaleUtils {
 
     public static final String EMPTY_STRING = "";
@@ -56,7 +54,7 @@ public class LocaleUtils {
      * @see Locale
      * @see Match
      */
-    public static boolean localMatches(final Locale requested, final Match matchLevel, final Locale[] available) {
+    public static boolean localMatches(final Locale requested, final Match matchLevel, final Locale... available) {
         Assert.requireNonNull(requested, "requested");
         Assert.requireNonNull(matchLevel, "matchLevel");
         Assert.requireNonNull(available, "available");

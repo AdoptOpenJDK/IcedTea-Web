@@ -66,6 +66,7 @@ import java.util.Objects;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
+import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
 
 /**
  * <p>
@@ -591,24 +592,17 @@ public class JNLPFile {
     public InformationDesc getInformation(final Locale locale, final String os, final String arch) {
         Objects.requireNonNull(locale, "locale");
 
-        boolean strict = false;
-        if (this.infos != null) {
-            for (InformationDesc infoDesc : this.infos) {
-                if (infoDesc.strict) {
-                    strict = true;
-                    break;
-                }
-            }
+        if (infos == null || infos.isEmpty()) {
+            return new InformationDesc(new Locale[]{locale}, os, arch);
         }
+
+        final boolean strict = infos.stream().anyMatch(infoDesc -> infoDesc.strict);
 
         final Map<String, List<Object>> mergedItems = new HashMap<>();
 
-        final List<Match> matches = Arrays.asList(Match.values());
-        Collections.reverse(matches);
-
-        for (Match precision : matches) {
-            for (InformationDesc infoDesc : this.infos) {
-                if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
+        for (InformationDesc infoDesc : infos) {
+            for (Match precision : Match.values()) {
+                if (localMatches(locale, precision, infoDesc.getLocales())) {
                     if (StringUtils.isBlank(os) || StringUtils.isBlank(infoDesc.getOs()) ||
                             (Objects.nonNull(infoDesc.getOs()) && infoDesc.getOs().toLowerCase().startsWith(os.toLowerCase()))) {
                         if (StringUtils.isBlank(arch) || StringUtils.isBlank(infoDesc.getArch()) ||
@@ -628,6 +622,7 @@ public class JNLPFile {
                             }
                         }
                     }
+                    break; // after first match of the locale break out of the precision loop.
                 }
             }
         }

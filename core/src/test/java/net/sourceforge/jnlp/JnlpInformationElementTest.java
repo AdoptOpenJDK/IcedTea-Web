@@ -84,7 +84,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         // then
         Assert.assertThat(information.getTitle(), is("Titel"));
         Assert.assertThat(information.getVendor(), is("Hersteller"));
-        Assert.assertThat(information.getDescription(), is("Beschreibung")); // only default available
+        Assert.assertThat(information.getDescription(), is("Beschreibung"));
     }
 
     @Test
@@ -101,6 +101,36 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
                 + "    <vendor>Hersteller</vendor>\n"
                 + "  </information>\n"
                 + "  <information locale=\"de\" os=\"Mac OS X\">\n"
+                + "    <vendor>Apple</vendor>\n"
+                + "  </information>\n"
+                + "  <resources>\n"
+                + "  </resources>\n"
+                + "</jnlp>\n"
+        );
+
+        // when
+        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", null);
+
+        // then
+        Assert.assertThat(information.getTitle(), is("Titel"));
+        Assert.assertThat(information.getVendor(), is("Apple"));
+        Assert.assertThat(information.getDescription(), is("Description"));
+    }
+
+    @Test
+    public void testGetInformationByOsWithFallbacksForMissing() throws MalformedURLException, ParseException {
+        // given
+        final JNLPFile jnlpFile = setUp("<jnlp>\n"
+                + "  <information>\n"
+                + "    <title>Title</title>\n"
+                + "    <vendor>Vendor</vendor>\n"
+                + "    <description>Description</description>\n"
+                + "  </information>\n"
+                + "  <information locale=\"de\">\n"
+                + "    <title>Titel</title>\n"
+                + "    <vendor>Hersteller</vendor>\n"
+                + "  </information>\n"
+                + "  <information os=\"Mac OS X\">\n"
                 + "    <vendor>Apple</vendor>\n"
                 + "  </information>\n"
                 + "  <resources>\n"
