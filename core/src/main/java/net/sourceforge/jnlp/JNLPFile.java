@@ -601,30 +601,13 @@ public class JNLPFile {
             }
         }
 
-        final Map<String, List<Object>> mergedItems = getMergedItems(locale, os, arch);
-
-        return new InformationDesc(new Locale[]{locale}, os, arch, strict) {
-            @Override
-            public List<Object> getItems(Object key) {
-                final List<Object> result = mergedItems.get(key);
-                return result == null ? Collections.emptyList() : result;
-            }
-
-            @Override
-            public void addItem(final String key, final Object value) {
-                throw new IllegalStateException();
-            }
-        };
-    }
-
-    private Map<String, List<Object>> getMergedItems(final Locale locale, final String os, final String arch) {
-        Map<String, List<Object>> mergedItems = new HashMap<>();
+        final Map<String, List<Object>> mergedItems = new HashMap<>();
 
         final List<Match> matches = Arrays.asList(Match.values());
         Collections.reverse(matches);
 
         for (Match precision : matches) {
-            for (InformationDesc infoDesc : JNLPFile.this.infos) {
+            for (InformationDesc infoDesc : this.infos) {
                 if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
                     if (StringUtils.isBlank(os) || StringUtils.isBlank(infoDesc.getOs()) ||
                             (Objects.nonNull(infoDesc.getOs()) && infoDesc.getOs().toLowerCase().startsWith(os.toLowerCase()))) {
@@ -648,7 +631,19 @@ public class JNLPFile {
                 }
             }
         }
-        return mergedItems;
+
+        return new InformationDesc(new Locale[]{locale}, os, arch, strict) {
+            @Override
+            public List<Object> getItems(Object key) {
+                final List<Object> result = mergedItems.get(key);
+                return result == null ? Collections.emptyList() : result;
+            }
+
+            @Override
+            public void addItem(final String key, final Object value) {
+                throw new IllegalStateException();
+            }
+        };
     }
 
     /**
