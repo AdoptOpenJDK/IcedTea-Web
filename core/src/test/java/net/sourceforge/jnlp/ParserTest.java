@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
@@ -56,7 +57,9 @@ import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 
-/** Test various corner cases of the parser */
+/**
+ * Test various corner cases of the parser
+ */
 public class ParserTest extends NoStdOutErrTest {
 
     private static final String LANG = "en";
@@ -66,9 +69,9 @@ public class ParserTest extends NoStdOutErrTest {
     private static final Locale LANG_COUNTRY_LOCALE = new Locale(LANG, COUNTRY);
     private static final Locale ALL_LOCALE = new Locale(LANG, COUNTRY, VARIANT);
 
-    ParserSettings defaultParser=new ParserSettings();
-    ParserSettings strictParser=new ParserSettings(true, true, true);
-    
+    ParserSettings defaultParser = new ParserSettings();
+    ParserSettings strictParser = new ParserSettings(true, true, true);
+
     @Test(expected = MissingInformationException.class)
     public void testMissingInfoFullLocale() throws ParseException {
         String data = "<jnlp></jnlp>\n";
@@ -85,7 +88,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test(expected = MissingTitleException.class)
     public void testEmptyLocalizedInfoFullLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "  </information>\n"
                 + "</jnlp>\n";
 
@@ -107,7 +110,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test
     public void testOneFullyLocalizedInfoFullLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>English_CA_utf8_T</title>\n"
                 + "    <vendor>English_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -436,7 +439,7 @@ public class ParserTest extends NoStdOutErrTest {
         List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInformationDescs(root));
 
-        Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
+        Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
 
         file.setInfo(infoDescs);
         parser.checkForInformation();
@@ -445,7 +448,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test(expected = MissingTitleException.class)
     public void testEmptyLocalizedTitleFullLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title></title>\n"
                 + "    <vendor>English_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -469,7 +472,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test(expected = MissingVendorException.class)
     public void testEmptyLocalizedVendorFullLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>English_CA_utf8_T</title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
@@ -505,11 +508,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='fr_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='fr_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>French_CA_utf8_T</title>\n"
                 + "    <vendor>French_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -573,7 +576,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test(expected = MissingTitleException.class)
     public void testOneFullyLocalizedInfoLangCountryLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>English_CA_utf8_T</title>\n"
                 + "    <vendor>English_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -898,7 +901,7 @@ public class ParserTest extends NoStdOutErrTest {
         List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInformationDescs(root));
 
-        Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
+        Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
 
         file.setInfo(infoDescs);
         parser.checkForInformation();
@@ -967,11 +970,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='fr_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='fr_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>French_CA_utf8_T</title>\n"
                 + "    <vendor>French_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -1035,7 +1038,7 @@ public class ParserTest extends NoStdOutErrTest {
     @Test(expected = MissingTitleException.class)
     public void testOneFullyLocalizedInfoLangLocale() throws ParseException {
         String data = "<jnlp>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>English_CA_utf8_T</title>\n"
                 + "    <vendor>English_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -1319,7 +1322,7 @@ public class ParserTest extends NoStdOutErrTest {
         List<InformationDesc> infoDescs = new ArrayList<>();
         infoDescs.addAll(parser.getInformationDescs(root));
 
-        Assert.assertTrue("Exactly two info descs should be found",infoDescs.size() == 2);
+        Assert.assertTrue("Exactly two info descs should be found", infoDescs.size() == 2);
 
         file.setInfo(infoDescs);
         parser.checkForInformation();
@@ -1388,11 +1391,11 @@ public class ParserTest extends NoStdOutErrTest {
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='" + LANG + "_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='" + LANG + "_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title></title>\n"
                 + "    <vendor></vendor>\n"
                 + "  </information>\n"
-                + "  <information locale='fr_" + COUNTRY +  "." + VARIANT + "'>\n"
+                + "  <information locale='fr_" + COUNTRY + "." + VARIANT + "'>\n"
                 + "    <title>French_CA_utf8_T</title>\n"
                 + "    <vendor>French_CA_utf8_V</vendor>\n"
                 + "  </information>\n"
@@ -1509,8 +1512,8 @@ public class ParserTest extends NoStdOutErrTest {
 
         Assert.assertEquals(overwrittenCodebase.toExternalForm(), parser.getCodeBase().toExternalForm());
     }
-    
-    
+
+
     @Test
     public void testEmptyCodebase() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1529,14 +1532,15 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, u);
         try {
             NodeUtils.getURL(root, JNLPFile.CODEBASE_ATTRIBUTE, null, defaultParser.isStrict());
-        } catch (ParseException ex) {
+        }
+        catch (ParseException ex) {
             eex = ex;
         }
         Assert.assertEquals(true, eex != null);
         Assert.assertEquals(true, eex instanceof ParseException);
     }
-    
-    
+
+
     @Test
     public void testNullMainClassApplication() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1563,7 +1567,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, main2);
 
     }
-    
+
     @Test
     public void testNullMainClassInstaller() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1579,7 +1583,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals(null, main1);
-        
+
         //strict also ok
         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
@@ -1590,8 +1594,8 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, main2);
 
     }
-    
-      @Test(expected = ParseException.class)
+
+    @Test(expected = ParseException.class)
     public void testNullMainClassApplet() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
                 + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
@@ -1599,16 +1603,16 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</applet-desc>\n"
                 + "</jnlp>";
 
-          final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
-          Node root1 = xmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root1 = xmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         parser1.getEntryPointDesc(root1).getMainClass();
         //both throw
     }
-    
-    
+
+
     @Test
     public void testOkMainClassApplication() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1624,7 +1628,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
-        
+
         //strict also ok
         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
@@ -1635,9 +1639,9 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals("some.main.class", main2);
 
     }
-    
-    
-     @Test(expected = ParseException.class)
+
+
+    @Test(expected = ParseException.class)
     public void testNeedToBeTrimmed1MainClassApplication() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
                 + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
@@ -1645,24 +1649,24 @@ public class ParserTest extends NoStdOutErrTest {
                 + "</application-desc>\n"
                 + "</jnlp>";
 
-         final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
-         Node root1 = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root1 = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
         Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
         MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
-        
+
         //strict throws
-         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
-         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
+        Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
         Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
         MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getEntryPointDesc(root2).getMainClass();
 
     }
-    
+
     @Test(expected = ParseException.class)
     public void testNeedToBeTrimmed2MainClassApplication() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1678,7 +1682,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some.main.class", main1);
-        
+
         //strict throws
         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
@@ -1688,7 +1692,7 @@ public class ParserTest extends NoStdOutErrTest {
         parser2.getEntryPointDesc(root2).getMainClass();
 
     }
-    
+
     @Test(expected = ParseException.class)
     public void testSpacesInsidePersistedMainClassApplication() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1704,7 +1708,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("som e.main .class", main1);
-        
+
         //strict throws
         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
@@ -1713,7 +1717,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         parser2.getEntryPointDesc(root2).getMainClass();
     }
-    
+
     @Test(expected = ParseException.class)
     public void testSpacesAroundDots() throws Exception {
         String data = "<?xml version=\"1.0\"?>\n"
@@ -1729,7 +1733,7 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
         String main1 = parser1.getEntryPointDesc(root1).getMainClass();
         Assert.assertEquals("some . another . main .class. here", main1);
-        
+
         //strict throws
         final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
         Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
@@ -1739,4 +1743,82 @@ public class ParserTest extends NoStdOutErrTest {
         parser2.getEntryPointDesc(root2).getMainClass();
     }
 
+    @Test
+    public void testProgressClassAttributeInApplicationDescriptor() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<application-desc main-class=\"some.MainClass\" progress-class=\"some.ProgressClass\">\n"
+                + "</application-desc>\n"
+                + "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root1 = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String progressClass1 = parser1.getApplicationDesc(ApplicationType.JAVA, root1.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass1);
+
+        //strict also ok
+        final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
+        Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        String progressClass2 = parser2.getApplicationDesc(ApplicationType.JAVA, root2.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass2);
+    }
+
+    @Test
+    public void testProgressClassAttributeInAppletDescriptor() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<applet-desc main-class=\"some.MainClass\" name=\"MyApplet\" width=\"100\" height=\"100\"\n"
+                + "progress-class=\"some.ProgressClass\">\n"
+                + "</applet-desc>\n"
+                + "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root1 = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String progressClass1 = parser1.getAppletDesc(root1.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass1);
+
+        //strict also ok
+        final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
+        Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        String progressClass2 = parser2.getAppletDesc(root2.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass2);
+    }
+
+    @Test
+    public void testProgressClassAttributeInInstallerDescriptor() throws Exception {
+        String data = "<?xml version=\"1.0\"?>\n"
+                + "<jnlp codebase=\"http://someNotExistingUrl.com\"  >\n"
+                + "<installer-desc main-class=\"some.MainClass\" progress-class=\"some.ProgressClass\">\n"
+                + "</installer-desc>\n"
+                + "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root1 = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root1.getNodeName().getName());
+        MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser1 = new Parser(file1, null, root1, defaultParser, null);
+        String progressClass1 = parser1.getInstallerDesc(root1.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass1);
+
+        //strict also ok
+        final XMLParser strictXmlParser = XmlParserFactory.getParser(strictParser.getParserType());
+        Node root2 = strictXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        Assert.assertEquals("Root name is not jnlp", "jnlp", root2.getNodeName().getName());
+        MockJNLPFile file2 = new MockJNLPFile(LANG_LOCALE);
+        Parser parser2 = new Parser(file2, null, root2, strictParser, null);
+        String progressClass2 = parser2.getInstallerDesc(root2.getFirstChild()).getProgressClass();
+        Assert.assertEquals("some.ProgressClass", progressClass2);
+    }
 }

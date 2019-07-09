@@ -35,7 +35,7 @@ public class ApplicationDesc implements EntryPoint {
     public static final String APPLICATION_DESC_ELEMENT = "application-desc";
     public static final String JAVAFX_DESC_ELEMENT = "javafx-desc";
     public static final String ARGUMENT_ELEMENT = "argument";
-
+    public static final String PROGRESS_CLASS_ATTRIBUTE = "progress-class";
     /**
      * The type of application supported by the JNLP Client. The optional attribute indicates the type of
      * application contained in the resources and identified by the main-class attribute. The default value
@@ -57,7 +57,7 @@ public class ApplicationDesc implements EntryPoint {
 
     /**
      * The name of a class containing an implementation of the {@link javax.jnlp.DownloadServiceListener}
-     * interface of applications.
+     * interface of applications. May be used to indicate download progress.
      */
     private final String progressClass;
 

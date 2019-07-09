@@ -38,6 +38,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
  */
 public class InstallerDesc implements EntryPoint {
     public static final String INSTALLER_DESC_ELEMENT = "installer-desc";
+    public static final String PROGRESS_CLASS_ATTRIBUTE = "progress-class";
 
     /**
      * For Java applications this method returns the name of the class containing the public static
@@ -48,7 +49,7 @@ public class InstallerDesc implements EntryPoint {
 
     /**
      * The name of a class containing an implementation of the {@link javax.jnlp.DownloadServiceListener}
-     * interface of applications.
+     * interface of applications. May be used to indicate download progress.
      */
     private final String progressClass;
 
