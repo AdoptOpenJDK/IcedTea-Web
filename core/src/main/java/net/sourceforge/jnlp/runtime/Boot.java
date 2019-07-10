@@ -75,7 +75,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
-    public static final String name = Boot.class.getPackage().getImplementationTitle();
+    private static final String name = Boot.class.getPackage().getImplementationTitle();
     public static final String version = Boot.class.getPackage().getImplementationVersion();
 
     private static final String nameAndVersion = name + " " + version;
@@ -192,7 +192,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(CommandLineOptions.UPDATE)) {
             int value = Integer.parseInt(optionParser.getParam(CommandLineOptions.UPDATE));
-            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
+            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000L));
         }
         if (optionParser.hasOption(CommandLineOptions.NOUPDATE)) {
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
