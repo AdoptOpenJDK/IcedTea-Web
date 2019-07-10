@@ -18,6 +18,7 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
@@ -54,13 +55,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
+import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
 
 /**
  * <p>
@@ -100,60 +106,96 @@ public class JNLPFile {
     // todo: currently does not filter resources by jvm version.
     //
 
-    /** the location this JNLP file was created from */
+    /**
+     * the location this JNLP file was created from
+     */
     protected URL sourceLocation = null;
 
-    /** the network location of this JNLP file */
+    /**
+     * the network location of this JNLP file
+     */
     protected URL fileLocation;
 
-    /** the ParserSettings which were used to parse this file */
+    /**
+     * the ParserSettings which were used to parse this file
+     */
     protected ParserSettings parserSettings = null;
 
-    /** A key that uniquely identifies connected instances (main jnlp+ext) */
+    /**
+     * A key that uniquely identifies connected instances (main jnlp+ext)
+     */
     protected String uniqueKey = null;
 
-    /** the URL used to resolve relative URLs in the file */
+    /**
+     * the URL used to resolve relative URLs in the file
+     */
     protected URL codeBase;
 
-    /** file version */
+    /**
+     * file version
+     */
     protected Version fileVersion;
 
-    /** spec version */
+    /**
+     * spec version
+     */
     protected Version specVersion;
 
-    /** information */
-    protected List<InformationDesc> info;
+    /**
+     * information
+     */
+    protected List<InformationDesc> infos;
 
     protected UpdateDesc update;
 
-    /** resources */
+    /**
+     * resources
+     */
     protected List<ResourcesDesc> resources;
 
-    /** additional resources not in JNLP file (from command line) */
+    /**
+     * additional resources not in JNLP file (from command line)
+     */
     protected final ResourcesDesc sharedResources = new ResourcesDesc(this, null, null, null);
 
-    /** the application entry point */
+    /**
+     * the application entry point
+     */
     protected EntryPoint entryPointDesc;
 
-    /** the component description */
+    /**
+     * the component description
+     */
     protected ComponentDesc component;
 
-    /** the security descriptor */
+    /**
+     * the security descriptor
+     */
     protected SecurityDesc security;
 
-    /** the default JVM locale */
+    /**
+     * the default JVM locale
+     */
     protected Locale defaultLocale = null;
 
-    /** the default OS */
+    /**
+     * the default OS
+     */
     protected String defaultOS = null;
 
-    /** the default arch */
+    /**
+     * the default arch
+     */
     protected String defaultArch = null;
 
-    /** A signed JNLP file is missing from the main jar */
+    /**
+     * A signed JNLP file is missing from the main jar
+     */
     private boolean missingSignedJNLP = false;
 
-    /** JNLP file contains special properties */
+    /**
+     * JNLP file contains special properties
+     */
     private boolean containsSpecialProperties = false;
 
     /**
@@ -161,7 +203,9 @@ public class JNLPFile {
      */
     final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
 
-    /** important manifests' attributes */
+    /**
+     * important manifests' attributes
+     */
     private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
     public static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
@@ -172,7 +216,8 @@ public class JNLPFile {
             defaultLocale = Locale.getDefault();
             defaultOS = System.getProperty(OS_NAME);
             defaultArch = System.getProperty(OS_ARCH);
-        } catch (SecurityException ex) {
+        }
+        catch (SecurityException ex) {
             // null values will still work, and app can set defaults later
         }
     }
@@ -187,7 +232,7 @@ public class JNLPFile {
      * Create a JNLPFile from a URL.
      *
      * @param location the location of the JNLP file
-     * @throws IOException if an IO exception occurred
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location) throws IOException, ParseException {
@@ -200,7 +245,7 @@ public class JNLPFile {
      *
      * @param location the location of the JNLP file
      * @param settings the parser settings to use while parsing the file
-     * @throws IOException if an IO exception occurred
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, ParserSettings settings) throws IOException, ParseException {
@@ -212,9 +257,9 @@ public class JNLPFile {
      * the default policy.
      *
      * @param location the location of the JNLP file
-     * @param version the version of the JNLP file
+     * @param version  the version of the JNLP file
      * @param settings the parser settings to use while parsing the file
-     * @throws IOException if an IO exception occurred
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, Version version, ParserSettings settings) throws IOException, ParseException {
@@ -226,26 +271,26 @@ public class JNLPFile {
      * using the specified policy.
      *
      * @param location the location of the JNLP file
-     * @param version the version of the JNLP file
+     * @param version  the version of the JNLP file
      * @param settings the {@link ParserSettings} to use when parsing the {@code location}
-     * @param policy the update policy
-     * @throws IOException if an IO exception occurred
+     * @param policy   the update policy
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
-	    this(location, version, settings, policy, null);
+        this(location, version, settings, policy, null);
     }
 
     /**
      * Create a JNLPFile from a URL and a version, checking for updates
      * using the specified policy.
      *
-     * @param location the location of the JNLP file
-     * @param version the version of the JNLP file
-     * @param settings the parser settings to use while parsing the file
-     * @param policy the update policy
+     * @param location      the location of the JNLP file
+     * @param version       the version of the JNLP file
+     * @param settings      the parser settings to use while parsing the file
+     * @param policy        the update policy
      * @param forceCodebase codebase to use if not specified in JNLP file.
-     * @throws IOException if an IO exception occurred
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     protected JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
@@ -264,8 +309,8 @@ public class JNLPFile {
         this.fileLocation = location;
 
         this.uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" +
-                         ((int)(Math.random()*Integer.MAX_VALUE)) + "-" +
-                         location;
+                ((int) (Math.random() * Integer.MAX_VALUE)) + "-" +
+                location;
 
         LOG.debug("UNIQUEKEY=" + this.uniqueKey);
     }
@@ -274,12 +319,12 @@ public class JNLPFile {
      * Create a JNLPFile from a URL, parent URLm a version and checking for
      * updates using the specified policy.
      *
-     * @param location the location of the JNLP file
+     * @param location  the location of the JNLP file
      * @param uniqueKey A string that uniquely identifies connected instances
-     * @param version the version of the JNLP file
-     * @param settings the parser settings to use while parsing the file
-     * @param policy the update policy
-     * @throws IOException if an IO exception occurred
+     * @param version   the version of the JNLP file
+     * @param settings  the parser settings to use while parsing the file
+     * @param policy    the update policy
+     * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
@@ -292,7 +337,7 @@ public class JNLPFile {
     /**
      * Create a JNLPFile from an input stream.
      *
-     * @param input input stream from which create jnlp file
+     * @param input    input stream from which create jnlp file
      * @param settings settings of parser
      * @throws ParseException if the JNLP file was invalid
      */
@@ -304,7 +349,7 @@ public class JNLPFile {
     /**
      * Create a JNLPFile from an input stream.
      *
-     * @param input input stream of JNLP file.
+     * @param input    input stream of JNLP file.
      * @param codebase codebase to use if not specified in JNLP file..
      * @param settings the {@link ParserSettings} to use when parsing
      * @throws ParseException if the JNLP file was invalid
@@ -320,11 +365,12 @@ public class JNLPFile {
      * download to the cache.
      * Unless file is find in cache, this method blocks until it is downloaded.
      * This is the best way in itw how to download and cache file
+     *
      * @param location of resource to open
-     * @param version of resource
-     * @param policy update policy of resource
-     * @return  opened stream from given url
-     * @throws java.io.IOException  if something goes wrong
+     * @param version  of resource
+     * @param policy   update policy of resource
+     * @return opened stream from given url
+     * @throws java.io.IOException if something goes wrong
      */
     public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
         if (location == null || policy == null)
@@ -335,7 +381,8 @@ public class JNLPFile {
             tracker.addResource(location, version, null, policy);
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IOException(ex);
         }
     }
@@ -343,14 +390,15 @@ public class JNLPFile {
     /**
      * @return the JNLP file's best localized title. This method returns the same
      * value as InformationDesc.getTitle().
-     *
+     * <p>
      * Since jdk7 u45, also manifest title, and mainclass are taken to consideration;
      * See PluginBridge
      */
     public String getTitle() {
         try {
             return getTitle(false);
-        } catch (MissingTitleException cause) {
+        }
+        catch (MissingTitleException cause) {
             throw new RuntimeException(cause);
         }
     }
@@ -368,7 +416,8 @@ public class JNLPFile {
             LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
             title = "Corrupted or missing title. Do not trust this application!";
             LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + ": {}", title);
-        } else {
+        }
+        else {
             LOG.info("Acceptable title tag found, contains: {}", title);
         }
         return title;
@@ -416,7 +465,8 @@ public class JNLPFile {
     public String getVendor() {
         try {
             return getVendor(false);
-        } catch (MissingVendorException cause) {
+        }
+        catch (MissingVendorException cause) {
             throw new RuntimeException(cause);
         }
     }
@@ -432,8 +482,9 @@ public class JNLPFile {
         if (vendor.trim().isEmpty()) {
             LOG.warn("The vendor section has not been specified for your locale nor does a default value exist in the JNLP file.");
             vendor = "Corrupted or missing vendor. Do not trust this application!";
-            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor"+ ": " + vendor);
-        } else {
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor" + ": " + vendor);
+        }
+        else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
         return vendor;
@@ -496,18 +547,19 @@ public class JNLPFile {
 
     /**
      * It is not recommended to use this method for internals of itw - use normal getCodeBase rather, as null is expected always except toString calls.
-     *
+     * <p>
      * If you are not sure, use getCodeBase and check null as you need. See that this method is used mostly for xtendedAppletSecuriyty dialogs.
      *
      * @return the codebase URL for the JNLP file  or url of location of calling file (jnlp, hreffed jnlp, or directly html)
      */
     public URL getNotNullProbableCodeBase() {
-        if (getCodeBase()!=null){
+        if (getCodeBase() != null) {
             return getCodeBase();
         }
         try {
             return UrlUtils.removeFileName(getSourceLocation());
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return getSourceLocation();
@@ -522,67 +574,70 @@ public class JNLPFile {
     }
 
     /**
-     * @param locale preferred locale of informations
+     * @param locale preferred locale of information element
      * @return the information section of the JNLP file as viewed
      * through the specified locale.
      */
     public InformationDesc getInformation(final Locale locale) {
-        boolean strict = false;
-        if (this.info != null) {
-            for (InformationDesc infoDesc : this.info) {
-                if (infoDesc.strict) {
-                    strict = true;
-                    break;
+        return this.getInformation(locale, defaultOS, defaultArch);
+    }
+
+    /**
+     * @param locale preferred locale of information element
+     * @param os     preferred os of information element
+     * @param arch   preferred arch of information element
+     * @return the information section of the JNLP file as viewed
+     * through the specified locale.
+     */
+    public InformationDesc getInformation(final Locale locale, final String os, final String arch) {
+        Objects.requireNonNull(locale, "locale");
+
+        if (infos == null || infos.isEmpty()) {
+            return new InformationDesc(new Locale[]{locale}, os, arch);
+        }
+
+        final boolean strict = infos.stream().anyMatch(infoDesc -> infoDesc.strict);
+
+        final Map<String, List<Object>> mergedItems = new HashMap<>();
+
+        for (InformationDesc infoDesc : infos) {
+            for (Match precision : Match.values()) {
+                if (localMatches(locale, precision, infoDesc.getLocales())) {
+                    if (StringUtils.isBlank(os) || StringUtils.isBlank(infoDesc.getOs()) ||
+                            (Objects.nonNull(infoDesc.getOs()) && infoDesc.getOs().toLowerCase().startsWith(os.toLowerCase()))) {
+                        if (StringUtils.isBlank(arch) || StringUtils.isBlank(infoDesc.getArch()) ||
+                                (Objects.nonNull(infoDesc.getArch()) && infoDesc.getArch().toLowerCase().startsWith(arch.toLowerCase()))) {
+
+                            final Map<String, List<Object>> items = infoDesc.getItems();
+
+                            for (String key : items.keySet()) {
+                                if (mergedItems.containsKey(key)) {
+                                    final List<Object> values = mergedItems.get(key);
+                                    items.get(key).stream()
+                                            .filter(v -> !StringUtils.isBlank(v.toString()))
+                                            .forEach(values::add);
+                                }
+                                else {
+                                    mergedItems.put(key, infoDesc.getItems(key));
+                                }
+                            }
+                        }
+                    }
+                    break; // after first match of the locale break out of the precision loop.
                 }
             }
         }
-        return new InformationDesc(new Locale[] { locale }, strict) {
+
+        return new InformationDesc(new Locale[]{locale}, os, arch, strict) {
             @Override
             public List<Object> getItems(Object key) {
-                List<Object> result = new ArrayList<>();
-
-                for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
-                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)) {
-                            result.addAll(infoDesc.getItems(key));
-                        }
-                    }
-
-                    if (result.size() > 0) {
-                        return result;
-                    }
-                }
-                return result;
+                final List<Object> result = mergedItems.get(key);
+                return result == null ? Collections.emptyList() : result;
             }
 
             @Override
-            public String getTitle() {
-                for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
-                        String title = infoDesc.getTitle();
-                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
-                                && title != null && !"".equals(title)) {
-                            return title;
-                        }
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            public String getVendor() {
-                for (Match precision : Match.values()) {
-                    for (InformationDesc infoDesc : JNLPFile.this.info) {
-                        String vendor = infoDesc.getVendor();
-                        if (LocaleUtils.localeMatches(locale, infoDesc.getLocales(), precision)
-                                && vendor != null && !"".equals(vendor)) {
-                            return vendor;
-                        }
-                    }
-                }
-
-                return null;
+            public void addItem(final String key, final Object value) {
+                throw new IllegalStateException();
             }
         };
     }
@@ -626,13 +681,13 @@ public class JNLPFile {
 
     /**
      * @param locale preferred locale of resource
-     * @param os preferred os of resource
-     * @param arch preferred arch of resource
+     * @param os     preferred os of resource
+     * @param arch   preferred arch of resource
      * @return the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
     public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
-        return new ResourcesDesc(this, new Locale[] { locale }, new String[] { os }, new String[] { arch }) {
+        return new ResourcesDesc(this, new Locale[]{locale}, new String[]{os}, new String[]{arch}) {
 
             @Override
             public <T> List<T> getResources(Class<T> launchType) {
@@ -677,14 +732,14 @@ public class JNLPFile {
 
     /**
      * @param locale preferred locale of resource
-     * @param os preferred os of resource
-     * @param arch preferred arch of resource
+     * @param os     preferred os of resource
+     * @param arch   preferred arch of resource
      * @return the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
     public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
         List<ResourcesDesc> matchingResources = new ArrayList<>();
-        for (ResourcesDesc rescDesc: resources) {
+        for (ResourcesDesc rescDesc : resources) {
             boolean hasUsableLocale = false;
             for (Match match : Match.values()) {
                 hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
@@ -708,7 +763,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an applet.
-     *
      * @throws UnsupportedOperationException if there is no applet information
      */
     public AppletDesc getApplet() {
@@ -720,7 +774,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an application.
-     *
      * @throws UnsupportedOperationException if there is no application information
      */
     public ApplicationDesc getApplication() {
@@ -732,7 +785,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for a component.
-     *
      * @throws UnsupportedOperationException if there is no component information
      */
     public ComponentDesc getComponent() {
@@ -744,7 +796,6 @@ public class JNLPFile {
 
     /**
      * @return the launch information for an installer.
-     *
      * @throws UnsupportedOperationException if there is no installer information
      */
     public InstallerDesc getInstaller() {
@@ -787,8 +838,9 @@ public class JNLPFile {
      * getInformation, getResources, etc.  If unset, the defaults
      * are the properties os.name, os.arch, and the locale returned
      * by Locale.getDefault().
-     * @param os preferred os of resource
-     * @param arch preferred arch of resource
+     *
+     * @param os     preferred os of resource
+     * @param arch   preferred arch of resource
      * @param locale preferred locale of resource
      */
     public void setDefaults(String os, String arch, Locale locale) {
@@ -817,7 +869,7 @@ public class JNLPFile {
             fileVersion = parser.getFileVersion();
             codeBase = parser.getCodeBase();
             sourceLocation = parser.getFileLocation();
-            info = parser.getInformationDescs(root);
+            infos = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
             resources = parser.getResources(root, false); // false == not a j2se/java resources section
@@ -827,9 +879,11 @@ public class JNLPFile {
 
             checkForSpecialProperties();
 
-        } catch (ParseException ex) {
+        }
+        catch (ParseException ex) {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw new RuntimeException(ex.toString());
         }
@@ -848,7 +902,8 @@ public class JNLPFile {
 
                     if (property.equals(generalProperties[i])) {
                         break;
-                    } else if (!property.equals(generalProperties[i])
+                    }
+                    else if (!property.equals(generalProperties[i])
                             && i == generalProperties.length - 1) {
                         containsSpecialProperties = true;
                         return;
@@ -860,7 +915,6 @@ public class JNLPFile {
     }
 
     /**
-     *
      * @return true if the JNLP file specifies things that can only be
      * applied on a new vm (eg: different max heap memory)
      */
@@ -870,8 +924,8 @@ public class JNLPFile {
     }
 
     /**
-     *  @return a list of args to pass to the new
-     *  JVM based on this JNLP file
+     * @return a list of args to pass to the new
+     * JVM based on this JNLP file
      */
     public List<String> getNewVMArgs() {
 
@@ -939,9 +993,11 @@ public class JNLPFile {
         final String location;
         if (getSourceLocation() != null) {
             location = getSourceLocation().toString();
-        } else if (getCodeBase() != null) {
+        }
+        else if (getCodeBase() != null) {
             location = getCodeBase().toString();
-        } else {
+        }
+        else {
             location = "unknown";
         }
         return location;
@@ -955,9 +1011,11 @@ public class JNLPFile {
         final String location;
         if (getSourceLocation() != null) {
             location = new File(getSourceLocation().getFile()).getName();
-        } else if (getCodeBase() != null) {
+        }
+        else if (getCodeBase() != null) {
             location = new File(getCodeBase().getFile()).getName();
-        } else {
+        }
+        else {
             location = "unknown";
         }
         return location;
@@ -979,8 +1037,9 @@ public class JNLPFile {
     public String createNameForDesktopFile() {
         String basicTitle = getTitle();
         if (basicTitle == null || basicTitle.trim().isEmpty()) {
-            return createJnlpTitleValue().replaceAll(".jnlp$","");
-        } else {
+            return createJnlpTitleValue().replaceAll(".jnlp$", "");
+        }
+        else {
             return basicTitle;
         }
     }

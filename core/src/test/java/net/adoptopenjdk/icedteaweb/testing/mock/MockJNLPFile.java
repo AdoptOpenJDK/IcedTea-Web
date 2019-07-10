@@ -50,6 +50,6 @@ public class MockJNLPFile extends JNLPFile {
     }
 
     public void setInfo(final List<InformationDesc> infoList) {
-        info = infoList;
+        infos = infoList;
     }
 }

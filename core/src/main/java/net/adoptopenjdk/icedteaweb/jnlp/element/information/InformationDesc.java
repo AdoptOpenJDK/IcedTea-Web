@@ -22,9 +22,15 @@ import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
@@ -37,10 +43,9 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
  * The information element contains information intended to be consumed by the JNLP Client to integrate
  * the application into the desktop, provide user feedback, etc.
  *
+ * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
  * for a detailed specification of this class.
- *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  */
 
 // There is an understanding between this class and the parser
@@ -51,7 +56,8 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.
 public class InformationDesc {
     public static final String INFORMATION_ELEMENT = "information";
 
-    // TODO: missing the information element attributes os and arch (defined since spec version 1.5.0)
+    public static final String OS_ATTRIBUTE = "os";
+    public static final String ARCH_ATTRIBUTE = "arch";
 
     public static final String LOCALE_ATTRIBUTE = "locale";
 
@@ -64,7 +70,23 @@ public class InformationDesc {
      */
     final private Locale[] locales;
 
-    /** the data as list of key,value pairs */
+    /**
+     * Specifies the operating system for which the information element should be considered. If the value is a
+     * prefix of the os.name system property, then the information element can be used. If the attribute is not
+     * specified, it matches all operating systems.
+     */
+    private final String os;
+
+    /**
+     * Specifies the architecure for which the information element should be considered. If the value is a prefix
+     * of the os.arch system property, then the information element can be used. If the attribute is not specified,
+     * it matches all architecures.
+     */
+    private final String arch;
+
+    /**
+     * the data as list of key,value pairs
+     */
     private List<Object> info;
 
     public final boolean strict;
@@ -82,10 +104,35 @@ public class InformationDesc {
      * Create an information element object.
      *
      * @param locales the locales for which the information element should be used
-     * @param strict whether parser was strict
+     * @param strict  whether parser was strict
      */
     public InformationDesc(final Locale[] locales, final boolean strict) {
+        this(locales, null, null, strict);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
+     * @param os      the operating system for which the information element should be considered
+     * @param arch    the architecure for which the information element should be considered
+     */
+    public InformationDesc(final Locale[] locales, final String os, final String arch) {
+        this(locales, os, arch, false);
+    }
+
+    /**
+     * Create an information element object.
+     *
+     * @param locales the locales for which the information element should be used
+     * @param os      the operating system for which the information element should be considered
+     * @param arch    the architecure for which the information element should be considered
+     * @param strict  whether parser was strict
+     */
+    public InformationDesc(final Locale[] locales, final String os, final String arch, final boolean strict) {
         this.locales = locales;
+        this.os = os;
+        this.arch = arch;
         this.strict = strict;
     }
 
@@ -131,9 +178,8 @@ public class InformationDesc {
     }
 
     /**
-     * @return the application's description of the specified type.
-     *
      * @param kind one of {@link DescriptionKind}
+     * @return the application's description of the specified type.
      */
     public String getDescription(final DescriptionKind kind) {
         final String result = getDescriptionStrict(kind);
@@ -143,14 +189,13 @@ public class InformationDesc {
             return result;
     }
 
-      /**
-     * @return the application's description of the specified type.
-     *
+    /**
      * @param kind one of {@link DescriptionKind}
+     * @return the application's description of the specified type.
      */
     public String getDescriptionStrict(DescriptionKind kind) {
         return (String) getItem("description-" + kind.getValue());
-        
+
     }
 
     /**
@@ -171,8 +216,8 @@ public class InformationDesc {
      * specified width and height unless there are no other icons
      * available.
      *
-     * @param kind the kind of icon to get
-     * @param width desired width of icon
+     * @param kind   the kind of icon to get
+     * @param width  desired width of icon
      * @param height desired height of icon
      * @return the closest icon by size or null if no icons declared
      */
@@ -209,12 +254,27 @@ public class InformationDesc {
     }
 
     /**
+     * @return the operating system for which the information element should be considered
+     */
+    public String getOs() {
+        return os;
+    }
+
+    /**
+     * @return the architecure for which the information element should be considered
+     */
+    public String getArch() {
+        return arch;
+    }
+
+    /**
      * @return whether offline execution allowed.
      */
     public boolean isOfflineAllowed() {
         if (strict) {
             return null != getItem(OFFLINE_ALLOWED_ELEMENT);
-        } else {
+        }
+        else {
             // by default itw ignore this switch. Most applications are misusing it
             return true;
         }
@@ -234,9 +294,24 @@ public class InformationDesc {
      * @return the associations specified in the JNLP file
      */
     public AssociationDesc[] getAssociations() {
-        List<Object> associations = getItems(ASSOCIATION_ELEMENT);
+        final List<AssociationDesc> associations = (List) getItems(ASSOCIATION_ELEMENT);
 
-        return associations.toArray(new AssociationDesc[associations.size()]);
+        Collections.reverse(associations);
+
+        final Set<ExtensionAndMimeType> alreadySeen = new HashSet<>();
+        final List<AssociationDesc> result = new ArrayList<>();
+
+        for (AssociationDesc association : associations) {
+            final ExtensionAndMimeType key = new ExtensionAndMimeType(association.getExtensions(), association.getMimeType());
+            if (!alreadySeen.contains(key)) {
+                alreadySeen.add(key);
+                result.add(association);
+            }
+        }
+
+        Collections.reverse(result);
+
+        return result.toArray(new AssociationDesc[0]);
     }
 
     /**
@@ -286,7 +361,8 @@ public class InformationDesc {
     /**
      * Add an information item (description, icon, etc) under a
      * specified key name.
-     * @param key key to place value to
+     *
+     * @param key   key to place value to
      * @param value value to be placed to key
      */
     public void addItem(final String key, final Object value) {
@@ -299,4 +375,44 @@ public class InformationDesc {
         info.add(value);
     }
 
+    public Map<String, List<Object>> getItems() {
+        final Map<String, List<Object>> result = new HashMap<>();
+
+        if (info != null) {
+            for (int i = 0; i < info.size(); i += 2) {
+                final String key = (String) info.get(i);
+                final Object value = info.get(i + 1);
+                result.computeIfAbsent(key, k -> new ArrayList()).add(value);
+            }
+        }
+
+        return result;
+    }
+
+
+    private static class ExtensionAndMimeType {
+        private final String[] extensions;
+        private final String mimeType;
+
+        private ExtensionAndMimeType(String[] extensions, String mimeType) {
+            this.extensions = extensions;
+            this.mimeType = mimeType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ExtensionAndMimeType that = (ExtensionAndMimeType) o;
+            return Arrays.equals(extensions, that.extensions) &&
+                    mimeType.equals(that.mimeType);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(mimeType);
+            result = 31 * result + Arrays.hashCode(extensions);
+            return result;
+        }
+    }
 }

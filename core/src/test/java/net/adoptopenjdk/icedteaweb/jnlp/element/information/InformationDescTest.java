@@ -71,6 +71,15 @@ public class InformationDescTest {
     }
 
     @Test
+    public void testOsAndArch() {
+        InformationDesc info;
+
+        info = new InformationDesc(new Locale[0], "Win10", "i386");
+        assertEquals("Win10", info.getOs());
+        assertEquals("i386", info.getArch());
+    }
+
+    @Test
     public void testTitle() {
         InformationDesc info = new InformationDesc(new Locale[0]);
         info.addItem("title", "A Title");

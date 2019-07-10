@@ -162,7 +162,7 @@ public final class PluginBridge extends JNLPFile {
                     main = jnlpFile.getApplet().getMainClass();
 
                 Map<String, String> jnlpParams = jnlpFile.getApplet().getParameters();
-                info = jnlpFile.info;
+                infos = jnlpFile.infos;
 
                 // Change the parameter name to lowercase to follow conventions.
                 for (Map.Entry<String, String> entry : jnlpParams.entrySet()) {
@@ -186,7 +186,7 @@ public final class PluginBridge extends JNLPFile {
             }
         } else {
             // Should we populate this list with applet attribute tags?
-            info = new ArrayList<>();
+            infos = new ArrayList<>();
             useJNLPHref = false;
         }
 
