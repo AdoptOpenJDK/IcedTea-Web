@@ -78,16 +78,16 @@ public class Launcher implements ApplicationLauncher {
     public static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
     /** the handler */
-    private LaunchHandler handler = null;
+    private final LaunchHandler handler;
 
     /** the update policy */
-    private UpdatePolicy updatePolicy = JNLPRuntime.getDefaultUpdatePolicy();
+    private final UpdatePolicy updatePolicy;
 
     /** whether to create an AppContext (if possible) */
     private boolean context = true;
 
     /** If the application should call JNLPRuntime.exit on fatal errors */
-    private boolean exitOnFailure = true;
+    private final boolean exitOnFailure;
 
     private ParserSettings parserSettings = new ParserSettings();
 
@@ -98,39 +98,11 @@ public class Launcher implements ApplicationLauncher {
     /**
      * Create a launcher with the runtime's default update policy
      * and launch handler.
-     */
-    private Launcher() {
-        this(null, null);
-
-        if (handler == null) {
-            handler = JNLPRuntime.getDefaultLaunchHandler();
-        }
-    }
-
-    /**
-     * Create a launcher with the runtime's default update policy
-     * and launch handler.
      *
-     * @param exitOnFailure Exit if there is an error (usually default, but false when being used from the plugin)
+     * @param exitOnFailure exit if there is an error (usually default, but false when being used from the plugin)
      */
     public Launcher(boolean exitOnFailure) {
-        this(null, null);
-
-        if (handler == null) {
-            handler = JNLPRuntime.getDefaultLaunchHandler();
-        }
-
-        this.exitOnFailure = exitOnFailure;
-    }
-
-    /**
-     * Create a launcher with the specified handler and the
-     * runtime's default update policy.
-     *
-     * @param handler the handler to use or null for no handler.
-     */
-    private Launcher(LaunchHandler handler) {
-        this(handler, null);
+        this(null, null, exitOnFailure);
     }
 
     /**
@@ -139,33 +111,12 @@ public class Launcher implements ApplicationLauncher {
      *
      * @param handler the handler to use or null for no handler.
      * @param policy the update policy to use or null for default policy.
+     * @param exitOnFailure exit if there is an error (usually default, but false when being used from the plugin)
      */
-    private Launcher(LaunchHandler handler, UpdatePolicy policy) {
-        if (policy == null)
-            policy = JNLPRuntime.getDefaultUpdatePolicy();
-
-        this.handler = handler;
-        this.updatePolicy = policy;
-
-    }
-
-    /**
-     * Sets the update policy used by launched applications.
-     * @param policy to be used for resources
-     */
-    public void setUpdatePolicy(UpdatePolicy policy) {
-        if (policy == null) {
-            throw new IllegalArgumentException("Update policy cannot be null.");
-        }
-
-        this.updatePolicy = policy;
-    }
-
-    /**
-     * @return the update policy used when launching applications.
-     */
-    public UpdatePolicy getUpdatePolicy() {
-        return updatePolicy;
+    public Launcher(final LaunchHandler handler, final UpdatePolicy policy, boolean exitOnFailure) {
+        this.handler = (handler == null) ? JNLPRuntime.getDefaultLaunchHandler() : null;
+        this.updatePolicy = (policy == null) ? JNLPRuntime.getDefaultUpdatePolicy() : null;
+        this.exitOnFailure = exitOnFailure;
     }
 
     /**
@@ -177,14 +128,6 @@ public class Launcher implements ApplicationLauncher {
      */
     public void setCreateAppContext(boolean context) {
         this.context = context;
-    }
-
-    /**
-     * @return whether applications are launched in their own
-     * AppContext.
-     */
-    public boolean isCreateAppContext() {
-        return this.context;
     }
 
     /**
@@ -215,7 +158,7 @@ public class Launcher implements ApplicationLauncher {
      * @return the application instance
      * @throws LaunchException if an error occurred while launching (also sent to handler)
      */
-    public ApplicationInstance launch(JNLPFile file) throws LaunchException {
+    private ApplicationInstance launch(final JNLPFile file) throws LaunchException {
         return launch(file, null);
     }
 
@@ -253,16 +196,7 @@ public class Launcher implements ApplicationLauncher {
             }
         }
 
-        if (file instanceof PluginBridge && cont != null) {
-            tg = new TgThread(file, cont, true);
-        }
-        else if (cont == null) {
-            tg = new TgThread(file);
-        }
-        else {
-            tg = new TgThread(file, cont);
-        }
-
+        tg = new TgThread(file, cont, file instanceof PluginBridge);
         tg.start();
 
         try {
@@ -361,7 +295,7 @@ public class Launcher implements ApplicationLauncher {
             }
 
             String name = input.substring(0, equals);
-            String value = input.substring(equals + 1, input.length());
+            String value = input.substring(equals + 1);
 
             applet.addParameter(name, value);
         }
@@ -386,7 +320,7 @@ public class Launcher implements ApplicationLauncher {
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
      */
-    public void launchExternal(List<String> vmArgs, List<String> javawsArgs) throws LaunchException {
+    private void launchExternal(List<String> vmArgs, List<String> javawsArgs) throws LaunchException {
         try {
 
             List<String> commands = new LinkedList<>();
@@ -466,7 +400,7 @@ public class Launcher implements ApplicationLauncher {
      * @return application to be launched
      * @throws net.sourceforge.jnlp.LaunchException if launch fails on unrecoverable exception
      */
-   private ApplicationInstance launchApplication(JNLPFile file) throws LaunchException {
+   private ApplicationInstance launchApplication(final JNLPFile file) throws LaunchException {
         if (!file.isApplication()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
         }
@@ -487,7 +421,7 @@ public class Launcher implements ApplicationLauncher {
                         sp.close();
                     }
                 }
-                List<String> netxArguments = new LinkedList<String>();
+                List<String> netxArguments = new LinkedList<>();
                 netxArguments.add("-Xnofork");
                 netxArguments.addAll(JNLPRuntime.getInitialArguments());
                 launchExternal(file.getNewVMArgs(), netxArguments);
@@ -523,16 +457,12 @@ public class Launcher implements ApplicationLauncher {
 
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
-            Method main = mainClass.getMethod("main", new Class<?>[] { String[].class });
-            String args[] = file.getApplication().getArguments();
+            Method main = mainClass.getMethod("main", String[].class);
+            String[] args = file.getApplication().getArguments();
 
             // create EDT within application context:
-            SwingUtils.callOnAppContext(new Runnable() {
-                // dummy method to force Event Dispatch Thread creation
-                @Override
-                public void run() {
-                }
-            });
+            // dummy method to force Event Dispatch Thread creation
+            SwingUtils.callOnAppContext(() -> {});
 
             setContextClassLoaderForAllThreads(app.getThreadGroup(), app.getClassLoader());
 
@@ -715,7 +645,7 @@ public class Launcher implements ApplicationLauncher {
                  appletInstance = new AppletInstance(file, group, loader, null, cont);
              }
 
-             /**
+             /*
               * Due to PR2968, moved to earlier phase, so early stages of applet
               * can access Thread.currentThread().getContextClassLoader().
               *
@@ -739,35 +669,6 @@ public class Launcher implements ApplicationLauncher {
             return appletInstance;
         } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."), appletInstance);
-        }
-    }
-
-    /**
-     * Creates an Applet object from a JNLPFile. This is mainly to be used with
-     * gcjwebplugin.
-     * @param file the PluginBridge to be used.
-     * @param enableCodeBase whether to add the code base URL to the classloader.
-     * @param cont container where to put applet
-     * @return applet
-     * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably dien
-     */
-    protected Applet createAppletObject(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
-        try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
-
-            if (enableCodeBase) {
-                loader.enableCodeBase();
-            } else if (file.getResources().getJARs().length == 0) {
-                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
-            }
-
-            String appletName = file.getApplet().getMainClass();
-            Class<?> appletClass = loader.loadClass(appletName);
-            Applet applet = (Applet) appletClass.newInstance();
-
-            return applet;
-        } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."));
         }
     }
 
@@ -869,22 +770,11 @@ public class Launcher implements ApplicationLauncher {
      * for the application, applet, or installer in its thread group.
      */
     private class TgThread extends Thread { // ThreadGroupThread
-        private JNLPFile file;
+        private final JNLPFile file;
         private ApplicationInstance application;
         private LaunchException exception;
-        private Container cont;
-        private boolean isPlugin = false;
-
-        TgThread(JNLPFile file) {
-            this(file, null);
-        }
-
-        TgThread(JNLPFile file, Container cont) {
-            super(createThreadGroup(file), file.getTitle());
-
-            this.file = file;
-            this.cont = cont;
-        }
+        private final Container cont;
+        private final boolean isPlugin;
 
         TgThread(JNLPFile file, Container cont, boolean isPlugin) {
             super(createThreadGroup(file), file.getTitle());
