@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,6 +25,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.launch.ApplicationLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
@@ -66,7 +68,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.22 $
  */
-public class Launcher {
+public class Launcher implements ApplicationLauncher {
 
     private final static Logger LOG = LoggerFactory.getLogger(Launcher.class);
 
@@ -291,6 +293,7 @@ public class Launcher {
      * @throws LaunchException if there was an exception
      * @return the application instance
      */
+    @Override
     public ApplicationInstance launch(URL location) throws LaunchException {
         JNLPRuntime.saveHistory(location.toExternalForm());
         return launch(fromUrl(location));
@@ -374,47 +377,6 @@ public class Launcher {
         for (String input : args ) {
             app.addArgument(input);
         }
-    }
-
-
-    /**
-     * Launches the JNLP file in a new JVM instance.
-     * All streams are properly redirected.
-     *
-     * @param vmArgs the arguments to pass to the new JVM. Can be empty but
-     *        must not be null.
-     * @param file the JNLP file to launch
-     * @param javawsArgs the arguments to pass to the javaws command. Can be
-     *        an empty list but must not be null.
-     * @throws LaunchException if there was an exception
-     */
-    public void launchExternal(List<String> vmArgs, JNLPFile file, List<String> javawsArgs) throws LaunchException {
-        List<String> updatedArgs = new LinkedList<String>(javawsArgs);
-
-        if (file.getFileLocation() != null) {
-            updatedArgs.add(file.getFileLocation().toString());
-        }
-        else if (file.getSourceLocation() != null) {
-            updatedArgs.add(file.getFileLocation().toString());
-        } else {
-            launchError(new LaunchException(file, null, "Fatal", "External Launch Error", "Could not determine .jnlp file location.", "An attempt was made to launch a JNLP file in another JVM, but the file could not be located.  In order to launch in an external JVM, the runtime must be able to locate the .jnlp file either in the local file system or on a server."));
-        }
-
-        launchExternal(vmArgs, updatedArgs);
-
-    }
-
-    /**
-     * Launches the JNLP file in a new JVM instance.
-     * All streams are properly redirected.
-     *
-     * @param url the URL of the JNLP file to launch
-     * @throws LaunchException if there was an exception
-     */
-    public void launchExternal(URL url) throws LaunchException {
-        List<String> javawsArgs = new LinkedList<String>();
-        javawsArgs.add(url.toString());
-        launchExternal(new LinkedList<String>(), javawsArgs);
     }
 
     /**
@@ -504,7 +466,7 @@ public class Launcher {
      * @return application to be launched
      * @throws net.sourceforge.jnlp.LaunchException if launch fails on unrecoverable exception
      */
-    protected ApplicationInstance launchApplication(JNLPFile file) throws LaunchException {
+   private ApplicationInstance launchApplication(JNLPFile file) throws LaunchException {
         if (!file.isApplication()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
         }
@@ -638,7 +600,7 @@ public class Launcher {
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    protected ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -684,7 +646,7 @@ public class Launcher {
      * @return applet
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    protected ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -712,7 +674,7 @@ public class Launcher {
      * @return  application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    protected ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
+    private ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
         throw launchError(new LaunchException(file, null, "Fatal", "Unsupported Feature", "Installers not supported.", "JNLP installer files are not yet supported."));
@@ -731,7 +693,7 @@ public class Launcher {
     //and then applets creates in little bit strange manner. This issue is visible with
     //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
-    protected  AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
          AppletInstance appletInstance = null;
          try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
@@ -815,7 +777,7 @@ public class Launcher {
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    protected ApplicationInstance createApplication(JNLPFile file) throws LaunchException {
+    private ApplicationInstance createApplication(JNLPFile file) throws LaunchException {
         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, false);
             ThreadGroup group = Thread.currentThread().getThreadGroup();
@@ -837,7 +799,7 @@ public class Launcher {
      * ThreadGroup has to be created at an earlier point in the applet code.
      * @return  ThreadGroup for this app/applet
      */
-    protected ThreadGroup createThreadGroup(JNLPFile file) {
+    private ThreadGroup createThreadGroup(JNLPFile file) {
         final ThreadGroup tg;
 
         if (file instanceof PluginBridge) {
@@ -975,14 +937,14 @@ public class Launcher {
             }
         }
 
-        public LaunchException getException() {
+        LaunchException getException() {
             return exception;
         }
 
-        public ApplicationInstance getApplication() {
+        ApplicationInstance getApplication() {
             return application;
         }
 
-    };
+    }
 
 }

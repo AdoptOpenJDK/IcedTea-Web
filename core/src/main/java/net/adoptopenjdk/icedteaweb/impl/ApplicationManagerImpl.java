@@ -5,7 +5,6 @@ import net.adoptopenjdk.icedteaweb.ApplicationManager;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.Launcher;
 
 import java.net.URL;
@@ -43,8 +42,7 @@ public class ApplicationManagerImpl implements ApplicationManager {
 
     private Application installSync(final URL url) {
         try {
-            final JNLPFile file = new JNLPFile(url);
-            final Application application = new ApplicationImpl(file, null);
+            final Application application = new ApplicationImpl(url, null);
             applications.add(application);
         } catch (Exception e) {
             LOG.error("Can not install application based on url {}", url);

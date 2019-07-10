@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,10 +25,12 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.launch.ApplicationLauncherFactory;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -97,23 +100,31 @@ public final class Boot implements PrivilegedAction<Void> {
             + "\n";
 
     private static CommandLineOptionsParser optionParser;
+    private static ApplicationLauncherFactory launcherFactory;
 
     public static CommandLineOptionsParser getOptionParser() {
         return optionParser;
     }
 
-
-
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
-     * @param argsIn launching arguments
+     * @param args launching arguments
      */
-    public static void main(String[] argsIn) throws UnevenParameterException {
+    public static void main(String[] args) throws UnevenParameterException {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        optionParser = new CommandLineOptionsParser(argsIn, CommandLineOptionsDefinition.getJavaWsOptions());
+        if (launcherFactory == null) {
+            launcherFactory = (parserSettings, extraInformation) -> {
+                Launcher launcher = new Launcher(true);
+                launcher.setParserSettings(parserSettings);
+                launcher.setInformationToMerge(extraInformation);
+                return launcher;
+            };
+        }
+
+        optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
         if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             JNLPRuntime.setDebug(true);
@@ -211,11 +222,21 @@ public final class Boot implements PrivilegedAction<Void> {
             LinkingBrowser.showStandAloneWindow(url, false);
         } else {
 
-            JNLPRuntime.setInitialArguments(Arrays.asList(argsIn));
+            JNLPRuntime.setInitialArguments(Arrays.asList(args));
 
             AccessController.doPrivileged(new Boot());
         }
+    }
 
+    /**
+     * Launch the JNLP file specified by the command-line arguments with the given launch factory.
+     *
+     * @param launcherFactory the launch factory
+     * @param args launching arguments
+     */
+    public static void main(final ApplicationLauncherFactory launcherFactory, final String[] args) {
+        Boot.launcherFactory = launcherFactory;
+        main(args);
     }
 
     private static void handleMessage() {
@@ -271,14 +292,21 @@ public final class Boot implements PrivilegedAction<Void> {
         Map<String, List<String>> extra = new HashMap<>();
 
         if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            boolean run = new HtmlBoot(optionParser).run(extra);
-            if (!run) {
+            new HtmlBoot(optionParser).run(extra);
+        } else {
+            final ParserSettings settings = init(extra);
+            if (settings == null) {
                 return null;
             }
-        } else {
-            boolean run = new JnlpBoot(optionParser).run(extra);
-            if (!run) {
-                return null;
+            try {
+                LOG.info("Proceeding with jnlp");
+                launcherFactory.createLauncher(settings, extra).launch(Boot.getFileLocation());
+            } catch (LaunchException ex) {
+                // default handler prints this
+                JNLPRuntime.exit(1);
+            } catch (Exception ex) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
             }
         }
         return null;
