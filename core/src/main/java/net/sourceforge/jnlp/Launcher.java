@@ -157,7 +157,7 @@ public class Launcher {
      * @return the application instance
      * @throws LaunchException if an error occurred while launching (also sent to handler)
      */
-    private ApplicationInstance launch(final JNLPFile file) throws LaunchException {
+    public ApplicationInstance launch(final JNLPFile file) throws LaunchException {
         return launch(file, null);
     }
 

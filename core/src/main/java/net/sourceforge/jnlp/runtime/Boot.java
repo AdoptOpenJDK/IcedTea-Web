@@ -289,21 +289,20 @@ public final class Boot implements PrivilegedAction<Void> {
             new HtmlBoot(optionParser).run(extra);
         } else {
             final ParserSettings settings = init(extra);
-            if (settings == null) {
-                return null;
-            }
-            try {
-                LOG.info("Proceeding with jnlp");
-                Launcher launcher = new Launcher(true);
-                launcher.setParserSettings(settings);
-                launcher.setInformationToMerge(extra);
-                launcher.launch(Boot.getFileLocation());
-            } catch (LaunchException ex) {
-                // default handler prints this
-                JNLPRuntime.exit(1);
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
+            if (settings != null) {
+                try {
+                    LOG.info("Proceeding with jnlp");
+                    Launcher launcher = new Launcher(true);
+                    launcher.setParserSettings(settings);
+                    launcher.setInformationToMerge(extra);
+                    launcher.launch(Boot.getFileLocation());
+                } catch (LaunchException ex) {
+                    // default handler prints this
+                    JNLPRuntime.exit(1);
+                } catch (Exception ex) {
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
+                }
             }
         }
         return null;
