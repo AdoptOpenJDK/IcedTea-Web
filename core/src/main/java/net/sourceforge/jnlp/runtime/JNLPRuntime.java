@@ -269,7 +269,7 @@ public class JNLPRuntime {
 
         doMainAppContextHacks();
 
-        if (securityEnabled) {
+        if (securityEnabled && !forksAllowed) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
         }
