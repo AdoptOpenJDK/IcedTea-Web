@@ -16,19 +16,20 @@
 //
 package net.adoptopenjdk.icedteaweb.launch;
 
-import net.sourceforge.jnlp.ParserSettings;
+import static java.util.Objects.requireNonNull;
 
-import java.util.List;
-import java.util.Map;
+public class JvmLauncherHolder {
 
-public interface ApplicationLauncherFactory {
-    /**
-     * Creates an {@link ApplicationLauncher}.
-     *
-     * @param parserSettings the parser settings to use when the Launcher initiates parsing of a JNLP file
-     * @param extraInformation map containing extra information to add to the main JNLP. The values for
-     *              keys "arguments", "parameters", and "properties" are used.
-     * @return
-     */
-    ApplicationLauncher createLauncher(ParserSettings parserSettings, Map<String, List<String>> extraInformation);
+    private static JvmLauncher launcher;
+
+    public static JvmLauncher getLauncher() {
+        return requireNonNull(launcher, "JvmLauncher is not set");
+    }
+
+    public static void setLauncher(JvmLauncher launcher) {
+        if (JvmLauncherHolder.launcher != null) {
+            throw new IllegalStateException("JvmLauncher already set");
+        }
+        JvmLauncherHolder.launcher = launcher;
+    }
 }

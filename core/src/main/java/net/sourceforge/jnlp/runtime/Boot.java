@@ -25,10 +25,12 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
-import net.adoptopenjdk.icedteaweb.launch.ApplicationLauncherFactory;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
@@ -55,6 +57,7 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -100,7 +103,6 @@ public final class Boot implements PrivilegedAction<Void> {
             + "\n";
 
     private static CommandLineOptionsParser optionParser;
-    private static ApplicationLauncherFactory launcherFactory;
 
     public static CommandLineOptionsParser getOptionParser() {
         return optionParser;
@@ -112,17 +114,20 @@ public final class Boot implements PrivilegedAction<Void> {
      * @param args launching arguments
      */
     public static void main(String[] args) throws UnevenParameterException {
+        main(new ItwJvmLauncher(), args);
+    }
+
+    /**
+     * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
+     *
+     * @param launcher the JVM launcher
+     * @param args launching arguments
+     */
+    public static void main(final JvmLauncher launcher, final String[] args) {
+        JvmLauncherHolder.setLauncher(requireNonNull(launcher));
+
         // setup Swing EDT tracing:
         SwingUtils.setup();
-
-        if (launcherFactory == null) {
-            launcherFactory = (parserSettings, extraInformation) -> {
-                Launcher launcher = new Launcher(true);
-                launcher.setParserSettings(parserSettings);
-                launcher.setInformationToMerge(extraInformation);
-                return launcher;
-            };
-        }
 
         optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
@@ -228,17 +233,6 @@ public final class Boot implements PrivilegedAction<Void> {
         }
     }
 
-    /**
-     * Launch the JNLP file specified by the command-line arguments with the given launch factory.
-     *
-     * @param launcherFactory the launch factory
-     * @param args launching arguments
-     */
-    public static void main(final ApplicationLauncherFactory launcherFactory, final String[] args) {
-        Boot.launcherFactory = launcherFactory;
-        main(args);
-    }
-
     private static void handleMessage() {
         final TextsProvider helpMessagesProvider = new JavaWsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
 
@@ -300,7 +294,10 @@ public final class Boot implements PrivilegedAction<Void> {
             }
             try {
                 LOG.info("Proceeding with jnlp");
-                launcherFactory.createLauncher(settings, extra).launch(Boot.getFileLocation());
+                Launcher launcher = new Launcher(true);
+                launcher.setParserSettings(settings);
+                launcher.setInformationToMerge(extra);
+                launcher.launch(Boot.getFileLocation());
             } catch (LaunchException ex) {
                 // default handler prints this
                 JNLPRuntime.exit(1);

@@ -2,8 +2,8 @@ package net.adoptopenjdk.icedteaweb.impl;
 
 import net.adoptopenjdk.icedteaweb.Application;
 import net.adoptopenjdk.icedteaweb.Process;
-import net.adoptopenjdk.icedteaweb.launch.ApplicationLauncher;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.Launcher;
 
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -11,10 +11,10 @@ import java.util.concurrent.CompletableFuture;
 public class ApplicationImpl implements Application {
 
     private final URL jnlpFileLocation;
-    private final ApplicationLauncher launcher;
+    private final Launcher launcher;
 
 
-    public ApplicationImpl(final URL jnlpFileLocation, final ApplicationLauncher launcher) {
+    public ApplicationImpl(final URL jnlpFileLocation, final Launcher launcher) {
         this.jnlpFileLocation = jnlpFileLocation;
         this.launcher = launcher;
     }

@@ -18,14 +18,12 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.launch.ApplicationLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
@@ -54,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder.getLauncher;
 
 /**
  * Launches JNLPFiles either in the foreground or background.
@@ -68,7 +67,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.22 $
  */
-public class Launcher implements ApplicationLauncher {
+public class Launcher {
 
     private final static Logger LOG = LoggerFactory.getLogger(Launcher.class);
 
@@ -227,7 +226,6 @@ public class Launcher implements ApplicationLauncher {
      * @throws LaunchException if there was an exception
      * @return the application instance
      */
-    @Override
     public ApplicationInstance launch(URL location) throws LaunchException {
         JNLPRuntime.saveHistory(location.toExternalForm());
         return launch(fromUrl(location));
@@ -316,30 +314,13 @@ public class Launcher implements ApplicationLauncher {
     /**
      * Launches the JNLP file at the specified location in a new JVM
      * instance. All streams are properly redirected.
-     * @param vmArgs the arguments to pass to the jvm
+     * @param file the JNLP file to read arguments an JVM details from
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
      */
-    private void launchExternal(List<String> vmArgs, List<String> javawsArgs) throws LaunchException {
+    private void launchExternal(JNLPFile file, List<String> javawsArgs) throws LaunchException {
         try {
-
-            List<String> commands = new LinkedList<>();
-
-            // this property is set by the javaws launcher to point to the javaws binary
-            String pathToWebstartBinary = System.getProperty(KEY_JAVAWS_LOCATION);
-            commands.add(pathToWebstartBinary);
-            // use -Jargument format to pass arguments to the JVM through the launcher
-            for (String arg : vmArgs) {
-                commands.add("-J" + arg);
-            }
-            commands.addAll(javawsArgs);
-
-            String[] command = commands.toArray(new String[] {});
-
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.inheritIO();
-            Process p =pb.start();
-            StreamUtils.waitForSafely(p);
+            getLauncher().launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, null, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
@@ -421,10 +402,10 @@ public class Launcher implements ApplicationLauncher {
                         sp.close();
                     }
                 }
-                List<String> netxArguments = new LinkedList<>();
-                netxArguments.add("-Xnofork");
-                netxArguments.addAll(JNLPRuntime.getInitialArguments());
-                launchExternal(file.getNewVMArgs(), netxArguments);
+                List<String> javawsArgs = new LinkedList<>();
+                javawsArgs.add("-Xnofork");
+                javawsArgs.addAll(JNLPRuntime.getInitialArguments());
+                launchExternal(file, javawsArgs);
                 return null;
             }
 

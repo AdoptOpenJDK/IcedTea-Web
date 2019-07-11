@@ -16,22 +16,23 @@
 //
 package net.adoptopenjdk.icedteaweb.launch;
 
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.JNLPFile;
 
-import java.net.URL;
+import java.util.List;
 
 /**
- * An interface defining the contract on how to launch an application specified in a JNLP file and
- * managed by a web start application environment.
+ * An interface defining the contract on how to launch a new JVM with Webstart in it.
+ *
+ * The main reason for doing so is changing the JVM version or passing different/extra arguments.
  */
-public interface ApplicationLauncher {
+public interface JvmLauncher {
+
     /**
-     * Launches the application specified in the JNLP file at the given URL location.
+     * Launches Webstart with the given JNLP and arguments.
      *
-     * @param location the URL of the JNLP file specifying the application to launch
-     * @return a representation of the application described in the JNLP file
-     * @throws LaunchException if there was an exception
+     * @param jnlpFile the JNLP file to launch in the new JVM.
+     * @param args arguments to pass to the new JVM
+     * @throws Exception if there was an exception
      */
-    ApplicationInstance launch(URL location) throws LaunchException;
+    void launchExternal(JNLPFile jnlpFile, List<String> args) throws Exception;
 }
