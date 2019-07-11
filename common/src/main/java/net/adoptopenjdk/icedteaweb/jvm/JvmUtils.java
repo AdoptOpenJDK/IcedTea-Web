@@ -1,12 +1,18 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.adoptopenjdk.icedteaweb.JvmPropertyConstants;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS_JAR;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 public class JvmUtils {
@@ -115,5 +121,26 @@ public class JvmUtils {
             "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
             "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
             "-XX:MaxDirectMemorySize",};
+    }
+
+    public static String getPathToJavawsJar() {
+        final String classPath = System.getProperty(JvmPropertyConstants.JAVA_CLASS_PATH);
+        final String pathSeparator = System.getProperty(JvmPropertyConstants.PATH_SEPARATOR);
+        final String javaHome = System.getProperty(JvmPropertyConstants.JAVA_HOME);
+
+        final String[] classpathElements = classPath.split(Pattern.quote(pathSeparator));
+
+        final List<String> jarCandidates = Arrays.stream(classpathElements)
+                .filter(e -> e.endsWith(JAVAWS_JAR))
+                .filter(e -> !e.startsWith(javaHome))
+                .collect(Collectors.toList());
+
+        if (jarCandidates.isEmpty()) {
+            throw new IllegalStateException("javaws jar not found");
+        }
+        else if (jarCandidates.size() > 1) {
+            throw new IllegalStateException("multiple javaws jars found");
+        }
+        return jarCandidates.get(0);
     }
 }

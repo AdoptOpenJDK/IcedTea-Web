@@ -81,4 +81,6 @@ public interface JvmPropertyConstants {
     String JAVA_HOME = "java.home";
 
     String AWT_HEADLESS = "java.awt.headless";
+
+    String JAVA_CLASS_PATH = "java.class.path";
 }
