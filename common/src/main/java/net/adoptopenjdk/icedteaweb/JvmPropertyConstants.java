@@ -12,6 +12,8 @@ public interface JvmPropertyConstants {
 
     String JAVA_CLASS_VERSION = "java.class.version";
 
+    String JAVA_CLASS_PATH = "java.class.path";
+
     String OS_NAME = "os.name";
 
     String OS_VERSION = "os.version";
@@ -81,6 +83,4 @@ public interface JvmPropertyConstants {
     String JAVA_HOME = "java.home";
 
     String AWT_HEADLESS = "java.awt.headless";
-
-    String JAVA_CLASS_PATH = "java.class.path";
 }

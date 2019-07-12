@@ -30,7 +30,7 @@ import static net.sourceforge.jnlp.Launcher.KEY_JAVAWS_LOCATION;
 public class ItwJvmLauncher implements JvmLauncher {
 
     @Override
-    public void launchExternal(JNLPFile jnlpFile, List<String> args) throws Exception {
+    public void launchExternal(final JNLPFile jnlpFile, final List<String> args) throws Exception {
         launchExternal(jnlpFile.getNewVMArgs(), args);
     }
 
@@ -38,7 +38,7 @@ public class ItwJvmLauncher implements JvmLauncher {
      * @param vmArgs     the arguments to pass to the jvm
      * @param javawsArgs the arguments to pass to javaws (aka IcedTea-Web)
      */
-    private void launchExternal(List<String> vmArgs, List<String> javawsArgs) throws Exception {
+    private void launchExternal(final List<String> vmArgs, final List<String> javawsArgs) throws Exception {
         final List<String> commands = new LinkedList<>();
 
         // this property is set by the javaws launcher to point to the javaws binary

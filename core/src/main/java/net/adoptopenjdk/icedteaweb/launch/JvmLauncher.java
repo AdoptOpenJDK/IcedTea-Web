@@ -21,14 +21,14 @@ import net.sourceforge.jnlp.JNLPFile;
 import java.util.List;
 
 /**
- * An interface defining the contract on how to launch a new JVM with Webstart in it.
+ * An interface defining the contract on how to launch a new JVM including the web start application environment.
  *
  * The main reason for doing so is changing the JVM version or passing different/extra arguments.
  */
 public interface JvmLauncher {
 
     /**
-     * Launches Webstart with the given JNLP and arguments.
+     * Launches the web start application environment with the given JNLP file and arguments.
      *
      * @param jnlpFile the JNLP file to launch in the new JVM.
      * @param args arguments to pass to the new JVM

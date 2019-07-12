@@ -18,17 +18,26 @@ package net.adoptopenjdk.icedteaweb.launch;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Holds the JVM Launcher in use by the web start application environment.
+ */
 public class JvmLauncherHolder {
 
     private static JvmLauncher launcher;
 
     public static JvmLauncher getLauncher() {
-        return requireNonNull(launcher, "JvmLauncher is not set");
+        return requireNonNull(launcher, "JvmLauncher is not set.");
     }
 
+    /**
+     * Sets the JVM Launcher that should be used by the web start application environment.
+     *
+     * @param launcher the JVM Launcher
+     * @throws IllegalStateException if the JVM launcher is already set
+     */
     public static void setLauncher(JvmLauncher launcher) {
         if (JvmLauncherHolder.launcher != null) {
-            throw new IllegalStateException("JvmLauncher already set");
+            throw new IllegalStateException("JvmLauncher already set.");
         }
         JvmLauncherHolder.launcher = launcher;
     }

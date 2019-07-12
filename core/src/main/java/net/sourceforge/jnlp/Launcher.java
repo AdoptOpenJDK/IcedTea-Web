@@ -318,7 +318,7 @@ public class Launcher {
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
      */
-    private void launchExternal(JNLPFile file, List<String> javawsArgs) throws LaunchException {
+    private void launchExternal(final JNLPFile file, final List<String> javawsArgs) throws LaunchException {
         try {
             getLauncher().launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
@@ -402,7 +402,7 @@ public class Launcher {
                         sp.close();
                     }
                 }
-                List<String> javawsArgs = new LinkedList<>();
+                final List<String> javawsArgs = new LinkedList<>();
                 javawsArgs.add("-Xnofork");
                 javawsArgs.addAll(JNLPRuntime.getInitialArguments());
                 launchExternal(file, javawsArgs);
@@ -438,8 +438,8 @@ public class Launcher {
 
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
-            Method main = mainClass.getMethod("main", String[].class);
-            String[] args = file.getApplication().getArguments();
+            final Method main = mainClass.getMethod("main", String[].class);
+            final String[] args = file.getApplication().getArguments();
 
             // create EDT within application context:
             // dummy method to force Event Dispatch Thread creation
@@ -511,7 +511,7 @@ public class Launcher {
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance launchApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private ApplicationInstance launchApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -557,7 +557,7 @@ public class Launcher {
      * @return applet
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance getApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private ApplicationInstance getApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -585,7 +585,7 @@ public class Launcher {
      * @return  application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance launchInstaller(JNLPFile file) throws LaunchException {
+    private ApplicationInstance launchInstaller(final JNLPFile file) throws LaunchException {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
         throw launchError(new LaunchException(file, null, "Fatal", "Unsupported Feature", "Installers not supported.", "JNLP installer files are not yet supported."));
@@ -604,7 +604,7 @@ public class Launcher {
     //and then applets creates in little bit strange manner. This issue is visible with
     //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
-    private AppletInstance createApplet(JNLPFile file, boolean enableCodeBase, Container cont) throws LaunchException {
+    private AppletInstance createApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
          AppletInstance appletInstance = null;
          try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
@@ -659,7 +659,7 @@ public class Launcher {
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance createApplication(JNLPFile file) throws LaunchException {
+    private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, false);
             ThreadGroup group = Thread.currentThread().getThreadGroup();
@@ -681,7 +681,7 @@ public class Launcher {
      * ThreadGroup has to be created at an earlier point in the applet code.
      * @return  ThreadGroup for this app/applet
      */
-    private ThreadGroup createThreadGroup(JNLPFile file) {
+    private ThreadGroup createThreadGroup(final JNLPFile file) {
         final ThreadGroup tg;
 
         if (file instanceof PluginBridge) {
