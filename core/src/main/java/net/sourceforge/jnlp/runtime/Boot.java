@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,10 +25,14 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -52,6 +57,7 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -72,7 +78,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
-    public static final String name = Boot.class.getPackage().getImplementationTitle();
+    private static final String name = Boot.class.getPackage().getImplementationTitle();
     public static final String version = Boot.class.getPackage().getImplementationVersion();
 
     private static final String nameAndVersion = name + " " + version;
@@ -102,18 +108,28 @@ public final class Boot implements PrivilegedAction<Void> {
         return optionParser;
     }
 
-
-
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
-     * @param argsIn launching arguments
+     * @param args launching arguments
      */
-    public static void main(String[] argsIn) throws UnevenParameterException {
+    public static void main(String[] args) throws UnevenParameterException {
+        main(new ItwJvmLauncher(), args);
+    }
+
+    /**
+     * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
+     *
+     * @param launcher the JVM launcher
+     * @param args launching arguments
+     */
+    public static void main(final JvmLauncher launcher, final String[] args) {
+        JvmLauncherHolder.setLauncher(requireNonNull(launcher));
+
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
-        optionParser = new CommandLineOptionsParser(argsIn, CommandLineOptionsDefinition.getJavaWsOptions());
+        optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
         if (optionParser.hasOption(CommandLineOptions.VERBOSE)) {
             JNLPRuntime.setDebug(true);
@@ -181,7 +197,7 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(CommandLineOptions.UPDATE)) {
             int value = Integer.parseInt(optionParser.getParam(CommandLineOptions.UPDATE));
-            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000l));
+            JNLPRuntime.setDefaultUpdatePolicy(new UpdatePolicy(value * 1000L));
         }
         if (optionParser.hasOption(CommandLineOptions.NOUPDATE)) {
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
@@ -211,11 +227,10 @@ public final class Boot implements PrivilegedAction<Void> {
             LinkingBrowser.showStandAloneWindow(url, false);
         } else {
 
-            JNLPRuntime.setInitialArguments(Arrays.asList(argsIn));
+            JNLPRuntime.setInitialArguments(Arrays.asList(args));
 
             AccessController.doPrivileged(new Boot());
         }
-
     }
 
     private static void handleMessage() {
@@ -271,14 +286,23 @@ public final class Boot implements PrivilegedAction<Void> {
         Map<String, List<String>> extra = new HashMap<>();
 
         if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            boolean run = new HtmlBoot(optionParser).run(extra);
-            if (!run) {
-                return null;
-            }
+            new HtmlBoot(optionParser).run(extra);
         } else {
-            boolean run = new JnlpBoot(optionParser).run(extra);
-            if (!run) {
-                return null;
+            final ParserSettings settings = init(extra);
+            if (settings != null) {
+                try {
+                    LOG.info("Proceeding with jnlp");
+                    Launcher launcher = new Launcher(true);
+                    launcher.setParserSettings(settings);
+                    launcher.setInformationToMerge(extra);
+                    launcher.launch(Boot.getFileLocation());
+                } catch (LaunchException ex) {
+                    // default handler prints this
+                    JNLPRuntime.exit(1);
+                } catch (Exception ex) {
+                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
+                }
             }
         }
         return null;
