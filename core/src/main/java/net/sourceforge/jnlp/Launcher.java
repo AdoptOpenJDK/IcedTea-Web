@@ -113,8 +113,8 @@ public class Launcher {
      * @param exitOnFailure exit if there is an error (usually default, but false when being used from the plugin)
      */
     public Launcher(final LaunchHandler handler, final UpdatePolicy policy, boolean exitOnFailure) {
-        this.handler = (handler == null) ? JNLPRuntime.getDefaultLaunchHandler() : null;
-        this.updatePolicy = (policy == null) ? JNLPRuntime.getDefaultUpdatePolicy() : null;
+        this.handler = handler == null ? JNLPRuntime.getDefaultLaunchHandler() : handler;
+        this.updatePolicy = policy == null ? JNLPRuntime.getDefaultUpdatePolicy() : policy;
         this.exitOnFailure = exitOnFailure;
     }
 
@@ -314,7 +314,7 @@ public class Launcher {
     /**
      * Launches the JNLP file at the specified location in a new JVM
      * instance. All streams are properly redirected.
-     * @param file the JNLP file to read arguments an JVM details from
+     * @param file the JNLP file to read arguments and JVM details from
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
      */
@@ -395,7 +395,7 @@ public class Launcher {
                 return null;
             }
 
-            if (JNLPRuntime.getForksAllowed() /*&& file.needsNewVM()*/) {
+            if (JNLPRuntime.getForksAllowed()) {
                 if (!JNLPRuntime.isHeadless()){
                     SplashScreen sp = SplashScreen.getSplashScreen();
                     if (sp!=null) {
