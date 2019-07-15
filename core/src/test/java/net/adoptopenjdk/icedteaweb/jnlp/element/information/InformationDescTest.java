@@ -200,7 +200,7 @@ public class InformationDescTest {
         InformationDesc info = new InformationDesc(new Locale[0]);
         assertNull(info.getShortcut());
 
-        ShortcutDesc shortcut = new ShortcutDesc(false, false);
+        final ShortcutDesc shortcut = new ShortcutDesc(false, false, false);
         info.addItem("shortcut", shortcut);
         assertSame(shortcut, info.getShortcut());
     }
