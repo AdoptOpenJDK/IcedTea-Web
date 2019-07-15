@@ -31,6 +31,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
  */
 public final class AssociationDesc {
     public static final String ASSOCIATION_ELEMENT = "association";
+    public static final String DESCRIPTION_ELEMENT = "description";
     public static final String EXTENSIONS_ATTRIBUTE = "extensions";
     public static final String MIME_TYPE_ATTRIBUTE = "mime-type";
 
@@ -40,16 +41,19 @@ public final class AssociationDesc {
     /** the mime type for the association */
     private final String mimeType;
 
-    // TODO: optional description element according to JSR
+    /** A short description of the association. */
+    private String description;
+
     // TODO: optional icon element according to JSR
 
-    public AssociationDesc(final String mimeType, final String[] extensions) throws ParseException {
+    public AssociationDesc(final String mimeType, final String[] extensions, final String description) throws ParseException {
         Assert.requireNonNull(mimeType, "mimeType");
         Assert.requireNonNull(extensions, "extensions");
 
         checkMimeType(mimeType);
         this.mimeType = mimeType;
         this.extensions = extensions;
+        this.description = description;
     }
 
     /**
@@ -64,6 +68,13 @@ public final class AssociationDesc {
      */
     public String getMimeType() {
         return mimeType;
+    }
+
+    /**
+     * @return the short description of the association
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

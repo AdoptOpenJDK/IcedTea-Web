@@ -18,7 +18,9 @@
       <desktop/>
       <menu submenu='submenu'/>
     </shortcut>
-    <association extensions='*.foo' mime-type='foo/bar'/>
+    <association extensions='*.foo' mime-type='foo/bar'>
+      <description>description of association</description>
+    </association>
     <related-content href='http://related-content/'>
       <title>related-content <!-- or something -->title</title>
       <description>description of related-content</description>

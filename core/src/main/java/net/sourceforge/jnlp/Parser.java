@@ -71,6 +71,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.AP
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.JAVAFX_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.DESCRIPTION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
@@ -935,11 +936,29 @@ public final class Parser {
 
         final String[] extensions = getRequiredAttribute(node, EXTENSIONS_ATTRIBUTE, null, strict).split(" ");
         final String mimeType = getRequiredAttribute(node, MIME_TYPE_ATTRIBUTE, null, strict);
+        String description = null;
 
-        // TODO: optional description element according to JSR
-        // TODO: optional icon element according to JSR
+        // step through the elements
+        Node child = node.getFirstChild();
+        while (child != null) {
+            final String name = child.getNodeName().getName();
+            if (null != name) {
+                switch (name) {
+                    case DESCRIPTION_ELEMENT:
+                        if (description != null && strict) {
+                            throw new ParseException("Only one description element allowed.");
+                        }
+                        description = getSpanText(child, false);
+                        break;
 
-        return new AssociationDesc(mimeType, extensions);
+                    // TODO: optional icon element according to JSR
+                }
+            }
+
+            child = child.getNextSibling();
+        }
+
+        return new AssociationDesc(mimeType, extensions, description);
     }
 
     /**

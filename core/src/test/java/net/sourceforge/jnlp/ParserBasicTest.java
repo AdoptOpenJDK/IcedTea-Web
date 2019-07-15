@@ -36,8 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import java.io.InputStream;
-import java.util.List;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind;
@@ -62,6 +60,9 @@ import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Test that the parser works with basic jnlp files
@@ -173,6 +174,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         Assert.assertEquals(1, associations.length);
         AssociationDesc association = associations[0];
         Assert.assertNotNull(association);
+        Assert.assertEquals("description of association", association.getDescription());
         String[] extensions = association.getExtensions();
         Assert.assertNotNull(extensions);
         Assert.assertEquals(1, extensions.length);
