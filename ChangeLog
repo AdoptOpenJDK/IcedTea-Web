@@ -1,3 +1,8 @@
+2019-07-15  Andrew Leonard <andrew_m_leonard@uk.ibm.com>
+
+        Release changes
+        * configure.ac: (AC_INIT) bumped to 1.8.2
+
 2019-05-21  George Adams <george@jclarity.com>
 
 	Post-release changes

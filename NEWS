@@ -8,6 +8,15 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.2 (2019-07-15):
+* fix(JNLPFile): location/sourceLocation confusion
+* Fix hang in windows when javaws is launched outside the console
+* support handling of white space in PolicyURI when on file system
+* fix(ManifestAttributesChecker): jars must be relative to codebase
+* Added embedded mode
+* Update JNLPPolicy.java
+* If streams are disabled, and console enabled, silent also client application
+
 New in release 1.8.1 (2019-05-21):
 * backport deadlock fix from #219
 * handle jnlp filename with space for shortcuts (#180)
