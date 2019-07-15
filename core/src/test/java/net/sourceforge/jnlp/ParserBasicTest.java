@@ -175,6 +175,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         AssociationDesc association = associations[0];
         Assert.assertNotNull(association);
         Assert.assertEquals("description of association", association.getDescription());
+        Assert.assertEquals("http://localhost/icon.png", association.getIcon().getLocation().toString());
         String[] extensions = association.getExtensions();
         Assert.assertNotNull(extensions);
         Assert.assertEquals(1, extensions.length);

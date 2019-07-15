@@ -31,9 +31,11 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
  */
 public final class AssociationDesc {
     public static final String ASSOCIATION_ELEMENT = "association";
-    public static final String DESCRIPTION_ELEMENT = "description";
     public static final String EXTENSIONS_ATTRIBUTE = "extensions";
     public static final String MIME_TYPE_ATTRIBUTE = "mime-type";
+    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String ICON_ELEMENT = "icon";
+
 
     /** the extensions this application wants to register with */
     private final String[] extensions;
@@ -44,9 +46,14 @@ public final class AssociationDesc {
     /** A short description of the association. */
     private String description;
 
-    // TODO: optional icon element according to JSR
+    /** The icon can be registered with the operating system as the default icon for items of this mime-type. */
+    private IconDesc icon;
 
-    public AssociationDesc(final String mimeType, final String[] extensions, final String description) throws ParseException {
+    public AssociationDesc(final String mimeType, final String[] extensions) throws ParseException {
+        this(mimeType, extensions, null, null);
+    }
+
+    public AssociationDesc(final String mimeType, final String[] extensions, final String description, IconDesc icon) throws ParseException {
         Assert.requireNonNull(mimeType, "mimeType");
         Assert.requireNonNull(extensions, "extensions");
 
@@ -54,6 +61,7 @@ public final class AssociationDesc {
         this.mimeType = mimeType;
         this.extensions = extensions;
         this.description = description;
+        this.icon = icon;
     }
 
     /**
@@ -75,6 +83,13 @@ public final class AssociationDesc {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * @return the icon descriptor for this association
+     */
+    public IconDesc getIcon() {
+        return icon;
     }
 
     /**

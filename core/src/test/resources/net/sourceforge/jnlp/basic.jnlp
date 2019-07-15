@@ -20,6 +20,7 @@
     </shortcut>
     <association extensions='*.foo' mime-type='foo/bar'>
       <description>description of association</description>
+      <icon href='icon.png' />
     </association>
     <related-content href='http://related-content/'>
       <title>related-content <!-- or something -->title</title>

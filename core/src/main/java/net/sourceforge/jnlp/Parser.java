@@ -71,6 +71,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.AP
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.JAVAFX_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.*;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.DESCRIPTION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
@@ -671,7 +672,7 @@ public final class Parser {
                 }
                 addInfo(informationDesc, child, null, Boolean.TRUE);
             }
-            if (AssociationDesc.ASSOCIATION_ELEMENT.equals(name)) {
+            if (ASSOCIATION_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, null, getAssociation(child));
             }
             if (ShortcutDesc.SHORTCUT_ELEMENT.equals(name)) {
@@ -937,6 +938,7 @@ public final class Parser {
         final String[] extensions = getRequiredAttribute(node, EXTENSIONS_ATTRIBUTE, null, strict).split(" ");
         final String mimeType = getRequiredAttribute(node, MIME_TYPE_ATTRIBUTE, null, strict);
         String description = null;
+        IconDesc icon = null;
 
         // step through the elements
         Node child = node.getFirstChild();
@@ -951,14 +953,19 @@ public final class Parser {
                         description = getSpanText(child, false);
                         break;
 
-                    // TODO: optional icon element according to JSR
+                    case ICON_ELEMENT:
+                        if (icon != null && strict) {
+                            throw new ParseException("Only one icon element allowed.");
+                        }
+                        icon = getIcon(child);
+                        break;
                 }
             }
 
             child = child.getNextSibling();
         }
 
-        return new AssociationDesc(mimeType, extensions, description);
+        return new AssociationDesc(mimeType, extensions, description, icon);
     }
 
     /**

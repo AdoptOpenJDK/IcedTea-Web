@@ -211,7 +211,7 @@ public class InformationDescTest {
 
         Assert.assertArrayEquals(new AssociationDesc[0], info.getAssociations());
 
-        AssociationDesc association = new AssociationDesc("application/java-archive", new String[0], null);
+        AssociationDesc association = new AssociationDesc("application/java-archive", new String[0]);
         info.addItem("association", association);
         assertArrayEquals(new AssociationDesc[] { association }, info.getAssociations());
     }
