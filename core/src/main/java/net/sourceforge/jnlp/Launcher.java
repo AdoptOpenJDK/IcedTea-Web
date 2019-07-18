@@ -420,7 +420,7 @@ public class Launcher {
             // look at the main jar for the main class.
             if (mainName == null) {
                 JARDesc mainJarDesc = file.getResources().getMainJAR();
-                File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), null);
+                File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), mainJarDesc.getVersion());
                 if (f != null) {
                     JarFile mainJar = new JarFile(f);
                     mainName = mainJar.getManifest().

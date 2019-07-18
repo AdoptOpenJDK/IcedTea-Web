@@ -9,7 +9,7 @@ import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -454,7 +454,7 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void extractGzip(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+    private void extractGzip(URL compressedLocation, URL uncompressedLocation, VersionString version) throws IOException {
         LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
 
         final File compressedFile = CacheUtil.getCacheFile(compressedLocation, version);
@@ -470,7 +470,7 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private void extractPackGz(URL compressedLocation, URL uncompressedLocation, Version version) throws IOException {
+    private void extractPackGz(URL compressedLocation, URL uncompressedLocation, VersionString version) throws IOException {
         LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
 
         try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil

@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class CacheEntryTest {
     /** A custom subclass that allows supplying num predefined cache file */
     static class TestCacheEntry extends CacheEntry {
         private File cacheFile;
-        public TestCacheEntry(URL location, Version version, File cacheFile) {
+        public TestCacheEntry(URL location, VersionString version, File cacheFile) {
             super(location, version);
             this.cacheFile = cacheFile;
         }
@@ -72,7 +72,7 @@ public class CacheEntryTest {
     }
 
     private URL url;
-    private Version version;
+    private VersionString version;
 
     private ByteArrayOutputStream baos;
     private PrintStream out;
@@ -80,7 +80,7 @@ public class CacheEntryTest {
     @Before
     public void setUp() throws MalformedURLException {
         url = new URL("http://example.com/example.jar");
-        version = new Version("1.0");
+        version = VersionString.fromString("1.0");
         baos = new ByteArrayOutputStream();
         out = new PrintStream(baos);
     }

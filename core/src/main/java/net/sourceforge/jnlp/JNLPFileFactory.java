@@ -22,7 +22,7 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 
@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class JNLPFileFactory {
-    public JNLPFile create(final URL location, final Version version, final ParserSettings settings,
+    public JNLPFile create(final URL location, final VersionString version, final ParserSettings settings,
                            final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
         return new JNLPFile(location, version, settings, policy, forceCodebase);
     }

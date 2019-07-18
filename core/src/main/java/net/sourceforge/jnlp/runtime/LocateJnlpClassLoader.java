@@ -37,11 +37,12 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
-import java.net.URL;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+
+import java.net.URL;
 
 class LocateJnlpClassLoader {
 
@@ -85,7 +86,7 @@ class LocateJnlpClassLoader {
      * @return the JNLPClassLoader of the JNLP file's resource.
      */
     static JNLPClassLoader getLoaderByResourceUrl(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
-        Version resourceVersion = (version == null) ? null : new Version(version);
+        VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
 
         for (JNLPClassLoader loader : rootClassLoader.getLoaders()) {
             ResourcesDesc resources = loader.getJNLPFile().getResources();

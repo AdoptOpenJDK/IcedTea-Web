@@ -1,14 +1,30 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import org.junit.Test;
 
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_CHAR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_STRING;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.DOT;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.MINUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.SPACE;
@@ -27,6 +43,8 @@ public class VersionIdTest {
         assertEquals("1.2.2-001", VersionId.fromString("1.2.2-001").toString());
         assertEquals("1.3.0-rc2-w", VersionId.fromString("1.3.0-rc2-w").toString());
         assertEquals("1.2.3_build42", VersionId.fromString("1.2.3_build42").toString());
+        assertEquals("1.3.0-SNAPSHOT", VersionId.fromString("1.3.0-SNAPSHOT").toString());
+        assertEquals("15.2.2_21.05.2019_11:43:34", VersionId.fromString("15.2.2_21.05.2019_11:43:34").toString());
     }
 
     @Test
@@ -418,15 +436,27 @@ public class VersionIdTest {
     }
 
     @Test
-    public void testIsExactVersionId() {
-        assertTrue(VersionId.fromString("1.0").isExactVersionId());
-        assertTrue(VersionId.fromString("1.0.0-beta").isExactVersionId());
-        assertTrue(VersionId.fromString("1.4&1.4.1").isExactVersionId());
+    public void testIsCompoundVersion() {
+        assertTrue(VersionId.fromString("1.4&1.4.1").isCompoundVersion());
+        assertTrue(VersionId.fromString("1.4*&1.4.1").isCompoundVersion());
+        assertTrue(VersionId.fromString("1.4*&1.4.1+").isCompoundVersion());
+        // not compound
+        assertFalse(VersionId.fromString("1.0").isCompoundVersion());
+        assertFalse(VersionId.fromString("1.0.0-beta").isCompoundVersion());
+        assertFalse(VersionId.fromString("1.0+").isCompoundVersion());
+        assertFalse(VersionId.fromString("1.0.0-beta*").isCompoundVersion());
+    }
+
+    @Test
+    public void testIsExactVersion() {
+        assertTrue(VersionId.fromString("1.0").isExactVersion());
+        assertTrue(VersionId.fromString("1.0.0-beta").isExactVersion());
         // not considered to be exact
-        assertFalse(VersionId.fromString("1.0+").isExactVersionId());
-        assertFalse(VersionId.fromString("1.0.0-beta*").isExactVersionId());
-        assertFalse(VersionId.fromString("1.4*&1.4.1").isExactVersionId());
-        assertFalse(VersionId.fromString("1.4*&1.4.1+").isExactVersionId());
+        assertFalse(VersionId.fromString("1.0+").isExactVersion());
+        assertFalse(VersionId.fromString("1.0.0-beta*").isExactVersion());
+        assertFalse(VersionId.fromString("1.4&1.4.1").isExactVersion());
+        assertFalse(VersionId.fromString("1.4*&1.4.1").isExactVersion());
+        assertFalse(VersionId.fromString("1.4*&1.4.1+").isExactVersion());
     }
 
     @Test

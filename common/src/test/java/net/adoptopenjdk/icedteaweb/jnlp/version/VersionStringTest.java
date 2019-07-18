@@ -1,3 +1,19 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import org.junit.Assert;
@@ -26,6 +42,8 @@ public class VersionStringTest {
         Assert.assertEquals("1.0+", VersionString.fromString("1.0+").toString());
         Assert.assertEquals("1.0*", VersionString.fromString("1.0*").toString());
         Assert.assertEquals("1_0_0-build42*", VersionString.fromString("1_0_0-build42*").toString());
+        Assert.assertEquals("1.3.0-SNAPSHOT", VersionString.fromString("1.3.0-SNAPSHOT").toString());
+        Assert.assertEquals("15.2.2_21.05.2019_11:43:34", VersionString.fromString("15.2.2_21.05.2019_11:43:34").toString());
 
         // simple range, exact version-ids
         Assert.assertEquals("1 2", VersionString.fromString("1 2").toString());
@@ -83,6 +101,24 @@ public class VersionStringTest {
     }
 
     @Test
+    public void testStaticContains() {
+        Assert.assertTrue(VersionString.contains("1.0+", "1.0"));
+        Assert.assertTrue(VersionString.contains("1.0+", "1.1"));
+        Assert.assertTrue(VersionString.contains("1.0+", "1.1.5"));
+        Assert.assertTrue(VersionString.contains("1.0+", "6.0-beta"));
+        Assert.assertTrue(VersionString.contains("1.0+", "2.0.0"));
+
+        Assert.assertTrue(VersionString.contains("1.0 2.0", "1.0"));
+        Assert.assertTrue(VersionString.contains("1.1* 1.3*", "1.1"));
+
+        Assert.assertFalse(VersionString.contains("1.2+", "1.1"));
+        Assert.assertFalse(VersionString.contains("1.0 1.2", "1.3"));
+        Assert.assertFalse(VersionString.contains("1.0 2.0", "1.5"));
+        Assert.assertFalse(VersionString.contains("1.1* 1.3*", "1.2"));
+        Assert.assertFalse(VersionString.contains("1.1* 1.3*", "2.0"));
+    }
+
+        @Test
     public void testContainsGreaterThan() {
         Assert.assertTrue(VersionString.fromString("2.0").containsGreaterThan("1.5"));
         Assert.assertTrue(VersionString.fromString("1.1+").containsGreaterThan("1.0"));
@@ -95,6 +131,17 @@ public class VersionStringTest {
         Assert.assertTrue(VersionString.fromString("1.0 2.0").containsGreaterThan("1.0"));
         Assert.assertTrue(VersionString.fromString("1.0+ 2.0").containsGreaterThan("1.5"));
         Assert.assertTrue(VersionString.fromString("1.0 2.0 3.0").containsGreaterThan("2.0.0"));
+    }
+
+    @Test
+    public void testContainsPlainVersionId() {
+        Assert.assertTrue(VersionString.fromString("2.0").containsSingleVersionId());
+        Assert.assertTrue(VersionString.fromString("1.1+").containsSingleVersionId());
+        Assert.assertTrue(VersionString.fromString("1.1*").containsSingleVersionId());
+        Assert.assertTrue(VersionString.fromString("1.4.0_04&amp;1.4.1_02").containsSingleVersionId());
+
+        Assert.assertFalse(VersionString.fromString("1.0 2.0").containsSingleVersionId());
+        Assert.assertFalse(VersionString.fromString("1.0+ 2.0*").containsSingleVersionId());
     }
 
     @Test

@@ -18,6 +18,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
@@ -45,16 +46,17 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
-import net.adoptopenjdk.icedteaweb.jnlp.version.JreVersion;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.LocaleUtils;
 
+import javax.swing.JOptionPane;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,6 +68,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.APPLET_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
@@ -159,9 +162,10 @@ public final class Parser {
     private final Node root;
 
     /**
-     * the specification version
+     * The versions of the specification that this JNLP file requires.
+     * The value of the attribute is specified as a version string, see JSR-56, section 3.1
      */
-    private final Version spec;
+    private final VersionString spec;
 
     /**
      * the base URL that all hrefs are relative to
@@ -235,7 +239,7 @@ public final class Parser {
         }
 
         // JNLP tag information
-        this.spec = getVersion(root, SPEC_ATTRIBUTE, SPEC_VERSION_DEFAULT);
+        this.spec = getVersionString(root, SPEC_ATTRIBUTE, SPEC_VERSION_DEFAULT);
 
         try {
             this.codebase = addSlash(getURL(root, XMLParser.CODEBASE, base, strict));
@@ -274,12 +278,12 @@ public final class Parser {
     }
 
     /**
-     * Returns the file version.
+     * Returns the version of the application being launched, as well as the version of the JNLP file itself.
      *
      * @return version of file
      */
-    public Version getFileVersion() {
-        return getVersion(root, JNLPFile.VERSION_ATTRIBUTE, null);
+    public VersionString getFileVersion() {
+        return getVersionString(root, JNLPFile.VERSION_ATTRIBUTE, null);
     }
 
     /**
@@ -299,10 +303,12 @@ public final class Parser {
     }
 
     /**
-     * @return the specification version.
+     * Returns the versions of the specification that this JNLP file requires.
+     * The value of the attribute is specified as a version string, see JSR-56, section 3.1
      *
+     * @return the specification version.
      */
-    public Version getSpecVersion() {
+    public VersionString getSpecVersion() {
         return spec;
     }
 
@@ -472,7 +478,7 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private JREDesc getJRE(final Node node) throws ParseException {
-        final Version version = getVersion(node, JREDesc.VERSION_ATTRIBUTE, null);
+        final VersionString version = getVersionString(node, JREDesc.VERSION_ATTRIBUTE, null);
         final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
         String vmArgs = getAttribute(node, JREDesc.JAVA_VM_ARGS_ATTRIBUTE, null);
         try {
@@ -487,7 +493,33 @@ public final class Parser {
         // require version attribute
         getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
 
-        return new JREDesc(new JreVersion(version.toString(), strict), location, vmArgs, initialHeap, maxHeap, resources);
+        checkJreVersionWithSystemProperty(version, strict);
+
+        return new JREDesc(version, location, vmArgs, initialHeap, maxHeap, resources);
+    }
+
+    private static void checkJreVersionWithSystemProperty(final VersionString version, final boolean strict) {
+        final String jreVersion = System.getProperty(JAVA_VERSION);
+        final boolean match = version.contains(jreVersion);
+
+        if (!match) {
+            final String s = Translator.R("JREversionDontMatch", jreVersion, version.toString());
+            final String e = "Strict run is defined, and your JRE - " + jreVersion + " - doesn't match requested JRE(s) - " + version.toString();
+            if (strict) {
+                if (!JNLPRuntime.isHeadless()) {
+                    final int r = JOptionPane.showConfirmDialog(null, s + "\n" + Translator.R("JREContinueDialogSentence2"), Translator.R("JREContinueDialogSentenceTitle"), JOptionPane.YES_NO_OPTION);
+                    if (r == JOptionPane.NO_OPTION) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                LOG.warn(s);
+            }
+        } else {
+            LOG.info("good - your JRE - {} - match requested JRE - {}", jreVersion, version.toString());
+        }
     }
 
     /**
@@ -499,7 +531,7 @@ public final class Parser {
     private JARDesc getJAR(final Node node) throws ParseException {
         boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
         final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
-        final Version version = getVersion(node, JARDesc.VERSION_ATTRIBUTE, null);
+        final VersionString versionString = getVersionString(node, JARDesc.VERSION_ATTRIBUTE, null);
         final String part = getAttribute(node, JARDesc.PART_ATTRIBUTE, null);
         final boolean main = "true".equals(getAttribute(node, JARDesc.MAIN_ATTRIBUTE, "false"));
         final boolean lazy = LAZY.getValue().equals(getAttribute(node, JARDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
@@ -510,7 +542,7 @@ public final class Parser {
             }
         }
 
-        return new JARDesc(location, version, part, lazy, main, nativeJar, true);
+        return new JARDesc(location, versionString, part, lazy, main, nativeJar, true);
 
     }
 
@@ -522,7 +554,7 @@ public final class Parser {
      */
     private ExtensionDesc getExtension(final Node node) throws ParseException {
         final String name = getAttribute(node, ExtensionDesc.NAME_ATTRIBUTE, null);
-        final Version version = getVersion(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
+        final VersionString version = getVersionString(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
         final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
@@ -1111,22 +1143,17 @@ public final class Parser {
         return locales.toArray(new Locale[locales.size()]);
     }
 
-
     /**
-     * @return a Version from the specified attribute and default value.
+     * @return a version-string from the specified attribute and default value.
      *
      * @param node the node
-     * @param name the attribute
+     * @param attributeName the attribute name
      * @param defaultValue default if no such attribute
-     * @return a Version, or null if no such attribute and default is null
+     * @return a version-string, or null if no such attribute and default is null
      */
-    private Version getVersion(Node node, String name, String defaultValue) {
-        String version = getAttribute(node, name, defaultValue);
-        if (version == null) {
-            return null;
-        } else {
-            return new Version(version);
-        }
+    private VersionString getVersionString(final Node node, final String attributeName, final String defaultValue) {
+        final String version = getAttribute(node, attributeName, defaultValue);
+        return (version == null) ? null : VersionString.fromString(version);
     }
 
     private String getOptionalMainClass(Node node) {

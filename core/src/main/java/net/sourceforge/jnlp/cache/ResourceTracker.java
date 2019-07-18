@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -129,7 +129,7 @@ public class ResourceTracker {
      * @param options options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
-    public void addResource(URL location, Version version, DownloadOptions options, UpdatePolicy updatePolicy) {
+    public void addResource(URL location, VersionString version, DownloadOptions options, UpdatePolicy updatePolicy) {
         if (location == null)
             throw new IllegalResourceDescriptorException("location==null");
         try {
@@ -194,7 +194,7 @@ public class ResourceTracker {
      * @return whether the resource are already downloaded
      */
     private boolean checkCache(Resource resource, UpdatePolicy updatePolicy) {
-        if (!CacheUtil.isCacheable(resource.getLocation(), resource.getDownloadVersion())) {
+        if (!CacheUtil.isCacheable(resource.getLocation())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).

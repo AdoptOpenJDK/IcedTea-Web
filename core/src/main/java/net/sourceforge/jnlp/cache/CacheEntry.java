@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.PropertiesFile;
@@ -46,7 +46,7 @@ public class CacheEntry {
     private final URL location;
 
     /** the requested version */
-    private final Version version;
+    private final VersionString version;
 
     /** info about the cached file */
     private final PropertiesFile properties;
@@ -58,7 +58,7 @@ public class CacheEntry {
      * @param location the remote resource location
      * @param version the version of the resource
      */
-    public CacheEntry(URL location, Version version) {
+    public CacheEntry(final URL location, final VersionString version) {
         this.location = location;
         this.version = version;
         

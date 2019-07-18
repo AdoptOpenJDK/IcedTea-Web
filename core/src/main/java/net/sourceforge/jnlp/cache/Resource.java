@@ -16,8 +16,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
@@ -81,10 +81,10 @@ public class Resource {
     private File localFile;
 
     /** the requested version */
-    private final Version requestVersion;
+    private final VersionString requestVersion;
 
     /** the version downloaded from server */
-    private Version downloadVersion;
+    private VersionString downloadVersion;
 
     /** amount in bytes transferred */
     private volatile long transferred = 0;
@@ -104,7 +104,7 @@ public class Resource {
     /**
      * Create a resource.
      */
-    private Resource(URL location, Version requestVersion, UpdatePolicy updatePolicy) {
+    private Resource(URL location, VersionString requestVersion, UpdatePolicy updatePolicy) {
         this.location = location;
         this.downloadLocation = location;
         this.requestVersion = requestVersion;
@@ -119,7 +119,7 @@ public class Resource {
      * @param updatePolicy final policy for updating
      * @return new resource, which is already added in resources list
      */
-    public static Resource getResource(URL location, Version requestVersion, UpdatePolicy updatePolicy) {
+    public static Resource getResource(URL location, VersionString requestVersion, UpdatePolicy updatePolicy) {
         //TODO -rename to create resource?
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, updatePolicy);
@@ -200,14 +200,14 @@ public class Resource {
     /**
      * @return the requested version
      */
-    public Version getRequestVersion() {
+    public VersionString getRequestVersion() {
     	return requestVersion;
     }
     
     /**
      * @return the version downloaded from server
      */
-    public Version getDownloadVersion() {
+    public VersionString getDownloadVersion() {
     	return downloadVersion;
     }
     
@@ -215,7 +215,7 @@ public class Resource {
      * Sets the version downloaded from server
      * @param downloadVersion version of downloaded resource
      */
-    public void setDownloadVersion(Version downloadVersion) {
+    public void setDownloadVersion(VersionString downloadVersion) {
     	this.downloadVersion = downloadVersion;
     }
     

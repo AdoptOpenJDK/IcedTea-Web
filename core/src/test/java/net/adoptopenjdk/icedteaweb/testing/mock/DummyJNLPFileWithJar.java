@@ -5,7 +5,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.JNLPFile;
 
 import java.io.File;
@@ -20,7 +20,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
     /* Create a JARDesc for the given URL location */
     private static JARDesc makeJarDesc(final URL jarLocation, final boolean main) {
-        return new JARDesc(jarLocation, new Version("1"), null, false,main, false,false);
+        return new JARDesc(jarLocation, VersionString.fromString("1"), null, false,main, false,false);
     }
 
     private final JARDesc[] jarDescs;

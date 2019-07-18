@@ -37,7 +37,7 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
@@ -73,19 +73,8 @@ public class ResourceTest {
     public void testGetRequestVersion() throws Exception {
         String testName = "GetRequestVersion";
         Resource res = createResource(testName);
-        Version dummyVersion = new Version("1.0");
-        Version getVersion = res.getRequestVersion();
-        assertTrue("Versions should match each other.", dummyVersion.matches(getVersion));
-    }
-
-    @Test
-    public void testGetDownloadVersion() throws Exception {
-        String testName = "GetDownloadVersion";
-        Resource res = createResource(testName);
-        Version dummyVersion = new Version("1.0");
-        res.setDownloadVersion(dummyVersion);
-        Version getVersion = res.getDownloadVersion();
-       assertTrue("Set version should match other.", getVersion.matches(dummyVersion));
+        VersionString getVersion = res.getRequestVersion();
+        assertTrue("Versions should match each other.", getVersion.contains("1.0"));
     }
 
     @Test
@@ -177,7 +166,7 @@ public class ResourceTest {
 
     private static Resource createResource(String testName) throws MalformedURLException {
         URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
-        return Resource.getResource(dummyUrl, new Version("1.0"), UpdatePolicy.ALWAYS);
+        return Resource.getResource(dummyUrl, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
     }
 
     private static void setStatus(Resource resource, Collection<Resource.Status> flags) {

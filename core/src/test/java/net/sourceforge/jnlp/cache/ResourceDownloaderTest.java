@@ -1,7 +1,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -202,8 +202,8 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
             ResourceDownloader resourceDownloader = new ResourceDownloader(null, null);
             Resource r1 = Resource.getResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
             Resource r2 = Resource.getResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), new Version("1.0"), UpdatePolicy.NEVER);
+            Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+            Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
             assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getRedirectURL());
             assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
             assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
@@ -364,7 +364,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         setupFile("download-version__V1.0.jar", expected);
 
         URL url = downloadServer.getUrl("download-version.jar");
-        Resource resource = Resource.getResource(url, new Version("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.getResource(url, VersionString.fromString("1.0"), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -385,7 +385,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz__V1.0", expected);
 
-        Resource resource = Resource.getResource(downloadServer.getUrl("download-packgz.jar"), new Version("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.getResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 

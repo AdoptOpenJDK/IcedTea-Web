@@ -32,7 +32,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
@@ -132,14 +132,16 @@ public class JNLPFile {
     protected URL codeBase;
 
     /**
-     * file version
+     * The version attribute of the jnlp element specifies the version of the application being launched,
+     * as well as the version of the JNLP file itself.
      */
-    protected Version fileVersion;
+    protected VersionString fileVersion;
 
     /**
-     * spec version
+     * Specifies the versions of the specification that this JNLP file requires.
+     * The value of the attribute is specified as a version string, see JSR-56, section 3.1
      */
-    protected Version specVersion;
+    protected VersionString specVersion;
 
     /**
      * information
@@ -249,21 +251,7 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile(URL location, ParserSettings settings) throws IOException, ParseException {
-        this(location, (Version) null, settings);
-    }
-
-    /**
-     * Create a JNLPFile from a URL and a Version checking for updates using
-     * the default policy.
-     *
-     * @param location the location of the JNLP file
-     * @param version  the version of the JNLP file
-     * @param settings the parser settings to use while parsing the file
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(URL location, Version version, ParserSettings settings) throws IOException, ParseException {
-        this(location, version, settings, JNLPRuntime.getDefaultUpdatePolicy());
+        this(location, (VersionString) null, settings, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
     /**
@@ -277,7 +265,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+    public JNLPFile(URL location, VersionString version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
         this(location, version, settings, policy, null);
     }
 
@@ -293,7 +281,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    protected JNLPFile(URL location, Version version, ParserSettings settings, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
+    protected JNLPFile(URL location, VersionString version, ParserSettings settings, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
         InputStream input = openURL(location, version, policy);
         this.parserSettings = settings;
         parse(input, location, forceCodebase);
@@ -327,7 +315,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+    public JNLPFile(URL location, String uniqueKey, VersionString version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
         this(location, version, settings, policy);
         this.uniqueKey = uniqueKey;
 
@@ -372,7 +360,7 @@ public class JNLPFile {
      * @return opened stream from given url
      * @throws java.io.IOException if something goes wrong
      */
-    public static InputStream openURL(URL location, Version version, UpdatePolicy policy) throws IOException {
+    public static InputStream openURL(URL location, VersionString version, UpdatePolicy policy) throws IOException {
         if (location == null || policy == null)
             throw new IllegalArgumentException("Null parameter");
 
@@ -527,14 +515,17 @@ public class JNLPFile {
     /**
      * @return the JNLP file's version.
      */
-    public Version getFileVersion() {
+    public VersionString getFileVersion() {
         return fileVersion;
     }
 
     /**
-     * @return the specification version required by the file.
+     * Returns the versions of the specification that this JNLP file requires.
+     * The value of the attribute is specified as a version string, see JSR-56, section 3.1
+     *
+     * @return the versions of the specification that this JNLP file requires.
      */
-    public Version getSpecVersion() {
+    public VersionString getSpecVersion() {
         return specVersion;
     }
 
