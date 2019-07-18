@@ -80,6 +80,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDe
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.DESKTOP_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.INSTALL_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.MENU_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.ONLINE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
@@ -976,6 +977,9 @@ public final class Parser {
         final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
         final boolean shortcutIsOnline = Boolean.valueOf(online);
 
+        final String installAttribute = getAttribute(node, INSTALL_ATTRIBUTE, "false");
+        final boolean install = Boolean.valueOf(installAttribute);
+
         boolean showOnDesktop = false;
         MenuDesc menu = null;
 
@@ -1004,7 +1008,7 @@ public final class Parser {
             child = child.getNextSibling();
         }
 
-        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
+        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, install, showOnDesktop);
         if (menu != null) {
             shortcut.setMenu(menu);
         }
