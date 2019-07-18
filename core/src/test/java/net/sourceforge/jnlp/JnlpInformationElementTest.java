@@ -49,6 +49,7 @@ import java.net.URL;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -268,14 +269,14 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
                 + "  <information>\n"
                 + "    <title>Title</title>\n"
                 + "    <association extensions=\"*.html\" mime-type=\"text/html\">"
-                + "      <description>Best browser ever</description>"
+                + "      <description>association description</description>"
                 + "      <icon href=\"icon.gif\"/>"
                 + "    </association>"
                 + "  </information>\n"
                 + "  <information locale=\"en\">\n"
                 + "    <title>English Title</title>\n"
                 + "    <association extensions=\"*.html\" mime-type=\"text/html\">"
-                + "      <description>Best browser ever</description>"
+                + "      <description>association description with English locale</description>"
                 + "      <icon href=\"icon.gif\"/>"
                 + "    </association>"
                 + "  </information>\n"
@@ -290,6 +291,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         // then
         assertThat(information.getTitle(), is("English Title"));
         assertThat(information.getAssociations(), arrayWithSize(1));
+        assertThat(information.getAssociations()[0].getDescription(), containsString("with English locale"));
     }
 
 
