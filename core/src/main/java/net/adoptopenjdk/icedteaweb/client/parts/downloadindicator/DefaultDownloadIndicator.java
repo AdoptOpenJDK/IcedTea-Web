@@ -16,15 +16,10 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.downloadindicator;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.ImageResources;
 
@@ -134,32 +129,6 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
      */
     @Override
     public DownloadServiceListener getListener(final String downloadName, final URL[] resources) {
-
-        final ApplicationInstance application = JNLPRuntime.getApplication();
-        final EntryPoint entryPoint = application.getJNLPFile().getEntryPointDesc();
-        String progressClass = null;
-
-        if (entryPoint instanceof ApplicationDesc) {
-            ApplicationDesc applicationDesc = (ApplicationDesc) entryPoint;
-            progressClass = applicationDesc.getProgressClass();
-        } else if (entryPoint instanceof AppletDesc) {
-            AppletDesc appletDesc = (AppletDesc) entryPoint;
-            progressClass = appletDesc.getProgressClass();
-        } else if (entryPoint instanceof InstallerDesc) {
-            InstallerDesc installerDesc = (InstallerDesc) entryPoint;
-            progressClass = installerDesc.getProgressClass();
-        }
-
-        if (progressClass != null) {
-            try {
-                final Class<?> downloadProgressIndicatorClass = application.getClassLoader().loadClass(progressClass);
-                return (DownloadServiceListener) downloadProgressIndicatorClass.newInstance();
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-                LOG.warn("Could not load progress class '{}' specified in JNLP file, " +
-                        "use default download progress indicator instead.", progressClass);
-            }
-        }
-
         final FutureResult<DownloadPanel> result = new FutureResult<DownloadPanel>() {
             @Override
             public void run() {
