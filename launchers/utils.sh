@@ -124,7 +124,7 @@ function docs() {
   mkdir -p $docDir
   local LANG_BACKUP=$LANG
   local ID=`echo "$LANG_ID" | head -c 2`
-  local ENCOD=`echo "$LANG_ID" | tail -c 6 -`
+  local ENCOD=`echo "$LANG_ID" | tail -c 6`
   export LANG=$LANG_ID
   local langDir="$docDir/$ID"
   if [ $type == "plain" ] ; then
