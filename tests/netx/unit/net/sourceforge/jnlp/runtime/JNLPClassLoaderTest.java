@@ -43,6 +43,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +57,12 @@ import net.sourceforge.jnlp.annotations.Bug;
 import net.sourceforge.jnlp.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.ServerAccess;
+import net.sourceforge.jnlp.ServerLauncher;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletSecurityLevel;
 import net.sourceforge.jnlp.security.appletextendedsecurity.AppletStartupSecuritySettings;
@@ -65,6 +73,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
@@ -138,7 +147,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "test.jar");
 
-        /* Test with main-class in manifest */ {
+        /* Test with main-class in manifest */
+        {
             Manifest manifest = new Manifest();
             manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass");
             FileTestUtils.createJarWithContents(jarLocation, manifest);
@@ -156,8 +166,10 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
+    @Ignore
     public void getMainClassNameTestEmpty() throws Exception {
-        /* Test with-out any main-class specified */ {
+        /* Test with-out any main-class specified */
+        {
             File tempDirectory = FileTestUtils.createTempDirectory();
             File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation /* No contents */);
@@ -363,4 +375,57 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         }
 
     }
+
+    @Test
+    public void testRelativePathInUrl() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        dir = new File(dir,"base");
+        dir.mkdir();
+        File jar = new File(dir,"j1.jar");
+        File jnlp = new File(dir+"/a/b/up.jnlp");
+        jnlp.getParentFile().mkdirs();
+        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/up.jnlp");
+        String jnlpString = StreamUtils.readStreamAsString(is, true, "utf-8");
+        is.close();
+        jnlpString = jnlpString.replaceAll("8080", ""+port);
+        is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
+        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        Files.write(jnlp.toPath(),jnlpString.getBytes("utf-8"));
+        ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        try {
+            final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/up.jnlp"));
+            final JNLPClassLoader classLoader1 = new JNLPClassLoader(jnlpFile1, UpdatePolicy.ALWAYS) {
+                @Override
+                protected void activateJars(List<JARDesc> jars) {
+                    super.activateJars(jars);
+                }
+
+            };
+            InputStream is1 = classLoader1.getResourceAsStream("Hello1.class");
+            is1.close();
+            is1 = classLoader1.getResourceAsStream("META-INF/MANIFEST.MF");
+            is1.close();
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/up.jnlp").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/f812acb32c857fd916c842e2bf4fb32b9c3837ef63922b167a7e163305058b7.jar").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            as.stop();
+        }
+
+    }
+
 }
