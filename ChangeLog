@@ -1,5 +1,13 @@
 2019-06-26  Jiri Vanek <jvanek@redhat.com>
 
+	All files, except signatures files, are now  checked for signatures - CVE-2019-10181
+	* netx/net/sourceforge/jnlp/tools/JarCertVerifier.java: (isMetaInfFile) fixed bug, when anything in META-INF was not
+	checked for signature. Now only signature files are skipped
+	* tests/netx/unit/net/sourceforge/jnlp/tools/JarCertVerifierTest.java: added tests for check if file should be skipped from 
+	signature check
+
+2019-06-26  Jiri Vanek <jvanek@redhat.com>
+
 	Nested jar, if by relative path point up, is stored as hashed - CVE-2019-10185
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar: crafted jar with hacked zip entries to be named like ".."
 	* tests/netx/unit/net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp: jnlp to call jar03_dotdotN1.jar
