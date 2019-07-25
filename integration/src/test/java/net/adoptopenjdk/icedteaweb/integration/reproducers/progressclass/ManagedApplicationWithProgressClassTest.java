@@ -14,29 +14,32 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.adoptopenjdk.icedteaweb.integration.testcase1;
+package net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
+import net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass.applications.ProgressClassManagedApplication;
 import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.HELLO_FILE;
+import static net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass.applications.ProgressClassManagedApplication.PROGRESS_CLASS_OUTPUT_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
 
 /**
  * TODO: Scenario Description
  */
-public class ManagedApplicationStartedTest implements IntegrationTest {
-    private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
+public class ManagedApplicationWithProgressClassTest implements IntegrationTest {
+    private static final String JAR_NAME = "App-ProgressClassManagedApplication.jar";
 
     @Rule
     public TemporaryItwHome tmpItwHome = new TemporaryItwHome();
@@ -44,10 +47,27 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
+    // This test does not run on CI as it is not headless. When you specify -headless in the args list for Boot below,
+    // the functionality under test is not executed in ITW.
+    // To run this test remove the @Ignore and run it manually in an environment that does not require headless run,
+    // e.g. in the IDE.
+    @Ignore
     public void testSuccessfullyLaunchSimpleJavaApplication() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServer(wireMock, "ManagedApplicationWithProgressClass.jnlp", ProgressClassManagedApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
+
+        // pimp the initial delay so that the progress indicator really shows up
+        class TestDownloadIndicator extends DefaultDownloadIndicator {
+            @Override
+            public int getInitialDelay() {
+                return 1;
+            }
+        }
+
+        TestDownloadIndicator testDownloadIndicator = new TestDownloadIndicator();
+
+        JNLPRuntime.setDefaultDownloadIndicator(testDownloadIndicator);
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork"};
@@ -55,6 +75,6 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
 
         // then
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
-        assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
+        assertThat(getCachedFileAsString(tmpItwHome, PROGRESS_CLASS_OUTPUT_FILE), containsString("MyDownloadServiceListener.progress called"));
     }
 }
