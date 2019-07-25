@@ -18,19 +18,26 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static net.sourceforge.jnlp.Launcher.KEY_JAVAWS_LOCATION;
 
 /**
  * Implementation of {@link JvmLauncher} which uses the IcedTea-Web launcher to start a new JVM.
  */
 public class ItwJvmLauncher implements JvmLauncher {
+    private final static Logger LOG = LoggerFactory.getLogger(ItwJvmLauncher.class);
 
     @Override
     public void launchExternal(final JNLPFile jnlpFile, final List<String> args) throws Exception {
+        requireNonNull(jnlpFile, "JNLPFile must not be null.");
+        requireNonNull(args, "args must not be null.");
+
         launchExternal(jnlpFile.getNewVMArgs(), args);
     }
 
@@ -51,6 +58,8 @@ public class ItwJvmLauncher implements JvmLauncher {
         }
 
         commands.addAll(javawsArgs);
+
+        LOG.info("About to launch external with commands: '{}'", commands.toString());
 
         final Process p = new ProcessBuilder()
                 .command(commands)
