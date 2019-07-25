@@ -1407,7 +1407,7 @@ public class JNLPClassLoader extends URLClassLoader {
             urls[i] = jar.getLocation();
         }
 
-        CacheUtil.waitForResources(app, tracker, urls, file.getTitle());
+        CacheUtil.waitForResources(this, tracker, urls, file.getTitle());
     }
 
     /**

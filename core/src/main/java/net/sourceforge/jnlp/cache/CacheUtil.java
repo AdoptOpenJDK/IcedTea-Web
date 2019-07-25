@@ -20,13 +20,17 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
@@ -747,14 +751,14 @@ public class CacheUtil {
     /**
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
-     *
-     * @param app       application instance with context for this resource
+     * @param jnlpClassLoader the classloader
+     * @param jnlpClassLoader
      * @param tracker   the resource tracker
      * @param resources the resources to wait for
      * @param title     name of the download
      */
-    public static void waitForResources(ApplicationInstance app, ResourceTracker tracker, URL resources[], String title) {
-        DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
+    public static void waitForResources(final JNLPClassLoader jnlpClassLoader, final ResourceTracker tracker, final URL[] resources, final String title) {
+        final DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
         DownloadServiceListener listener = null;
 
         try {
@@ -769,14 +773,14 @@ public class CacheUtil {
                 return;
 
             // only resources not starting out downloaded are displayed
-            List<URL> urlList = new ArrayList<>();
+            final List<URL> urlList = new ArrayList<>();
             for (URL url : resources) {
                 if (!tracker.checkResource(url))
                     urlList.add(url);
             }
-            URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
+            final URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
 
-            listener = indicator.getListener(title, undownloaded);
+            listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
 
             do {
                 long read = 0;
@@ -812,6 +816,35 @@ public class CacheUtil {
                 indicator.disposeListener(listener);
         }
     }
+
+    private static DownloadServiceListener getDownloadServiceListener(final JNLPClassLoader jnlpClassLoader, final String title, final URL[] undownloaded, final DownloadIndicator indicator) {
+        final EntryPoint entryPoint = jnlpClassLoader.getJNLPFile().getEntryPointDesc();
+        String progressClass = null;
+
+        if (entryPoint instanceof ApplicationDesc) {
+            final ApplicationDesc applicationDesc = (ApplicationDesc) entryPoint;
+            progressClass = applicationDesc.getProgressClass();
+        } else if (entryPoint instanceof AppletDesc) {
+            final AppletDesc appletDesc = (AppletDesc) entryPoint;
+            progressClass = appletDesc.getProgressClass();
+        } else if (entryPoint instanceof InstallerDesc) {
+            final InstallerDesc installerDesc = (InstallerDesc) entryPoint;
+            progressClass = installerDesc.getProgressClass();
+        }
+
+        if (progressClass != null) {
+            try {
+                final Class<?> downloadProgressIndicatorClass = jnlpClassLoader.loadClass(progressClass);
+                return (DownloadServiceListener) downloadProgressIndicatorClass.newInstance();
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+                LOG.warn("Could not load progress class '{}' specified in JNLP file, " +
+                        "use default download progress indicator instead.", progressClass);
+            }
+        }
+
+        return indicator.getListener(title, undownloaded);
+    }
+
 
     /**
      * This will remove all old cache items.
