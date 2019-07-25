@@ -320,7 +320,7 @@ public class Launcher {
         try {
             getLauncher().launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
-            throw launchError(new LaunchException(null, null, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
+            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
             throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
