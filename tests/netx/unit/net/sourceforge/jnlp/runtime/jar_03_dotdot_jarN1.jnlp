@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp spec="6.0+" >
+
+<information><title>1965</title><vendor>Nemzeti Ado- es Vamhivatal</vendor><offline-allowed/></information>
+
+<security><all-permissions/></security>
+
+<resources>
+  <j2se href="http://java.sun.com/products/autodl/j2se" version="1.8+" />
+  <jar href="jar03_dotdotN1.jar" version="2.0"/>
+</resources>
+
+<application-desc main-class="http://localhost/jar01.jar!META-INF/jar01_to_be_injected.jar!METAxINF.Test" />
+
+</jnlp>
