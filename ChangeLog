@@ -1,5 +1,13 @@
 2019-06-26  Jiri Vanek <jvanek@redhat.com>
 
+	Nested jar, if by relative path point up, is stored as hashed - CVE-2019-10185
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar: crafted jar with hacked zip entries to be named like ".."
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp: jnlp to call jar03_dotdotN1.jar
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.jsava: (hex) made public to be reused in JNLPClassLoader
+	* netx/net/sourceforge/jnlp/runtime/JNLPClassLoader.java: if nested jar contains .. in path, is extracted as hashed
+
+2019-06-26  Jiri Vanek <jvanek@redhat.com>
+
 	Fixed bug when relative path (..) could leak up (even out of cache) - CVE-2019-10182
 	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: if path or query contains .. is saved to cache via its hash 
 	* netx/net/sourceforge/jnlp/util/FileUtils.java: added warning about different behavior on win/linux

@@ -745,7 +745,7 @@ public class CacheUtil {
         }
     }
 
-    private static String hex(String origName, String candidate) throws NoSuchAlgorithmException {
+    public static String hex(String origName, String candidate) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] sum = md.digest(candidate.getBytes(StandardCharsets.UTF_8));
         //convert the byte to hex format method 2
