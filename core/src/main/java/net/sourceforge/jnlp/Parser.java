@@ -74,6 +74,8 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.AP
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.JAVAFX_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.*;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.DESCRIPTION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
@@ -81,6 +83,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDe
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.LOCALE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc.RELATED_CONTENT_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.DESKTOP_ELEMENT;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.INSTALL_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.MENU_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.ONLINE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
@@ -702,7 +705,7 @@ public final class Parser {
                 }
                 addInfo(informationDesc, child, null, Boolean.TRUE);
             }
-            if (AssociationDesc.ASSOCIATION_ELEMENT.equals(name)) {
+            if (ASSOCIATION_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, null, getAssociation(child));
             }
             if (ShortcutDesc.SHORTCUT_ELEMENT.equals(name)) {
@@ -967,11 +970,35 @@ public final class Parser {
 
         final String[] extensions = getRequiredAttribute(node, EXTENSIONS_ATTRIBUTE, null, strict).split(" ");
         final String mimeType = getRequiredAttribute(node, MIME_TYPE_ATTRIBUTE, null, strict);
+        String description = null;
+        IconDesc icon = null;
 
-        // TODO: optional description element according to JSR
-        // TODO: optional icon element according to JSR
+        // step through the elements
+        Node child = node.getFirstChild();
+        while (child != null) {
+            final String name = child.getNodeName().getName();
+            if (null != name) {
+                switch (name) {
+                    case DESCRIPTION_ELEMENT:
+                        if (description != null && strict) {
+                            throw new ParseException("Only one description element allowed.");
+                        }
+                        description = getSpanText(child, false);
+                        break;
 
-        return new AssociationDesc(mimeType, extensions);
+                    case ICON_ELEMENT:
+                        if (icon != null && strict) {
+                            throw new ParseException("Only one icon element allowed.");
+                        }
+                        icon = getIcon(child);
+                        break;
+                }
+            }
+
+            child = child.getNextSibling();
+        }
+
+        return new AssociationDesc(mimeType, extensions, description, icon);
     }
 
     /**
@@ -981,6 +1008,9 @@ public final class Parser {
 
         final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
         final boolean shortcutIsOnline = Boolean.valueOf(online);
+
+        final String installAttribute = getAttribute(node, INSTALL_ATTRIBUTE, "false");
+        final boolean install = Boolean.valueOf(installAttribute);
 
         boolean showOnDesktop = false;
         MenuDesc menu = null;
@@ -1010,7 +1040,7 @@ public final class Parser {
             child = child.getNextSibling();
         }
 
-        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, showOnDesktop);
+        final ShortcutDesc shortcut = new ShortcutDesc(shortcutIsOnline, install, showOnDesktop);
         if (menu != null) {
             shortcut.setMenu(menu);
         }

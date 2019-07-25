@@ -148,7 +148,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                     dialog.getContentPane().add(result, vertical);
                     dialog.pack();
                     placeFrameToLowerRight();
-                    
+
                     result.addComponentListener(new ComponentAdapter() {
                         @Override
                         public void componentResized(ComponentEvent e) {
@@ -162,6 +162,7 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
                 }
             }
         };
+
         SwingUtils.invokeAndWait(result);
         return result.getRef();
     }

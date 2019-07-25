@@ -33,6 +33,9 @@ public final class AssociationDesc {
     public static final String ASSOCIATION_ELEMENT = "association";
     public static final String EXTENSIONS_ATTRIBUTE = "extensions";
     public static final String MIME_TYPE_ATTRIBUTE = "mime-type";
+    public static final String DESCRIPTION_ELEMENT = "description";
+    public static final String ICON_ELEMENT = "icon";
+
 
     /** the extensions this application wants to register with */
     private final String[] extensions;
@@ -40,16 +43,25 @@ public final class AssociationDesc {
     /** the mime type for the association */
     private final String mimeType;
 
-    // TODO: optional description element according to JSR
-    // TODO: optional icon element according to JSR
+    /** A short description of the association. */
+    private String description;
+
+    /** The icon can be registered with the operating system as the default icon for items of this mime-type. */
+    private IconDesc icon;
 
     public AssociationDesc(final String mimeType, final String[] extensions) throws ParseException {
+        this(mimeType, extensions, null, null);
+    }
+
+    public AssociationDesc(final String mimeType, final String[] extensions, final String description, IconDesc icon) throws ParseException {
         Assert.requireNonNull(mimeType, "mimeType");
         Assert.requireNonNull(extensions, "extensions");
 
         checkMimeType(mimeType);
         this.mimeType = mimeType;
         this.extensions = extensions;
+        this.description = description;
+        this.icon = icon;
     }
 
     /**
@@ -64,6 +76,20 @@ public final class AssociationDesc {
      */
     public String getMimeType() {
         return mimeType;
+    }
+
+    /**
+     * @return the short description of the association
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the icon descriptor for this association
+     */
+    public IconDesc getIcon() {
+        return icon;
     }
 
     /**

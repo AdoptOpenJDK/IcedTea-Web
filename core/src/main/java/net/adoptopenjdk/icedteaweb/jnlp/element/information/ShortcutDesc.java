@@ -21,10 +21,12 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 public final class ShortcutDesc {
     public static final String SHORTCUT_ELEMENT = "shortcut";
+    public static final String ONLINE_ATTRIBUTE = "online";
+    public static final String INSTALL_ATTRIBUTE = "install";
+
     public static final String DESKTOP_ELEMENT = "desktop";
     public static final String MENU_ELEMENT = "menu";
 
-    public static final String ONLINE_ATTRIBUTE = "online";
 
     // TODO: missing the shortcut attribute "install" (defined since spec version 7.0)
 
@@ -38,6 +40,18 @@ public final class ShortcutDesc {
     public static final String CREATE_ASK_USER_IF_HINTED = "ASK_IF_HINTED";
     /** Create a desktop shortcut without prompting if the jnlp asks for it */
     public static final String CREATE_ALWAYS_IF_HINTED = "ALWAYS_IF_HINTED";
+
+    /**
+     * The optional install attribute can be used in a shortcut element to describe the application's preference
+     * for being considered "installed". If the value is "true" the application prefers to be considered installed.
+     * The default value of the install attribute is "false".
+     *
+     * It is up to the JNLP Client to determine how and if applications are treated differently when install="true",
+     * and this may vary from platform to platform. For example, a JNLP client on a Windows platforms may add the
+     * application to the Windows Add/Remove menu only when install="true" is specified, while making no
+     * distinction on unix platforms.
+     */
+    private boolean install = false;
 
     /**
      * the application wants to be placed on the desktop 
@@ -64,11 +78,20 @@ public final class ShortcutDesc {
     /**
      * Create a new Shortcut descriptor
      * @param requiresOnline whether the shortcut requires connectivity
+     * @param installed the application's preference for being considered installed
      * @param onDesktop whether the shortcut wants to be placed on the desktop
      */
-    public ShortcutDesc(boolean requiresOnline, boolean onDesktop) {
+    public ShortcutDesc(boolean requiresOnline, boolean installed, boolean onDesktop) {
         this.requiresOnline = requiresOnline;
+        this.install = installed;
         this.onDesktop = onDesktop;
+    }
+
+    /**
+     * @return whether the application prefers being considered installed.
+     */
+    public boolean isInstall() {
+        return install;
     }
 
     /**
