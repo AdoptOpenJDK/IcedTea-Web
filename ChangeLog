@@ -1,3 +1,13 @@
+2019-06-26  Jiri Vanek <jvanek@redhat.com>
+
+	Fixed bug when relative path (..) could leak up (even out of cache) - CVE-2019-10182
+	* netx/net/sourceforge/jnlp/cache/CacheUtil.java: if path or query contains .. is saved to cache via its hash 
+	* netx/net/sourceforge/jnlp/util/FileUtils.java: added warning about different behavior on win/linux
+	* tests/netx/unit/net/sourceforge/jnlp/cache/CacheUtilTest.java: added tests for hashing
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/JNLPClassLoaderTest.java:  added test for .. in path. Added test
+	that verifies encoded .. (%2E%2E) do not leak from cahce
+	* tests/netx/unit/net/sourceforge/jnlp/runtime/up.jnlp: example jnlp with .. full url
+
 2019-07-15  Andrew Leonard <andrew_m_leonard@uk.ibm.com>
 
         Release changes
