@@ -17,13 +17,9 @@
 package net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass.applications;
 
 import javax.jnlp.DownloadServiceListener;
-import javax.jnlp.FileContents;
-import javax.jnlp.PersistenceService;
-import javax.jnlp.ServiceManager;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
+
+import static net.adoptopenjdk.icedteaweb.integration.ManagedApplicationFileWriter.writeFile;
 
 /**
  * This class represents a basic IcedTea-Web managed application. It is intended to be launched by integration
@@ -57,26 +53,5 @@ public class ProgressClassManagedApplication implements DownloadServiceListener 
     @Override
     public void downloadFailed(final URL url, final String version) {
         lastMessageFromDownloadServiceListener = "MyDownloadServiceListener.downloadFailed called";
-    }
-
-    private static void writeFile(final String fileName, final String content) throws Exception {
-        writeFile(fileName, writer -> writer.write(content));
-    }
-
-    private static void writeFile(final String fileName, final ThrowingConsumer<Writer> consumer) throws Exception {
-        final PersistenceService persistenceService = (PersistenceService) ServiceManager.lookup("PersistenceService");
-        final String fileUrl = "http://localhost/" + fileName;
-        persistenceService.create(new URL(fileUrl), Long.MAX_VALUE);
-        final FileContents fileContents = persistenceService.get(new URL(fileUrl));
-        try (final OutputStream outputStream = fileContents.getOutputStream(true)) {
-            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-
-            consumer.accept(writer);
-            writer.flush();
-        }
-    }
-
-    private interface ThrowingConsumer<E> {
-        void accept(E e) throws Exception;
     }
 }

@@ -65,6 +65,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
@@ -837,8 +838,8 @@ public class CacheUtil {
                 final Class<?> downloadProgressIndicatorClass = jnlpClassLoader.loadClass(progressClass);
                 return (DownloadServiceListener) downloadProgressIndicatorClass.newInstance();
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-                LOG.warn("Could not load progress class '{}' specified in JNLP file, " +
-                        "use default download progress indicator instead.", progressClass);
+                LOG.warn(format("Could not load progress class '%s' specified in JNLP file, " +
+                        "use default download progress indicator instead.", progressClass), ex);
             }
         }
 
