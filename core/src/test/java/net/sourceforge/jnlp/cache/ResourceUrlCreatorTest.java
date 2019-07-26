@@ -18,14 +18,13 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
     private static final DownloadOptions DLOPTS_NOPACK_USEVERSION = new DownloadOptions(false, true);
     private static final DownloadOptions DLOPTS_NOPACK_NOVERSION = new DownloadOptions(false, false);
 
-    private URL getResultUrl(String url, VersionString version,
-            boolean usePack /*use pack.gz suffix*/, boolean useVersion /*use version suffix*/) throws MalformedURLException {
-        Resource resource = Resource.getResource(new URL(url), version, null);
+    private URL getResultUrl(final String url, final VersionString version, final boolean usePack /*use pack.gz suffix*/, final boolean useVersion /*use version suffix*/) throws MalformedURLException {
+        final Resource resource = Resource.createResource(new URL(url), version, null);
         return ResourceUrlCreator.getUrl(resource, usePack, useVersion);
     }
 
-    private URL getResultUrl(String url, VersionString version, DownloadOptions downloadOptions) throws MalformedURLException {
-        Resource resource = Resource.getResource(new URL(url), version, null);
+    private URL getResultUrl(final String url, final VersionString version, final DownloadOptions downloadOptions) throws MalformedURLException {
+        Resource resource = Resource.createResource(new URL(url), version, null);
         ResourceUrlCreator ruc = new ResourceUrlCreator(resource, downloadOptions);
         return ruc.getVersionedUrl();
     }

@@ -79,7 +79,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
 
     private static Resource createResource(final String name) throws MalformedURLException {
-        return Resource.getResource(new URL("http://example.com/" + name + ".jar"), VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
+        return Resource.createResource(new URL("http://example.com/" + name + ".jar"), VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
     }
 
     @Test

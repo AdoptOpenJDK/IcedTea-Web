@@ -104,7 +104,7 @@ public class Resource {
     /**
      * Create a resource.
      */
-    private Resource(URL location, VersionString requestVersion, UpdatePolicy updatePolicy) {
+    private Resource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
         this.location = location;
         this.downloadLocation = location;
         this.requestVersion = requestVersion;
@@ -112,15 +112,14 @@ public class Resource {
     }
 
     /**
-     * Return a shared Resource object representing the given
+     * Creates and returns a shared Resource object representing the given
      * location and version.
      * @param location final location of resource
      * @param requestVersion final version of resource
      * @param updatePolicy final policy for updating
      * @return new resource, which is already added in resources list
      */
-    public static Resource getResource(URL location, VersionString requestVersion, UpdatePolicy updatePolicy) {
-        //TODO -rename to create resource?
+    public static Resource createResource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, updatePolicy);
 
@@ -215,7 +214,7 @@ public class Resource {
      * Sets the version downloaded from server
      * @param downloadVersion version of downloaded resource
      */
-    public void setDownloadVersion(VersionString downloadVersion) {
+    public void setDownloadVersion(final VersionString downloadVersion) {
     	this.downloadVersion = downloadVersion;
     }
     

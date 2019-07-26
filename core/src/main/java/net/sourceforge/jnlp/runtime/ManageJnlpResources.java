@@ -64,7 +64,7 @@ public class ManageJnlpResources {
             final List<JARDesc> foundJars = new ArrayList<>();
             final ResourcesDesc resources = foundLoader.getJNLPFile().getResources();
 
-            for (JARDesc aJar : resources.getJARs(part)) {
+            for (final JARDesc aJar : resources.getJARs(part)) {
                 if (version == null || version.equals(aJar.getVersion()))
                     foundJars.add(aJar);
             }
@@ -98,7 +98,7 @@ public class ManageJnlpResources {
      * @param version version of jar to be downloaded
      */
     public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final VersionString version) {
-        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
 
         if (foundLoader != null)
             foundLoader.initializeNewJarDownload(ref, part, version);

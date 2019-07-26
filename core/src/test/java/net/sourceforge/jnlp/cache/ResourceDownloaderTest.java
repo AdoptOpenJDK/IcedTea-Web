@@ -200,10 +200,10 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
             versionedFileForServerWithoutHeader.createNewFile();
 
             ResourceDownloader resourceDownloader = new ResourceDownloader(null, null);
-            Resource r1 = Resource.getResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r2 = Resource.getResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.getResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.getResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+            Resource r1 = Resource.createResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
+            Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
+            Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+            Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
             assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getRedirectURL());
             assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
             assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
@@ -312,7 +312,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     private Resource setupResource(String fileName, String text) throws IOException {
         File f = setupFile(fileName, text);
         URL url = downloadServer.getUrl(fileName);
-        Resource resource = Resource.getResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
         return resource;
     }
 
@@ -339,7 +339,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz", expected);
 
-        Resource resource = Resource.getResource(downloadServer.getUrl("download-packgz.jar"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -364,7 +364,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         setupFile("download-version__V1.0.jar", expected);
 
         URL url = downloadServer.getUrl("download-version.jar");
-        Resource resource = Resource.getResource(url, VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -385,7 +385,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz__V1.0", expected);
 
-        Resource resource = Resource.getResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -415,7 +415,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         String stringURL = "file://" + localFile.getAbsolutePath();
         URL url = new URL(stringURL);
 
-        Resource resource = Resource.getResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -427,7 +427,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @Test
     public void testDownloadNotExistingResourceFails() throws IOException {
-        Resource resource = Resource.getResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 

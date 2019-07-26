@@ -18,6 +18,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
@@ -68,7 +69,7 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
 
    @Test
     public void testExactVersionOfMainJarResource() throws ParseException {
-        ResourcesDesc resources = parser.getResources(root, false).get(0);
+        final ResourcesDesc resources = parser.getResources(root, false).get(0);
         JARDesc mainJar = resources.getMainJAR();
         Assert.assertNotNull(mainJar);
         Assert.assertEquals("1.2", mainJar.getVersion().toString());
@@ -76,7 +77,7 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
 
     @Test
     public void testVersionStringsOfJarResources() throws ParseException {
-        ResourcesDesc resources = parser.getResources(root, false).get(0);
+        final ResourcesDesc resources = parser.getResources(root, false).get(0);
         final JARDesc[] jars = resources.getJARs();
 
         assertThat(jars, hasItemInArray(hasProperty("version", hasToString("2.4 2.5 2.6"))));
@@ -87,7 +88,7 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
 
     @Test
     public void testVersionStringOfNativeLibs() throws ParseException {
-        ResourcesDesc resources = parser.getResources(root, false).get(0);
+        final ResourcesDesc resources = parser.getResources(root, false).get(0);
         final JARDesc[] jars = resources.getJARs();
 
         assertThat(jars, hasItemInArray(hasProperty("version", hasToString("1.0.0-rc1"))));
@@ -95,9 +96,18 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
 
     @Test
     public void testVersionStringOfExtensions() throws ParseException {
-        ResourcesDesc resources = parser.getResources(root, false).get(0);
+        final ResourcesDesc resources = parser.getResources(root, false).get(0);
         final ExtensionDesc[] extensions = resources.getExtensions();
 
         assertThat(extensions, hasItemInArray(hasProperty("version", hasToString("0.1.1"))));
+    }
+
+    @Test
+    public void testVersionStringOfJVMDeclarations() throws ParseException {
+        final ResourcesDesc resources = parser.getResources(root, false).get(0);
+        final JREDesc[] runtimes = resources.getJREs();
+
+        assertThat(runtimes, hasItemInArray(hasProperty("version", hasToString("1.3+"))));
+        assertThat(runtimes, hasItemInArray(hasProperty("version", hasToString("1.8+"))));
     }
 }

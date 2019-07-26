@@ -61,7 +61,7 @@ public class CacheEntryTest {
     /** A custom subclass that allows supplying num predefined cache file */
     static class TestCacheEntry extends CacheEntry {
         private File cacheFile;
-        public TestCacheEntry(URL location, VersionString version, File cacheFile) {
+        public TestCacheEntry(final URL location, final VersionString version, final File cacheFile) {
             super(location, version);
             this.cacheFile = cacheFile;
         }

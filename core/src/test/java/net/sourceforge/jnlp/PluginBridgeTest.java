@@ -63,8 +63,8 @@ public class PluginBridgeTest extends NoStdOutErrTest{
         }
 
         @Override
-        public JNLPFile create(URL location, VersionString version, ParserSettings settings,
-                               UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
+        public JNLPFile create(final URL location, final VersionString version, final ParserSettings settings,
+                               final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
             JNLPHref = location;
             return new MockJNLPFile();
         }

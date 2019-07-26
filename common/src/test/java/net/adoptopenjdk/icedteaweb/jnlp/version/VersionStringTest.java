@@ -134,7 +134,7 @@ public class VersionStringTest {
     }
 
     @Test
-    public void testContainsPlainVersionId() {
+    public void testContainsSingleVersionId() {
         Assert.assertTrue(VersionString.fromString("2.0").containsSingleVersionId());
         Assert.assertTrue(VersionString.fromString("1.1+").containsSingleVersionId());
         Assert.assertTrue(VersionString.fromString("1.1*").containsSingleVersionId());

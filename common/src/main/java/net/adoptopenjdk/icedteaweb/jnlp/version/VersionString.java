@@ -55,7 +55,7 @@ public class VersionString {
      * @param versionString a version-string
      * @return a versionString
      */
-    public static VersionString fromString(String versionString) {
+    public static VersionString fromString(final String versionString) {
         if (Objects.isNull(versionString) || !versionString.matches(REGEXP_VERSION_STRING)) {
             throw new IllegalArgumentException(format("'%s' is not a valid version string according to JSR-56, Appendix A.", versionString));
         }
@@ -73,7 +73,7 @@ public class VersionString {
      * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    public boolean contains(String versionId) {
+    public boolean contains(final String versionId) {
         return contains(VersionId.fromString(versionId));
     }
 
@@ -90,7 +90,7 @@ public class VersionString {
      * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    private boolean contains(VersionId versionId) {
+    private boolean contains(final VersionId versionId) {
         return Arrays.stream(versionIds).anyMatch(vid -> vid.matches(versionId));
     }
 
@@ -101,7 +101,7 @@ public class VersionString {
      * @param versionId the version-id
      * @return {@code true} if the given version-string contains the given version-id, false otherwise
      */
-    static public boolean contains(String versionString, String versionId) {
+    static public boolean contains(final String versionString, final String versionId) {
         return (VersionString.fromString(versionString)).contains(versionId);
     }
 
@@ -113,7 +113,7 @@ public class VersionString {
      * @return {@code true} if this version-string contains a version-id greater than the
      * given {@code versionId}, {@code false} otherwise
      */
-    public boolean containsGreaterThan(String versionId) {
+    public boolean containsGreaterThan(final String versionId) {
         return containsGreaterThan(VersionId.fromString(versionId));
     }
 
@@ -125,7 +125,7 @@ public class VersionString {
      * @return {@code true} if this version-string contains a version-id greater than the
      * given {@code versionId}, {@code false} otherwise
      */
-    private boolean containsGreaterThan(VersionId versionId) {
+    private boolean containsGreaterThan(final VersionId versionId) {
         return Arrays.stream(versionIds).anyMatch(vid -> vid.isGreaterThan(versionId));
     }
 

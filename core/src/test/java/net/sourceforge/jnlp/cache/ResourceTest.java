@@ -71,9 +71,10 @@ public class ResourceTest {
 
     @Test
     public void testGetRequestVersion() throws Exception {
-        String testName = "GetRequestVersion";
-        Resource res = createResource(testName);
-        VersionString getVersion = res.getRequestVersion();
+        final String testName = "GetRequestVersion";
+        final Resource res = createResource(testName);
+        final VersionString getVersion = res.getRequestVersion();
+
         assertTrue("Versions should match each other.", getVersion.contains("1.0"));
     }
 
@@ -165,8 +166,8 @@ public class ResourceTest {
     }
 
     private static Resource createResource(String testName) throws MalformedURLException {
-        URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
-        return Resource.getResource(dummyUrl, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
+        final URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
+        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
     }
 
     private static void setStatus(Resource resource, Collection<Resource.Status> flags) {

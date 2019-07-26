@@ -20,7 +20,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
     /* Create a JARDesc for the given URL location */
     private static JARDesc makeJarDesc(final URL jarLocation, final boolean main) {
-        return new JARDesc(jarLocation, VersionString.fromString("1"), null, false,main, false,false);
+        return new JARDesc(jarLocation, VersionString.fromString("1"), null, false, main, false, false);
     }
 
     private final JARDesc[] jarDescs;

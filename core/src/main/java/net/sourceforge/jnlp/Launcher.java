@@ -411,7 +411,7 @@ public class Launcher {
 
             handler.launchInitialized(file);
 
-            ApplicationInstance app = createApplication(file);
+            final ApplicationInstance app = createApplication(file);
             app.initialize();
 
             String mainName = file.getApplication().getMainClass();
@@ -419,10 +419,10 @@ public class Launcher {
             // When the application-desc field is empty, we should take a
             // look at the main jar for the main class.
             if (mainName == null) {
-                JARDesc mainJarDesc = file.getResources().getMainJAR();
-                File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), mainJarDesc.getVersion());
+                final JARDesc mainJarDesc = file.getResources().getMainJAR();
+                final File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), mainJarDesc.getVersion());
                 if (f != null) {
-                    JarFile mainJar = new JarFile(f);
+                    final JarFile mainJar = new JarFile(f);
                     mainName = mainJar.getManifest().
                                 getMainAttributes().getValue("Main-Class");
                 }
@@ -436,7 +436,7 @@ public class Launcher {
 
             LOG.info("Starting application [{}] ...", mainName);
 
-            Class<?> mainClass = app.getClassLoader().loadClass(mainName);
+            final Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
             final Method main = mainClass.getMethod("main", String[].class);
             final String[] args = file.getApplication().getArguments();

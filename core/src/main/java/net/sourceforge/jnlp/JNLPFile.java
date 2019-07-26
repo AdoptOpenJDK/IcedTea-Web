@@ -237,7 +237,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location) throws IOException, ParseException {
+    public JNLPFile(final URL location) throws IOException, ParseException {
         this(location, new ParserSettings());
     }
 
@@ -250,7 +250,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, ParserSettings settings) throws IOException, ParseException {
+    public JNLPFile(final URL location, final ParserSettings settings) throws IOException, ParseException {
         this(location, (VersionString) null, settings, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
@@ -265,7 +265,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, VersionString version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+    public JNLPFile(final URL location, final VersionString version, final ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
         this(location, version, settings, policy, null);
     }
 
@@ -281,7 +281,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    protected JNLPFile(URL location, VersionString version, ParserSettings settings, UpdatePolicy policy, URL forceCodebase) throws IOException, ParseException {
+    protected JNLPFile(final URL location, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
         InputStream input = openURL(location, version, policy);
         this.parserSettings = settings;
         parse(input, location, forceCodebase);
@@ -315,7 +315,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(URL location, String uniqueKey, VersionString version, ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
+    public JNLPFile(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
         this(location, version, settings, policy);
         this.uniqueKey = uniqueKey;
 
@@ -329,7 +329,7 @@ public class JNLPFile {
      * @param settings settings of parser
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(InputStream input, ParserSettings settings) throws ParseException {
+    public JNLPFile(final InputStream input, final ParserSettings settings) throws ParseException {
         this.parserSettings = settings;
         parse(input, null, null);
     }
@@ -342,7 +342,7 @@ public class JNLPFile {
      * @param settings the {@link ParserSettings} to use when parsing
      * @throws ParseException if the JNLP file was invalid
      */
-    public JNLPFile(InputStream input, URL codebase, ParserSettings settings) throws ParseException {
+    public JNLPFile(final InputStream input, final URL codebase, final ParserSettings settings) throws ParseException {
         this.parserSettings = settings;
         parse(input, null, codebase);
     }

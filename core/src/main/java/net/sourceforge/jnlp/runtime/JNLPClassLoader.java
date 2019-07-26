@@ -535,7 +535,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(URL location, String uniqueKey, VersionString version, ParserSettings settings, UpdatePolicy policy, String mainName, boolean enableCodeBase)
+    public static JNLPClassLoader getInstance(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final String mainName, boolean enableCodeBase)
             throws IOException, ParseException, LaunchException {
 
         JNLPClassLoader loader;
@@ -544,7 +544,7 @@ public class JNLPClassLoader extends URLClassLoader {
             loader = uniqueKeyToLoader.get(uniqueKey);
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
-                JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
+                final JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
 
                 loader = getInstance(jnlpFile, policy, mainName, enableCodeBase);
             }
@@ -2098,8 +2098,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param version of jar to be downloaded
      * @throws LaunchException
      */
-    void initializeNewJarDownload(URL ref, String part, VersionString version) {
-        JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
+    void initializeNewJarDownload(final URL ref, final String part, final VersionString version) {
+        final JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
 
         for (JARDesc eachJar : jars) {
             LOG.info("Downloading and initializing jar: {}", eachJar.getLocation().toString());
