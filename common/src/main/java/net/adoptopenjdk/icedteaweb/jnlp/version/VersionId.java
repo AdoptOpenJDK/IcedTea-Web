@@ -195,7 +195,7 @@ public class VersionId {
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this version-id considering $
+     * Check if {@code otherVersionId} is a match with this version-id considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
@@ -219,14 +219,14 @@ public class VersionId {
             return compoundVersionId.matches(otherVersionId);
         }
 
-        if (this.hasPrefixMatchModifier())
-            return this.isPrefixMatchOf(otherVersionId);
+        if (hasPrefixMatchModifier())
+            return isPrefixMatchOf(otherVersionId);
         else {
-            if (this.hasGreaterThanOrEqualMatchModifier()) {
+            if (hasGreaterThanOrEqualMatchModifier()) {
                 return otherVersionId.isGreaterThanOrEqual(this);
             }
             else {
-                return this.isExactMatchOf(otherVersionId);
+                return isExactMatchOf(otherVersionId);
             }
         }
     }

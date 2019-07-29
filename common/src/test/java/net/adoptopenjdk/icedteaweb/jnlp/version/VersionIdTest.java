@@ -79,37 +79,37 @@ public class VersionIdTest {
 
     @Test(expected = NullPointerException.class)
     public void testNullVersionId() {
-        VersionId.fromString(null).toString();
+        VersionId.fromString(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyVersionId() {
-        VersionId.fromString("").toString();
+        VersionId.fromString("");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidSpaceChar() {
-        VersionId.fromString("1.0 beta").toString();
+        VersionId.fromString("1.0 beta");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidAmpersandChar() {
-        VersionId.fromString("1.0.0-&").toString();
+        VersionId.fromString("1.0.0-&");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidAsteriskModifierChar() {
-        VersionId.fromString("1.0.0-*").toString();
+        VersionId.fromString("1.0.0-*");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidAsteriskModifierChar2() {
-        VersionId.fromString("1.0.0*-build42").toString();
+        VersionId.fromString("1.0.0*-build42");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithInvalidPlusModifierChar() {
-        VersionId.fromString("1.0.0-buildWithC++").toString();
+        VersionId.fromString("1.0.0-buildWithC++");
     }
 
     @Test(expected = NullPointerException.class)
@@ -125,6 +125,8 @@ public class VersionIdTest {
     @Test
     public void testMatches() {
         assertTrue(VersionId.fromString("1.0").matches("1"));
+        assertTrue(VersionId.fromString("1-0").matches("1"));
+        assertTrue(VersionId.fromString("1_0").matches("1"));
         assertTrue(VersionId.fromString("1").matches("1.0"));
         assertTrue(VersionId.fromString("1.0").matches("1.0"));
         assertTrue(VersionId.fromString("1.0").matches("1.0.0-0"));
