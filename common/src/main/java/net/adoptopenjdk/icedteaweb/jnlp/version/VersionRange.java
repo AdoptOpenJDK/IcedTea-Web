@@ -48,15 +48,15 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
  *
  * @see JNLPVersionSpecifications
  */
-public class VersionId {
+public class VersionRange {
     private static final String ZERO_ELEMENT = "0";
 
     private final String versionId;
-    private final VersionId compoundVersionId;
+    private final VersionRange compoundVersionRange;
 
-    private VersionId(String versionId, VersionId compoundVersionId) {
+    private VersionRange(String versionId, VersionRange compoundVersionRange) {
         this.versionId = versionId;
-        this.compoundVersionId = compoundVersionId;
+        this.compoundVersionRange = compoundVersionRange;
     }
 
     public boolean hasPrefixMatchModifier() {
@@ -71,7 +71,7 @@ public class VersionId {
      * @return {@code true} if this version-id is a compound version range using an ampersand (&amp;), false otherwise
      */
     public boolean isCompoundVersion() {
-        return compoundVersionId != null;
+        return compoundVersionRange != null;
     }
 
     /**
@@ -88,7 +88,7 @@ public class VersionId {
      * @param versionId a version-id
      * @return a version-id
      */
-    public static VersionId fromString(String versionId) {
+    public static VersionRange fromString(String versionId) {
         Assert.requireNonNull(versionId, "versionId");
 
         if (versionId.contains(AMPERSAND.symbol())) {
@@ -111,27 +111,27 @@ public class VersionId {
                 throw new IllegalArgumentException(format("'%s' is not a valid compound version id according to JSR-56, Appendix A.", malformedVersion));
             }
 
-            return new VersionId(compoundVersions[0], VersionId.fromString(compoundVersions[1]));
+            return new VersionRange(compoundVersions[0], VersionRange.fromString(compoundVersions[1]));
         }
         else if (!versionId.matches(REGEXP_VERSION_ID)) {
             throw new IllegalArgumentException(format("'%s' is not a valid version id according to JSR-56, Appendix A.", versionId));
         }
 
-        return new VersionId(versionId, null);
+        return new VersionRange(versionId, null);
     }
 
     /**
-     * Provides a string representation of this {@link VersionId}.
+     * Provides a string representation of this {@link VersionRange}.
      *
      * @return a string representation of this version-id
      */
     @Override
     public String toString() {
-        return (compoundVersionId != null) ? versionId + AMPERSAND.symbol() + compoundVersionId.toString() : versionId;
+        return (compoundVersionRange != null) ? versionId + AMPERSAND.symbol() + compoundVersionRange.toString() : versionId;
     }
 
     /**
-     * Provides a string representation of the exact version of this {@link VersionId} (no modifiers and compound versions).
+     * Provides a string representation of the exact version of this {@link VersionRange} (no modifiers and compound versions).
      *
      * @return a string representation of this version-id
      */
@@ -171,13 +171,13 @@ public class VersionId {
 
     @Override
     public boolean equals(final Object otherVersionId) {
-        if (Objects.isNull(otherVersionId) || !(otherVersionId instanceof VersionId)) {
+        if (Objects.isNull(otherVersionId) || !(otherVersionId instanceof VersionRange)) {
             return false;
         }
-        final VersionId other = (VersionId) otherVersionId;
+        final VersionRange other = (VersionRange) otherVersionId;
 
-        if (compoundVersionId != null) {
-            return this.compoundVersionId.equals(other.compoundVersionId == null? other : other.compoundVersionId);
+        if (compoundVersionRange != null) {
+            return this.compoundVersionRange.equals(other.compoundVersionRange == null? other : other.compoundVersionRange);
         }
 
         final String[] tuple1 = this.asNormalizedTuple(other.asTuple().length);
@@ -202,31 +202,31 @@ public class VersionId {
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean matches(final String otherVersionId) {
-        return matches(VersionId.fromString(otherVersionId));
+        return matches(VersionRange.fromString(otherVersionId));
     }
 
     /**
      * Check if {@code otherVersionId} is a match with this version-id considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean matches(final VersionId otherVersionId) {
-        Assert.requireNonNull(otherVersionId, "otherVersionId");
+    public boolean matches(final VersionRange otherVersionRange) {
+        Assert.requireNonNull(otherVersionRange, "otherVersionId");
 
-        if (compoundVersionId != null) {
-            return compoundVersionId.matches(otherVersionId);
+        if (compoundVersionRange != null) {
+            return compoundVersionRange.matches(otherVersionRange);
         }
 
         if (hasPrefixMatchModifier())
-            return isPrefixMatchOf(otherVersionId);
+            return isPrefixMatchOf(otherVersionRange);
         else {
             if (hasGreaterThanOrEqualMatchModifier()) {
-                return otherVersionId.isGreaterThanOrEqual(this);
+                return otherVersionRange.isGreaterThanOrEqual(this);
             }
             else {
-                return isExactMatchOf(otherVersionId);
+                return isExactMatchOf(otherVersionRange);
             }
         }
     }
@@ -240,11 +240,11 @@ public class VersionId {
      * <p/>
      * See JSR-56 Specification, Appendix A.2 Exact Match.
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this version-id is an exact matches of {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isExactMatchOf(VersionId otherVersionId) {
-        return isEqualTo(otherVersionId);
+    public boolean isExactMatchOf(VersionRange otherVersionRange) {
+        return isEqualTo(otherVersionRange);
     }
 
     /**
@@ -259,18 +259,18 @@ public class VersionId {
      * <p/>
      * See JSR-56 Specification, Appendix A.2 Prefix Match.
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this version-id is a prefix matches of {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isPrefixMatchOf(VersionId otherVersionId) {
-        if (compoundVersionId != null) {
-            if (!compoundVersionId.isPrefixMatchOf(otherVersionId)) {
+    public boolean isPrefixMatchOf(VersionRange otherVersionRange) {
+        if (compoundVersionRange != null) {
+            if (!compoundVersionRange.isPrefixMatchOf(otherVersionRange)) {
                 return false;
             }
         }
 
         final String[] tuple1 = this.asTuple();
-        final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple1.length);
+        final String[] tuple2 = otherVersionRange.asNormalizedTuple(tuple1.length);
 
         for (int i = 0; i < tuple1.length; i++) {
             final Object tuple1Element = prepareForNormalizedComparison(tuple1[i]);
@@ -286,11 +286,11 @@ public class VersionId {
     /**
      * Compares whether this version-id is equal to the {@code otherVersionId}.
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this equals to {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isEqualTo(final VersionId otherVersionId) {
-        return equals(otherVersionId);
+    public boolean isEqualTo(final VersionRange otherVersionRange) {
+        return equals(otherVersionRange);
     }
 
     /**
@@ -308,16 +308,16 @@ public class VersionId {
      * <p/>
      * See JSR-56 Specification, Appendix A
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this version-id is greater than {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isGreaterThan(VersionId otherVersionId) {
-        if (compoundVersionId != null) {
-            return compoundVersionId.isGreaterThan(otherVersionId);
+    public boolean isGreaterThan(VersionRange otherVersionRange) {
+        if (compoundVersionRange != null) {
+            return compoundVersionRange.isGreaterThan(otherVersionRange);
         }
 
-        final String[] tuple1 = this.asNormalizedTuple(otherVersionId.asTuple().length);
-        final String[] tuple2 = otherVersionId.asNormalizedTuple(this.asTuple().length);
+        final String[] tuple1 = this.asNormalizedTuple(otherVersionRange.asTuple().length);
+        final String[] tuple2 = otherVersionRange.asNormalizedTuple(this.asTuple().length);
 
         for (int i = 0; i < tuple1.length; i++) {
             final String tuple1Element = tuple1[i];
@@ -343,12 +343,12 @@ public class VersionId {
      * of A which is greater than the corresponding element of B, and all earlier elements of A
      * are the same as in B (see JSR-56 Specification, Appendix A.1 Ordering).
      *
-     * @param otherVersionId a version-id
+     * @param otherVersionRange a version-id
      * @return {@code true} if this version-id is greater than or equal to {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isGreaterThanOrEqual(VersionId otherVersionId) {
-        final boolean greaterThan = isGreaterThan(otherVersionId);
-        final boolean equalTo = isEqualTo(otherVersionId);
+    public boolean isGreaterThanOrEqual(VersionRange otherVersionRange) {
+        final boolean greaterThan = isGreaterThan(otherVersionRange);
+        final boolean equalTo = isEqualTo(otherVersionRange);
 
         return greaterThan || equalTo;
     }

@@ -17,7 +17,7 @@
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 /**
- * Enum of all modifiers as defined for {@link VersionId}s as defined by JSR-56 Specification, Appendix A.
+ * Enum of all modifiers as defined for {@link VersionRange}s as defined by JSR-56 Specification, Appendix A.
  */
 public enum VersionModifier {
     PLUS("+"),

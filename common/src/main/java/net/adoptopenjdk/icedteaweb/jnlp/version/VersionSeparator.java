@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 /**
- * Enum of all separators as defined for {@link VersionId}s and {@link VersionString}s as defined
+ * Enum of all separators as defined for {@link VersionRange}s and {@link VersionString}s as defined
  * by JSR-56 Specification, Appendix A.
  */
 public enum VersionSeparator {

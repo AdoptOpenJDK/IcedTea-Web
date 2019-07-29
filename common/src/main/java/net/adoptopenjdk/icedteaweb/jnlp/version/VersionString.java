@@ -43,10 +43,10 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications
  */
 public class VersionString {
 
-    private final VersionId[] versionIds;
+    private final VersionRange[] versionRanges;
 
-    private VersionString(VersionId[] versionIds) {
-        this.versionIds = versionIds;
+    private VersionString(VersionRange[] versionRanges) {
+        this.versionRanges = versionRanges;
     }
 
     /**
@@ -60,11 +60,11 @@ public class VersionString {
             throw new IllegalArgumentException(format("'%s' is not a valid version string according to JSR-56, Appendix A.", versionString));
         }
 
-        final VersionId[] versionIds = Arrays.stream(versionString.split(REGEXP_SPACE))
-                .map(VersionId::fromString)
-                .toArray(VersionId[]::new);
+        final VersionRange[] versionRanges = Arrays.stream(versionString.split(REGEXP_SPACE))
+                .map(VersionRange::fromString)
+                .toArray(VersionRange[]::new);
 
-        return new VersionString(versionIds);
+        return new VersionString(versionRanges);
     }
 
     /**
@@ -74,24 +74,24 @@ public class VersionString {
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
     public boolean contains(final String versionId) {
-        return contains(VersionId.fromString(versionId));
+        return contains(VersionRange.fromString(versionId));
     }
 
     /**
      * @return {@code true} if this version-string contains only a single version id, false otherwise
      */
     public boolean containsSingleVersionId() {
-        return versionIds.length == 1;
+        return versionRanges.length == 1;
     }
 
     /**
      * Checks if this version-string (list of exact version-ids or version ranges) contains the given {@code versionId}.
      *
-     * @param versionId a version-id
+     * @param versionRange a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    private boolean contains(final VersionId versionId) {
-        return Arrays.stream(versionIds).anyMatch(vid -> vid.matches(versionId));
+    private boolean contains(final VersionRange versionRange) {
+        return Arrays.stream(versionRanges).anyMatch(vid -> vid.matches(versionRange));
     }
 
     /**
@@ -114,19 +114,19 @@ public class VersionString {
      * given {@code versionId}, {@code false} otherwise
      */
     public boolean containsGreaterThan(final String versionId) {
-        return containsGreaterThan(VersionId.fromString(versionId));
+        return containsGreaterThan(VersionRange.fromString(versionId));
     }
 
     /**
      * Checks if this version-string (list of exact version-ids or version ranges) contains a version-id
      * greater than the given {@code versionId}.
      *
-     * @param versionId a version-id
+     * @param versionRange a version-id
      * @return {@code true} if this version-string contains a version-id greater than the
      * given {@code versionId}, {@code false} otherwise
      */
-    private boolean containsGreaterThan(final VersionId versionId) {
-        return Arrays.stream(versionIds).anyMatch(vid -> vid.isGreaterThan(versionId));
+    private boolean containsGreaterThan(final VersionRange versionRange) {
+        return Arrays.stream(versionRanges).anyMatch(vid -> vid.isGreaterThan(versionRange));
     }
 
     /**
@@ -137,8 +137,8 @@ public class VersionString {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        for (VersionId versionId : versionIds) {
-            sb.append(versionId.toString());
+        for (VersionRange versionRange : versionRanges) {
+            sb.append(versionRange.toString());
             sb.append(' ');
         }
         return sb.toString().trim();
