@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.jvm;
 
 import net.adoptopenjdk.icedteaweb.JvmPropertyConstants;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,10 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS_JAR;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_LOCATION;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 public class JvmUtils {
@@ -142,5 +146,62 @@ public class JvmUtils {
             throw new IllegalStateException("multiple javaws jars found");
         }
         return jarCandidates.get(0);
+    }
+
+    /**
+     * @return the javaws binary.
+     */
+    public static String getJavaWsBin() {
+        //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
+        //absolute - works in case of self built
+        final String exec = System.getProperty(ITW_BIN_LOCATION);
+        if (exec != null) {
+            return exec;
+        }
+        final String pathResult = findOnPath(new String[]{JAVAWS, System.getProperty(ITW_BIN_NAME)});
+        if (pathResult != null) {
+            return pathResult;
+        }
+
+        return JAVAWS;
+    }
+
+
+    /**
+     * Find a binary of the given binaries on PATH.
+     *
+     * @param bins list of binaries to look for
+     * @return the absolute path to the first binary found
+     */
+    public static String findOnPath(final String[] bins) {
+        String exec = null;
+        //find if one of binaries is on path
+        String path = System.getenv().get("PATH");
+        if (path == null || path.trim().isEmpty()) {
+            path = System.getenv().get("path");
+        }
+        if (path == null || path.trim().isEmpty()) {
+            path = System.getenv().get("Path");
+        }
+        if (path != null && !path.trim().isEmpty()) {
+            //relative - works with alternatives
+            final String[] paths = path.split(File.pathSeparator);
+            outerloop:
+            for (String bin : bins) {
+                //when property is not set
+                if (bin == null) {
+                    continue;
+                }
+                for (String p : paths) {
+                    final File file = new File(p, bin);
+                    if (file.exists()) {
+                        exec = file.getAbsolutePath();
+                        break outerloop;
+                    }
+                }
+
+            }
+        }
+        return exec;
     }
 }

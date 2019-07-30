@@ -22,7 +22,7 @@ import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import java.util.LinkedList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.Launcher.KEY_JAVAWS_LOCATION;
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_LOCATION;
 
 /**
  * Implementation of {@link JvmLauncher} which uses the IcedTea-Web launcher to start a new JVM.
@@ -42,7 +42,7 @@ public class ItwJvmLauncher implements JvmLauncher {
         final List<String> commands = new LinkedList<>();
 
         // this property is set by the javaws launcher to point to the javaws binary
-        final String pathToItwBinary = System.getProperty(KEY_JAVAWS_LOCATION);
+        final String pathToItwBinary = System.getProperty(ITW_BIN_LOCATION);
         commands.add(pathToItwBinary);
 
         // use -Jargument format to pass arguments to the JVM through the launcher
