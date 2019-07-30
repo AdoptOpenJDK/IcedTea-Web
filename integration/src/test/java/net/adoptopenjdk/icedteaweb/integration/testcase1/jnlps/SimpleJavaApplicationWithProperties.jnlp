@@ -11,7 +11,15 @@
     <resources>
         <j2se version="1.8+"/>
         <jar href="resources/App-SimpleJavaApplication.jar" main="true"/>
-        <property name="key1" value="SystemPropertyViaJnlpFile1"/>
+
+        <!-- JSR-56, section 4.2 says:
+        Properties must be processed in the order specified in the JNLP file.
+        Thus, if two properties define different values for the same property, then the last value specified
+        in the JNLP file is used. For example, given the following two declarations, in the given order:
+        -->
+        <property name="key1" value="SystemPropertyViaJnlpFile_Overwritten"/>
+        <property name="key1" value="SystemPropertyViaJnlpFile_Used"/>
+
         <property name="key2" value="System Property Via Jnlp File2"/>
     </resources>
 
