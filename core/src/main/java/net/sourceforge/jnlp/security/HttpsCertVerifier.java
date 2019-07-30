@@ -187,10 +187,6 @@ public class HttpsCertVerifier implements CertVerifier {
                     }
                 }
             }
-
-            if (subjAltNames != null)
-                names = names.substring(2); // remove proceeding ", "
-
         } catch (CertificateParsingException cpe) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cpe);
         } catch (IOException ioe) {
