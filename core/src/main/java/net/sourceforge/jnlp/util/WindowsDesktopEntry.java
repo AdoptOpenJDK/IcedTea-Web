@@ -17,6 +17,7 @@ package net.sourceforge.jnlp.util;
 
 import mslinks.ShellLink;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -24,6 +25,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -65,16 +67,30 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public void createShortcutOnWindowsDesktop() throws IOException {
-        String path = getDesktopLnkPath();
-        String JavaWsBin = XDesktopEntry.getJavaWsBin();
-        ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
+        ShellLink sl = ShellLink.createLink(getJavaWsBin()).setCMDArgs(quoted(file.getSourceLocation()));
         if (iconLocation != null) {
             sl.setIconLocation(iconLocation);
         }
+        final String path = getDesktopLnkPath();
         sl.saveTo(path);
         // write shortcut path to list
         manageShortcutList(ManageMode.A, path);
     }
+
+    private String getJavaWsBin() throws FileNotFoundException {
+        final String javaWsBin = JvmUtils.getJavaWsBin();
+        if (new File(javaWsBin).exists()) {
+            return javaWsBin;
+        }
+
+        final String javaWsBinExe = javaWsBin + ".exe";
+        if (new File(javaWsBinExe).exists()) {
+            return javaWsBinExe;
+        }
+
+        throw new FileNotFoundException("Could not find the javaws binary to create desktop shortcut");
+    }
+
 
     @Override
     public void createWindowsMenu() throws IOException {
@@ -97,7 +113,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         if (!menuDir.exists()) {
             menuDir.mkdir();
         }
-        final String JavaWsBin = XDesktopEntry.getJavaWsBin();
+        final String JavaWsBin = getJavaWsBin();
         final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         // setup uninstall shortcut
         final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + quoted(file.getFileLocation()));

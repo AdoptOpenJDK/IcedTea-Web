@@ -92,8 +92,6 @@ public class Launcher {
 
     private Map<String, List<String>> extra = null;
 
-    public static final String KEY_JAVAWS_LOCATION = "icedtea-web.bin.location";
-
     /**
      * Create a launcher with the runtime's default update policy
      * and launch handler.

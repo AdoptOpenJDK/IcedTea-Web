@@ -74,6 +74,8 @@ public interface JvmPropertyConstants {
 
     String ITW_BIN_NAME = "icedtea-web.bin.name";
 
+    String ITW_BIN_LOCATION = "icedtea-web.bin.location";
+
     String USED_BROWSERS = "used.browsers";
 
     String USER_DIR = "user.dir";
