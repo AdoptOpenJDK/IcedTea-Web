@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 public class SimpleRangeTest {
 
     @Test
-    public void testExactSimpleRange() {
+    public void testExactSimpleRangeParsingAndToString() {
         // numerical
         assertEquals("1", simpleRange("1").toString());
         assertEquals("1.1", simpleRange("1.1").toString());
@@ -46,7 +46,7 @@ public class SimpleRangeTest {
     }
 
     @Test
-    public void testSimpleRangeWithModifiers() {
+    public void testSimpleRangeWithModifiersParsingAndToString() {
         assertEquals("1+", simpleRange("1+").toString());
         assertEquals("1*", simpleRange("1*").toString());
         assertEquals("1.1.1+", simpleRange("1.1.1+").toString());
@@ -90,7 +90,7 @@ public class SimpleRangeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testVersionIdWithDuplicatedModifierChar() {
-        simpleRange("1.0.0-buildWithC+*");
+        simpleRange("1.0.0-buildWithC++");
     }
 
     @Test(expected = NullPointerException.class)
@@ -116,6 +116,7 @@ public class SimpleRangeTest {
         assertTrue(simpleRange("1.2.2.4").matches("1.2.2-004"));
         // not a match
         assertFalse(simpleRange("1.0.4").matches("1.0"));
+        assertFalse(simpleRange("1.0.4").matches("1.4"));
         assertFalse(simpleRange("1.0.4").matches("1.0.3"));
     }
 
@@ -139,6 +140,7 @@ public class SimpleRangeTest {
         assertTrue(simpleRange("1.5+").matches("1.5"));
         assertTrue(simpleRange("1.0.3+").matches("1.0.4"));
         assertTrue(simpleRange("1.5+").matches("1.6"));
+        assertTrue(simpleRange("1.5+").matches("2.0"));
         assertTrue(simpleRange("1.4.1_02+").matches("1.4.1_42"));
         // not a match
         assertFalse(simpleRange("2.0.1+").matches("2.0.0"));
@@ -186,6 +188,8 @@ public class SimpleRangeTest {
         assertTrue(simpleRange("1*").hasPrefixMatchModifier());
         assertTrue(simpleRange("1.0*").hasPrefixMatchModifier());
         assertTrue(simpleRange("1.0.0-build42*").hasPrefixMatchModifier());
+
+        assertFalse(simpleRange("1.0+").hasPrefixMatchModifier());
     }
 
     @Test
@@ -193,6 +197,8 @@ public class SimpleRangeTest {
         assertTrue(simpleRange("1+").hasGreaterThanOrEqualMatchModifier());
         assertTrue(simpleRange("1.0+").hasGreaterThanOrEqualMatchModifier());
         assertTrue(simpleRange("1.0.0-build42+").hasGreaterThanOrEqualMatchModifier());
+
+        assertFalse(simpleRange("1.0*").hasGreaterThanOrEqualMatchModifier());
     }
 
     private SimpleRange simpleRange(String s) {

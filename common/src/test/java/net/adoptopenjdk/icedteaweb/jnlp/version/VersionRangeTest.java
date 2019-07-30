@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 public class VersionRangeTest {
     @Test
-    public void testExactVersionRanges() {
+    public void testExactVersionRangesParsingAndToString() {
         // numerical
         assertEquals("1", versionRange("1").toString());
         assertEquals("1.1", versionRange("1.1").toString());
@@ -45,7 +45,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testVersionRangeWithModifiers() {
+    public void testVersionRangeWithModifiersParsingAndToString() {
         assertEquals("1+", versionRange("1+").toString());
         assertEquals("1*", versionRange("1*").toString());
         assertEquals("1.1.1+", versionRange("1.1.1+").toString());
@@ -58,7 +58,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testCompoundVersionRange() {
+    public void testCompoundVersionRangeParsingAndToString() {
         assertEquals("1.4&1.4.1_02", versionRange("1.4&1.4.1_02").toString());
         assertEquals("1.4*&1.4.1_02+", versionRange("1.4*&1.4.1_02+").toString());
         assertEquals("1.4+&1.4.1", versionRange("1.4+&1.4.1").toString());
@@ -122,6 +122,7 @@ public class VersionRangeTest {
         assertTrue(versionRange("1.2.2.4").matches("1.2.2-004"));
         // not a match
         assertFalse(versionRange("1.0.4").matches("1.0"));
+        assertFalse(versionRange("1.0.4").matches("1.4"));
         assertFalse(versionRange("1.0.4").matches("1.0.3"));
     }
 
@@ -145,6 +146,7 @@ public class VersionRangeTest {
         assertTrue(versionRange("1.5+").matches("1.5"));
         assertTrue(versionRange("1.0.3+").matches("1.0.4"));
         assertTrue(versionRange("1.5+").matches("1.6"));
+        assertTrue(versionRange("1.5+").matches("2.0"));
         assertTrue(versionRange("1.4.1_02+").matches("1.4.1_42"));
         // not a match
         assertFalse(versionRange("2.0.1+").matches("2.0.0"));

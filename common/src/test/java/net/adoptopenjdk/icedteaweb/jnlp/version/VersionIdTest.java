@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 public class VersionIdTest {
 
     @Test
-    public void testValidNumericVersionIds() {
+    public void testValidNumericVersionIdsParsingAndToString() {
         assertEquals("1", versionId("1").toString());
         assertEquals("1.1", versionId("1.1").toString());
         assertEquals("1.1.0", versionId("1.1.0").toString());
@@ -39,7 +39,7 @@ public class VersionIdTest {
     }
 
     @Test
-    public void testValidAlphaNumericVersionIds() {
+    public void testValidAlphaNumericVersionIdsParsingAndToString() {
         assertEquals("A", versionId("A").toString());
         assertEquals("A.B", versionId("A.B").toString());
         assertEquals("A.B.1", versionId("A.B.1").toString());
@@ -97,6 +97,7 @@ public class VersionIdTest {
 
         // not a match
         assertFalse(versionId("1.0.4").isEqualTo(versionId("1.0")));
+        assertFalse(versionId("1.0.4").isEqualTo(versionId("1.4")));
         assertFalse(versionId("1.0-build42").isEqualTo(versionId("1.0.0-build42")));
         assertFalse(versionId("1.0-b42").isEqualTo(versionId("1.0-B42")));
     }
@@ -120,7 +121,7 @@ public class VersionIdTest {
 
     @Test
     public void testIsLessThan() {
-        // greater than
+        // less than
         assertTrue(versionId("1").isLessThan(versionId("2")));
         assertTrue(versionId("1").isLessThan(versionId("1.1")));
         assertTrue(versionId("1.0").isLessThan(versionId("1.1")));
@@ -136,7 +137,7 @@ public class VersionIdTest {
         assertTrue(versionId("1.0.0-build41").isLessThan(versionId("1.0.0-build42")));
         assertTrue(versionId("1.0.0-42").isLessThan(versionId("1.0.0-build42")));
 
-        // not greater than
+        // not less than
         assertFalse(versionId("1.0").isLessThan(versionId("1")));
         assertFalse(versionId("1.0").isLessThan(versionId("1.0")));
         assertFalse(versionId("1.1").isLessThan(versionId("1.0")));

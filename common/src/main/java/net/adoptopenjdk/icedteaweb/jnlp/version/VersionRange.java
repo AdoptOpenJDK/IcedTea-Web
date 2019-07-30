@@ -21,18 +21,22 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import java.util.Arrays;
 
 import static java.lang.String.format;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_VERSION_RANGE;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
 
 /**
- * A version-id specifies the version that is associated with a resource, such as a JAR file.
- * A version-id can be postfixed with a '+' to indicate a greater-than-or-equal match,
- * a "*" to indicated a prefix match when used within a {@link VersionString}.
- * A version-id with no postfix indicate an exact match (plain version).
- * <p></p>
- * The version-id used in this specification must conform to the following syntax:
+ * A version-range is either a version-id, a version-id followed by a star (*),
+ * a version-id followed by a plus sign (+) , or two version-ranges combined using an ampersand (&amp;).
+ * The star means prefix match, the plus sign means this version or greater,
+ * and the ampersand means the logical and-ing of the two version-ranges.
+ * <p>
+ * The syntax of version-strings is:
  *
  * <pre>
- *     version-range ::=  simple-range ( "&amp;" simple-range) *
+ *      version-string     ::=  version-range ( " " element) *
+ *      version-range      ::=  simple-range ( "&amp;" simple-range) *
+ *      simple-range       ::=  version-id | version-id modifier
+ *      modifier           ::=  `+` | '*'
  * </pre>
  * <p>
  * See JSR-56 Specification, Appendix A.
@@ -50,51 +54,52 @@ public class VersionRange {
     }
 
     /**
-     * @return {@code true} if this version-id is a compound version range using an ampersand (&amp;), false otherwise
+     * @return {@code true} if this version-range is a compound range using an ampersand (&amp;), false otherwise
      */
     boolean isCompoundVersion() {
         return ranges.length > 1;
     }
 
     /**
-     * Checks whether this version-id represents a plain (exact) version without any postfix modifiers.
+     * Checks whether this version-range represents a plain (exact) version without any postfix modifiers.
      *
-     * @return {@code true} if this version-id does not have any modifiers, {@code false} otherwise.
+     * @return {@code true} if this version-range does not have any modifiers, {@code false} otherwise.
      */
     boolean isExactVersion() {
         return ranges.length == 1 && ranges[0].isExactVersion();
     }
 
     /**
-     * Checks whether this version-id represents a plain (exact) version without any postfix modifiers.
+     * Checks whether this version-range represents a range with a prefix match modifier.
      *
-     * @return {@code true} if this version-id does not have any modifiers, {@code false} otherwise.
+     * @return {@code true} if this version-range is not a compound range
+     * and its only simple range has a prefix match modifier, {@code false} otherwise.
      */
     boolean hasPrefixMatchModifier() {
         return ranges.length == 1 && ranges[0].hasPrefixMatchModifier();
     }
 
     /**
-     * Checks whether this version-id represents a plain (exact) version without any postfix modifiers.
+     * Checks whether this version-range represents a range with a greater or equal modifier.
      *
-     * @return {@code true} if this version-id does not have any modifiers, {@code false} otherwise.
+     * @return {@code true} if this version-range is not a compound range
+     * and its only simple range has a greater or equal modifier, {@code false} otherwise.
      */
     boolean hasGreaterThanOrEqualMatchModifier() {
         return ranges.length == 1 && ranges[0].hasGreaterThanOrEqualMatchModifier();
     }
 
     /**
-     * Construct a version-id by the given {@code versionId}.
+     * Construct a version-range by the given {@code versionRange}.
      *
-     * @param versionRange a version-id
+     * @param versionRange a version-range
      * @return a version-id
      */
     public static VersionRange fromString(String versionRange) {
-        Assert.requireNonNull(versionRange, "versionId");
+        Assert.requireNonNull(versionRange, "versionRange");
 
-        // a version range must not end with an ampersand
-        if (versionRange.endsWith(AMPERSAND.symbol())) {
-            throw new IllegalArgumentException(format("'%s' is not a valid compound version id according to JSR-56, Appendix A.", versionRange));
+        if (!versionRange.matches(REGEXP_VERSION_RANGE)) {
+            throw new IllegalArgumentException(format("'%s' is not a valid version-range according to JSR-56, Appendix A.", versionRange));
         }
 
         final SimpleRange[] ranges = Arrays.stream(versionRange.split(AMPERSAND.symbol()))
@@ -105,7 +110,7 @@ public class VersionRange {
     }
 
     /**
-     * Check if {@code versionId} is a match with this version-range considering.
+     * Check if {@code versionId} is a match with this version-range.
      *
      * @param versionId a version-id
      * @return {@code true} if this version-range matches {@code versionId}, {@code false} otherwise.
@@ -115,7 +120,7 @@ public class VersionRange {
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this version-id considering.
+     * Check if {@code versionId} is a match with this version-id considering.
      *
      * @param versionId a version-id
      * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
@@ -143,7 +148,7 @@ public class VersionRange {
     /**
      * Provides a string representation of this {@link VersionRange}.
      *
-     * @return a string representation of this version-id
+     * @return a string representation of this version-range
      */
     @Override
     public String toString() {

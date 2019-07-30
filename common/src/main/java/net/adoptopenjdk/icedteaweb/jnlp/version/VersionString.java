@@ -16,6 +16,8 @@
 //
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -25,17 +27,18 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_VERSION_STRING;
 
 /**
- * A version string is a list of version ranges separated by spaces. A version range is either a version-id,
+ * A version-string is a list of version-ranges separated by spaces. A version-range is either a version-id,
  * a version-id followed by a star (*), a version-id followed by a plus sign (+) , or two version-ranges
  * combined using an ampersand (&amp;). The star means prefix match, the plus sign means this version or
- * greater, and the ampersand means the logical and-ing of the two version-ranges. The syntax of
- * version-strings is:
+ * greater, and the ampersand means the logical and-ing of the two version-ranges.
+ *
+ * The syntax of version-strings is:
  *
  * <pre>
- *      version-string     ::=  version-range ( " " element) *
+ *      version-string     ::=  version-range ( " " version-range) *
  *      version-range      ::=  simple-range ( "&amp;" simple-range) *
  *      simple-range       ::=  version-id | version-id modifier
- *      modifier           ::=  `+` | '*'
+ *      modifier           ::=  "+" | "*"
  * </pre>
  * <p>
  * See JSR-56 Specification, Appendix A.
@@ -57,8 +60,10 @@ public class VersionString {
      * @return a versionString
      */
     public static VersionString fromString(final String versionString) {
-        if (Objects.isNull(versionString) || !versionString.matches(REGEXP_VERSION_STRING)) {
-            throw new IllegalArgumentException(format("'%s' is not a valid version string according to JSR-56, Appendix A.", versionString));
+        Assert.requireNonNull(versionString, "versionString");
+
+        if (!versionString.matches(REGEXP_VERSION_STRING)) {
+            throw new IllegalArgumentException(format("'%s' is not a valid version-string according to JSR-56, Appendix A.", versionString));
         }
 
         final VersionRange[] versionRanges = Arrays.stream(versionString.split(REGEXP_SPACE))
@@ -69,14 +74,14 @@ public class VersionString {
     }
 
     /**
-     * @return {@code true} if this version-string contains only a single version id, false otherwise
+     * @return {@code true} if this version-string consists of only a single version-range, {@code false} otherwise.
      */
     public boolean containsSingleVersionId() {
         return versionRanges.length == 1;
     }
 
     /**
-     * @return {@code true} if this version-string contains a single version-range which is an exact match, {@code false} otherwise.
+     * @return {@code true} if this version-string consists of a single version-range which is an exact match, {@code false} otherwise.
      */
     public boolean isExactVersion() {
         return versionRanges.length == 1 && versionRanges[0].isExactVersion();
@@ -95,11 +100,11 @@ public class VersionString {
     /**
      * Checks if this version-string (list of exact version-ids or version ranges) contains the given {@code versionId}.
      *
-     * @param versionRange a version-id
+     * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    private boolean contains(final VersionId versionRange) {
-        return Arrays.stream(versionRanges).anyMatch(vid -> vid.matches(versionRange));
+    private boolean contains(final VersionId versionId) {
+        return Arrays.stream(versionRanges).anyMatch(range -> range.matches(versionId));
     }
 
     /**

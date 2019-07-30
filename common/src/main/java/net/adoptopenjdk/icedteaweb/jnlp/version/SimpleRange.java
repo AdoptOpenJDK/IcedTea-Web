@@ -28,23 +28,22 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.NONE;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 
 /**
- * A version-id specifies the version that is associated with a resource, such as a JAR file.
- * A version-id can be postfixed with a '+' to indicate a greater-than-or-equal match,
- * a "*" to indicated a prefix match when used within a {@link VersionString}.
- * A version-id with no postfix indicate an exact match (plain version).
- * <p></p>
- * The version-id used in this specification must conform to the following syntax:
+ * A simple-range is either a version-id, a version-id followed by a star (*) or a version-id followed by a plus sign (+).
+ * The star means prefix match, the plus sign means this version or greater.
+ *
+ * The syntax of version-strings is:
  *
  * <pre>
- *     simple-range       ::=  version-id ( modifier ) ?
- *     modifier           ::=  '+' | '*'
+ *      simple-range       ::=  version-id | version-id modifier
+ *      modifier           ::=  `+` | '*'
  * </pre>
- *
+ * <p>
  * See JSR-56 Specification, Appendix A.
  *
  * @see JNLPVersionPatterns
  */
 class SimpleRange {
+
     private final VersionId versionId;
     private final VersionModifier modifier;
 
@@ -70,16 +69,16 @@ class SimpleRange {
     }
 
     /**
-     * Construct a version-id by the given {@code versionId}.
+     * Construct a simple-range by the given {@code simpleRange}.
      *
      * @param simpleRange a simple-range
      * @return a SimpleRange
      */
     public static SimpleRange fromString(String simpleRange) {
-        Assert.requireNonNull(simpleRange, "versionId");
+        Assert.requireNonNull(simpleRange, "simpleRange");
 
         if (!simpleRange.matches(REGEXP_SIMPLE_RANGE)) {
-            throw new IllegalArgumentException(format("'%s' is not a valid simple range according to JSR-56, Appendix A.", simpleRange));
+            throw new IllegalArgumentException(format("'%s' is not a valid simple-range according to JSR-56, Appendix A.", simpleRange));
         }
 
         final VersionId versionId = extractVersionId(simpleRange);
@@ -105,7 +104,7 @@ class SimpleRange {
     /**
      * Provides a string representation of this {@link SimpleRange}.
      *
-     * @return a string representation of this version-id
+     * @return a string representation of this simple-range
      */
     @Override
     public String toString() {
@@ -121,28 +120,28 @@ class SimpleRange {
         if (otherSimpleRange == null || otherSimpleRange.getClass() != SimpleRange.class) {
             return false;
         }
-        final SimpleRange other = (SimpleRange) otherSimpleRange;
 
+        final SimpleRange other = (SimpleRange) otherSimpleRange;
         return versionId.equals(other.versionId) && modifier == other.modifier;
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this version-id considering
+     * Check if {@code otherVersionId} is a match with this simple-range considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this simple-range matches {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean matches(final String otherVersionId) {
         return matches(VersionId.fromString(otherVersionId));
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this version-id considering
+     * Check if {@code otherVersionId} is a match with this simple-range considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this simple-range matches {@code otherVersionId}, {@code false} otherwise.
      */
     public boolean matches(final VersionId otherVersionId) {
         Assert.requireNonNull(otherVersionId, "otherVersionId");
@@ -156,10 +155,7 @@ class SimpleRange {
         }
 
         if (hasGreaterThanOrEqualMatchModifier()) {
-            final boolean lessThan = versionId.isLessThan(otherVersionId);
-            final boolean equalTo = versionId.isEqualTo(otherVersionId);
-
-            return lessThan || equalTo;
+            return versionId.isLessThan(otherVersionId) || versionId.isEqualTo(otherVersionId);
         }
 
         throw new IllegalStateException("Simple range is neither exact, nor prefix, nor less");

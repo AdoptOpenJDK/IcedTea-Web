@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_CHAR;
@@ -17,7 +16,8 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.DOT;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.MINUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.SPACE;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionSeparator.UNDERSCORE;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for ensuring the REGEXP are OK.
@@ -35,6 +35,9 @@ public class JNLPVersionPatternsTest {
     assertFalse("1.0+".matches(REGEXP_VERSION_ID));
     assertFalse("1.0*".matches(REGEXP_VERSION_ID));
     assertFalse("1.0&".matches(REGEXP_VERSION_ID));
+    assertFalse("1&1".matches(REGEXP_VERSION_ID));
+    assertFalse("1+1".matches(REGEXP_VERSION_ID));
+    assertFalse("1*1".matches(REGEXP_VERSION_ID));
 
     assertFalse("".matches(REGEXP_VERSION_ID));
     assertFalse("1.".matches(REGEXP_VERSION_ID));
@@ -58,7 +61,7 @@ public class JNLPVersionPatternsTest {
   }
 
   @Test
-  public void testVersionIdSpecificationString() {
+  public void testRegexpForString() {
     assertTrue("12".matches(REGEXP_STRING));
     assertTrue("abc".matches(REGEXP_STRING));
     assertTrue("V1".matches(REGEXP_STRING));
@@ -79,7 +82,7 @@ public class JNLPVersionPatternsTest {
    * Test all version-id char tokens as defined by JSR-56 specification, Appendix A.
    */
   @Test
-  public void testVersionIdSpecificationChar() {
+  public void testRegexpForChar() {
     // legal chars
     assertTrue("a".matches(REGEXP_CHAR));
     assertTrue("1".matches(REGEXP_CHAR));
@@ -104,7 +107,7 @@ public class JNLPVersionPatternsTest {
    * Test all version-id separator tokens as defined by JSR-56 specification, Appendix A.
    */
   @Test
-  public void testVersionIdSpecificationSeparator() {
+  public void testRegexpForSeparator() {
     assertTrue(DOT.symbol().matches(REGEXP_SEPARATOR));
     assertTrue(MINUS.symbol().matches(REGEXP_SEPARATOR));
     assertTrue(UNDERSCORE.symbol().matches(REGEXP_SEPARATOR));

@@ -21,16 +21,11 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import java.util.Arrays;
 
 import static java.lang.String.format;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_MODIFIER;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_VERSION_ID;
 
 /**
  * A version-id specifies the version that is associated with a resource, such as a JAR file.
- * A version-id can be postfixed with a '+' to indicate a greater-than-or-equal match,
- * a "*" to indicated a prefix match when used within a {@link VersionString}.
- * A version-id with no postfix indicate an exact match (plain version).
- * <p></p>
  * The version-id used in this specification must conform to the following syntax:
  *
  * <pre>
@@ -46,6 +41,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  * @see JNLPVersionPatterns
  */
 public class VersionId {
+
     private static final String ZERO_ELEMENT = "0";
 
     private final String versionId;
@@ -60,7 +56,7 @@ public class VersionId {
 
     private VersionId(String versionId) {
         this.versionId = versionId;
-        this.tuple = versionId.replaceAll(REGEXP_MODIFIER + "$", "").split(REGEXP_SEPARATOR);
+        this.tuple = versionId.split(REGEXP_SEPARATOR);
     }
 
     /**
@@ -73,7 +69,7 @@ public class VersionId {
         Assert.requireNonNull(versionId, "versionId");
 
         if (!versionId.matches(REGEXP_VERSION_ID)) {
-            throw new IllegalArgumentException(format("'%s' is not a valid version id according to JSR-56, Appendix A.", versionId));
+            throw new IllegalArgumentException(format("'%s' is not a valid version-id according to JSR-56, Appendix A.", versionId));
         }
 
         return new VersionId(versionId);
@@ -95,7 +91,7 @@ public class VersionId {
      * @param otherVersionId a version-id
      * @return {@code true} if this equals to {@code otherVersionId}, {@code false} otherwise.
      */
-    public boolean isEqualTo(final VersionId otherVersionId) {
+    boolean isEqualTo(final VersionId otherVersionId) {
         return equals(otherVersionId);
     }
 
@@ -150,10 +146,10 @@ public class VersionId {
     }
 
     /**
-     * Compares whether this version-id is greater than {@code otherVersionId}.
+     * Compares whether this version-id is less than {@code otherVersionId}.
      * <p/>
-     * A is greater than B if, when represented as normalized tuples, there exists some element
-     * of A which is greater than the corresponding element of B, and all earlier elements of A
+     * A is less than B if, when represented as normalized tuples, there exists some element
+     * of A which is less than the corresponding element of B, and all earlier elements of A
      * are the same as in B (see JSR-56 Specification, Appendix A.1 Ordering).
      * <p/>
      * Two numeric elements are compared numerically. Two alphanumeric elements are compared
@@ -165,7 +161,7 @@ public class VersionId {
      * See JSR-56 Specification, Appendix A
      *
      * @param otherVersionRange a version-id
-     * @return {@code true} if this version-id is greater than {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-id is less than {@code otherVersionId}, {@code false} otherwise.
      */
     boolean isLessThan(VersionId otherVersionRange) {
         final String[] tuple1 = asNormalizedTuple(otherVersionRange.tuple.length);
@@ -236,7 +232,7 @@ public class VersionId {
     }
 
     /**
-     * Only used for testing
+     * NOTE: Package visible for testing - do not use this method outside of VersionId.
      */
     String[] asTuple() {
         return tuple;
