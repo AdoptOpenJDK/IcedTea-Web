@@ -26,6 +26,8 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.CodeSource;
 import java.security.NoSuchAlgorithmException;
@@ -174,17 +176,23 @@ public class JNLPPolicy extends Policy {
      * Returns true if the CodeSource corresponds to a system jar. That is,
      * it's part of the JRE.
      */
-    private boolean isSystemJar(CodeSource source) {
+    private boolean isSystemJar(final CodeSource source) {
         if (source == null || source.getLocation() == null) {
             return false;
         }
 
         // anything in JRE/lib/ext is a system jar and has full permissions
-        String sourceProtocol = source.getLocation().getProtocol();
-        String sourcePath = source.getLocation().getPath();
-        if (sourceProtocol.toUpperCase().equals("FILE") &&
-                sourcePath.startsWith(jreExtDir.getRawPath())) {
-            return true;
+        final String sourceProtocol = source.getLocation().getProtocol();
+        final Path jreExtDirPath = Paths.get(jreExtDir);
+        try {
+            final Path sourcePath = Paths.get(source.getLocation().toURI());
+
+            if (sourceProtocol.toUpperCase().equals("FILE") && sourcePath.startsWith(jreExtDirPath)) {
+                return true;
+            }
+        } catch (URISyntaxException e) {
+            LOG.error("Invalid or corrupt code source location.", e);
+            throw new RuntimeException("Invalid or corrupt code source location.", e);
         }
 
         // check to see if source protocol is a Java System Library protocol

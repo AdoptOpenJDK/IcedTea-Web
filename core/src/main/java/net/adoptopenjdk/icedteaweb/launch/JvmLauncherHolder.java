@@ -16,6 +16,9 @@
 //
 package net.adoptopenjdk.icedteaweb.launch;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -23,6 +26,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class JvmLauncherHolder {
 
+    private final static Logger LOG = LoggerFactory.getLogger(JvmLauncherHolder.class);
     private static JvmLauncher launcher;
 
     public static JvmLauncher getLauncher() {
@@ -39,6 +43,7 @@ public class JvmLauncherHolder {
         if (JvmLauncherHolder.launcher != null) {
             throw new IllegalStateException("JvmLauncher already set.");
         }
+        LOG.info("JvmLauncher set to {}.", launcher.getClass().getName());
         JvmLauncherHolder.launcher = launcher;
     }
 }
