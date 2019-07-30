@@ -21,12 +21,12 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -61,8 +61,8 @@ import java.util.Map.Entry;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
+import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.getJavaWsBin;
 
 /**
  * This class builds a (freedesktop.org) desktop entry out of a {@link JNLPFile}
@@ -207,61 +207,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
 
     public static String getBrowserBin() {
-        String pathResult = findOnPath(BROWSERS);
+        String pathResult = JvmUtils.findOnPath(BROWSERS);
         if (pathResult != null) {
             return pathResult;
         } else {
             return "browser_not_found";
         }
         
-    }
-    
-    public static String getJavaWsBin() {
-        //Shortcut executes the jnlp as it was with system preferred java. It should work fine offline
-        //absolute - works in case of self built
-        String exec = System.getProperty(Launcher.KEY_JAVAWS_LOCATION);
-        if (exec != null) {
-            return exec;
-        }
-        String pathResult = findOnPath(new String[]{JAVAWS, System.getProperty(ITW_BIN_NAME)});
-        if (pathResult != null) {
-            return pathResult;
-        }
-        
-        return JAVAWS;
-    }
-    
-    
-    private static String findOnPath(String[] bins) {
-        String exec = null;
-        //find if one of binaries is on path
-        String path = System.getenv().get("PATH");
-        if (path == null || path.trim().isEmpty()) {
-            path = System.getenv().get("path");
-        }
-        if (path == null || path.trim().isEmpty()) {
-            path = System.getenv().get("Path");
-        }
-        if (path != null && !path.trim().isEmpty()) {
-            //relative - works with alternatives
-            String[] paths = path.split(File.pathSeparator);
-            outerloop:
-            for (String bin : bins) {
-                //when property is not set
-                if (bin == null) {
-                    continue;
-                }
-                for (String p : paths) {
-                    final File file = new File(p, bin);
-                    if (file.exists()) {
-                        exec = file.getAbsolutePath();
-                        break outerloop;
-                    }
-                }
-
-            }
-        }
-        return exec;
     }
 
     /**
