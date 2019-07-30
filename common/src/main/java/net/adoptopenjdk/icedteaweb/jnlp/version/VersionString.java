@@ -1,3 +1,19 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
 import java.util.Arrays;
@@ -39,7 +55,7 @@ public class VersionString {
      * @param versionString a version-string
      * @return a versionString
      */
-    public static VersionString fromString(String versionString) {
+    public static VersionString fromString(final String versionString) {
         if (Objects.isNull(versionString) || !versionString.matches(REGEXP_VERSION_STRING)) {
             throw new IllegalArgumentException(format("'%s' is not a valid version string according to JSR-56, Appendix A.", versionString));
         }
@@ -57,8 +73,15 @@ public class VersionString {
      * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    public boolean contains(String versionId) {
+    public boolean contains(final String versionId) {
         return contains(VersionId.fromString(versionId));
+    }
+
+    /**
+     * @return {@code true} if this version-string contains only a single version id, false otherwise
+     */
+    public boolean containsSingleVersionId() {
+        return versionIds.length == 1;
     }
 
     /**
@@ -67,8 +90,19 @@ public class VersionString {
      * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    private boolean contains(VersionId versionId) {
+    private boolean contains(final VersionId versionId) {
         return Arrays.stream(versionIds).anyMatch(vid -> vid.matches(versionId));
+    }
+
+    /**
+     * Check if the given version-string contains the given version-id
+     *
+     * @param versionString the version-string
+     * @param versionId the version-id
+     * @return {@code true} if the given version-string contains the given version-id, false otherwise
+     */
+    static public boolean contains(final String versionString, final String versionId) {
+        return (VersionString.fromString(versionString)).contains(versionId);
     }
 
     /**
@@ -79,7 +113,7 @@ public class VersionString {
      * @return {@code true} if this version-string contains a version-id greater than the
      * given {@code versionId}, {@code false} otherwise
      */
-    public boolean containsGreaterThan(String versionId) {
+    public boolean containsGreaterThan(final String versionId) {
         return containsGreaterThan(VersionId.fromString(versionId));
     }
 
@@ -91,7 +125,7 @@ public class VersionString {
      * @return {@code true} if this version-string contains a version-id greater than the
      * given {@code versionId}, {@code false} otherwise
      */
-    private boolean containsGreaterThan(VersionId versionId) {
+    private boolean containsGreaterThan(final VersionId versionId) {
         return Arrays.stream(versionIds).anyMatch(vid -> vid.isGreaterThan(versionId));
     }
 

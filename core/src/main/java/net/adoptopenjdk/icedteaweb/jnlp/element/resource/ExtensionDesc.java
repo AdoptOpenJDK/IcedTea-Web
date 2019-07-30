@@ -1,4 +1,5 @@
 // Copyright (C) 2001-2003 Jon A. Maxwell (JAM)
+// Copyright (C) 2019 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,7 +17,7 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -49,8 +50,10 @@ public class ExtensionDesc {
     /** the extension name */
     private final String name;
 
-    /** the required extension version */
-    private final Version version;
+    /**
+     * The required version. The version attribute can specify an exact version or
+     * a list of versions (version string). See JSR-56, section 6.4 for details. */
+    private final VersionString version;
 
     /** the location of the extension JNLP file */
     private final URL location;
@@ -68,10 +71,10 @@ public class ExtensionDesc {
      * Create an extension descriptor.
      *
      * @param name the extension name
-     * @param version the required version of the extension JNLPFile
-     * @param location the location of the extension JNLP file
+     * @param version the required version of the JNLP file extension
+     * @param location the location of the JNLP file extension
      */
-    public ExtensionDesc(String name, Version version, URL location) {
+    public ExtensionDesc(String name, VersionString version, URL location) {
         this.name = name;
         this.version = version;
         this.location = location;
@@ -114,7 +117,7 @@ public class ExtensionDesc {
     /**
      * @return the required version of the extension JNLP file.
      */
-    public Version getVersion() {
+    public VersionString getVersion() {
         return version;
     }
 

@@ -37,13 +37,14 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
 
 public class ManageJnlpResources {
 
@@ -56,16 +57,16 @@ public class ManageJnlpResources {
      * @param version version of jar
      * @return jars found.
      */
-    public static JARDesc[] findJars(final JNLPClassLoader rootClassLoader, final URL ref, final String part, final Version version) {
-        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(rootClassLoader, ref);
+    public static JARDesc[] findJars(final JNLPClassLoader rootClassLoader, final URL ref, final String part, final VersionString version) {
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(rootClassLoader, ref);
 
         if (foundLoader != null) {
-            List<JARDesc> foundJars = new ArrayList<>();
-            ResourcesDesc resources = foundLoader.getJNLPFile().getResources();
+            final List<JARDesc> foundJars = new ArrayList<>();
+            final ResourcesDesc resources = foundLoader.getJNLPFile().getResources();
 
-            for (JARDesc eachJar : resources.getJARs(part)) {
-                if (version == null || version.equals(eachJar.getVersion()))
-                    foundJars.add(eachJar);
+            for (final JARDesc aJar : resources.getJARs(part)) {
+                if (version == null || version.equals(aJar.getVersion()))
+                    foundJars.add(aJar);
             }
 
             return foundJars.toArray(new JARDesc[foundJars.size()]);
@@ -96,8 +97,8 @@ public class ManageJnlpResources {
      * @param part The name of the path.
      * @param version version of jar to be downloaded
      */
-    public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final Version version) {
-        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
+    public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final VersionString version) {
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
 
         if (foundLoader != null)
             foundLoader.initializeNewJarDownload(ref, part, version);

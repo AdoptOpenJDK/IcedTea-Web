@@ -212,13 +212,12 @@ public class ParserCornerCasesTest {
         Assert.assertEquals("1.0", p.getSpecVersion().toString());
     }
 
-    @Test
+    @Test (expected = java.lang.IllegalArgumentException.class)
     public void testCommentInAttributes() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
         final XMLParser xmlParser = XmlParserFactory.getParser(MALFORMED);
         Node root = xmlParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
         Parser p = new Parser(null, null, root, defaultParser);
-        Assert.assertEquals("<!-- something -->", p.getSpecVersion().toString());
     }
 
     @Test

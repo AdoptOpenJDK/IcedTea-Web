@@ -16,7 +16,7 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
 import java.net.URL;
 
@@ -38,8 +38,10 @@ public class JARDesc {
     /** the location of the JAR file */
     private final URL location;
 
-    /** the required JAR versions, or null */
-    private final Version version;
+    /**
+     * The required JAR version. The version attribute can specify an exact version or
+     * a list of versions (version string). See JSR-56, section 3.4 for details. */
+    private VersionString version;
 
     /** the part name */
     private final String part;
@@ -67,7 +69,7 @@ public class JARDesc {
      * @param nativeJar whether the JAR contains native libraries
      * @param cacheable whether the JAR can be cached or not
      */
-    public JARDesc(final URL location, final Version version, final String part, final boolean lazy, final boolean main, final boolean nativeJar, final boolean cacheable) {
+    public JARDesc(final URL location, final VersionString version, final String part, final boolean lazy, final boolean main, final boolean nativeJar, final boolean cacheable) {
         this.location = location;
         this.version = version;
         this.part = part;
@@ -87,8 +89,12 @@ public class JARDesc {
     /**
      * @return the required version of the JAR file.
      */
-    public Version getVersion() {
+    public VersionString getVersion() {
         return version;
+    }
+
+    public void setVersion(final VersionString version) {
+        this.version = version;
     }
 
     /**
