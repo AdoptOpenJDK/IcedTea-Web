@@ -26,7 +26,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
@@ -535,7 +535,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(URL location, String uniqueKey, Version version, ParserSettings settings, UpdatePolicy policy, String mainName, boolean enableCodeBase)
+    public static JNLPClassLoader getInstance(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final String mainName, boolean enableCodeBase)
             throws IOException, ParseException, LaunchException {
 
         JNLPClassLoader loader;
@@ -544,7 +544,7 @@ public class JNLPClassLoader extends URLClassLoader {
             loader = uniqueKeyToLoader.get(uniqueKey);
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
-                JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
+                final JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
 
                 loader = getInstance(jnlpFile, policy, mainName, enableCodeBase);
             }
@@ -2074,7 +2074,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
-            File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), null);
+            File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), eachJar.getVersion());
             String directoryUrl = CacheUtil.getCacheParentDirectory(cachedFile.getAbsolutePath());
 
             File directory = new File(directoryUrl);
@@ -2095,10 +2095,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param ref Path of the launch or extension JNLP File containing the
      * resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the path.
+     * @param version of jar to be downloaded
      * @throws LaunchException
      */
-    void initializeNewJarDownload(URL ref, String part, Version version) {
-        JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
+    void initializeNewJarDownload(final URL ref, final String part, final VersionString version) {
+        final JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
 
         for (JARDesc eachJar : jars) {
             LOG.info("Downloading and initializing jar: {}", eachJar.getLocation().toString());
@@ -2116,10 +2117,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * DOWNLOADTOCACHE, REMOVEFROMCACHE, or CHECKCACHE.
      * @return true if CHECKCACHE and the resource is cached.
      */
-    boolean manageExternalJars(URL ref, String version, DownloadAction action) {
+    boolean manageExternalJars(final URL ref, final String version, final DownloadAction action) {
         boolean approved = false;
         JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByResourceUrl(this, ref, version);
-        Version resourceVersion = (version == null) ? null : new Version(version);
+        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
 
         if (foundLoader != null) {
             approved = true;

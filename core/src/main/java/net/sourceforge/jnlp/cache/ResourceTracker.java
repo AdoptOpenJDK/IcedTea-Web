@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -129,15 +129,18 @@ public class ResourceTracker {
      * @param options options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
-    public void addResource(URL location, Version version, DownloadOptions options, UpdatePolicy updatePolicy) {
-        if (location == null)
+    public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
+        if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
+        }
+
         try {
             location = UrlUtils.normalizeUrl(location);
         } catch (Exception ex) {
-            LOG.error("Normalization of " + location.toString() + " have failed", ex);
+            LOG.error("Normalization of " + location.toString() + " has failed", ex);
         }
-        Resource resource = Resource.getResource(location, version, updatePolicy);
+
+        Resource resource = Resource.createResource(location, version, updatePolicy);
 
         synchronized (resources) {
             if (resources.contains(resource))
@@ -146,10 +149,7 @@ public class ResourceTracker {
             resources.add(resource);
         }
 
-        if (options == null) {
-            options = new DownloadOptions(false, false);
-        }
-        resource.setDownloadOptions(options);
+        resource.setDownloadOptions(options == null ? new DownloadOptions(false, false) : options);
 
         // checkCache may take a while (loads properties file).  this
         // should really be synchronized on resources, but the worst
@@ -193,8 +193,8 @@ public class ResourceTracker {
      * @param updatePolicy whether to check for updates if already in cache
      * @return whether the resource are already downloaded
      */
-    private boolean checkCache(Resource resource, UpdatePolicy updatePolicy) {
-        if (!CacheUtil.isCacheable(resource.getLocation(), resource.getDownloadVersion())) {
+    private boolean checkCache(final Resource resource, final UpdatePolicy updatePolicy) {
+        if (!CacheUtil.isCacheable(resource.getLocation())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).

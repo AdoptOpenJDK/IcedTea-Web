@@ -1,20 +1,40 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
 package net.adoptopenjdk.icedteaweb.jnlp.version;
+
+import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.util.Arrays;
 import java.util.Objects;
-import net.adoptopenjdk.icedteaweb.Assert;
 
 import static java.lang.String.format;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
-import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_MODIFIER;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionSpecifications.REGEXP_VERSION_ID;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.ASTERISK;
+import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 
 /**
- * A version-id is an exact version that is associated with a resource, such as a JAR file.
- *
+ * A version-id specifies the version that is associated with a resource, such as a JAR file.
+ * A version-id can be postfixed with a '+' to indicate a greater-than-or-equal match,
+ * a "*" to indicated a prefix match when used within a {@link VersionString}.
+ * A version-id with no postfix indicate an exact match (plain version).
+ * <p></p>
  * The version-id used in this specification must conform to the following syntax:
  *
  * <pre>
@@ -48,11 +68,18 @@ public class VersionId {
     }
 
     /**
-     * Exact version-ids are just plain version-ids and must not have any postfix modifiers.
+     * @return {@code true} if this version-id is a compound version range using an ampersand (&amp;), false otherwise
+     */
+    public boolean isCompoundVersion() {
+        return compoundVersionId != null;
+    }
+
+    /**
+     * Checks whether this version-id represents a plain (exact) version without any postfix modifiers.
      * @return {@code true} if this version-id does not have any modifiers, {@code false} otherwise.
      */
-    public boolean isExactVersionId() {
-        return !(hasPrefixMatchModifier() || hasGreaterThanOrEqualMatchModifier());
+    public boolean isExactVersion() {
+        return !hasPrefixMatchModifier() && !hasGreaterThanOrEqualMatchModifier() && !isCompoundVersion();
     }
 
     /**
@@ -168,7 +195,7 @@ public class VersionId {
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this version-id considering $
+     * Check if {@code otherVersionId} is a match with this version-id considering
      * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
      *
      * @param otherVersionId a version-id
@@ -192,14 +219,14 @@ public class VersionId {
             return compoundVersionId.matches(otherVersionId);
         }
 
-        if (this.hasPrefixMatchModifier())
-            return this.isPrefixMatchOf(otherVersionId);
+        if (hasPrefixMatchModifier())
+            return isPrefixMatchOf(otherVersionId);
         else {
-            if (this.hasGreaterThanOrEqualMatchModifier()) {
+            if (hasGreaterThanOrEqualMatchModifier()) {
                 return otherVersionId.isGreaterThanOrEqual(this);
             }
             else {
-                return this.isExactMatchOf(otherVersionId);
+                return isExactMatchOf(otherVersionId);
             }
         }
     }

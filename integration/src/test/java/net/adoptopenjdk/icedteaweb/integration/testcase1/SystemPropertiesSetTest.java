@@ -53,7 +53,7 @@ public class SystemPropertiesSetTest implements IntegrationTest {
         Boot.main(args);
 
         // then
-        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile1"));
+        assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile_Used"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
         

@@ -20,11 +20,11 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
@@ -91,9 +91,9 @@ public class CacheUtil {
      * @param policy   how to handle update
      * @return either the location in the cache or the original location
      */
-    public static URL getCachedResourceURL(URL location, Version version, UpdatePolicy policy) {
+    public static URL getCachedResourceURL(final URL location, final VersionString version, final UpdatePolicy policy) {
         try {
-            File f = getCachedResourceFile(location, version, policy);
+            final File f = getCachedResourceFile(location, version, policy);
             //url was pointing to nowhere eg 404
             if (f == null) {
                 //originally  f.toUrl was throwing NPE
@@ -115,11 +115,10 @@ public class CacheUtil {
      * @param policy   update policy of resource
      * @return location in ITW cache on filesystem
      */
-    public static File getCachedResourceFile(URL location, Version version, UpdatePolicy policy) {
-        ResourceTracker rt = new ResourceTracker();
+    public static File getCachedResourceFile(final URL location, final VersionString version, final UpdatePolicy policy) {
+        final ResourceTracker rt = new ResourceTracker();
         rt.addResource(location, version, null, policy);
-        File f = rt.getCacheFile(location);
-        return f;
+        return rt.getCacheFile(location);
     }
 
     /**
@@ -130,10 +129,10 @@ public class CacheUtil {
      * @param version  the version, or {@code null}
      * @return permissions of the location
      */
-    public static Permission getReadPermission(URL location, Version version) {
+    public static Permission getReadPermission(final URL location, final VersionString version) {
         Permission result = null;
-        if (CacheUtil.isCacheable(location, version)) {
-            File file = CacheUtil.getCacheFile(location, version);
+        if (CacheUtil.isCacheable(location)) {
+            final File file = CacheUtil.getCacheFile(location, version);
             result = new FilePermission(file.getPath(), FILE_READ_ACTION);
         } else {
             // this is what URLClassLoader does
@@ -430,9 +429,9 @@ public class CacheUtil {
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(URL source, Version version, long lastModified) {
+    public static boolean isCurrent(final URL source, final VersionString version, long lastModified) {
 
-        if (!isCacheable(source, version))
+        if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         try {
@@ -457,8 +456,8 @@ public class CacheUtil {
      * @return true if the source is in the cache
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCached(URL source, Version version) {
-        if (!isCacheable(source, version))
+    public static boolean isCached(final URL source, final VersionString version) {
+        if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         CacheEntry entry = new CacheEntry(source, version); // could pool this
@@ -475,10 +474,9 @@ public class CacheUtil {
      * the contents.
      *
      * @param source  the url of resource
-     * @param version version of resource
      * @return whether this resource can be cached
      */
-    public static boolean isCacheable(URL source, Version version) {
+    public static boolean isCacheable(URL source) {
         if (source == null)
             return false;
 
@@ -498,18 +496,16 @@ public class CacheUtil {
      * resource that matches the specified version will be returned.
      *
      * @param source  the source {@link URL}
-     * @param version the version id of the local file
+     * @param version the version of the local file
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static File getCacheFile(URL source, Version version) {
-        // ensure that version is an version id not version string
-
-        if (!isCacheable(source, version))
+    public static File getCacheFile(final URL source, final VersionString version) {
+        if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
         File cacheFile = null;
-        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             try {
                 lruHandler.lock();
@@ -595,8 +591,8 @@ public class CacheUtil {
      * @param version the version id of the local file
      * @return the file location in the cache.
      */
-    public static File makeNewCacheFile(URL source, Version version) {
-        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
+    public static File makeNewCacheFile(final URL source, final VersionString version) {
+        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             File cacheFile = null;
             try {
@@ -638,9 +634,9 @@ public class CacheUtil {
      * @return the stream to write to resource
      * @throws IOException if IO breaks
      */
-    public static OutputStream getOutputStream(URL source, Version version) throws IOException {
-        File localFile = getCacheFile(source, version);
-        OutputStream out = new FileOutputStream(localFile);
+    public static OutputStream getOutputStream(final URL source, final VersionString version) throws IOException {
+        final File localFile = getCacheFile(source, version);
+        final OutputStream out = new FileOutputStream(localFile);
 
         return new BufferedOutputStream(out);
     }
@@ -753,7 +749,6 @@ public class CacheUtil {
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
      * @param jnlpClassLoader the classloader
-     * @param jnlpClassLoader
      * @param tracker   the resource tracker
      * @param resources the resources to wait for
      * @param title     name of the download

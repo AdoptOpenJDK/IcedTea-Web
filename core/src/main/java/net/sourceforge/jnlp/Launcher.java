@@ -320,7 +320,7 @@ public class Launcher {
         try {
             getLauncher().launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
-            throw launchError(new LaunchException(null, null, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
+            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
             throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
@@ -409,7 +409,7 @@ public class Launcher {
 
             handler.launchInitialized(file);
 
-            ApplicationInstance app = createApplication(file);
+            final ApplicationInstance app = createApplication(file);
             app.initialize();
 
             String mainName = file.getApplication().getMainClass();
@@ -417,10 +417,10 @@ public class Launcher {
             // When the application-desc field is empty, we should take a
             // look at the main jar for the main class.
             if (mainName == null) {
-                JARDesc mainJarDesc = file.getResources().getMainJAR();
-                File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), null);
+                final JARDesc mainJarDesc = file.getResources().getMainJAR();
+                final File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), mainJarDesc.getVersion());
                 if (f != null) {
-                    JarFile mainJar = new JarFile(f);
+                    final JarFile mainJar = new JarFile(f);
                     mainName = mainJar.getManifest().
                                 getMainAttributes().getValue("Main-Class");
                 }
@@ -434,7 +434,7 @@ public class Launcher {
 
             LOG.info("Starting application [{}] ...", mainName);
 
-            Class<?> mainClass = app.getClassLoader().loadClass(mainName);
+            final Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
             final Method main = mainClass.getMethod("main", String[].class);
             final String[] args = file.getApplication().getArguments();

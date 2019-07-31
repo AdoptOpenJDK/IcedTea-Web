@@ -194,7 +194,7 @@ public class ResourceUrlCreator {
         if (!query.isEmpty()) {
             query = "?" + query;
         }
-        if (resource.getRequestVersion() != null && resource.getRequestVersion().isVersionId()) {
+        if (resource.getRequestVersion() != null && resource.getRequestVersion().containsSingleVersionId()) {
             if (!query.isEmpty()) {
                 query += "&";
             } else {

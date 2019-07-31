@@ -31,7 +31,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.Version;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -112,8 +112,8 @@ public final class PluginBridge extends JNLPFile {
     public PluginBridge(URL codebase, URL documentBase, String archive, String main,
                         int width, int height, final PluginParameters params, JNLPFileFactory factory)
             throws Exception {
-        specVersion = new Version("1.0");
-        fileVersion = new Version("1.1");
+        specVersion = VersionString.fromString("1.0");
+        fileVersion = VersionString.fromString("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
         this.params = params;
@@ -349,13 +349,13 @@ public final class PluginBridge extends JNLPFile {
                             String[] jarAndVer = cacheJar.split(";");
 
                             String jar = jarAndVer[0];
-                            Version version = null;
+                            VersionString version = null;
 
                             if (jar.length() == 0)
                                 continue;
 
                             if (jarAndVer.length > 1) {
-                                version = new Version(jarAndVer[1]);
+                                version = VersionString.fromString(jarAndVer[1]);
                             }
 
                             jarDescs.add(new JARDesc(new URL(codeBase, jar),
@@ -370,7 +370,7 @@ public final class PluginBridge extends JNLPFile {
                             String[] jarInfo = cacheExJar.split(";");
 
                             String jar = jarInfo[0].trim();
-                            Version version = null;
+                            VersionString version = null;
                             boolean lazy = true;
 
                             if (jarInfo.length > 1) {
@@ -380,12 +380,12 @@ public final class PluginBridge extends JNLPFile {
                                 if (jarInfo[1].equals("preload")) {
                                     lazy = false;
                                 } else {
-                                    version = new Version(jarInfo[1].trim());
+                                    version = VersionString.fromString(jarInfo[1].trim());
                                 }
 
                                 if (jarInfo.length > 2) {
                                     lazy = false;
-                                    version = new Version(jarInfo[2].trim());
+                                    version = VersionString.fromString(jarInfo[2].trim());
                                 }
                             }
 
