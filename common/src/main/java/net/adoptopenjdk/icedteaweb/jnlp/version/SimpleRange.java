@@ -35,7 +35,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
  *
  * <pre>
  *      simple-range       ::=  version-id | version-id modifier
- *      modifier           ::=  `+` | '*'
+ *      modifier           ::=  "+" | "*"
  * </pre>
  * <p>
  * See JSR-56 Specification, Appendix A.

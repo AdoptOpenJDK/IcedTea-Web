@@ -36,7 +36,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND
  *      version-string     ::=  version-range ( " " element) *
  *      version-range      ::=  simple-range ( "&amp;" simple-range) *
  *      simple-range       ::=  version-id | version-id modifier
- *      modifier           ::=  `+` | '*'
+ *      modifier           ::=  "+" | "*"
  * </pre>
  * <p>
  * See JSR-56 Specification, Appendix A.

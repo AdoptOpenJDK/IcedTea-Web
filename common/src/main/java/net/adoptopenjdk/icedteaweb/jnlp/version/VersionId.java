@@ -33,7 +33,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  *     string     ::= char ( char ) *
  *     char       ::= any ASCII character except a space, an ampersand, a separator, or a modifier.
  *     separator  ::= "." | "-" | "_"
- *     modifier   ::=  `+` | '*'
+ *     modifier   ::=  "+" | "*"
  * </pre>
  *
  * See JSR-56 Specification, Appendix A.

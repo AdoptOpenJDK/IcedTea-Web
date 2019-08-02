@@ -116,7 +116,7 @@ public class VersionString {
     @Override
     public String toString() {
         return Arrays.stream(versionRanges)
-            .map(VersionRange::toString)
-            .collect(Collectors.joining(" "));
+                .map(VersionRange::toString)
+                .collect(Collectors.joining(" "));
     }
 }
