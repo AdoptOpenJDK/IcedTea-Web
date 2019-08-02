@@ -37,26 +37,30 @@ exception statement from your version. */
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
+import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
 public class ResourceUrlCreator {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
-    protected final Resource resource;
-    protected final DownloadOptions downloadOptions;
+    private final Resource resource;
+    private final DownloadOptions downloadOptions;
 
-    public ResourceUrlCreator(Resource resource, DownloadOptions downloadOptions) {
+    ResourceUrlCreator(final Resource resource, final DownloadOptions downloadOptions) {
         this.resource = resource;
         this.downloadOptions = downloadOptions;
     }
@@ -69,83 +73,78 @@ public class ResourceUrlCreator {
      * @return a list of URLs that the resources might be downloadable from
      */
     public List<URL> getUrls() {
-        List<URL> urls = new LinkedList<>();
-        URL url;
+        final List<URL> urls = new LinkedList<>();
 
         if (downloadOptions.useExplicitPack() && downloadOptions.useExplicitVersion()) {
-            url = getUrl(resource, true, true);
+            final URL url = getUrl(resource, true, true);
             if (url != null) {
                 urls.add(url);
             }
-            url = getUrl(resource, false, true);
+        }
+        if (downloadOptions.useExplicitVersion()) {
+            final URL url = getUrl(resource, false, true);
             if (url != null) {
                 urls.add(url);
             }
-            url = getUrl(resource, true, false);
-            if (url != null) {
-                urls.add(url);
-            }
-        } else if (downloadOptions.useExplicitPack()) {
-            url = getUrl(resource, true, false);
-            if (url != null) {
-                urls.add(url);
-            }
-        } else if (downloadOptions.useExplicitVersion()) {
-            url = getUrl(resource, false, true);
+        }
+        if (downloadOptions.useExplicitPack()) {
+            final URL url = getUrl(resource, true, false);
             if (url != null) {
                 urls.add(url);
             }
         }
 
-        url = getVersionedUrl();
-        urls.add(url);
-
+        urls.add(getVersionedUrl());
         urls.add(resource.getLocation());
 
-        boolean noHttpsPreferred = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE));
+        final List<URL> result = new ArrayList<>();
+
+        final boolean noHttpsPreferred = Boolean.parseBoolean(getConfiguration().getProperty(KEY_HTTPS_DONT_ENFORCE));
         if (!noHttpsPreferred) {
             //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
-            List<URL> urlsCopy = new LinkedList<>(urls);
-            Collections.reverse(urlsCopy);
-            for (URL u : urlsCopy) {
-                if (u.getProtocol().equals("http") && u.getPort() < 0) {
+            for (final URL url : urls) {
+                if (url.getProtocol().equals("http") && url.getPort() < 0) { // port < 0 means default port
                     try {
-                        urls.add(0, copyUrltoHttps(u));
+                        result.add(0, new URL("https", url.getHost(), url.getFile()));
                     } catch (Exception ex) {
                         LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
                 }
             }
         }
-        return urls;
+
+        result.addAll(urls);
+        return result;
     }
 
     /**
      * Returns a url for the resource.
      *
-     * @param resource the resource
-     * @param usePack whether the URL should point to the pack200 file
+     * @param resource   the resource
+     * @param usePack    whether the URL should point to the pack200 file
      * @param useVersion whether the URL should be modified to include the
-     * version
+     *                   version
      * @return a URL for the resource or null if an appropriate URL can not be
      * found
      */
-    static URL getUrl(Resource resource, boolean usePack, boolean useVersion) {
+    static URL getUrl(final Resource resource, final boolean usePack, final boolean useVersion) {
         if (!(usePack || useVersion)) {
             throw new IllegalArgumentException("either pack200 or version required");
         }
 
-        String location = resource.getLocation().toString();
-        int lastSlash = resource.getLocation().toString().lastIndexOf('/');
+        final String location = resource.getLocation().toString();
+        final int lastSlash = resource.getLocation().toString().lastIndexOf('/');
         if (lastSlash == -1) {
             return resource.getLocation();
         }
-        String filename = location.substring(lastSlash + 1);
+        final String filename = location.substring(lastSlash + 1);
+
+        final String filenameWithVersion;
         if (useVersion && resource.getRequestVersion() != null) {
             // With 'useVersion', j2-commons-cli.jar becomes, for example, j2-commons-cli__V1.0.jar
-            String parts[] = filename.split("\\.", -1 /* Keep blank strings*/);
+            final String[] parts = filename.split("\\.", -1 /* Keep blank strings*/);
 
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             for (int i = 0; i < parts.length; i++) {
                 sb.append(parts[i]);
                 // Append __V<number> before last '.'
@@ -156,15 +155,21 @@ public class ResourceUrlCreator {
             }
             sb.setLength(sb.length() - 1); // remove last '.'
 
-            filename = sb.toString();
-        }
-        if (usePack) {
-            filename = filename + ".pack.gz";
+            filenameWithVersion = sb.toString();
+        } else {
+            filenameWithVersion = filename;
         }
 
-        location = location.substring(0, lastSlash + 1) + filename;
+        final String filenameWithVersionAndEnding;
+        if (usePack) {
+            filenameWithVersionAndEnding = filenameWithVersion + ".pack.gz";
+        } else {
+            filenameWithVersionAndEnding = filenameWithVersion;
+        }
+
+        final String urlLocation = location.substring(0, lastSlash + 1) + filenameWithVersionAndEnding;
         try {
-            URL newUrl = new URL(location);
+            final URL newUrl = new URL(urlLocation);
             return newUrl;
         } catch (MalformedURLException e) {
             return null;
@@ -177,54 +182,41 @@ public class ResourceUrlCreator {
      *
      * @return url with version cared about
      */
-    protected URL getVersionedUrl() {
-        URL resourceUrl = resource.getLocation();
-        String protocol = uriPartToString(resourceUrl.getProtocol()) + "://";
-        String userInfo = uriPartToString(resourceUrl.getUserInfo());
-        if (!userInfo.isEmpty()) {
-            userInfo += "@";
-        }
-        String host = uriPartToString(resourceUrl.getHost());
-        String port;
-        if (resourceUrl.getPort() == -1) {
-            port = "";
-        } else {
-            port = ":" + String.valueOf(resourceUrl.getPort());
-        }
-        String path = uriPartToString(resourceUrl.getPath());
-        String query = uriPartToString(resourceUrl.getQuery());
-        if (!query.isEmpty()) {
-            query = "?" + query;
-        }
+    URL getVersionedUrl() {
+        final URL resourceUrl = resource.getLocation();
+        final String protocol = uriPartToString(resourceUrl.getProtocol()) + "://";
+        final String userInfoPart = uriPartToString(resourceUrl.getUserInfo());
+        final String userInfo = !userInfoPart.isEmpty() ? userInfoPart + "@" : userInfoPart;
+        final String host = uriPartToString(resourceUrl.getHost());
+        final String port = resourceUrl.getPort() < 0 ? "" : ":" + resourceUrl.getPort();
+        final String path = uriPartToString(resourceUrl.getPath());
+
+        final List<String> queryParts = Arrays.stream(uriPartToString(resourceUrl.getQuery()).split("&"))
+                .filter(s -> !StringUtils.isBlank(s))
+                .collect(Collectors.toList());
         if (resource.getRequestVersion() != null && resource.getRequestVersion().containsSingleVersionId()) {
-            if (!query.isEmpty()) {
-                query += "&";
-            } else {
-                query = "?" + query;
-            }
-            query += "version-id=" + resource.getRequestVersion();
+            queryParts.add("version-id=" + resource.getRequestVersion());
         }
+        final String query;
+        if (queryParts.isEmpty()) {
+            query = "";
+        } else {
+            query = "?" + String.join("&", queryParts);
+        }
+
         try {
-            URL url = new URL(protocol + userInfo + host + port + path + query);
+            final URL url = new URL(protocol + userInfo + host + port + path + query);
             return url;
         } catch (MalformedURLException e) {
             return resourceUrl;
         }
     }
 
-    private static String uriPartToString(String part) {
+    private static String uriPartToString(final String part) {
         if (part == null) {
             return "";
         }
         return part;
-    }
-
-    private URL copyUrltoHttps(URL u) throws MalformedURLException {
-        if (u.getPort() < 0) {
-            return new URL("https", u.getHost(), u.getFile());
-        } else {
-            return new URL("https", u.getHost(), u.getPort(), u.getFile(), null);
-        }
     }
 
 }
