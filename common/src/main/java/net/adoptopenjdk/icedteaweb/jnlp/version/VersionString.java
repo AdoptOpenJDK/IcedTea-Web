@@ -108,6 +108,34 @@ public class VersionString {
         return Arrays.stream(versionRanges).anyMatch(range -> range.contains(versionId));
     }
 
+    int compare(VersionId id1, VersionId id2) {
+        final int idxOfId1 = indexOfFirstRangeContaining(id1);
+        final int idxOfId2 = indexOfFirstRangeContaining(id2);
+        final int diff = idxOfId2 - idxOfId1;
+
+        return diff != 0 ? diff : id1.compareTo(id2);
+    }
+
+    private int indexOfFirstRangeContaining(VersionId versionId) {
+        final int length = versionRanges.length;
+        for (int i = 0; i < length; i++) {
+            if (versionRanges[i].contains(versionId)) {
+                return i;
+            }
+        }
+        return length;
+    }
+
+    @Override
+    public boolean equals(final Object otherVersionString) {
+        if (otherVersionString == null || otherVersionString.getClass() != VersionRange.class) {
+            return false;
+        }
+        final VersionString other = (VersionString) otherVersionString;
+
+        return Arrays.equals(versionRanges, other.versionRanges);
+    }
+
     /**
      * Provides string representation of this version-string.
      *

@@ -40,7 +40,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  *
  * @see JNLPVersionPatterns
  */
-public class VersionId {
+public class VersionId implements Comparable<VersionId> {
 
     private static final String ZERO_ELEMENT = "0";
 
@@ -114,7 +114,16 @@ public class VersionId {
             }
         }
         return true;
-     }
+    }
+
+    @Override
+    public int compareTo(VersionId versionId) {
+        if (isEqualTo(versionId)) {
+            return 0;
+        }
+
+        return isLessThan(versionId) ? -1 : 1;
+    }
 
     /**
      * A is a prefix matches of B if, when represented as tuples, the elements of A are the same as the
@@ -185,7 +194,7 @@ public class VersionId {
                 return false;
             }
 
-            return ((Comparable)element1).compareTo(element2) < 0;
+            return ((Comparable) element1).compareTo(element2) < 0;
         }
         return false;
     }

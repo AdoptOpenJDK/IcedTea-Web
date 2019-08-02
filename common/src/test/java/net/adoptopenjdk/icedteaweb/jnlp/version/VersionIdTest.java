@@ -83,7 +83,7 @@ public class VersionIdTest {
     }
 
     @Test
-    public void testMatches() {
+    public void testEquals() {
         assertTrue(versionId("1.0").isEqualTo(versionId("1")));
         assertTrue(versionId("1-0").isEqualTo(versionId("1")));
         assertTrue(versionId("1_0").isEqualTo(versionId("1")));
@@ -131,7 +131,9 @@ public class VersionIdTest {
         assertTrue(versionId("1.4.2").isLessThan(versionId("1.4.5")));
 
         // numeric elements have lower precedence than non-numeric elements
+        assertTrue(versionId("1").isLessThan(versionId("A")));
         assertTrue(versionId("1.0.1").isLessThan(versionId("1.0.A")));
+        assertTrue(versionId("1.0.A").isLessThan(versionId("1.0.B")));
         assertTrue(versionId("1.0.B").isLessThan(versionId("1.1.A")));
         assertTrue(versionId("1.0.A").isLessThan(versionId("1.0.ABC")));
         assertTrue(versionId("1.0.0-build41").isLessThan(versionId("1.0.0-build42")));
@@ -165,6 +167,68 @@ public class VersionIdTest {
         assertTuples(versionId("1.2").asNormalizedTuple(1), "1", "2");
         assertTuples(versionId("1.2").asNormalizedTuple(2), "1", "2");
         assertTuples(versionId("1.2").asNormalizedTuple(3), "1", "2", "0");
+    }
+
+    @Test
+    public void testComparingOfEqualVersionIds() {
+        assertEquals(0, versionId("1.0").compareTo(versionId("1")));
+        assertEquals(0, versionId("1-0").compareTo(versionId("1")));
+        assertEquals(0, versionId("1_0").compareTo(versionId("1")));
+        assertEquals(0, versionId("1").compareTo(versionId("1.0")));
+        assertEquals(0, versionId("1.0").compareTo(versionId("1.0")));
+        assertEquals(0, versionId("1.0").compareTo(versionId("1.0.0-0")));
+        assertEquals(0, versionId("1.0.0_0").compareTo(versionId("1.0.0")));
+        assertEquals(0, versionId("1.3").compareTo(versionId("1.3.0")));
+        assertEquals(0, versionId("1.3.0").compareTo(versionId("1.3")));
+        assertEquals(0, versionId("1.2.2.4").compareTo(versionId("1.2.2-004")));
+    }
+
+    @Test
+    public void testComparingOfUnequalVersionIds() {
+        // less than
+        assertLessThan("1", "2");
+        assertLessThan("1", "1.1");
+        assertLessThan("1.0", "1.1");
+        assertLessThan("1.1.0", "1.1.1");
+        assertLessThan("1.1", "1.1.1");
+        assertLessThan("1.4.2", "1.4.5");
+        assertLessThan("1.0.2", "1.1");
+
+        // greater than
+        assertGreaterThan("2", "1");
+        assertGreaterThan("1.1", "1");
+        assertGreaterThan("1.1", "1.0");
+        assertGreaterThan("1.1.1", "1.1.0");
+        assertGreaterThan("1.1.1", "1.1");
+        assertGreaterThan("1.4.5", "1.4.1");
+        assertGreaterThan("1.1", "1.0.2");
+
+        // numeric elements have lower precedence than non-numeric elements
+        assertLessThan("1", "A");
+        assertLessThan("1.0.1", "1.0.A");
+        assertLessThan("1.0.A", "1.0.B");
+        assertLessThan("1.0.B", "1.1.A");
+        assertLessThan("1.0.A", "1.0.ABC");
+        assertLessThan("1.0.0-build42", "1.0.1");
+        assertLessThan("1.0.0-build41", "1.0.0-build42");
+        assertLessThan("1.0.0-42", "1.0.0-build42");
+
+        assertGreaterThan("A", "1");
+        assertGreaterThan("1.0.A", "1.0.1");
+        assertGreaterThan("1.0.B", "1.0.A");
+        assertGreaterThan("1.1.A", "1.0.B");
+        assertGreaterThan("1.0.ABC", "1.0.A");
+        assertGreaterThan("1.0.1", "1.0.0-build42");
+        assertGreaterThan("1.0.0-build42", "1.0.0-build41");
+        assertGreaterThan("1.0.0-build42", "1.0.0-42");
+    }
+
+    private void assertGreaterThan(String versionId1, String versionId2) {
+        assertTrue(versionId(versionId1).compareTo(versionId(versionId2)) > 0);
+    }
+
+    private void assertLessThan(String versionId1, String versionId2) {
+        assertTrue(versionId(versionId1).compareTo(versionId(versionId2)) < 0);
     }
 
     private VersionId versionId(String s) {
