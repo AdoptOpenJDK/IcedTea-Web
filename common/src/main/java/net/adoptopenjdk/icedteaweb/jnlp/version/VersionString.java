@@ -19,7 +19,6 @@ package net.adoptopenjdk.icedteaweb.jnlp.version;
 import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -104,7 +103,9 @@ public class VersionString {
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
     private boolean contains(final VersionId versionId) {
-        return Arrays.stream(versionRanges).anyMatch(range -> range.matches(versionId));
+        Assert.requireNonNull(versionId, "versionId");
+
+        return Arrays.stream(versionRanges).anyMatch(range -> range.contains(versionId));
     }
 
     /**

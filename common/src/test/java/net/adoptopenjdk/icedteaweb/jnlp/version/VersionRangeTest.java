@@ -101,66 +101,66 @@ public class VersionRangeTest {
 
     @Test(expected = NullPointerException.class)
     public void testMatchesWithNullStringVersionId() {
-        versionRange("1.0").matches((String) null);
+        versionRange("1.0").contains((String) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testMatchesWithNullVersionId() {
-        versionRange("1.0").matches((VersionId) null);
+    public void testContainsWithNullVersionId() {
+        versionRange("1.0").contains((VersionId) null);
     }
 
     @Test
-    public void testExactMatches() {
-        assertTrue(versionRange("1.0").matches("1"));
-        assertTrue(versionRange("1-0").matches("1"));
-        assertTrue(versionRange("1_0").matches("1"));
-        assertTrue(versionRange("1").matches("1.0"));
-        assertTrue(versionRange("1.0").matches("1.0"));
-        assertTrue(versionRange("1.0").matches("1.0.0-0"));
-        assertTrue(versionRange("1.0.0_0").matches("1.0.0"));
-        assertTrue(versionRange("1.3").matches("1.3.0"));
-        assertTrue(versionRange("1.2.2.4").matches("1.2.2-004"));
+    public void testContainsWithExactMatches() {
+        assertTrue(versionRange("1.0").contains("1"));
+        assertTrue(versionRange("1-0").contains("1"));
+        assertTrue(versionRange("1_0").contains("1"));
+        assertTrue(versionRange("1").contains("1.0"));
+        assertTrue(versionRange("1.0").contains("1.0"));
+        assertTrue(versionRange("1.0").contains("1.0.0-0"));
+        assertTrue(versionRange("1.0.0_0").contains("1.0.0"));
+        assertTrue(versionRange("1.3").contains("1.3.0"));
+        assertTrue(versionRange("1.2.2.4").contains("1.2.2-004"));
         // not a match
-        assertFalse(versionRange("1.0.4").matches("1.0"));
-        assertFalse(versionRange("1.0.4").matches("1.4"));
-        assertFalse(versionRange("1.0.4").matches("1.0.3"));
+        assertFalse(versionRange("1.0.4").contains("1.0"));
+        assertFalse(versionRange("1.0.4").contains("1.4"));
+        assertFalse(versionRange("1.0.4").contains("1.0.3"));
     }
 
     @Test
-    public void testMatchesWithPrefixModifiers() {
-        assertTrue(versionRange("1.0*").matches("1"));
-        assertTrue(versionRange("1.0*").matches("1.0"));
-        assertTrue(versionRange("1.0*").matches("1.0.0"));
-        assertTrue(versionRange("1.0*").matches("1.0.4"));
-        assertTrue(versionRange("2.0*").matches("2.0.1"));
+    public void testContainsWithPrefixModifiers() {
+        assertTrue(versionRange("1.0*").contains("1"));
+        assertTrue(versionRange("1.0*").contains("1.0"));
+        assertTrue(versionRange("1.0*").contains("1.0.0"));
+        assertTrue(versionRange("1.0*").contains("1.0.4"));
+        assertTrue(versionRange("2.0*").contains("2.0.1"));
         // not a match
-        assertFalse(versionRange("1.5*").matches("1.6"));
-        assertFalse(versionRange("1.5*").matches("2.0.0"));
+        assertFalse(versionRange("1.5*").contains("1.6"));
+        assertFalse(versionRange("1.5*").contains("2.0.0"));
     }
 
     @Test
-    public void testMatchesWithGreaterOrEqualsModifiers() {
-        assertTrue(versionRange("1.0+").matches("1.0.0"));
-        assertTrue(versionRange("1.4+").matches("1.4.6"));
-        assertTrue(versionRange("1.4.3+").matches("1.4.3-009"));
-        assertTrue(versionRange("1.5+").matches("1.5"));
-        assertTrue(versionRange("1.0.3+").matches("1.0.4"));
-        assertTrue(versionRange("1.5+").matches("1.6"));
-        assertTrue(versionRange("1.5+").matches("2.0"));
-        assertTrue(versionRange("1.4.1_02+").matches("1.4.1_42"));
+    public void testContainsWithGreaterOrEqualsModifiers() {
+        assertTrue(versionRange("1.0+").contains("1.0.0"));
+        assertTrue(versionRange("1.4+").contains("1.4.6"));
+        assertTrue(versionRange("1.4.3+").contains("1.4.3-009"));
+        assertTrue(versionRange("1.5+").contains("1.5"));
+        assertTrue(versionRange("1.0.3+").contains("1.0.4"));
+        assertTrue(versionRange("1.5+").contains("1.6"));
+        assertTrue(versionRange("1.5+").contains("2.0"));
+        assertTrue(versionRange("1.4.1_02+").contains("1.4.1_42"));
         // not a match
-        assertFalse(versionRange("2.0.1+").matches("2.0.0"));
+        assertFalse(versionRange("2.0.1+").contains("2.0.0"));
     }
 
     @Test
-    public void testMatchesWithCompound() {
+    public void testContainsWithCompound() {
         // version-id with 1.4 as a prefix and that is not less than 1.4.1_02
-        assertTrue(versionRange("1.4*&1.4.1_02+").matches("1.4.1_02"));
-        assertTrue(versionRange("1.4*&1.4.1_02+").matches("1.4.1_42"));
-        assertTrue(versionRange("1.4*&1.4.1_02+").matches("1.4.5"));
+        assertTrue(versionRange("1.4*&1.4.1_02+").contains("1.4.1_02"));
+        assertTrue(versionRange("1.4*&1.4.1_02+").contains("1.4.1_42"));
+        assertTrue(versionRange("1.4*&1.4.1_02+").contains("1.4.5"));
 
         // not a match
-        assertFalse(versionRange("1.4*&1.4.1_02+").matches("1.4.1_01"));
+        assertFalse(versionRange("1.4*&1.4.1_02+").contains("1.4.1_01"));
     }
 
     @Test

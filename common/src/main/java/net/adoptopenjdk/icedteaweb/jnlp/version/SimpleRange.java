@@ -126,24 +126,22 @@ class SimpleRange {
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this simple-range considering
-     * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
+     * Check if this simple-range contains the given {@code versionId}.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this simple-range matches {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-range contains {@code versionId}, {@code false} otherwise.
      */
-    public boolean matches(final String otherVersionId) {
-        return matches(VersionId.fromString(otherVersionId));
+    public boolean contains(final String otherVersionId) {
+        return contains(VersionId.fromString(otherVersionId));
     }
 
     /**
-     * Check if {@code otherVersionId} is a match with this simple-range considering
-     * {@link #hasPrefixMatchModifier()} and {@link #hasGreaterThanOrEqualMatchModifier()}.
+     * Check if this simple-range contains the given {@code versionId}.
      *
      * @param otherVersionId a version-id
-     * @return {@code true} if this simple-range matches {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-range contains {@code versionId}, {@code false} otherwise.
      */
-    public boolean matches(final VersionId otherVersionId) {
+    public boolean contains(final VersionId otherVersionId) {
         Assert.requireNonNull(otherVersionId, "otherVersionId");
 
         if (isExactVersion()) {

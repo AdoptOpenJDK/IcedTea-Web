@@ -110,25 +110,25 @@ public class VersionRange {
     }
 
     /**
-     * Check if {@code versionId} is a match with this version-range.
+     * Check if this version-range contains the given {@code versionId}.
      *
      * @param versionId a version-id
-     * @return {@code true} if this version-range matches {@code versionId}, {@code false} otherwise.
+     * @return {@code true} if this version-range contains {@code versionId}, {@code false} otherwise.
      */
-    public boolean matches(final String versionId) {
-        return matches(VersionId.fromString(versionId));
+    public boolean contains(final String versionId) {
+        return contains(VersionId.fromString(versionId));
     }
 
     /**
-     * Check if {@code versionId} is a match with this version-id considering.
+     * Check if this version-range contains the given {@code versionId}.
      *
      * @param versionId a version-id
-     * @return {@code true} if this version-id matches {@code otherVersionId}, {@code false} otherwise.
+     * @return {@code true} if this version-range contains {@code versionId}, {@code false} otherwise.
      */
-    public boolean matches(final VersionId versionId) {
+    public boolean contains(final VersionId versionId) {
         Assert.requireNonNull(versionId, "versionId");
 
-        return Arrays.stream(ranges).allMatch(simpleRange -> simpleRange.matches(versionId));
+        return Arrays.stream(ranges).allMatch(simpleRange -> simpleRange.contains(versionId));
     }
 
     boolean isEqualTo(final VersionRange otherVersionRange) {

@@ -132,6 +132,8 @@ public class VersionId {
      * @return {@code true} if this version-id is a prefix matches of {@code otherVersionId}, {@code false} otherwise.
      */
     boolean isPrefixMatchOf(VersionId otherVersionId) {
+        Assert.requireNonNull(otherVersionId, "otherVersionId");
+
         final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple.length);
 
         for (int i = 0; i < tuple.length; i++) {
@@ -160,12 +162,14 @@ public class VersionId {
      * <p/>
      * See JSR-56 Specification, Appendix A
      *
-     * @param otherVersionRange a version-id
+     * @param otherVersionId a version-id
      * @return {@code true} if this version-id is less than {@code otherVersionId}, {@code false} otherwise.
      */
-    boolean isLessThan(VersionId otherVersionRange) {
-        final String[] tuple1 = asNormalizedTuple(otherVersionRange.tuple.length);
-        final String[] tuple2 = otherVersionRange.asNormalizedTuple(tuple.length);
+    boolean isLessThan(VersionId otherVersionId) {
+        Assert.requireNonNull(otherVersionId, "otherVersionId");
+
+        final String[] tuple1 = asNormalizedTuple(otherVersionId.tuple.length);
+        final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple.length);
 
         for (int i = 0; i < tuple1.length; i++) {
             final Object element1 = prepareForComparison(tuple1[i]);

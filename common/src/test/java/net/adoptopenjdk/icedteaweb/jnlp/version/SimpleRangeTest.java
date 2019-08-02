@@ -94,56 +94,56 @@ public class SimpleRangeTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testMatchesWithNullStringVersionId() {
-        simpleRange("1.0").matches((String) null);
+    public void testContainsWithNullStringVersionId() {
+        simpleRange("1.0").contains((String) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testMatchesWithNullVersionId() {
-        simpleRange("1.0").matches((VersionId) null);
+    public void testContainsWithNullVersionId() {
+        simpleRange("1.0").contains((VersionId) null);
     }
 
     @Test
-    public void testExactMatches() {
-        assertTrue(simpleRange("1.0").matches("1"));
-        assertTrue(simpleRange("1-0").matches("1"));
-        assertTrue(simpleRange("1_0").matches("1"));
-        assertTrue(simpleRange("1").matches("1.0"));
-        assertTrue(simpleRange("1.0").matches("1.0"));
-        assertTrue(simpleRange("1.0").matches("1.0.0-0"));
-        assertTrue(simpleRange("1.0.0_0").matches("1.0.0"));
-        assertTrue(simpleRange("1.3").matches("1.3.0"));
-        assertTrue(simpleRange("1.2.2.4").matches("1.2.2-004"));
+    public void testContainsWithExactMatches() {
+        assertTrue(simpleRange("1.0").contains("1"));
+        assertTrue(simpleRange("1-0").contains("1"));
+        assertTrue(simpleRange("1_0").contains("1"));
+        assertTrue(simpleRange("1").contains("1.0"));
+        assertTrue(simpleRange("1.0").contains("1.0"));
+        assertTrue(simpleRange("1.0").contains("1.0.0-0"));
+        assertTrue(simpleRange("1.0.0_0").contains("1.0.0"));
+        assertTrue(simpleRange("1.3").contains("1.3.0"));
+        assertTrue(simpleRange("1.2.2.4").contains("1.2.2-004"));
         // not a match
-        assertFalse(simpleRange("1.0.4").matches("1.0"));
-        assertFalse(simpleRange("1.0.4").matches("1.4"));
-        assertFalse(simpleRange("1.0.4").matches("1.0.3"));
+        assertFalse(simpleRange("1.0.4").contains("1.0"));
+        assertFalse(simpleRange("1.0.4").contains("1.4"));
+        assertFalse(simpleRange("1.0.4").contains("1.0.3"));
     }
 
     @Test
-    public void testMatchesWithPrefixModifiers() {
-        assertTrue(simpleRange("1.0*").matches("1"));
-        assertTrue(simpleRange("1.0*").matches("1.0"));
-        assertTrue(simpleRange("1.0*").matches("1.0.0"));
-        assertTrue(simpleRange("1.0*").matches("1.0.4"));
-        assertTrue(simpleRange("2.0*").matches("2.0.1"));
+    public void testContainsWithWithPrefixModifiers() {
+        assertTrue(simpleRange("1.0*").contains("1"));
+        assertTrue(simpleRange("1.0*").contains("1.0"));
+        assertTrue(simpleRange("1.0*").contains("1.0.0"));
+        assertTrue(simpleRange("1.0*").contains("1.0.4"));
+        assertTrue(simpleRange("2.0*").contains("2.0.1"));
         // not a match
-        assertFalse(simpleRange("1.5*").matches("1.6"));
-        assertFalse(simpleRange("1.5*").matches("2.0.0"));
+        assertFalse(simpleRange("1.5*").contains("1.6"));
+        assertFalse(simpleRange("1.5*").contains("2.0.0"));
     }
 
     @Test
-    public void testMatchesWithGreaterOrEqualsModifiers() {
-        assertTrue(simpleRange("1.0+").matches("1.0.0"));
-        assertTrue(simpleRange("1.4+").matches("1.4.6"));
-        assertTrue(simpleRange("1.4.3+").matches("1.4.3-009"));
-        assertTrue(simpleRange("1.5+").matches("1.5"));
-        assertTrue(simpleRange("1.0.3+").matches("1.0.4"));
-        assertTrue(simpleRange("1.5+").matches("1.6"));
-        assertTrue(simpleRange("1.5+").matches("2.0"));
-        assertTrue(simpleRange("1.4.1_02+").matches("1.4.1_42"));
+    public void testContainsWithWithGreaterOrEqualsModifiers() {
+        assertTrue(simpleRange("1.0+").contains("1.0.0"));
+        assertTrue(simpleRange("1.4+").contains("1.4.6"));
+        assertTrue(simpleRange("1.4.3+").contains("1.4.3-009"));
+        assertTrue(simpleRange("1.5+").contains("1.5"));
+        assertTrue(simpleRange("1.0.3+").contains("1.0.4"));
+        assertTrue(simpleRange("1.5+").contains("1.6"));
+        assertTrue(simpleRange("1.5+").contains("2.0"));
+        assertTrue(simpleRange("1.4.1_02+").contains("1.4.1_42"));
         // not a match
-        assertFalse(simpleRange("2.0.1+").matches("2.0.0"));
+        assertFalse(simpleRange("2.0.1+").contains("2.0.0"));
     }
 
     @Test
