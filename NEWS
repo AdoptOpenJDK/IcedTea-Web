@@ -8,6 +8,12 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.3 (2019-08-02):
+* Security updates
+  - CVE-2019-10182 - Fixed bug when relative path (..) could leak up (even out of cache)
+  - CVE-2019-10185 - Nested jar, if by relative path point up, is stored as hashed
+  - CVE-2019-10181 - All files, except signatures files, are now  checked for signatures
+
 New in release 1.8.2 (2019-07-15):
 * fix(JNLPFile): location/sourceLocation confusion
 * Fix hang in windows when javaws is launched outside the console
@@ -20,7 +26,7 @@ New in release 1.8.2 (2019-07-15):
 New in release 1.8.1 (2019-05-21):
 * backport deadlock fix from #219
 * handle jnlp filename with space for shortcuts (#180)
-* use ico-file instead of png-file as itw-icon and use it as default icon 
+* use ico-file instead of png-file as itw-icon and use it as default icon
 
 New in release 1.8 (2019-03-12):
 * added support for javafx-desc and so allwong run of pure-javafx only applications
