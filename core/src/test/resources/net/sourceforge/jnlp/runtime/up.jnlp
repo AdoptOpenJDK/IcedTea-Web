@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp spec="6.0+" codebase=".">
+
+<information><title>1965</title><vendor>Nemzeti Ado- es Vamhivatal</vendor><offline-allowed/></information>
+
+
+<resources>
+  <j2se href="http://java.sun.com/products/autodl/j2se" version="1.8+" />
+<!-- absolute url is a must -->
+  <jar href="http://localhost:8080/../../../base/j1.jar" version="2.0"/>
+</resources>
+
+<application-desc main-class="Hello1" />
+
+</jnlp>

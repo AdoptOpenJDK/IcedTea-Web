@@ -88,6 +88,69 @@ public class CacheUtilTest {
         final File expected = new File("/tmp/https/example.com/5050/applet/e4f3cf11f86f5aa33f424bc3efe3df7a9d20837a6f1a5bbbc60c1f57f3780a4");
         Assert.assertEquals(expected, CacheUtil.urlToPath(u, "/tmp"));
     }
+
+    @Test
+    public void tesPathUpNoGoBasic() throws Exception {
+        final URL u = new URL("https://example.com/applet/../my.jar");
+        final File expected = new File("/tmp/https/example.com/abca4723622ed60db3dea12cbe2402622a74f7a49b73e23b55988e4eee5ded.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void tesPathUpNoGoBasicLong() throws Exception {
+        final URL u = new URL("https://example.com/applet/../my.jar.q_SlNFU1NJT05JRD02OUY1ODVCNkJBOTM1NThCQjdBMTA5RkQyNDZEQjEwRi5wcm9kX3RwdG9tY2F0MjE1X2p2bTsgRW50cnVzdFRydWVQYXNzUmVkaXJlY3RVcmw9Imh0dHBzOi8vZWZzLnVzcHRvLmdvdi9FRlNXZWJVSVJlZ2lzdGVyZWQvRUZTV2ViUmVnaXN0ZXJlZCI7IFRDUFJPRFBQQUlSc2Vzc2lvbj02MjIxMjk0MTguMjA0ODAuMDAwMA\"");
+        final File expected = new File("/tmp/https/example.com/ec97413e3f6eee8215ecc8375478cc1ae5f44f18241b9375361d5dfcd7b0ec");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void tesPathUpNoGoBasic2() throws Exception {
+        final URL u = new URL("https://example.com/../my.jar");
+        final File expected = new File("/tmp/https/example.com/eb1a56bed34523dbe7ad84d893ebc31a8bbbba9ce3f370e42741b6a5f067c140.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void tesPathUpNoGoBasicEvil() throws Exception {
+        final URL u = new URL("https://example.com/../../my.jar");
+        final File expected = new File("/tmp/https/example.com/db464f11d68af73e37eefaef674517b6be23f0e4a5738aaee774ecf5b58f1bfc.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void tesPathUpNoGoBasicEvil2() throws Exception {
+        final URL u = new URL("https://example.com:99/../../../my.jar");
+        final File expected = new File("/tmp/https/example.com/99/95401524c345e0d554d4d77330e86c98a77b9bb58a0f93094204df446b356.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+    @Test
+    public void tesPathUpNoGoBasicEvilest() throws Exception {
+        final URL u = new URL("https://example2.com/something/../../../../../../../../../../../my.jar");
+        final File expected = new File("/tmp/https/example2.com/a8df64388f5b84d5f635e4d6dea5f4d2f692ae5381f8ec6736825ff8d6ff2c0.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void testQueryGotHAshedToo() throws Exception {
+        final URL u = new URL("https://example2.com/something/my.jar?../../harm");
+        final File expected = new File("/tmp/https/example2.com/2844b3c690ea355159ed61de6e727f2e9169ab55bf58b8fa3f4b64f6a25bd7.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
+
+    @Test
+    public void testNameGotHashedToo() throws Exception {
+        final URL u = new URL("https://example2.com/something/..my.jar");
+        final File expected = new File("/tmp/https/example2.com/c0c13e25fbe26876938eecd15227ab6299f9a4b8c11746e5451fb88cb775cb0.jar");
+        File r = CacheUtil.urlToPath(u, "/tmp/");
+        Assert.assertEquals(expected, r);
+    }
     
     
     @Test

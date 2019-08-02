@@ -35,15 +35,25 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
+import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -52,7 +62,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -137,7 +151,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         File tempDirectory = FileTestUtils.createTempDirectory();
         File jarLocation = new File(tempDirectory, "test.jar");
 
-        /* Test with main-class in manifest */ {
+        /* Test with main-class in manifest */
+        {
             Manifest manifest = new Manifest();
             manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "DummyClass");
             FileTestUtils.createJarWithContents(jarLocation, manifest);
@@ -157,7 +172,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     @Test
     @Ignore
     public void getMainClassNameTestEmpty() throws Exception {
-        /* Test with-out any main-class specified */ {
+        /* Test with-out any main-class specified */
+        {
             File tempDirectory = FileTestUtils.createTempDirectory();
             File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation /* No contents */);
@@ -363,4 +379,222 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         }
 
     }
+
+    @Test
+    public void testRelativePathInUrl() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        dir = new File(dir,"base");
+        dir.mkdir();
+        File jar = new File(dir,"j1.jar");
+        File jnlp = new File(dir+"/a/b/up.jnlp");
+        jnlp.getParentFile().mkdirs();
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/up.jnlp");
+        String jnlpString = StreamUtils.readStreamAsString(is, Charset.forName("utf-8"));
+        is.close();
+        jnlpString = jnlpString.replaceAll("8080", ""+port);
+        is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
+        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        Files.write(jnlp.toPath(),jnlpString.getBytes("utf-8"));
+        ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        try {
+            final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/up.jnlp"));
+            final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
+            InputStream is1 = classLoader1.getResourceAsStream("Hello1.class");
+            is1.close();
+            is1 = classLoader1.getResourceAsStream("META-INF/MANIFEST.MF");
+            is1.close();
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/up.jnlp").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/f812acb32c857fd916c842e2bf4fb32b9c3837ef63922b167a7e163305058b7.jar").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
+            as.stop();
+        }
+
+    }
+
+    @Test
+    public void testEncodedPathIsNotDecodedForCache() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        dir = new File(dir,"base");
+        dir.mkdir();
+        File jar = new File(dir,"j1.jar");
+        File jnlp = new File(dir+"/a/b/upEncoded.jnlp");
+        jnlp.getParentFile().mkdirs();
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/upEncoded.jnlp");
+        String jnlpString = StreamUtils.readStreamAsString(is, Charset.forName("utf-8"));
+        is.close();
+        jnlpString = jnlpString.replaceAll("8080", ""+port);
+        is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
+        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        Files.write(jnlp.toPath(),jnlpString.getBytes("utf-8"));
+        ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK); JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        try {
+            final JNLPFile jnlpFile1 = new JNLPFile(new URL("http://localhost:" + port + "/upEncoded.jnlp"));
+            final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
+            InputStream is1 = classLoader1.getResourceAsStream("Hello1.class");
+            is1.close();
+            is1 = classLoader1.getResourceAsStream("META-INF/MANIFEST.MF");
+            is1.close();
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/upEncoded.jnlp").exists());
+            //be aware; if decoding ever come in play here, thios will leak out of cache folder. Thus harm user system. See fix for " Fixed bug when relative path (..) could leak up (even out of cache)"
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/%2E%2E/%2E%2E/%2E%2E/base").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
+            as.stop();
+        }
+
+    }
+
+    @Test
+    public void testRelativePathInNestedJars() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        File jar = new File(dir,"jar03_dotdotN1.jar");
+        File jnlp = new File(dir,"jar_03_dotdot_jarN1.jnlp");
+        InputStream is1 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp");
+        InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
+        OutputStream fos1 = new FileOutputStream(jnlp);
+        OutputStream fos2 = new FileOutputStream(jar);
+        StreamUtils.copyStream(is1, fos1);
+        StreamUtils.copyStream(is2, fos2);
+        fos1.flush();;
+        fos2.flush();
+        fos1.close();
+        fos2.close();
+        ServerLauncher as = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        //fix of "All files, except signaturre files, are now  checked for signatures" make this actually correctly failing ahead of time
+        String ignoreBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, "true");
+        String manifestAttsBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        try {
+            //it is invalid jar, so we have to disable checks first
+            final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
+            final JNLPClassLoader classLoader = JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
+
+            //ThreadGroup group = Thread.currentThread().getThreadGroup();
+            //ApplicationInstance app = new ApplicationInstance(jnlpFile, group, classLoader);
+            //classLoader.setApplication(app);
+            //app.initialize();
+
+            //this test is actually not testing mutch. The app must be accessing the nested jar in plugin-like way
+            InputStream is = classLoader.getResourceAsStream("application/abev/nyomtatvanyinfo/1965.teminfo.enyk");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/MANIFEST.MF");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/j1.jar");
+            is.close();
+            is = classLoader.getResourceAsStream("META-INF/../../jar01_to_be_injected.jar");
+            //the .. is not recognized correctly
+            //is.close();
+            //Class c = classLoader.getClass().forName("Hello1");
+            // in j1.jar
+            is = classLoader.getResourceAsStream("Hello1.class");
+            //is.close(); nested jar is not on defualt CP
+            //in  jar01
+            //c = classLoader.getClass().forName("com.devdaily.FileUtilities");
+            is = classLoader.getResourceAsStream("com/devdaily/FileUtilities.class");
+            // is.close(); nested jar is not on defualt CP
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/0/http/localhost/"+port+"/jar_03_dotdot_jarN1.jnlp").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar.nested/99a90686bfbe84e3f9dbeed8127bba85672ed73688d3c69191aa1ee70916a.jar").exists());
+            Assert.assertTrue(new File(PathsAndFiles.CACHE_DIR.getFullPath()+"/1/http/localhost/"+port+"/jar03_dotdotN1.jar.nested/META-INF/j1.jar").exists());
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
+            as.stop();
+        }
+
+    }
+
+    @Test(expected = Exception.class)
+    public void testDifferentSignatureInManifestMf() throws Exception {
+        CacheUtil.clearCache();
+        int port = ServerAccess.findFreePort();
+        File dir = FileTestUtils.createTempDirectory();
+        dir.deleteOnExit();
+        File jar = new File(dir,"jar03_dotdotN1.jar");
+        File jnlp = new File(dir,"jar_03_dotdot_jarN1.jnlp");
+        InputStream is1 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar_03_dotdot_jarN1.jnlp");
+        InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
+        OutputStream fos1 = new FileOutputStream(jnlp);
+        OutputStream fos2 = new FileOutputStream(jar);
+        StreamUtils.copyStream(is1, fos1);
+        StreamUtils.copyStream(is2, fos2);
+        fos1.flush();;
+        fos2.flush();
+        fos1.close();
+        fos2.close();
+        ServerLauncher as = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), port);
+        boolean verifyBackup = JNLPRuntime.isVerifying();
+        boolean trustBackup= JNLPRuntime.isTrustAll();
+        boolean securityBAckup= JNLPRuntime.isSecurityEnabled();
+        boolean verbose= JNLPRuntime.isDebug();
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        String ignoreBackup = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, "false");
+        try {
+            //it is invalid jar, so we have to disable checks first
+            final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
+            final JNLPClassLoader classLoader = JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBAckup);
+            JNLPRuntime.setDebug(verbose);
+            JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
+            as.stop();
+        }
+    }
+
 }
