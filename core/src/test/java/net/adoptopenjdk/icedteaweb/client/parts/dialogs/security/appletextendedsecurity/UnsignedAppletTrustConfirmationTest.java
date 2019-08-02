@@ -210,10 +210,14 @@ public class UnsignedAppletTrustConfirmationTest {
     @BeforeClass
     public static void initUrlsX123() throws MalformedURLException, IOException {
         urlX1 = new URL("http://&#10;does&#32;not&#32;matter&#32;is&#32;ok");
-        urlX2 = new URL("http://\ndoes not matter is harmful");
-        Properties p = new Properties();
-        p.load(new StringReader("key=http:\\u002F\\u002F\\u000Adoes\\u0020not\\u0020matter\\u0020is\\u0020harmful"));
-        urlX3=new URL(p.getProperty("key"));
+        try {
+            urlX2 = new URL("http://\ndoes not matter is harmful");
+            Properties p = new Properties();
+            p.load(new StringReader("key=http:\\u002F\\u002F\\u000Adoes\\u0020not\\u0020matter\\u0020is\\u0020harmful"));
+            urlX3=new URL(p.getProperty("key"));
+        } catch (MalformedURLException ex) { // normal since jdk-8u221            
+            ServerAccess.logException(ex);
+        }
     }
 
     @BeforeClass
