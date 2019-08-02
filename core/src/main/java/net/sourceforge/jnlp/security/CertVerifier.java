@@ -50,36 +50,36 @@ public interface CertVerifier {
     /**
      * @return  if the publisher is already trusted
      */
-    public boolean getAlreadyTrustPublisher();
+    boolean getAlreadyTrustPublisher();
 
     /**
      * @return  if the root is in CA certs
      */
-    public boolean getRootInCacerts();
+    boolean getRootInCaCerts();
 
     /**
      * @return  if there are signing issues with the certificate being verified
      * @param certPath to be validated
      */
-    public boolean hasSigningIssues(CertPath certPath);
+    boolean hasSigningIssues(CertPath certPath);
 
     /**
      * @return  the details regarding issue with this certificate
      * @param certPath certificate
      */
-    public List<String> getDetails(CertPath certPath);
+    List<String> getDetails(CertPath certPath);
 
     /**
      * @return  a valid certificate path to this certificate being verified
      * @param certPath to be read
      */
-    public CertPath getCertPath(CertPath certPath);
+    CertPath getCertPath(CertPath certPath);
 
     /**
      * @return the application's publisher's certificate.
      * @param certPath to be read for publisher
      */
-    public abstract Certificate getPublisher(CertPath certPath);
+    Certificate getPublisher(CertPath certPath);
 
     /**
      * @return  the application's root's certificate. This
@@ -88,5 +88,5 @@ public interface CertVerifier {
      * @param certPath certificate
      *  
      */
-    public abstract Certificate getRoot(CertPath certPath);
+    Certificate getRoot(CertPath certPath);
 }

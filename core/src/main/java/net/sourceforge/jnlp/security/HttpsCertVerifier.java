@@ -44,7 +44,6 @@ import sun.security.util.DerValue;
 import sun.security.util.HostnameChecker;
 import sun.security.x509.X500Name;
 
-import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -52,30 +51,30 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
+import static java.util.stream.Collectors.joining;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public class HttpsCertVerifier implements CertVerifier {
 
-    private final static Logger LOG = LoggerFactory.getLogger(HttpsCertVerifier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpsCertVerifier.class);
 
-    private X509Certificate[] chain;
-    private String authType;
-    private String hostName;
-    private boolean isTrusted;
-    private boolean hostMatched;
-    private ArrayList<String> details = new ArrayList<String>();
+    private final X509Certificate[] chain;
+    private final String hostName;
+    private final boolean isTrusted;
+    private final boolean hostMatched;
+    private final ArrayList<String> details = new ArrayList<>();
 
-    public HttpsCertVerifier(X509Certificate[] chain, String authType,
-                             boolean isTrusted, boolean hostMatched,
-                             String hostName) {
+    HttpsCertVerifier(final X509Certificate[] chain, final String authType,
+                      final boolean isTrusted, final boolean hostMatched,
+                      final String hostName) {
         this.chain = chain;
-        this.authType = authType;
         this.hostName = hostName;
         this.isTrusted = isTrusted;
         this.hostMatched = hostMatched;
@@ -86,20 +85,18 @@ public class HttpsCertVerifier implements CertVerifier {
         return isTrusted;
     }
 
-
     /* XXX: Most of these methods have a CertPath param that should be passed
      * from the UI dialogs. However, this is not implemented yet so most of
      * the params are ignored.
      */
 
     @Override
-    public CertPath getCertPath(CertPath certPath) { // Parameter ignored.
+    public CertPath getCertPath(final CertPath certPath) { // Parameter ignored.
 
-        ArrayList<X509Certificate> list = new ArrayList<X509Certificate>();
-        for (int i = 0; i < chain.length; i++)
-            list.add(chain[i]);
+        final ArrayList<X509Certificate> list = new ArrayList<>();
+        Collections.addAll(list, chain);
 
-        ArrayList<CertPath> certPaths = new ArrayList<CertPath>();
+        final ArrayList<CertPath> certPaths = new ArrayList<>();
 
         try {
             certPaths.add(CertificateFactory.getInstance("X.509").generateCertPath(list));
@@ -112,120 +109,108 @@ public class HttpsCertVerifier implements CertVerifier {
     }
 
     @Override
-    public List<String> getDetails(CertPath certPath) { // Parameter ignored.
+    public List<String> getDetails(final CertPath certPath) { // Parameter ignored.
 
-        boolean hasExpiredCert = false;
-        boolean hasExpiringCert = false;
-        boolean notYetValidCert = false;
-        boolean isUntrusted = false;
-        boolean CNMisMatch = !hostMatched;
+        if (!getAlreadyTrustPublisher()) {
+            addToDetails(R("SUntrustedCertificate"));
+        }
 
-        if (!getAlreadyTrustPublisher())
-            isUntrusted = true;
-
-        for (int i = 0; i < chain.length; i++) {
-            X509Certificate cert = chain[i];
-
+        for (X509Certificate cert : chain) {
             long now = System.currentTimeMillis();
             long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L;
             long notAfter = cert.getNotAfter().getTime();
             if (notAfter < now) {
-                hasExpiredCert = true;
+                addToDetails(R("SHasExpiredCert"));
             } else if (notAfter < now + SIX_MONTHS) {
-                hasExpiringCert = true;
+                addToDetails(R("SHasExpiringCert"));
             }
 
             try {
                 cert.checkValidity();
             } catch (CertificateNotYetValidException cnyve) {
-                notYetValidCert = true;
+                addToDetails(R("SNotYetValidCert"));
             } catch (CertificateExpiredException cee) {
-                hasExpiredCert = true;
+                addToDetails(R("SHasExpiredCert"));
             }
         }
 
-        String altNames = getNamesForCert(chain[0]);
-
-        if (isUntrusted || hasExpiredCert || hasExpiringCert || notYetValidCert || CNMisMatch) {
-            if (isUntrusted)
-                addToDetails(R("SUntrustedCertificate"));
-            if (hasExpiredCert)
-                addToDetails(R("SHasExpiredCert"));
-            if (hasExpiringCert)
-                addToDetails(R("SHasExpiringCert"));
-            if (notYetValidCert)
-                addToDetails(R("SNotYetValidCert"));
-            if (CNMisMatch)
-                addToDetails(R("SCNMisMatch", altNames, this.hostName));
+        if (!hostMatched) {
+            addToDetails(R("SCNMisMatch", getNamesForCert(chain[0]), this.hostName));
         }
 
         return details;
     }
 
-    private String getNamesForCert(X509Certificate c) {
+    private String getNamesForCert(final X509Certificate c) {
 
-        String names = "";
+        final List<String> names = new ArrayList<>();
 
         // We use the specification from
         // http://java.sun.com/j2se/1.5.0/docs/api/java/security/cert/X509Certificate.html#getSubjectAlternativeNames()
         // to determine the type of address
-        int ALTNAME_DNS = 2;
-        int ALTNAME_IP = 7;
+        final int ALTNAME_DNS = 2;
+        final int ALTNAME_IP = 7;
 
         try {
-            Collection<List<?>> subjAltNames = c.getSubjectAlternativeNames();
-            X500Name subjectName = HostnameChecker.getSubjectX500Name(c);
-            DerValue derValue = subjectName.findMostSpecificAttribute
-                    (X500Name.commonName_oid);
-            names += derValue.getAsString();
+            final X500Name subjectName = HostnameChecker.getSubjectX500Name(c);
+            if (subjectName != null) {
+                final DerValue derValue = subjectName.findMostSpecificAttribute(X500Name.commonName_oid);
+                if (derValue != null) {
+                    names.add(derValue.getAsString());
+                }
+            }
 
+            final Collection<List<?>> subjAltNames = c.getSubjectAlternativeNames();
             if (subjAltNames != null) {
                 for (List<?> next : subjAltNames) {
-                    if (((Integer) next.get(0)).intValue() == ALTNAME_IP ||
-                            ((Integer) next.get(0)).intValue() == ALTNAME_DNS) {
-                        names += ", " + (String) next.get(1);
+                    final Integer type = (Integer) next.get(0);
+                    if (type == ALTNAME_IP || type == ALTNAME_DNS) {
+                        names.add((String) next.get(1));
                     }
                 }
             }
-        } catch (CertificateParsingException cpe) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cpe);
-        } catch (IOException ioe) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
+        } catch (Exception e) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
-        return names;
+        return names.stream().filter(Objects::nonNull).collect(joining(", "));
     }
 
-    private void addToDetails(String detail) {
-        if (!details.contains(detail))
+    private void addToDetails(final String detail) {
+        if (!details.contains(detail)) {
             details.add(detail);
+        }
     }
 
     @Override
-    public Certificate getPublisher(CertPath certPath) { // Parameter ignored.
-        if (chain.length > 0)
-            return (Certificate) chain[0];
+    public Certificate getPublisher(final CertPath certPath) { // Parameter ignored.
+        if (chain.length > 0) {
+            return chain[0];
+        }
         return null;
     }
 
     @Override
-    public Certificate getRoot(CertPath certPath) { // Parameter ignored.
-        if (chain.length > 0)
-            return (Certificate) chain[chain.length - 1];
+    public Certificate getRoot(final CertPath certPath) { // Parameter ignored.
+        if (chain.length > 0) {
+            return chain[chain.length - 1];
+        }
         return null;
     }
 
-    public boolean getRootInCacerts() {
+    @Override
+    public boolean getRootInCaCerts() {
         try {
-            KeyStore[] caCertsKeyStores = KeyStores.getCAKeyStores();
+            final KeyStore[] caCertsKeyStores = KeyStores.getCAKeyStores();
             return CertificateUtils.inKeyStores((X509Certificate) getRoot(null), caCertsKeyStores);
         } catch (Exception e) {
+            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
         return false;
     }
 
     @Override
-    public boolean hasSigningIssues(CertPath certPath) {
+    public boolean hasSigningIssues(final CertPath certPath) {
         return false;
     }
 }

@@ -162,7 +162,7 @@ public class CertWarningPane extends SecurityDialogPanel {
 
         // Labels
         String topLabelText = "";
-        bottomLabelWarningText = parent.getCertVerifier().getRootInCacerts() ?
+        bottomLabelWarningText = parent.getCertVerifier().getRootInCaCerts() ?
                 R("STrustedSource") : R("SUntrustedSource");
         String iconLocation = "net/sourceforge/jnlp/resources/";
         alwaysTrustSelected = false;

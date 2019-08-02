@@ -129,7 +129,7 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     @Override
-    public boolean getRootInCacerts() {
+    public boolean getRootInCaCerts() {
         boolean allRootCAsTrusted = appVerifier.hasRootInCacerts(certs,
                 jarSignableEntries);
         LOG.debug("App has trusted root CA: {}", allRootCAsTrusted);
