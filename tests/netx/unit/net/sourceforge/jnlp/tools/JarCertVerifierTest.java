@@ -59,9 +59,22 @@ public class JarCertVerifierTest {
     @Test
     public void testIsMetaInfFile() {
         final String METAINF = "META-INF";
+        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.MF"));
+        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.SF"));
+        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.DSA"));
+        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.RSA"));
+        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/SIG-blah.blah"));
+
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.MF.class"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.SF.class"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.DSA.class"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.RSA.class"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/SIG-blah.blah.class"));
+
         assertFalse(JarCertVerifier.isMetaInfFile("some_dir/" + METAINF + "/filename"));
         assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "filename"));
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/filename"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/filename"));
+        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/filename"));
     }
 
     class JarCertVerifierEntry extends JarEntry {
