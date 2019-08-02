@@ -45,6 +45,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -105,6 +106,7 @@ public class ResourceUrlCreator {
         if (!noHttpsPreferred) {
             //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
             List<URL> urlsCopy = new LinkedList<>(urls);
+            Collections.reverse(urlsCopy);
             for (URL u : urlsCopy) {
                 if (u.getProtocol().equals("http") && u.getPort() < 0) {
                     try {
