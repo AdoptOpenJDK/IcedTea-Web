@@ -184,10 +184,6 @@ public class HttpsCertVerifier implements CertVerifier {
                     }
                 }
             }
-
-            if (subjAltNames != null)
-                names = names.substring(2); // remove proceeding ", "
-
         } catch (CertificateParsingException cpe) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, cpe);
         } catch (IOException ioe) {
