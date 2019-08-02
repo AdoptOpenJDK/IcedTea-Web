@@ -47,7 +47,7 @@ public class VersionStringTest {
         Assert.assertEquals("1.0* 2.0*", versionString("1.0* 2.0*").toString());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testNullVersionString() {
         versionString(null);
     }
