@@ -49,7 +49,7 @@ public class VersionString {
     private final VersionRange[] versionRanges;
 
     private VersionString(final VersionRange[] versionRanges) {
-        this.versionRanges = Assert.requireNonNull(versionRanges, "versionRanges");
+        this.versionRanges = versionRanges;
     }
 
     /**
@@ -65,11 +65,11 @@ public class VersionString {
             throw new IllegalArgumentException(format("'%s' is not a valid version-string according to JSR-56, Appendix A.", versionString));
         }
 
-        final VersionRange[] versionRanges = Arrays.stream(versionString.split(REGEXP_SPACE))
+        final VersionRange[] ranges = Arrays.stream(versionString.split(REGEXP_SPACE))
                 .map(VersionRange::fromString)
                 .toArray(VersionRange[]::new);
 
-        return new VersionString(versionRanges);
+        return new VersionString(ranges);
     }
 
     /**
@@ -108,12 +108,32 @@ public class VersionString {
         return Arrays.stream(versionRanges).anyMatch(range -> range.contains(versionId));
     }
 
-    int compare(final VersionId id1, final VersionId id2) {
-        final int idxOfId1 = indexOfFirstRangeContaining(id1);
-        final int idxOfId2 = indexOfFirstRangeContaining(id2);
+    /**
+     * Compares two version-ids in the context of this version-string.
+     * This implementation follows the specification of a {@link java.util.Comparator}.
+     *
+     * If two or more version-id match the given version-string,
+     * the JNLP Client should use the one matching the earlier version-range in the version-string.
+     *
+     * If two or more version-id match a given version-range,
+     * the JNLP Client should use the one with the highest version-id.
+     *
+     * See JSR-56 Specification, Appendix A.
+     *
+     * @param versionId1 a version-id
+     * @param versionId2 a version-id
+     * @return a negative int if versionId1 is less than versionId2,
+     *  a positive int if versionId1 is after than versionId2 or zero if they are equal.
+     */
+    int compare(final VersionId versionId1, final VersionId versionId2) {
+        Assert.requireNonNull(versionId1, "versionId1");
+        Assert.requireNonNull(versionId2, "versionId2");
+
+        final int idxOfId1 = indexOfFirstRangeContaining(versionId1);
+        final int idxOfId2 = indexOfFirstRangeContaining(versionId2);
         final int diff = idxOfId2 - idxOfId1;
 
-        return diff != 0 ? diff : id1.compareTo(id2);
+        return diff != 0 ? diff : versionId1.compareTo(versionId2);
     }
 
     private int indexOfFirstRangeContaining(final VersionId versionId) {

@@ -47,9 +47,9 @@ class SimpleRange {
     private final VersionId versionId;
     private final VersionModifier modifier;
 
-    private SimpleRange(VersionId versionId, VersionModifier modifier) {
-        this.versionId = Assert.requireNonNull(versionId, "versionId");
-        this.modifier = Assert.requireNonNull(modifier, "modifier");
+    private SimpleRange(final VersionId versionId, final VersionModifier modifier) {
+        this.versionId = versionId;
+        this.modifier = modifier;
     }
 
     /**
@@ -74,7 +74,7 @@ class SimpleRange {
      * @param simpleRange a simple-range
      * @return a SimpleRange
      */
-    public static SimpleRange fromString(String simpleRange) {
+    public static SimpleRange fromString(final String simpleRange) {
         Assert.requireNonNull(simpleRange, "simpleRange");
 
         if (!simpleRange.matches(REGEXP_SIMPLE_RANGE)) {
@@ -87,7 +87,7 @@ class SimpleRange {
         return new SimpleRange(versionId, modifier);
     }
 
-    private static VersionModifier extractModifier(String simpleRange) {
+    private static VersionModifier extractModifier(final String simpleRange) {
         for (VersionModifier modifier : Arrays.asList(PLUS, ASTERISK)) {
             if (simpleRange.endsWith(modifier.symbol())) {
                 return modifier;
@@ -96,7 +96,7 @@ class SimpleRange {
         return NONE;
     }
 
-    private static VersionId extractVersionId(String simpleRange) {
+    private static VersionId extractVersionId(final String simpleRange) {
         final String exactId = simpleRange.replaceAll(REGEXP_MODIFIER + "$", "");
         return VersionId.fromString(exactId);
     }

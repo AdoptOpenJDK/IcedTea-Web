@@ -19,6 +19,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.version;
 import net.adoptopenjdk.icedteaweb.Assert;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEXP_VERSION_RANGE;
@@ -45,19 +46,17 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.AMPERSAND
  */
 public class VersionRange {
 
-    private final String versionRange;
-    private final SimpleRange[] ranges;
+    private final SimpleRange[] simpleRanges;
 
-    private VersionRange(final String versionId, final SimpleRange[] ranges) {
-        this.versionRange = versionId;
-        this.ranges = Assert.requireNonNull(ranges, "ranges");
+    private VersionRange(final SimpleRange[] simpleRanges) {
+        this.simpleRanges = simpleRanges;
     }
 
     /**
      * @return {@code true} if this version-range is a compound range using an ampersand (&amp;), false otherwise
      */
     boolean isCompoundVersion() {
-        return ranges.length > 1;
+        return simpleRanges.length > 1;
     }
 
     /**
@@ -66,7 +65,7 @@ public class VersionRange {
      * @return {@code true} if this version-range does not have any modifiers, {@code false} otherwise.
      */
     boolean isExactVersion() {
-        return ranges.length == 1 && ranges[0].isExactVersion();
+        return simpleRanges.length == 1 && simpleRanges[0].isExactVersion();
     }
 
     /**
@@ -76,7 +75,7 @@ public class VersionRange {
      * and its only simple range has a prefix match modifier, {@code false} otherwise.
      */
     boolean hasPrefixMatchModifier() {
-        return ranges.length == 1 && ranges[0].hasPrefixMatchModifier();
+        return simpleRanges.length == 1 && simpleRanges[0].hasPrefixMatchModifier();
     }
 
     /**
@@ -86,7 +85,7 @@ public class VersionRange {
      * and its only simple range has a greater or equal modifier, {@code false} otherwise.
      */
     boolean hasGreaterThanOrEqualMatchModifier() {
-        return ranges.length == 1 && ranges[0].hasGreaterThanOrEqualMatchModifier();
+        return simpleRanges.length == 1 && simpleRanges[0].hasGreaterThanOrEqualMatchModifier();
     }
 
     /**
@@ -106,7 +105,7 @@ public class VersionRange {
                 .map(SimpleRange::fromString)
                 .toArray(SimpleRange[]::new);
 
-        return new VersionRange(versionRange, ranges);
+        return new VersionRange(ranges);
     }
 
     /**
@@ -128,7 +127,7 @@ public class VersionRange {
     public boolean contains(final VersionId versionId) {
         Assert.requireNonNull(versionId, "versionId");
 
-        return Arrays.stream(ranges).allMatch(simpleRange -> simpleRange.contains(versionId));
+        return Arrays.stream(simpleRanges).allMatch(simpleRange -> simpleRange.contains(versionId));
     }
 
     boolean isEqualTo(final VersionRange otherVersionRange) {
@@ -142,7 +141,7 @@ public class VersionRange {
         }
         final VersionRange other = (VersionRange) otherVersionRange;
 
-        return Arrays.equals(ranges, other.ranges);
+        return Arrays.equals(simpleRanges, other.simpleRanges);
     }
 
     /**
@@ -152,6 +151,8 @@ public class VersionRange {
      */
     @Override
     public String toString() {
-        return versionRange;
+        return Arrays.stream(simpleRanges)
+                .map(SimpleRange::toString)
+                .collect(Collectors.joining("&"));
     }
 }
