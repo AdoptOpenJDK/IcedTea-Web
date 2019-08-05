@@ -48,8 +48,8 @@ class SimpleRange {
     private final VersionModifier modifier;
 
     private SimpleRange(VersionId versionId, VersionModifier modifier) {
-        this.versionId = versionId;
-        this.modifier = modifier;
+        this.versionId = Assert.requireNonNull(versionId, "versionId");
+        this.modifier = Assert.requireNonNull(modifier, "modifier");
     }
 
     /**

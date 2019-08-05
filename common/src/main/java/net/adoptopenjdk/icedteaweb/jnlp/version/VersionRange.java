@@ -48,9 +48,9 @@ public class VersionRange {
     private final String versionRange;
     private final SimpleRange[] ranges;
 
-    private VersionRange(String versionId, SimpleRange[] ranges) {
+    private VersionRange(final String versionId, final SimpleRange[] ranges) {
         this.versionRange = versionId;
-        this.ranges = ranges;
+        this.ranges = Assert.requireNonNull(ranges, "ranges");
     }
 
     /**
@@ -95,7 +95,7 @@ public class VersionRange {
      * @param versionRange a version-range
      * @return a version-id
      */
-    public static VersionRange fromString(String versionRange) {
+    public static VersionRange fromString(final String versionRange) {
         Assert.requireNonNull(versionRange, "versionRange");
 
         if (!versionRange.matches(REGEXP_VERSION_RANGE)) {

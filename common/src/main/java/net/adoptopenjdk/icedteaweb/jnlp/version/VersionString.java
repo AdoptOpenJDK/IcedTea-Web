@@ -48,8 +48,8 @@ public class VersionString {
 
     private final VersionRange[] versionRanges;
 
-    private VersionString(VersionRange[] versionRanges) {
-        this.versionRanges = versionRanges;
+    private VersionString(final VersionRange[] versionRanges) {
+        this.versionRanges = Assert.requireNonNull(versionRanges, "versionRanges");
     }
 
     /**
@@ -102,13 +102,13 @@ public class VersionString {
      * @param versionId a version-id
      * @return {@code true} if this version-string contains the given {@code versionId}, {@code false} otherwise
      */
-    private boolean contains(final VersionId versionId) {
+    public boolean contains(final VersionId versionId) {
         Assert.requireNonNull(versionId, "versionId");
 
         return Arrays.stream(versionRanges).anyMatch(range -> range.contains(versionId));
     }
 
-    int compare(VersionId id1, VersionId id2) {
+    int compare(final VersionId id1, final VersionId id2) {
         final int idxOfId1 = indexOfFirstRangeContaining(id1);
         final int idxOfId2 = indexOfFirstRangeContaining(id2);
         final int diff = idxOfId2 - idxOfId1;
@@ -116,7 +116,7 @@ public class VersionString {
         return diff != 0 ? diff : id1.compareTo(id2);
     }
 
-    private int indexOfFirstRangeContaining(VersionId versionId) {
+    private int indexOfFirstRangeContaining(final VersionId versionId) {
         final int length = versionRanges.length;
         for (int i = 0; i < length; i++) {
             if (versionRanges[i].contains(versionId)) {
