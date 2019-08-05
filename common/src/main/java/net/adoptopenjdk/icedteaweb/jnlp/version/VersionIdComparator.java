@@ -16,22 +16,29 @@
 //
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
+import java.util.Comparator;
+
 /**
- * Enum of all modifiers as defined for {@link VersionRange}s as defined by JSR-56 Specification, Appendix A.
+ * Comparator to compare two version-ids in the context of a version-string.
+ *
+ * If two or more version-id match the given version-string,
+ * the JNLP Client should use the one matching the earlier version-range in the version-string.
+ *
+ * If two or more version-id match a given version-range,
+ * the JNLP Client should use the one with the highest version-id.
+ *
+ * See JSR-56 Specification, Appendix A.
  */
-public enum VersionModifier {
-    NONE(""),
-    PLUS("+"),
-    ASTERISK("*"),
-    AMPERSAND("&");
+public class VersionIdComparator implements Comparator<VersionId> {
 
-    private String symbol;
+    private final VersionString versionString;
 
-    VersionModifier(final String symbol) {
-        this.symbol = symbol;
+    public VersionIdComparator(VersionString versionString) {
+        this.versionString = versionString;
     }
 
-    public String symbol() {
-        return symbol;
+    @Override
+    public int compare(VersionId o1, VersionId o2) {
+        return versionString.compare(o1, o2);
     }
 }
