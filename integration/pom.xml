@@ -121,6 +121,24 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>progressclass</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/reproducers/progressclass/**/*.class</include>
+                            </includes>
+                            <finalName>App</finalName>
+                            <classifier>ProgressClassManagedApplication</classifier>
+                            <outputDirectory>
+                                ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/reproducers/progressclass/resources
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
