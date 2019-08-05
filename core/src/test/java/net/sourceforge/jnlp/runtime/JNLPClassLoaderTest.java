@@ -38,10 +38,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
@@ -53,7 +50,6 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -76,6 +72,7 @@ import java.util.jar.Manifest;
 import static net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils.assertNoFileLeak;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
@@ -377,7 +374,33 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         } finally {
             JNLPRuntime.setVerify(verifyBackup);
         }
+    }
 
+    @Test
+    public void testFindLibrary() throws Exception {
+        final File tempDirectory = FileTestUtils.createTempDirectory();
+        final String nativeLibName = "native";
+
+        // Create jar to search in
+        final File jarLocation = new File(tempDirectory, "app.jar");
+
+        // Create native lib to search for using System.mapLibraryName(),
+        // which maps as follows:
+        // Windows: "native" -> "native.dll"
+        // Linux/Solaris: "native" "libnative.so"
+        // Mac: "native" -> "libnative.dylib"
+        final String nativeLibPlatformSpecificName = System.mapLibraryName(nativeLibName);
+        final File nativeLibFile = new File(tempDirectory, nativeLibPlatformSpecificName);
+        FileTestUtils.createFileWithContents(nativeLibFile, "");
+
+        FileTestUtils.createJarWithContents(jarLocation, nativeLibFile);
+
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+
+        final String nativeLib = classLoader.findLibrary(nativeLibName);
+
+        assertNoFileLeak(() -> assertNotNull(nativeLib));
     }
 
     @Test
