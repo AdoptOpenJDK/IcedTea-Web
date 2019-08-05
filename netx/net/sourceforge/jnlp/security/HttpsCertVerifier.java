@@ -185,7 +185,7 @@ public class HttpsCertVerifier implements CertVerifier {
                 }
             }
 
-            if (subjAltNames != null)
+            if (derValue.length() == 0 && subjAltNames != null)
                 names = names.substring(2); // remove proceeding ", "
 
         } catch (CertificateParsingException cpe) {
