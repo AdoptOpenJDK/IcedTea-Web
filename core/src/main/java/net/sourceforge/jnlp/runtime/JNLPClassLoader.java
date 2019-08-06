@@ -1358,6 +1358,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Return the absolute path to the native library.
      */
+    @Override
     protected String findLibrary(String lib) {
         String syslib = System.mapLibraryName(lib);
         File libFile = nativeLibraryStorage.findLibrary(syslib);
