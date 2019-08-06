@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-import static net.adoptopenjdk.icedteaweb.integration.ManagedApplicationFileWriter.*;
+import static net.adoptopenjdk.icedteaweb.integration.common.ManagedApplicationFileWriter.writeFile;
 
 /**
  * This class represents a basic IcedTea-Web managed application. It is intended to be launched by integration
@@ -53,9 +53,7 @@ public class SimpleJavaApplication {
         System.out.println("Simple Java application install and launched by Iced-Tea Web");
         System.out.println("Arguments: " +  Arrays.toString(args));
 
-        writeFile(HELLO_FILE, "Hello from managed app\n");
         writeFile(SYSTEM_PROPERTIES_FILE, System.getProperties());
-        writeFile(ARGUMENTS_FILE, Arrays.toString(args));
         writeFile(SYSTEM_ENVIRONMENT_FILE, asProperties(System.getenv()));
     }
 

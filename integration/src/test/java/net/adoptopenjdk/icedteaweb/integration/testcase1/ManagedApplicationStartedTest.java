@@ -19,14 +19,12 @@ package net.adoptopenjdk.icedteaweb.integration.testcase1;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
-import net.sourceforge.jnlp.runtime.Boot;
+import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SecureJavaApplication;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.HELLO_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -44,14 +42,13 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testSuccessfullyLaunchSimpleJavaApplication() throws IOException {
+    public void testSuccessfullyLaunchSimpleJavaApplication() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork"};
-        Boot.main(args);
+        launchItwHeadless(jnlpUrl);
 
         // then
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));

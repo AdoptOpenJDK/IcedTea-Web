@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.integration;
+package net.adoptopenjdk.icedteaweb.integration.common;
 
 import javax.jnlp.FileContents;
 import javax.jnlp.PersistenceService;
