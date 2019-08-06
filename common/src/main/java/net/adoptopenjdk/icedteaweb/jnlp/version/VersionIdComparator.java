@@ -16,6 +16,8 @@
 //
 package net.adoptopenjdk.icedteaweb.jnlp.version;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.util.Comparator;
 
 /**
@@ -33,12 +35,12 @@ public class VersionIdComparator implements Comparator<VersionId> {
 
     private final VersionString versionString;
 
-    public VersionIdComparator(VersionString versionString) {
-        this.versionString = versionString;
+    public VersionIdComparator(final VersionString versionString) {
+        this.versionString = Assert.requireNonNull(versionString, "versionString");
     }
 
     @Override
-    public int compare(VersionId o1, VersionId o2) {
+    public int compare(final VersionId o1, final VersionId o2) {
         return versionString.compare(o1, o2);
     }
 }

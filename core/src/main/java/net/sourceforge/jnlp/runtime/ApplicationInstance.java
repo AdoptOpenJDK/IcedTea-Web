@@ -315,33 +315,30 @@ public class ApplicationInstance {
      * Install the environment variables.
      */
     void installEnvironment() {
-        final PropertyDesc props[] = file.getResources().getProperties();
+        final PropertyDesc[] props = file.getResources().getProperties();
 
-        CodeSource cs = new CodeSource((URL) null, (java.security.cert.Certificate[]) null);
+        if (!(props.length == 0)) {
+            final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-        JNLPClassLoader loader = (JNLPClassLoader) this.loader;
-        SecurityDesc s = loader.getSecurity();
+            final JNLPClassLoader loader = (JNLPClassLoader) this.loader;
+            final SecurityDesc s = loader.getSecurity();
+            final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
+            final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 
-        ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
-
-        // Add to hashmap
-        AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
-
-        PrivilegedAction<Object> installProps = new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
+            final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
                     System.setProperty(propDesc.getKey(), propDesc.getValue());
                 }
-                
-                // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible 
-                // for the started application to detect the execution context.
-                System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
-                
                 return null;
-            }
-        };
-        AccessController.doPrivileged(installProps, acc);
+            };
+
+            LOG.info("about to set system properties");
+            AccessController.doPrivileged(setPropertiesAction, acc);
+        }
+
+        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible
+        // for the started application to detect the execution context.
+        System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
     }
 
     /**

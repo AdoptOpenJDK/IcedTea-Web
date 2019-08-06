@@ -54,7 +54,7 @@ public class VersionId implements Comparable<VersionId> {
      */
     private final String[] tuple;
 
-    private VersionId(String versionId) {
+    private VersionId(final String versionId) {
         this.versionId = versionId;
         this.tuple = versionId.split(REGEXP_SEPARATOR);
     }
@@ -65,7 +65,7 @@ public class VersionId implements Comparable<VersionId> {
      * @param versionId a version-id
      * @return a version-id
      */
-    public static VersionId fromString(String versionId) {
+    public static VersionId fromString(final String versionId) {
         Assert.requireNonNull(versionId, "versionId");
 
         if (!versionId.matches(REGEXP_VERSION_ID)) {
@@ -117,7 +117,7 @@ public class VersionId implements Comparable<VersionId> {
     }
 
     @Override
-    public int compareTo(VersionId versionId) {
+    public int compareTo(final VersionId versionId) {
         if (isEqualTo(versionId)) {
             return 0;
         }
@@ -140,7 +140,7 @@ public class VersionId implements Comparable<VersionId> {
      * @param otherVersionId a version-id
      * @return {@code true} if this version-id is a prefix matches of {@code otherVersionId}, {@code false} otherwise.
      */
-    boolean isPrefixMatchOf(VersionId otherVersionId) {
+    boolean isPrefixMatchOf(final VersionId otherVersionId) {
         Assert.requireNonNull(otherVersionId, "otherVersionId");
 
         final String[] tuple2 = otherVersionId.asNormalizedTuple(tuple.length);
@@ -174,7 +174,7 @@ public class VersionId implements Comparable<VersionId> {
      * @param otherVersionId a version-id
      * @return {@code true} if this version-id is less than {@code otherVersionId}, {@code false} otherwise.
      */
-    boolean isLessThan(VersionId otherVersionId) {
+    boolean isLessThan(final VersionId otherVersionId) {
         Assert.requireNonNull(otherVersionId, "otherVersionId");
 
         final String[] tuple1 = asNormalizedTuple(otherVersionId.tuple.length);

@@ -37,10 +37,11 @@
         <module>test-extensions</module>
         <module>xml-parser</module>
         <module>core</module>
+        <module>artifacts</module>
+        <module>integration-test-extensions</module>
         <module>integration</module>
         <module>clients</module>
         <module>jnlp-servlet</module>
-        <module>artifacts</module>
         <module>launchers</module>
     </modules>
 

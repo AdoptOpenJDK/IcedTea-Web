@@ -17,6 +17,8 @@
 package net.adoptopenjdk.icedteaweb.integration;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import junit.framework.AssertionFailedError;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -49,6 +51,8 @@ public interface IntegrationTest {
 
     String PORT = "PORT";
     String MAIN_CLASS = "MAIN_CLASS";
+
+    String NO_SECURITY = CommandLineOptions.NOSEC.getOption();
 
     default String setupServer(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
         return setupServer(wireMock, Arrays.asList(jnlpFilename), mainClass, resources);
@@ -146,7 +150,7 @@ public interface IntegrationTest {
             return stream.get(0).toFile();
         }
 
-        throw new RuntimeException("found " + numHints + " cache files with name " + fileName);
+        throw new AssertionFailedError("found " + numHints + " cache files with name " + fileName);
     }
 
 
