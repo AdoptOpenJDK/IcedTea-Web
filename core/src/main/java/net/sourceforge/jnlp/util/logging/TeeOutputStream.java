@@ -51,6 +51,8 @@ import java.io.PrintStream;
  */
 public final class TeeOutputStream extends PrintStream implements SingleStreamLogger{
 
+    private static final String LINE_SEPARATOR = PlainTextFormatter.getLineSeparator();
+
     // Everything written to TeeOutputStream is written to our log too
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final boolean isError;
@@ -118,7 +120,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     private void appendByte(int b) {
         byteArrayOutputStream.write(b);
         String s = byteArrayOutputStream.toString();
-        if (s.endsWith(PlainTextFormatter.getLineSeparator())) {
+        if (s.endsWith(LINE_SEPARATOR)) {
             flushLog();
         }
     }
@@ -126,7 +128,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     private void appendByteArray(byte[] b, int off, int len) {
         byteArrayOutputStream.write(b, off, len);
         String s = new String(b, off, len);
-        if (s.endsWith(PlainTextFormatter.getLineSeparator())) {
+        if (s.endsWith(LINE_SEPARATOR)) {
             flushLog();
         }
     }

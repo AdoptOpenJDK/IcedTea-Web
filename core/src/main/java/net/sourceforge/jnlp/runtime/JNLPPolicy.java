@@ -26,6 +26,7 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AllPermission;
@@ -181,24 +182,27 @@ public class JNLPPolicy extends Policy {
             return false;
         }
 
-        // anything in JRE/lib/ext is a system jar and has full permissions
-        final String sourceProtocol = source.getLocation().getProtocol();
-        final Path jreExtDirPath = Paths.get(jreExtDir);
-        try {
-            final Path sourcePath = Paths.get(source.getLocation().toURI());
-
-            if (sourceProtocol.toUpperCase().equals("FILE") && sourcePath.startsWith(jreExtDirPath)) {
-                return true;
-            }
-        } catch (URISyntaxException e) {
-            LOG.error("Invalid or corrupt code source location.", e);
-            throw new RuntimeException("Invalid or corrupt code source location.", e);
-        }
+        final URL location = source.getLocation();
+        final String sourceProtocol = location.getProtocol();
 
         // check to see if source protocol is a Java System Library protocol
         if (sourceProtocol.equalsIgnoreCase("jrt")) {
-            // jrt protocols are only for system code return true 
+            // jrt protocols are only for system code return true
             return true;
+        }
+
+        if (sourceProtocol.equalsIgnoreCase("file")) {
+            try {
+                final Path jreExtDirPath = Paths.get(jreExtDir);
+                final Path sourcePath = Paths.get(location.toURI());
+                if (sourcePath.startsWith(jreExtDirPath)) {
+                    // anything in JRE/lib/ext is a system jar and has full permissions
+                    return true;
+                }
+            } catch (URISyntaxException e) {
+                LOG.error("Invalid or corrupt code source location.", e);
+                throw new RuntimeException("Invalid or corrupt code source location.", e);
+            }
         }
 
         return false;
