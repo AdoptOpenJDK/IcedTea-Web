@@ -20,13 +20,11 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
 import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
-import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_PROPERTIES_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -43,23 +41,23 @@ public class SystemPropertiesSetTest implements IntegrationTest {
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testLaunchWithSystemProperty() throws IOException {
+    public void testLaunchWithSystemProperty() throws Exception {
         // given
         final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithProperties.jnlp", SimpleJavaApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless", "-property", "key3=SystemPropertyAsCommandLineArgument"};
-        Boot.main(args);
+        // needs no-security as setting of properties is prohibited in sandboxed mode
+        launchItwHeadless(jnlpUrl, NO_SECURITY, "-property", "key3=SystemPropertyAsCommandLineArgument");
 
         // then
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile_Used"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
-        
+
         // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible 
         // for the started application to detect the execution context. 
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("deployment.javaws"), containsString("IcedTea-Web"));
     }
-    
+
 }

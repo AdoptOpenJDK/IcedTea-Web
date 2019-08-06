@@ -19,14 +19,12 @@ package net.adoptopenjdk.icedteaweb.integration.testcase1;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
-import net.sourceforge.jnlp.runtime.Boot;
+import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SecureJavaApplication;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItw;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -43,14 +41,13 @@ public class SplashScreenIconTest implements IntegrationTest {
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testSplashIcon() throws IOException {
+    public void testSplashIcon() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SimpleJavaApplication.class, JAR_NAME, SPLASH_ICON);
+        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SecureJavaApplication.class, JAR_NAME, SPLASH_ICON);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork"};
-        Boot.main(args);
+        launchItw(jnlpUrl);
 
         // then
         assertThat(hasCachedFile(tmpItwHome, SPLASH_ICON), is(true));

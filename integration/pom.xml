@@ -18,24 +18,45 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>icedtea-web-core</artifactId>
+            <groupId>net.adoptopenjdk</groupId>
+            <artifactId>integration-test-extensions-itw-all-depts-${project.version}.jar</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>1.11.1</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>icedtea-web-test-extensions</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.1</version>
         </dependency>
+
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock-jre8</artifactId>
             <version>2.23.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.11.1</version>
         </dependency>
     </dependencies>
 
@@ -73,6 +94,7 @@
                                     <directory>${project.build.testOutputDirectory}</directory>
                                     <includes>
                                         <include>**/applications/*.class</include>
+                                        <include>**/common/*.class</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
@@ -94,6 +116,7 @@
                         <phase>process-test-classes</phase>
                         <configuration>
                             <includes>
+                                <include>**/common/*.class</include>
                                 <include>**/testcase1/**/*.class</include>
                             </includes>
                             <finalName>App</finalName>
@@ -112,6 +135,7 @@
                         <phase>process-test-classes</phase>
                         <configuration>
                             <includes>
+                                <include>**/common/*.class</include>
                                 <include>**/reproducers/extensionresources/**/*.class</include>
                             </includes>
                             <finalName>App</finalName>
@@ -130,6 +154,7 @@
                         <phase>process-test-classes</phase>
                         <configuration>
                             <includes>
+                                <include>**/common/*.class</include>
                                 <include>**/reproducers/progressclass/**/*.class</include>
                             </includes>
                             <finalName>App</finalName>

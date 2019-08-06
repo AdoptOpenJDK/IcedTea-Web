@@ -19,7 +19,7 @@ package net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass.applic
 import javax.jnlp.DownloadServiceListener;
 import java.net.URL;
 
-import static net.adoptopenjdk.icedteaweb.integration.ManagedApplicationFileWriter.writeFile;
+import static net.adoptopenjdk.icedteaweb.integration.common.ManagedApplicationFileWriter.writeFile;
 
 /**
  * This class represents a basic IcedTea-Web managed application. It is intended to be launched by integration
