@@ -37,8 +37,8 @@
         <module>test-extensions</module>
         <module>xml-parser</module>
         <module>core</module>
-        <module>artifacts</module>
-        <module>integration-test-extensions</module>
+        <module>artifact-no-dependencies</module>
+        <module>artifact-all-dependencies</module>
         <module>integration</module>
         <module>clients</module>
         <module>jnlp-servlet</module>
@@ -53,6 +53,23 @@
     </repositories>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shortRevisionLength>8</shortRevisionLength>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>

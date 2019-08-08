@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>net.adoptopenjdk</groupId>
-            <artifactId>integration-test-extensions-itw-all-depts-${project.version}.jar</artifactId>
+            <artifactId>icedtea-web-all-dependencies</artifactId>
             <version>${project.version}</version>
         </dependency>
 
