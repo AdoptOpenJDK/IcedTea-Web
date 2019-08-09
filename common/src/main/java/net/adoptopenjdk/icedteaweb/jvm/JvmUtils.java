@@ -127,27 +127,6 @@ public class JvmUtils {
             "-XX:MaxDirectMemorySize",};
     }
 
-    public static String getPathToJavawsJar() {
-        final String classPath = System.getProperty(JvmPropertyConstants.JAVA_CLASS_PATH);
-        final String pathSeparator = System.getProperty(JvmPropertyConstants.PATH_SEPARATOR);
-        final String javaHome = System.getProperty(JvmPropertyConstants.JAVA_HOME);
-
-        final String[] classpathElements = classPath.split(Pattern.quote(pathSeparator));
-
-        final List<String> jarCandidates = Arrays.stream(classpathElements)
-                .filter(e -> e.endsWith(JAVAWS_JAR))
-                .filter(e -> !e.startsWith(javaHome))
-                .collect(Collectors.toList());
-
-        if (jarCandidates.isEmpty()) {
-            throw new IllegalStateException("javaws jar not found");
-        }
-        else if (jarCandidates.size() > 1) {
-            throw new IllegalStateException("multiple javaws jars found");
-        }
-        return jarCandidates.get(0);
-    }
-
     /**
      * @return the javaws binary.
      */
@@ -165,7 +144,6 @@ public class JvmUtils {
 
         return JAVAWS;
     }
-
 
     /**
      * Find a binary of the given binaries on PATH.

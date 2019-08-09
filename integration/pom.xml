@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.adoptopenjdk</groupId>
         <artifactId>icedtea-web-parent</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>net.adoptopenjdk</groupId>
-            <artifactId>integration-test-extensions-itw-all-depts-${project.version}.jar</artifactId>
+            <artifactId>icedtea-web-all-dependencies</artifactId>
             <version>${project.version}</version>
         </dependency>
 

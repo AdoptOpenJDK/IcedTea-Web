@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.adoptopenjdk</groupId>
+        <artifactId>icedtea-web-parent</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <artifactId>icedtea-web-all-dependencies</artifactId>
+    <name>ITW with all dependencies</name>
+    <description>
+        Creates a fat jar of ITW including all dependencies.
+        Dependencies are shaded into subpackages of 'net.adoptopenjdk.icedteaweb.shaded'.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>icedtea-web-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.mozilla</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.mozilla</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.ccil.cowan.tagsoup</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.tagsoup</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>mslinks</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.mslinks</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.mslinks.io</shadedPattern>
+                                    <includes>
+                                        <include>io.ByteReader</include>
+                                        <include>io.Bytes</include>
+                                        <include>io.ByteWriter</include>
+                                    </includes>
+                                </relocation>
+                            </relocations>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>net.adoptopenjdk.icedteaweb.client.commandline.CommandLine</mainClass>
+                                    <manifestEntries>
+                                        <Scm-Commit>${buildNumber}</Scm-Commit>
+                                        <Build-Time>${maven.build.timestamp}</Build-Time>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
