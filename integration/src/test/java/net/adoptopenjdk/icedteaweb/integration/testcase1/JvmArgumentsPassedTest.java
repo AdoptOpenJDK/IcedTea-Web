@@ -28,6 +28,7 @@ import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadl
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.ARGUMENTS_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 /**
  * TODO: Scenario Description
@@ -47,9 +48,10 @@ public class JvmArgumentsPassedTest implements IntegrationTest {
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        launchItwHeadless(jnlpUrl);
+        final int result = launchItwHeadless(jnlpUrl);
 
         // then
+        assertThat("Managed application return code", result, is(0));
         assertThat(getCachedFileAsString(tmpItwHome, ARGUMENTS_FILE), containsString("argument1"));
         assertThat(getCachedFileAsString(tmpItwHome, ARGUMENTS_FILE), containsString("argument2 with spaces"));
     }

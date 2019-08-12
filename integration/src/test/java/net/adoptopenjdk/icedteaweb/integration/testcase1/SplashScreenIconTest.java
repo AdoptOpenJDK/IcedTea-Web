@@ -47,9 +47,10 @@ public class SplashScreenIconTest implements IntegrationTest {
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        launchItw(jnlpUrl);
+        final int result = launchItw(jnlpUrl);
 
         // then
+        assertThat("Managed application return code", result, is(0));
         assertThat(hasCachedFile(tmpItwHome, SPLASH_ICON), is(true));
     }
 }

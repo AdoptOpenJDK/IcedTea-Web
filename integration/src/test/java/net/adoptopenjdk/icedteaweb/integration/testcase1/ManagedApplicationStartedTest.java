@@ -48,9 +48,10 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        launchItwHeadless(jnlpUrl);
+        final int result = launchItwHeadless(jnlpUrl);
 
         // then
+        assertThat("Managed application return code", result, is(0));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
     }

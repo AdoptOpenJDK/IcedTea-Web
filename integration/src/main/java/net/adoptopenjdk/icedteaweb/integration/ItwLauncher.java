@@ -21,15 +21,15 @@ import static net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions.VERBOSE
  */
 public class ItwLauncher {
 
-    public static void launchItw(String jnlpUrl, String... arguments) throws Exception {
-        launchItw(jnlpUrl, Arrays.asList(NOFORK, VERBOSE), arguments);
+    public static int launchItw(String jnlpUrl, String... arguments) throws Exception {
+        return launchItw(jnlpUrl, Arrays.asList(NOFORK, VERBOSE), arguments);
     }
 
-    public static void launchItwHeadless(String jnlpUrl, String... arguments) throws Exception {
-        launchItw(jnlpUrl, Arrays.asList(NOFORK, VERBOSE, HEADLESS), arguments);
+    public static int launchItwHeadless(String jnlpUrl, String... arguments) throws Exception {
+        return launchItw(jnlpUrl, Arrays.asList(NOFORK, VERBOSE, HEADLESS), arguments);
     }
 
-    private static void launchItw(String jnlpUrl, List<CommandLineOptions> additionalArgs, String... arguments) throws Exception {
+    private static int launchItw(String jnlpUrl, List<CommandLineOptions> additionalArgs, String... arguments) throws Exception {
         final String javaBinary = "/bin/java".replace('/', File.separatorChar);
         final String pathToJavaBinary = System.getProperty(JvmPropertyConstants.JAVA_HOME) + javaBinary;
 
@@ -42,7 +42,7 @@ public class ItwLauncher {
         Collections.addAll(args, arguments);
 
 
-        launchExternal(pathToJavaBinary, pathToJavawsJar, Collections.emptyList(), args);
+        return launchExternal(pathToJavaBinary, pathToJavawsJar, Collections.emptyList(), args);
     }
 
     /**
@@ -50,8 +50,9 @@ public class ItwLauncher {
      * @param pathToJavawsJar  path to the javaws.jar included in OWS
      * @param vmArgs           the arguments to pass to the jvm
      * @param javawsArgs       the arguments to pass to javaws (aka IcedTea-Web)
+     * @return the exit value of the external JVM process
      */
-    private static void launchExternal(String pathToJavaBinary, String pathToJavawsJar, List<String> vmArgs, List<String> javawsArgs) throws Exception {
+    private static int launchExternal(String pathToJavaBinary, String pathToJavawsJar, List<String> vmArgs, List<String> javawsArgs) throws Exception {
         final List<String> commands = new LinkedList<>();
 
         commands.add(addQuotesIfRequired(pathToJavaBinary));
@@ -72,6 +73,8 @@ public class ItwLauncher {
                 .start();
 
         StreamUtils.waitForSafely(p);
+
+        return p.exitValue();
     }
 
     /**

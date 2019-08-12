@@ -28,6 +28,7 @@ import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadl
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_ENVIRONMENT_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Test the successful access to a system environment variable by an ITW-managed application.
@@ -47,9 +48,10 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        launchItwHeadless(jnlpUrl, NO_SECURITY);
+        final int result = launchItwHeadless(jnlpUrl, NO_SECURITY);
 
         // then
+        assertThat("Managed application return code", result, is(0));
         final String cachedFileAsString = getCachedFileAsString(tmpItwHome, SYSTEM_ENVIRONMENT_FILE);
         assertThat(cachedFileAsString, containsString("USER"));
     }

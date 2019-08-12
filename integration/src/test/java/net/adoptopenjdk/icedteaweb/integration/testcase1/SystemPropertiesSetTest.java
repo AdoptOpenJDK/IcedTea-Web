@@ -28,6 +28,7 @@ import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadl
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_PROPERTIES_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 /**
  * TODO: Scenario Description
@@ -48,9 +49,10 @@ public class SystemPropertiesSetTest implements IntegrationTest {
 
         // when
         // needs no-security as setting of properties is prohibited in sandboxed mode
-        launchItwHeadless(jnlpUrl, NO_SECURITY, "-property", "key3=SystemPropertyAsCommandLineArgument");
+        final int result = launchItwHeadless(jnlpUrl, NO_SECURITY, "-property", "key3=SystemPropertyAsCommandLineArgument");
 
         // then
+        assertThat("Managed application return code", result, is(0));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key1"), containsString("SystemPropertyViaJnlpFile_Used"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
