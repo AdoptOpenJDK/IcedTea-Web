@@ -25,7 +25,6 @@
 
 package net.sourceforge.jnlp.tools;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -301,8 +300,8 @@ public class JarCertVerifier implements CertVerifier {
                     entriesVec);
 
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            throw e;
+            LOG.error("Error in verify jar " + jarName, e);
+            throw new RuntimeException("Error in verify jar " + jarName, e);
         }
     }
 
