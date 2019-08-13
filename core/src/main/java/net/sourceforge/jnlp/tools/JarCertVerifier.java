@@ -302,7 +302,7 @@ public class JarCertVerifier implements CertVerifier {
 
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            throw e;
+            throw new RuntimeException("Error in verify jar " + jarName);
         }
     }
 
