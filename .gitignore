@@ -1,7 +1,8 @@
 .DS_Store
 .idea
 *.iml
-*/target
+**/target
+**/dependency-reduced-pom.xml
 
 launchers/build.log
 launchers/rust-launcher/Cargo.lock
