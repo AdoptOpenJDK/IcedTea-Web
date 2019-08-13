@@ -64,6 +64,16 @@ public enum AppletSecurityLevel {
     }
 
     public static AppletSecurityLevel fromString(String s) {
+        // see https://docs.oracle.com/javase/7/docs/technotes/guides/jweb/jcp/properties.html
+        if ("MEDIUM".equalsIgnoreCase(s)) {
+            return ALLOW_UNSIGNED;
+        }
+        if ("HIGH".equalsIgnoreCase(s)) {
+            return ASK_UNSIGNED;
+        }
+        if ("VERY_HIGH".equalsIgnoreCase(s)) {
+            return DENY_UNSIGNED;
+        }
         return AppletSecurityLevel.valueOf(s.toUpperCase());
     }
 
