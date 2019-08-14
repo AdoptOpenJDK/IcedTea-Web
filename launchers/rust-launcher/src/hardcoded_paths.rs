@@ -8,12 +8,7 @@ use std::str::FromStr;
 const SPLASH_PNG: Option<&'static str> = option_env!("SPLASH_PNG");
 const JRE: Option<&'static str> = option_env!("JRE");
 const MAIN_CLASS: Option<&'static str> = option_env!("MAIN_CLASS");
-const CORE_JAR: Option<&'static str> = option_env!("CORE_JAR");
-const COMMON_JAR: Option<&'static str> = option_env!("COMMON_JAR");
-const JNLPAPI_JAR: Option<&'static str> = option_env!("JNLPAPI_JAR");
-const XMLPARSER_JAR: Option<&'static str> = option_env!("XMLPARSER_JAR");
-const CLIENTS_JAR: Option<&'static str> = option_env!("CLIENTS_JAR");
-const JNLPSERVER_JAR: Option<&'static str> = option_env!("JNLPSERVER_JAR");
+const JAVAWS_JAR: Option<&'static str> = option_env!("JAVAWS_JAR");
 const TAGSOUP_JAR: Option<&'static str> = option_env!("TAGSOUP_JAR");
 const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
 const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
@@ -33,17 +28,7 @@ pub fn get_splash() -> &'static str {
     SPLASH_PNG.unwrap_or("SPLASH_PNG-dev-unspecified")
 }
 
-pub fn get_core() -> &'static str { CORE_JAR.unwrap_or("CORE_JAR-dev-unspecified") }
-
-pub fn get_common() -> &'static str { COMMON_JAR.unwrap_or("COMMON_JAR-dev-unspecified") }
-
-pub fn get_jnlpapi() -> &'static str { JNLPAPI_JAR.unwrap_or("JNLPAPI_JAR-dev-unspecified") }
-
-pub fn get_xmlparser() -> &'static str { XMLPARSER_JAR.unwrap_or("XMLPARSER_JAR-dev-unspecified") }
-
-pub fn get_clientsjar() -> &'static str { CLIENTS_JAR.unwrap_or("CLIENTS_JAR-dev-unspecified") }
-
-pub fn get_jnlpserver() -> &'static str { JNLPSERVER_JAR.unwrap_or("JNLPSERVER_JAR-dev-unspecified") }
+pub fn get_javaws() -> &'static str { JAVAWS_JAR.unwrap_or("JAVAWS_JAR-dev-unspecified") }
 
 pub fn get_itwlibsearch() -> &'static str { ITW_LIBS.unwrap_or("ITW_LIBS-dev-unspecified") }
 
@@ -149,30 +134,20 @@ mod tests {
 
     #[test]
     fn variables_non_default() {
-        assert_ne!(String::from(super::get_jre()).trim(), String::from("JRE-dev-unspecified"));
         assert_ne!(String::from(super::get_main()).trim(), String::from("MAIN_CLASS-dev-unspecified"));
+        assert_ne!(String::from(super::get_jre()).trim(), String::from("JRE-dev-unspecified"));
         assert_ne!(String::from(super::get_splash()).trim(), String::from("SPLASH_PNG-dev-unspecified"));
-        assert_ne!(String::from(super::get_core()).trim(), String::from("CORE_JAR-dev-unspecified"));
-        assert_ne!(String::from(super::get_common()).trim(), String::from("COMMON_JAR-dev-unspecified"));
-        assert_ne!(String::from(super::get_xmlparser()).trim(), String::from("XMLPARSER_JAR-dev-unspecified"));
-        assert_ne!(String::from(super::get_clientsjar()).trim(), String::from("CLIENTS_JAR-dev-unspecified"));
-        assert_ne!(String::from(super::get_jnlpserver()).trim(), String::from("JNLPSERVER_JAR-dev-unspecified"));
-        assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from("JNLPAPI_JAR-dev-unspecified"));
+        assert_ne!(String::from(super::get_javaws()).trim(), String::from("JAVAWS_JAR-dev-unspecified"));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from("ITW_LIBS-dev-unspecified"));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from("MODULARJDK_ARGS_LOCATION-dev-unspecified"));
     }
 
     #[test]
     fn variables_non_empty() {
-        assert_ne!(String::from(super::get_jre()).trim(), String::from(""));
         assert_ne!(String::from(super::get_main()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_jre()).trim(), String::from(""));
         assert_ne!(String::from(super::get_splash()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_core()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_common()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_xmlparser()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_clientsjar()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_jnlpserver()).trim(), String::from(""));
-        assert_ne!(String::from(super::get_jnlpapi()).trim(), String::from(""));
+        assert_ne!(String::from(super::get_javaws()).trim(), String::from(""));
         assert_ne!(String::from(super::get_itwlibsearch()).trim(), String::from(""));
         assert_ne!(String::from(super::get_argsfile()).trim(), String::from(""));
     }

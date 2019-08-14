@@ -17,19 +17,14 @@ RUN_ARGS_LOCATION=@MODULARJDK_ARGS_LOCATION@
 ITW_LIBS=@ITW_LIBS@
 
 # individual parts of bootclasspath
-CORE_JAR=@CORE_JAR@
-COMMON_JAR=@COMMON_JAR@
-JNLPAPI_JAR=@JNLPAPI_JAR@
-XMLPARSER_JAR=@XMLPARSER_JAR@
-CLIENTS_JAR=@CLIENTS_JAR@
-JNLPSERVER_JAR=@JNLPSERVER_JAR@
-TAGSOUP_JAR=@TAGSOUP_JAR@
-RHINO_JAR=@RHINO_JAR@
-# windows only: (cywin usage?); need to decare it anyway
-MSLINKS_JAR=@MSLINKS_JAR@
+readonly JAVAWS_SRC=@JAVAWS_JAR@
+readonly TAGSOUP_SRC=@TAGSOUP_JAR@
+readonly RHINO_SRC=@RHINO_JAR@
+# windows only: (cywin usage?); need to declare it anyway
+readonly MSLINKS_SRC=@MSLINKS_JAR@
 
 if [ "x$ITW_LIBS" == "xEMBEDDED" ] ; then
- echo "ITW_LIBS=EMBEDDED not (yet?) supported"
+ echo "ITW_LIBS=EMBEDDED not (yet?) supported in shell launchers. Use native ones"
  exit 1
 fi
 
@@ -84,22 +79,24 @@ if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
     ITW_HOME=$PORTABLE_ITW_HOME
   fi
   set -u
-  BINARY_LOCATION="$ITW_HOME/bin/`basename \"$BINARY_LOCATION\"`"
-  SPLASH_PNG="`locallib \"$SPLASH_PNG\"`"
-  RUN_ARGS_LOCATION="`locallib \"$RUN_ARGS_LOCATION\"`"
-  CORE_JAR="`locallib  \"$CORE_JAR\"`"
-  COMMON_JAR="`locallib  \"$COMMON_JAR\"`"
-  JNLPAPI_JAR="`locallib  \"$JNLPAPI_JAR\"`"
-  XMLPARSER_JAR="`locallib  \"$XMLPARSER_JAR\"`"
-  RHINO_JAR="`locallib  \"$RHINO_JAR\"`"
-  TAGSOUP_JAR="`locallib  \"$TAGSOUP_JAR\"`"
-  MSLINKS_JAR="`locallib  \"$MSLINKS_JAR\"`"
-  CLIENTS_JAR="`locallib  \"$CLIENTS_JAR\"`"
-  JNLPSERVER_JAR="`locallib  \"$JNLPSERVER_JAR\"`"
+  readonly BINARY_LOCATION="$ITW_HOME/bin/`basename \"$BINARY_LOCATION\"`"
+  readonly SPLASH_PNG="`locallib \"$SPLASH_PNG\"`"
+  readonly RUN_ARGS_LOCATION="`locallib \"$RUN_ARGS_LOCATION\"`"
+  readonly JAVAWS_JAR="`locallib  \"$JAVAWS_SRC\"`"
+  #in fat jar with dependencies
+  readonly RHINO_JAR=""
+  readonly TAGSOUP_JAR=""
+  readonly MSLINKS_JAR=""
   echo "warning, using portable itw from $ITW_HOME"
+else
+  readonly JAVAWS_JAR="$JAVAWS_SRC"
+  #not in fat jar without dependencies
+  readonly RHINO_JAR="$RHINO_SRC"
+  readonly TAGSOUP_JAR="$TAGSOUP_SRC"
+  readonly MSLINKS_JAR="$MSLINKS_SRC"
 fi
 set -u
-LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$CORE_JAR:$COMMON_JAR:$JNLPAPI_JAR:$XMLPARSER_JAR:$CLIENTS_JAR:$JNLPSERVER_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR"
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR"
 
 # Fix classpaths for custom JRE:
 if [ "x$CUSTOM_JRE" != "x" ] ; then
