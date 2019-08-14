@@ -46,6 +46,8 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  *
  * wrapper around Runtime.getRuntime().exec(...) which ensures that process is run inside its own, by us controlled, thread.
@@ -145,8 +147,8 @@ public class ThreadedProcess extends Thread {
                 if (writer != null){
                     final Thread t = new Thread(() -> {
                         try (
-                                final BufferedReader br = new BufferedReader(new InputStreamReader(writer, "utf-8"));
-                                final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "utf-8"))) {
+                                final BufferedReader br = new BufferedReader(new InputStreamReader(writer, UTF_8));
+                                final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), UTF_8))) {
                             while (true) {
                                 final String s = br.readLine();
                                 if (s == null) {
