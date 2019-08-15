@@ -128,7 +128,7 @@ public class IOUtils {
      * @throws IOException if reading from the stream failed
      */
     public static String readContentAsUtf8String(final InputStream inputStream) throws IOException {
-        return readContentAsString(inputStream, UTF_8);
+        return new String(readContent(inputStream), UTF_8);
     }
 
     /**
