@@ -129,7 +129,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
         dc.save();
 
-        String s = FileUtils.loadFileAsString(f);
+        String s = FileUtils.loadFileAsUtf8String(f);
         Assert.assertTrue(s.contains("#" + ConfigurationConstants.DEPLOYMENT_COMMENT));
         String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
         Assert.assertTrue(s.contains("#" + date)); //check day part of date...
@@ -168,7 +168,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
             dc.save();
 
-            s = FileUtils.loadFileAsString(f);
+            s = FileUtils.loadFileAsUtf8String(f);
             for (int y = 0; x < x; x++) {
                 //ensure salt
                 Assert.assertTrue(s.contains("#id" + y + "id"));

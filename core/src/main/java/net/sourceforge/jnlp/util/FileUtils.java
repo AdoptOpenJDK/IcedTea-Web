@@ -520,7 +520,7 @@ public final class FileUtils {
         return lock;
     }
 
-    public static String loadFileAsString(File f) throws IOException {
+    public static String loadFileAsUtf8String(File f) throws IOException {
         return loadFileAsString(f, UTF_8);
     }
 

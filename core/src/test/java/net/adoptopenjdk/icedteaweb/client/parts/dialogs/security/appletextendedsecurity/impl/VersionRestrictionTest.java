@@ -106,7 +106,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
         } else {
             Assert.assertEquals("there should be exactly one backup", 1, f.length);
             Assert.assertTrue(f[0].getName().endsWith("." + expectedVersion + UnsignedAppletActionStorageImpl.BACKUP_SUFFIX));
-            String s = FileUtils.loadFileAsString(f[0]);
+            String s = FileUtils.loadFileAsUtf8String(f[0]);
             String l[] = s.split("\\n");
             int hc = 0;
             for (String string : l) {

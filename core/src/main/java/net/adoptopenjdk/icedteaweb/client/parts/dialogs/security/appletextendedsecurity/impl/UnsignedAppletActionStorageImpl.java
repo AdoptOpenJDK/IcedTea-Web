@@ -311,7 +311,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             File backup = new File(backingFile.getAbsolutePath() + "." + version + BACKUP_SUFFIX);
             LOG.info("backuping {} as {}", getBackingFile().getAbsolutePath(), backup.getName());
             String warning = "- !WARNING! this is automated copy of old " + backingFile.getName() + " which was removed/replaced. Before you blindly copy those items back, please note, that this file might be modified without your approval by evil attacker. It is advised to not return below lines, or verify them before returning";
-            String s = FileUtils.loadFileAsString(backingFile);
+            String s = FileUtils.loadFileAsUtf8String(backingFile);
             s.replaceFirst("\\s*", "");
             if (s.startsWith(versionPrefix)) {
                 s = s.replaceFirst("\n", " " + warning + "\n");

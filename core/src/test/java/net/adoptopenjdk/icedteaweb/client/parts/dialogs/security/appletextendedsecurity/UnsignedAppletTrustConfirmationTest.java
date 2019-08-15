@@ -128,7 +128,7 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.ALWAYS, "YES"),
                 Boolean.FALSE,
                 UnsignedAppletTrustWarningPanel.class);
-        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        String s = FileUtils.loadFileAsUtf8String(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertTrue(s.contains("UnsignedAppletTrustWarningPanel:A{YES}"));
         Assert.assertTrue(s.contains(url41+url42));
         Assert.assertTrue(s.contains(surl1));
@@ -137,7 +137,7 @@ public class UnsignedAppletTrustConfirmationTest {
                 new SavedRememberAction(ExecuteAppletAction.NEVER, "NO"),
                 Boolean.TRUE,
                 UnsignedAppletTrustWarningPanel.class);
-        s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        s = FileUtils.loadFileAsUtf8String(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertTrue(s.contains("UnsignedAppletTrustWarningPanel:N{NO}"));
         Assert.assertFalse(s.contains(url41+url42));
         Assert.assertTrue(s.contains(surl1));        
@@ -304,7 +304,7 @@ public class UnsignedAppletTrustConfirmationTest {
         } catch (Exception ex){
             ServerAccess.logException(ex);
         }
-        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        String s = FileUtils.loadFileAsUtf8String(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertFalse(s.contains("harmful"));
     }
     
@@ -321,7 +321,7 @@ public class UnsignedAppletTrustConfirmationTest {
         } catch (Exception ex){
             ServerAccess.logException(ex);
         }
-        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        String s = FileUtils.loadFileAsUtf8String(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertFalse(s.contains("harmful"));
     }
     
@@ -341,7 +341,7 @@ public class UnsignedAppletTrustConfirmationTest {
             eex = ex;
             ServerAccess.logException(ex);
         }
-        String s = FileUtils.loadFileAsString(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
+        String s = FileUtils.loadFileAsUtf8String(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile());
         Assert.assertNull(eex);
         Assert.assertTrue(s.contains("http://&#10;does&#32;not&#32;matter&#32;is&#32;ok"));
     }

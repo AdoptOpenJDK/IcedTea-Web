@@ -114,7 +114,7 @@ public class DeploymentPropertiesModifier {
     }
 
     private void setDeploymentProperties(final String property, final String value) throws IOException {
-        String properties = FileUtils.loadFileAsString(src.getFile());
+        String properties = FileUtils.loadFileAsUtf8String(src.getFile());
 
         for (final String line : properties.split("\n")) {
             if (line.contains(property)) {
@@ -131,7 +131,7 @@ public class DeploymentPropertiesModifier {
     }
 
     private void restoreDeploymentProperties() throws IOException {
-        String properties = FileUtils.loadFileAsString(src.getFile());
+        String properties = FileUtils.loadFileAsUtf8String(src.getFile());
         if (savedValue != null) {
             properties = properties.replace(requestedProperty + "=" + requestedValue + "\n", savedValue);
         } else {

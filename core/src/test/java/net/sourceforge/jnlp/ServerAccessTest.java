@@ -162,8 +162,8 @@ public class ServerAccessTest {
         Assert.assertTrue(dirFile.exists());
         Assert.assertTrue(server.getDir().listFiles().length > 1);
 
-        String portFileContent = FileUtils.loadFileAsString(portFile);
-        String dirFileContent = FileUtils.loadFileAsString(dirFile);
+        String portFileContent = FileUtils.loadFileAsUtf8String(portFile);
+        String dirFileContent = FileUtils.loadFileAsUtf8String(dirFile);
 
         URL portUrl = new URL("http", "localhost", server.getPort(), "/server.port");
         URL dirUrl = new URL("http", "localhost", server.getPort(), "/server.dir");
