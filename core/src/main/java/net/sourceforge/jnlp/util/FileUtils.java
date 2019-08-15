@@ -88,7 +88,7 @@ public final class FileUtils {
     /**
      * list of characters not allowed in filenames
      */
-    public static final List<Character> INVALID_PATH = Arrays.asList(new Character[]{':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','});
+    public static final List<Character> INVALID_PATH = Arrays.asList(':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ',');
     public static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
 
     static {
