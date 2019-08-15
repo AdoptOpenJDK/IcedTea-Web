@@ -20,6 +20,7 @@ import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
@@ -535,7 +536,7 @@ public final class FileUtils {
             is = new FileInputStream(file);
             dis = new DigestInputStream(is, md5);
 
-            md5.update(BasicFileUtils.toByteArray(dis));
+            md5.update(IOUtils.readContent(dis));
         } finally {
             if (is != null) {
                 is.close();
