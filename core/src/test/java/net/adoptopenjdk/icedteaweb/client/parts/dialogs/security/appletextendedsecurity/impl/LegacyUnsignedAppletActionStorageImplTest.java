@@ -35,7 +35,6 @@ exception statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +44,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Applet
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActionsTest;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -67,9 +67,9 @@ public class LegacyUnsignedAppletActionStorageImplTest {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");
-        BasicFileUtils.saveFile(versionLine+"A 123456 .* .* jar1,jar2", f1);
-        BasicFileUtils.saveFile(versionLine+"N 123456 .* \\Qbla\\E jar1,jar2", f2);
-        BasicFileUtils.saveFile(versionLine
+        FileUtils.saveFile(versionLine+"A 123456 .* .* jar1,jar2", f1);
+        FileUtils.saveFile(versionLine+"N 123456 .* \\Qbla\\E jar1,jar2", f2);
+        FileUtils.saveFile(versionLine
                 + "A 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "N 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "n 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
@@ -82,10 +82,10 @@ public class LegacyUnsignedAppletActionStorageImplTest {
         ff2 = File.createTempFile("itwMatching", "testFile2");
         ff3 = File.createTempFile("itwMatching", "testFile3");
         ff4 = File.createTempFile("itwMatching", "testFile3");
-        BasicFileUtils.saveFile(versionLine+"AXn 123456 .* .* jar1,jar2", ff1);
-        BasicFileUtils.saveFile(versionLine+"XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
-        BasicFileUtils.saveFile(versionLine+"XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
-        BasicFileUtils.saveFile(versionLine
+        FileUtils.saveFile(versionLine+"AXn 123456 .* .* jar1,jar2", ff1);
+        FileUtils.saveFile(versionLine+"XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
+        FileUtils.saveFile(versionLine+"XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
+        FileUtils.saveFile(versionLine
                 + "XA 1 \\Qa\\E \\Qb\\E jar1\n"
                 + "NNA 2 \\Qc\\E \\Qd\\E\n"
                 + "nyXyn 3 \\Qe\\E \\Qf\\E j1,j2"

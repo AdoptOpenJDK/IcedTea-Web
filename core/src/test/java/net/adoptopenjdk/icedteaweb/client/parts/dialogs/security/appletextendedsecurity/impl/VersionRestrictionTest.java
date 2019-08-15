@@ -35,8 +35,6 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -128,7 +126,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void numberFormatExceptionInOnInLoad1() throws IOException {
-        BasicFileUtils.saveFile("#VERSION X\n"
+        FileUtils.saveFile("#VERSION X\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -141,7 +139,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void numberFormatExceptionInOnInLoad2() throws IOException {
-        BasicFileUtils.saveFile("#VERSION\n"
+        FileUtils.saveFile("#VERSION\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -154,7 +152,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void numberFormatExceptionInOnInLoad3() throws IOException {
-        BasicFileUtils.saveFile("#VERSION \n"
+        FileUtils.saveFile("#VERSION \n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -167,7 +165,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void numberFormatExceptionInOnInLoad4() throws IOException {
-        BasicFileUtils.saveFile("#VERSION                \n"
+        FileUtils.saveFile("#VERSION                \n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -180,7 +178,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void correctLoad() throws IOException {
-        BasicFileUtils.saveFile("#VERSION 2\n"
+        FileUtils.saveFile("#VERSION 2\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -193,7 +191,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void correctLoad2() throws IOException {
-        BasicFileUtils.saveFile("#VERSION 2"
+        FileUtils.saveFile("#VERSION 2"
                 + "\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar"
                 + "\n"
@@ -209,7 +207,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void correctLoad3() throws IOException {
-        BasicFileUtils.saveFile("\n"
+        FileUtils.saveFile("\n"
                 + "\n"
                 + "#VERSION 2"
                 + "\n"
@@ -228,7 +226,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void firstVersionValidOnlyOK() throws IOException {
-        BasicFileUtils.saveFile("\n"
+        FileUtils.saveFile("\n"
                 + "\n"
                 + "#VERSION 2"
                 + "\n"
@@ -249,7 +247,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void firstVersionValidOnlyBad() throws IOException {
-        BasicFileUtils.saveFile("\n"
+        FileUtils.saveFile("\n"
                 + "\n"
                 + "#VERSION 1"
                 + "\n"
@@ -270,7 +268,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void laterVersionIgnored() throws IOException {
-        BasicFileUtils.saveFile("\n"
+        FileUtils.saveFile("\n"
                 + "\n"
                 + "\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar"
@@ -287,7 +285,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void incorrectLoad() throws IOException {
-        BasicFileUtils.saveFile("#VERSION 1\n"
+        FileUtils.saveFile("#VERSION 1\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -300,7 +298,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void incorrectLoad1() throws IOException {
-        BasicFileUtils.saveFile("#VERSION2\n"
+        FileUtils.saveFile("#VERSION2\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar", testFile);
         UnsignedAppletActionStorageImpl i1 = new UnsignedAppletActionStorageImpl(testFile);
         i1.readContents();
@@ -313,7 +311,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void incorrectLoad2() throws IOException {
-        BasicFileUtils.saveFile("#VERSION 1"
+        FileUtils.saveFile("#VERSION 1"
                 + "\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar"
                 + "\n"
@@ -329,7 +327,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Test
     public void noVersionNoLoad() throws IOException {
-        BasicFileUtils.saveFile("\n"
+        FileUtils.saveFile("\n"
                 + "cN:N{YES}; 1 \\Qhttp://some.url/\\E \\Qhttp://some.url/\\E jar.jar"
                 + "\n"
                 + "cN:N{YES}; 1 \\Qhttp://some2.url/\\E \\Qhttp://some2.url/\\E jar.jar", testFile);

@@ -36,7 +36,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;
@@ -115,7 +115,7 @@ public class PolicyFileModelTest {
     @Test
     public void testSavePolicyFile() throws Exception {
         File file = new File(tempFilePath);
-        BasicFileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
         assertEquals("policy file size", EXAMPLE_POLICY_1.length(), file.length());
         
         model.setFile(file);
@@ -133,9 +133,9 @@ public class PolicyFileModelTest {
     @Test
     public void testFileHasChangedWithChange() throws Exception {
         assertFalse("Model should not report changes made initially", model.hasChanged());
-        BasicFileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
         model.openAndParsePolicyFile();
-        BasicFileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
         assertTrue("File should be marked changed after being externally modified", model.hasChanged());
     }
 

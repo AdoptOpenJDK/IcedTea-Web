@@ -36,7 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.testing.ProcessResult;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -155,9 +154,9 @@ public class ServerAccessTest {
         File portFile = new File(server.getDir(), "server.port");
         File dirFile = new File(server.getDir(), "server.dir");
 
-        BasicFileUtils.saveFile(server.getDir().getAbsolutePath(), dirFile);
-        BasicFileUtils.saveFile(server.getPort().toString(), portFile);
-        BasicFileUtils.saveFile(server.getPort().toString(), portFile);
+        FileUtils.saveFile(server.getDir().getAbsolutePath(), dirFile);
+        FileUtils.saveFile(server.getPort().toString(), portFile);
+        FileUtils.saveFile(server.getPort().toString(), portFile);
 
         Assert.assertTrue(portFile.exists());
         Assert.assertTrue(dirFile.exists());

@@ -36,7 +36,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
+import net.sourceforge.jnlp.util.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;
@@ -103,9 +103,9 @@ public class PolicyEditorControllerTest {
     @Test
     public void testFileHasChangedWithChange() throws Exception {
         assertFalse("Controller should report file has changed initially", controller.fileHasChanged());
-        BasicFileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
         controller.openAndParsePolicyFile();
-        BasicFileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
+        FileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
         assertTrue("File should be marked changed after being externally modified", controller.fileHasChanged());
     }
 
@@ -328,7 +328,7 @@ public class PolicyEditorControllerTest {
     @Test
     public void testOpenAndParsePolicyFile() throws Exception {
         final PolicyIdentifier exampleIdentifier = new PolicyIdentifier(null, Collections.<PolicyParser.PrincipalEntry>emptyList(), "http://example.com");
-        BasicFileUtils.saveFile(CLIPBOARD_POLICY, new File(tempFilePath));
+        FileUtils.saveFile(CLIPBOARD_POLICY, new File(tempFilePath));
         controller.openAndParsePolicyFile();
         assertEquals("Controller should have one identifier", 1, controller.getIdentifiers().size());
         assertTrue("Controller should have identifier " + exampleIdentifier, controller.getIdentifiers().contains(exampleIdentifier));
