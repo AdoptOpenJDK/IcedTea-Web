@@ -127,7 +127,7 @@ public class DeploymentPropertiesModifier {
             properties += property + "=" + value + "\n";
         }
 
-        FileUtils.saveFile(properties, src.getFile());
+        FileUtils.saveFileUtf8(properties, src.getFile());
     }
 
     private void restoreDeploymentProperties() throws IOException {
@@ -138,7 +138,7 @@ public class DeploymentPropertiesModifier {
             properties = properties.replace(requestedProperty + "=" + requestedValue + "\n", "");
         }
 
-        FileUtils.saveFile(properties, src.getFile());
+        FileUtils.saveFileUtf8(properties, src.getFile());
     }
 
 }

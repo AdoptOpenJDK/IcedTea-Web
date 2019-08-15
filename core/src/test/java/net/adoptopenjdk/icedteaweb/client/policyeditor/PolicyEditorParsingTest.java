@@ -120,7 +120,7 @@ public class PolicyEditorParsingTest {
     }
 
     private void setupTest(final String policyContents, final PolicyIdentifier identifier) throws Exception {
-        FileUtils.saveFile(policyContents, file);
+        FileUtils.saveFileUtf8(policyContents, file);
         policyFileModel = new PolicyFileModel(file.getCanonicalFile());
         policyFileModel.openAndParsePolicyFile();
         policyFileModel.addIdentifier(DEFAULT_IDENTIFIER);

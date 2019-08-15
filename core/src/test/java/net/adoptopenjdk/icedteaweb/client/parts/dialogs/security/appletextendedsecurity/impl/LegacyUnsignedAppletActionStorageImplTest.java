@@ -67,9 +67,9 @@ public class LegacyUnsignedAppletActionStorageImplTest {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");
-        FileUtils.saveFile(versionLine+"A 123456 .* .* jar1,jar2", f1);
-        FileUtils.saveFile(versionLine+"N 123456 .* \\Qbla\\E jar1,jar2", f2);
-        FileUtils.saveFile(versionLine
+        FileUtils.saveFileUtf8(versionLine+"A 123456 .* .* jar1,jar2", f1);
+        FileUtils.saveFileUtf8(versionLine+"N 123456 .* \\Qbla\\E jar1,jar2", f2);
+        FileUtils.saveFileUtf8(versionLine
                 + "A 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "N 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "n 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
@@ -82,10 +82,10 @@ public class LegacyUnsignedAppletActionStorageImplTest {
         ff2 = File.createTempFile("itwMatching", "testFile2");
         ff3 = File.createTempFile("itwMatching", "testFile3");
         ff4 = File.createTempFile("itwMatching", "testFile3");
-        FileUtils.saveFile(versionLine+"AXn 123456 .* .* jar1,jar2", ff1);
-        FileUtils.saveFile(versionLine+"XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
-        FileUtils.saveFile(versionLine+"XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
-        FileUtils.saveFile(versionLine
+        FileUtils.saveFileUtf8(versionLine+"AXn 123456 .* .* jar1,jar2", ff1);
+        FileUtils.saveFileUtf8(versionLine+"XXXXXy 123456 .* \\Qbla\\E jar1,jar2", ff2);
+        FileUtils.saveFileUtf8(versionLine+"XXXXXA 123456 .* \\Qbla\\E jar1,jar2", ff4);
+        FileUtils.saveFileUtf8(versionLine
                 + "XA 1 \\Qa\\E \\Qb\\E jar1\n"
                 + "NNA 2 \\Qc\\E \\Qd\\E\n"
                 + "nyXyn 3 \\Qe\\E \\Qf\\E j1,j2"

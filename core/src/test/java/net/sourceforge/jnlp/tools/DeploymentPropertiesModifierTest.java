@@ -164,7 +164,7 @@ public class DeploymentPropertiesModifierTest {
         tempUserFile.deleteOnExit();
 
         String content = "a.b=12\nc.d=34\ne.f=56\ng.h=78\ni.j=90";
-        FileUtils.saveFile(content, tempUserFile);
+        FileUtils.saveFileUtf8(content, tempUserFile);
         deploymentFile = tempUserFile;
         DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
 

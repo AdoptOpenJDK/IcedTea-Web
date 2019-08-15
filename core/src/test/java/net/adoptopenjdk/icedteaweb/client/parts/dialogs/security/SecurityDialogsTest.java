@@ -664,9 +664,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             //no we fake queue
             fakeQueue();
             //file exists our 6 rememberable dialogues should pass
-            FileUtils.saveFile(appletSecurityContent, f);
+            FileUtils.saveFileUtf8(appletSecurityContent, f);
             runRememeberableClasses(ExpectedResults.PositiveResults);
-            FileUtils.saveFile(appletSecurityContent.replace("{YES}", "{NO}"), f);
+            FileUtils.saveFileUtf8(appletSecurityContent.replace("{YES}", "{NO}"), f);
             runRememeberableClasses(ExpectedResults.NegativeResults);
         } finally {
             resetQueue();

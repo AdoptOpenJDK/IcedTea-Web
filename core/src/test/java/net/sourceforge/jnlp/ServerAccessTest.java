@@ -154,9 +154,9 @@ public class ServerAccessTest {
         File portFile = new File(server.getDir(), "server.port");
         File dirFile = new File(server.getDir(), "server.dir");
 
-        FileUtils.saveFile(server.getDir().getAbsolutePath(), dirFile);
-        FileUtils.saveFile(server.getPort().toString(), portFile);
-        FileUtils.saveFile(server.getPort().toString(), portFile);
+        FileUtils.saveFileUtf8(server.getDir().getAbsolutePath(), dirFile);
+        FileUtils.saveFileUtf8(server.getPort().toString(), portFile);
+        FileUtils.saveFileUtf8(server.getPort().toString(), portFile);
 
         Assert.assertTrue(portFile.exists());
         Assert.assertTrue(dirFile.exists());

@@ -537,7 +537,7 @@ public final class FileUtils {
      * @param f file to be saved. No warnings provided
      * @throws IOException if save fails
      */
-    public static void saveFile(final String content, final File f) throws IOException {
+    public static void saveFileUtf8(final String content, final File f) throws IOException {
         saveFile(content, f, UTF_8);
     }
 

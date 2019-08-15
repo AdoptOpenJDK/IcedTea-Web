@@ -318,7 +318,7 @@ public class UnsignedAppletActionStorageImpl extends LockingReaderWriter impleme
             } else {
                 s = readVersion + " " + warning + "\n" + s;
             }
-            FileUtils.saveFile(s, backup);
+            FileUtils.saveFileUtf8(s, backup);
         } catch (Exception ex) {
             LOG.error("Error during backuping", ex);
         }

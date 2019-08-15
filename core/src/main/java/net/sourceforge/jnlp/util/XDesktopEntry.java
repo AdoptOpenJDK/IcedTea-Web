@@ -134,7 +134,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             try {
                 String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF, info.isFixHref());
                 generatedJnlp = getGeneratedJnlpFileName();
-                FileUtils.saveFile(content, generatedJnlp);
+                FileUtils.saveFileUtf8(content, generatedJnlp);
             } catch (Exception ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }

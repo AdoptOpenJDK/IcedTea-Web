@@ -115,7 +115,7 @@ public class PolicyFileModelTest {
     @Test
     public void testSavePolicyFile() throws Exception {
         File file = new File(tempFilePath);
-        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        FileUtils.saveFileUtf8(EXAMPLE_POLICY_1, new File(tempFilePath));
         assertEquals("policy file size", EXAMPLE_POLICY_1.length(), file.length());
         
         model.setFile(file);
@@ -133,9 +133,9 @@ public class PolicyFileModelTest {
     @Test
     public void testFileHasChangedWithChange() throws Exception {
         assertFalse("Model should not report changes made initially", model.hasChanged());
-        FileUtils.saveFile(EXAMPLE_POLICY_1, new File(tempFilePath));
+        FileUtils.saveFileUtf8(EXAMPLE_POLICY_1, new File(tempFilePath));
         model.openAndParsePolicyFile();
-        FileUtils.saveFile(EXAMPLE_POLICY_2, new File(tempFilePath));
+        FileUtils.saveFileUtf8(EXAMPLE_POLICY_2, new File(tempFilePath));
         assertTrue("File should be marked changed after being externally modified", model.hasChanged());
     }
 

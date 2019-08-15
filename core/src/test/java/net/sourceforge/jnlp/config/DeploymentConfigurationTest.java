@@ -112,7 +112,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     public void testPersistedComments() throws ConfigurationException, IOException {
         final File f = File.createTempFile("properties", "withComments");
         f.deleteOnExit();
-        FileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
+        FileUtils.saveFileUtf8("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
         DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor() {
 
             @Override
@@ -149,7 +149,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     public void testEnsurePersistedCommentsDoNotMultiplyHeaderAndDate() throws ConfigurationException, IOException {
         final File f = File.createTempFile("properties", "withComments");
         f.deleteOnExit();
-        FileUtils.saveFile("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
+        FileUtils.saveFileUtf8("#commented1=val1\nproperty2=val2\n#commented3=val3\nproperty4=val4", f);
         DeploymentConfiguration dc = new DeploymentConfiguration(new InfrastructureFileDescriptor() {
 
             @Override
@@ -185,7 +185,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val3"));
             Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val4"));
             //insert some salt to check if it really iterates
-            FileUtils.saveFile(s + "\n#id" + x + "id", f);
+            FileUtils.saveFileUtf8(s + "\n#id" + x + "id", f);
         }
         //System.out.println(s);
     }

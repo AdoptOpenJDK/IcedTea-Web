@@ -86,9 +86,9 @@ public class UnsignedAppletActionStorageImplTest {
         f1 = File.createTempFile("itwMatching", "testFile1");
         f2 = File.createTempFile("itwMatching", "testFile2");
         f3 = File.createTempFile("itwMatching", "testFile3");
-        FileUtils.saveFile(versionLine+"c1:A{YES}; 123456 .* .* jar1,jar2", f1);
-        FileUtils.saveFile(versionLine+"c1:N{NO}; 123456 .* \\Qbla\\E jar1,jar2", f2);
-        FileUtils.saveFile(versionLine
+        FileUtils.saveFileUtf8(versionLine+"c1:A{YES}; 123456 .* .* jar1,jar2", f1);
+        FileUtils.saveFileUtf8(versionLine+"c1:N{NO}; 123456 .* \\Qbla\\E jar1,jar2", f2);
+        FileUtils.saveFileUtf8(versionLine
                 + "c1:A{YES}; 1 \\Qhttp://jmol.sourceforge.net/demo/atoms/\\E \\Qhttp://jmol.sourceforge.net/jmol/\\E JmolApplet0.jar\n"
                 + "c1:N{NO}; 1363278653454 \\Qhttp://www.walter-fendt.de/ph14e\\E.* \\Qhttp://www.walter-fendt.de\\E.*\n"
                 + "c1:n{NO}; 1363281783104 \\Qhttp://www.walter-fendt.de/ph14e/inclplane.htm\\E \\Qhttp://www.walter-fendt.de/ph14_jar/\\E Ph14English.jar,SchiefeEbene.jar"
@@ -101,10 +101,10 @@ public class UnsignedAppletActionStorageImplTest {
         ff2 = File.createTempFile("itwMatching", "testFile2");
         ff3 = File.createTempFile("itwMatching", "testFile3");
         ff4 = File.createTempFile("itwMatching", "testFile3");
-        FileUtils.saveFile(versionLine+"c1:A{YES};c3:n{NO}; 123456 .* .* jar1,jar2", ff1);
-        FileUtils.saveFile(versionLine+"c6:y{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff2);
-        FileUtils.saveFile(versionLine+"c6:A{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff4);
-        FileUtils.saveFile(versionLine
+        FileUtils.saveFileUtf8(versionLine+"c1:A{YES};c3:n{NO}; 123456 .* .* jar1,jar2", ff1);
+        FileUtils.saveFileUtf8(versionLine+"c6:y{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff2);
+        FileUtils.saveFileUtf8(versionLine+"c6:A{YES}; 123456 .* \\Qbla\\E jar1,jar2", ff4);
+        FileUtils.saveFileUtf8(versionLine
                 + "c2:A{YES}; 1 \\Qa\\E \\Qb\\E jar1\n"
                 + "c1:N{NO};c2:N{NO};c3:A{YES}; 2 \\Qc\\E \\Qd\\E\n"
                 + "c1:n{NO};c2:y{YES};c4:y{YES};c5:n{NO}; 3 \\Qe\\E \\Qf\\E j1,j2"

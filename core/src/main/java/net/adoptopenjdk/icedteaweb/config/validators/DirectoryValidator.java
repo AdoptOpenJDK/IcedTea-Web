@@ -101,7 +101,7 @@ public class DirectoryValidator {
                 correctPermissions = false;
             }
             try {
-                FileUtils.saveFile("ww", testFile);
+                FileUtils.saveFileUtf8("ww", testFile);
                 final String s = FileUtils.loadFileAsString(testFile);
                 if (!s.trim().equals("ww")) {
                     correctPermissions = false;
