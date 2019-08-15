@@ -78,14 +78,4 @@ public class IOUtils {
         outputStream.write(rawData);
         outputStream.flush();
     }
-
-    public static byte[] unbox(final Byte[] array) {
-        Assert.requireNonNull(array, "array");
-        final byte[] result = new byte[array.length];
-        int j=0;
-        for(Byte b: array) {
-            result[j++] = b.byteValue();
-        }
-        return result;
-    }
 }
