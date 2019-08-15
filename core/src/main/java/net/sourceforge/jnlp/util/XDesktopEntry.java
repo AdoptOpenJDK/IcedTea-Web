@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.getJavaWsBin;
@@ -299,7 +298,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            FileUtils.saveFile(getContent(true, info, isSigned), f, UTF_8);
+            FileUtils.saveFileUtf8(getContent(true, info, isSigned), f);
             LOG.info("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -320,7 +319,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
             FileUtils.createRestrictedFile(shortcutFile, true);
-            FileUtils.saveFile(getContent(false, info, isSigned), shortcutFile, UTF_8);
+            FileUtils.saveFileUtf8(getContent(false, info, isSigned), shortcutFile);
 
             /*
              * Install the desktop entry
