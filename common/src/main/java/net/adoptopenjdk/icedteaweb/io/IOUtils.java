@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.StringUtils.splitIntoMultipleLines;
 
 /**
@@ -66,10 +67,13 @@ public class IOUtils {
         return outputStream.toByteArray();
     }
 
+    public static String readContentAsUtf8String(final InputStream inputStream) throws IOException {
+        return readContentAsString(inputStream, UTF_8);
+    }
+
     public static String readContentAsString(final InputStream inputStream, final Charset encoding) throws IOException {
         return new String(readContent(inputStream), encoding);
     }
-
 
     public static void writeContent(final OutputStream outputStream, final byte[] rawData) throws IOException {
         Assert.requireNonNull(outputStream, "outputStream");
