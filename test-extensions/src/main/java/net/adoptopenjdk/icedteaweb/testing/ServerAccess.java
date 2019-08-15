@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.OutputUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
@@ -390,7 +391,7 @@ public class ServerAccess {
             connection.connect();
 
             try (final InputStream is = connection.getInputStream()) {
-                return BasicFileUtils.toString(is);
+                return IOUtils.readContentAsUtf8String(is);
             }
         } finally {
             if (connection instanceof HttpURLConnection) {

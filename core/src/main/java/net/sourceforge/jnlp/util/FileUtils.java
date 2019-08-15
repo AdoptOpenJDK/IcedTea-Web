@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
 import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
@@ -523,7 +522,7 @@ public final class FileUtils {
 
     public static String loadFileAsString(File f, Charset encoding) throws IOException {
         try (final FileInputStream is = new FileInputStream(f)) {
-            return BasicFileUtils.toString(is, encoding);
+            return IOUtils.readContentAsString(is, encoding);
         }
     }
 

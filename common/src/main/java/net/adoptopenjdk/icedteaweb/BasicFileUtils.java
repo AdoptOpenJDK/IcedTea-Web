@@ -1,12 +1,9 @@
 package net.adoptopenjdk.icedteaweb;
 
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -41,26 +38,4 @@ public class BasicFileUtils {
         }
     }
 
-    /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is stream
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String toString(final InputStream is) throws IOException {
-        return IOUtils.readContentAsUtf8String(is);
-    }
-
-    /**
-     * utility method which can read from any stream as one long String
-     *
-     * @param is       stream
-     * @param encoding the encoding to use to convert the bytes from the stream
-     * @return stream as string
-     * @throws IOException if connection can't be established or resource does not exist
-     */
-    public static String toString(final InputStream is, final Charset encoding) throws IOException {
-        return IOUtils.readContentAsString(is, encoding);
-    }
 }
