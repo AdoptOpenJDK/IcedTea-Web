@@ -401,18 +401,6 @@ public class ServerAccess {
     }
 
     /**
-     * helping dummy  method to save String as file in UTF-8 encoding.
-     *
-     * @param content which will be saved as it is saved in this String
-     * @param f       file to be saved. No warnings provided
-     * @throws IOException
-     */
-    public static void saveFile(final String content, final File f) throws IOException {
-        BasicFileUtils.saveFile(content, f);
-    }
-
-
-    /**
      * @param resource relative resource to be opened in browser for current server instance.
      * @return result of browser run
      */
