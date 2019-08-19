@@ -149,12 +149,7 @@ fn filter_in_key(key: &str, os: &os_access::Os, vec: &mut Vec<std::path::PathBuf
 //TODO what to do with rt.jar, nashorn and javafx.jar with jdk11 and up?
 fn get_bootcp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
-    cp_parts.push(resolve_jar(hardcoded_paths::get_core(), os));
-    cp_parts.push(resolve_jar(hardcoded_paths::get_common(), os));
-    cp_parts.push(resolve_jar(hardcoded_paths::get_jnlpapi(), os));
-    cp_parts.push(resolve_jar(hardcoded_paths::get_xmlparser(), os));
-    cp_parts.push(resolve_jar(hardcoded_paths::get_clientsjar(), os));
-    cp_parts.push(resolve_jar(hardcoded_paths::get_jnlpserver(), os));
+    cp_parts.push(resolve_jar(hardcoded_paths::get_javaws(), os));
     append_if_exists(hardcoded_paths::get_rhino(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_tagsoup(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_mslinks(), os, &mut cp_parts);

@@ -1,35 +1,31 @@
+#$1 original file
+#$2 target path
+#$3 optional renaming
 function getTarget() {
- echo "$2/`basename \"$1\"`"
+ if [ "x$3" == "x" ]; then
+   echo "$2/`basename \"$1\"`"
+ else
+   echo "$2/$3"
+ fi
 }
 
 function publishInternalLib() {
- cp $1 `getTarget $1 $2`
- RESOURCES_SRC_TO_DEST["$1"]="`getTarget $1 $2`"
-}
-
-function publishExternalLib() {
-if [ "x$ITW_LIBS" = "xDISTRIBUTION" ] ; then
-  RESOURCES_SRC_TO_DEST["$1"]="$1"
-else
-  publishInternalLib "$1" "$LIB_TARGET_DIR"
-fi
+ cp $1 `getTarget $1 $2 $3`
+ RESOURCES_SRC_TO_DEST["$1"]="`getTarget $1 $2 $3`"
 }
 
 function build() {
   TYPE=$1 # sh+bats x rust+rust-coverage
   PROGRAM_NAME=$2 # only used to name the in file
   export MAIN_CLASS=$3
-  export TAGSOUP_JAR=${RESOURCES_SRC_TO_DEST["$TAGSOUP_SRC"]}
-  export RHINO_JAR=${RESOURCES_SRC_TO_DEST["$RHINO_SRC"]}
-  export MSLINKS_JAR=${RESOURCES_SRC_TO_DEST["$MSLINKS_SRC"]}
+  if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
+    export TAGSOUP_JAR=$TAGSOUP_SRC
+    export RHINO_JAR=$RHINO_SRC
+    export MSLINKS_JAR=$MSLINKS_SRC
+  fi
   export JRE
   export ITW_LIBS
-  export CORE_JAR=${RESOURCES_SRC_TO_DEST["$CORE_SRC"]}
-  export COMMON_JAR=${RESOURCES_SRC_TO_DEST["$COMMON_SRC"]}
-  export JNLPAPI_JAR=${RESOURCES_SRC_TO_DEST["$JNLPAPI_SRC"]}
-  export XMLPARSER_JAR=${RESOURCES_SRC_TO_DEST["$XMLPARSER_SRC"]}
-  export CLIENTS_JAR=${RESOURCES_SRC_TO_DEST["$CLIENTS_SRC"]}
-  export JNLPSERVER_JAR=${RESOURCES_SRC_TO_DEST["$JNLPSERVER_SRC"]}
+  export JAVAWS_JAR=${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]}
   export SPLASH_PNG=${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}
   export MODULARJDK_ARGS_LOCATION=${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}
   BUILD_DIR=$TARGET/launcher.in.$PROGRAM_NAME
@@ -58,12 +54,7 @@ function build() {
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
         -e "s|[@]MSLINKS_JAR[@]|$MSLINKS_JAR|g" \
         -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
-        -e "s|[@]CORE_JAR[@]|$CORE_JAR|g" \
-        -e "s|[@]COMMON_JAR[@]|$COMMON_JAR|g" \
-        -e "s|[@]JNLPAPI_JAR[@]|$JNLPAPI_JAR|g" \
-        -e "s|[@]XMLPARSER_JAR[@]|$XMLPARSER_JAR|g" \
-        -e "s|[@]CLIENTS_JAR[@]|$CLIENTS_JAR|g" \
-        -e "s|[@]JNLPSERVER_JAR[@]|$JNLPSERVER_JAR|g" \
+        -e "s|[@]JAVAWS_JAR[@]|$JAVAWS_JAR|g" \
         -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
         -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \
         -e "s|[@]JRE[@]|$JRE|g" \
@@ -143,7 +134,7 @@ function docs() {
   fi
   mkdir -p $langDir
   $JRE/bin/java \
-    -cp `createCp $CORE_SRC $COMMON_SRC $JNLPAPI_SRC` \
+    -cp `createCp $JAVAWS_SRC` \
     net.sourceforge.jnlp.util.docprovider.TextsProvider \
     $type $ENPARAM $langDir $WIDTH false $VERSION "-authorString=https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors"
   # TODO, genere on fly resource

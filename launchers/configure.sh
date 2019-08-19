@@ -71,25 +71,12 @@ else
   readonly ICO_TARGET_DIR=$ICO_TARGET_DIR
 fi
 
-if [ "x$SNAPSHOT" == "x" ] ; then
-  readonly SNAPSHOT="-SNAPSHOT"
+if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar`
 else
-  readonly SNAPSHOT="$SNAPSHOT"
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar`
 fi
 
-# should javadoc be handled?
-readonly CORE_SRC=`ls $PROJECT_TOP/core/target/icedtea-web-core-?.?$SNAPSHOT.jar`
-readonly COMMON_SRC=`ls $PROJECT_TOP/common/target/icedtea-web-common-?.?$SNAPSHOT.jar`
-readonly JNLPAPI_SRC=`ls $PROJECT_TOP/jnlp-api/target/jnlp-api-?.?$SNAPSHOT.jar`
-readonly XMLPARSER_SRC=`ls $PROJECT_TOP/xml-parser/target/icedtea-web-xml-parser-?.?$SNAPSHOT.jar`
-readonly CLIENTS_SRC=`ls $PROJECT_TOP/clients/target/icedtea-web-clients-?.?$SNAPSHOT.jar`
-readonly JNLPSERVER_SRC=`ls $PROJECT_TOP/jnlp-servlet/target/jnlp-servlet-?.?$SNAPSHOT.jar`
-
-if [ "x$MAVEN_REPO" == "x" ] ; then
-  readonly MAVEN_REPO=${HOME}/.m2/
-else
-  readonly MAVEN_REPO=$MAVEN_REPO
-fi
 if [ "x$SYSTEM_JARS" == "x" ] ; then
   readonly SYSTEM_JARS=/usr/share
 else
@@ -105,10 +92,10 @@ function getJar() {
   if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
     findJar "$SYSTEM_JARS"  "$1"
   else
-    findJar "$MAVEN_REPO" "$1"
+    # Dependent jars for non distribution builds have no sense with fat javaws.jar
+    echo ""
   fi
 }
-
 
 if [ "x$RHINO_SRC" == "x" ] ; then
   readonly RHINO_SRC=`getJar "rhino"`
