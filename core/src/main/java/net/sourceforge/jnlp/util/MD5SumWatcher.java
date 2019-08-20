@@ -88,7 +88,7 @@ public class MD5SumWatcher {
     public boolean update() throws FileNotFoundException, IOException {
         byte[] newSum;
         try {
-            newSum = FileUtils.getFileMD5Sum(watchedFile, "MD5");
+            newSum = FileUtils.getFileMD5Sum(watchedFile);
         } catch (final NoSuchAlgorithmException e) {
             // There definitely should be an MD5 algorithm, but if not, all we can do is fail.
             // This really, really is not expected to happen, so rethrow as RuntimeException

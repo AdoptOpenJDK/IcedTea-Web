@@ -62,6 +62,8 @@ public final class FileUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
+    private static final String MD5 = "MD5";
+
     private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
 
     private static final List<String> WIN_ROOT_PRINCIPALS = Arrays.asList("NT AUTHORITY\\SYSTEM", "BUILTIN\\Administrators");
@@ -541,12 +543,12 @@ public final class FileUtils {
         }
     }
 
-    public static byte[] getFileMD5Sum(final File file, final String algorithm) throws NoSuchAlgorithmException, IOException {
+    public static byte[] getFileMD5Sum(final File file) throws NoSuchAlgorithmException, IOException {
         final MessageDigest md5;
         InputStream is = null;
         DigestInputStream dis = null;
         try {
-            md5 = MessageDigest.getInstance(algorithm);
+            md5 = MessageDigest.getInstance(MD5);
             is = new FileInputStream(file);
             dis = new DigestInputStream(is, md5);
 
