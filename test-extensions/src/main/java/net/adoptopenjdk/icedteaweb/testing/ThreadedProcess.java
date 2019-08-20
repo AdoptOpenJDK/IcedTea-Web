@@ -44,7 +44,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
+
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -164,7 +165,7 @@ public class ThreadedProcess extends Thread {
                     });
                     t.start();
                 }
-                StreamUtils.waitForSafely(p);
+                ProcessUtils.waitForSafely(p);
                 exitCode = p.exitValue();
                 Thread.sleep(500); //this is giving to fast done processes's e/o readers time to read all. I would like to know better solution :-/
                 while(assassin.isKilling() && !assassin.haveKilled()){

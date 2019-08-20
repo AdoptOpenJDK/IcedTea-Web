@@ -37,7 +37,7 @@
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
@@ -61,7 +61,7 @@ public class UnixSystemLog implements SingleStreamLogger{
                 m = m.replaceAll("\t", "    ");
                 ProcessBuilder pb = new ProcessBuilder("logger", "-p","user.err", "--", m);
                 Process p = pb.start();
-                StreamUtils.waitForSafely(p);
+                ProcessUtils.waitForSafely(p);
                 LOG.debug("System logger called with result of {}", p.exitValue());
             }
         } catch (Exception ex) {

@@ -16,7 +16,7 @@
 package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -249,7 +249,7 @@ class XBasicService implements BasicService {
             final ProcessBuilder pb = new ProcessBuilder(cmdarray);
             pb.inheritIO();
             final Process p = pb.start();
-            StreamUtils.waitForSafely(p);
+            ProcessUtils.waitForSafely(p);
             return (p.exitValue() == 0);
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);

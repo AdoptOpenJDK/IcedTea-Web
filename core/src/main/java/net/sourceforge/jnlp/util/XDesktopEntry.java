@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
@@ -332,7 +332,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             pb.inheritIO();
             Process installer = pb.start();
 
-            StreamUtils.waitForSafely(installer);
+            ProcessUtils.waitForSafely(installer);
 
             if (!shortcutFile.delete()) {
                 throw new IOException("Unable to delete temporary file:" + shortcutFile);
