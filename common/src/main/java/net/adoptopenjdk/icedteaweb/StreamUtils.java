@@ -41,11 +41,9 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
@@ -53,45 +51,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class StreamUtils {
 
-    private final static Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
-
-    public static final int DEFAULT_BYTE_SIZE = 1024;
-
-    /**
-     * Closes a stream, without throwing IOException.
-     * In IOException is properly logged and consumed
-     * 
-     * @param stream the stream that will be closed
-     */
-    public static void closeSilently(final Closeable stream) {
-        if (stream != null) {
-            try {
-                stream.close();
-            } catch (final IOException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
-        }
-    }
-
-    /**
-     * Copy an input stream's contents into an output stream.
-     * @param input input stream
-     * @param output stream where to copy input
-     * @throws java.io.IOException if IO fails
-     */
-    public static void copyStream(final InputStream input, final OutputStream output)
-            throws IOException {
-        Objects.requireNonNull(input);
-        Objects.requireNonNull(input);
-        final byte[] buffer = new byte[DEFAULT_BYTE_SIZE];
-        while (true) {
-            final int bytesRead = input.read(buffer);
-            if (bytesRead == -1) {
-                break;
-            }
-            output.write(buffer, 0, bytesRead);
-        }
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(StreamUtils.class);
 
     public static String readStreamAsString(final InputStream stream)  throws IOException {
         return readStreamAsString(stream, false);
@@ -121,7 +81,7 @@ public class StreamUtils {
         }
         return sb.toString();
     }
-    
+
     /**
      * This should be workaround for https://en.wikipedia.org/wiki/Spurious_wakeup which real can happen in case of processes.
      * See http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2015-June/032350.html thread

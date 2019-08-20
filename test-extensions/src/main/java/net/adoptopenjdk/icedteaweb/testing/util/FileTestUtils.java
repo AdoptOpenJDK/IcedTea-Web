@@ -37,8 +37,8 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.util;
 
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -117,7 +117,7 @@ public class FileTestUtils {
         for (final File file : fileContents) {
             jarWriter.putNextEntry(new JarEntry(file.getName()));
             final FileInputStream fileReader = new FileInputStream(file);
-            StreamUtils.copyStream(fileReader, jarWriter);
+            IOUtils.copy(fileReader, jarWriter);
             fileReader.close();
             jarWriter.closeEntry();
         }
