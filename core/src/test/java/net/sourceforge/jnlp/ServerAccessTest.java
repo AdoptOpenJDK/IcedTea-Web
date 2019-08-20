@@ -154,16 +154,16 @@ public class ServerAccessTest {
         File portFile = new File(server.getDir(), "server.port");
         File dirFile = new File(server.getDir(), "server.dir");
 
-        ServerAccess.saveFile(server.getDir().getAbsolutePath(), dirFile);
-        ServerAccess.saveFile(server.getPort().toString(), portFile);
-        ServerAccess.saveFile(server.getPort().toString(), portFile);
+        FileUtils.saveFileUtf8(server.getDir().getAbsolutePath(), dirFile);
+        FileUtils.saveFileUtf8(server.getPort().toString(), portFile);
+        FileUtils.saveFileUtf8(server.getPort().toString(), portFile);
 
         Assert.assertTrue(portFile.exists());
         Assert.assertTrue(dirFile.exists());
         Assert.assertTrue(server.getDir().listFiles().length > 1);
 
-        String portFileContent = FileUtils.loadFileAsString(portFile);
-        String dirFileContent = FileUtils.loadFileAsString(dirFile);
+        String portFileContent = FileUtils.loadFileAsUtf8String(portFile);
+        String dirFileContent = FileUtils.loadFileAsUtf8String(dirFile);
 
         URL portUrl = new URL("http", "localhost", server.getPort(), "/server.port");
         URL dirUrl = new URL("http", "localhost", server.getPort(), "/server.dir");

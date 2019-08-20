@@ -61,6 +61,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class PolicyFileModel {
 
     private final static Logger LOG = LoggerFactory.getLogger(PolicyFileModel.class);
@@ -114,7 +116,7 @@ public class PolicyFileModel {
         clearPermissions();
         final FileLock fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);
         try {
-            parser.read(new BufferedReader(new InputStreamReader(Channels.newInputStream(fileLock.channel()), "UTF-8")));
+            parser.read(new BufferedReader(new InputStreamReader(Channels.newInputStream(fileLock.channel()), UTF_8)));
             keystoreInfo = new KeystoreInfo(parser.getKeyStoreUrl(), parser.getKeyStoreType(), parser.getKeyStoreProvider(), parser.getStorePassURL());
             final Set<PolicyParser.GrantEntry> grantEntries = new HashSet<>(Collections.list(parser.grantElements()));
             synchronized (permissionsMap) {
@@ -187,7 +189,7 @@ public class PolicyFileModel {
                     parser.add(grantEntry);
                 }
             }
-            parser.write(new BufferedWriter(new OutputStreamWriter(Channels.newOutputStream(fileLock.channel()), "UTF-8")));
+            parser.write(new BufferedWriter(new OutputStreamWriter(Channels.newOutputStream(fileLock.channel()), UTF_8)));
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } finally {

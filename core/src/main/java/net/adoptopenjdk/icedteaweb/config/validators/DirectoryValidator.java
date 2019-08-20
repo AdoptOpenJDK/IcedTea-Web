@@ -4,7 +4,6 @@
  */
 package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -102,8 +101,8 @@ public class DirectoryValidator {
                 correctPermissions = false;
             }
             try {
-                BasicFileUtils.saveFile("ww", testFile);
-                final String s = FileUtils.loadFileAsString(testFile);
+                FileUtils.saveFileUtf8("ww", testFile);
+                final String s = FileUtils.loadFileAsUtf8String(testFile);
                 if (!s.trim().equals("ww")) {
                     correctPermissions = false;
                 }

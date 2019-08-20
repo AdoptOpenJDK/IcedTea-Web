@@ -108,7 +108,7 @@ public interface IntegrationTest {
     default byte[] fileContent(String file, Map<String, String> replacements) throws IOException {
         String content;
         try (final InputStream in = getClass().getResourceAsStream(file)) {
-            content = IOUtils.readContentAsString(in, UTF_8);
+            content = IOUtils.readContentAsUtf8String(in);
         }
 
         for (Map.Entry<String, String> replacePair : replacements.entrySet()) {
@@ -122,7 +122,7 @@ public interface IntegrationTest {
         final File helloFile = getCachedFile(tmpItwHome, fileName);
         final String content;
         try (final InputStream inputStream = new FileInputStream(helloFile)) {
-            content = IOUtils.readContentAsString(inputStream, UTF_8);
+            content = IOUtils.readContentAsUtf8String(inputStream);
         }
         return content;
     }

@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
@@ -65,14 +64,14 @@ public class DeploymentPropertiesModifierTest {
         deploymentFile = tempUserFile;
         DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
 
-        String properties = FileUtils.loadFileAsString(deploymentFile);
+        String properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(0, properties.length());
 
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
         dpm.setProperties(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
         String setProperty = ConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
 
-        properties = FileUtils.loadFileAsString(deploymentFile);
+        properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(setProperty, properties);
 
     }
@@ -85,18 +84,18 @@ public class DeploymentPropertiesModifierTest {
         deploymentFile = tempUserFile;
         DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
 
-        String properties = FileUtils.loadFileAsString(deploymentFile);
+        String properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(0, properties.length());
 
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
         dpm.setProperties(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
 
         String setProperty = ConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n";
-        properties = FileUtils.loadFileAsString(deploymentFile);
+        properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(setProperty, properties);
 
         dpm.restoreProperties();
-        properties = FileUtils.loadFileAsString(deploymentFile);
+        properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(0, properties.length());
 
     }
@@ -112,7 +111,7 @@ public class DeploymentPropertiesModifierTest {
         DeploymentPropertiesModifier dpm = new DeploymentPropertiesModifier(deploymentInfrastructure);
 
         dpm.restoreProperties();
-        String properties = FileUtils.loadFileAsString(deploymentFile);
+        String properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(0, properties.length());
 
     }
@@ -152,7 +151,7 @@ public class DeploymentPropertiesModifierTest {
         dpm2.setProperties(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString());
 
         String contents = ConfigurationConstants.KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.toChars() + "\n" + ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK + "=" + ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString() + "\n";
-        String properties = FileUtils.loadFileAsString(deploymentFile);
+        String properties = FileUtils.loadFileAsUtf8String(deploymentFile);
         assertEquals(contents, properties);
 
         dpm2.restoreProperties();
@@ -165,7 +164,7 @@ public class DeploymentPropertiesModifierTest {
         tempUserFile.deleteOnExit();
 
         String content = "a.b=12\nc.d=34\ne.f=56\ng.h=78\ni.j=90";
-        BasicFileUtils.saveFile(content, tempUserFile);
+        FileUtils.saveFileUtf8(content, tempUserFile);
         deploymentFile = tempUserFile;
         DummyInfrastructureFileDescriptor deploymentInfrastructure = new DummyInfrastructureFileDescriptor(deploymentFile);
 
@@ -175,7 +174,7 @@ public class DeploymentPropertiesModifierTest {
                         new AbstractMap.SimpleEntry<>("i.j", "44")
                 );
         dpm1.setProperties();
-        String propertiesChanged = FileUtils.loadFileAsString(deploymentFile);
+        String propertiesChanged = FileUtils.loadFileAsUtf8String(deploymentFile);
         Assert.assertNotEquals(content, propertiesChanged);
         Assert.assertTrue(propertiesChanged.contains("12"));
         Assert.assertFalse(propertiesChanged.contains("34"));
@@ -191,7 +190,7 @@ public class DeploymentPropertiesModifierTest {
         Assert.assertTrue(propertiesChanged.contains("i.j"));
         
         dpm1.restoreProperties();
-        String propertiesRestored = FileUtils.loadFileAsString(deploymentFile);
+        String propertiesRestored = FileUtils.loadFileAsUtf8String(deploymentFile);
         
         Assert.assertNotEquals(content, propertiesChanged);
         Assert.assertTrue(propertiesRestored.contains("12"));

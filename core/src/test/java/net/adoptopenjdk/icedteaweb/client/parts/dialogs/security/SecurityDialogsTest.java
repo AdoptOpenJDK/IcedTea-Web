@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 
-import net.adoptopenjdk.icedteaweb.BasicFileUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
@@ -62,6 +61,7 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.util.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -664,9 +664,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             //no we fake queue
             fakeQueue();
             //file exists our 6 rememberable dialogues should pass
-            BasicFileUtils.saveFile(appletSecurityContent, f);
+            FileUtils.saveFileUtf8(appletSecurityContent, f);
             runRememeberableClasses(ExpectedResults.PositiveResults);
-            BasicFileUtils.saveFile(appletSecurityContent.replace("{YES}", "{NO}"), f);
+            FileUtils.saveFileUtf8(appletSecurityContent.replace("{YES}", "{NO}"), f);
             runRememeberableClasses(ExpectedResults.NegativeResults);
         } finally {
             resetQueue();
