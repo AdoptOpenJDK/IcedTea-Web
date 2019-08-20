@@ -1,40 +1,4 @@
-/* FileUtilsTest.java
-Copyright (C) 2014 Red Hat, Inc.
-
-This file is part of IcedTea.
-
-IcedTea is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, version 2.
-
-IcedTea is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with IcedTea; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
-
-Linking this library statically or dynamically with other modules is
-making a combined work based on this library.  Thus, the terms and
-conditions of the GNU General Public License cover the whole
-combination.
-
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent
-modules, and to copy and distribute the resulting executable under
-terms of your choice, provided that you also meet, for each linked
-independent module, the terms and conditions of the license of that
-module.  An independent module is a module which is not derived from
-or based on this library.  If you modify this library, you may extend
-this exception to your version of the library, but you are not
-obligated to do so.  If you do not wish to do so, delete this
-exception statement from your version.
- */
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb.io;
 
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import org.junit.Test;
@@ -43,27 +7,20 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclFileAttributeView;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
+import static net.adoptopenjdk.icedteaweb.io.FileUtils.INVALID_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * ...
+ */
 public class FileUtilsTest {
 
-    public static final List<Character> INVALID_PATH = Arrays.asList(new Character[]{':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ','});
-    public static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
-
-    static {
-        INVALID_NAME.add(0, '\\');
-        INVALID_NAME.add(0, '/');
-    }
-
     @Test
-    public void testSanitizePath() throws Exception {
+    public void testSanitizePath() {
         for (char ch : INVALID_PATH) {
             String str = "/tmp/test" + ch + "path";
             String sanitized = FileUtils.sanitizePath(str);
@@ -73,7 +30,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSanitizeMoreDoubleDots() throws Exception {
+    public void testSanitizeMoreDoubleDots() {
         String str = "C:/some:dir/some:file";
         String sanitized = FileUtils.sanitizePath(str);
         if (OsUtil.isWindows()) {
@@ -84,7 +41,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSanitizePathWindowsLinuxSlashes() throws Exception {
+    public void testSanitizePathWindowsLinuxSlashes() {
         String str = "C:/some.dir/some.file";
         String sanitized = FileUtils.sanitizePath(str);
         if (OsUtil.isWindows()) {
@@ -95,7 +52,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSanitizePathWindowsWinSlashes() throws Exception {
+    public void testSanitizePathWindowsWinSlashes() {
         String str = "C:\\some.dir\\some.file";
         String sanitized = FileUtils.sanitizePath(str);
         if (OsUtil.isWindows()) {
@@ -106,7 +63,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSanitizeFilename() throws Exception {
+    public void testSanitizeFilename() {
         for (char ch : INVALID_PATH) {
             String str = "file" + ch + "name";
             String sanitized = FileUtils.sanitizeFileName(str);
@@ -116,7 +73,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSanitizeFilenameSlashes() throws Exception {
+    public void testSanitizeFilenameSlashes() {
         for (char ch : new char[]{'/', '\\'}) {
             String str = "file" + ch + "name";
             String sanitized = FileUtils.sanitizeFileName(str);
@@ -158,5 +115,6 @@ public class FileUtilsTest {
         }
         assertTrue("No owner entry", hasOwner);
     }
+
 
 }

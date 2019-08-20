@@ -38,7 +38,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.tools;
 
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.IOException;
 import java.util.AbstractMap;

@@ -36,7 +36,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.provider.PolicyParser;

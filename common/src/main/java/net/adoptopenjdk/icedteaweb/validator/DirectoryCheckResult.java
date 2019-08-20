@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.config.validators;
+package net.adoptopenjdk.icedteaweb.validator;
 
 import java.io.File;
 

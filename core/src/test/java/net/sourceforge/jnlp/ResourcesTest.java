@@ -46,7 +46,7 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserFactory;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.BrowserTest;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browsers;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

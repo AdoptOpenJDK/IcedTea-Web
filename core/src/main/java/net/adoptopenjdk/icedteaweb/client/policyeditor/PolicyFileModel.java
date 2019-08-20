@@ -39,7 +39,7 @@ package net.adoptopenjdk.icedteaweb.client.policyeditor;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
 import sun.security.provider.PolicyParser;
 

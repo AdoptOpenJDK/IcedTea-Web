@@ -2,13 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.adoptopenjdk.icedteaweb.config.validators;
+package net.adoptopenjdk.icedteaweb.validator;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,16 +40,17 @@ public class DirectoryValidator {
      * hope that corrupted dirs will not be necessary
      * </p>
      * @return  result of directory checks
+     * @param isDebug output debug information
      */
-    public DirectoryCheckResults ensureDirs() {
-        return ensureDirs(dirsToCheck);
+    public DirectoryCheckResults ensureDirs(boolean isDebug) {
+        return ensureDirs(dirsToCheck, isDebug);
     }
 
-    private static DirectoryCheckResults ensureDirs(final List<File> dirs) {
+    private static DirectoryCheckResults ensureDirs(final List<File> dirs, boolean isDebug) {
         final List<DirectoryCheckResult> result = new ArrayList<>(dirs.size());
         for (final File f : dirs) {
             if (f.exists()) {
-                final DirectoryCheckResult r = testDir(f, true, true);
+                final DirectoryCheckResult r = testDir(f, true, true, isDebug);
                 result.add(r);
                 continue;
             }
@@ -59,7 +59,7 @@ public class DirectoryValidator {
             } else {
                 LOG.debug("OK: Directory {} did not exist but has been created", f.getAbsolutePath());
             }
-            final DirectoryCheckResult r = testDir(f, true, true);
+            final DirectoryCheckResult r = testDir(f, true, true, isDebug);
             result.add(r);
         }
         return new DirectoryCheckResults(result);
@@ -79,7 +79,7 @@ public class DirectoryValidator {
      * ACL or network disks)
      * </p>
      */
-    public static DirectoryCheckResult testDir(final File f, final boolean verbose, final boolean testSubdir) {
+    public static DirectoryCheckResult testDir(final File f, final boolean verbose, final boolean testSubdir, boolean isDebug) {
         final DirectoryCheckResult result = new DirectoryCheckResult(f);
         if (!f.exists()) {
             if (verbose) {
@@ -107,7 +107,7 @@ public class DirectoryValidator {
                     correctPermissions = false;
                 }
             } catch (final Exception ex) {
-                if (JNLPRuntime.isDebug()) {
+                if (isDebug) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 }
                 correctPermissions = false;
@@ -126,7 +126,7 @@ public class DirectoryValidator {
                 }
                 if (testFile.exists()) {
                     if (testSubdir) {
-                        final DirectoryCheckResult subdirResult = testDir(testFile, verbose, false);
+                        final DirectoryCheckResult subdirResult = testDir(testFile, verbose, false, isDebug);
                         if (subdirResult.getFailures() != 0) {
                             result.subDir = subdirResult;
                             correctPermissions = false;
@@ -141,7 +141,7 @@ public class DirectoryValidator {
                 }
             }
         } catch (final Exception ex) {
-            if (JNLPRuntime.isDebug()) {
+            if (isDebug) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             correctPermissions = false;

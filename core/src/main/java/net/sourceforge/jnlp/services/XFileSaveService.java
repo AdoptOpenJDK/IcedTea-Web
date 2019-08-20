@@ -46,7 +46,7 @@ import javax.jnlp.FileSaveService;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 /**
  * The FileSaveService JNLP service.

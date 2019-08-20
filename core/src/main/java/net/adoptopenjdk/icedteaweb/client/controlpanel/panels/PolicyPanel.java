@@ -46,8 +46,9 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils.OpenFileResult;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -141,7 +142,7 @@ public class PolicyPanel extends NamedBorderPanel {
     private static void launchPolicyTool(final Component parentComponent, final String filePath) {
         try {
             final File policyFile = new File(filePath).getCanonicalFile();
-            final OpenFileResult result = FileUtils.testFilePermissions(policyFile);
+            final OpenFileResult result = FileUtils.testFilePermissions(policyFile, JNLPRuntime.isDebug());
             if (result == OpenFileResult.SUCCESS) {
                 policyToolLaunchHelper(parentComponent, filePath);
             } else if (result == OpenFileResult.CANT_WRITE) {
