@@ -21,7 +21,7 @@ import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.imageio.spi.IIORegistry;
 import javax.naming.ConfigurationException;

@@ -49,8 +49,8 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.FileUtils;
-import net.sourceforge.jnlp.util.FileUtils.OpenFileResult;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils.OpenFileResult;
 import net.sourceforge.jnlp.util.ImageResources;
 import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
@@ -1470,7 +1470,7 @@ public class PolicyEditor extends JPanel {
             return;
         }
         resetEntries();
-        final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
+        final OpenFileResult ofr = FileUtils.testFilePermissions(getFile(), JNLPRuntime.isDebug());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
             LOG.debug("Unable to open policy file");
@@ -1501,7 +1501,7 @@ public class PolicyEditor extends JPanel {
             return;
         }
         resetEntries();
-        final OpenFileResult ofr = FileUtils.testFilePermissions(getFile());
+        final OpenFileResult ofr = FileUtils.testFilePermissions(getFile(), JNLPRuntime.isDebug());
         if (ofr == OpenFileResult.FAILURE || ofr == OpenFileResult.NOT_FILE) {
             addDefaultAllAppletsIdentifier();
             if (policyEditorController.getFile().exists()) {

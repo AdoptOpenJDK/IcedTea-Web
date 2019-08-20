@@ -54,7 +54,7 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

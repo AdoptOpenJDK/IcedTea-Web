@@ -41,7 +41,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;

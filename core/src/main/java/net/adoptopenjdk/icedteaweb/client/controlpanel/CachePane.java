@@ -30,7 +30,7 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import javax.swing.JButton;

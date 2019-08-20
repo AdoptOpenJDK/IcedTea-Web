@@ -14,12 +14,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.util;
+package net.adoptopenjdk.icedteaweb.io;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.config.validators.DirectoryCheckResults;
-import net.adoptopenjdk.icedteaweb.config.validators.DirectoryValidator;
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
+import net.adoptopenjdk.icedteaweb.validator.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.validator.DirectoryValidator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
@@ -60,7 +59,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class FileUtils {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FileUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
     private static final String MD5 = "MD5";
 
@@ -88,8 +87,8 @@ public final class FileUtils {
     /**
      * list of characters not allowed in filenames
      */
-    public static final List<Character> INVALID_PATH = Arrays.asList(':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ',');
-    public static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
+    static final List<Character> INVALID_PATH = Arrays.asList(':', '*', '?', '"', '<', '>', '|', '[', ']', '\'', ';', '=', ',');
+    private static final List<Character> INVALID_NAME = new ArrayList<>(INVALID_PATH);
 
     static {
         INVALID_NAME.add(0, '\\');
@@ -238,8 +237,6 @@ public final class FileUtils {
      * readable or writable by anyone other than the owner. If writeableByOwner
      * is false, even the owner can not write to it. If isDir is true, then the
      * directory can be executed by the owner
-     *
-     * @throws IOException
      */
     private static void createRestrictedFile(File file, boolean isDir, boolean writableByOwner) throws IOException {
 
@@ -264,8 +261,7 @@ public final class FileUtils {
             }
 
             // prepare ACL permissions
-            Set<AclEntryPermission> permissions = new LinkedHashSet<>();
-            permissions.addAll(Arrays.asList(
+            Set<AclEntryPermission> permissions = new LinkedHashSet<>(Arrays.asList(
                     AclEntryPermission.READ_DATA,
                     AclEntryPermission.READ_NAMED_ATTRS,
                     AclEntryPermission.EXECUTE,
@@ -342,9 +338,10 @@ public final class FileUtils {
      * Ensure that the parent directory of the file exists and that we are
      * able to create and access files within this directory
      * @param file the {@link File} representing a Java Policy file to test
+     * @param isDebug output debug information
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
-    public static DirectoryCheckResults testDirectoryPermissions(File file) {
+    public static DirectoryCheckResults testDirectoryPermissions(File file, boolean isDebug) {
         try {
             file = file.getCanonicalFile();
         } catch (final IOException e) {
@@ -357,7 +354,7 @@ public final class FileUtils {
         final List<File> policyDirectory = new ArrayList<>();
         policyDirectory.add(file.getParentFile());
         final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
-        final DirectoryCheckResults result = validator.ensureDirs();
+        final DirectoryCheckResults result = validator.ensureDirs(isDebug);
 
         return result;
     }
@@ -365,9 +362,10 @@ public final class FileUtils {
     /**
      * Verify that a given file object points to a real, accessible plain file.
      * @param file the {@link File} to verify
+     * @param isDebug output debug information
      * @return an {@link OpenFileResult} representing the accessibility level of the file
      */
-    public static OpenFileResult testFilePermissions(File file) {
+    public static OpenFileResult testFilePermissions(File file, boolean isDebug) {
         if (file == null || !file.exists()) {
             return OpenFileResult.FAILURE;
         }
@@ -376,7 +374,7 @@ public final class FileUtils {
         } catch (final IOException e) {
             return OpenFileResult.FAILURE;
         }
-        final DirectoryCheckResults dcr = FileUtils.testDirectoryPermissions(file);
+        final DirectoryCheckResults dcr = FileUtils.testDirectoryPermissions(file, isDebug);
         if (dcr != null && dcr.getFailures() == 0) {
             if (file.isDirectory())
                 return OpenFileResult.NOT_FILE;

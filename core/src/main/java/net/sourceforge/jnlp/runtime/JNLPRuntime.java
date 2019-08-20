@@ -38,7 +38,7 @@ import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.net.www.protocol.jar.URLJarFile;

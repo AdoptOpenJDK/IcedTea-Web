@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -419,7 +420,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         is.close();
         jnlpString = jnlpString.replaceAll("8080", ""+port);
         is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
-        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        IOUtils.copy(is, new FileOutputStream(jar));
         Files.write(jnlp.toPath(),jnlpString.getBytes(UTF_8));
         ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         boolean verifyBackup = JNLPRuntime.isVerifying();
@@ -468,7 +469,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         is.close();
         jnlpString = jnlpString.replaceAll("8080", ""+port);
         is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar");
-        StreamUtils.copyStream(is, new FileOutputStream(jar));
+        IOUtils.copy(is, new FileOutputStream(jar));
         Files.write(jnlp.toPath(),jnlpString.getBytes(UTF_8));
         ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         boolean verifyBackup = JNLPRuntime.isVerifying();
@@ -513,8 +514,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
         OutputStream fos1 = new FileOutputStream(jnlp);
         OutputStream fos2 = new FileOutputStream(jar);
-        StreamUtils.copyStream(is1, fos1);
-        StreamUtils.copyStream(is2, fos2);
+        IOUtils.copy(is1, fos1);
+        IOUtils.copy(is2, fos2);
         fos1.flush();;
         fos2.flush();
         fos1.close();
@@ -589,8 +590,8 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         InputStream is2 = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/jar03_dotdotN1.jar");
         OutputStream fos1 = new FileOutputStream(jnlp);
         OutputStream fos2 = new FileOutputStream(jar);
-        StreamUtils.copyStream(is1, fos1);
-        StreamUtils.copyStream(is2, fos2);
+        IOUtils.copy(is1, fos1);
+        IOUtils.copy(is2, fos2);
         fos1.flush();;
         fos2.flush();
         fos1.close();

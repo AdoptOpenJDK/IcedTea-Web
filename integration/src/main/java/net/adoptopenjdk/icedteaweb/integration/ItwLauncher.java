@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration;
 
 import net.adoptopenjdk.icedteaweb.JvmPropertyConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.Boot;
 
@@ -72,7 +72,7 @@ public class ItwLauncher {
         final Process p = builder
                 .start();
 
-        StreamUtils.waitForSafely(p);
+        ProcessUtils.waitForSafely(p);
 
         return p.exitValue();
     }

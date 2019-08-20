@@ -47,7 +47,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Applet
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.Assert;

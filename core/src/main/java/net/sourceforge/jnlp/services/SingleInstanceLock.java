@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.services;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

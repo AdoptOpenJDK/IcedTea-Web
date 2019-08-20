@@ -37,16 +37,17 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.util;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -57,14 +58,23 @@ import static org.junit.Assert.assertEquals;
 
 public class FileTestUtils {
 
-    /* Get the open file-descriptor count for the process. Note that this is
-     * specific to Unix-like operating systems. */
+    private static final ObjectName OS;
+    static {
+        try {
+            OS = new ObjectName("java.lang:type=OperatingSystem");
+        } catch (MalformedObjectNameException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get the open file-descriptor count for the process. Note that this is
+     * specific to Unix-like operating systems.
+     */
     private static long getOpenFileDescriptorCount() {
         final MBeanServer beanServer = ManagementFactory.getPlatformMBeanServer();
         try {
-            return (Long) beanServer.getAttribute(new ObjectName(
-                    "java.lang:type=OperatingSystem"),
-                    "OpenFileDescriptorCount");
+            return (Long) beanServer.getAttribute(OS, "OpenFileDescriptorCount");
         } catch (final Exception e) {
             // Effectively disables leak tests
             ServerAccess.logErrorReprint("Warning: Cannot get file descriptors for this platform!");
@@ -72,76 +82,108 @@ public class FileTestUtils {
         }
     }
 
-    /* Check the amount of file descriptors before and after a Runnable */
-    static public void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
-        Thread.sleep(100);
+    /**
+     * Check the amount of file descriptors before and after a Runnable
+     */
+    public static void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
+        Thread.sleep(200);
         final long filesOpenBefore = getOpenFileDescriptorCount();
         runnable.run();
-        Thread.sleep(100);
+        Thread.sleep(200);
         final long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
         //how come? Apparently can...
-        if (filesLeaked<0){
+        if (filesLeaked < 0) {
             return;
         }
         assertEquals(0, filesLeaked);
     }
 
-    /* Creates a file with the given contents */
-    static public void createFileWithContents(final File file, final String contents)
-            throws IOException {
-        final PrintWriter out = new PrintWriter(file);
-        out.write(contents);
-        out.close();
+    /**
+     * Creates a file with the given contents
+     */
+    public static void createFileWithContents(final File file, final String contents) throws IOException {
+        createFile(file);
+        FileUtils.saveFileUtf8(contents, file);
     }
 
-    /* Creates a jar in a temporary directory, with the given name & file contents */
-    static public void createJarWithoutManifestContents(final File jarFile, final File... fileContents) throws Exception{
+    /**
+     * Creates a jar in a temporary directory, with the given name & file contents
+     */
+    public static void createJarWithoutManifestContents(final File jarFile, final File... fileContents) throws Exception {
         createJarWithContents(jarFile, null, fileContents);
     }
-    
-    /* Creates a jar in a temporary directory, with the given name & file contents */
-    static public void createJarWithContents(final File jarFile, final Manifest manifestContents, final File... fileContents)
-            throws Exception {
-        /* Manifest quite evilly ignores all attributes if we don't specify a version! 
-         * Make sure it's set here. */
-        if (manifestContents != null){
-            manifestContents.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        }
 
-        final JarOutputStream jarWriter;
-        if (manifestContents == null){
-            jarWriter = new JarOutputStream(new FileOutputStream(jarFile));
-        } else {
-            jarWriter = new JarOutputStream(new FileOutputStream(jarFile), manifestContents);
-        }
-        for (final File file : fileContents) {
-            jarWriter.putNextEntry(new JarEntry(file.getName()));
-            final FileInputStream fileReader = new FileInputStream(file);
-            StreamUtils.copyStream(fileReader, jarWriter);
-            fileReader.close();
-            jarWriter.closeEntry();
-        }
-        jarWriter.close();
-    }
-
-    /* Creates a jar in a temporary directory, with the given name, manifest & file contents */
-    static public void createJarWithContents(final File jarFile, final File... fileContents) throws Exception {
+    /**
+     * Creates a jar in a temporary directory, with the given name, manifest & file contents
+     */
+    public static void createJarWithContents(final File jarFile, final File... fileContents) throws Exception {
         /* Note that we always specify a manifest, to avoid empty jars.
          * Empty jars are not allowed by icedtea-web during the zip-file header check. */
         createJarWithContents(jarFile, new Manifest(), fileContents);
     }
 
-    /* Creates a temporary directory. Note that Java 7 has a method for this,
-     * but we want to remain 6-compatible. */
-    static public File createTempDirectory() throws IOException {
-        final File file = File.createTempFile("temp",
-                Long.toString(System.nanoTime()));
+    /**
+     * Creates a jar in a temporary directory, with the given name & file contents
+     */
+    public static void createJarWithContents(final File jarFile, final Manifest manifestContents, final File... fileContents)
+            throws Exception {
+        createFile(jarFile);
+
+        /* Manifest quite evilly ignores all attributes if we don't specify a version!
+         * Make sure it's set here. */
+        if (manifestContents != null) {
+            manifestContents.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        }
+
+        final JarOutputStream jarWriter;
+        if (manifestContents == null) {
+            jarWriter = new JarOutputStream(new FileOutputStream(jarFile));
+        } else {
+            jarWriter = new JarOutputStream(new FileOutputStream(jarFile), manifestContents);
+        }
+
+        for (final File file : fileContents) {
+            jarWriter.putNextEntry(new JarEntry(file.getName()));
+            final FileInputStream fileReader = new FileInputStream(file);
+            IOUtils.copy(fileReader, jarWriter);
+            fileReader.close();
+            jarWriter.closeEntry();
+        }
+
+        jarWriter.flush();
+        jarWriter.finish();
+        jarWriter.close();
+    }
+
+    /**
+     * Creates a temporary directory. Note that Java 7 has a method for this,
+     * but we want to remain 6-compatible.
+     */
+    public static File createTempDirectory() throws IOException {
+        final File file = File.createTempFile("temp", Long.toString(System.nanoTime()));
         file.delete();
         if (!file.mkdir()) {
-            throw new IOException("Failed to create temporary directory '"
-                    + file + "' for test.");
+            throw new IllegalStateException("Failed to create temporary directory '" + file + "' for test.");
         }
         return file;
     }
 
+    private static void createFile(File file) throws IOException {
+        if (file.exists()) {
+            file.delete();
+        } else {
+            final File dir = file.getParentFile();
+            if (dir.isFile()) {
+                dir.delete();
+            }
+            if (!dir.isDirectory()) {
+                if (!dir.mkdirs()) {
+                    throw new IllegalStateException("Failed to create directory '" + dir + "' for test.");
+                }
+            }
+        }
+        if (!file.createNewFile()) {
+            throw new IllegalStateException("Failed to create file '" + file + "' for test.");
+        }
+    }
 }

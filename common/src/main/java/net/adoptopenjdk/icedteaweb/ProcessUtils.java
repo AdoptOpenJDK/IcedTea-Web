@@ -37,42 +37,36 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.Objects;
 
-public class StreamUtils {
+public class ProcessUtils {
 
-    public static String readStreamAsString(final InputStream stream) throws IOException {
-        return readStreamAsString(stream, false);
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessUtils.class);
 
-    public static String readStreamAsString(final InputStream stream, final Charset encoding) throws IOException {
-        return readStreamAsString(stream, false, encoding);
-    }
-
-    public static String readStreamAsString(InputStream stream, boolean includeEndOfLines) throws IOException {
-        return readStreamAsString(stream, includeEndOfLines, UTF_8);
-    }
-
-    public static String readStreamAsString(final InputStream stream, final boolean includeEndOfLines, final Charset encoding) throws IOException {
-        final InputStreamReader is = new InputStreamReader(stream, encoding);
-        final StringBuilder sb = new StringBuilder();
-        final BufferedReader br = new BufferedReader(is);
-        while (true) {
-            final String read = br.readLine();
-            if (read == null) {
-                break;
+    /**
+     * This should be workaround for https://en.wikipedia.org/wiki/Spurious_wakeup which real can happen in case of processes.
+     * See http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2015-June/032350.html thread
+     *
+     * @param process process to be waited for
+     */
+    public static void waitForSafely(final Process process) {
+        Objects.requireNonNull(process);
+        boolean pTerminated = false;
+        while (!pTerminated) {
+            try {
+                process.waitFor();
+            } catch (final InterruptedException e) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
-            sb.append(read);
-            if (includeEndOfLines) {
-                sb.append('\n');
+            try {
+                process.exitValue();
+                pTerminated = true;
+            } catch (final IllegalThreadStateException e) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
-        return sb.toString();
     }
 }

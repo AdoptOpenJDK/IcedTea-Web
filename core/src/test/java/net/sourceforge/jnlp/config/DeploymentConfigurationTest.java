@@ -41,7 +41,7 @@ import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
 import net.sourceforge.jnlp.config.DeploymentConfiguration.ConfigType;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Ignore;

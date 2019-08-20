@@ -36,7 +36,7 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.FileLog;
 import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
 

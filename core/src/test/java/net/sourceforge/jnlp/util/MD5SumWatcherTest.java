@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

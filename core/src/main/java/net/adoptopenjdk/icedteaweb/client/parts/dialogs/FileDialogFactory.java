@@ -4,7 +4,7 @@ import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 

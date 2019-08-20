@@ -152,11 +152,11 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
         CodeBaseClassLoader classLoader = new CodeBaseClassLoader(new URL[]{DummyJNLPFile.JAR_URL, DummyJNLPFile.CODEBASE_URL}, parent);
 
-        int level = 10;
+        double level = 10;
         if (shouldExists) {
             //for found the "caching" is by internal logic.Always faster, but who knows how...
             //to keep the test stable keep the difference minimal
-            level = 1;
+            level = 0.9;
         }
         long startTime, stopTime;
 

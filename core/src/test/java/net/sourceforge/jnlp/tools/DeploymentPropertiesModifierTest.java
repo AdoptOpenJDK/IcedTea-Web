@@ -42,7 +42,7 @@ import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.testing.tools.DeploymentPropertiesModifier;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.util.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

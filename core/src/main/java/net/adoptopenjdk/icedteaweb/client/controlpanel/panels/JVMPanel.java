@@ -37,6 +37,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.DocumentAdapter;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
@@ -256,7 +257,7 @@ public class JVMPanel extends NamedBorderPanel {
         Integer r = null;
         try {
             p = sb.start();
-            StreamUtils.waitForSafely(p);
+            ProcessUtils.waitForSafely(p);
             processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
             processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
             r = p.exitValue();
