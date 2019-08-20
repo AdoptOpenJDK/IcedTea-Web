@@ -24,16 +24,14 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
@@ -533,39 +531,13 @@ public final class FileUtils {
     /**
      * Save String into a file in UTF-8 encoding.
      *
-     * @param content which will be saved as it is saved in this String
-     * @param f file to be saved. No warnings provided
+     * @param content which will be saved to the file
+     * @param f       file to be saved. No warnings provided
      * @throws IOException if save fails
      */
     public static void saveFileUtf8(final String content, final File f) throws IOException {
-        saveFile(content, f, UTF_8);
-    }
-
-    /**
-     * Save String into a file in specified encoding.
-     *
-     * @param content  which will be saved as it is saved in this String
-     * @param f        file to be saved. No warnings provided
-     * @param encoding of output byte representation
-     * @throws IOException if save fails
-     */
-    public static void saveFile(final String content, final File f, final Charset encoding) throws IOException {
-        try (final Writer output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), encoding))) {
-            output.write(content);
-            output.flush();
-        }
-    }
-
-    /**
-     * Save String into a file in specified encoding.
-     *
-     * @param f        file to be saved. No warnings provided
-     * @param content  which will be saved to the file
-     * @throws IOException if save fails
-     */
-    public static void saveFile(final File f, final InputStream content) throws IOException {
-        try (final FileOutputStream output = new FileOutputStream(f)) {
-            IOUtils.copy(content, output);
+        try (final OutputStream out = new FileOutputStream(f)) {
+            IOUtils.writeUtf8Content(out, content);
         }
     }
 

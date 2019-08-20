@@ -143,6 +143,14 @@ public class IOUtils {
         return new String(readContent(inputStream), encoding);
     }
 
+    public static void writeUtf8Content(final OutputStream outputStream, final String content) throws IOException {
+        Assert.requireNonNull(outputStream, "outputStream");
+        Assert.requireNonNull(content, "content");
+
+        outputStream.write(content.getBytes(UTF_8));
+        outputStream.flush();
+    }
+
     public static void writeContent(final OutputStream outputStream, final byte[] rawData) throws IOException {
         Assert.requireNonNull(outputStream, "outputStream");
         Assert.requireNonNull(rawData, "rawData");
