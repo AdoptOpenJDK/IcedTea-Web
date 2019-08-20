@@ -68,9 +68,12 @@ function build() {
     exit 2
   fi
 }
+function imageName() {
+  echo icedtea-web-$VERSION-$1
+}
 
 function image() {
-  local img_name=icedtea-web-$VERSION-$1
+  local img_name=`imageName $1`
   mkdir $TARGET_IMAGES/icedtea-web
   cp -r $LIB_TARGET_DIR  $BIN_TARGET_DIR $TARGET_IMAGES/icedtea-web
   cp -r $TARGET_DOCS_PARENT  $TARGET_IMAGES/icedtea-web/
@@ -140,5 +143,12 @@ function docs() {
   # TODO, genere on fly resource
   # $TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$ID.html" $TP_TAIL; \
   export LANG=$LANG_BACKUP ; \
+}
+
+function splitVersion() {
+  PACKAGE_VERSION="$1"
+  MAJOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 1`
+  MINOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 2`
+  MICRO_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 3 | sed "s/[^0-9]*//g"`
 }
 
