@@ -68,9 +68,12 @@ function build() {
     exit 2
   fi
 }
+function imageName() {
+  echo icedtea-web-$VERSION-$1
+}
 
 function image() {
-  local img_name=icedtea-web-$VERSION-$1
+  local img_name=`imageName $1`
   mkdir $TARGET_IMAGES/icedtea-web
   cp -r $LIB_TARGET_DIR  $BIN_TARGET_DIR $TARGET_IMAGES/icedtea-web
   cp -r $TARGET_DOCS_PARENT  $TARGET_IMAGES/icedtea-web/
@@ -116,6 +119,7 @@ function docs() {
   local LANG_BACKUP=$LANG
   local ID=`echo "$LANG_ID" | head -c 2`
   local ENCOD=`echo "$LANG_ID" | tail -c 6`
+  local COUNTRY=`echo "$LANG_ID" | sed "s/.*_//" | sed "s/\..*//"`
   export LANG=$LANG_ID
   local langDir="$docDir/$ID"
   if [ $type == "plain" ] ; then
@@ -132,13 +136,25 @@ function docs() {
   else
    unset ENPARAM
   fi
+  local WIN_LOC_OVERWRITE=""
+  if isWindows; then
+    local WIN_LOC_OVERWRITE="-Duser.language=$ID -Duser.country=$COUNTRY -Dfile.encoding=$ENCOD"
+  fi
   mkdir -p $langDir
   $JRE/bin/java \
+    $WIN_LOC_OVERWRITE \
     -cp `createCp $JAVAWS_SRC` \
     net.sourceforge.jnlp.util.docprovider.TextsProvider \
     $type $ENPARAM $langDir $WIDTH false $VERSION "-authorString=https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors"
   # TODO, genere on fly resource
   # $TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$ID.html" $TP_TAIL; \
   export LANG=$LANG_BACKUP ; \
+}
+
+function splitVersion() {
+  PACKAGE_VERSION="$1"
+  MAJOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 1`
+  MINOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 2`
+  MICRO_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 3 | sed "s/[^0-9]*//g"`
 }
 

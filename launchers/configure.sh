@@ -149,3 +149,25 @@ if [ "x$CARGO_RUST" == "x" ] ; then
 else
   readonly CARGO_RUST="$CARGO_RUST"
 fi
+
+
+if [ "x$WIN_INSTALLER_DIR" == "x" ] ; then
+  readonly WIN_INSTALLER_DIR=$SCRIPT_DIR/win-installer
+else
+  readonly WIN_INSTALLER_DIR="$WIN_INSTALLER_DIR"
+fi
+
+if [ "x$WIXGEN_JAR" == "x" ] ; then
+  #java needs win-like paths
+  readonly WIXGEN_JAR="C:/msi-deps/wixgen.jar"
+else
+  readonly WIXGEN_JAR="$WIXGEN_JAR"
+fi
+
+if [ "x$WIX_TOOLSET_DIR" == "x" ] ; then
+  #natives are enough with cigwin paths
+  readonly WIX_TOOLSET_DIR="/cygdrive/c/msi-deps/wix311-binaries/"
+else
+  readonly WIX_TOOLSET_DIR="$WIX_TOOLSET_DIR"
+fi
+
