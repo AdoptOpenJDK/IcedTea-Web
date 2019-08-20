@@ -86,10 +86,10 @@ public class FileTestUtils {
      * Check the amount of file descriptors before and after a Runnable
      */
     public static void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(200);
         final long filesOpenBefore = getOpenFileDescriptorCount();
         runnable.run();
-        Thread.sleep(100);
+        Thread.sleep(200);
         final long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
         //how come? Apparently can...
         if (filesLeaked < 0) {
