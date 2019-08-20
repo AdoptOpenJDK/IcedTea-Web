@@ -119,6 +119,7 @@ function docs() {
   local LANG_BACKUP=$LANG
   local ID=`echo "$LANG_ID" | head -c 2`
   local ENCOD=`echo "$LANG_ID" | tail -c 6`
+  local COUNTRY=`echo "$LANG_ID" | sed "s/.*_//" | sed "s/\..*//"`
   export LANG=$LANG_ID
   local langDir="$docDir/$ID"
   if [ $type == "plain" ] ; then
@@ -135,8 +136,13 @@ function docs() {
   else
    unset ENPARAM
   fi
+  local WIN_LOC_OVERWRITE=""
+  if isWindows; then
+    local WIN_LOC_OVERWRITE="-Duser.language=$ID -Duser.country=$COUNTRY -Dfile.encoding=$ENCOD"
+  fi
   mkdir -p $langDir
   $JRE/bin/java \
+    $WIN_LOC_OVERWRITE \
     -cp `createCp $JAVAWS_SRC` \
     net.sourceforge.jnlp.util.docprovider.TextsProvider \
     $type $ENPARAM $langDir $WIDTH false $VERSION "-authorString=https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors"
