@@ -37,8 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils;
@@ -50,6 +52,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -1820,5 +1823,66 @@ public class ParserTest extends NoStdOutErrTest {
         Parser parser2 = new Parser(file2, null, root2, strictParser, null);
         String progressClass2 = parser2.getInstallerDesc(root2.getFirstChild()).getProgressClass();
         Assert.assertEquals("some.ProgressClass", progressClass2);
+    }
+
+    @Test
+    @Bug(id = "gissue368")
+    public void testPercentInApletSize() throws Exception {
+        try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/appletsizes/percent.jnlp")) {
+            Assert.assertNotNull(is);
+            final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+            Node root = xmlParser.getRootNode(is);
+            MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+            Parser parser = new Parser(file1, null, root, defaultParser, null);
+            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            //test have 10% of height, which is usually about 500-1000
+            //so check for 50-200 loks reliable
+            Assert.assertTrue(ad.getHeight() > 50 && ad.getHeight() < 200);
+            //test have 50% of width, which is usually about 800-2000
+            //so check for 200-1000 loks reliable
+            Assert.assertTrue(ad.getWidth() > 200 && ad.getWidth() < 1000);
+        }
+    }
+
+    @Test
+    public void testAbsInAppletSize() throws Exception {
+        try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/appletsizes/abs.jnlp")) {
+            Assert.assertNotNull(is);
+            final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+            Node root = xmlParser.getRootNode(is);
+            MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+            Parser parser = new Parser(file1, null, root, defaultParser, null);
+            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            Assert.assertEquals(111, ad.getHeight());
+            Assert.assertEquals(555, ad.getWidth());
+        }
+    }
+
+    @Test
+    public void testNoSizesInApplet() throws Exception {
+        try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/appletsizes/nothing.jnlp")) {
+            Assert.assertNotNull(is);
+            final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+            Node root = xmlParser.getRootNode(is);
+            MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+            Parser parser = new Parser(file1, null, root, defaultParser, null);
+            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            Assert.assertEquals(100, ad.getHeight());
+            Assert.assertEquals(100, ad.getWidth());
+        }
+    }
+
+    @Test(expected = ParseException.class)
+    public void tesIllegaloSizesInApplet() throws Exception {
+        try (InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/appletsizes/bad.jnlp")) {
+            Assert.assertNotNull(is);
+            final XMLParser xmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+            Node root = xmlParser.getRootNode(is);
+            MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
+            Parser parser = new Parser(file1, null, root, defaultParser, null);
+            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            ad.getHeight();
+            ad.getWidth();
+        }
     }
 }

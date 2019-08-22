@@ -50,6 +50,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
@@ -57,6 +58,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.LocaleUtils;
 
 import javax.swing.JOptionPane;
+import java.awt.Rectangle;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -875,19 +877,8 @@ public final class Parser {
         final String progressClass = getAttribute(node, AppletDesc.PROGRESS_CLASS_ATTRIBUTE, null);
         final URL docbase = getURL(node, AppletDesc.DOCUMENTBASE_ATTRIBUTE, base, strict);
         final Map<String, String> paramMap = new HashMap<>();
-        int width = 0;
-        int height = 0;
-
-        try {
-            width = Integer.parseInt(getRequiredAttribute(node, AppletDesc.WIDTH_ATTRIBUTE, "100", strict));
-            height = Integer.parseInt(getRequiredAttribute(node, AppletDesc.HEIGHT_ATTRIBUTE, "100", strict));
-        } catch (NumberFormatException nfe) {
-            if (width <= 0) {
-                throw new ParseException("Invalid applet width.");
-            }
-            throw new ParseException("Invalid applet width.");
-        }
-
+        int width = getAppletDescSize(AppletDesc.WIDTH_ATTRIBUTE, node);
+        int height = getAppletDescSize(AppletDesc.HEIGHT_ATTRIBUTE, node);
         // read params
         final Node params[] = getChildNodes(node, AppletDesc.PARAM_ELEMENT);
         for (final Node param : params) {
@@ -895,6 +886,38 @@ public final class Parser {
         }
 
         return new AppletDesc(name, main, progressClass, docbase, width, height, paramMap);
+    }
+
+    private int getAppletDescSize(final String wh, final Node node) throws ParseException {
+        int numberValue = 0;
+        try {
+            String stringValue = getRequiredAttribute(node, wh, "100", strict);
+            numberValue = tryRelativeAbsoluteSize(wh, stringValue);
+        } catch (NumberFormatException nfe) {
+            if (numberValue <= 0) {
+                throw new ParseException("Invalid applet " + wh + ".", nfe);
+            }
+            throw new ParseException("Invalid applet " + wh + ".", nfe);
+        }
+        return numberValue;
+    }
+
+    private static int tryRelativeAbsoluteSize(final String wh, final String readedSize) {
+        String readSizeValue = readedSize.trim();
+        //https://github.com/AdoptOpenJDK/IcedTea-Web/issues/368
+        //% not in specification, but oracle javaws is doing so
+        if (readSizeValue.endsWith("%")) {
+            readSizeValue = readSizeValue.replace("%", "");
+            int percent = Integer.parseInt(readSizeValue);
+            Rectangle screen = ScreenFinder.getCurrentScreenSizeWithoutBounds();
+            if (AppletDesc.WIDTH_ATTRIBUTE.equals(wh)) {
+                return screen.width * percent / 100;
+            } else {
+                return screen.height * percent / 100;
+            }
+        } else {
+            return Integer.parseInt(readSizeValue);
+        }
     }
 
     /**
