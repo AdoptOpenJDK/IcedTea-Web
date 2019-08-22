@@ -469,10 +469,13 @@ public final class FileUtils {
 
         if (file.isDirectory()) {
             File[] children = file.listFiles();
-            for (File children1 : children) {
-                recursiveDelete(children1, base);
+            if (children != null) {
+                for (File child : children) {
+                    recursiveDelete(child, base);
+                }
             }
         }
+
         if (!file.delete()) {
             throw new IOException("Unable to delete file: " + file);
         }
