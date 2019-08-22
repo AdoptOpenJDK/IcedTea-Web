@@ -38,8 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.config.Target;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -58,7 +58,7 @@ public class InfrastructureFileDescriptor {
     protected InfrastructureFileDescriptor() {
         this("undef", "undef", "undef", "undef");
     }
-    
+
     InfrastructureFileDescriptor(String fileName, String pathStub, String systemPathStub, String descriptionKey, Target... target) {
         this.fileName = fileName;
         this.pathStub = pathStub;
@@ -67,9 +67,11 @@ public class InfrastructureFileDescriptor {
         this.target = target;
     }
 
-    /** setup-able files have to override this
+    /**
+     * setup-able files have to override this
      * if they don't, they are read only, and set value will fail
      * if it is desired to write value of property, then override and use known key.
+     *
      * @return null by default. Should return key to configuration if overridden.
      */
     protected String getPropertiesKey() {
@@ -79,7 +81,7 @@ public class InfrastructureFileDescriptor {
     public File getFile() {
         return new File(getFullPath());
     }
-    
+
     public URL getUrl() throws MalformedURLException {
         return getFile().toURI().toURL();
     }
@@ -87,16 +89,17 @@ public class InfrastructureFileDescriptor {
     public void setValue(String value) {
         setValue(value, JNLPRuntime.getConfiguration());
     }
-    
-      public String getFullPath() {
+
+    public String getFullPath() {
         return getFullPath(JNLPRuntime.getConfiguration());
     }
-    
+
     /**
      * overload version for control panel, which is saving to internal copy.
-     * @param value new path of file
-     * @param config  config where t write this value (note, usually JNLPRuntime.getConfiguration()
-     * so you don't need it, but our config gui tool is using two sets to allow undo.
+     *
+     * @param value  new path of file
+     * @param config config where t write this value (note, usually JNLPRuntime.getConfiguration()
+     *               so you don't need it, but our config gui tool is using two sets to allow undo.
      */
     public void setValue(String value, DeploymentConfiguration config) {
         String key = getPropertiesKey();
@@ -106,11 +109,12 @@ public class InfrastructureFileDescriptor {
             config.setProperty(key, value);
         }
     }
-    
+
     /**
      * overload version for control panel, which is saving to internal copy.
+     *
      * @param config config from where to read this value (note, usually JNLPRuntime.getConfiguration()
-     * so you don't need it, but our config gui tool is using two sets to allow undo.
+     *               so you don't need it, but our config gui tool is using two sets to allow undo.
      * @return configured property or default
      */
     public String getFullPath(DeploymentConfiguration config) {
@@ -156,8 +160,9 @@ public class InfrastructureFileDescriptor {
 
     /**
      * For documentation purposes, the descriptor may be created as VARIABLE/custom/path.
-     *
+     * <p>
      * This is whole part, which is considered as setup-able.
+     *
      * @return directory acronym for nice docs
      */
     public String getDirViaAcronym() {
@@ -166,10 +171,10 @@ public class InfrastructureFileDescriptor {
 
     /**
      * Remove garbage from paths.
-     *
+     * <p>
      * Currently this methods unify all multiple occurrences of separators
      * to single one. Eg /path/to//file will become /path/to/file.
-     *
+     * <p>
      * Those artifacts maybe spread during various s=path+separator+subdir+separator
      * file=s+separator+filename
      *
@@ -189,5 +194,5 @@ public class InfrastructureFileDescriptor {
     public String getDescription() {
         return Translator.R(descriptionKey);
     }
-    
+
 }
