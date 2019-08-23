@@ -85,38 +85,38 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_CACHE_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    CACHE_DIR.getDefaultFullPath()
+                    CACHE_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    PCACHE_DIR.getDefaultFullPath()
+                    PCACHE_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_CACHE_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_LOG_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    LOG_DIR.getDefaultFullPath()
+                    LOG_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TMP_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    TMP_DIR.getDefaultFullPath()
+                    TMP_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_LOCKS_DIR,
-                    ValidatorFactory.createFilePathValidator(),
-                    LOCKS_DIR.getDefaultFullPath()
+                    LOCKS_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE,
-                    ValidatorFactory.createFilePathValidator(),
-                    MAIN_LOCK.getDefaultFullPath()
+                    MAIN_LOCK.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
 
             /*
@@ -124,64 +124,63 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_SECURITY_POLICY,
-                    ValidatorFactory.createUrlValidator(),
-
-                    "file://" + JAVA_POLICY.getDefaultFullPath()
+                    "file://" + JAVA_POLICY.getDefaultFullPath(),
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    USER_CACERTS.getDefaultFullPath()
+                    USER_CACERTS.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    USER_JSSECAC.getDefaultFullPath()
+                    USER_JSSECAC.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    USER_CERTS.getDefaultFullPath()
+                    USER_CERTS.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    USER_JSSECER.getDefaultFullPath()
+                    USER_JSSECER.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    USER_CLIENTCERT.getDefaultFullPath()
+                    USER_CLIENTCERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY,
-                    ValidatorFactory.createUrlValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    SYS_CACERT.getDefaultFullPath()
+                    SYS_CACERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    SYS_JSSECAC.getDefaultFullPath()
+                    SYS_JSSECAC.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    SYS_CERT.getDefaultFullPath()
+                    SYS_CERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    SYS_JSSECERT.getDefaultFullPath()
+                    SYS_JSSECERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
-                    ValidatorFactory.createFilePathValidator(),
-                    SYS_CLIENTCERT.getDefaultFullPath()
+                    SYS_CLIENTCERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
             ),
 
             /*
@@ -189,59 +188,58 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_PROMPT_USER,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_NOTINCA_WARNING,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_EXPIRED_WARNING,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY,
-                    ValidatorFactory.createFilePathValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createFilePathValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER,
-                    ValidatorFactory.createBooleanValidator(),
-
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
 
             /*
@@ -249,18 +247,19 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_TYPE,
-                    ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN, JNLPProxySelector.PROXY_TYPE_BROWSER),
-                    String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER)
+                    String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER),
+                    ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN,
+                            JNLPProxySelector.PROXY_TYPE_BROWSER)
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SAME,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL,
-                    ValidatorFactory.createUrlValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_BYPASS_LIST,
@@ -323,18 +322,18 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_CACHE_MAX_SIZE,
-                    ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE),
-                    "-1"
+                    "-1",
+                    ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE)
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED,
-                    ValidatorFactory.createRangedIntegerValidator(0, 10),
-                    String.valueOf(0)
+                    String.valueOf(0),
+                    ValidatorFactory.createRangedIntegerValidator(0, 10)
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_CACHE_ENABLED,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
 
             /*
@@ -342,49 +341,49 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
+                    ConfigurationConstants.CONSOLE_HIDE,
                     ValidatorFactory.createStringValidator(new String[]{
                             ConfigurationConstants.CONSOLE_DISABLE,
                             ConfigurationConstants.CONSOLE_HIDE,
                             ConfigurationConstants.CONSOLE_SHOW,
                             ConfigurationConstants.CONSOLE_SHOW_PLUGIN,
                             ConfigurationConstants.CONSOLE_SHOW_JAVAWS
-                    }),
-                    ConfigurationConstants.CONSOLE_HIDE
+                    })
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(true)
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
             ),
 
             /*
@@ -392,9 +391,9 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_JNLP_ASSOCIATIONS,
+                    String.valueOf(ConfigurationConstants.JNLP_ASSOCIATION_ASK_USER),
                     ValidatorFactory.createRangedIntegerValidator(ConfigurationConstants.JNLP_ASSOCIATION_NEVER,
-                            ConfigurationConstants.JNLP_ASSOCIATION_REPLACE_ASK),
-                    String.valueOf(ConfigurationConstants.JNLP_ASSOCIATION_ASK_USER)
+                            ConfigurationConstants.JNLP_ASSOCIATION_REPLACE_ASK)
             ),
 
             /*
@@ -402,14 +401,14 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT,
+                    ShortcutDesc.CREATE_ASK_USER_IF_HINTED,
                     ValidatorFactory.createStringValidator(new String[]{
                             ShortcutDesc.CREATE_ALWAYS,
                             ShortcutDesc.CREATE_ALWAYS_IF_HINTED,
                             ShortcutDesc.CREATE_ASK_USER,
                             ShortcutDesc.CREATE_ASK_USER_IF_HINTED,
                             ShortcutDesc.CREATE_NEVER
-                    }),
-                    ShortcutDesc.CREATE_ASK_USER_IF_HINTED
+                    })
             ),
 
             /*
@@ -417,8 +416,8 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_JRE_INTSTALL_URL,
-                    ValidatorFactory.createUrlValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createUrlValidator()
             ),
 
             /*
@@ -426,8 +425,8 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_AUTO_DOWNLOAD_JRE,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
 
             /*
@@ -435,8 +434,8 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_BROWSER_PATH,
-                    ValidatorFactory.createBrowserPathValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createBrowserPathValidator()
             ),
 
             /*
@@ -444,13 +443,13 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_UPDATE_TIMEOUT,
-                    ValidatorFactory.createRangedIntegerValidator(0, 10000),
-                    String.valueOf(500)
+                    String.valueOf(500),
+                    ValidatorFactory.createRangedIntegerValidator(0, 10000)
             ),
             Setting.createDefault(
                     ConfigurationConstants.IGNORE_HEADLESS_CHECK,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
 
             /*
@@ -467,8 +466,8 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_LEVEL,
-                    new SecurityValueValidator(),
-                    null
+                    null,
+                    new SecurityValueValidator()
             ),
 
             /*
@@ -484,33 +483,36 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
-                    ValidatorFactory.createManifestAttributeCheckValidator(),
-                    String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL)
+                    String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL),
+                    ValidatorFactory.createManifestAttributeCheckValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_CONFIG,
-                    ValidatorFactory.createUrlValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY,
-                    ValidatorFactory.createBooleanValidator(),
-                    String.valueOf(false)
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_WIDTH,
-                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
-                    String.valueOf(800)//0 is disabling it; negative is enforcing it
+                    String.valueOf(800),
+                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999)
+                    //0 is disabling it; negative is enforcing it
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_HEIGHT,
-                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
-                    String.valueOf(600)//0 is disabling it; negative is enforcing it
+                    String.valueOf(600),
+                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999)
+                    //0 is disabling it; negative is enforcing it
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD,
-                    ValidatorFactory.createRangedIntegerValidator(0, 1000),
-                    String.valueOf(10)// threshold when applet is considered as too small
+                    String.valueOf(10),
+                    ValidatorFactory.createRangedIntegerValidator(0, 1000)
+                    // threshold when applet is considered as too small
             ),
 
             /*
@@ -518,23 +520,23 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_LAUNCHER_RUST_CP_ADD,
-                    ValidatorFactory.createRustCpValidator(),
-                    ""
+                    "",
+                    ValidatorFactory.createRustCpValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_LAUNCHER_RUST_CP_REMOVE,
-                    ValidatorFactory.createRustCpValidator(),
-                    ""
+                    "",
+                    ValidatorFactory.createRustCpValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_ADD,
-                    ValidatorFactory.createRustCpValidator(),
-                    null
+                    null,
+                    ValidatorFactory.createRustCpValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
-                    ValidatorFactory.createRustCpValidator(),
-                    ""
+                    "",
+                    ValidatorFactory.createRustCpValidator()
             )
     );
 
