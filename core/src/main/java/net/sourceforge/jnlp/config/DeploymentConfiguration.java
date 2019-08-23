@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROPERTIES;
 
 /**
  * Manages the various properties and configuration related to deployment.
@@ -391,18 +392,18 @@ public final class DeploymentConfiguration {
         try {
             final Setting<String> urlSettings = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
-                LOG.info("No System level {} found in {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
+                LOG.info("No System level {} found in {}", DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
             final Setting<String> mandatory = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
-            systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
-            LOG.info("System level settings {} are mandatory: {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
+            systemPropertiesMandatory = Boolean.parseBoolean(mandatory == null ? null : mandatory.getValue()); //never null
+            LOG.info("System level settings {} are mandatory: {}", DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
             systemPropertiesFile = new URL(urlString);
-            LOG.info("Using System level {} : {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
+            LOG.info("Using System level {} : {}", DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (final MalformedURLException e) {
-            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
+            LOG.error("Invalid url for " + DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
             if (systemPropertiesMandatory){
                 final ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
@@ -427,7 +428,7 @@ public final class DeploymentConfiguration {
     static Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
-            final String message = String.format("No %s level %s found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
+            final String message = String.format("No %s level %s found at %s.", type, DEPLOYMENT_PROPERTIES, file);
             if (mandatory) {
                 final ConfigurationException configurationException = new ConfigurationException(message);
                 LOG.error(message);
@@ -438,11 +439,11 @@ public final class DeploymentConfiguration {
             }
         }
 
-        LOG.info("Loading {} level properties from: {}", type.toString(), file);
+        LOG.info("Loading {} level properties from: {}", type, file);
         try {
             return parsePropertiesFile(file);
         } catch (final IOException e) {
-            final String message = String.format("Exception during loading of mandatory properties file '%s'.", file);
+            final String message = String.format("Exception during loading of properties file '%s'.", file);
             if (mandatory) {
                 final ConfigurationException configurationException = new ConfigurationException(message);
                 configurationException.initCause(e);
