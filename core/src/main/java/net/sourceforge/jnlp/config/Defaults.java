@@ -74,25 +74,12 @@ import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
  */
 public class Defaults {
 
-
-    /**
-     * Get the default settings for deployment
-     *
-     * @return the default settings for deployment
-     */
-    public static Map<String, Setting<String>> getDefaults() {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkRead(USER_DEPLOYMENT_FILE.getDefaultFullPath());
-            sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
-        }
-
-        /*
+        /**
          * This is more or less a straight copy from the deployment
          * configuration page, with occasional replacements of "" or no-defaults
          * with null
          */
-        final List<Setting<String>> defaults = Arrays.asList(
+    private static final List<Setting<String>> defaults = Arrays.asList(
                 /*
                  * infrastructure
                  */
@@ -555,6 +542,18 @@ public class Defaults {
                         ""
                 )
         );
+
+    /**
+     * Get the default settings for deployment
+     *
+     * @return the default settings for deployment
+     */
+    public static Map<String, Setting<String>> getDefaults() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkRead(USER_DEPLOYMENT_FILE.getDefaultFullPath());
+            sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
+        }
 
         return defaults.stream().map(Setting::copy).collect(Collectors.toMap(Setting::getName, Function.identity()));
     }
