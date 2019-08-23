@@ -91,14 +91,11 @@ public class Defaults {
          * This is more or less a straight copy from the deployment
          * configuration page, with occasional replacements of "" or no-defaults
          * with null
-         *
-         * The format of this is:
-         * name
-         * checker (can be null or a ValueChecker)
-         * value (can be null or a String)
          */
         final List<Setting<String>> defaults = Arrays.asList(
-                /* infrastructure */
+                /*
+                 * infrastructure
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_USER_CACHE_DIR,
                         ValidatorFactory.createFilePathValidator(),
@@ -134,7 +131,10 @@ public class Defaults {
                         ValidatorFactory.createFilePathValidator(),
                         MAIN_LOCK.getDefaultFullPath()
                 ),
-                /* certificates and policy files */
+
+                /*
+                 * certificates and policy files
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_USER_SECURITY_POLICY,
                         ValidatorFactory.createUrlValidator(),
@@ -196,7 +196,10 @@ public class Defaults {
                         ValidatorFactory.createFilePathValidator(),
                         SYS_CLIENTCERT.getDefaultFullPath()
                 ),
-                /* security access and control */
+
+                /*
+                 * security access and control
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_SECURITY_PROMPT_USER,
                         ValidatorFactory.createBooleanValidator(),
@@ -258,7 +261,10 @@ public class Defaults {
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 ),
-                /* networking */
+
+                /*
+                 * networking
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_PROXY_TYPE,
                         ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN, JNLPProxySelector.PROXY_TYPE_BROWSER),
@@ -329,7 +335,10 @@ public class Defaults {
                         null,
                         null
                 ),
-                /* cache and optional package repository */
+
+                /*
+                 * cache and optional package repository
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_CACHE_MAX_SIZE,
                         ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE),
@@ -345,7 +354,10 @@ public class Defaults {
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 ),
-                /* java console */
+
+                /*
+                 * java console
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
                         ValidatorFactory.createStringValidator(new String[]{
@@ -392,14 +404,20 @@ public class Defaults {
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(true)
                 ),
-                /* JNLP association */
+
+                /*
+                 * JNLP association
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_JNLP_ASSOCIATIONS,
                         ValidatorFactory.createRangedIntegerValidator(ConfigurationConstants.JNLP_ASSOCIATION_NEVER,
                                 ConfigurationConstants.JNLP_ASSOCIATION_REPLACE_ASK),
                         String.valueOf(ConfigurationConstants.JNLP_ASSOCIATION_ASK_USER)
                 ),
-                /* desktop integration */
+
+                /*
+                 * desktop integration
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT,
                         ValidatorFactory.createStringValidator(new String[]{
@@ -411,25 +429,37 @@ public class Defaults {
                         }),
                         ShortcutDesc.CREATE_ASK_USER_IF_HINTED
                 ),
-                /* jre selection */
+
+                /*
+                 * jre selection
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_JRE_INTSTALL_URL,
                         ValidatorFactory.createUrlValidator(),
                         null
                 ),
-                /* jre management */
+
+                /*
+                 * jre management
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_AUTO_DOWNLOAD_JRE,
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 ),
-                /* browser selection */
+
+                /*
+                 * browser selection
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_BROWSER_PATH,
                         ValidatorFactory.createBrowserPathValidator(),
                         null
                 ),
-                /* check for update timeout */
+
+                /*
+                 * check for update timeout
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_UPDATE_TIMEOUT,
                         ValidatorFactory.createRangedIntegerValidator(0, 10000),
@@ -440,25 +470,36 @@ public class Defaults {
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 ),
-                //JVM arguments for plugin
+
+                /*
+                 * JVM arguments for plugin
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS,
                         null,
                         null
                 ),
-                //unsigned applet security level
+
+                /*
+                 * unsigned applet security level
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_SECURITY_LEVEL,
                         new SecurityValueValidator(),
                         null
                 ),
-                //JVM executable for itw
+
+                /*
+                 * JVM executable for itw
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_JRE_DIR,
                         null,
                         null
                 ),
-                //enable manifest-attributes checks
+                /*
+                 * enable manifest-attributes checks
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
                         ValidatorFactory.createManifestAttributeCheckValidator(),
@@ -489,9 +530,10 @@ public class Defaults {
                         ValidatorFactory.createRangedIntegerValidator(0, 1000),
                         String.valueOf(10)// threshold when applet is considered as too small
                 ),
-                //**************
-                //* Native (rust) only - beggin
-                //**************
+
+                /*
+                 * Native (rust) only - beggin
+                 */
                 Setting.createDefault(
                         ConfigurationConstants.KEY_LAUNCHER_RUST_CP_ADD,
                         ValidatorFactory.createRustCpValidator(),
@@ -512,9 +554,6 @@ public class Defaults {
                         ValidatorFactory.createRustCpValidator(),
                         ""
                 )
-                //**************
-                //* Native (rust) only - end
-                //**************
         );
 
         return defaults.stream().map(Setting::copy).collect(Collectors.toMap(Setting::getName, Function.identity()));
