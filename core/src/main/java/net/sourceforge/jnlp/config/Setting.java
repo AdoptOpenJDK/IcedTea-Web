@@ -50,11 +50,12 @@ import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
  */
 public class Setting<T> {
 
-    private String name = null;
-    private String description = null;
+    private final String name;
+    private final String description;
+    private final ValueValidator validator;
+    private final T defaultValue;
+
     private boolean locked = false;
-    private ValueValidator validator = null;
-    private T defaultValue = null;
     private T value = null;
     private String source = null;
 
