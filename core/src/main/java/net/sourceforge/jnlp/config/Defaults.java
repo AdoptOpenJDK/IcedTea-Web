@@ -243,11 +243,6 @@ public class Defaults {
                         ValidatorFactory.createBooleanValidator(),
                         String.valueOf(false)
                 ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
 
                 /*
                  * networking
