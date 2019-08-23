@@ -85,15 +85,14 @@ public class ConfigurationValidator {
                     try {
                         checker.validate(unknown.getValue());
                     } catch (final IllegalArgumentException e) {
-                        final Setting<String> strange = new Setting<>(unknown);
+                        final Setting<String> strange = unknown.copy();
                         strange.setValue(unknown.getValue());
                         incorrectEntries.add(strange);
                     }
                 }
             } else {
                 // check for unknown settings
-                final Setting<String> strange = new Setting<>(toValidate.get(key));
-                unrecognizedEntries.add(strange);
+                unrecognizedEntries.add(toValidate.get(key).copy());
             }
         }
 

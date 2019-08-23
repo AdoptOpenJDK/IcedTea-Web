@@ -173,7 +173,7 @@ public final class DeploymentConfiguration {
         unchangeableConfiguration.clear();
         final Set<String> keys = initialProperties.keySet();
         for (final String key : keys) {
-            unchangeableConfiguration.put(key, new Setting<>(initialProperties.get(key)));
+            unchangeableConfiguration.put(key, initialProperties.get(key).copy());
         }
 
         /*
@@ -297,8 +297,7 @@ public final class DeploymentConfiguration {
                 currentValue.setValue(value);
             }
         } else {
-            final Setting<String> newValue = new Setting<>(key, R("Unknown"), false, null, null, value, R("Unknown"));
-            currentConfiguration.put(key, newValue);
+            currentConfiguration.put(key, Setting.createUnknown(key, value));
         }
     }
 
@@ -533,24 +532,14 @@ public final class DeploymentConfiguration {
         for (final String key : keys) {
             if (key.endsWith(".locked")) {
                 final String realKey = key.substring(0, key.length() - ".locked".length());
-                Setting<String> configValue = result.get(realKey);
-                if (configValue == null) {
-                    configValue = new Setting<>(realKey, R("Unknown"), true, null, null, null, propertiesFile.toString());
-                    result.put(realKey, configValue);
-                } else {
-                    configValue.setLocked(true);
-                }
+                final Setting<String> configValue = result.get(realKey);
+                final String value = configValue == null ? null : configValue.getValue();
+                result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
             } else {
-                /* when parsing a properties we set value without checking if it is locked or not */
                 final String newValue = properties.getProperty(key);
-                Setting<String> configValue = result.get(key);
-                if (configValue == null) {
-                    configValue = new Setting<>(key, R("Unknown"), false, null, null, newValue, propertiesFile.toString());
-                    result.put(key, configValue);
-                } else {
-                    configValue.setValue(newValue);
-                    configValue.setSource(propertiesFile.toString());
-                }
+                final Setting<String> configValue = result.get(key);
+                final boolean locked = configValue != null && configValue.isLocked();
+                result.put(key, Setting.createFromPropertyFile(key, newValue, locked, propertiesFile));
             }
         }
         return result;
@@ -573,9 +562,7 @@ public final class DeploymentConfiguration {
                 finalMap.put(key, srcValue);
             } else {
                 if (!destValue.isLocked()) {
-                    destValue.setSource(srcValue.getSource());
-                    destValue.setValue(srcValue.getValue());
-                    destValue.setLocked(srcValue.isLocked());
+                    finalMap.put(key, destValue.copyValuesFrom(srcValue));
                 }
             }
         }
