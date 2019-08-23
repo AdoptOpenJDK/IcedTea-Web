@@ -19,9 +19,9 @@ package net.sourceforge.jnlp.config;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.imageio.spi.IIORegistry;
 import javax.naming.ConfigurationException;
@@ -474,13 +474,15 @@ public final class DeploymentConfiguration {
         final Properties toSave = new Properties();
 
         for (final String key : currentConfiguration.keySet()) {
-            final String oldValue = unchangeableConfiguration.get(key) == null ? null
-                    : unchangeableConfiguration.get(key).getValue();
-            final String newValue = currentConfiguration.get(key) == null ? null : currentConfiguration
-                    .get(key).getValue();
-            if(!Objects.equals(newValue, oldValue)) {
+            final Setting<String> defaultSetting = unchangeableConfiguration.get(key);
+            final Setting<String> currentSetting = currentConfiguration.get(key);
+
+            final String defaultValue = defaultSetting == null ? null : defaultSetting.getValue();
+            final String newValue = currentSetting == null ? null : currentSetting.getValue();
+
+            if (!Objects.equals(newValue, defaultValue)) {
                 toSave.setProperty(key, newValue);
-                if (currentConfiguration.get(key).isLocked()) {
+                if (currentSetting != null && currentSetting.isLocked()) {
                     toSave.setProperty(key + ".locked", "");
                 }
             }
