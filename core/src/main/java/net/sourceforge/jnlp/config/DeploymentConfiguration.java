@@ -163,28 +163,11 @@ public final class DeploymentConfiguration {
         if (sm != null) {
             sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
-        final URL systemConfigFile = findSystemConfigFile();
-        load(systemConfigFile, userDeploymentFileDescriptor.getFile(), fixIssues);
-    }
 
-    private void load(final URL systemConfigFile, final File userFile, final boolean fixIssues) throws ConfigurationException, MalformedURLException {
         final Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
-        final Map<String, Setting<String>> systemProperties = new HashMap<>();
+        final Map<String, Setting<String>> systemProperties = loadSystemProperties();
 
-        /*
-         * First, try to read the system's subdirResult deployment.config file to find if
-         * there is a system-level deployment.properties file
-         */
-
-        if (systemConfigFile != null) {
-            if (loadSystemConfiguration(systemConfigFile)) {
-                LOG.info("System level {} is mandatory: {}", ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
-                /* Second, read the System level deployment.properties file */
-                systemProperties.putAll(loadProperties(ConfigType.SYSTEM, systemPropertiesFile,
-                        systemPropertiesMandatory));
-            }
-            mergeMaps(initialProperties, systemProperties);
-        }
+        mergeMaps(initialProperties, systemProperties);
 
         /* need a copy of the original when we have to save */
         unchangeableConfiguration.clear();
@@ -196,9 +179,10 @@ public final class DeploymentConfiguration {
         /*
          * Third, read the user's subdirResult deployment.properties file
          */
-        userPropertiesFile = userFile;
-        final Map<String, Setting<String>> userProperties = loadProperties(ConfigType.USER, userPropertiesFile.toURI().toURL(), false);
-        userComments = loadComments(userPropertiesFile.toURI().toURL());
+        userPropertiesFile = userDeploymentFileDescriptor.getFile();
+        final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
+        final Map<String, Setting<String>> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
+        userComments = loadComments(userPropertiesUrl);
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
         }
@@ -209,6 +193,24 @@ public final class DeploymentConfiguration {
 
         currentConfiguration.clear();
         currentConfiguration.putAll(initialProperties);
+    }
+
+    private Map<String, Setting<String>> loadSystemProperties() throws MalformedURLException, ConfigurationException {
+        /*
+         * First, try to read the system's deployment.config file to find if
+         * there is a system-level deployment.properties file
+         */
+        final URL systemConfigFile = findSystemConfigFile();
+        if (systemConfigFile != null) {
+            if (loadSystemConfiguration(systemConfigFile)) {
+                LOG.info("System level {} is mandatory: {}", ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
+                /*
+                 * Second, read the System level deployment.properties file
+                 */
+                return loadProperties(ConfigType.SYSTEM, systemPropertiesFile, systemPropertiesMandatory);
+            }
+        }
+        return new HashMap<>();
     }
 
     /**
