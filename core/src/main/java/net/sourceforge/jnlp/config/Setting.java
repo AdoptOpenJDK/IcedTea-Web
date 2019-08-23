@@ -39,6 +39,10 @@ package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 
+import java.net.URL;
+
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+
 /**
  * Represents a value for a configuration. Provides methods to get the value
  * as well as marking the value as locked.
@@ -50,14 +54,26 @@ import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
  */
 public class Setting<T> {
 
+    public static Setting<String> createDefault(final String key, final String value, final ValueValidator validator) {
+        return new Setting<>(key, R("Unknown"), false, validator, value, value, R("DCSourceInternal"));
+    }
+
+    public static Setting<String> createUnknown(final String key, final String value) {
+        return new Setting<>(key, R("Unknown"), false, null, null, value, R("Unknown"));
+    }
+
+    public static Setting<String> createFromPropertyFile(final String key, final String value, boolean locked, final URL propertyFile) {
+        return new Setting<>(key, R("Unknown"), locked, null, null, value, propertyFile.toExternalForm());
+    }
+
     private final String name;
     private final String description;
+    private final boolean locked;
     private final ValueValidator validator;
+    private final String source;
     private final T defaultValue;
 
-    private boolean locked = false;
     private T value = null;
-    private String source = null;
 
     /**
      * Creates a new Settings object
@@ -72,7 +88,7 @@ public class Setting<T> {
      * @param value the initial value of this setting
      * @param source the origin of the value (a file, or perhaps "{@code <internal>}")
      */
-    public Setting(String name, String description, boolean locked,
+    private Setting(String name, String description, boolean locked,
                    ValueValidator validator, T defaultValue, T value, String source) {
         this.name = name;
         this.description = description;
@@ -84,13 +100,20 @@ public class Setting<T> {
     }
 
     /**
-     * Creates a new Settings object by cloning the values from another
-     * Settings object
-     * @param other a Settings object to initialize settings from
+     * Creates a copy of this setting
      */
-    public Setting(Setting<T> other) {
-        this(other.name, other.description, other.locked, other.validator,
-                other.defaultValue, other.value, other.source);
+    public Setting<T> copy() {
+        return new Setting<>(name, description, locked, validator, defaultValue, value, source);
+    }
+
+    /**
+     * Creates a copy of this setting and copies the following attributes from {@code src}:
+     * - value
+     * - locked
+     * - source
+     */
+    Setting<T> copyValuesFrom(Setting<T> src) {
+        return new Setting<>(name, description, src.locked, validator, defaultValue, src.value, src.source);
     }
 
     /**
@@ -146,26 +169,6 @@ public class Setting<T> {
     }
 
     /**
-     * Marks this setting as locked or unlocked. Setting the value is not
-     * enforced by this class.
-     *
-     * @param locked whether to mark this setting as locked or not locked.
-     */
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
-    /**
-     * Sets the source of the current value of this Setting. Maybe a string
-     * like "internal" or the location of the properties file
-     *
-     * @param source the source of the value
-     */
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    /**
      * Note that setting the value is not enforced - it is the caller's
      * responsibility to check if a value is locked or not before setting a
      * new value
@@ -180,7 +183,4 @@ public class Setting<T> {
     public String toString() {
         return value.toString();
     }
-    
-    
-
 }

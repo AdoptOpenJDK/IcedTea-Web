@@ -522,8 +522,7 @@ public class Defaults {
             String name = (String) default1[0];
             ValueValidator checker = (ValueValidator) default1[1];
             String actualValue = (String) default1[2];
-            boolean locked = false;
-            Setting<String> value = new Setting<>(name, R("Unknown"), locked, checker, actualValue, actualValue, R("DCSourceInternal"));
+            Setting<String> value = Setting.createDefault(name, actualValue, checker);
             result.put(name, value);
         }
 

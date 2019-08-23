@@ -19,9 +19,9 @@ package net.sourceforge.jnlp.config;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.imageio.spi.IIORegistry;
 import javax.naming.ConfigurationException;
@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROPERTIES;
 
 /**
  * Manages the various properties and configuration related to deployment.
@@ -162,42 +163,26 @@ public final class DeploymentConfiguration {
         if (sm != null) {
             sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
-        final URL systemConfigFile = findSystemConfigFile();
-        load(systemConfigFile, userDeploymentFileDescriptor.getFile(), fixIssues);
-    }
 
-    private void load(final URL systemConfigFile, final File userFile, final boolean fixIssues) throws ConfigurationException, MalformedURLException {
         final Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
-        final Map<String, Setting<String>> systemProperties = new HashMap<>();
+        final Map<String, Setting<String>> systemProperties = loadSystemProperties();
 
-        /*
-         * First, try to read the system's subdirResult deployment.config file to find if
-         * there is a system-level deployment.properties file
-         */
-
-        if (systemConfigFile != null) {
-            if (loadSystemConfiguration(systemConfigFile)) {
-                LOG.info("System level {} is mandatory: {}", ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
-                /* Second, read the System level deployment.properties file */
-                systemProperties.putAll(loadProperties(ConfigType.SYSTEM, systemPropertiesFile,
-                        systemPropertiesMandatory));
-            }
-            mergeMaps(initialProperties, systemProperties);
-        }
+        mergeMaps(initialProperties, systemProperties);
 
         /* need a copy of the original when we have to save */
         unchangeableConfiguration.clear();
         final Set<String> keys = initialProperties.keySet();
         for (final String key : keys) {
-            unchangeableConfiguration.put(key, new Setting<>(initialProperties.get(key)));
+            unchangeableConfiguration.put(key, initialProperties.get(key).copy());
         }
 
         /*
          * Third, read the user's subdirResult deployment.properties file
          */
-        userPropertiesFile = userFile;
-        final Map<String, Setting<String>> userProperties = loadProperties(ConfigType.USER, userPropertiesFile.toURI().toURL(), false);
-        userComments = loadComments(userPropertiesFile.toURI().toURL());
+        userPropertiesFile = userDeploymentFileDescriptor.getFile();
+        final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
+        final Map<String, Setting<String>> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
+        userComments = loadComments(userPropertiesUrl);
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
         }
@@ -208,6 +193,24 @@ public final class DeploymentConfiguration {
 
         currentConfiguration.clear();
         currentConfiguration.putAll(initialProperties);
+    }
+
+    private Map<String, Setting<String>> loadSystemProperties() throws MalformedURLException, ConfigurationException {
+        /*
+         * First, try to read the system's deployment.config file to find if
+         * there is a system-level deployment.properties file
+         */
+        final URL systemConfigFile = findSystemConfigFile();
+        if (systemConfigFile != null) {
+            if (loadSystemConfiguration(systemConfigFile)) {
+                LOG.info("System level {} is mandatory: {}", ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, systemPropertiesMandatory);
+                /*
+                 * Second, read the System level deployment.properties file
+                 */
+                return loadProperties(ConfigType.SYSTEM, systemPropertiesFile, systemPropertiesMandatory);
+            }
+        }
+        return new HashMap<>();
     }
 
     /**
@@ -294,8 +297,7 @@ public final class DeploymentConfiguration {
                 currentValue.setValue(value);
             }
         } else {
-            final Setting<String> newValue = new Setting<>(key, R("Unknown"), false, null, null, value, R("Unknown"));
-            currentConfiguration.put(key, newValue);
+            currentConfiguration.put(key, Setting.createUnknown(key, value));
         }
     }
 
@@ -391,18 +393,18 @@ public final class DeploymentConfiguration {
         try {
             final Setting<String> urlSettings = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
-                LOG.info("No System level {} found in {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
+                LOG.info("No System level {} found in {}", DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
             final Setting<String> mandatory = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
-            systemPropertiesMandatory = Boolean.valueOf(mandatory == null ? null : mandatory.getValue()); //never null
-            LOG.info("System level settings {} are mandatory: {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
+            systemPropertiesMandatory = Boolean.parseBoolean(mandatory == null ? null : mandatory.getValue()); //never null
+            LOG.info("System level settings {} are mandatory: {}", DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
             systemPropertiesFile = new URL(urlString);
-            LOG.info("Using System level {} : {}", ConfigurationConstants.DEPLOYMENT_PROPERTIES, systemPropertiesFile);
+            LOG.info("Using System level {} : {}", DEPLOYMENT_PROPERTIES, systemPropertiesFile);
             return true;
         } catch (final MalformedURLException e) {
-            LOG.error("Invalid url for " + ConfigurationConstants.DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
+            LOG.error("Invalid url for " + DEPLOYMENT_PROPERTIES + ": " + urlString + "in " + configFile.toExternalForm(), e);
             if (systemPropertiesMandatory){
                 final ConfigurationException ce = new ConfigurationException("Invalid url to system properties, which are mandatory");
                 ce.initCause(e);
@@ -427,7 +429,7 @@ public final class DeploymentConfiguration {
     static Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
-            final String message = String.format("No %s level %s found.", type.toString(), ConfigurationConstants.DEPLOYMENT_PROPERTIES);
+            final String message = String.format("No %s level %s found at %s.", type, DEPLOYMENT_PROPERTIES, file);
             if (mandatory) {
                 final ConfigurationException configurationException = new ConfigurationException(message);
                 LOG.error(message);
@@ -438,11 +440,11 @@ public final class DeploymentConfiguration {
             }
         }
 
-        LOG.info("Loading {} level properties from: {}", type.toString(), file);
+        LOG.info("Loading {} level properties from: {}", type, file);
         try {
             return parsePropertiesFile(file);
         } catch (final IOException e) {
-            final String message = String.format("Exception during loading of mandatory properties file '%s'.", file);
+            final String message = String.format("Exception during loading of properties file '%s'.", file);
             if (mandatory) {
                 final ConfigurationException configurationException = new ConfigurationException(message);
                 configurationException.initCause(e);
@@ -474,13 +476,15 @@ public final class DeploymentConfiguration {
         final Properties toSave = new Properties();
 
         for (final String key : currentConfiguration.keySet()) {
-            final String oldValue = unchangeableConfiguration.get(key) == null ? null
-                    : unchangeableConfiguration.get(key).getValue();
-            final String newValue = currentConfiguration.get(key) == null ? null : currentConfiguration
-                    .get(key).getValue();
-            if(!Objects.equals(newValue, oldValue)) {
+            final Setting<String> defaultSetting = unchangeableConfiguration.get(key);
+            final Setting<String> currentSetting = currentConfiguration.get(key);
+
+            final String defaultValue = defaultSetting == null ? null : defaultSetting.getValue();
+            final String newValue = currentSetting == null ? null : currentSetting.getValue();
+
+            if (!Objects.equals(newValue, defaultValue)) {
                 toSave.setProperty(key, newValue);
-                if (currentConfiguration.get(key).isLocked()) {
+                if (currentSetting != null && currentSetting.isLocked()) {
                     toSave.setProperty(key + ".locked", "");
                 }
             }
@@ -528,24 +532,14 @@ public final class DeploymentConfiguration {
         for (final String key : keys) {
             if (key.endsWith(".locked")) {
                 final String realKey = key.substring(0, key.length() - ".locked".length());
-                Setting<String> configValue = result.get(realKey);
-                if (configValue == null) {
-                    configValue = new Setting<>(realKey, R("Unknown"), true, null, null, null, propertiesFile.toString());
-                    result.put(realKey, configValue);
-                } else {
-                    configValue.setLocked(true);
-                }
+                final Setting<String> configValue = result.get(realKey);
+                final String value = configValue == null ? null : configValue.getValue();
+                result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
             } else {
-                /* when parsing a properties we set value without checking if it is locked or not */
                 final String newValue = properties.getProperty(key);
-                Setting<String> configValue = result.get(key);
-                if (configValue == null) {
-                    configValue = new Setting<>(key, R("Unknown"), false, null, null, newValue, propertiesFile.toString());
-                    result.put(key, configValue);
-                } else {
-                    configValue.setValue(newValue);
-                    configValue.setSource(propertiesFile.toString());
-                }
+                final Setting<String> configValue = result.get(key);
+                final boolean locked = configValue != null && configValue.isLocked();
+                result.put(key, Setting.createFromPropertyFile(key, newValue, locked, propertiesFile));
             }
         }
         return result;
@@ -568,9 +562,7 @@ public final class DeploymentConfiguration {
                 finalMap.put(key, srcValue);
             } else {
                 if (!destValue.isLocked()) {
-                    destValue.setSource(srcValue.getSource());
-                    destValue.setValue(srcValue.getValue());
-                    destValue.setLocked(srcValue.isLocked());
+                    finalMap.put(key, destValue.copyValuesFrom(srcValue));
                 }
             }
         }
