@@ -49,7 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.StreamUtils.loadServiceAsStream;
 import static net.sourceforge.jnlp.config.PathsAndFiles.CACHE_DIR;
 import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_POLICY;
 import static net.sourceforge.jnlp.config.PathsAndFiles.LOCKS_DIR;
@@ -540,6 +542,10 @@ public class Defaults {
             )
     );
 
+    private static final List<Setting<String>> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
+            .flatMap(provider -> provider.getDefaults().stream())
+            .collect(Collectors.toList());
+
     /**
      * Get the default settings for deployment
      *
@@ -552,6 +558,8 @@ public class Defaults {
             sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
         }
 
-        return DEFAULTS.stream().map(Setting::copy).collect(Collectors.toMap(Setting::getName, Function.identity()));
+        return Stream.concat(additionalDefaults.stream(), DEFAULTS.stream())
+                .map(Setting::copy)
+                .collect(Collectors.toMap(Setting::getName, Function.identity()));
     }
 }
