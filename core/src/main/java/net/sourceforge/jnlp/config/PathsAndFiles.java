@@ -454,9 +454,9 @@ public class PathsAndFiles {
 
     }
 
-    private static class ItwCacheFileDescriptor extends CacheFileDescriptor {
+    public static class ItwCacheFileDescriptor extends CacheFileDescriptor {
 
-        private ItwCacheFileDescriptor(String fileName, String description, Target... target) {
+        protected ItwCacheFileDescriptor(String fileName, String description, Target... target) {
             super(fileName, ConfigurationConstants.DEPLOYMENT_SUBDIR_DIR, description, target);
         }
 
