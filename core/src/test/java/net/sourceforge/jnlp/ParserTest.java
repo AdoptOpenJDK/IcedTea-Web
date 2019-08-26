@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -51,6 +52,7 @@ import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -1835,12 +1837,14 @@ public class ParserTest extends NoStdOutErrTest {
             MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
             Parser parser = new Parser(file1, null, root, defaultParser, null);
             AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
-            //test have 10% of height, which is usually about 500-1000
-            //so check for 50-200 loks reliable
-            Assert.assertTrue(ad.getHeight() > 50 && ad.getHeight() < 200);
-            //test have 50% of width, which is usually about 800-2000
-            //so check for 200-1000 loks reliable
-            Assert.assertTrue(ad.getWidth() > 200 && ad.getWidth() < 1000);
+
+            Rectangle screen = ScreenFinder.getCurrentScreenSizeWithoutBounds();
+            double expectedWidth = screen.getWidth()/2;
+            double expectedHeight = screen.getHeight()/10;
+            double errorMargin = 2;
+
+            Assert.assertTrue(ad.getWidth() > expectedWidth - errorMargin && ad.getWidth() < expectedWidth + errorMargin );
+            Assert.assertTrue(ad.getHeight() > expectedHeight - errorMargin && ad.getHeight() < expectedHeight + errorMargin );
         }
     }
 
