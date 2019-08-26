@@ -54,7 +54,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class Setting<T> {
 
-    public static Setting<String> createDefault(final String key, final ValueValidator validator, final String value) {
+    public static Setting<String> createDefault(final String key, final String value, final ValueValidator validator) {
         return new Setting<>(key, R("Unknown"), false, validator, value, value, R("DCSourceInternal"));
     }
 

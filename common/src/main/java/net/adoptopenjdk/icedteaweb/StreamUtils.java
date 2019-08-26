@@ -42,6 +42,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.ServiceLoader;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -74,5 +78,13 @@ public class StreamUtils {
             }
         }
         return sb.toString();
+    }
+
+    public static <T> Stream<T> loadServiceAsStream(Class<T> serviceInterface) {
+        return toStream(ServiceLoader.load(serviceInterface).iterator());
+    }
+
+    public static <T> Stream<T> toStream(Iterator<T> iterator) {
+        return StreamSupport.stream(((Iterable<T>) (() -> iterator)).spliterator(), false);
     }
 }

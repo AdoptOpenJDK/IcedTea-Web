@@ -49,7 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.StreamUtils.loadServiceAsStream;
 import static net.sourceforge.jnlp.config.PathsAndFiles.CACHE_DIR;
 import static net.sourceforge.jnlp.config.PathsAndFiles.JAVA_POLICY;
 import static net.sourceforge.jnlp.config.PathsAndFiles.LOCKS_DIR;
@@ -74,469 +76,475 @@ import static net.sourceforge.jnlp.config.PathsAndFiles.USER_JSSECER;
  */
 public class Defaults {
 
-        /**
-         * This is more or less a straight copy from the deployment
-         * configuration page, with occasional replacements of "" or no-defaults
-         * with null
-         */
-    private static final List<Setting<String>> defaults = Arrays.asList(
-                /*
-                 * infrastructure
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_CACHE_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        CACHE_DIR.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        PCACHE_DIR.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_CACHE_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_LOG_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        LOG_DIR.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TMP_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        TMP_DIR.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_LOCKS_DIR,
-                        ValidatorFactory.createFilePathValidator(),
-                        LOCKS_DIR.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE,
-                        ValidatorFactory.createFilePathValidator(),
-                        MAIN_LOCK.getDefaultFullPath()
-                ),
+    /**
+     * This is more or less a straight copy from the deployment
+     * configuration page, with occasional replacements of "" or no-defaults
+     * with null
+     */
+    private static final List<Setting<String>> DEFAULTS = Arrays.asList(
+            /*
+             * infrastructure
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_CACHE_DIR,
+                    CACHE_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_PERSISTENCE_CACHE_DIR,
+                    PCACHE_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_CACHE_DIR,
+                    null,
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_LOG_DIR,
+                    LOG_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TMP_DIR,
+                    TMP_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_LOCKS_DIR,
+                    LOCKS_DIR.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE,
+                    MAIN_LOCK.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
 
-                /*
-                 * certificates and policy files
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_SECURITY_POLICY,
-                        ValidatorFactory.createUrlValidator(),
+            /*
+             * certificates and policy files
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_SECURITY_POLICY,
+                    "file://" + JAVA_POLICY.getDefaultFullPath(),
+                    ValidatorFactory.createUrlValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS,
+                    USER_CACERTS.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS,
+                    USER_JSSECAC.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TRUSTED_CERTS,
+                    USER_CERTS.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS,
+                    USER_JSSECER.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS,
+                    USER_CLIENTCERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY,
+                    null,
+                    ValidatorFactory.createUrlValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS,
+                    SYS_CACERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
+                    SYS_JSSECAC.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS,
+                    SYS_CERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
+                    SYS_JSSECERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
+                    SYS_CLIENTCERT.getDefaultFullPath(),
+                    ValidatorFactory.createFilePathValidator()
+            ),
 
-                        "file://" + JAVA_POLICY.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        USER_CACERTS.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CA_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        USER_JSSECAC.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TRUSTED_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        USER_CERTS.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TRUSTED_JSSE_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        USER_JSSECER.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_USER_TRUSTED_CLIENT_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        USER_CLIENTCERT.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY,
-                        ValidatorFactory.createUrlValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        SYS_CACERT.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        SYS_JSSECAC.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_TRUSTED_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        SYS_CERT.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        SYS_JSSECERT.getDefaultFullPath()
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_TRUSTED_CLIENT_CERTS,
-                        ValidatorFactory.createFilePathValidator(),
-                        SYS_CLIENTCERT.getDefaultFullPath()
-                ),
+            /*
+             * security access and control
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_PROMPT_USER,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_NOTINCA_WARNING,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_EXPIRED_WARNING,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY,
+                    null,
+                    ValidatorFactory.createFilePathValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
-                /*
-                 * security access and control
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_PROMPT_USER,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_NOTINCA_WARNING,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_EXPIRED_WARNING,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY,
-                        ValidatorFactory.createFilePathValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER,
-                        ValidatorFactory.createBooleanValidator(),
+            /*
+             * networking
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_TYPE,
+                    String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER),
+                    ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN,
+                            JNLPProxySelector.PROXY_TYPE_BROWSER)
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_SAME,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL,
+                    null,
+                    ValidatorFactory.createUrlValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_BYPASS_LIST,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_HTTP_HOST,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_HTTP_PORT,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_FTP_HOST,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_FTP_PORT,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
+                    null,
+                    null
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS,
+                    null,
+                    null
+            ),
 
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
+            /*
+             * cache and optional package repository
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_CACHE_MAX_SIZE,
+                    "-1",
+                    ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE)
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED,
+                    String.valueOf(0),
+                    ValidatorFactory.createRangedIntegerValidator(0, 10)
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_CACHE_ENABLED,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
-                /*
-                 * networking
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_TYPE,
-                        ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN, JNLPProxySelector.PROXY_TYPE_BROWSER),
-                        String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_SAME,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL,
-                        ValidatorFactory.createUrlValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_BYPASS_LIST,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_HTTP_HOST,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_HTTP_PORT,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_FTP_HOST,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_FTP_PORT,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
-                        null,
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS,
-                        null,
-                        null
-                ),
+            /*
+             * java console
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
+                    ConfigurationConstants.CONSOLE_HIDE,
+                    ValidatorFactory.createStringValidator(new String[]{
+                            ConfigurationConstants.CONSOLE_DISABLE,
+                            ConfigurationConstants.CONSOLE_HIDE,
+                            ConfigurationConstants.CONSOLE_SHOW,
+                            ConfigurationConstants.CONSOLE_SHOW_PLUGIN,
+                            ConfigurationConstants.CONSOLE_SHOW_JAVAWS
+                    })
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
-                /*
-                 * cache and optional package repository
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_CACHE_MAX_SIZE,
-                        ValidatorFactory.createRangedIntegerValidator(-1, Integer.MAX_VALUE),
-                        "-1"
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED,
-                        ValidatorFactory.createRangedIntegerValidator(0, 10),
-                        String.valueOf(0)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_CACHE_ENABLED,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
+            /*
+             * JNLP association
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_JNLP_ASSOCIATIONS,
+                    String.valueOf(ConfigurationConstants.JNLP_ASSOCIATION_ASK_USER),
+                    ValidatorFactory.createRangedIntegerValidator(ConfigurationConstants.JNLP_ASSOCIATION_NEVER,
+                            ConfigurationConstants.JNLP_ASSOCIATION_REPLACE_ASK)
+            ),
 
-                /*
-                 * java console
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
-                        ValidatorFactory.createStringValidator(new String[]{
-                                ConfigurationConstants.CONSOLE_DISABLE,
-                                ConfigurationConstants.CONSOLE_HIDE,
-                                ConfigurationConstants.CONSOLE_SHOW,
-                                ConfigurationConstants.CONSOLE_SHOW_PLUGIN,
-                                ConfigurationConstants.CONSOLE_SHOW_JAVAWS
-                        }),
-                        ConfigurationConstants.CONSOLE_HIDE
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LOGGING,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(true)
-                ),
+            /*
+             * desktop integration
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT,
+                    ShortcutDesc.CREATE_ASK_USER_IF_HINTED,
+                    ValidatorFactory.createStringValidator(new String[]{
+                            ShortcutDesc.CREATE_ALWAYS,
+                            ShortcutDesc.CREATE_ALWAYS_IF_HINTED,
+                            ShortcutDesc.CREATE_ASK_USER,
+                            ShortcutDesc.CREATE_ASK_USER_IF_HINTED,
+                            ShortcutDesc.CREATE_NEVER
+                    })
+            ),
 
-                /*
-                 * JNLP association
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_JNLP_ASSOCIATIONS,
-                        ValidatorFactory.createRangedIntegerValidator(ConfigurationConstants.JNLP_ASSOCIATION_NEVER,
-                                ConfigurationConstants.JNLP_ASSOCIATION_REPLACE_ASK),
-                        String.valueOf(ConfigurationConstants.JNLP_ASSOCIATION_ASK_USER)
-                ),
+            /*
+             * jre selection
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_JRE_INTSTALL_URL,
+                    null,
+                    ValidatorFactory.createUrlValidator()
+            ),
 
-                /*
-                 * desktop integration
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT,
-                        ValidatorFactory.createStringValidator(new String[]{
-                                ShortcutDesc.CREATE_ALWAYS,
-                                ShortcutDesc.CREATE_ALWAYS_IF_HINTED,
-                                ShortcutDesc.CREATE_ASK_USER,
-                                ShortcutDesc.CREATE_ASK_USER_IF_HINTED,
-                                ShortcutDesc.CREATE_NEVER
-                        }),
-                        ShortcutDesc.CREATE_ASK_USER_IF_HINTED
-                ),
+            /*
+             * jre management
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_AUTO_DOWNLOAD_JRE,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
-                /*
-                 * jre selection
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_JRE_INTSTALL_URL,
-                        ValidatorFactory.createUrlValidator(),
-                        null
-                ),
+            /*
+             * browser selection
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_BROWSER_PATH,
+                    null,
+                    ValidatorFactory.createBrowserPathValidator()
+            ),
 
-                /*
-                 * jre management
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_AUTO_DOWNLOAD_JRE,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
+            /*
+             * check for update timeout
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_UPDATE_TIMEOUT,
+                    String.valueOf(500),
+                    ValidatorFactory.createRangedIntegerValidator(0, 10000)
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.IGNORE_HEADLESS_CHECK,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
-                /*
-                 * browser selection
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_BROWSER_PATH,
-                        ValidatorFactory.createBrowserPathValidator(),
-                        null
-                ),
+            /*
+             * JVM arguments for plugin
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS,
+                    null,
+                    null
+            ),
 
-                /*
-                 * check for update timeout
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_UPDATE_TIMEOUT,
-                        ValidatorFactory.createRangedIntegerValidator(0, 10000),
-                        String.valueOf(500)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.IGNORE_HEADLESS_CHECK,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
+            /*
+             * unsigned applet security level
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_LEVEL,
+                    null,
+                    new SecurityValueValidator()
+            ),
 
-                /*
-                 * JVM arguments for plugin
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_PLUGIN_JVM_ARGUMENTS,
-                        null,
-                        null
-                ),
+            /*
+             * JVM executable for itw
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_JRE_DIR,
+                    null,
+                    null
+            ),
+            /*
+             * enable manifest-attributes checks
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
+                    String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL),
+                    ValidatorFactory.createManifestAttributeCheckValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_CONFIG,
+                    null,
+                    ValidatorFactory.createUrlValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_WIDTH,
+                    String.valueOf(800),
+                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999)
+                    //0 is disabling it; negative is enforcing it
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_HEIGHT,
+                    String.valueOf(600),
+                    ValidatorFactory.createRangedIntegerValidator(-9999, +9999)
+                    //0 is disabling it; negative is enforcing it
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD,
+                    String.valueOf(10),
+                    ValidatorFactory.createRangedIntegerValidator(0, 1000)
+                    // threshold when applet is considered as too small
+            ),
 
-                /*
-                 * unsigned applet security level
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SECURITY_LEVEL,
-                        new SecurityValueValidator(),
-                        null
-                ),
+            /*
+             * Native (rust) only - beggin
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_LAUNCHER_RUST_CP_ADD,
+                    "",
+                    ValidatorFactory.createRustCpValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_LAUNCHER_RUST_CP_REMOVE,
+                    "",
+                    ValidatorFactory.createRustCpValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_ADD,
+                    null,
+                    ValidatorFactory.createRustCpValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
+                    "",
+                    ValidatorFactory.createRustCpValidator()
+            )
+    );
 
-                /*
-                 * JVM executable for itw
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_JRE_DIR,
-                        null,
-                        null
-                ),
-                /*
-                 * enable manifest-attributes checks
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,
-                        ValidatorFactory.createManifestAttributeCheckValidator(),
-                        String.valueOf(ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_CONFIG,
-                        ValidatorFactory.createUrlValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY,
-                        ValidatorFactory.createBooleanValidator(),
-                        String.valueOf(false)
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_WIDTH,
-                        ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
-                        String.valueOf(800)//0 is disabling it; negative is enforcing it
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_HEIGHT,
-                        ValidatorFactory.createRangedIntegerValidator(-9999, +9999),
-                        String.valueOf(600)//0 is disabling it; negative is enforcing it
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_SMALL_SIZE_OVERRIDE_THRESHOLD,
-                        ValidatorFactory.createRangedIntegerValidator(0, 1000),
-                        String.valueOf(10)// threshold when applet is considered as too small
-                ),
-
-                /*
-                 * Native (rust) only - beggin
-                 */
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_LAUNCHER_RUST_CP_ADD,
-                        ValidatorFactory.createRustCpValidator(),
-                        ""
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_LAUNCHER_RUST_CP_REMOVE,
-                        ValidatorFactory.createRustCpValidator(),
-                        ""
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_ADD,
-                        ValidatorFactory.createRustCpValidator(),
-                        null
-                ),
-                Setting.createDefault(
-                        ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
-                        ValidatorFactory.createRustCpValidator(),
-                        ""
-                )
-        );
+    private static final List<Setting<String>> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
+            .flatMap(provider -> provider.getDefaults().stream())
+            .collect(Collectors.toList());
 
     /**
      * Get the default settings for deployment
@@ -550,6 +558,8 @@ public class Defaults {
             sm.checkRead(USER_DEPLOYMENT_FILE.getFullPath());
         }
 
-        return defaults.stream().map(Setting::copy).collect(Collectors.toMap(Setting::getName, Function.identity()));
+        return Stream.concat(additionalDefaults.stream(), DEFAULTS.stream())
+                .map(Setting::copy)
+                .collect(Collectors.toMap(Setting::getName, Function.identity()));
     }
 }
