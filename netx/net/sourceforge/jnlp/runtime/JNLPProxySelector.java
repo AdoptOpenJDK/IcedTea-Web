@@ -14,6 +14,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+// Code changed/added and fixed for IE Proxy Registry Key
+// Justin Reock, John Saboe, Patris Soltanpour
+
+
 package net.sourceforge.jnlp.runtime;
 
 import java.io.IOException;
@@ -31,9 +35,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.WinRegistry;
+
 
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
@@ -48,6 +56,18 @@ public abstract class JNLPProxySelector extends ProxySelector {
     public static final int PROXY_TYPE_MANUAL = 1;
     public static final int PROXY_TYPE_AUTO = 2;
     public static final int PROXY_TYPE_BROWSER = 3;
+    public static final String PROXY_REGISTRY_KEY =
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
+    public static final String PROXY_DWORD_REGISTRY_KEY =
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
+    //    public static final String PROXY_ENABLE_REGISTRY_VAL =
+//             "ProxyEnable";
+    public static final String PROXY_SERVER_REGISTRY_VAL =
+            "ProxyServer";
+    public static final String PROXY_SERVER_OVERRIDE_VAL =
+            "ProxyOverride";
+    public static final String PROXY_AUTOCONFIG_URL_VAL =
+            "AutoConfigURL";
 
     /** The default port to use as a fallback. Currently squid's default port */
     public static final int FALLBACK_PROXY_PORT = 3128;
@@ -80,8 +100,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
     private String proxySocks4Host;
     private int proxySocks4Port;
 
-    // FIXME what is this? where should it be used?
-    private String overrideHosts = null;
+    private static String overrideHosts = null;
 
     public JNLPProxySelector(DeploymentConfiguration config) {
         parseConfiguration(config);
@@ -180,36 +199,95 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     @Override
     public List<Proxy> select(URI uri) {
-        OutputController.getLogger().log("Selecting proxy for: " + uri);
-        
-        if (inBypassList(uri)) {
-            List<Proxy> proxies = Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
-            OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
-            return proxies;
-        }
+//        OutputController.getLogger().log("Selecting proxy for: " + uri);
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Selecting proxy for: " + uri);
+
+
+
+
+//        if (inBypassList(uri)) {
+//            List<Proxy> proxies = Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
+//            OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Selected proxies: " + Arrays.toString(proxies.toArray()));
+//            return proxies;
+//        }
 
         List<Proxy> proxies = new ArrayList<>();
 
         switch (proxyType) {
+            case PROXY_TYPE_BROWSER:
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Configuring from Browser...");
+                String autoConfigString = "";
+                String proxyServer = "";
+                String proxyOver = "";
+                try {
+                    proxyServer = WinRegistry.readString(
+                            WinRegistry.HKEY_CURRENT_USER,
+                            PROXY_REGISTRY_KEY,
+                            PROXY_SERVER_REGISTRY_VAL, 0);
+
+                    if ((proxyServer.startsWith("ftp=")) || (proxyServer.startsWith("http=")) || (proxyServer.startsWith("https=")) || (proxyServer.startsWith("socks="))) {
+                        proxyServer = proxyServer.replaceAll("\\.*.*=" , "").replaceAll(";.*" , "");
+                    }
+                    else {
+                        proxyServer = proxyServer;
+                    }
+                    proxyOver = WinRegistry.readString(
+                            WinRegistry.HKEY_CURRENT_USER,
+                            PROXY_REGISTRY_KEY,
+                            PROXY_SERVER_OVERRIDE_VAL, 0);
+                    autoConfigString = WinRegistry.readString(
+                            WinRegistry.HKEY_CURRENT_USER,
+                            PROXY_REGISTRY_KEY,
+                            PROXY_AUTOCONFIG_URL_VAL, 0);
+                    if (proxyServer.equalsIgnoreCase("localhost:1234")) {
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "IE has wrong ProxyServer Registry Key Value: "  + proxyServer + ", Java uses DIRECT connection");
+                        proxies.add(Proxy.NO_PROXY);
+                    }
+                    else if (proxyServer != null && proxyOver !=null) {
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "IE has ProxyServer & ProxyOverride Registry Key and Proxy Server value is: " + proxyServer);
+                        proxies.addAll(getFromWindowsRegistry(uri));
+                    }
+                    else if (autoConfigString != null) {
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "IE has PAC File URL Registry Key");
+                        proxies.addAll(getFromPAC(uri));
+                    }
+                    else  {
+                        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Java uses DIRECT connection");
+                        proxies.add(Proxy.NO_PROXY);
+                    }
+
+                }
+                catch (Exception e) {
+                    OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+                }
+                break;
             case PROXY_TYPE_MANUAL:
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Configuring manual proxy...");
                 proxies.addAll(getFromConfiguration(uri));
                 break;
             case PROXY_TYPE_AUTO:
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Configuring proxy from PAC...");
                 proxies.addAll(getFromPAC(uri));
                 break;
-            case PROXY_TYPE_BROWSER:
-                proxies.addAll(getFromBrowser(uri));
-                break;
             case PROXY_TYPE_UNKNOWN:
-                // fall through
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Unknown configuration...");
+                proxies.addAll(getFromBrowser(uri));
+                break;    // fall through
             case PROXY_TYPE_NONE:
-                // fall through
-            default:
+                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "No proxy...");
                 proxies.add(Proxy.NO_PROXY);
                 break;
+//            default:
+//                OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Configuring default proxy...");
+//                proxies.add(Proxy.NO_PROXY);
+//                break;
         }
 
-        OutputController.getLogger().log("Selected proxies: " + Arrays.toString(proxies.toArray()));
+//        if (proxies.isEmpty()) {
+//            proxies.add(Proxy.NO_PROXY);
+//        }
+
+        OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG, "Selected proxies: " + Arrays.toString(proxies.toArray()));
         return proxies;
     }
 
@@ -311,11 +389,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * @return a List of Proxy objects
      */
     protected static List<Proxy> getFromArguments(URI uri,
-            boolean sameProxy, boolean sameProxyIncludesSocket,
-            String proxyHttpsHost, int proxyHttpsPort,
-            String proxyHttpHost, int proxyHttpPort,
-            String proxyFtpHost, int proxyFtpPort,
-            String proxySocks4Host, int proxySocks4Port) {
+                                                  boolean sameProxy, boolean sameProxyIncludesSocket,
+                                                  String proxyHttpsHost, int proxyHttpsPort,
+                                                  String proxyHttpHost, int proxyHttpPort,
+                                                  String proxyFtpHost, int proxyFtpPort,
+                                                  String proxySocks4Host, int proxySocks4Port) {
 
         List<Proxy> proxies = new ArrayList<>();
 
@@ -393,6 +471,115 @@ public abstract class JNLPProxySelector extends ProxySelector {
      */
     protected abstract List<Proxy> getFromBrowser(URI uri);
 
+    public static void setOverrideHosts(String override) {
+        overrideHosts = override;
+    }
+
+    public static String getOverrideHosts() {
+        return overrideHosts;
+    }
+
+    /**
+     * Returns a list of proxies by inspecting the Windows Registry
+     *
+     * @return a list of proxies
+     */
+
+    public static List<Proxy> getFromWindowsRegistry(URI uri) {
+        String proxyServer = "";
+/*         String proxyEnable = "0x0";
+         try {
+             proxyEnable = WinRegistry.readDword (
+                 PROXY_DWORD_REGISTRY_KEY,
+                 PROXY_ENABLE_REGISTRY_VAL
+             );
+
+           OutputController.getLogger().log("ProxyEnable set to " + proxyEnable);
+         }
+         catch (Exception e) {
+            OutputController.getLogger().log("Error reading from Windows registry or Operating System is not Windows based.");
+            return new ArrayList<>();
+         } */
+        try {
+
+//             if (proxyEnable.equals("0x1")) {
+            proxyServer = WinRegistry.readString (
+                    WinRegistry.HKEY_CURRENT_USER,
+                    PROXY_REGISTRY_KEY,
+                    PROXY_SERVER_REGISTRY_VAL, 0);
+
+            if ((proxyServer.startsWith("ftp=")) || (proxyServer.startsWith("http=")) || (proxyServer.startsWith("https=")) || (proxyServer.startsWith("socks="))) {
+                proxyServer = proxyServer.replaceAll("\\.*.*=" , "").replaceAll(";.*" , "");
+            }
+            else {
+                proxyServer = proxyServer;
+            }
+            setOverrideHosts(
+                    WinRegistry.readString(
+                            WinRegistry.HKEY_CURRENT_USER,
+                            PROXY_REGISTRY_KEY,
+                            PROXY_SERVER_OVERRIDE_VAL, 0)
+            );
+
+//                 OutputController.getLogger().log("ProxyServer set to " + proxyServer);
+//                 OutputController.getLogger().log("ProxyOverrides set to " + getOverrideHosts());
+
+
+        }
+        catch (Exception e) {
+//            OutputController.getLogger().log("WARNING: Found ProxyEnable set to 1, but could not read value of ProxyServer");
+        }
+//         OutputController.getLogger().log("Found proxy server '" + proxyServer + "' in the Windows Registry");
+        List<Proxy> proxies = new ArrayList<>();
+        String host = "";
+        host = proxyServer.split(":")[0];
+        int port = Integer.valueOf(proxyServer.split(":")[1]);
+
+        if (!host.isEmpty()) {
+            try {
+                SocketAddress sa = new InetSocketAddress(host, port);
+                proxies.add(new Proxy(Type.HTTP, sa));
+            }
+            catch (Exception e) {
+                OutputController.getLogger().log("Could not parse proxy settings: " + e.getMessage());
+            }
+        }
+
+        if (checkProxyOverride(getOverrideHosts(), uri)) {
+            proxies = new ArrayList<>();
+            proxies.add(Proxy.NO_PROXY);
+        }
+
+        return proxies;
+
+    } // getFromWindowsRegistry
+
+    public static Boolean checkProxyOverride(String proxyOverrides, URI uri) {
+
+        Boolean overrideFound = false;
+        if (proxyOverrides != null) {
+            String[] overrides = proxyOverrides.split(";");
+            for (String override : overrides) {
+//            OutputController.getLogger().log("Proxy override check: Comparing '" +
+//                 uri.toString() + "' to '" + override + "'");
+                if (override.equals("<local>")) {
+                    if (!uri.getHost().contains(".")) {
+//                    OutputController.getLogger().log("Matched <local> URL " + uri.toString());
+                        overrideFound = true;
+                    }
+                } else {
+//                OutputController.getLogger().log("Proxy override check: Regex is '" +
+//                        ".*" + Pattern.quote(override).replace("*","\\E.*\\Q") + ".*" + "'");
+                    if (uri.toString().matches(".*" + Pattern.quote(override).replace("*","\\E.*\\Q") + ".*")) {
+//                    OutputController.getLogger().log("Found match for " + uri.toString());
+                        overrideFound = true;
+                    }
+                }
+            }
+        }
+        return overrideFound;
+    }
+
     /**
      * Converts a proxy string from a browser into a List of Proxy objects
      * suitable for java.
@@ -437,7 +624,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             } else if (token.startsWith("DIRECT")) {
                 proxies.add(Proxy.NO_PROXY);
             } else {
-                 OutputController.getLogger().log("Unrecognized proxy token: " + token);
+                OutputController.getLogger().log("Unrecognized proxy token: " + token);
             }
         }
 
