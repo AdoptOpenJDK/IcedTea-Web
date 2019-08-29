@@ -282,9 +282,10 @@ public class JNLPFile {
      * @throws ParseException if the JNLP file was invalid
      */
     protected JNLPFile(final URL location, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
-        InputStream input = openURL(location, version, policy);
         this.parserSettings = settings;
-        parse(input, location, forceCodebase);
+        try (InputStream input = openURL(location, version, policy)) {
+            parse(input, location, forceCodebase);
+        }
 
         //Downloads the original jnlp file into the cache if possible
         //(i.e. If the jnlp file being launched exist locally, but it
