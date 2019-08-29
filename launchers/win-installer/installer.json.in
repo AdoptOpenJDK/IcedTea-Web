@@ -127,6 +127,17 @@
           "value": "\"[INSTALLDIR]bin\\javaws.exe\" \"%1\""
         }
       ]
+    },
+    {
+      "root": "HKLM",
+      "key": "SOFTWARE\\Classes\\MIME\\Database\\Content Type\\application/x-java-jnlp-file",
+      "values": [
+        {
+          "type": "string",
+          "name": "Extension",
+          "value": ".jnlp"
+        }
+      ]
     }
   ],
   "environmentVariables": [
