@@ -482,11 +482,11 @@ public final class DeploymentConfiguration {
             final String defaultValue = defaultSetting == null ? null : defaultSetting.getValue();
             final String newValue = currentSetting == null ? null : currentSetting.getValue();
 
-            if (!Objects.equals(newValue, defaultValue)) {
+            if (newValue != null && !newValue.equals(defaultValue)) {
                 toSave.setProperty(key, newValue);
-                if (currentSetting != null && currentSetting.isLocked()) {
-                    toSave.setProperty(key + ".locked", "");
-                }
+            }
+            if (currentSetting != null && currentSetting.isLocked()) {
+                toSave.setProperty(key + ".locked", "");
             }
         }
 
