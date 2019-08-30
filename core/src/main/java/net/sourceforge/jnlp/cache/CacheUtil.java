@@ -703,7 +703,7 @@ public class CacheUtil {
             path.append(location.getPort());
             path.append(File.separatorChar);
         }
-        String locationPath = location.getPath().replace('/', File.separatorChar);
+        String locationPath = location.getPath();
         String query = "";
         if (location.getQuery() != null) {
             query = location.getQuery();
@@ -723,7 +723,7 @@ public class CacheUtil {
                 throw new RuntimeException(ex);
             }
         } else {
-            path.append(locationPath);
+            path.append(locationPath.replace('/', File.separatorChar));
             if (location.getQuery() != null && !location.getQuery().trim().isEmpty()) {
                 path.append(".").append(location.getQuery());
             }
