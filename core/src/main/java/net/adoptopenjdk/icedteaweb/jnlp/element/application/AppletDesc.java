@@ -127,7 +127,28 @@ public class AppletDesc implements EntryPoint {
      */
     @Override
     public String getMainClass() {
-        return mainClass;
+        return cleanMainClass();
+    }
+
+    /**
+     * https://github.com/AdoptOpenJDK/IcedTea-Web/issues/361
+     * appelts can have class specified both pkg.myclass and pkg.myclass.class
+     * There are several places in ITW where this can be applied
+     * I had decided to go eith direct getter from AppletDesc for several reasons:
+     * - it is applet-desc specific, and application-desc should not be crippeld by this
+     * - in checkForMain is palce where .class is appended, that would need to be adjsuted
+     * - checkEntryPoint is comparin main class against record in manifest.
+     * -- classes in manifest are supposed to be suffix .class free. Although you can smuggle class.class into manifest, that is usually bringing you toubles.
+     * -- eg. java -jar willnot load such main-class
+     * - I can be wrong with the manifest usage
+     * @return mainclass striped of tailing .class if any
+     */
+    private String cleanMainClass() {
+        if (mainClass == null) {
+            return mainClass;
+        } else {
+            return mainClass.replaceAll("\\.class$", "");
+        }
     }
 
     /**
