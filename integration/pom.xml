@@ -164,6 +164,25 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>appletDescMainClassWithClass</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/common/*.class</include>
+                                <include>**/reproducers/appletDescMainClassWithClass/**/*.class</include>
+                            </includes>
+                            <finalName>App</finalName>
+                            <classifier>appletDescMainClassWithClass</classifier>
+                            <outputDirectory>
+                                ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/reproducers/appletDescMainClassWithClass/resources
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
