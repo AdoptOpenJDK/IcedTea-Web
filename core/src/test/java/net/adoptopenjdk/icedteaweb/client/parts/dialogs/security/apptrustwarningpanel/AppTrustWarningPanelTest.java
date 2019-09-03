@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.PluginParameters;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import javax.swing.JButton;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,15 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 public class AppTrustWarningPanelTest {
 
-    private static URL mockCodebase;
-    private static URL mockDocumentBase;
-    private static String mockJar;
     private static String mockMainClass;
-    private static int mockWidth;
-    private static int mockHeight;
     private static PluginParameters mockParameters;
-
-    private static PluginBridge mockPluginBridge;
 
     /* Should contain an instance of each AppTrustWarningPanel subclass */
     private static List<AppTrustWarningPanel> panelList = new ArrayList<AppTrustWarningPanel>();
@@ -64,21 +55,11 @@ public class AppTrustWarningPanelTest {
         backupAppletSecurity();
         //emptying  .appletTrustSettings to not affect run of this test
         removeAppletSecurityImpl();
-        mockCodebase = new URL("http://www.example.com");
-        mockDocumentBase = new URL("http://www.example.com");
-        mockJar = "ApplicationName.jar";
         mockMainClass = "ApplicationMainClass";
-        mockWidth = 100;
-        mockHeight = 100;
 
         Map<String, String> fakeMap = new HashMap<String, String>();
         fakeMap.put("code", mockMainClass);
         mockParameters = new PluginParameters(fakeMap);
-
-        mockPluginBridge = new PluginBridge(mockCodebase, mockDocumentBase, mockJar,
-                mockMainClass, mockWidth, mockHeight, mockParameters);
-
-        panelList.add(new UnsignedAppletTrustWarningPanel(null, mockPluginBridge));
     }
 
     @Test

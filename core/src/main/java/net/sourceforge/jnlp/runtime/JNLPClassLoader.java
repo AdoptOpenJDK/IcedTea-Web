@@ -30,7 +30,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
@@ -38,7 +37,6 @@ import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
@@ -321,13 +319,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.enableCodeBase = enableCodeBase;
 
-        AppVerifier verifier;
-
-        if (file instanceof PluginBridge && !((PluginBridge) file).useJNLPHref()) {
-            verifier = new PluginAppVerifier();
-        } else {
-            verifier = new JNLPAppVerifier();
-        }
+        final AppVerifier verifier = new JNLPAppVerifier();
 
         jcv = new JarCertVerifier(verifier);
 
@@ -433,8 +425,6 @@ public class JNLPClassLoader extends URLClassLoader {
         // permission level to do it!
         if (loader.getSigningState() == SigningState.PARTIAL) {
             loader.securityDelegate.promptUserOnPartialSigning();
-        } else if (!loader.getSigning() && !loader.securityDelegate.userPromptedForSandbox() && file instanceof PluginBridge) {
-            UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired((PluginBridge) file);
         }
 
         // New loader init may have caused extensions to create a
@@ -637,11 +627,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return whether to filter invalid jars, or error later on
      */
     private boolean shouldFilterInvalidJars() {
-        if (file instanceof PluginBridge) {
-            PluginBridge pluginBridge = (PluginBridge) file;
-            /*Ignore on applet, ie !useJNLPHref*/
-            return !pluginBridge.useJNLPHref();
-        }
         return false;//Error is default behaviour
     }
 
@@ -650,17 +635,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * downloading.
      */
     void initializeResources() throws LaunchException {
-        if (file instanceof PluginBridge) {
-            PluginBridge bridge = (PluginBridge) file;
-
-            for (String codeBaseFolder : bridge.getCodeBaseFolders()) {
-                try {
-                    addToCodeBaseLoader(new URL(file.getCodeBase(), codeBaseFolder));
-                } catch (MalformedURLException mfe) {
-                    LOG.error("Problem trying to add folder to code base:", mfe);
-                }
-            }
-        }
 
         JARDesc jars[] = resources.getJARs();
 
@@ -1320,16 +1294,6 @@ public class JNLPClassLoader extends URLClassLoader {
                             CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
 
                             try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
-                                Manifest mf = jarFile.getManifest();
-
-                                // Only check classpath if this is the plugin and there is no jnlp_href usage.
-                                // Note that this is different from proprietary plugin behaviour.
-                                // If jnlp_href is used, the app should be treated similarly to when
-                                // it is run from javaws as a webstart.
-                                if (file instanceof PluginBridge && !((PluginBridge) file).useJNLPHref()) {
-                                    classpaths.addAll(ManifestAttributesReader.getClassPaths(mf, jar.getLocation()));
-                                }
-
                                 JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);
                                 if (index != null) {
                                     jarIndexes.add(index);
@@ -2300,7 +2264,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         @Override
         public boolean isPluginApplet() {
-            return classLoader.file instanceof PluginBridge;
+            return false;
         }
 
         @Override

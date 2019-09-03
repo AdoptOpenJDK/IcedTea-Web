@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridgeTest;
+import net.sourceforge.jnlp.config.DeploymentConfigurationTest;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -330,7 +330,7 @@ public class XDesktopEntryTest {
         a.setFixHref(false);
         a.setShortcutType(type);
         String s = xde.getContent(menu, a, true);
-        Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
+        Assert.assertEquals(occurrences, DeploymentConfigurationTest.countOccurrences(s, "-html"));
     }
 
     @Test

@@ -18,7 +18,6 @@ package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
@@ -27,7 +26,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -130,15 +128,6 @@ public class XDesktopEntry implements GenericDesktopEntry {
      */
     String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
         File generatedJnlp = null;
-        if (file instanceof PluginBridge && (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF)) {
-            try {
-                String content = ((PluginBridge) file).toJnlp(isSigned, info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF, info.isFixHref());
-                generatedJnlp = getGeneratedJnlpFileName();
-                FileUtils.saveFileUtf8(content, generatedJnlp);
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            }
-        }
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
@@ -170,12 +159,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         String exec;
         String title = "xdesktop writing";
         if (JNLPRuntime.isWebstartApplication()) {
-            String htmlSwitch = "";
-            if (JNLPRuntime.isHtml()){
-                htmlSwitch = " "+ CommandLineOptions.HTML.getOption();
-            }
-            exec = "Exec="
-                    + getJavaWsBin() + htmlSwitch + " \"" + file.getSourceLocation() + "\"\n";
+            exec = "Exec=" + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
             fileContents += exec;
         } else {
             if (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.BROWSER) {

@@ -193,7 +193,7 @@ public class Launcher {
             }
         }
 
-        tg = new TgThread(file, cont, file instanceof PluginBridge);
+        tg = new TgThread(file, cont);
         tg.start();
 
         try {
@@ -674,21 +674,10 @@ public class Launcher {
     /**
      * Create a thread group for the JNLP file.
      * @param file the JNLP file
-     * Note: if the JNLPFile is an applet (ie it is a subclass of PluginBridge)
-     * then this method simply returns the existing ThreadGroup. The applet
-     * ThreadGroup has to be created at an earlier point in the applet code.
      * @return  ThreadGroup for this app/applet
      */
     private ThreadGroup createThreadGroup(final JNLPFile file) {
-        final ThreadGroup tg;
-
-        if (file instanceof PluginBridge) {
-            tg = Thread.currentThread().getThreadGroup();
-        } else {
-            tg = new ThreadGroup(mainGroup, file.getTitle());
-        }
-
-        return tg;
+        return new ThreadGroup(mainGroup, file.getTitle());
     }
 
     /**
@@ -729,8 +718,6 @@ public class Launcher {
 
     /**
      * Do hacks on per-application level to allow different AppContexts to work
-     *
-     * @see JNLPRuntime#doMainAppContextHacks
      */
     private static void doPerApplicationAppContextHacks() {
 
@@ -753,13 +740,11 @@ public class Launcher {
         private ApplicationInstance application;
         private LaunchException exception;
         private final Container cont;
-        private final boolean isPlugin;
 
-        TgThread(JNLPFile file, Container cont, boolean isPlugin) {
+        TgThread(JNLPFile file, Container cont) {
             super(createThreadGroup(file), file.getTitle());
             this.file = file;
             this.cont = cont;
-            this.isPlugin = isPlugin;
         }
 
         @Override
@@ -767,31 +752,25 @@ public class Launcher {
             try {
                 // Do not create new AppContext if we're using NetX and icedteaplugin.
                 // The plugin needs an AppContext too, but it has to be created earlier.
-                if (context && !isPlugin) {
+                if (context) {
                     SunToolkit.createNewAppContext();
                 }
 
                 doPerApplicationAppContextHacks();
 
-                if (isPlugin) {
-                    // Do not display download indicators if we're using gcjwebplugin.
-                    JNLPRuntime.setDefaultDownloadIndicator(null);
-                    application = getApplet(file, ((PluginBridge)file).codeBaseLookup(), cont);
-                } else {
-                    if (file.isApplication()) {
-                        application = launchApplication(file);
-                    }
-                    else if (file.isApplet()) {
-                        application = launchApplet(file, true, cont);
-                    } // enable applet code base
-                    else if (file.isInstaller()) {
-                        application = launchInstaller(file);
-                    }
-                    else {
-                        throw launchError(new LaunchException(file, null,
-                                "Fatal", "Application Error", "Not a launchable JNLP file.",
-                                "File must be a JNLP application, applet, or installer type."));
-                    }
+                if (file.isApplication()) {
+                    application = launchApplication(file);
+                }
+                else if (file.isApplet()) {
+                    application = launchApplet(file, true, cont);
+                } // enable applet code base
+                else if (file.isInstaller()) {
+                    application = launchInstaller(file);
+                }
+                else {
+                    throw launchError(new LaunchException(file, null,
+                            "Fatal", "Application Error", "Not a launchable JNLP file.",
+                            "File must be a JNLP application, applet, or installer type."));
                 }
             } catch (LaunchException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

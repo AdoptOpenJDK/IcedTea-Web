@@ -36,7 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
-import net.sourceforge.jnlp.PluginBridgeTest;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
@@ -61,6 +60,21 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 public class DeploymentConfigurationTest extends NoStdOutErrTest {
+
+    public static int countOccurrences(String str, String findStr) {
+        int lastIndex = 0;
+        int count = 0;
+        while (lastIndex != -1) {
+
+            lastIndex = str.indexOf(findStr, lastIndex);
+
+            if (lastIndex != -1) {
+                count++;
+                lastIndex += findStr.length();
+            }
+        }
+        return count;
+    }
 
     @Test
     public void testLoad() throws ConfigurationException {
@@ -173,17 +187,17 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
                 //ensure salt
                 Assert.assertTrue(s.contains("#id" + y + "id"));
             }
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, ConfigurationConstants.DEPLOYMENT_COMMENT));
+            Assert.assertEquals(1, countOccurrences(s, ConfigurationConstants.DEPLOYMENT_COMMENT));
             String date = new Date().toString().substring(0, 10); //every propertiews file have header and date by default
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, date)); //check day part of date...
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "#commented1"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "property2"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "#commented3"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "property4"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val1"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val2"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val3"));
-            Assert.assertEquals(1, PluginBridgeTest.countOccurrences(s, "val4"));
+            Assert.assertEquals(1, countOccurrences(s, date)); //check day part of date...
+            Assert.assertEquals(1, countOccurrences(s, "#commented1"));
+            Assert.assertEquals(1, countOccurrences(s, "property2"));
+            Assert.assertEquals(1, countOccurrences(s, "#commented3"));
+            Assert.assertEquals(1, countOccurrences(s, "property4"));
+            Assert.assertEquals(1, countOccurrences(s, "val1"));
+            Assert.assertEquals(1, countOccurrences(s, "val2"));
+            Assert.assertEquals(1, countOccurrences(s, "val3"));
+            Assert.assertEquals(1, countOccurrences(s, "val4"));
             //insert some salt to check if it really iterates
             FileUtils.saveFileUtf8(s + "\n#id" + x + "id", f);
         }

@@ -49,7 +49,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -191,9 +190,6 @@ public class UnsignedAppletTrustConfirmation {
     }
 
     private static List<String> getJars(JNLPFile file) {
-        if (file instanceof PluginBridge)
-            return ((PluginBridge) file).getArchiveJars();
-
         List<JARDesc> jars = Arrays.asList(file.getResources().getJARs());
         List<String> result = new ArrayList<>();
         for (JARDesc jar : jars) {

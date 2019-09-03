@@ -47,7 +47,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
@@ -455,11 +454,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             this.add(jnlpHref);
             this.add(javawsHtml);
             this.add(fix);
-            if (parent.getFile() instanceof PluginBridge && ((PluginBridge)(parent.getFile())).haveDebugJnlp()){
-                jnlpHref.setEnabled(true);
-            } else {
-                jnlpHref.setEnabled(false);
-            }
+            jnlpHref.setEnabled(false);
         }
 
         private void setTooltips() {

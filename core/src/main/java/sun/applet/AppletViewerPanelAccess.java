@@ -32,12 +32,10 @@
  statement from your version.*/
 package sun.applet;
 
-import net.adoptopenjdk.icedteaweb.client.appletviewer.NetxPanel;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.applet.Applet;
-import java.applet.AppletContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -88,14 +86,6 @@ public abstract class AppletViewerPanelAccess extends AppletViewerPanel {
         super.run();
     }
 
-    @Override
-    public AppletContext getAppletContext() {
-        if (getParent() instanceof AppletContext) {
-            return super.getAppletContext();
-        }
-        return ((NetxPanel)this).getAppInst().getAppletEnvironment();
-    }
-    
     /**
      * NOTE. We cannot override private method, and this call is unused and useless.
      * But kept for record of troubles to run on any openjdk.
