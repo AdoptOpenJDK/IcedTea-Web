@@ -393,7 +393,7 @@ public class Launcher {
                 return null;
             }
 
-            if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
+            if (JNLPRuntime.getForksStrategy().needsToFork(file)) {
                 if (!JNLPRuntime.isHeadless()){
                     SplashScreen sp = SplashScreen.getSplashScreen();
                     if (sp!=null) {
@@ -514,7 +514,7 @@ public class Launcher {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
 
-        if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
+        if (JNLPRuntime.getForksStrategy().needsToFork(file)) {
             if (!JNLPRuntime.isHeadless()) {
                 SplashScreen sp = SplashScreen.getSplashScreen();
                 if (sp != null) {
@@ -730,7 +730,7 @@ public class Launcher {
     /**
      * Do hacks on per-application level to allow different AppContexts to work
      *
-     * @see JNLPRuntime#doMainAppContextHacks
+     * see JNLPRuntime#doMainAppContextHacks
      */
     private static void doPerApplicationAppContextHacks() {
 

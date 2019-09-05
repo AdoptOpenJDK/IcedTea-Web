@@ -60,6 +60,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import static net.sourceforge.jnlp.runtime.ForkingStrategy.NEVER;
+
 public final class HtmlBoot {
 
     private final static Logger LOG = LoggerFactory.getLogger(HtmlBoot.class);
@@ -127,7 +129,7 @@ public final class HtmlBoot {
         );
         }
         List<String> vars = optionParser.getParams(CommandLineOptions.HTML);
-        JNLPRuntime.setForksAllowed(false);//needed?
+        JNLPRuntime.setForkingStrategy(NEVER);//needed?
         ParserSettings settings = Boot.init(extra);
         if (settings == null) {
             return false;

@@ -23,11 +23,11 @@ import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
@@ -38,7 +38,6 @@ import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.net.www.protocol.jar.URLJarFile;
@@ -80,6 +79,7 @@ import java.util.List;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
+import static net.sourceforge.jnlp.runtime.ForkingStrategy.IF_JNLP_REQUIRES;
 
 /**
  * <p>
@@ -157,8 +157,8 @@ public class JNLPRuntime {
     /** set to true if this is a webstart application. */
     private static boolean isWebstartApplication;
 
-    /** set to false to indicate another JVM should not be spawned, even if necessary */
-    private static boolean forksAllowed = true;
+    /** set to NEVER to indicate another JVM should not be spawned, even if necessary */
+    private static ForkingStrategy forkingStrategy = IF_JNLP_REQUIRES;
 
     /** all security dialogs will be consumed and pretented as being verified by user and allowed.*/
     private static boolean trustAll=false;
@@ -269,7 +269,7 @@ public class JNLPRuntime {
 
         doMainAppContextHacks();
 
-        if (securityEnabled && !forksAllowed) {
+        if (securityEnabled && forkingStrategy.mayRunManagedApplication()) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
         }
@@ -378,7 +378,7 @@ public class JNLPRuntime {
     /**
      * Performs a few hacks that are needed for the main AppContext
      *
-     * @see Launcher#doPerApplicationAppContextHacks
+     * see Launcher#doPerApplicationAppContextHacks
      */
     private static void doMainAppContextHacks() {
 
@@ -706,13 +706,13 @@ public class JNLPRuntime {
     /**
      * @return {@code true} if the current runtime will fork
      */
-    public static boolean getForksAllowed() {
-        return forksAllowed;
+    public static ForkingStrategy getForksStrategy() {
+        return forkingStrategy;
     }
 
-    public static void setForksAllowed(boolean value) {
+    public static void setForkingStrategy(ForkingStrategy strategy) {
         checkInitialized();
-        forksAllowed = value;
+        forkingStrategy = strategy;
     }
 
     /**
