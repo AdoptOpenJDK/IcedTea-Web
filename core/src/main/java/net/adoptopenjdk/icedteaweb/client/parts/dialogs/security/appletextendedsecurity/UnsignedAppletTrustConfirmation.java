@@ -114,9 +114,8 @@ public class UnsignedAppletTrustConfirmation {
     }
 
     private static UnsignedAppletActionEntry getMatchingItem(UnsignedAppletActionStorage actionStorage, JNLPFile file, Class<? extends RememberableDialog> id) {
-        URL location = (file.getSourceLocation() != null) ? file.getSourceLocation() : file.getFileLocation();
         return actionStorage.getMatchingItem(
-                UrlUtils.normalizeUrlAndStripParams(location, true /* encode local files */).toString(),
+                UrlUtils.normalizeUrlAndStripParams(file.getSourceLocation(), true /* encode local files */).toString(),
                 UrlUtils.normalizeUrlAndStripParams(file.getNotNullProbableCodeBase(), true /* encode local files */).toString(),
                 toRelativePaths(getJars(file), file.getNotNullProbableCodeBase().toExternalForm()), id);
     }
