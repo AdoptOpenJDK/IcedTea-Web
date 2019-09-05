@@ -77,7 +77,7 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    private ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
+    public ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
         super();
         Assert.requireNonNull(style, "style");
         setTitle(style.getDialogTitle());
@@ -93,7 +93,11 @@ public class ControlPanel extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(640, 480));
+        setPreferredSize(new Dimension(920, 520));
+
         pack();
+        SwingUtils.centerOnPrimaryScreen(this);
     }
 
 
