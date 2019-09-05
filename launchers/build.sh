@@ -40,6 +40,7 @@ mkdir -p "$ICO_TARGET_DIR"
 mkdir -p "$SPLASH_TARGET_DIR"
 
 publishInternalLib "$JAVAWS_SRC" "$ITW_TARGET_DIR" "javaws.jar"
+publishInternalLib "$JAVAWS_SRC_SRC" "$ITW_TARGET_DIR" "javaws-srcs.jar"
 publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
 publishInternalLib "$MODULARJDK_ARGS_FILE_SRC" "$ETC_TARGET_DIR"

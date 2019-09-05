@@ -72,9 +72,11 @@ else
 fi
 
 if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
-  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar`
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep -v sources | grep -v javadoc`
+  readonly JAVAWS_SRC_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep sources`
 else
-  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar`
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep -v sources | grep -v javadoc`
+  readonly JAVAWS_SRC_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep sources`
 fi
 
 if [ "x$SYSTEM_JARS" == "x" ] ; then
