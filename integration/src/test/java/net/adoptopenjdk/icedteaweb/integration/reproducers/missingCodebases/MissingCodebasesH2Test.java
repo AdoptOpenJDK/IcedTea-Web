@@ -1,9 +1,9 @@
-package net.adoptopenjdk.icedteaweb.integration.reproducers.appletDescMainClassWithClass;
+package net.adoptopenjdk.icedteaweb.integration.reproducers.missingCodebases;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.reproducers.appletDescMainClassWithClass.applications.AppletDescMainClassWithClass;
+import net.adoptopenjdk.icedteaweb.integration.reproducers.missingCodebases.applications.MissingCodebases;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,8 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 
-public class AppletDescMainClassWithClassTest2 implements IntegrationTest {
-    private static final String JAR_NAME = "App-appletDescMainClassWithClass.jar";
+public class MissingCodebasesH2Test implements IntegrationTest {
+    private static final String JAR_NAME = "App-missingCodebases.jar";
 
     @Rule
     public TemporaryItwHome tmpItwHome = new TemporaryItwHome();
@@ -25,9 +25,9 @@ public class AppletDescMainClassWithClassTest2 implements IntegrationTest {
 
 
     @Test(timeout = 100_000)
-    public void appletWithDotClassSuffixedMainClass() throws IOException {
+    public void codebaseEmptyHrefNone() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "AppletDescMainClassWithClass2.jnlp", AppletDescMainClassWithClass.class, JAR_NAME);
+        final String jnlpUrl = setupServer(wireMock, "MissingCodebasesH2.jnlp", MissingCodebases.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -36,7 +36,7 @@ public class AppletDescMainClassWithClassTest2 implements IntegrationTest {
 
         // then
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
-        //assertThat(getCachedFileAsString(tmpItwHome, AppletDescMainClassWithClass.ID), containsString("init AppletDescMainClassWithClass"));
+        //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }
 
 }
