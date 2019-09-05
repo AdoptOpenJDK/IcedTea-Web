@@ -37,10 +37,15 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb;
 
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class ProcessUtils {
 
@@ -68,5 +73,71 @@ public class ProcessUtils {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             }
         }
+    }
+
+    /**
+     * Actively ignore the content of stdout and stderr.
+     * This happens in a separate thread as on windows the process will not terminate if a buffer is full.
+     * Reading in a separate thread ensures that the buffer is constantly drained.
+     *
+     * @param process the process to drain stdout and stderr
+     */
+    public static void ignoreStdOutAndStdErr(final Process process) {
+        ignoreStream(process.getInputStream());
+        ignoreStream(process.getErrorStream());
+    }
+
+    private static void ignoreStream(final InputStream in) {
+        new Thread(() -> {
+            try {
+                final byte[] buffer = new byte[1024];
+                while (in.read(buffer) > 0) {
+                    // do nothing;
+                }
+            } catch (IOException e) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    /**
+     * Reads the content of the stdout into a future string.
+     * This happens in a separate thread as on windows the process will not terminate if the out buffer is full.
+     * Reading in a separate thread ensures that the buffer is constantly drained.
+     * The future will complete when the process has exited.
+     *
+     * @param process the process to read the stdout from
+     * @return a future holding the content of the stdout
+     */
+    public static Future<String> readStdOutAsUtf8(final Process process) {
+        return readStreamAsUtf8(process.getInputStream());
+    }
+
+    /**
+     * Reads the content of the stderr into a future string.
+     * This happens in a separate thread as on windows the process will not terminate if the err buffer is full.
+     * Reading in a separate thread ensures that the buffer is constantly drained.
+     * The future will complete when the process has exited.
+     *
+     * @param process the process to read the stderr from
+     * @return a future holding the content of the stderr
+     */
+    public static Future<String> readStdErrAsUtf8(final Process process) {
+        return readStreamAsUtf8(process.getErrorStream());
+    }
+
+    private static Future<String> readStreamAsUtf8(final InputStream in) {
+        final CompletableFuture<String> result = new CompletableFuture<>();
+        new Thread(() -> {
+            try {
+                final String content = IOUtils.readContentAsUtf8String(in);
+                result.complete(content);
+            } catch (IOException e) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                throw new RuntimeException(e);
+            }
+        }).start();
+        return result;
     }
 }

@@ -72,6 +72,7 @@ public class ItwLauncher {
         final Process p = builder
                 .start();
 
+        ProcessUtils.ignoreStdOutAndStdErr(p);
         ProcessUtils.waitForSafely(p);
 
         return p.exitValue();

@@ -64,6 +64,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.concurrent.Future;
 
 @SuppressWarnings("serial")
 public class JVMPanel extends NamedBorderPanel {
@@ -257,9 +258,11 @@ public class JVMPanel extends NamedBorderPanel {
         Integer r = null;
         try {
             p = sb.start();
+            final Future<String> stdOut = ProcessUtils.readStdOutAsUtf8(p);
+            final Future<String> stdErr = ProcessUtils.readStdErrAsUtf8(p);
             ProcessUtils.waitForSafely(p);
-            processErrorStream = StreamUtils.readStreamAsString(p.getErrorStream());
-            processStdOutStream = StreamUtils.readStreamAsString(p.getInputStream());
+            processErrorStream = stdErr.get();
+            processStdOutStream = stdOut.get();
             r = p.exitValue();
             LOG.debug(processErrorStream);
             LOG.info(processStdOutStream);
