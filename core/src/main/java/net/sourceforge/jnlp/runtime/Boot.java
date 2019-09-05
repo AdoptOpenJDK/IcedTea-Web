@@ -60,6 +60,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.runtime.ForkingStrategy.NEVER;
 
 /**
  * This is the main entry point for the JNLP client. The main method parses the
@@ -203,7 +204,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.setDefaultUpdatePolicy(UpdatePolicy.NEVER);
         }
         if (optionParser.hasOption(CommandLineOptions.NOFORK)) {
-            JNLPRuntime.setForksAllowed(false);
+            JNLPRuntime.setForkingStrategy(NEVER);
         }
         if (optionParser.hasOption(CommandLineOptions.TRUSTALL)) {
             JNLPRuntime.setTrustAll(true);
