@@ -393,7 +393,7 @@ public class Launcher {
                 return null;
             }
 
-            if (JNLPRuntime.getForksAllowed()) {
+            if (JNLPRuntime.getForksAllowed() && file.needsNewVM()) {
                 if (!JNLPRuntime.isHeadless()){
                     SplashScreen sp = SplashScreen.getSplashScreen();
                     if (sp!=null) {
