@@ -183,6 +183,25 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>missingCodebases</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/common/*.class</include>
+                                <include>**/reproducers/missingCodebases/**/*.class</include>
+                            </includes>
+                            <finalName>App</finalName>
+                            <classifier>missingCodebases</classifier>
+                            <outputDirectory>
+                                ${project.build.directory}/test-classes/net/adoptopenjdk/icedteaweb/integration/reproducers/missingCodebases/resources
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
