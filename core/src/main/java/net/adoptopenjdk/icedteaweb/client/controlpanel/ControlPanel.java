@@ -86,7 +86,7 @@ public class ControlPanel extends JFrame {
         this.config = config;
 
         JPanel topPanel = style.createHeader();
-        JPanel mainPanel = createMainSettingsPanel();
+        JPanel mainPanel = createMainSettingsPanel(style);
         JPanel buttonPanel = createButtonPanel();
 
         add(topPanel, BorderLayout.PAGE_START);
@@ -163,12 +163,13 @@ public class ControlPanel extends JFrame {
      * 
      * @return A panel with all the components in place.
      */
-    private JPanel createMainSettingsPanel() {
+    private JPanel createMainSettingsPanel(final ControlPanelStyle style) {
+        Assert.requireNonNull(style, "style");
         final Map<String, ControlPanelProvider> providers = new HashMap<>();
         final ServiceLoader<ControlPanelProvider> serviceLoader = ServiceLoader.load(ControlPanelProvider.class);
         serviceLoader.iterator().forEachRemaining(p -> {
             final String name = p.getName();
-            if (p.isActive()) {
+            if (p.isActive() && style.isPanelActive(p.getName())) {
                 if (providers.containsKey(name)) {
                     throw new IllegalStateException("More than 1 active view provider for control panel with name " + name + " found!");
                 }
