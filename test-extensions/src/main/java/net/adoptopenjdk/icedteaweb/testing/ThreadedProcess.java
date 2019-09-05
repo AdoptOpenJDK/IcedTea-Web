@@ -165,6 +165,7 @@ public class ThreadedProcess extends Thread {
                     });
                     t.start();
                 }
+                ProcessUtils.ignoreStdOutAndStdErr(p);
                 ProcessUtils.waitForSafely(p);
                 exitCode = p.exitValue();
                 Thread.sleep(500); //this is giving to fast done processes's e/o readers time to read all. I would like to know better solution :-/

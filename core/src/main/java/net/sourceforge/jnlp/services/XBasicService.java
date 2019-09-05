@@ -249,6 +249,7 @@ class XBasicService implements BasicService {
             final ProcessBuilder pb = new ProcessBuilder(cmdarray);
             pb.inheritIO();
             final Process p = pb.start();
+            ProcessUtils.ignoreStdOutAndStdErr(p);
             ProcessUtils.waitForSafely(p);
             return (p.exitValue() == 0);
         } catch (Exception e) {
