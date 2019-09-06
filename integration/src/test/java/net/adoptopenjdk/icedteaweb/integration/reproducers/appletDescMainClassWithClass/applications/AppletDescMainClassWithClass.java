@@ -2,8 +2,6 @@ package net.adoptopenjdk.icedteaweb.integration.reproducers.appletDescMainClassW
 
 import java.applet.Applet;
 
-import static net.adoptopenjdk.icedteaweb.integration.common.ManagedApplicationFileWriter.writeFile;
-
 public class AppletDescMainClassWithClass extends Applet {
 
     public static String ID = "AppletDescMainClassWithClass";

@@ -82,23 +82,6 @@ public class ManifestAttributesCheckerTest {
         checker.checkAll();
     }
 
-    @Test
-    public void checkAllCheckAlacTest2() throws LaunchException, IOException, ParseException {
-        // issue 265: if the JNLP tag has no href attribute, then there shouldn't be a warning about multiple remote locations when the JNLP file is loaded from disk
-        ClassLoader cl = ManifestAttributesCheckerTest.class.getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-        URL jnlpURL = cl.getResource("net/sourceforge/jnlp/minimal.jnlp");
-        JNLPFile jnlpFile = new JNLPFile(jnlpURL);
-        URL codebase = new URL("http://foo/");
-        SecurityDesc security = new SecurityDesc(jnlpFile, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
-        JNLPClassLoader.SecurityDelegate securityDelegate = new DummySecurityDelegate();
-        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, jnlpFile, JNLPClassLoader.SigningState.FULL, securityDelegate);
-        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
-        checker.checkAll();
-    }
-
     private static void tryTest(String src, String expected) throws MalformedURLException {
         URL s = new URL(src);
         URL q = ManifestAttributesChecker.stripDocbase(s);

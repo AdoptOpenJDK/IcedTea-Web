@@ -401,7 +401,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
         final String nativeLib = classLoader.findLibrary(nativeLibName);
 
-        assertNoFileLeak(() -> assertNotNull(nativeLib));
+        assertNotNull(nativeLib);
     }
 
     @Test

@@ -860,7 +860,7 @@ public class JNLPFile {
             specVersion = parser.getSpecVersion();
             fileVersion = parser.getFileVersion();
             codeBase = parser.getCodeBase();
-            sourceLocation = parser.getFileLocation();
+            sourceLocation = parser.getFileLocation() != null ? parser.getFileLocation() : location;
             infos = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);

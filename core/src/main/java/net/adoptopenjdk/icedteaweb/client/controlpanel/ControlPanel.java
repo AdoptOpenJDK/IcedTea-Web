@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel.JvmValidationResult;
@@ -30,14 +31,11 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.ImageResources;
 
 import javax.naming.ConfigurationException;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,8 +47,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -60,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This is the control panel for Java. It provides a GUI for modifying the
@@ -83,14 +77,15 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    private ControlPanel(DeploymentConfiguration config) {
+    private ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
         super();
-        setTitle(Translator.R("CPHead"));
-        setIconImages(ImageResources.INSTANCE.getApplicationImages());
+        Assert.requireNonNull(style, "style");
+        setTitle(style.getDialogTitle());
+        setIconImages(style.getDialogIcons());
 
         this.config = config;
 
-        JPanel topPanel = createTopPanel();
+        JPanel topPanel = style.createHeader();
         JPanel mainPanel = createMainSettingsPanel();
         JPanel buttonPanel = createButtonPanel();
 
@@ -101,34 +96,7 @@ public class ControlPanel extends JFrame {
         pack();
     }
 
-    private JPanel createTopPanel() {
-        Font currentFont;
-        JLabel about = new JLabel(R("CPMainDescriptionShort"));
-        currentFont = about.getFont();
-        about.setFont(currentFont.deriveFont(currentFont.getSize2D() + 2));
-        currentFont = about.getFont();
-        about.setFont(currentFont.deriveFont(Font.BOLD));
 
-        JLabel description = new JLabel(R("CPMainDescriptionLong"));
-        description.setBorder(new EmptyBorder(2, 0, 2, 0));
-
-        JPanel descriptionPanel = new JPanel(new GridLayout(0, 1));
-        descriptionPanel.setBackground(UIManager.getColor("TextPane.background"));
-        descriptionPanel.add(about);
-        descriptionPanel.add(description);
-
-        JLabel image = new JLabel();
-        image.setIcon(new ImageIcon(ImageResources.INSTANCE.getApplicationImages().get(0)));
-
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(UIManager.getColor("TextPane.background"));
-        topPanel.add(descriptionPanel, BorderLayout.LINE_START);
-        topPanel.add(image, BorderLayout.LINE_END);
-        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        return topPanel;
-    }
-    
     private int validateJdk() {
         String s = ControlPanel.this.config.getProperty(ConfigurationConstants.KEY_JRE_DIR);
         JvmValidationResult validationResult = JVMPanel.validateJvm(s);
@@ -281,7 +249,7 @@ public class ControlPanel extends JFrame {
         }
 
         SwingUtils.invokeLater(() -> {
-            final ControlPanel editor = new ControlPanel(config);
+            final ControlPanel editor = new ControlPanel(config, new DefaultControlPanelStyle());
             editor.setVisible(true);
         });
     }

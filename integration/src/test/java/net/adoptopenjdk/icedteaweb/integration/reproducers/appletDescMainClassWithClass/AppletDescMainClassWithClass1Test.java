@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 
-public class AppletDescMainClassWithClassTest1 implements IntegrationTest {
+public class AppletDescMainClassWithClass1Test implements IntegrationTest {
     private static final String JAR_NAME = "App-appletDescMainClassWithClass.jar";
 
     @Rule

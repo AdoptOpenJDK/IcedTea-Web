@@ -295,10 +295,11 @@ public class JNLPFileTest extends NoStdOutErrTest{
         if (cl == null) {
             cl = ClassLoader.getSystemClassLoader();
         }
-        URL jnlpURL = cl.getResource("net/sourceforge/jnlp/minimal.jnlp");
+        String jnlpResourceName = "net/sourceforge/jnlp/minimal.jnlp";
+        URL jnlpURL = cl.getResource(jnlpResourceName);
         JNLPFile jnlpFile = new JNLPFile(jnlpURL);
-        // no href in JNLP tag: sourceLocation is null
-        Assert.assertNull(jnlpFile.getSourceLocation());
+        Assert.assertNotNull(jnlpFile.getSourceLocation());
+        Assert.assertTrue(jnlpFile.getSourceLocation().getFile().endsWith(jnlpResourceName));
     }
     @Test
     public void testGetSourceLocation2() throws IOException, ParseException {
