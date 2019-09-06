@@ -17,6 +17,7 @@ package net.sourceforge.jnlp.util;
 
 import mslinks.ShellLink;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.LazyLoaded;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -45,11 +46,11 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private final static Logger LOG = LoggerFactory.getLogger(WindowsDesktopEntry.class);
 
     private final JNLPFile file;
-    private final String iconLocation;
+    private final LazyLoaded<String> iconLocation;
 
     public WindowsDesktopEntry(JNLPFile file) {
         this.file = file;
-        this.iconLocation = new XDesktopEntry(file).cacheAndGetIconLocation();
+        this.iconLocation = new LazyLoaded<>(() -> new XDesktopEntry(file).cacheAndGetIconLocation());
     }
 
     @Override
@@ -69,8 +70,8 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     @Override
     public void createShortcutOnWindowsDesktop() throws IOException {
         ShellLink sl = ShellLink.createLink(getJavaWsBin()).setCMDArgs(quoted(file.getSourceLocation()));
-        if (iconLocation != null) {
-            sl.setIconLocation(iconLocation);
+        if (iconLocation.get() != null) {
+            sl.setIconLocation(iconLocation.get());
         }
         final String path = getDesktopLnkPath();
         sl.saveTo(path);
@@ -118,9 +119,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         final ShellLink sl = ShellLink.createLink(JavaWsBin).setCMDArgs(quoted(file.getSourceLocation()));
         // setup uninstall shortcut
         final ShellLink ul = ShellLink.createLink(JavaWsBin).setCMDArgs("-Xclearcache " + quoted(file.getFileLocation()));
-        if (iconLocation != null) {
-            sl.setIconLocation(iconLocation);
-            ul.setIconLocation(iconLocation);
+        if (iconLocation.get() != null) {
+            sl.setIconLocation(iconLocation.get());
+            ul.setIconLocation(iconLocation.get());
         }
         final String link = FileUtils.sanitizeFileName(file.getInformation().getTitle() + ".lnk", '-');
         sl.saveTo(path + "/" + link);
@@ -160,10 +161,6 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
             }
         }
-    }
-
-    private String getFavIcon() {
-        return XDesktopEntry.getFavIcon(file);
     }
 
     @Override
