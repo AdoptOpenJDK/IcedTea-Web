@@ -515,15 +515,6 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         return this.iconLocation;
     }
-    
-    static String getFavIcon(JNLPFile file) {
-        URL u = getFavIconUrl(file);
-        if (u == null){
-            return null;
-        } else {
-            return u.toString();
-        }
-    }
     static List<String> possibleFavIconLocations(String path) {
         while (path.endsWith("/") || path.endsWith("\\")) {
             path = path.substring(0, path.length() - 1);
