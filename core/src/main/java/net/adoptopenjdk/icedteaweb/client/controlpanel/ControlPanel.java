@@ -26,6 +26,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.ControlPa
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -77,7 +78,7 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    public ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
+    private ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
         super();
         Assert.requireNonNull(style, "style");
         setTitle(style.getDialogTitle());
@@ -97,7 +98,7 @@ public class ControlPanel extends JFrame {
         setPreferredSize(new Dimension(920, 520));
 
         pack();
-        SwingUtils.centerOnPrimaryScreen(this);
+        ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 
 

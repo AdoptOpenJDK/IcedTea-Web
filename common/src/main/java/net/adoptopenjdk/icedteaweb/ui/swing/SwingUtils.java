@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.ui.swing;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -46,7 +45,6 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 
@@ -69,9 +67,7 @@ public final class SwingUtils {
     // internals:
     private static boolean DO_SETUP = true;
 
-    /**
-     * main thread group (initialized at startup)
-     */
+    /** main thread group (initialized at startup) */
     private static final ThreadGroup MAIN_GROUP = Thread.currentThread().getThreadGroup();
 
     /* shared Window owner */
@@ -190,16 +186,5 @@ public final class SwingUtils {
             });
         }
         return window;
-    }
-
-    /**
-     * Centers the window on the primary screen
-     * @param window the window
-     */
-    public static void centerOnPrimaryScreen(final Window window) {
-        Assert.requireNonNull(window, "window");
-        final int x = (Toolkit.getDefaultToolkit().getScreenSize().width)/2 - window.getWidth()/2;
-        final int y = (Toolkit.getDefaultToolkit().getScreenSize().height)/2 - window.getHeight()/2;
-        window.setLocation(x, y);
     }
 }
