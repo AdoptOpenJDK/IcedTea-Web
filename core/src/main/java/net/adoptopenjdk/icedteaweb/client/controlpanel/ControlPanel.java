@@ -26,6 +26,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.ControlPa
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -93,7 +94,11 @@ public class ControlPanel extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(640, 480));
+        setPreferredSize(new Dimension(920, 520));
+
         pack();
+        ScreenFinder.centerWindowsToCurrentScreen(this);
     }
 
 
