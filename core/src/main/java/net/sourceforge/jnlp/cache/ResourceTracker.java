@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
@@ -500,7 +501,7 @@ public class ResourceTracker {
         CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
     }
 
-    static Resource selectByFilter(Collection<Resource> source, Filter<Resource> filter) {
+    static Resource selectByFilter(Collection<Resource> source, Predicate<Resource> filter) {
         Resource result = null;
 
         for (Resource resource : source) {
@@ -531,7 +532,7 @@ public class ResourceTracker {
      * </p>
      */
     static Resource selectByStatus(Collection<Resource> source, final Collection<Resource.Status> included, final Collection<Resource.Status> excluded) {
-        return selectByFilter(source, new Filter<Resource>() {
+        return selectByFilter(source, new Predicate<Resource>() {
             @Override
             public boolean test(Resource t) {
                 boolean hasIncluded = false;
@@ -615,9 +616,5 @@ public class ResourceTracker {
                 lock.wait(waitTime);
             }
         }
-    }
-
-    interface Filter<T> {
-        public boolean test(T t);
     }
 }
