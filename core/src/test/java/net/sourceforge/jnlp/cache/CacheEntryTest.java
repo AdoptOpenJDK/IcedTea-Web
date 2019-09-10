@@ -158,7 +158,6 @@ public class CacheEntryTest {
         File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
-        entry.setRemoteContentLength(contents.length());
         entry.setLastModified(lastModified);
 
         assertTrue(entry.isCurrent(lastModified));
@@ -172,7 +171,6 @@ public class CacheEntryTest {
         File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
-        entry.setRemoteContentLength(contents.length());
         entry.setLastModified(oldTimeStamp);
 
         assertFalse(entry.isCurrent(newTimeStamp));

@@ -35,7 +35,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class CacheEntry {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
 
     private static final String KEY_CONTENT_LENGTH = "content-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
@@ -58,12 +58,12 @@ public class CacheEntry {
      * @param location the remote resource location
      * @param version the version of the resource
      */
-    public CacheEntry(final URL location, final VersionString version) {
+    CacheEntry(final URL location, final VersionString version) {
         this.location = location;
         this.version = version;
         
-        File infoFile = CacheUtil.getCacheFile(location, version);
-        infoFile = new File(infoFile.getPath() + CacheDirectory.INFO_SUFFIX); // replace with something that can't be clobbered
+        final File cacheFile = CacheUtil.getCacheFile(location, version);
+        final File infoFile = new File(cacheFile.getPath() + CacheDirectory.INFO_SUFFIX);
 
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
@@ -81,7 +81,7 @@ public class CacheEntry {
      * most recently checked for an update.
      * @return when the item was updated (in ms)
      */
-    public long getLastUpdated() {
+    long getLastUpdated() {
         return getLongKey(KEY_LAST_UPDATED);
     }
 
@@ -90,27 +90,27 @@ public class CacheEntry {
      * most recently checked for an update.
      * @param updatedTime the time (in ms) to be set as last updated time
      */
-    public void setLastUpdated(long updatedTime) {
+    void setLastUpdated(long updatedTime) {
         setLongKey(KEY_LAST_UPDATED, updatedTime);
     }
 
-    public long getRemoteContentLength() {
+    long getRemoteContentLength() {
         return getLongKey(KEY_CONTENT_LENGTH);
     }
 
-    public void setRemoteContentLength(long length) {
+    void setRemoteContentLength(long length) {
         setLongKey(KEY_CONTENT_LENGTH, length);
     }
 
-    public void setJnlpPath(String jnlpPath) {
-    	properties.setProperty(KEY_JNLP_PATH, jnlpPath);
+    void setJnlpPath(String jnlpPath) {
+        properties.setProperty(KEY_JNLP_PATH, jnlpPath);
     }
 
-    public long getLastModified() {
+    long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
     }
 
-    public void setLastModified(long modifyTime) {
+    void setLastModified(long modifyTime) {
         setLongKey(KEY_LAST_MODIFIED, modifyTime);
     }
 
@@ -133,16 +133,16 @@ public class CacheEntry {
      * @param lastModified - current time as get from server (in ms). Mostly value of "Last-Modified" http header'? 
      * @return whether the cache contains the version
      */
-    public boolean isCurrent(long lastModified) {
+    boolean isCurrent(long lastModified) {
         boolean cached = isCached();
-        LOG.info("isCurrent:isCached {}", cached);
+        LOG.info("{} - version {}: isCached {}", location, version, cached);
 
         if (!cached) {
             return false;
         }
         try {
             long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
-            LOG.info("isCurrent:lastModified cache:{} actual:{}", cachedModified, lastModified);
+            LOG.info("{} - version {}: lastModified cache:{} actual:{}", location, version, cachedModified, lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -158,8 +158,9 @@ public class CacheEntry {
      */
     public boolean isCached() {
         File localFile = getCacheFile();
-        if (!localFile.exists())
+        if (!localFile.exists()) {
             return false;
+        }
 
         try {
             long cachedLength = localFile.length();
@@ -167,10 +168,7 @@ public class CacheEntry {
 
             LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
 
-            if (remoteLength >= 0 && cachedLength != remoteLength)
-                return false;
-            else
-                return true;
+            return remoteLength < 0 || cachedLength == remoteLength;
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 
@@ -202,7 +200,7 @@ public class CacheEntry {
     /**
      * Mark this entry for deletion at shutdown.
      */
-    public void markForDelete() { // once marked it should not be unmarked.
+    void markForDelete() { // once marked it should not be unmarked.
         properties.setProperty("delete", Boolean.toString(true));
     }
 
@@ -220,11 +218,11 @@ public class CacheEntry {
         properties.unlock();
     }
 
-    protected boolean tryLock() {
+    boolean tryLock() {
         return properties.tryLock();
     }
 
-    protected boolean isHeldByCurrentThread() {
+    boolean isHeldByCurrentThread() {
         return properties.isHeldByCurrentThread();
     }
 
