@@ -62,6 +62,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
@@ -132,7 +133,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         Resource resource = createResource("filterUninitialized");
         Assert.assertNotNull(resource);
         List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByFilter(resources, new ResourceTracker.Filter<Resource>() {
+        Resource result = ResourceTracker.selectByFilter(resources, new Predicate<Resource>() {
             @Override
             public boolean test(Resource t) {
                 return !t.isInitialized();
