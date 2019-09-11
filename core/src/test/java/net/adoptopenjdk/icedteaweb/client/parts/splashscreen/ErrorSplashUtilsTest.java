@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorSplashScreen2012;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,6 +45,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.APPLET;
 import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.JAVAWS;
+import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -84,8 +86,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen2() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT.value());
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
@@ -98,8 +100,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen3() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
-        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.DEFAULT);
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, NONE.value());
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT.value());
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
@@ -111,8 +113,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen4() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, NONE.value());
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
         assertThat(sa, is(nullValue()));
@@ -124,8 +126,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen5() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.NONE);
-        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, SplashUtils.NONE);
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, NONE.value());
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, NONE.value());
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
         assertThat(sa, is(nullValue()));
@@ -136,8 +138,8 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen6() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, SplashUtils.DEFAULT);
-        envVars.set(SplashUtils.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
@@ -150,7 +152,7 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void testGetErrorSplashScreen7() {
-        envVars.set(SplashUtils.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
+        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
 
         SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));

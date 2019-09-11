@@ -46,14 +46,28 @@ import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-public class SplashUtils {
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
+import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashType.NONE;
 
+public class SplashUtils {
     private final static Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
-    static final String ICEDTEA_WEB_PLUGIN_SPLASH = "ICEDTEA_WEB_PLUGIN_SPLASH";
-    static final String ICEDTEA_WEB_SPLASH = "ICEDTEA_WEB_SPLASH";
-    static final String NONE = "none";
-    static final String DEFAULT = "default";
+    public enum SplashType {
+        NONE("none"),
+        DEFAULT("default"),
+        ;
+
+        private String value;
+
+        SplashType(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return value;
+        }
+    }
 
     /**
      * Indicator whether to show icedtea-web plugin or just icedtea-web
@@ -169,52 +183,42 @@ public class SplashUtils {
     }
 
     /**
+     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants.ICEDTEA_WEB_SPLASH} environment variable
+     *
      * @param width
      * @param height
      * @param splashReason
      * @param loadingException
      * @param isError
      */
-    public static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable loadingException, boolean isError) {
-        String splashEnvironmentVar = null;
-        String pluginSplashEnvironmentVar = null;
-        try {
-            pluginSplashEnvironmentVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
-            splashEnvironmentVar = System.getenv(ICEDTEA_WEB_SPLASH);
-        } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+    public static SplashPanel getSplashScreen(final int width, final int height, final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
+        SplashPanel splashPanel;
+
+        if (NONE.value().equals(getSplashEnvironmentVariable(splashReason))) {
+            return null;
         }
-        SplashPanel sp = null;
-        if (SplashReason.JAVAWS.equals(splashReason)) {
-            if (NONE.equals(splashEnvironmentVar)) {
-                return null;
-            }
-            if (DEFAULT.equals(splashEnvironmentVar)) {
-                if (isError) {
-                    sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
-                } else {
-                    sp = new DefaultSplashScreen2012(width, height, splashReason);
-                }
-            }
-        }
-        if (SplashReason.APPLET.equals(splashReason)) {
-            if (NONE.equals(pluginSplashEnvironmentVar)) {
-                return null;
-            }
-            if (DEFAULT.equals(pluginSplashEnvironmentVar)) {
-                if (isError) {
-                    sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
-                } else {
-                    sp = new DefaultSplashScreen2012(width, height, splashReason);
-                }
-            }
-        }
+
         if (isError) {
-            sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
+            splashPanel = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
         } else {
-            sp = new DefaultSplashScreen2012(width, height, splashReason);
+            splashPanel = new DefaultSplashScreen2012(width, height, splashReason);
         }
-        sp.setVersion(Boot.version);
-        return sp;
+
+        splashPanel.setVersion(Boot.version);
+        return splashPanel;
+    }
+
+    private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
+        try {
+            if (SplashReason.JAVAWS.equals(splashReason)) {
+                return System.getenv(ICEDTEA_WEB_SPLASH);
+            }
+            else if (SplashReason.APPLET.equals(splashReason)) {
+                return System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
+            }
+        } catch (Exception ex) {
+            LOG.error("Problem reading environment variable for splash screen.", ex);
+        }
+        return null;
     }
 }
