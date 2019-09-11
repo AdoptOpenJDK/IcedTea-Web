@@ -193,24 +193,10 @@ public class SplashUtils {
      */
     public static SplashPanel getSplashScreen(final int width, final int height, final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
         SplashPanel splashPanel;
-        String splashEnvironmentVar = null;
 
-        try {
-            if (SplashReason.JAVAWS.equals(splashReason)) {
-                splashEnvironmentVar = System.getenv(ICEDTEA_WEB_SPLASH);
-            }
-            else if (SplashReason.APPLET.equals(splashReason)) {
-                splashEnvironmentVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
-            }
-        } catch (Exception ex) {
-            LOG.error("Problem reading environment variable for splash screen.", ex);
-        }
-
-        if (NONE.value().equals(splashEnvironmentVar)) {
+        if (NONE.value().equals(getSplashEnvironmentVariable(splashReason))) {
             return null;
         }
-
-        // else DEFAULT or empty
 
         if (isError) {
             splashPanel = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
@@ -220,5 +206,19 @@ public class SplashUtils {
 
         splashPanel.setVersion(Boot.version);
         return splashPanel;
+    }
+
+    private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
+        try {
+            if (SplashReason.JAVAWS.equals(splashReason)) {
+                return System.getenv(ICEDTEA_WEB_SPLASH);
+            }
+            else if (SplashReason.APPLET.equals(splashReason)) {
+                return System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
+            }
+        } catch (Exception ex) {
+            LOG.error("Problem reading environment variable for splash screen.", ex);
+        }
+        return null;
     }
 }
