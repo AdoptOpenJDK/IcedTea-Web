@@ -48,33 +48,17 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashType.NONE;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
 
 public class SplashUtils {
-    private final static Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
-
-    public enum SplashType {
-        NONE("none"),
-        DEFAULT("default"),
-        ;
-
-        private String value;
-
-        SplashType(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return value;
-        }
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
     /**
      * Indicator whether to show icedtea-web plugin or just icedtea-web
      * For "just icedtea-web" will be done an attempt to show content of
      * information element 
      */
-    public static enum SplashReason {
+    public enum SplashReason {
 
         APPLET, JAVAWS;
 
@@ -183,7 +167,7 @@ public class SplashUtils {
     }
 
     /**
-     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants.ICEDTEA_WEB_SPLASH} environment variable
+     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable
      *
      * @param width
      * @param height
@@ -194,7 +178,7 @@ public class SplashUtils {
     public static SplashPanel getSplashScreen(final int width, final int height, final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
         SplashPanel splashPanel;
 
-        if (NONE.value().equals(getSplashEnvironmentVariable(splashReason))) {
+        if (NO_SPLASH.equalsIgnoreCase(getSplashEnvironmentVariable(splashReason))) {
             return null;
         }
 
@@ -210,10 +194,10 @@ public class SplashUtils {
 
     private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
         try {
-            if (SplashReason.JAVAWS.equals(splashReason)) {
+            if (SplashReason.JAVAWS == splashReason) {
                 return System.getenv(ICEDTEA_WEB_SPLASH);
             }
-            else if (SplashReason.APPLET.equals(splashReason)) {
+            else if (SplashReason.APPLET == splashReason) {
                 return System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
             }
         } catch (Exception ex) {
