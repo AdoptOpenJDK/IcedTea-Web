@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.sourceforge.jnlp.runtime.AppletEnvironment;
 import net.sourceforge.jnlp.runtime.AppletInstance;
@@ -48,16 +47,19 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import java.lang.reflect.Field;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
 import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.APPLET;
 import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashType.DEFAULT;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashType.NONE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 public class SplashUtilsTest {
+    
+    private static final String DEFAULT = "";
 
     @Rule
     public EnvironmentVariables envVars = new EnvironmentVariables();
@@ -92,8 +94,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen2() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT.value());
+        envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
@@ -106,8 +108,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen3() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, NONE.value());
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT.value());
+        envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
@@ -119,8 +121,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen4() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, NONE.value());
+        envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(nullValue()));
@@ -132,8 +134,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen5() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, NONE.value());
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, NONE.value());
+        envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(nullValue()));
@@ -144,8 +146,8 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen6() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, DEFAULT.value());
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
+        envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
@@ -158,7 +160,7 @@ public class SplashUtilsTest {
 
     @Test
     public void testGetSplashScreen7() {
-        envVars.set(IcedTeaWebConstants.ICEDTEA_WEB_SPLASH, "egtrutkyukl");
+        envVars.set(ICEDTEA_WEB_SPLASH, "egtrutkyukl");
 
         SplashPanel sa = SplashUtils.getSplashScreen(100, 100, APPLET);
         assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
