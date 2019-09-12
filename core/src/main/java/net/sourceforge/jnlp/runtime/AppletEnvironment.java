@@ -17,7 +17,6 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -158,18 +157,6 @@ public class AppletEnvironment implements AppletContext, AppletStub {
     public Container getAppletFrame() {
         // TODO: rename this method to getAppletContainer ?
         return cont;
-    }
-
-     /**
-     * container must be SplashController.
-     * @return container
-     */
-    public SplashController getSplashController() {
-        if (cont instanceof SplashController) {
-            return (SplashController) cont;
-        } else {
-            return null;
-        }
     }
 
     /**

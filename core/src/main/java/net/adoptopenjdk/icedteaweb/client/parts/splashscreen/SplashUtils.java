@@ -41,8 +41,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorS
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -74,41 +72,6 @@ public class SplashUtils {
         }
     }
 
-    public static void showErrorCaught(Throwable ex, AppletInstance appletInstance) {
-        try {
-            showError(ex, appletInstance);
-        } catch (Throwable t) {
-                // printing this exception is discutable. I have let it in for case that
-                //some retyping will fail
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
-        }
-    }
-
-    public static void showError(Throwable ex, AppletInstance appletInstance) {
-        if (appletInstance == null) {
-            return;
-        }
-        AppletEnvironment ae = appletInstance.getAppletEnvironment();
-        showError(ex, ae);
-    }
-
-    public static void showError(Throwable ex, AppletEnvironment ae) {
-        if (ae == null) {
-            return;
-        }
-        SplashController p = ae.getSplashController();
-        showError(ex, p);
-    }
-
-    public static void showError(Throwable ex, SplashController f) {
-        if (f == null) {
-            return;
-        }
-
-        f.replaceSplash(getErrorSplashScreen(f.getSplashWidth(), f.getSplashHeight(), ex));
-    }
-
-    
     private static SplashReason getReason() {
         if (JNLPRuntime.isWebstartApplication()) {
             return SplashReason.JAVAWS;

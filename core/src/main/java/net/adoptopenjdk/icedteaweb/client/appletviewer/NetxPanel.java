@@ -23,8 +23,6 @@
 package net.adoptopenjdk.icedteaweb.client.appletviewer;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashController;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -49,14 +47,13 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Francis Kung &lt;fkung@redhat.com&gt;
  */
-public class NetxPanel extends AppletViewerPanelAccess implements SplashController {
+public class NetxPanel extends AppletViewerPanelAccess {
 
     private final static Logger LOG = LoggerFactory.getLogger(NetxPanel.class);
 
     private final PluginParameters parameters;
     private PluginBridge bridge = null;
     private AppletInstance appInst = null;
-    private SplashController splashController;
     private volatile boolean initialized;
 
     // We use this so that we can create exactly one thread group
@@ -124,7 +121,6 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
         } catch (Exception e) {
             status = APPLET_ERROR;
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            replaceSplash(SplashUtils.getErrorSplashScreen(getWidth(), getHeight(), e));
         } finally {
             // PR1157: This needs to occur even in the case of an exception
             // so that the applet's event listeners are signaled.
@@ -185,30 +181,6 @@ public class NetxPanel extends AppletViewerPanelAccess implements SplashControll
         if (null == appContextCreated.putIfAbsent(parameters.getUniqueKey(getCodeBase()), Boolean.TRUE)) {
             SunToolkit.createNewAppContext();
         }
-    }
-
-    public void setAppletViewerFrame(SplashController framePanel) {
-        splashController=framePanel;
-    }
-
-    @Override
-    public void removeSplash() {
-        splashController.removeSplash();
-    }
-
-    @Override
-    public void replaceSplash(SplashPanel r) {
-        splashController.replaceSplash(r);
-    }
-
-    @Override
-    public int getSplashWidth() {
-        return splashController.getSplashWidth();
-    }
-
-    @Override
-    public int getSplashHeight() {
-        return splashController.getSplashHeight();
     }
 
     public void init(PluginBridge bridge) throws LaunchException {
