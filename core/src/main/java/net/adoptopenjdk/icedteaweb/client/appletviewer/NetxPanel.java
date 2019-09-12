@@ -121,7 +121,6 @@ public class NetxPanel extends AppletViewerPanelAccess {
         } catch (Exception e) {
             status = APPLET_ERROR;
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            SplashUtils.showErrorCaught(e, this.appInst);
         } finally {
             // PR1157: This needs to occur even in the case of an exception
             // so that the applet's event listeners are signaled.

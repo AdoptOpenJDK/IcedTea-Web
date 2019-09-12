@@ -18,7 +18,6 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -535,11 +534,11 @@ public class Launcher {
             return applet;
         } catch (InstanceExistsException ieex) {
             LOG.error("Single instance applet is already running.", ieex);
-            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."), applet);
+            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."));
         } catch (LaunchException lex) {
-            throw launchError(lex, applet);
+            throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."), applet);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }finally{
             if (handler != null) {
                 handler.launchStarting(applet);
@@ -568,11 +567,11 @@ public class Launcher {
 
         } catch (InstanceExistsException ieex) {
             LOG.info("Single instance applet is already running.");
-            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."), applet);
+            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."));
         } catch (LaunchException lex) {
-            throw launchError(lex, applet);
+            throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."), applet);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -647,7 +646,7 @@ public class Launcher {
 
             return appletInstance;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."), appletInstance);
+            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."));
         }
     }
 
@@ -696,13 +695,6 @@ public class Launcher {
      * caller.
      */
     private LaunchException launchError(LaunchException ex) {
-        return launchError(ex, null);
-    }
-
-    private LaunchException launchError(LaunchException ex, AppletInstance applet) {
-        if (applet != null) {
-            SplashUtils.showErrorCaught(ex, applet);
-        }
         if (handler != null) {
             handler.launchError(ex);
         }

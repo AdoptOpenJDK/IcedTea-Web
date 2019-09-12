@@ -37,8 +37,6 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -169,13 +167,6 @@ public class SplashUtilsTest {
         SplashPanel sw = SplashUtils.getSplashScreen(100, 100, JAVAWS);
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
-    }
-
-    @Test
-    public void assertNullsAreOkInShow() {
-        SplashUtils.showError(null, (AppletEnvironment) null);
-        SplashUtils.showError(null, (AppletInstance) null);
-        SplashUtils.showError(null, (SplashController) null);
     }
 
     static void modifyIsWebstartApplicationRuntime(boolean isWebstartApplication) {
