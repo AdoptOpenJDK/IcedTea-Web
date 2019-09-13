@@ -24,7 +24,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.cache.CacheLRUWrapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +36,7 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
+import static net.sourceforge.jnlp.util.WindowsShortcutManager.getWindowsShortcutsFile;
 
 /**
  * Based on https://github.com/DmitriiShamrikov/mslinks
@@ -132,12 +132,12 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     }
 
     private void manageShortcutList(ManageMode mode, String path) throws IOException {
-        if (!CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
-            CacheLRUWrapper.getInstance().getWindowsShortcutList().createNewFile();
+        if (!getWindowsShortcutsFile().exists()) {
+            getWindowsShortcutsFile().createNewFile();
         }
 
         if (ManageMode.A == mode) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), UTF_8);
+            List<String> lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
             Iterator it = lines.iterator();
             String sItem = "";
             String sPath;
@@ -158,10 +158,11 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 LOG.debug("Adding sCut to list = ", sItem);
                 String scInfo = file.getFileLocation().toString() + ",";
                 scInfo += path + "\r\n";
-                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
+                Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
             }
         }
     }
+
 
     @Override
     public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {

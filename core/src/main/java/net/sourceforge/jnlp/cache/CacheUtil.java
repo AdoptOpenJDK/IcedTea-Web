@@ -34,6 +34,7 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.BufferedInputStream;
@@ -57,7 +58,6 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -171,7 +171,7 @@ public class CacheUtil {
                 cacheDir = cacheDir.getCanonicalFile();
                 // remove windows shortcuts before cache dir is gone
                 if (OsUtil.isWindows()) {
-                    removeWindowsShortcuts("ALL");
+                    WindowsShortcutManager.removeWindowsShortcuts("ALL");
                 }
                 FileUtils.recursiveDelete(cacheDir, cacheDir);
                 cacheDir.mkdir();
@@ -234,7 +234,7 @@ public class CacheUtil {
                     }
                 });
                 if (OsUtil.isWindows()) {
-                    removeWindowsShortcuts(application.toLowerCase());
+                    WindowsShortcutManager.removeWindowsShortcuts(application.toLowerCase());
                 }
                 // clean the cache of entries now marked for deletion
                 cleanCache();
@@ -254,49 +254,6 @@ public class CacheUtil {
             return false;
         }
         return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
-    }
-
-    public static void removeWindowsShortcuts(String jnlpApp)
-            throws IOException {
-        LOG.debug("Clearing Windows shortcuts");
-        if (CacheLRUWrapper.getInstance().getWindowsShortcutList().exists()) {
-            List<String> lines = Files.readAllLines(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), UTF_8);
-            Iterator it = lines.iterator();
-            Boolean fDelete;
-            while (it.hasNext()) {
-                String sItem = it.next().toString();
-                String[] sArray = sItem.split(",");
-                String application = sArray[0];
-                String sPath = sArray[1];
-                // if application is codebase then delete files
-                if (application.equalsIgnoreCase(jnlpApp)) {
-                    fDelete = true;
-                    it.remove();
-                } else {
-                    fDelete = false;
-                }
-                if (jnlpApp.equals("ALL")) {
-                    fDelete = true;
-                }
-                if (fDelete) {
-                    LOG.info("Deleting item = {}", sPath);
-                    File scList = new File(sPath);
-                    try {
-                        FileUtils.recursiveDelete(scList, scList);
-                    } catch (Exception e) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                    }
-                }
-            }
-            if (jnlpApp.equals("ALL")) {
-                //delete shortcut list file
-                Files.deleteIfExists(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath());
-            } else {
-                //write file after application shortcuts have been removed
-                Files.write(CacheLRUWrapper.getInstance().getWindowsShortcutList().toPath(), lines, UTF_8);
-            }
-        }
-
     }
 
     public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
