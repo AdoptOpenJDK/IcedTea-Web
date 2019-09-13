@@ -36,29 +36,27 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * This class helps maintain the ordering of most recently use items across
- * multiple jvm instances.
- *
+ * This class helps maintain the ordering of most recently use cache items across
+ * multiple jvm instances. The LRU information is stored as a properties file in the
+ * root of the file cache directory. The property key is a combination of a timestamp
+ * and the cache folder id. The property value is the path to the cached item.
  */
 public class CacheLRUWrapper {
 
@@ -74,7 +72,7 @@ public class CacheLRUWrapper {
     private final InfrastructureFileDescriptor cacheDir;
     private final File windowsShortcutList;
 
-    public CacheLRUWrapper() {
+    private CacheLRUWrapper() {
         this(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
 
@@ -93,7 +91,7 @@ public class CacheLRUWrapper {
                 FileUtils.createParentDir(recentlyUsed.getFile());
                 FileUtils.createRestrictedFile(recentlyUsed.getFile(), true);
             } catch (IOException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Error in creating recently used cache items file.", e);
             }
         }
     }
@@ -109,6 +107,15 @@ public class CacheLRUWrapper {
 
 
     private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
+
+    private static int compare(Entry<String, String> e1, Entry<String, String> e2) {
+        Long t1 = Long.parseLong(e1.getKey().split(",")[0]);
+        Long t2 = Long.parseLong(e2.getKey().split(",")[0]);
+
+        int c = t1.compareTo(t2);
+        return Integer.compare(0, c);
+    }
+
     /**
      * @return the recentlyUsedPropertiesFile
      */
@@ -136,7 +143,7 @@ public class CacheLRUWrapper {
     /**
      * @return the cacheDir
      */
-    public InfrastructureFileDescriptor getCacheDir() {
+    InfrastructureFileDescriptor getCacheDir() {
         return cacheDir;
     }
 
@@ -147,7 +154,7 @@ public class CacheLRUWrapper {
     /**
      * @return the recentlyUsedFile
      */
-    public InfrastructureFileDescriptor getRecentlyUsedFile() {
+    InfrastructureFileDescriptor getRecentlyUsedFile() {
         return recentlyUsedPropertiesFile;
     }
 
@@ -164,10 +171,9 @@ public class CacheLRUWrapper {
          * clean up possibly corrupted entries
          */
         if (loaded && checkData()) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new LruCacheException());
-            LOG.info("Cache is corrupt. Fixing.");
+            LOG.warn("Cache is corrupt. Fixing...");
             store();
-            LOG.info("Cache was corrupt and has been fixed. It is strongly recommended that you run ''javaws -Xclearcache'' and rerun your application as soon as possible. You can also use via itw-settings Cache -> View files -> Purge");
+            LOG.warn("Cache was corrupt and has been fixed. It is strongly recommended that you run ''javaws -Xclearcache'' and rerun your application as soon as possible. You can also use via itw-settings Cache -> View files -> Purge");
         }
     }
 
@@ -187,9 +193,9 @@ public class CacheLRUWrapper {
 
             // 1. check key format: "milliseconds,number"
             try {
-                String sa[] = key.split(",");
-                Long l1 = Long.parseLong(sa[0]);
-                Long l2 = Long.parseLong(sa[1]);
+                String[] sa = key.split(",");
+                Long.parseLong(sa[0]);
+                Long.parseLong(sa[1]);
             } catch (Exception ex) {
                 it.remove();
                 modified = true;
@@ -230,7 +236,7 @@ public class CacheLRUWrapper {
      * @param path path to cache item.
      * @return true if we successfully added to map, false otherwise.
      */
-    public synchronized boolean addEntry(String key, String path) {
+    synchronized boolean addEntry(String key, String path) {
         PropertiesFile props = getRecentlyUsedPropertiesFile();
         if (props.containsKey(key)) {
             return false;
@@ -245,7 +251,7 @@ public class CacheLRUWrapper {
      * @param key key we want to remove.
      * @return true if we successfully removed key from map, false otherwise.
      */
-    public synchronized boolean removeEntry(String key) {
+    synchronized boolean removeEntry(String key) {
         PropertiesFile props = getRecentlyUsedPropertiesFile();
         if (!props.containsKey(key)) {
             return false;
@@ -266,7 +272,7 @@ public class CacheLRUWrapper {
      * @param oldKey Key we wish to update.
      * @return true if we successfully updated value, false otherwise.
      */
-    public synchronized boolean updateEntry(String oldKey) {
+    synchronized boolean updateEntry(String oldKey) {
         PropertiesFile props = getRecentlyUsedPropertiesFile();
         if (!props.containsKey(oldKey)) {
             return false;
@@ -275,7 +281,7 @@ public class CacheLRUWrapper {
         String folder = getIdForCacheFolder(value);
 
         props.remove(oldKey);
-        props.setProperty(Long.toString(System.currentTimeMillis()) + "," + folder, value);
+        props.setProperty(System.currentTimeMillis() + "," + folder, value);
         return true;
     }
 
@@ -287,7 +293,7 @@ public class CacheLRUWrapper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     //although Properties are pretending to be <object,Object> they are always <String,String>
     //bug in jdk?
-    public synchronized List<Entry<String, String>> getLRUSortedEntries() {
+    synchronized List<Entry<String, String>> getLRUSortedEntries() {
         List<Entry<String, String>> entries = new ArrayList<>();
 
         for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
@@ -295,16 +301,7 @@ public class CacheLRUWrapper {
         }
 
         // sort by keys in descending order.
-        Collections.sort(entries, new Comparator<Entry<String, String>>() {
-            @Override
-            public int compare(Entry<String, String> e1, Entry<String, String> e2) {
-                Long t1 = Long.parseLong(e1.getKey().split(",")[0]);
-                Long t2 = Long.parseLong(e2.getKey().split(",")[0]);
-
-                int c = t1.compareTo(t2);
-                return c < 0 ? 1 : (c > 0 ? -1 : 0);
-            }
-        });
+        entries.sort(CacheLRUWrapper::compare);
         return entries;
     }
 
@@ -322,21 +319,11 @@ public class CacheLRUWrapper {
         getRecentlyUsedPropertiesFile().unlock();
     }
 
-    /**
-     * Return the value of given key.
-     *
-     * @param key key of property
-     * @return value of given key, null otherwise.
-     */
-    public synchronized String getValue(String key) {
-        return getRecentlyUsedPropertiesFile().getProperty(key);
-    }
-
     public synchronized boolean containsKey(String key) {
         return getRecentlyUsedPropertiesFile().containsKey(key);
     }
 
-    public synchronized boolean containsValue(String value) {
+    synchronized boolean containsValue(String value) {
         return getRecentlyUsedPropertiesFile().containsValue(value);
     }
 
@@ -347,7 +334,7 @@ public class CacheLRUWrapper {
      * @param path Path to generate a key with.
      * @return String representing the a key.
      */
-    public String generateKey(String path) {
+    String generateKey(String path) {
         return System.currentTimeMillis() + "," + getIdForCacheFolder(path);
     }
 

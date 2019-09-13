@@ -62,7 +62,6 @@ public class CacheReproducerTest {
     private static final List<String> trustedVerboses = Arrays.asList(new String[]{"-Xtrustall", ServerAccess.HEADLES_OPTION,"-verbose"});
     private static final List<String> verbosed = Arrays.asList(new String[]{"-verbose", ServerAccess.HEADLES_OPTION});
 
-    private static final String lre = "LruCacheException";
     private static final String ioobe = "IndexOutOfBoundsException";
     private static final String corruptRegex = "\\d{13}";
     private static final Pattern corruptPatern = Pattern.compile(corruptRegex);
@@ -208,14 +207,6 @@ public class CacheReproducerTest {
 
      private void assertAoobNOTappeared(ProcessResult pr2) {
         Assert.assertFalse("serr should NOT contain " + ioobe, pr2.stderr.contains(ioobe));
-    }
-
-    private void assertLruExceptionNOTappeared(ProcessResult pr2) {
-        Assert.assertFalse("serr should NOT contain " + lre, pr2.stderr.contains(lre));
-    }
-
-    private void assertLruExceptionAppeared(ProcessResult pr) {
-        Assert.assertTrue("serr should contain " + lre, pr.stderr.contains(lre));
     }
 
     @Test
