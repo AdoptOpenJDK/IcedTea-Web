@@ -20,11 +20,12 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
@@ -32,18 +33,15 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import javax.jnlp.DownloadServiceListener;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -596,37 +594,6 @@ public class CacheUtil {
         final OutputStream out = new FileOutputStream(localFile);
 
         return new BufferedOutputStream(out);
-    }
-
-    /**
-     * Copies from an input stream to an output stream.  On
-     * completion, both streams will be closed.  Streams are
-     * buffered automatically.
-     *
-     * @param is stream to read from
-     * @param os stream to write to
-     * @throws IOException if copy fails
-     */
-    public static void streamCopy(InputStream is, OutputStream os) throws IOException {
-        if (!(is instanceof BufferedInputStream))
-            is = new BufferedInputStream(is);
-
-        if (!(os instanceof BufferedOutputStream))
-            os = new BufferedOutputStream(os);
-
-        try {
-            byte b[] = new byte[4096];
-            while (true) {
-                int c = is.read(b, 0, b.length);
-                if (c == -1)
-                    break;
-
-                os.write(b, 0, c);
-            }
-        } finally {
-            is.close();
-            os.close();
-        }
     }
 
     /**

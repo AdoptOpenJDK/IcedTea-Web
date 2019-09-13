@@ -1,6 +1,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -127,8 +128,9 @@ public class NativeLibraryStorage {
                     if (!outFile.isFile()) {
                         FileUtils.createRestrictedFile(outFile, true);
                     }
-                    CacheUtil.streamCopy(jarFile.getInputStream(e),
-                            new FileOutputStream(outFile));
+                    try(FileOutputStream out = new FileOutputStream(outFile)) {
+                        IOUtils.copy(jarFile.getInputStream(e), out, 4096);
+                    }
                 }
             }
         } catch (IOException ex) {
