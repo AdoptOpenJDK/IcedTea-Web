@@ -34,6 +34,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
 
+import static net.sourceforge.jnlp.cache.CacheEntry.markForDelete;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -387,7 +388,7 @@ public class ResourceDownloader implements Runnable {
         extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        markForDelete(downloadFrom, resource.getDownloadVersion());
     }
 
     private void downloadGZipFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
@@ -396,7 +397,7 @@ public class ResourceDownloader implements Runnable {
         extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        markForDelete(downloadFrom, resource.getDownloadVersion());
     }
 
     private void downloadFile(CloseableConnection connection, URL downloadLocation) throws IOException {
@@ -425,17 +426,6 @@ public class ResourceDownloader implements Runnable {
         }
 
         downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
-    }
-
-    private void markForDelete(URL location) {
-        CacheEntry entry = new CacheEntry(location, resource.getDownloadVersion());
-        entry.lock();
-        try {
-            entry.markForDelete();
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
     }
 
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
