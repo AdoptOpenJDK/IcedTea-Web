@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -105,14 +106,6 @@ public class CacheLRUWrapper {
 
 
     private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
-
-    private static int compare(Entry<String, String> e1, Entry<String, String> e2) {
-        Long t1 = Long.parseLong(e1.getKey().split(",")[0]);
-        Long t2 = Long.parseLong(e2.getKey().split(",")[0]);
-
-        int c = t1.compareTo(t2);
-        return Integer.compare(0, c);
-    }
 
     /**
      * @return the recentlyUsedPropertiesFile
@@ -295,7 +288,7 @@ public class CacheLRUWrapper {
         }
 
         // sort by keys in descending order.
-        entries.sort(CacheLRUWrapper::compare);
+        entries.sort(Comparator.comparingLong(e -> Long.parseLong(e.getKey().split(",")[0])));
         return entries;
     }
 
