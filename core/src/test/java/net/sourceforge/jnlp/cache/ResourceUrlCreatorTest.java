@@ -25,8 +25,7 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
 
     private URL getResultUrl(final String url, final VersionString version, final DownloadOptions downloadOptions) throws MalformedURLException {
         Resource resource = Resource.createResource(new URL(url), version, null);
-        ResourceUrlCreator ruc = new ResourceUrlCreator(resource, downloadOptions);
-        return ruc.getVersionedUrl();
+        return ResourceUrlCreator.getVersionedUrl(resource);
     }
 
     @Test

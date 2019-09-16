@@ -272,7 +272,7 @@ public class ResourceDownloader implements Runnable {
             options = new DownloadOptions(false, false);
         }
 
-        List<URL> urls = new ResourceUrlCreator(resource, options).getUrls();
+        List<URL> urls = ResourceUrlCreator.getUrls(resource, options);
         LOG.debug("Finding best URL for: {} : {}", resource.getLocation(), options.toString());
         LOG.debug("All possible urls for {} : {}", resource.toString(), urls);
         for (final HttpMethod requestMethod : validRequestMethods) {

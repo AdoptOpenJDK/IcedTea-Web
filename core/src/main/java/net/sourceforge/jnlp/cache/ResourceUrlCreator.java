@@ -54,16 +54,7 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
 public class ResourceUrlCreator {
-
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
-
-    private final Resource resource;
-    private final DownloadOptions downloadOptions;
-
-    ResourceUrlCreator(final Resource resource, final DownloadOptions downloadOptions) {
-        this.resource = resource;
-        this.downloadOptions = downloadOptions;
-    }
 
     /**
      * Returns a list of URLs that the resources might be downloadable from. The
@@ -72,7 +63,7 @@ public class ResourceUrlCreator {
      *
      * @return a list of URLs that the resources might be downloadable from
      */
-    public List<URL> getUrls() {
+    static List<URL> getUrls(final Resource resource, final DownloadOptions downloadOptions) {
         final List<URL> urls = new LinkedList<>();
 
         if (downloadOptions.useExplicitPack() && downloadOptions.useExplicitVersion()) {
@@ -94,7 +85,7 @@ public class ResourceUrlCreator {
             }
         }
 
-        urls.add(getVersionedUrl());
+        urls.add(getVersionedUrl(resource));
         urls.add(resource.getLocation());
 
         final List<URL> result = new ArrayList<>();
@@ -169,8 +160,7 @@ public class ResourceUrlCreator {
 
         final String urlLocation = location.substring(0, lastSlash + 1) + filenameWithVersionAndEnding;
         try {
-            final URL newUrl = new URL(urlLocation);
-            return newUrl;
+            return new URL(urlLocation);
         } catch (MalformedURLException e) {
             return null;
         }
@@ -182,7 +172,7 @@ public class ResourceUrlCreator {
      *
      * @return url with version cared about
      */
-    URL getVersionedUrl() {
+    static URL getVersionedUrl(final Resource resource) {
         final URL resourceUrl = resource.getLocation();
         final String protocol = uriPartToString(resourceUrl.getProtocol()) + "://";
         final String userInfoPart = uriPartToString(resourceUrl.getUserInfo());
@@ -197,26 +187,16 @@ public class ResourceUrlCreator {
         if (resource.getRequestVersion() != null && resource.getRequestVersion().containsSingleVersionId()) {
             queryParts.add("version-id=" + resource.getRequestVersion());
         }
-        final String query;
-        if (queryParts.isEmpty()) {
-            query = "";
-        } else {
-            query = "?" + String.join("&", queryParts);
-        }
+        final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 
         try {
-            final URL url = new URL(protocol + userInfo + host + port + path + query);
-            return url;
+            return new URL(protocol + userInfo + host + port + path + query);
         } catch (MalformedURLException e) {
             return resourceUrl;
         }
     }
 
     private static String uriPartToString(final String part) {
-        if (part == null) {
-            return "";
-        }
-        return part;
+        return part == null ? "" : part;
     }
-
 }
