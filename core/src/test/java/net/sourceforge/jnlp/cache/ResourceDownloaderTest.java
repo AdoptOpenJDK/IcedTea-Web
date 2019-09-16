@@ -12,7 +12,6 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +33,6 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Ignore
 public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     public static ServerLauncher testServer;
