@@ -10,7 +10,6 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,9 +40,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
-
-    private static final String nameStub1 = "itw-server";
-    private static final String nameStub2 = "test-file";
 
     private static String cacheDir;
 
@@ -120,45 +116,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     @AfterClass
     public static void stopServer2() {
         testServerWithBrokenHead.stop();
-    }
-
-    private void assertOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-        assertVersion(u);
-    }
-
-    private void assertOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-        assertVersion(u);
-    }
-
-    private void assertCommonComponentsOfUrl(URL u) {
-        Assert.assertTrue(u.getProtocol().equals("http"));
-        Assert.assertTrue(u.getHost().equals("localhost"));
-        Assert.assertTrue(u.getPath().contains(nameStub1));
-        Assert.assertTrue(u.getPath().contains(nameStub2));
-        ServerAccess.logOutputReprint(u.toExternalForm());
-    }
-
-    private void assertPort(URL u, int port) {
-        Assert.assertTrue(u.getPort() == port);
-    }
-
-    private void assertVersion(URL u) {
-        Assert.assertTrue(u.getPath().contains("-2.0"));
-        Assert.assertTrue(u.getQuery().contains("version-id=1.0"));
     }
 
     @BeforeClass
