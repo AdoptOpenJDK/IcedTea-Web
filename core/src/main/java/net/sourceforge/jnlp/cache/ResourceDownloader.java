@@ -9,6 +9,7 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.cache.ResourceUrlCreator.UrlRequestResult;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -74,7 +75,7 @@ class ResourceDownloader implements Runnable {
 
     private void initializeOnlineResource() {
         try {
-            final ResourceUrlCreator.UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
+            final UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
             if (finalLocation != null) {
                 initializeFromURL(finalLocation);
             } else {
@@ -90,7 +91,7 @@ class ResourceDownloader implements Runnable {
         }
     }
 
-    private void initializeFromURL(final ResourceUrlCreator.UrlRequestResult location) throws IOException {
+    private void initializeFromURL(final UrlRequestResult location) throws IOException {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
         try (final CloseableConnection connection = getDownloadConnection(location.getRedirectURL())) {// this won't change so should be okay not-synchronized
