@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -21,11 +20,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -125,117 +122,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     @AfterClass
     public static void stopServer2() {
         testServerWithBrokenHead.stop();
-    }
-
-    @Test
-    public void getUrlResponseCodeTestWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequestOnNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void findBestUrltest() throws Exception {
-        redirectErr();
-        try {
-            File fileForServerWithHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithHeader = new File(fileForServerWithHeader.getParentFile(), fileForServerWithHeader.getName() + "-2.0");
-            versionedFileForServerWithHeader.createNewFile();
-
-            File fileForServerWithoutHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithoutHeader = new File(fileForServerWithoutHeader.getParentFile(), fileForServerWithoutHeader.getName() + "-2.0");
-            versionedFileForServerWithoutHeader.createNewFile();
-
-            ResourceDownloader resourceDownloader = new ResourceDownloader(null, null);
-            Resource r1 = Resource.createResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getRedirectURL());
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            fileForServerWithHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            versionedFileForServerWithHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            versionedFileForServerWithoutHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            Assert.assertNull(resourceDownloader.findBestUrl(r4));
-
-            fileForServerWithoutHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            Assert.assertNull(resourceDownloader.findBestUrl(r2));
-            Assert.assertNull(resourceDownloader.findBestUrl(r4));
-        } finally {
-            redirectErrBack();
-        }
-
     }
 
     private void assertOnServerWithoutHeader(URL u) {
