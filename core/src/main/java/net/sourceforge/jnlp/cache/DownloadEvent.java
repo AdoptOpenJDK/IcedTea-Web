@@ -26,7 +26,7 @@ import java.util.EventObject;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.3 $
  */
-public class DownloadEvent extends EventObject {
+class DownloadEvent extends EventObject {
 
     /** the tracker */
     final transient private ResourceTracker tracker;
@@ -41,7 +41,7 @@ public class DownloadEvent extends EventObject {
      * @param source the resource tracker
      * @param resource the resource
      */
-    public DownloadEvent(final ResourceTracker source, final Resource resource) {
+    DownloadEvent(final ResourceTracker source, final Resource resource) {
         super(source);
 
         this.tracker = source;

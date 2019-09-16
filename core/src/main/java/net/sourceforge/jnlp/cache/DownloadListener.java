@@ -28,7 +28,7 @@ import java.util.EventListener;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.3 $
  */
-public interface DownloadListener extends EventListener {
+interface DownloadListener extends EventListener {
     /**
      * Called when a resource is checked for being up-to-date.
      * @param downloadEvent information about started update

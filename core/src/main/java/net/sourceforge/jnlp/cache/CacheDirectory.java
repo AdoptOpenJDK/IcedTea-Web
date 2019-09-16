@@ -58,7 +58,7 @@ public final class CacheDirectory {
      * 
      * @param root Location of cache directory.
      */
-    public static void getDirStructure(DirectoryNode root) {
+    static void getDirStructure(DirectoryNode root) {
         for (File f : root.getFile().listFiles()) {
             DirectoryNode node = new DirectoryNode(f.getName(), f, root);
             if (f.isDirectory() || (!f.isDirectory() && !f.getName().endsWith(INFO_SUFFIX)))
@@ -74,7 +74,7 @@ public final class CacheDirectory {
      * @param root The point where we want to start getting the leafs.
      * @return An ArrayList of DirectoryNode.
      */
-    public static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
+    static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
         ArrayList<DirectoryNode> temp = new ArrayList<>();
         for (DirectoryNode f : root.getChildren()) {
             if (f.isDir())

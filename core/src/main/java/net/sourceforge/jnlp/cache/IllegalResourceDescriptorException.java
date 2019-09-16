@@ -44,7 +44,7 @@ public class IllegalResourceDescriptorException extends IllegalArgumentException
      * specified detail message.
      * @param msg the detail message.
      */
-    public IllegalResourceDescriptorException(String msg) {
+    IllegalResourceDescriptorException(String msg) {
         super(msg);
     }
 }

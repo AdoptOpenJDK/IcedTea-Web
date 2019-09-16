@@ -84,7 +84,7 @@ public class NativeLibraryStorage {
         return null;
     }
 
-    public static final String[] NATIVE_LIBRARY_EXTENSIONS = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
+    static final String[] NATIVE_LIBRARY_EXTENSIONS = { ".so", ".dylib", ".jnilib", ".framework", ".dll" };
 
     /**
      * Search for and enable any native code contained in a JAR by copying the
