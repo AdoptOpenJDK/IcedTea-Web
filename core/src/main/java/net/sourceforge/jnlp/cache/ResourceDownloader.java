@@ -34,6 +34,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
 
+import static net.sourceforge.jnlp.cache.CacheEntry.markForDelete;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -150,14 +151,8 @@ public class ResourceDownloader implements Runnable {
             resource.setDownloadLocation(location.redirectUrl);
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            Long size = location.length;
-            if (size == null) {
-                size = connection.getContentLength();
-            }
-            Long lm = location.lastModified;
-            if (lm == null) {
-                lm = connection.getLastModified();
-            }
+            long size = location.length;
+            long lm = location.lastModified;
             boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
@@ -386,8 +381,8 @@ public class ResourceDownloader implements Runnable {
 
         extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
+        markForDelete(downloadFrom, resource.getDownloadVersion());
     }
 
     private void downloadGZipFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
@@ -395,8 +390,8 @@ public class ResourceDownloader implements Runnable {
 
         extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom);
+        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
+        markForDelete(downloadFrom, resource.getDownloadVersion());
     }
 
     private void downloadFile(CloseableConnection connection, URL downloadLocation) throws IOException {
@@ -424,29 +419,7 @@ public class ResourceDownloader implements Runnable {
             resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
         }
 
-        storeEntryFields(downloadEntry, connection.getContentLength(), connection.getLastModified());
-    }
-
-    private void storeEntryFields(CacheEntry entry, long contentLength, long lastModified) {
-        entry.lock();
-        try {
-            entry.setRemoteContentLength(contentLength);
-            entry.setLastModified(lastModified);
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
-    }
-
-    private void markForDelete(URL location) {
-        CacheEntry entry = new CacheEntry(location, resource.getDownloadVersion());
-        entry.lock();
-        try {
-            entry.markForDelete();
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
+        downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
     }
 
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
@@ -548,7 +521,7 @@ public class ResourceDownloader implements Runnable {
         /**
          * @return whether the return code is not a OK one - anything except <200 or >=300
          */
-        public boolean isInvalid() {
+        boolean isInvalid() {
             return (responseCode < 200 || responseCode >= 300);
         }
 
