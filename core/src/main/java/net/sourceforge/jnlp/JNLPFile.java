@@ -46,6 +46,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import net.sourceforge.jnlp.util.LocaleUtils.Match;
 import net.sourceforge.jnlp.util.UrlUtils;
+import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +64,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
@@ -285,6 +287,14 @@ public class JNLPFile {
         this.parserSettings = settings;
         try (InputStream input = openURL(location, version, policy)) {
             parse(input, location, forceCodebase);
+        }
+
+        final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
+        if (! StringUtils.isBlank(httpAgent)) {
+            System.setProperty(HTTP_AGENT, httpAgent);
+            if (!HttpURLConnection.userAgent.contains(httpAgent)) {
+                LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
+            }
         }
 
         //Downloads the original jnlp file into the cache if possible
