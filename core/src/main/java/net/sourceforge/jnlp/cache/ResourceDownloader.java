@@ -151,14 +151,8 @@ public class ResourceDownloader implements Runnable {
             resource.setDownloadLocation(location.redirectUrl);
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            Long size = location.length;
-            if (size == null) {
-                size = connection.getContentLength();
-            }
-            Long lm = location.lastModified;
-            if (lm == null) {
-                lm = connection.getLastModified();
-            }
+            long size = location.length;
+            long lm = location.lastModified;
             boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
@@ -527,7 +521,7 @@ public class ResourceDownloader implements Runnable {
         /**
          * @return whether the return code is not a OK one - anything except <200 or >=300
          */
-        public boolean isInvalid() {
+        boolean isInvalid() {
             return (responseCode < 200 || responseCode >= 300);
         }
 
