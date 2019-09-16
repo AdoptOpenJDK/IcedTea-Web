@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
-public class ResourceUrlCreator {
+class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
     static final String ACCEPT_ENCODING = "Accept-Encoding";
@@ -122,7 +122,7 @@ public class ResourceUrlCreator {
      * @param resource the resource
      * @return the best URL, or null if all failed to resolve
      */
-    protected static  UrlRequestResult findBestUrl(final Resource resource) {
+    static UrlRequestResult findBestUrl(final Resource resource) {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {
             options = new DownloadOptions(false, false);
@@ -185,13 +185,12 @@ public class ResourceUrlCreator {
     /**
      * Complex wrapper around url request Contains return code (default is
      * HTTP_OK), length and last modified
-     *
+     * <p>
      * The storing of redirect target is quite obvious The storing length and
      * last modified may be not, but apparently
      * (http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2591) the url
      * connection is not always cached as expected, and so another request may
      * be sent when length and lastmodified are checked
-     *
      */
     static class UrlRequestResult {
 
@@ -224,7 +223,7 @@ public class ResourceUrlCreator {
             return length;
         }
 
-        public long getLastModified() {
+        long getLastModified() {
             return lastModified;
         }
 

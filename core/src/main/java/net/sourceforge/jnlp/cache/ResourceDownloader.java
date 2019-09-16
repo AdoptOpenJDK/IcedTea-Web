@@ -38,14 +38,14 @@ import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 
-public class ResourceDownloader implements Runnable {
+class ResourceDownloader implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
     private final Resource resource;
     private final Object lock;
 
-    public ResourceDownloader(Resource resource, Object lock) {
+    ResourceDownloader(Resource resource, Object lock) {
         this.resource = resource;
         this.lock = lock;
     }
