@@ -41,26 +41,22 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorS
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.AppletEnvironment;
-import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
+
 public class SplashUtils {
-
-    private final static Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
-
-    static final String ICEDTEA_WEB_PLUGIN_SPLASH = "ICEDTEA_WEB_PLUGIN_SPLASH";
-    static final String ICEDTEA_WEB_SPLASH = "ICEDTEA_WEB_SPLASH";
-    static final String NONE = "none";
-    static final String DEFAULT = "default";
+    private static final Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
     /**
      * Indicator whether to show icedtea-web plugin or just icedtea-web
      * For "just icedtea-web" will be done an attempt to show content of
      * information element 
      */
-    public static enum SplashReason {
+    public enum SplashReason {
 
         APPLET, JAVAWS;
 
@@ -76,41 +72,6 @@ public class SplashUtils {
         }
     }
 
-    public static void showErrorCaught(Throwable ex, AppletInstance appletInstance) {
-        try {
-            showError(ex, appletInstance);
-        } catch (Throwable t) {
-                // printing this exception is discutable. I have let it in for case that
-                //some retyping will fail
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
-        }
-    }
-
-    public static void showError(Throwable ex, AppletInstance appletInstance) {
-        if (appletInstance == null) {
-            return;
-        }
-        AppletEnvironment ae = appletInstance.getAppletEnvironment();
-        showError(ex, ae);
-    }
-
-    public static void showError(Throwable ex, AppletEnvironment ae) {
-        if (ae == null) {
-            return;
-        }
-        SplashController p = ae.getSplashController();
-        showError(ex, p);
-    }
-
-    public static void showError(Throwable ex, SplashController f) {
-        if (f == null) {
-            return;
-        }
-
-        f.replaceSplash(getErrorSplashScreen(f.getSplashWidth(), f.getSplashHeight(), ex));
-    }
-
-    
     private static SplashReason getReason() {
         if (JNLPRuntime.isWebstartApplication()) {
             return SplashReason.JAVAWS;
@@ -169,52 +130,42 @@ public class SplashUtils {
     }
 
     /**
+     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable
+     *
      * @param width
      * @param height
      * @param splashReason
      * @param loadingException
      * @param isError
      */
-    public static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable loadingException, boolean isError) {
-        String splashEnvironmentVar = null;
-        String pluginSplashEnvironmentVar = null;
-        try {
-            pluginSplashEnvironmentVar = System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
-            splashEnvironmentVar = System.getenv(ICEDTEA_WEB_SPLASH);
-        } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+    public static SplashPanel getSplashScreen(final int width, final int height, final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
+        SplashPanel splashPanel;
+
+        if (NO_SPLASH.equalsIgnoreCase(getSplashEnvironmentVariable(splashReason))) {
+            return null;
         }
-        SplashPanel sp = null;
-        if (SplashReason.JAVAWS.equals(splashReason)) {
-            if (NONE.equals(splashEnvironmentVar)) {
-                return null;
-            }
-            if (DEFAULT.equals(splashEnvironmentVar)) {
-                if (isError) {
-                    sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
-                } else {
-                    sp = new DefaultSplashScreen2012(width, height, splashReason);
-                }
-            }
-        }
-        if (SplashReason.APPLET.equals(splashReason)) {
-            if (NONE.equals(pluginSplashEnvironmentVar)) {
-                return null;
-            }
-            if (DEFAULT.equals(pluginSplashEnvironmentVar)) {
-                if (isError) {
-                    sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
-                } else {
-                    sp = new DefaultSplashScreen2012(width, height, splashReason);
-                }
-            }
-        }
+
         if (isError) {
-            sp = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
+            splashPanel = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
         } else {
-            sp = new DefaultSplashScreen2012(width, height, splashReason);
+            splashPanel = new DefaultSplashScreen2012(width, height, splashReason);
         }
-        sp.setVersion(Boot.version);
-        return sp;
+
+        splashPanel.setVersion(Boot.version);
+        return splashPanel;
+    }
+
+    private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
+        try {
+            if (SplashReason.JAVAWS == splashReason) {
+                return System.getenv(ICEDTEA_WEB_SPLASH);
+            }
+            else if (SplashReason.APPLET == splashReason) {
+                return System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
+            }
+        } catch (Exception ex) {
+            LOG.error("Problem reading environment variable for splash screen.", ex);
+        }
+        return null;
     }
 }

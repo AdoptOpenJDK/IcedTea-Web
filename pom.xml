@@ -29,7 +29,18 @@
         <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+
+        <skip.javadoc>true</skip.javadoc>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>javaDoc</id>
+            <properties>
+                <skip.javadoc>false</skip.javadoc>
+            </properties>
+        </profile>
+    </profiles>
 
     <modules>
         <module>jnlp-api</module>
@@ -148,6 +159,7 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
+                                <skip>${skip.javadoc}</skip>
                                 <doclint>none</doclint>
                             </configuration>
                         </execution>

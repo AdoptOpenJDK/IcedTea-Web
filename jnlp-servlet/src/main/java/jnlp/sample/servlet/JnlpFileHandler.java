@@ -70,8 +70,6 @@ public class JnlpFileHandler
 {
     private static final String JNLP_MIME_TYPE = "application/x-java-jnlp-file";
 
-    private static final String HEADER_LASTMOD = "Last-Modified";
-
     private ServletContext _servletContext;
 
     private JnlpFileHandlerHook _hook;

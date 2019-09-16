@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-/*
+/**
  * Process & thread locked access to a file. Creates file if it does not already exist.
  */
 public class LockableFile {
