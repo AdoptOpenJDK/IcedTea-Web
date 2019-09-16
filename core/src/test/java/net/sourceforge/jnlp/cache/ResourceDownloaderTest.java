@@ -288,7 +288,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(new File(System.getProperty(JAVA_IO_TMPDIR), "tempcache").getCanonicalPath());
     }
 
     @AfterClass
