@@ -85,60 +85,50 @@ public class SplashUtils {
      * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must 
      * be calculated prior calling this method
-     * @param width
-     * @param height
      */
-    public static SplashPanel getSplashScreen(int width, int height) {
-        return getSplashScreen(width, height, getReason());
+    public static SplashPanel getSplashScreen() {
+        return getSplashScreen(getReason());
     }
 
     /**
      * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
      * be calculated prior calling this method
-     * @param width
-     * @param height
      * @param ex exception to be shown if any
      */
-    public static SplashErrorPanel getErrorSplashScreen(int width, int height, Throwable ex) {
-        return getErrorSplashScreen(width, height, getReason(), ex);
+    public static SplashErrorPanel getErrorSplashScreen(Throwable ex) {
+        return getErrorSplashScreen(getReason(), ex);
     }
 
     /**
      * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
      * be calculated prior calling this method
-     * @param width
-     * @param height
      * @param splashReason
      */
-    static SplashPanel getSplashScreen(int width, int height, SplashUtils.SplashReason splashReason) {
-        return getSplashScreen(width, height, splashReason, null, false);
+    static SplashPanel getSplashScreen(SplashUtils.SplashReason splashReason) {
+        return getSplashScreen(splashReason, null, false);
     }
 
     /**
      * Warning - splash should have receive width and height without borders.
      * plugin's window have NO border, but javaws window HAVE border. This must
      * be calculated prior calling this method
-     * @param width
-     * @param height
      * @param splashReason
      * @param ex exception to be shown if any
      */
-    static SplashErrorPanel getErrorSplashScreen(int width, int height, SplashUtils.SplashReason splashReason, Throwable ex) {
-        return (SplashErrorPanel) getSplashScreen(width, height, splashReason, ex, true);
+    static SplashErrorPanel getErrorSplashScreen(SplashUtils.SplashReason splashReason, Throwable ex) {
+        return (SplashErrorPanel) getSplashScreen(splashReason, ex, true);
     }
 
     /**
      * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable
      *
-     * @param width
-     * @param height
      * @param splashReason
      * @param loadingException
      * @param isError
      */
-    public static SplashPanel getSplashScreen(final int width, final int height, final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
+    public static SplashPanel getSplashScreen(final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
         SplashPanel splashPanel;
 
         if (NO_SPLASH.equalsIgnoreCase(getSplashEnvironmentVariable(splashReason))) {
@@ -146,9 +136,9 @@ public class SplashUtils {
         }
 
         if (isError) {
-            splashPanel = new DefaultErrorSplashScreen2012(width, height, splashReason, loadingException);
+            splashPanel = new DefaultErrorSplashScreen2012(splashReason, loadingException);
         } else {
-            splashPanel = new DefaultSplashScreen2012(width, height, splashReason);
+            splashPanel = new DefaultSplashScreen2012(splashReason);
         }
 
         splashPanel.setVersion(Boot.version);

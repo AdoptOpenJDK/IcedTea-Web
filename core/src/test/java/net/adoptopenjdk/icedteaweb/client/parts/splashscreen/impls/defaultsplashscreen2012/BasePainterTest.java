@@ -59,7 +59,7 @@ public class BasePainterTest {
 
     @Test
     public void incLevel2Test() {
-        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(100, 100, SplashUtils.SplashReason.APPLET));
+        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET));
         int l1 = bp.getWaterLevel();
         int l2 = bp.getAnimationsPosition();
         bp.increaseAnimationPosition();
@@ -69,7 +69,7 @@ public class BasePainterTest {
 
     @Test
     public void adjustForSizeTest() {
-        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(100, 100, SplashUtils.SplashReason.APPLET));
+        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET));
         bp.adjustForSize(100, 100);
         Assert.assertNotNull(bp.prerenderedStuff);
         BufferedImage i1 = bp.prerenderStill();
@@ -87,7 +87,7 @@ public class BasePainterTest {
 
     @Test
     public void adjustForSizeTest2() {
-        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(0, 0, SplashUtils.SplashReason.APPLET), false);
+        BasePainter bp = new BasePainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET), false);
         Assert.assertNull(bp.prerenderedStuff);
         bp.master.setSplashHeight(10);
         bp.master.setSplashWidth(10);
