@@ -174,14 +174,14 @@ public class ResourceUrlCreator {
      */
     static URL getVersionedUrl(final Resource resource) {
         final URL resourceUrl = resource.getLocation();
-        final String protocol = uriPartToString(resourceUrl.getProtocol()) + "://";
-        final String userInfoPart = uriPartToString(resourceUrl.getUserInfo());
+        final String protocol = emptyIfNull(resourceUrl.getProtocol()) + "://";
+        final String userInfoPart = emptyIfNull(resourceUrl.getUserInfo());
         final String userInfo = !userInfoPart.isEmpty() ? userInfoPart + "@" : userInfoPart;
-        final String host = uriPartToString(resourceUrl.getHost());
+        final String host = emptyIfNull(resourceUrl.getHost());
         final String port = resourceUrl.getPort() < 0 ? "" : ":" + resourceUrl.getPort();
-        final String path = uriPartToString(resourceUrl.getPath());
+        final String path = emptyIfNull(resourceUrl.getPath());
 
-        final List<String> queryParts = Arrays.stream(uriPartToString(resourceUrl.getQuery()).split("&"))
+        final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
                 .filter(s -> !StringUtils.isBlank(s))
                 .collect(Collectors.toList());
         if (resource.getRequestVersion() != null && resource.getRequestVersion().containsSingleVersionId()) {
@@ -196,7 +196,7 @@ public class ResourceUrlCreator {
         }
     }
 
-    private static String uriPartToString(final String part) {
+    private static String emptyIfNull(final String part) {
         return part == null ? "" : part;
     }
 }
