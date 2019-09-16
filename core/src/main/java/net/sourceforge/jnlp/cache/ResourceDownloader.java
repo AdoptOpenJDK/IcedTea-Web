@@ -386,7 +386,7 @@ public class ResourceDownloader implements Runnable {
 
         extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
+        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
     }
 
@@ -395,7 +395,7 @@ public class ResourceDownloader implements Runnable {
 
         extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        storeEntryFields(entry, entry.getCacheFile().length(), connection.getLastModified());
+        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom);
     }
 
@@ -424,18 +424,7 @@ public class ResourceDownloader implements Runnable {
             resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
         }
 
-        storeEntryFields(downloadEntry, connection.getContentLength(), connection.getLastModified());
-    }
-
-    private void storeEntryFields(CacheEntry entry, long contentLength, long lastModified) {
-        entry.lock();
-        try {
-            entry.setRemoteContentLength(contentLength);
-            entry.setLastModified(lastModified);
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
+        downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
     }
 
     private void markForDelete(URL location) {

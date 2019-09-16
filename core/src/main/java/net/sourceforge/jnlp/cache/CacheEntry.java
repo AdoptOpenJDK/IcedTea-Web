@@ -197,6 +197,17 @@ public class CacheEntry {
         }
     }
 
+    void storeEntryFields(long contentLength, long lastModified) {
+        lock();
+        try {
+            setRemoteContentLength(contentLength);
+            setLastModified(lastModified);
+            store();
+        } finally {
+            unlock();
+        }
+    }
+
     /**
      * Mark this entry for deletion at shutdown.
      */
