@@ -301,15 +301,8 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
-        byte[] buf = new byte[1024];
-        int rlen;
         try (final OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
-            while (-1 != (rlen = in.read(buf))) {
-                resource.incrementTransferred(rlen);
-                out.write(buf, 0, rlen);
-            }
-
-            in.close();
+            IOUtils.copy(in, out);
         }
     }
 
