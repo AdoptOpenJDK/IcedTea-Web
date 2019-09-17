@@ -150,12 +150,10 @@ public class ResourceTracker {
         // should really be synchronized on resources, but the worst
         // case should be that the resource will be updated once even
         // if unnecessary.
-        boolean downloaded = checkCache(resource, updatePolicy);
+        initResourceFromCache(resource, updatePolicy);
 
-        if (!downloaded) {
-            if (prefetch) {
-                startDownload(resource);
-            }
+        if (prefetch && resource.isSet(DOWNLOADED)) {
+            startDownload(resource);
         }
     }
 
@@ -181,17 +179,14 @@ public class ResourceTracker {
      * as already downloaded if found.
      *
      * @param updatePolicy whether to check for updates if already in cache
-     * @return whether the resource are already downloaded
      */
-    private boolean checkCache(final Resource resource, final UpdatePolicy updatePolicy) {
+    private void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
         if (!CacheUtil.isCacheable(resource.getLocation())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
-            synchronized (resource) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
-            }
-            return true;
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
+            return;
         }
 
         if (updatePolicy != UpdatePolicy.ALWAYS && updatePolicy != UpdatePolicy.FORCE) { // save loading entry props file
@@ -206,7 +201,7 @@ public class ResourceTracker {
                     resource.setTransferred(resource.getLocalFile().length());
                     resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
                 }
-                return true;
+                return;
             }
         }
 
@@ -214,11 +209,6 @@ public class ResourceTracker {
             // When we are "always" updating, we update for each instance. Reset resource status.
             resource.resetStatus();
         }
-
-        // may or may not be cached, but check update when connection
-        // is open to possibly save network communication time if it
-        // has to be downloaded, and allow this call to return quickly
-        return false;
     }
 
     /**
