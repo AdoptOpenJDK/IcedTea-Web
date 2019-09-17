@@ -317,15 +317,16 @@ public class ResourceTracker {
     boolean waitForResources(URL[] urls, long timeout) throws InterruptedException {
         Resource[] lresources = new Resource[urls.length];
 
-        synchronized (lresources) {
+        synchronized (resources) {
             // keep the lock so getResource doesn't have to acquire it each time
             for (int i = 0; i < urls.length; i++) {
                 lresources[i] = getResource(urls[i]);
             }
         }
 
-        if (lresources.length > 0)
+        if (lresources.length > 0) {
             return wait(lresources, timeout);
+        }
 
         return true;
     }
