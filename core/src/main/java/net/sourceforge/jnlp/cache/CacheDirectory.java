@@ -36,16 +36,12 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public final class CacheDirectory {
-
-    private final static Logger LOG = LoggerFactory.getLogger(CacheDirectory.class);
 
     /* Don't allow instantiation of this class */
     private CacheDirectory(){}
@@ -59,7 +55,8 @@ public final class CacheDirectory {
      * @param root Location of cache directory.
      */
     static void getDirStructure(DirectoryNode root) {
-        for (File f : root.getFile().listFiles()) {
+        final File[] files = root.getFile().listFiles();
+        for (File f : files != null ? files : new File[0]) {
             DirectoryNode node = new DirectoryNode(f.getName(), f, root);
             if (f.isDirectory() || (!f.isDirectory() && !f.getName().endsWith(INFO_SUFFIX)))
                 root.addChild(node);
@@ -83,27 +80,6 @@ public final class CacheDirectory {
                 temp.add(f);
         }
         return temp;
-    }
-
-    /**
-     * Removes empty folders in the current directory.
-     * 
-     * @param root File pointing at the beginning of directory.
-     * @return True if something was deleted.
-     */
-    public static boolean cleanDir(File root) {
-        boolean delete = true;
-        for (File f : root.listFiles()) {
-            if (f.isDirectory())
-                cleanDir(f);
-            else
-                delete = false;
-        }
-        if (delete){
-            LOG.info("Delete -- {}", root);
-        }
-        //            root.delete();
-        return true;
     }
 
     /**

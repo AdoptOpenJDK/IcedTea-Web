@@ -157,7 +157,7 @@ public class CacheEntry {
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return cached;
+            return true;
         }
     }
 

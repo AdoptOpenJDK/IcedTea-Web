@@ -88,10 +88,10 @@ class ResourceDownloader implements Runnable {
         }
     }
 
-    private void initializeFromURL(final UrlRequestResult location) throws IOException {
+    private void initializeFromURL(final UrlRequestResult location) {
         CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
-        try (final CloseableConnection connection = getDownloadConnection(location.getRedirectURL())) {// this won't change so should be okay not-synchronized
+        try {
             resource.setDownloadLocation(location.getRedirectURL());
 
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());

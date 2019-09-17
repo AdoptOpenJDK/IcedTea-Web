@@ -39,13 +39,14 @@ public class UpdatePolicy {
     public static UpdatePolicy FORCE = new UpdatePolicy(Long.MIN_VALUE);
     public static UpdatePolicy NEVER = new UpdatePolicy(Long.MAX_VALUE);
 
-    private long timeDiff = -1;
+    private final long timeDiff;
 
     /**
      * Create a new update policy; this policy always updates the
      * entry unless the shouldUpdate method is overridden.
      */
     public UpdatePolicy() {
+        this(-1);
     }
 
     /**
@@ -64,7 +65,7 @@ public class UpdatePolicy {
      * up-to-date.
      * @param entry entry which should be cared
      */
-    public boolean shouldUpdate(CacheEntry entry) {
+    boolean shouldUpdate(CacheEntry entry) {
         long updated = entry.getLastUpdated();
         long current = System.currentTimeMillis();
 
