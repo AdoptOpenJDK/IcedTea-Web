@@ -154,7 +154,7 @@ public class ResourceTracker {
 
         if (!downloaded) {
             if (prefetch) {
-                startResource(resource);
+                startDownload(resource);
             }
         }
     }
@@ -375,7 +375,7 @@ public class ResourceTracker {
      *
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    private void startResource(Resource resource) {
+    private void startDownload(Resource resource) {
         boolean enqueue;
 
         synchronized (resource) {
@@ -456,7 +456,7 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            startResource(resource);
+            startDownload(resource);
         }
 
         // wait for completion
