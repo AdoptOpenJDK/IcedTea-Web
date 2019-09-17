@@ -97,9 +97,6 @@ public class ResourceTracker {
     /** the resources known about by this resource tracker */
     private final List<Resource> resources = new ArrayList<>();
 
-    /** download listeners for this tracker */
-    private final List<DownloadListener> listeners = new ArrayList<>();
-
     /** whether to download parts before requested */
     private final boolean prefetch;
 
@@ -201,7 +198,6 @@ public class ResourceTracker {
             synchronized (resource) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
             }
-            fireDownloadEvent(resource);
             return true;
         }
 
@@ -217,7 +213,6 @@ public class ResourceTracker {
                     resource.setTransferred(resource.getLocalFile().length());
                     resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
                 }
-                fireDownloadEvent(resource);
                 return true;
             }
         }
@@ -231,60 +226,6 @@ public class ResourceTracker {
         // is open to possibly save network communication time if it
         // has to be downloaded, and allow this call to return quickly
         return false;
-    }
-
-    /**
-     * Adds the listener to the list of objects interested in
-     * receiving DownloadEvents.
-     *
-     * @param listener the listener to add.
-     */
-    public void addDownloadListener(DownloadListener listener) {
-        synchronized (listeners) {
-            if (!listeners.contains(listener))
-                listeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes a download listener.
-     *
-     * @param listener the listener to remove.
-     */
-    public void removeDownloadListener(DownloadListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    /**
-     * Fires the download event corresponding to the resource's
-     * state.  This method is typically called by the Resource itself
-     * on each tracker that is monitoring the resource.  Do not call
-     * this method with any locks because the listeners may call
-     * back to this ResourceTracker.
-     * @param resource resource on which event is fired
-     */
-    protected void fireDownloadEvent(Resource resource) {
-        DownloadListener l[];
-        synchronized (listeners) {
-            l = listeners.toArray(new DownloadListener[0]);
-        }
-
-        Collection<Resource.Status> status;
-        synchronized (resource) {
-            status = resource.getCopyOfStatus();
-        }
-
-        DownloadEvent event = new DownloadEvent(this, resource);
-        for (DownloadListener dl : l) {
-            if (status.contains(ERROR) || status.contains(DOWNLOADED))
-                dl.downloadCompleted(event);
-            else if (status.contains(DOWNLOADING))
-                dl.downloadStarted(event);
-            else if (status.contains(CONNECTING))
-                dl.updateStarted(event);
-        }
     }
 
     /**
