@@ -27,7 +27,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -267,7 +266,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR))) {
-                waitForResource(location, 0);
+                waitForResource(location);
             }
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -336,12 +335,11 @@ public class ResourceTracker {
      * available.
      *
      * @param location the resource to wait for
-     * @param timeout the timeout, or 0 to wait until completed
      * @throws InterruptedException if another thread interrupted the wait
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    private void waitForResource(URL location, long timeout) throws InterruptedException {
-        wait(new Resource[]{getResource(location)}, timeout);
+    private void waitForResource(URL location) throws InterruptedException {
+        wait(new Resource[]{getResource(location)}, 0);
     }
 
     /**
