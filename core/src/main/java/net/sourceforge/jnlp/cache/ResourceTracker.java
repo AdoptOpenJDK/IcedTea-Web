@@ -238,10 +238,10 @@ public class ResourceTracker {
      */
     public URL getCacheURL(URL location) {
         try {
-            File f = getCacheFile(location);
-            if (f != null)
-                // TODO: Should be toURI().toURL()
-                return f.toURL();
+            final File f = getCacheFile(location);
+            if (f != null) {
+                return f.toURI().toURL();
+            }
         } catch (MalformedURLException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
