@@ -369,7 +369,7 @@ public class ResourceTracker {
         final boolean isProcessing;
 
         synchronized (resource) {
-            if (resource.isSet(ERROR)) {
+            if (resource.isSet(ERROR) || resource.isSet(DOWNLOADED)) {
                 return;
             }
 
