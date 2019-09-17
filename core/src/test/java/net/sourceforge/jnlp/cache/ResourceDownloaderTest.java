@@ -164,7 +164,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
         File downloadedFile = resource.getLocalFile();
@@ -184,7 +184,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resource.setDownloadOptions(new DownloadOptions(true, false));
 
         resourceDownloader.run();
@@ -209,7 +209,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resource.setDownloadOptions(new DownloadOptions(false, true));
         resourceDownloader.run();
 
@@ -230,7 +230,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resource.setDownloadOptions(new DownloadOptions(true, true));
 
         resourceDownloader.run();
@@ -260,7 +260,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
         assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
@@ -272,7 +272,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
         assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));

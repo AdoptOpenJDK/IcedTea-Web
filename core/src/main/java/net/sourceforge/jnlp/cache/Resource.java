@@ -320,44 +320,11 @@ public class Resource {
     }
 
     /**
-     * Set status flag
-     *
-     * @param flag a flag to set
-     */
-    void setStatusFlag(Status flag) {
-        synchronized (status) {
-            status.add(flag);
-        }
-    }
-
-    /**
-     * Set flags
-     *
-     * @param flags a collection of flags to set
-     */
-    void setStatusFlags(Collection<Status> flags) {
-        synchronized (status) {
-            status.addAll(flags);
-        }
-    }
-
-    /**
      * Clear all flags
      */
     void resetStatus() {
         synchronized (status) {
             status.clear();
-        }
-    }
-
-    /**
-     * Check if this resource has been initialized
-     *
-     * @return true iff any flags have been set
-     */
-    public boolean isInitialized() {
-        synchronized (status) {
-            return !status.isEmpty();
         }
     }
 

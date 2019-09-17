@@ -122,7 +122,7 @@ public class ResourceTest {
     @Test
     public void testSetFlag() throws Exception {
         Resource res = createResource("SetFlag");
-        setStatus(res, EnumSet.of(PRECONNECT));
+        res.changeStatus(null, EnumSet.of(PRECONNECT));
         assertFalse("Resource should have been initialized", isUninitialized(res));
         assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
         assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
@@ -131,7 +131,7 @@ public class ResourceTest {
     @Test
     public void testSetMultipleFlags() throws Exception {
         Resource res = createResource("SetFlags");
-        setStatus(res, EnumSet.of(PRECONNECT, PREDOWNLOAD));
+        res.changeStatus(null, EnumSet.of(PRECONNECT, PREDOWNLOAD));
         assertFalse("Resource should have been initialized", isUninitialized(res));
         assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
         assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
@@ -141,13 +141,13 @@ public class ResourceTest {
     @Test
     public void testChangeStatus() throws Exception {
         Resource res = createResource("ChangeStatus");
-        setStatus(res, EnumSet.of(PRECONNECT));
+        res.changeStatus(null, EnumSet.of(PRECONNECT));
         assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
         assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
 
         Collection<Resource.Status> downloadFlags = EnumSet.of(PREDOWNLOAD, DOWNLOADING, DOWNLOADED);
         Collection<Resource.Status> connectFlags = EnumSet.of(PRECONNECT, CONNECTING, CONNECTED);
-        changeStatus(res, connectFlags, downloadFlags);
+        res.changeStatus(connectFlags, downloadFlags);
 
         assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
         assertTrue("Resource should have had DOWNLOADING set", hasFlag(res, DOWNLOADING));
@@ -161,26 +161,12 @@ public class ResourceTest {
         return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
     }
 
-    private static void setStatus(Resource resource, Collection<Resource.Status> flags) {
-        resource.setStatusFlags(flags);
-    }
-
-    private static void changeStatus(Resource resource, Collection<Resource.Status> clear, Collection<Resource.Status> add) {
-        resource.changeStatus(clear, add);
-    }
-
     private static boolean hasOnly(Resource resource, Collection<Resource.Status> flags) {
-        for (final Resource.Status flag : flags) { // ensure all the specified flags are set
-            if (!resource.isSet(flag)) {
-                return false;
-            }
+        final Set<Resource.Status> status = resource.getCopyOfStatus();
+        if (status.size() != flags.size()) {
+            return false;
         }
-        for (final Resource.Status flag : Resource.Status.values()) { // ensure all other flags are unset
-            if (resource.isSet(flag) && !flags.contains(flag)) {
-                return false;
-            }
-        }
-        return true;
+        return status.containsAll(flags);
     }
 
     private static boolean hasFlag(Resource resource, Resource.Status flag) {
@@ -188,7 +174,7 @@ public class ResourceTest {
     }
 
     private static boolean isUninitialized(Resource resource) {
-        return !resource.isInitialized();
+        return resource.getCopyOfStatus().isEmpty();
     }
 
 }

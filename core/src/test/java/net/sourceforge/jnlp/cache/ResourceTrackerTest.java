@@ -87,7 +87,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     public void testSelectByStatusOneMatchingResource() throws Exception {
         Resource resource = createResource("oneMatchingResource");
         Assert.assertNotNull(resource);
-        resource.setStatusFlag(DOWNLOADING);
+        resource.changeStatus(null, EnumSet.of(DOWNLOADING));
         List<Resource> resources = Arrays.asList(resource);
         Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
         Assert.assertEquals(resource, result);
@@ -106,7 +106,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     public void testSelectByStatusExcludedResources() throws Exception {
         Resource resource = createResource("excludedResources");
         Assert.assertNotNull(resource);
-        resource.setStatusFlag(ERROR);
+        resource.changeStatus(null, EnumSet.of(ERROR));
         List<Resource> resources = Arrays.asList(resource);
         Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
         Assert.assertNull(result);
@@ -116,13 +116,13 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     public void testSelectByStatusMixedResources() throws Exception {
         Resource r1 = createResource("mixedResources1");
         Assert.assertNotNull(r1);
-        r1.setStatusFlag(CONNECTED);
-        r1.setStatusFlag(DOWNLOADING);
+        r1.changeStatus(null, EnumSet.of(CONNECTED));
+        r1.changeStatus(null, EnumSet.of(DOWNLOADING));
         Resource r2 = createResource("mixedResources2");
         Assert.assertNotNull(r2);
-        r2.setStatusFlag(CONNECTED);
-        r2.setStatusFlag(DOWNLOADING);
-        r2.setStatusFlag(ERROR);
+        r2.changeStatus(null, EnumSet.of(CONNECTED));
+        r2.changeStatus(null, EnumSet.of(DOWNLOADING));
+        r2.changeStatus(null, EnumSet.of(ERROR));
         List<Resource> resources = Arrays.asList(r1, r2);
         Resource result = ResourceTracker.selectByStatus(resources, EnumSet.of(CONNECTED, DOWNLOADING), EnumSet.of(ERROR));
         Assert.assertEquals(r1, result);
@@ -136,7 +136,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         Resource result = ResourceTracker.selectByFilter(resources, new Predicate<Resource>() {
             @Override
             public boolean test(Resource t) {
-                return !t.isInitialized();
+                return t.getCopyOfStatus().isEmpty();
             }
         });
         Assert.assertEquals(resource, result);
