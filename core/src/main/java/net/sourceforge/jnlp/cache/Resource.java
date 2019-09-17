@@ -94,7 +94,7 @@ public class Resource {
 
     /** the status of the resource */
     private final EnumSet<Status> status = EnumSet.noneOf(Status.class);
-    
+
     /** Update policy for this resource */
     private final UpdatePolicy updatePolicy;
 
@@ -114,9 +114,10 @@ public class Resource {
     /**
      * Creates and returns a shared Resource object representing the given
      * location and version.
-     * @param location final location of resource
+     *
+     * @param location       final location of resource
      * @param requestVersion final version of resource
-     * @param updatePolicy final policy for updating
+     * @param updatePolicy   final policy for updating
      * @return new resource, which is already added in resources list
      */
     static Resource createResource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
@@ -142,6 +143,7 @@ public class Resource {
 
     /**
      * Returns the remote location of the resource.
+     *
      * @return the same location as the one with which this resource was created
      */
     public URL getLocation() {
@@ -152,6 +154,7 @@ public class Resource {
      * Returns the URL to use for downloading the resource. This can be
      * different from the original location since it may use a different
      * file name to support versioning and compression
+     *
      * @return the url to use when downloading
      */
     URL getDownloadLocation() {
@@ -160,58 +163,62 @@ public class Resource {
 
     /**
      * Set the url to use for downloading the resource
+     *
      * @param downloadLocation url to be downloaded
      */
     void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;
     }
-    
+
     /**
      * @return the local file currently being downloaded
      */
     File getLocalFile() {
         return localFile;
     }
-    
+
     /**
      * Sets the local file to be downloaded
+     *
      * @param localFile location of stored resource
      */
     void setLocalFile(File localFile) {
         this.localFile = localFile;
     }
-    
+
     /**
      * @return the requested version
      */
     VersionString getRequestVersion() {
         return requestVersion;
     }
-    
+
     /**
      * @return the version downloaded from server
      */
     VersionString getDownloadVersion() {
         return downloadVersion;
     }
-    
+
     /**
      * Sets the version downloaded from server
+     *
      * @param downloadVersion version of downloaded resource
      */
     public void setDownloadVersion(final VersionString downloadVersion) {
         this.downloadVersion = downloadVersion;
     }
-    
+
     /**
      * @return the amount in bytes transferred
      */
     long getTransferred() {
         return transferred;
     }
-    
+
     /**
      * Sets the amount transferred
+     *
      * @param transferred set the whole transferred amount to this value
      */
     void setTransferred(long transferred) {
@@ -220,6 +227,7 @@ public class Resource {
 
     /**
      * Returns the size of the resource
+     *
      * @return size of resource (-1 if unknown)
      */
     public long getSize() {
@@ -228,6 +236,7 @@ public class Resource {
 
     /**
      * Sets the size of the resource
+     *
      * @param size desired size of resource
      */
     public void setSize(long size) {
@@ -244,6 +253,7 @@ public class Resource {
 
     /**
      * Check if the specified flag is set.
+     *
      * @param flag a status flag
      * @return true iff the flag is set
      */
@@ -255,6 +265,7 @@ public class Resource {
 
     /**
      * Check if all the specified flags are set.
+     *
      * @param flags a collection of flags
      * @return true iff all the flags are set
      */
@@ -293,8 +304,9 @@ public class Resource {
      * Changes the status by clearing the flags in the first
      * parameter and setting the flags in the second.  This method
      * is synchronized on this resource.
+     *
      * @param clear a collection of status flags to unset
-     * @param add a collection of status flags to set
+     * @param add   a collection of status flags to set
      */
     void changeStatus(Collection<Status> clear, Collection<Status> add) {
         synchronized (status) {
@@ -309,6 +321,7 @@ public class Resource {
 
     /**
      * Set status flag
+     *
      * @param flag a flag to set
      */
     void setStatusFlag(Status flag) {
@@ -319,6 +332,7 @@ public class Resource {
 
     /**
      * Set flags
+     *
      * @param flags a collection of flags to set
      */
     void setStatusFlags(Collection<Status> flags) {
@@ -338,6 +352,7 @@ public class Resource {
 
     /**
      * Check if this resource has been initialized
+     *
      * @return true iff any flags have been set
      */
     public boolean isInitialized() {
@@ -349,7 +364,7 @@ public class Resource {
     /**
      * Removes the tracker to the list of trackers monitoring this
      * resource.
-     * 
+     *
      * @param tracker tracker to be removed
      */
     void removeTracker(ResourceTracker tracker) {
@@ -362,6 +377,7 @@ public class Resource {
     /**
      * Adds the tracker to the list of trackers monitoring this
      * resource.
+     *
      * @param tracker to observing resource
      */
     void addTracker(ResourceTracker tracker) {
