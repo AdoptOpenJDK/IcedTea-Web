@@ -276,6 +276,12 @@ public class Resource {
         }
     }
 
+    boolean isComplete() {
+        synchronized (status) {
+            return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
+        }
+    }
+
     /**
      * @return the update policy for this resource
      */

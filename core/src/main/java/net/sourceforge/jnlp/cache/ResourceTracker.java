@@ -255,7 +255,7 @@ public class ResourceTracker {
     public File getCacheFile(URL location) {
         Resource resource = getResource(location);
         try {
-            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR))) {
+            if (!resource.isComplete()) {
                 waitForResource(location);
             }
         } catch (InterruptedException ex) {
@@ -356,7 +356,7 @@ public class ResourceTracker {
      */
     boolean checkResource(URL location) {
         Resource resource = getResource(location);
-        return resource.isSet(DOWNLOADED) || resource.isSet(ERROR);
+        return resource.isComplete();
     }
 
     /**
@@ -369,7 +369,7 @@ public class ResourceTracker {
         final boolean isProcessing;
 
         synchronized (resource) {
-            if (resource.isSet(ERROR) || resource.isSet(DOWNLOADED)) {
+            if (resource.isComplete()) {
                 return;
             }
 
@@ -456,7 +456,7 @@ public class ResourceTracker {
             synchronized (lock) {
                 // check for completion
                 for (Resource resource : resources) {
-                    if (!resource.isSet(DOWNLOADED) && !resource.isSet(ERROR)) {
+                    if (!resource.isComplete()) {
                         finished = false;
                         break;
                     }
