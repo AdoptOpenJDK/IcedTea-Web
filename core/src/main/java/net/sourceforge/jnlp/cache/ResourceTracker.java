@@ -376,28 +376,28 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private void startDownload(Resource resource) {
-        boolean enqueue;
+        final boolean isProcessing;
 
         synchronized (resource) {
             if (resource.isSet(ERROR)) {
                 return;
             }
 
-            enqueue = !resource.isSet(PROCESSING);
+            isProcessing = resource.isSet(PROCESSING);
 
-            if (!(resource.isSet(CONNECTED) || resource.isSet(CONNECTING))) {
+            if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
             }
-            if (!(resource.isSet(DOWNLOADED) || resource.isSet(DOWNLOADING))) {
+            if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
             }
 
-            if (!(resource.isSet(PREDOWNLOAD) || resource.isSet(PRECONNECT))) {
-                enqueue = false;
+            if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
+                return;
             }
         }
 
-        if (enqueue) {
+        if (!isProcessing) {
             startDownloadThread(resource);
         }
 
