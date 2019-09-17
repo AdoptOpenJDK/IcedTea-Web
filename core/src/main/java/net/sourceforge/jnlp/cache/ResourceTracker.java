@@ -141,7 +141,8 @@ public class ResourceTracker {
             LOG.error("Normalization of " + location.toString() + " has failed", ex);
         }
 
-        Resource resource = Resource.createResource(location, version, updatePolicy);
+        final DownloadOptions downloadOptions = options == null ? new DownloadOptions(false, false) : options;
+        Resource resource = Resource.createResource(location, version, downloadOptions, updatePolicy);
 
         synchronized (resources) {
             if (resources.contains(resource))
@@ -149,8 +150,6 @@ public class ResourceTracker {
             resource.addTracker(this);
             resources.add(resource);
         }
-
-        resource.setDownloadOptions(options == null ? new DownloadOptions(false, false) : options);
 
         // checkCache may take a while (loads properties file).  this
         // should really be synchronized on resources, but the worst
