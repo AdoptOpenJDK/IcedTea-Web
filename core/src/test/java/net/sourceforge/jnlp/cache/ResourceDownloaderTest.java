@@ -260,7 +260,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
-        assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
+        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
     @Test
@@ -272,7 +272,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
-        assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
+        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
     private void setupPackGzFile(String fileName, String version) throws IOException {
