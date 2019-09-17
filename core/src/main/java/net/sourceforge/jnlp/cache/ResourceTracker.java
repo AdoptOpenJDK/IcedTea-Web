@@ -172,13 +172,8 @@ public class ResourceTracker {
     public void removeResource(URL location) {
         synchronized (resources) {
             Resource resource = getResource(location);
-
-            if (resource != null) {
-                resources.remove(resource);
-                resource.removeTracker(this);
-            }
-
-            // should remove from queue? probably doesn't matter
+            resources.remove(resource);
+            resource.removeTracker(this);
         }
     }
 
