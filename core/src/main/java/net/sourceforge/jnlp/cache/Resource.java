@@ -270,9 +270,15 @@ public class Resource {
      * @param flags a collection of flags
      * @return true iff all the flags are set
      */
-    boolean hasFlags(Collection<Status> flags) {
+    boolean hasAllFlags(Collection<Status> flags) {
         synchronized (status) {
             return status.containsAll(flags);
+        }
+    }
+
+    boolean isComplete() {
+        synchronized (status) {
+            return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
         }
     }
 

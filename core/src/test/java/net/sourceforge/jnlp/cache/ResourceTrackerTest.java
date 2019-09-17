@@ -84,65 +84,6 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     }
 
     @Test
-    public void testSelectByStatusOneMatchingResource() throws Exception {
-        Resource resource = createResource("oneMatchingResource");
-        Assert.assertNotNull(resource);
-        resource.changeStatus(null, EnumSet.of(DOWNLOADING));
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertEquals(resource, result);
-    }
-
-    @Test
-    public void testSelectByStatusNoMatchingResource() throws Exception {
-        Resource resource = createResource("noMatchingResource");
-        Assert.assertNotNull(resource);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertNull(result);
-    }
-
-    @Test
-    public void testSelectByStatusExcludedResources() throws Exception {
-        Resource resource = createResource("excludedResources");
-        Assert.assertNotNull(resource);
-        resource.changeStatus(null, EnumSet.of(ERROR));
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertNull(result);
-    }
-
-    @Test
-    public void testSelectByStatusMixedResources() throws Exception {
-        Resource r1 = createResource("mixedResources1");
-        Assert.assertNotNull(r1);
-        r1.changeStatus(null, EnumSet.of(CONNECTED));
-        r1.changeStatus(null, EnumSet.of(DOWNLOADING));
-        Resource r2 = createResource("mixedResources2");
-        Assert.assertNotNull(r2);
-        r2.changeStatus(null, EnumSet.of(CONNECTED));
-        r2.changeStatus(null, EnumSet.of(DOWNLOADING));
-        r2.changeStatus(null, EnumSet.of(ERROR));
-        List<Resource> resources = Arrays.asList(r1, r2);
-        Resource result = ResourceTracker.selectByStatus(resources, EnumSet.of(CONNECTED, DOWNLOADING), EnumSet.of(ERROR));
-        Assert.assertEquals(r1, result);
-    }
-
-    @Test
-    public void testSelectByFilterUninitialized() throws Exception {
-        Resource resource = createResource("filterUninitialized");
-        Assert.assertNotNull(resource);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByFilter(resources, new Predicate<Resource>() {
-            @Override
-            public boolean test(Resource t) {
-                return t.getCopyOfStatus().isEmpty();
-            }
-        });
-        Assert.assertEquals(resource, result);
-    }
-
-    @Test
     public void testNormalizeUrl() throws Exception {
         URL[] u = getUrls();
 
