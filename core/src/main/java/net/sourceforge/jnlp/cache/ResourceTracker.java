@@ -379,22 +379,27 @@ public class ResourceTracker {
         boolean enqueue;
 
         synchronized (resource) {
-            if (resource.isSet(ERROR))
+            if (resource.isSet(ERROR)) {
                 return;
+            }
 
             enqueue = !resource.isSet(PROCESSING);
 
-            if (!(resource.isSet(CONNECTED) || resource.isSet(CONNECTING)))
+            if (!(resource.isSet(CONNECTED) || resource.isSet(CONNECTING))) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
-            if (!(resource.isSet(DOWNLOADED) || resource.isSet(DOWNLOADING)))
+            }
+            if (!(resource.isSet(DOWNLOADED) || resource.isSet(DOWNLOADING))) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
+            }
 
-            if (!(resource.isSet(PREDOWNLOAD) || resource.isSet(PRECONNECT)))
+            if (!(resource.isSet(PREDOWNLOAD) || resource.isSet(PRECONNECT))) {
                 enqueue = false;
+            }
         }
 
-        if (enqueue)
+        if (enqueue) {
             startDownloadThread(resource);
+        }
 
     }
 
@@ -470,8 +475,9 @@ public class ResourceTracker {
                         }
                     }
                 }
-                if (finished)
+                if (finished) {
                     return true;
+                }
 
                 // wait
                 long waitTime = 0;
