@@ -153,7 +153,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     private Resource setupResource(String fileName, String text) throws IOException {
         File f = setupFile(fileName, text);
         URL url = downloadServer.getUrl(fileName);
-        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
         return resource;
     }
 
@@ -180,12 +180,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz", expected);
 
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
-        resource.setDownloadOptions(new DownloadOptions(true, false));
 
         resourceDownloader.run();
 
@@ -205,12 +204,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         setupFile("download-version__V1.0.jar", expected);
 
         URL url = downloadServer.getUrl("download-version.jar");
-        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
-        resource.setDownloadOptions(new DownloadOptions(false, true));
         resourceDownloader.run();
 
         File downloadedFile = resource.getLocalFile();
@@ -226,12 +224,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz__V1.0", expected);
 
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
-        resource.setDownloadOptions(new DownloadOptions(true, true));
 
         resourceDownloader.run();
 
@@ -256,7 +253,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         String stringURL = "file://" + localFile.getAbsolutePath();
         URL url = new URL(stringURL);
 
-        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
@@ -268,7 +265,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @Test
     public void testDownloadNotExistingResourceFails() throws IOException {
-        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 

@@ -41,12 +41,12 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
     private static ByteArrayOutputStream currentErrorStream;
 
     private URL getResultUrl(final String url, final VersionString version, final boolean usePack /*use pack.gz suffix*/, final boolean useVersion /*use version suffix*/) throws MalformedURLException {
-        final Resource resource = Resource.createResource(new URL(url), version, null);
+        final Resource resource = Resource.createResource(new URL(url), version, null, null);
         return ResourceUrlCreator.getUrl(resource, usePack, useVersion);
     }
 
     private URL getResultUrl(final String url, final VersionString version, final DownloadOptions downloadOptions) throws MalformedURLException {
-        Resource resource = Resource.createResource(new URL(url), version, null);
+        Resource resource = Resource.createResource(new URL(url), version, null, null);
         return ResourceUrlCreator.getVersionedUrl(resource);
     }
 
@@ -311,10 +311,10 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
             versionedFileForServerWithoutHeader.createNewFile();
 
             ResourceDownloader resourceDownloader = new ResourceDownloader(null, null);
-            Resource r1 = Resource.createResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+            Resource r1 = Resource.createResource(testServer.getUrl(fileForServerWithHeader.getName()), null, null, UpdatePolicy.NEVER);
+            Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, null, UpdatePolicy.NEVER);
+            Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), null, UpdatePolicy.NEVER);
+            Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), null, UpdatePolicy.NEVER);
             assertOnServerWithHeader(ResourceUrlCreator.findBestUrl(r1).getRedirectURL());
             assertVersionedOneOnServerWithHeader(ResourceUrlCreator.findBestUrl(r3).getRedirectURL());
             assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getRedirectURL());

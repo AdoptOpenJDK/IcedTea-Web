@@ -99,15 +99,16 @@ public class Resource {
     private final UpdatePolicy updatePolicy;
 
     /** Download options for this resource */
-    private DownloadOptions downloadOptions;
+    private final DownloadOptions downloadOptions;
 
     /**
      * Create a resource.
      */
-    private Resource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
+    private Resource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         this.location = location;
         this.downloadLocation = location;
         this.requestVersion = requestVersion;
+        this.downloadOptions = downloadOptions;
         this.updatePolicy = updatePolicy;
     }
 
@@ -120,9 +121,9 @@ public class Resource {
      * @param updatePolicy   final policy for updating
      * @return new resource, which is already added in resources list
      */
-    static Resource createResource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
+    static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
-            Resource resource = new Resource(location, requestVersion, updatePolicy);
+            Resource resource = new Resource(location, requestVersion, downloadOptions, updatePolicy);
 
             //FIXME - url ignores port during its comparison
             //this may affect test-suites
@@ -372,10 +373,6 @@ public class Resource {
         for (ResourceTracker rt : send) {
             rt.fireDownloadEvent(this);
         }
-    }
-
-    void setDownloadOptions(DownloadOptions downloadOptions) {
-        this.downloadOptions = downloadOptions;
     }
 
     DownloadOptions getDownloadOptions() {

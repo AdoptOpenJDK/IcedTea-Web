@@ -158,7 +158,7 @@ public class ResourceTest {
 
     private static Resource createResource(String testName) throws MalformedURLException {
         final URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
-        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
+        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
     }
 
     private static boolean hasOnly(Resource resource, Collection<Resource.Status> flags) {
