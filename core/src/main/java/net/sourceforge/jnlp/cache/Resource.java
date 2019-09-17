@@ -359,22 +359,6 @@ public class Resource {
         }
     }
 
-    /**
-     * Instructs the trackers monitoring this resource to fire a
-     * download event.
-     */
-    void fireDownloadEvent() {
-        List<ResourceTracker> send;
-
-        synchronized (trackers) {
-            send = trackers.hardList();
-        }
-
-        for (ResourceTracker rt : send) {
-            rt.fireDownloadEvent(this);
-        }
-    }
-
     DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
     }

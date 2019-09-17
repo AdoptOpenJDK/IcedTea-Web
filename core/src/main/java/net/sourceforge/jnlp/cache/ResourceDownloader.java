@@ -55,12 +55,10 @@ class ResourceDownloader implements Runnable {
     public void run() {
         if (resource.isSet(PRECONNECT) && !resource.hasFlags(EnumSet.of(ERROR, CONNECTING, CONNECTED))) {
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECTING));
-            resource.fireDownloadEvent(); // fire CONNECTING
             initializeResource();
         }
         if (resource.isSet(PREDOWNLOAD) && !resource.hasFlags(EnumSet.of(ERROR, DOWNLOADING, DOWNLOADED))) {
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADING));
-            resource.fireDownloadEvent(); // fire CONNECTING
             downloadResource();
         }
     }
@@ -87,7 +85,6 @@ class ResourceDownloader implements Runnable {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
-            resource.fireDownloadEvent(); // fire ERROR
         }
     }
 
@@ -163,7 +160,6 @@ class ResourceDownloader implements Runnable {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
-            resource.fireDownloadEvent(); // fire CONNECTED
         } finally {
             entry.unlock();
         }
@@ -192,8 +188,6 @@ class ResourceDownloader implements Runnable {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
-            resource.fireDownloadEvent(); // fire CONNECTED or ERROR
-
         } finally {
             entry.unlock();
         }
@@ -238,14 +232,12 @@ class ResourceDownloader implements Runnable {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
-            resource.fireDownloadEvent(); // fire DOWNLOADED
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             synchronized (lock) {
                 lock.notifyAll();
             }
-            resource.fireDownloadEvent(); // fire ERROR
         }
     }
 
