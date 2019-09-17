@@ -371,23 +371,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Starts loading the resource if it is not already being
-     * downloaded or already cached.  Resources started downloading
-     * using this method may download faster than those prefetched
-     * by the tracker because the tracker will only prefetch one
-     * resource at a time to conserve system resources.
-     *
-     * @param location the resource location
-     * @return true if the resource is already downloaded (or an error occurred)
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    public boolean startResource(URL location) {
-        Resource resource = getResource(location);
-
-        return startResource(resource);
-    }
-
-    /**
      * Sets the resource status to connect and download, and
      * enqueues the resource if not already started.
      *
@@ -439,57 +422,6 @@ public class ResourceTracker {
      */
     protected void startDownloadThread(Resource resource) {
         CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
-    }
-
-    static Resource selectByFilter(Collection<Resource> source, Predicate<Resource> filter) {
-        Resource result = null;
-
-        for (Resource resource : source) {
-            boolean selectable;
-
-            synchronized (resource) {
-                selectable = filter.test(resource);
-            }
-
-            if (selectable) {
-                result = resource;
-            }
-        }
-
-        return result;
-    }
-
-    static Resource selectByStatus(Collection<Resource> source, Resource.Status include, Resource.Status exclude) {
-        return selectByStatus(source, EnumSet.of(include), EnumSet.of(exclude));
-    }
-
-    /**
-     * Selects a resource from the source list that has the
-     * specified flag set.
-     * <p>
-     * Calls to this method should be synchronized on lock and
-     * source list.
-     * </p>
-     */
-    static Resource selectByStatus(Collection<Resource> source, final Collection<Resource.Status> included, final Collection<Resource.Status> excluded) {
-        return selectByFilter(source, new Predicate<Resource>() {
-            @Override
-            public boolean test(Resource t) {
-                boolean hasIncluded = false;
-                for (Resource.Status flag : included) {
-                    if (t.isSet(flag)) {
-                        hasIncluded = true;
-                    }
-                }
-                boolean hasExcluded = false;
-                for (Resource.Status flag : excluded) {
-                    if (t.isSet(flag)) {
-                        hasExcluded = true;
-                    }
-                }
-                return hasIncluded && !hasExcluded;
-            }
-        });
     }
 
     /**
