@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
@@ -69,7 +68,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
  */
 public class ResourceTracker {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ResourceTracker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceTracker.class);
 
     // todo: use event listener arrays instead of lists
 
@@ -314,8 +313,8 @@ public class ResourceTracker {
      * @throws java.lang.InterruptedException if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    public boolean waitForResources(URL urls[], long timeout) throws InterruptedException {
-        Resource lresources[] = new Resource[urls.length];
+    boolean waitForResources(URL[] urls, long timeout) throws InterruptedException {
+        Resource[] lresources = new Resource[urls.length];
 
         synchronized (lresources) {
             // keep the lock so getResource doesn't have to acquire it each time
@@ -336,12 +335,11 @@ public class ResourceTracker {
      *
      * @param location the resource to wait for
      * @param timeout the timeout, or 0 to wait until completed
-     * @return whether the resource downloaded before the timeout
      * @throws InterruptedException if another thread interrupted the wait
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    public boolean waitForResource(URL location, long timeout) throws InterruptedException {
-        return wait(new Resource[]{getResource(location)}, timeout);
+    private void waitForResource(URL location, long timeout) throws InterruptedException {
+        wait(new Resource[]{getResource(location)}, timeout);
     }
 
     /**
@@ -351,7 +349,7 @@ public class ResourceTracker {
      * @return the number of bytes transferred
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    public long getAmountRead(URL location) {
+    long getAmountRead(URL location) {
         // not atomic b/c transferred is a long, but so what (each
         // byte atomic? so probably won't affect anything...)
         return getResource(location).getTransferred();
@@ -365,7 +363,7 @@ public class ResourceTracker {
      * @return resource availability
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    public boolean checkResource(URL location) {
+    boolean checkResource(URL location) {
         Resource resource = getResource(location);
         return resource.isSet(DOWNLOADED) || resource.isSet(ERROR);
     }
@@ -374,15 +372,14 @@ public class ResourceTracker {
      * Sets the resource status to connect and download, and
      * enqueues the resource if not already started.
      *
-     * @return true if the resource is already downloaded (or an error occurred)
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    private boolean startResource(Resource resource) {
+    private void startResource(Resource resource) {
         boolean enqueue;
 
         synchronized (resource) {
             if (resource.isSet(ERROR))
-                return true;
+                return;
 
             enqueue = !resource.isSet(PROCESSING);
 
@@ -398,7 +395,6 @@ public class ResourceTracker {
         if (enqueue)
             startDownloadThread(resource);
 
-        return !enqueue;
     }
 
     /**
@@ -409,7 +405,7 @@ public class ResourceTracker {
      * @return the number of bytes, or -1
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    public long getTotalSize(URL location) {
+    long getTotalSize(URL location) {
         return getResource(location).getSize(); // atomic
     }
 
@@ -420,7 +416,7 @@ public class ResourceTracker {
      * </p>
      * @param resource  resource to be download
      */
-    protected void startDownloadThread(Resource resource) {
+    private void startDownloadThread(Resource resource) {
         CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
     }
 
