@@ -456,15 +456,12 @@ public class ResourceTracker {
             synchronized (lock) {
                 // check for completion
                 for (Resource resource : resources) {
-                    //NetX Deadlocking may be solved by removing this
-                    //synch block.
-                    synchronized (resource) {
-                        if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR))) {
-                            finished = false;
-                            break;
-                        }
+                    if (!resource.isSet(DOWNLOADED) && !resource.isSet(ERROR)) {
+                        finished = false;
+                        break;
                     }
                 }
+
                 if (finished) {
                     return true;
                 }
@@ -473,7 +470,8 @@ public class ResourceTracker {
                 long waitTime = 0;
 
                 if (timeout > 0) {
-                    waitTime = timeout - (System.currentTimeMillis() - startTime);
+                    final long timeSinceStartOfMethod = System.currentTimeMillis() - startTime;
+                    waitTime = timeout - timeSinceStartOfMethod;
                     if (waitTime <= 0)
                         return false;
                 }
