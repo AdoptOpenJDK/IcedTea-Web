@@ -25,7 +25,7 @@ import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
  */
 public class NativeLibraryStorage {
 
-    private final static Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
 
     private final ResourceTracker tracker;
     private final List<File> nativeSearchDirectories = new ArrayList<>();

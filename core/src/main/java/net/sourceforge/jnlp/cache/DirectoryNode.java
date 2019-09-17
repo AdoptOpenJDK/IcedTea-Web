@@ -46,16 +46,6 @@ public class DirectoryNode {
     private DirectoryNode parent = null;
     private File infoFile;
 
-    /**
-     * Create a new instance of DirectoryNode.
-     * 
-     * @param name Name representing this node.
-     * @param absPathToNode Absolute path to this node given as a String.
-     * @param parent The parent node.
-     */
-    public DirectoryNode(String name, String absPathToNode, DirectoryNode parent) {
-        this(name, new File(absPathToNode), parent);
-    }
 
     /**
      * Create a new instance of DirectoryNode.
@@ -64,7 +54,7 @@ public class DirectoryNode {
      * @param absPathToNode Absolute path to this node as a File.
      * @param parent The parent node.
      */
-    public DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
+    DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
         this(name, absPathToNode, null, parent);
     }
 
@@ -76,7 +66,7 @@ public class DirectoryNode {
      * @param childNodes List of children nodes.
      * @param parent The parent node.
      */
-    public DirectoryNode(String name, File absPathToNode, ArrayList<DirectoryNode> childNodes, DirectoryNode parent) {
+    private DirectoryNode(String name, File absPathToNode, ArrayList<DirectoryNode> childNodes, DirectoryNode parent) {
         this.name = name;
         this.path = absPathToNode;
         this.childNodes = childNodes;
@@ -92,7 +82,7 @@ public class DirectoryNode {
      * 
      * @param node Node to be appended.
      */
-    public void addChild(DirectoryNode node) {
+    void addChild(DirectoryNode node) {
         try {
             childNodes.add(node);
         } catch (NullPointerException e) {
@@ -105,10 +95,9 @@ public class DirectoryNode {
      * Removes the node specified.
      * 
      * @param node Node to be removed from the list of children
-     * @return true if this list of children contained the specified element
      */
-    public boolean removeChild(DirectoryNode node) {
-        return this.childNodes.remove(node);
+    public void removeChild(DirectoryNode node) {
+        this.childNodes.remove(node);
     }
 
     /**
@@ -147,7 +136,7 @@ public class DirectoryNode {
      * 
      * @return ArrayList of type DirectoryNode containing all the child nodes.
      */
-    public ArrayList<DirectoryNode> getChildren() {
+    ArrayList<DirectoryNode> getChildren() {
         return this.childNodes;
     }
 
