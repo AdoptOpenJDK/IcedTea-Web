@@ -119,7 +119,7 @@ public class Resource {
      * @param updatePolicy final policy for updating
      * @return new resource, which is already added in resources list
      */
-    public static Resource createResource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
+    static Resource createResource(final URL location, final VersionString requestVersion, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, updatePolicy);
 
@@ -154,7 +154,7 @@ public class Resource {
      * file name to support versioning and compression
      * @return the url to use when downloading
      */
-    public URL getDownloadLocation() {
+    URL getDownloadLocation() {
         return downloadLocation;
     }
 
@@ -162,52 +162,37 @@ public class Resource {
      * Set the url to use for downloading the resource
      * @param downloadLocation url to be downloaded
      */
-    public void setDownloadLocation(URL downloadLocation) {
+    void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;
-    }
-
-    /**
-     * Returns the tracker that first created or monitored the
-     * resource, or null if no trackers are monitoring the resource.
-     */
-    ResourceTracker getTracker() {
-        synchronized (trackers) {
-            List<ResourceTracker> t = trackers.hardList();
-            if (t.size() > 0) {
-                return t.get(0);
-            }
-
-            return null;
-        }
     }
     
     /**
      * @return the local file currently being downloaded
      */
-    public File getLocalFile() {
-    	return localFile;
+    File getLocalFile() {
+        return localFile;
     }
     
     /**
      * Sets the local file to be downloaded
      * @param localFile location of stored resource
      */
-    public void setLocalFile(File localFile) {
-    	this.localFile = localFile;
+    void setLocalFile(File localFile) {
+        this.localFile = localFile;
     }
     
     /**
      * @return the requested version
      */
-    public VersionString getRequestVersion() {
-    	return requestVersion;
+    VersionString getRequestVersion() {
+        return requestVersion;
     }
     
     /**
      * @return the version downloaded from server
      */
-    public VersionString getDownloadVersion() {
-    	return downloadVersion;
+    VersionString getDownloadVersion() {
+        return downloadVersion;
     }
     
     /**
@@ -215,30 +200,22 @@ public class Resource {
      * @param downloadVersion version of downloaded resource
      */
     public void setDownloadVersion(final VersionString downloadVersion) {
-    	this.downloadVersion = downloadVersion;
+        this.downloadVersion = downloadVersion;
     }
     
     /**
      * @return the amount in bytes transferred
      */
-    public long getTransferred() {
-    	return transferred;
+    long getTransferred() {
+        return transferred;
     }
     
     /**
      * Sets the amount transferred
      * @param transferred set the whole transferred amount to this value
      */
-    public void setTransferred(long transferred) {
-    	this.transferred = transferred;
-    }
-    
-    /**
-     * Increments the amount transferred (in bytes)
-     * @param incTrans transferred amount in last transfer
-     */
-    public void incrementTransferred(long incTrans) {
-    	transferred += incTrans;
+    void setTransferred(long transferred) {
+        this.transferred = transferred;
     }
 
     /**
@@ -246,7 +223,7 @@ public class Resource {
      * @return size of resource (-1 if unknown)
      */
     public long getSize() {
-    	return size;
+        return size;
     }
 
     /**
@@ -260,7 +237,7 @@ public class Resource {
     /**
      * @return the status of the resource
      */
-    public Set<Status> getCopyOfStatus() {
+    Set<Status> getCopyOfStatus() {
         return EnumSet.copyOf(status);
 
     }
@@ -270,7 +247,7 @@ public class Resource {
      * @param flag a status flag
      * @return true iff the flag is set
      */
-    public boolean isSet(Status flag) {
+    boolean isSet(Status flag) {
         synchronized (status) {
             return status.contains(flag);
         }
@@ -281,7 +258,7 @@ public class Resource {
      * @param flags a collection of flags
      * @return true iff all the flags are set
      */
-    public boolean hasFlags(Collection<Status> flags) {
+    boolean hasFlags(Collection<Status> flags) {
         synchronized (status) {
             return status.containsAll(flags);
         }
@@ -290,7 +267,7 @@ public class Resource {
     /**
      * @return the update policy for this resource
      */
-    public UpdatePolicy getUpdatePolicy() {
+    UpdatePolicy getUpdatePolicy() {
         return this.updatePolicy;
     }
 
@@ -319,7 +296,7 @@ public class Resource {
      * @param clear a collection of status flags to unset
      * @param add a collection of status flags to set
      */
-    public void changeStatus(Collection<Status> clear, Collection<Status> add) {
+    void changeStatus(Collection<Status> clear, Collection<Status> add) {
         synchronized (status) {
             if (clear != null) {
                 status.removeAll(clear);
@@ -334,7 +311,7 @@ public class Resource {
      * Set status flag
      * @param flag a flag to set
      */
-    public void setStatusFlag(Status flag) {
+    void setStatusFlag(Status flag) {
         synchronized (status) {
             status.add(flag);
         }
@@ -344,26 +321,16 @@ public class Resource {
      * Set flags
      * @param flags a collection of flags to set
      */
-    public void setStatusFlags(Collection<Status> flags) {
+    void setStatusFlags(Collection<Status> flags) {
         synchronized (status) {
             status.addAll(flags);
         }
     }
 
     /**
-     * Unset flags
-     * @param flags a collection of flags to unset
-     */
-    public void unsetStatusFlag(Collection<Status> flags) {
-        synchronized (status) {
-            status.removeAll(flags);
-        }
-    }
-
-    /**
      * Clear all flags
      */
-    public void resetStatus() {
+    void resetStatus() {
         synchronized (status) {
             status.clear();
         }
@@ -385,7 +352,7 @@ public class Resource {
      * 
      * @param tracker tracker to be removed
      */
-    public void removeTracker(ResourceTracker tracker) {
+    void removeTracker(ResourceTracker tracker) {
         synchronized (trackers) {
             trackers.remove(tracker);
             trackers.trimToSize();
@@ -397,7 +364,7 @@ public class Resource {
      * resource.
      * @param tracker to observing resource
      */
-    public void addTracker(ResourceTracker tracker) {
+    void addTracker(ResourceTracker tracker) {
         synchronized (trackers) {
             // prevent GC between contains and add
             List<ResourceTracker> t = trackers.hardList();
@@ -412,7 +379,7 @@ public class Resource {
      * Instructs the trackers monitoring this resource to fire a
      * download event.
      */
-    protected void fireDownloadEvent() {
+    void fireDownloadEvent() {
         List<ResourceTracker> send;
 
         synchronized (trackers) {
@@ -424,15 +391,15 @@ public class Resource {
         }
     }
 
-    public void setDownloadOptions(DownloadOptions downloadOptions) {
+    void setDownloadOptions(DownloadOptions downloadOptions) {
         this.downloadOptions = downloadOptions;
     }
 
-    public DownloadOptions getDownloadOptions() {
+    DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
     }
 
-    public boolean isConnectable() {
+    boolean isConnectable() {
         return JNLPRuntime.isConnectable(this.location);
     }
 

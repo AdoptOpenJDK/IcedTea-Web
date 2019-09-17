@@ -86,15 +86,6 @@ public class ResourceTest {
     }
 
     @Test
-    public void testIncrementTransferred() throws Exception {
-        String testName = "IncrementTransferred";
-        Resource res = createResource(testName);
-        long original = res.getTransferred();
-        res.incrementTransferred(INCREMENT_TRANSFERRED_CONSTANT);
-        assertEquals(original + INCREMENT_TRANSFERRED_CONSTANT, res.getTransferred());
-    }
-
-    @Test
     public void testSizeIsNegativeOne() throws Exception {
         String testName = "SizeIsNegativeOne";
         Resource res = createResource(testName);
