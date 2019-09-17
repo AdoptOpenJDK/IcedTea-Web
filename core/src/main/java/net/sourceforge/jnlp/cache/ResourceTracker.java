@@ -264,38 +264,45 @@ public class ResourceTracker {
      * @see CacheUtil#isCacheable
      */
     public File getCacheFile(URL location) {
+        Resource resource = getResource(location);
         try {
-            Resource resource = getResource(location);
-            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR)))
+            if (!(resource.isSet(DOWNLOADED) || resource.isSet(ERROR))) {
                 waitForResource(location, 0);
-
-            if (resource.isSet(ERROR))
-                return null;
-
-            if (resource.getLocalFile() != null)
-                return resource.getLocalFile();
-
-            if (location.getProtocol().equalsIgnoreCase("file")) {
-                File file = UrlUtils.decodeUrlAsFile(location);
-                if (file.exists()) {
-                    return file;
-                }
-                // try plain, not decoded file now
-                // sometimes the jnlp app developers are encoding for us
-                // so we end up encoding already encoded file. See RH1154177
-                file = new File(location.getPath());
-                if (file.exists()) {
-                    return file;
-                }
-                // have it sense to try also filename with whole query here?
-                // => location.getFile() ?
             }
-
-            return null;
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return null; // need an error exception to throw
         }
+        return getCacheFile(resource);
+    }
+
+    private File getCacheFile(Resource resource) {
+        final URL location = resource.getLocation();
+        if (resource.isSet(ERROR)) {
+            return null;
+        }
+
+        if (resource.getLocalFile() != null) {
+            return resource.getLocalFile();
+        }
+
+        if (location.getProtocol().equalsIgnoreCase("file")) {
+            File file = UrlUtils.decodeUrlAsFile(location);
+            if (file.exists()) {
+                return file;
+            }
+            // try plain, not decoded file now
+            // sometimes the jnlp app developers are encoding for us
+            // so we end up encoding already encoded file. See RH1154177
+            file = new File(location.getPath());
+            if (file.exists()) {
+                return file;
+            }
+            // have it sense to try also filename with whole query here?
+            // => location.getFile() ?
+        }
+
+        return null;
     }
 
     /**
