@@ -31,12 +31,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
-import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 /**
@@ -153,7 +149,7 @@ public class ResourceTracker {
         initResourceFromCache(resource, updatePolicy);
 
         if (prefetch && resource.isSet(DOWNLOADED)) {
-            startDownload(resource, lock);
+            ResourceDownloader.startDownload(resource, lock);
         }
     }
 
@@ -360,40 +356,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Sets the resource status to connect and download, and
-     * enqueues the resource if not already started.
-     *
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    private static void startDownload(Resource resource, final Object lock) {
-        final boolean isProcessing;
-
-        synchronized (resource) {
-            if (resource.isComplete()) {
-                return;
-            }
-
-            isProcessing = resource.isSet(PROCESSING);
-
-            if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
-            }
-            if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
-            }
-
-            if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
-                return;
-            }
-        }
-
-        if (!isProcessing) {
-            startDownloadThread(resource, lock);
-        }
-
-    }
-
-    /**
      * Returns the number of total size in bytes of a resource, or
      * -1 it the size is not known.
      *
@@ -403,17 +365,6 @@ public class ResourceTracker {
      */
     long getTotalSize(URL location) {
         return getResource(location).getSize(); // atomic
-    }
-
-    /**
-     * Start a new download thread.
-     * <p>
-     * Calls to this method should be synchronized on lock.
-     * </p>
-     * @param resource  resource to be download
-     */
-    private static void startDownloadThread(Resource resource, final Object lock) {
-        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
     }
 
     /**
@@ -446,7 +397,7 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            startDownload(resource, lock);
+            ResourceDownloader.startDownload(resource, lock);
         }
 
         // wait for completion

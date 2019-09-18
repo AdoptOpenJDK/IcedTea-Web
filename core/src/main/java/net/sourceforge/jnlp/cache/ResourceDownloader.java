@@ -37,8 +37,9 @@ import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
+import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
-class ResourceDownloader implements Runnable {
+public class ResourceDownloader implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
@@ -48,6 +49,39 @@ class ResourceDownloader implements Runnable {
     ResourceDownloader(Resource resource, Object lock) {
         this.resource = resource;
         this.lock = lock;
+    }
+
+    /**
+     * Sets the resource status to connect and download, and
+     * enqueues the resource if not already started.
+     *
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     */
+    static void startDownload(Resource resource, final Object lock) {
+        final boolean isProcessing;
+
+        synchronized (resource) {
+            if (resource.isComplete()) {
+                return;
+            }
+
+            isProcessing = resource.isSet(PROCESSING);
+
+            if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
+            }
+            if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
+            }
+
+            if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
+                return;
+            }
+        }
+
+        if (!isProcessing) {
+            CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
+        }
     }
 
     @Override
@@ -71,23 +105,19 @@ class ResourceDownloader implements Runnable {
 
     private static void initializeResource(final Resource resource) {
         if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
-            initializeOnlineResource(resource);
+            try {
+                final UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
+                if (finalLocation != null) {
+                    initializeFromURL(resource, finalLocation);
+                } else {
+                    initializeOfflineResource(resource);
+                }
+            } catch (Exception e) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
+            }
         } else {
             initializeOfflineResource(resource);
-        }
-    }
-
-    private static void initializeOnlineResource(final Resource resource) {
-        try {
-            final UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
-            if (finalLocation != null) {
-                initializeFromURL(resource, finalLocation);
-            } else {
-                initializeOfflineResource(resource);
-            }
-        } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
         }
     }
 
