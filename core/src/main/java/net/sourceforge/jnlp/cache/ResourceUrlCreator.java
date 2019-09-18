@@ -36,14 +36,13 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -60,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
@@ -80,38 +80,19 @@ class ResourceUrlCreator {
      * @throws IOException if an I/O exception occurs.
      */
     static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
-
         try (final CloseableConnection connection = ConnectionFactory.openConnection(url, requestMethod, requestProperties)) {
-
-            final int responseCode = connection.getResponseCode();
-
             /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(connection);
 
-            final Map<String, List<String>> header = connection.getHeaderFields();
-            for (final Map.Entry<String, List<String>> entry : header.entrySet()) {
-                LOG.info("Key : {} ,Value : {}", entry.getKey(), entry.getValue());
-            }
-            /*
-             * Do this only on 301,302,303(?)307,308>
-             * Now setting value for all, and lets upper stack to handle it
-             */
-            final String possibleRedirect = connection.getHeaderField("Location");
+            LOG.debug("URL connection '{}' header fields: {}", url, connection.getHeaderFields());
 
-            final URL redirectUrl;
-            if (possibleRedirect != null && possibleRedirect.trim().length() > 0) {
-                redirectUrl = new URL(possibleRedirect);
-            } else {
-                redirectUrl = null;
-            }
-
-            final long lastModified = connection.getLastModified();
-            final long length = connection.getContentLength();
-
-            return new UrlRequestResult(responseCode, redirectUrl, lastModified, length);
+            return new UrlRequestResult(
+                    connection.getResponseCode(),
+                    connection.getLocationHeaderFieldUrl(),
+                    connection.getLastModified(),
+                    connection.getContentLength());
         }
-
     }
 
     /**
@@ -139,34 +120,27 @@ class ResourceUrlCreator {
                     requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
 
                     UrlRequestResult response = getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
-                    if (response.responseCode == 511) {
-                        if (!InetSecurity511Panel.isSkip()) {
-
-                            boolean result511 = SecurityDialogs.show511Dialogue(resource);
-                            if (!result511) {
-                                throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
-                            }
-                            //try again, what to do with original resource was nowhere specified
-                            i--;
-                            continue;
+                    if (response.getResponseCode() == 511 && !InetSecurity511Panel.isSkip()) {
+                        boolean result511 = SecurityDialogs.show511Dialogue(resource);
+                        if (!result511) {
+                            throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
                         }
+                        //try again, what to do with original resource was nowhere specified
+                        i--;
+                        continue;
                     }
-                    if (response.shouldRedirect()) {
-                        if (response.redirectUrl == null) {
-                            LOG.debug("Although {} got redirect {} code for {} request for {} the target was null. Not following", resource.toString(), response.responseCode, requestMethod, url.toExternalForm());
-                        } else {
-                            LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.responseCode, requestMethod, url.toExternalForm(), response.redirectUrl.toExternalForm());
-                            if (!JNLPRuntime.isAllowRedirect()) {
-                                throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.responseCode + ") to " + response.redirectUrl.toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
-                            }
-                            urls.add(response.redirectUrl);
+                    if (response.isRedirect()) {
+                        LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm(), response.getLocation().toExternalForm());
+                        if (!JNLPRuntime.isAllowRedirect()) {
+                            throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.getResponseCode() + ") to " + response.getLocation().toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
                         }
-                    } else if (response.isInvalid()) {
-                        LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.responseCode, requestMethod, url.toExternalForm());
+                        urls.add(response.getLocation());
+                    } else if (!response.isSuccess()) {
+                        LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm());
                     } else {
-                        LOG.debug("best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
-                        if (response.redirectUrl == null) {
-                            return response.withRedirectUrl(url);
+                        LOG.debug("Best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
+                        if (response.getLocation() == null) {
+                            return response.withLocation(url);
                         }
                         return response; /* This is the best URL */
 
@@ -180,79 +154,6 @@ class ResourceUrlCreator {
 
         /* No valid URL, return null */
         return null;
-    }
-
-    /**
-     * Complex wrapper around url request Contains return code (default is
-     * HTTP_OK), length and last modified
-     * <p>
-     * The storing of redirect target is quite obvious The storing length and
-     * last modified may be not, but apparently
-     * (http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=2591) the url
-     * connection is not always cached as expected, and so another request may
-     * be sent when length and lastmodified are checked
-     */
-    static class UrlRequestResult {
-
-        private final int responseCode;
-        private final URL redirectUrl;
-
-        private final long lastModified;
-        private final long length;
-
-        UrlRequestResult(int responseCode, URL redirectUrl, long lastModified, long length) {
-            this.responseCode = responseCode;
-            this.redirectUrl = redirectUrl;
-            this.lastModified = lastModified;
-            this.length = length;
-        }
-
-        UrlRequestResult withRedirectUrl(URL url) {
-            return new UrlRequestResult(responseCode, url, lastModified, length);
-        }
-
-        URL getRedirectURL() {
-            return redirectUrl;
-        }
-
-        int getResponseCode() {
-            return responseCode;
-        }
-
-        public long getLength() {
-            return length;
-        }
-
-        long getLastModified() {
-            return lastModified;
-        }
-
-        /**
-         * @return whether the result code is redirect one. Right now 301-303 and 307-308
-         */
-        boolean shouldRedirect() {
-            return (responseCode == 301
-                    || responseCode == 302
-                    || responseCode == 303 /*?*/
-                    || responseCode == 307
-                    || responseCode == 308);
-        }
-
-        /**
-         * @return whether the return code is not a OK one - anything except <200 or >=300
-         */
-        boolean isInvalid() {
-            return (responseCode < 200 || responseCode >= 300);
-        }
-
-        @Override
-        public String toString() {
-            return ""
-                    + "url: " + (redirectUrl == null ? "null" : redirectUrl.toExternalForm()) + "; "
-                    + "result:" + responseCode + "; "
-                    + "lastModified: " + lastModified + "; "
-                    + "length: " + length + "; ";
-        }
     }
 
     private static class RedirectionException extends RuntimeException {
@@ -302,8 +203,8 @@ class ResourceUrlCreator {
                 if (url.getProtocol().equals("http") && url.getPort() < 0) { // port < 0 means default port
                     try {
                         result.add(0, new URL("https", url.getHost(), url.getFile()));
-                    } catch (Exception ex) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    } catch (MalformedURLException ex) {
+                        LOG.error("Error while creating URL for '" + url + "' and adding it to list of download locations", ex);
                     }
                 }
             }
@@ -379,6 +280,8 @@ class ResourceUrlCreator {
      */
     static URL getVersionedUrl(final Resource resource) {
         final URL resourceUrl = resource.getLocation();
+        final VersionString requestVersion = resource.getRequestVersion();
+
         final String protocol = emptyIfNull(resourceUrl.getProtocol()) + "://";
         final String userInfoPart = emptyIfNull(resourceUrl.getUserInfo());
         final String userInfo = !userInfoPart.isEmpty() ? userInfoPart + "@" : userInfoPart;
@@ -387,10 +290,10 @@ class ResourceUrlCreator {
         final String path = emptyIfNull(resourceUrl.getPath());
 
         final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
-                .filter(s -> !StringUtils.isBlank(s))
+                .filter(s -> !isBlank(s))
                 .collect(Collectors.toList());
-        if (resource.getRequestVersion() != null && resource.getRequestVersion().containsSingleVersionId()) {
-            queryParts.add("version-id=" + resource.getRequestVersion());
+        if (requestVersion != null) {
+            queryParts.add("version-id=" + requestVersion.toString());
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 
