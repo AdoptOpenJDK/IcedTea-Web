@@ -104,20 +104,18 @@ public class ResourceDownloader implements Runnable {
     }
 
     private static void initializeResource(final Resource resource) {
-        if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
-            try {
-                final UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
-                if (finalLocation != null) {
-                    initializeFromURL(resource, finalLocation);
-                } else {
-                    initializeOfflineResource(resource);
+        try {
+            if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
+                final UrlRequestResult location = ResourceUrlCreator.findBestUrl(resource);
+                if (location != null) {
+                    initializeFromURL(resource, location);
+                    return;
                 }
-            } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
             }
-        } else {
             initializeOfflineResource(resource);
+        } catch (Exception e) {
+            LOG.error("Error while initializing resource from location " + resource.getLocation(), e);
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
         }
     }
 
@@ -169,7 +167,7 @@ public class ResourceDownloader implements Runnable {
                 //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
                 //another issue is forking. If this (eg local) jnlp starts its second instance, the url *can* be different
                 //in contrary, usually si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
-                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed 
+                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed
                 if (jnlpPath == null || jnlpPath.equals("")) {
                     jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);
                     if (jnlpPath == null || jnlpPath.equals("")) {
