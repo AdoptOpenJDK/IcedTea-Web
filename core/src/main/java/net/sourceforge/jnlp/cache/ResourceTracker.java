@@ -153,7 +153,7 @@ public class ResourceTracker {
         initResourceFromCache(resource, updatePolicy);
 
         if (prefetch && resource.isSet(DOWNLOADED)) {
-            startDownload(resource);
+            startDownload(resource, lock);
         }
     }
 
@@ -180,7 +180,7 @@ public class ResourceTracker {
      *
      * @param updatePolicy whether to check for updates if already in cache
      */
-    private void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
+    private static void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
         if (!CacheUtil.isCacheable(resource.getLocation())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
@@ -365,7 +365,7 @@ public class ResourceTracker {
      *
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    private void startDownload(Resource resource) {
+    private static void startDownload(Resource resource, final Object lock) {
         final boolean isProcessing;
 
         synchronized (resource) {
@@ -388,7 +388,7 @@ public class ResourceTracker {
         }
 
         if (!isProcessing) {
-            startDownloadThread(resource);
+            startDownloadThread(resource, lock);
         }
 
     }
@@ -412,7 +412,7 @@ public class ResourceTracker {
      * </p>
      * @param resource  resource to be download
      */
-    private void startDownloadThread(Resource resource) {
+    private static void startDownloadThread(Resource resource, final Object lock) {
         CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
     }
 
@@ -446,7 +446,7 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            startDownload(resource);
+            startDownload(resource, lock);
         }
 
         // wait for completion
