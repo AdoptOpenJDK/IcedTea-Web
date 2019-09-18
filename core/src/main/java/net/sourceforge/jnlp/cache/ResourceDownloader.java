@@ -112,7 +112,7 @@ public class ResourceDownloader implements Runnable {
                     return;
                 }
             }
-            initializeOfflineResource(resource);
+            initializeFromCache(resource);
         } catch (Exception e) {
             LOG.error("Error while initializing resource from location " + resource.getLocation(), e);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
@@ -192,7 +192,7 @@ public class ResourceDownloader implements Runnable {
         }
     }
 
-    private static void initializeOfflineResource(final Resource resource) {
+    private static void initializeFromCache(final Resource resource) {
         final CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
 
