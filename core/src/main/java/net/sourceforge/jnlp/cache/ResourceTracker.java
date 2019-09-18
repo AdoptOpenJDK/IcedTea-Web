@@ -252,7 +252,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                waitForResource(location);
+                wait(new Resource[]{getResource(location)}, 0);
             }
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -261,7 +261,7 @@ public class ResourceTracker {
         return getCacheFile(resource);
     }
 
-    private File getCacheFile(Resource resource) {
+    private static File getCacheFile(Resource resource) {
         final URL location = resource.getLocation();
         if (resource.isSet(ERROR)) {
             return null;
@@ -315,18 +315,6 @@ public class ResourceTracker {
         }
 
         return true;
-    }
-
-    /**
-     * Wait for a particular resource to be downloaded and made
-     * available.
-     *
-     * @param location the resource to wait for
-     * @throws InterruptedException if another thread interrupted the wait
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    private void waitForResource(URL location) throws InterruptedException {
-        wait(new Resource[]{getResource(location)}, 0);
     }
 
     /**
