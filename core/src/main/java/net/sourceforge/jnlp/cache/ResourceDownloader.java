@@ -6,18 +6,14 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,11 +21,7 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
-import java.util.zip.GZIPInputStream;
 
-import static net.sourceforge.jnlp.cache.CacheEntry.markForDelete;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -42,6 +34,8 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 class ResourceDownloader implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
+
+    private static final String INVALID_HTTP_RESPONSE = "Invalid Http response";
 
     private final Resource resource;
     private final Object lock;
@@ -218,40 +212,17 @@ class ResourceDownloader implements Runnable {
     }
 
     private void downloadResource() {
-        URL downloadFrom = resource.getDownloadLocation(); //Where to download from
-        URL downloadTo = resource.getLocation(); //Where to download to
+        final URL downloadFrom = resource.getDownloadLocation(); //Where to download from
+        final URL downloadLocation = resource.getLocation(); //Where to download to
 
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
+            final String contentEncoding = connection.getContentEncoding();
+            LOG.debug("Downloading {} from URL {} (encoding : {})", downloadLocation, downloadFrom, contentEncoding);
 
-            String contentEncoding = connection.getContentEncoding();
+            final StreamUnpacker unpacker = getStreamUnpacker(downloadFrom, contentEncoding);
 
-            LOG.debug("Downloading {} using {} (encoding : {})", downloadTo, downloadFrom, contentEncoding);
-
-            boolean packgz = "pack200-gzip".equals(contentEncoding)
-                    || downloadFrom.getPath().endsWith(".pack.gz");
-            boolean gzip = "gzip".equals(contentEncoding);
-
-            // It's important to check packgz first. If a stream is both
-            // pack200 and gz encoded, then con.getContentEncoding() could
-            // return ".gz", so if we check gzip first, we would end up
-            // treating a pack200 file as a jar file.
-            if (packgz) {
-                if (downloadFrom.getFile().endsWith(".pack.gz")) {
-                    downloadPackGzFile(connection, downloadFrom, downloadTo);
-                } else {
-                    downloadPackGzFile(connection, new URL(downloadFrom + ".pack.gz"), downloadTo);
-                }
-            } else if (gzip) {
-                if (downloadFrom.getFile().endsWith(".gz")) {
-                    downloadGZipFile(connection, downloadFrom, downloadTo);
-                } else {
-                    downloadGZipFile(connection, new URL(downloadFrom + ".gz"), downloadTo);
-                }
-            } else {
-                downloadFile(connection, downloadTo);
-            }
+            downloadFile(connection, downloadLocation, unpacker);
             resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
-
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
@@ -264,41 +235,37 @@ class ResourceDownloader implements Runnable {
         return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties);
     }
 
-    private void downloadPackGzFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
-        downloadFile(connection, downloadFrom);
+    private StreamUnpacker getStreamUnpacker(URL downloadFrom, String contentEncoding) {
+        boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
+        boolean gzip = "gzip".equals(contentEncoding);
 
-        extractPackGz(downloadFrom, downloadTo);
-        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom, resource.getDownloadVersion());
+        // It's important to check packgz first. If a stream is both
+        // pack200 and gz encoded, then con.getContentEncoding() could
+        // return ".gz", so if we check gzip first, we would end up
+        // treating a pack200 file as a jar file.
+        if (packgz) {
+            return new PackGzipUnpacker();
+        } else if (gzip) {
+            return new GzipUnpacker();
+        }
+
+        return new NotUnpacker();
     }
 
-    private void downloadGZipFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
-        downloadFile(connection, downloadFrom);
-
-        extractGzip(downloadFrom, downloadTo);
-        CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
-        entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
-        markForDelete(downloadFrom, resource.getDownloadVersion());
-    }
-
-    private void downloadFile(CloseableConnection connection, URL downloadLocation) throws IOException {
+    private void downloadFile(CloseableConnection connection, URL downloadLocation, StreamUnpacker unpacker) throws IOException {
         CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
         LOG.debug("Downloading file: {} into: {}", downloadLocation, downloadEntry.getCacheFile().getCanonicalPath());
         if (!downloadEntry.isCurrent(connection.getLastModified())) {
             try {
-                writeDownloadToFile(downloadLocation, new BufferedInputStream(connection.getInputStream()));
+                final InputStream packedStream = connection.getInputStream();
+                final InputStream unpackedStream = unpacker.unpack(packedStream);
+                writeDownloadToFile(downloadLocation, unpackedStream);
             } catch (IOException ex) {
-                String IH = "Invalid Http response";
-                if (ex.getMessage().equals(IH)) {
-                    LOG.error("'" + IH + "' message detected. Attempting direct socket", ex);
-                    Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(connection.getURL());
-                    LOG.info("Header of: {} ({})", connection.getURL(), downloadLocation);
-                    String head = (String) result[0];
-                    byte[] body = (byte[]) result[1];
-                    LOG.info(head);
-                    LOG.info("Body is: {} bytes long", body.length);
-                    writeDownloadToFile(downloadLocation, new ByteArrayInputStream(body));
+                if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
+                    LOG.error(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket", ex);
+                    final InputStream packedStream = getInputStreamFromDirectSocket(connection.getURL(), downloadLocation);
+                    final InputStream unpackedStream = unpacker.unpack(packedStream);
+                    writeDownloadToFile(downloadLocation, unpackedStream);
                 } else {
                     throw ex;
                 }
@@ -316,42 +283,13 @@ class ResourceDownloader implements Runnable {
         }
     }
 
-    private void extractGzip(final URL compressedLocation, final URL uncompressedLocation) throws IOException {
-        LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
-
-        final VersionString version = resource.getDownloadVersion();
-
-        final File compressedFile = CacheUtil.getCacheFile(compressedLocation, version);
-        final File uncompressedFile = CacheUtil.getCacheFile(uncompressedLocation, version);
-
-        final byte[] content;
-        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(compressedFile))) {
-            content = IOUtils.readContent(gzInputStream);
-        }
-
-        try (final OutputStream out = new FileOutputStream(uncompressedFile)) {
-            IOUtils.writeContent(out, content);
-        }
+    private InputStream getInputStreamFromDirectSocket(URL url, URL downloadLocation) throws IOException {
+        final Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(url);
+        final String head = (String) result[0];
+        final byte[] body = (byte[]) result[1];
+        LOG.info("Header of: {} ({})", url, downloadLocation);
+        LOG.info(head);
+        LOG.info("Body is: {} bytes long", body.length);
+        return new ByteArrayInputStream(body);
     }
-
-    private void extractPackGz(final URL compressedLocation, final URL uncompressedLocation) throws IOException {
-        LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
-
-        final VersionString version = resource.getDownloadVersion();
-
-        try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
-                .getCacheFile(compressedLocation, version)))) {
-            final InputStream inputStream = new BufferedInputStream(gzInputStream);
-
-            final JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(CacheUtil
-                    .getCacheFile(uncompressedLocation, version)));
-
-            final Pack200.Unpacker unpacker = Pack200.newUnpacker();
-            unpacker.unpack(inputStream, outputStream);
-
-            outputStream.close();
-            inputStream.close();
-        }
-    }
-
 }

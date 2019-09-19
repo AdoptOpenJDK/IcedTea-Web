@@ -37,13 +37,13 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -511,19 +511,6 @@ public class UrlUtils {
 
         return all.toString();
     }
-    
-    
-      private static byte[] getRemainingBytes(final InputStream is) throws IOException {
-        Objects.requireNonNull(is);
-        byte[] buf = new byte[2048];
-          final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int len;
-        while ((len = is.read(buf)) != -1) {
-            bos.write(buf, 0, len);
-        }
-        bos.close();
-        return bos.toByteArray();
-    }
 
     public static Object[] loadUrlWithInvalidHeaderBytes(final URL url) throws IOException {
         try (final Socket s = UrlUtils.createSocketFromUrl(url)) {
@@ -539,19 +526,22 @@ public class UrlUtils {
                         break;
                     }
                     head = head + ((char) readChar);
-                    if (head.endsWith("\n\n")
-                            || head.endsWith("\r\n\r\n")
-                            || head.endsWith("\n\r\n\r")
-                            || head.endsWith("\r\r")) {
-                        body = getRemainingBytes(is);
+                    if (endsWithBlankLine(head)) {
+                        body = IOUtils.readContent(is);
                     }
                 }
             }
             return new Object[]{head, body};
         }
     }
-    
-    
+
+    private static boolean endsWithBlankLine(String head) {
+        return head.endsWith("\n\n")
+                || head.endsWith("\r\n\r\n")
+                || head.endsWith("\n\r\n\r")
+                || head.endsWith("\r\r");
+    }
+
     public static String[] loadUrlWithInvalidHeader(final URL url) throws IOException {
         return loadUrlWithInvalidHeader(url, StandardCharsets.US_ASCII);
     }
