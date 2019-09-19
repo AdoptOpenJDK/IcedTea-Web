@@ -37,6 +37,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
+import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 class ResourceDownloader implements Runnable {
 
@@ -50,40 +51,71 @@ class ResourceDownloader implements Runnable {
         this.lock = lock;
     }
 
+    /**
+     * Sets the resource status to connect and download, and
+     * enqueues the resource if not already started.
+     *
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     */
+    static void startDownload(Resource resource, final Object lock) {
+        final boolean isProcessing;
+
+        synchronized (resource) {
+            if (resource.isComplete()) {
+                return;
+            }
+
+            isProcessing = resource.isSet(PROCESSING);
+
+            if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
+            }
+            if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
+            }
+
+            if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
+                return;
+            }
+        }
+
+        if (!isProcessing) {
+            CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
+        }
+    }
+
     @Override
     public void run() {
-        if (resource.isSet(PRECONNECT) && !resource.hasAllFlags(EnumSet.of(ERROR, CONNECTING, CONNECTED))) {
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECTING));
-            initializeResource();
+        try {
+            if (resource.isSet(PRECONNECT) && !resource.hasAllFlags(EnumSet.of(ERROR, CONNECTING, CONNECTED))) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECTING));
+                initializeResource();
+            }
+            if (resource.isSet(PREDOWNLOAD) && !resource.hasAllFlags(EnumSet.of(ERROR, DOWNLOADING, DOWNLOADED))) {
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADING));
+                downloadResource();
+            }
         }
-        if (resource.isSet(PREDOWNLOAD) && !resource.hasAllFlags(EnumSet.of(ERROR, DOWNLOADING, DOWNLOADED))) {
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADING));
-            downloadResource();
+        finally {
+            synchronized (lock) {
+                lock.notifyAll(); // wake up wait's to check for completion
+            }
         }
     }
 
     private void initializeResource() {
-        if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
-            initializeOnlineResource();
-        } else {
-            initializeOfflineResource();
-        }
-    }
-
-    private void initializeOnlineResource() {
         try {
-            final UrlRequestResult finalLocation = ResourceUrlCreator.findBestUrl(resource);
-            if (finalLocation != null) {
-                initializeFromURL(finalLocation);
-            } else {
-                initializeOfflineResource();
+            if (!JNLPRuntime.isOfflineForced() && resource.isConnectable()) {
+                final UrlRequestResult location = ResourceUrlCreator.findBestUrl(resource);
+                if (location != null) {
+                    initializeFromURL(location);
+                    return;
+                }
             }
+            initializeFromCache();
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Error while initializing resource from location " + resource.getLocation(), e);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
-            synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
-            }
         }
     }
 
@@ -135,7 +167,7 @@ class ResourceDownloader implements Runnable {
                 //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
                 //another issue is forking. If this (eg local) jnlp starts its second instance, the url *can* be different
                 //in contrary, usually si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
-                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed 
+                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed
                 if (jnlpPath == null || jnlpPath.equals("")) {
                     jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);
                     if (jnlpPath == null || jnlpPath.equals("")) {
@@ -155,16 +187,12 @@ class ResourceDownloader implements Runnable {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             }
             entry.store();
-
-            synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
-            }
         } finally {
             entry.unlock();
         }
     }
 
-    private void initializeOfflineResource() {
+    private void initializeFromCache() {
         final CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
         entry.lock();
 
@@ -182,10 +210,6 @@ class ResourceDownloader implements Runnable {
             } else {
                 LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
-            }
-
-            synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
             }
         } finally {
             entry.unlock();
@@ -226,21 +250,15 @@ class ResourceDownloader implements Runnable {
             } else {
                 downloadFile(connection, downloadTo);
             }
-
             resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
-            synchronized (lock) {
-                lock.notifyAll(); // wake up wait's to check for completion
-            }
+
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
-            synchronized (lock) {
-                lock.notifyAll();
-            }
         }
     }
 
-    private CloseableConnection getDownloadConnection(URL location) throws IOException {
+    private static CloseableConnection getDownloadConnection(URL location) throws IOException {
         final Map<String, String> requestProperties = new HashMap<>();
         requestProperties.put(ResourceUrlCreator.ACCEPT_ENCODING, ResourceUrlCreator.PACK_200_OR_GZIP);
         return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties);
@@ -249,7 +267,7 @@ class ResourceDownloader implements Runnable {
     private void downloadPackGzFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
-        extractPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
+        extractPackGz(downloadFrom, downloadTo);
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom, resource.getDownloadVersion());
@@ -258,7 +276,7 @@ class ResourceDownloader implements Runnable {
     private void downloadGZipFile(CloseableConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
         downloadFile(connection, downloadFrom);
 
-        extractGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
+        extractGzip(downloadFrom, downloadTo);
         CacheEntry entry = new CacheEntry(downloadTo, resource.getDownloadVersion());
         entry.storeEntryFields(entry.getCacheFile().length(), connection.getLastModified());
         markForDelete(downloadFrom, resource.getDownloadVersion());
@@ -292,14 +310,16 @@ class ResourceDownloader implements Runnable {
         downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
     }
 
-    private void writeDownloadToFile(URL downloadLocation, InputStream in) throws IOException {
+    private void writeDownloadToFile(final URL downloadLocation, final InputStream in) throws IOException {
         try (final OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
             IOUtils.copy(in, out);
         }
     }
 
-    private void extractGzip(final URL compressedLocation, final URL uncompressedLocation, final VersionString version) throws IOException {
+    private void extractGzip(final URL compressedLocation, final URL uncompressedLocation) throws IOException {
         LOG.debug("Extracting gzip: {} to {}", compressedLocation, uncompressedLocation);
+
+        final VersionString version = resource.getDownloadVersion();
 
         final File compressedFile = CacheUtil.getCacheFile(compressedLocation, version);
         final File uncompressedFile = CacheUtil.getCacheFile(uncompressedLocation, version);
@@ -314,8 +334,10 @@ class ResourceDownloader implements Runnable {
         }
     }
 
-    private void extractPackGz(final URL compressedLocation, final URL uncompressedLocation, final VersionString version) throws IOException {
+    private void extractPackGz(final URL compressedLocation, final URL uncompressedLocation) throws IOException {
         LOG.debug("Extracting packgz: {} to {}", compressedLocation, uncompressedLocation);
+
+        final VersionString version = resource.getDownloadVersion();
 
         try (final GZIPInputStream gzInputStream = new GZIPInputStream(new FileInputStream(CacheUtil
                 .getCacheFile(compressedLocation, version)))) {

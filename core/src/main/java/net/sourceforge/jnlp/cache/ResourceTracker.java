@@ -31,12 +31,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
-import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 /**
@@ -153,7 +149,7 @@ public class ResourceTracker {
         initResourceFromCache(resource, updatePolicy);
 
         if (prefetch && resource.isSet(DOWNLOADED)) {
-            startDownload(resource);
+            ResourceDownloader.startDownload(resource, lock);
         }
     }
 
@@ -180,7 +176,7 @@ public class ResourceTracker {
      *
      * @param updatePolicy whether to check for updates if already in cache
      */
-    private void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
+    private static void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
         if (!CacheUtil.isCacheable(resource.getLocation())) {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
@@ -256,7 +252,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                waitForResource(location);
+                wait(new Resource[]{getResource(location)}, 0);
             }
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -265,7 +261,7 @@ public class ResourceTracker {
         return getCacheFile(resource);
     }
 
-    private File getCacheFile(Resource resource) {
+    private static File getCacheFile(Resource resource) {
         final URL location = resource.getLocation();
         if (resource.isSet(ERROR)) {
             return null;
@@ -322,18 +318,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Wait for a particular resource to be downloaded and made
-     * available.
-     *
-     * @param location the resource to wait for
-     * @throws InterruptedException if another thread interrupted the wait
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    private void waitForResource(URL location) throws InterruptedException {
-        wait(new Resource[]{getResource(location)}, 0);
-    }
-
-    /**
      * Returns the number of bytes downloaded for a resource.
      *
      * @param location the resource location
@@ -360,40 +344,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Sets the resource status to connect and download, and
-     * enqueues the resource if not already started.
-     *
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    private void startDownload(Resource resource) {
-        final boolean isProcessing;
-
-        synchronized (resource) {
-            if (resource.isComplete()) {
-                return;
-            }
-
-            isProcessing = resource.isSet(PROCESSING);
-
-            if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
-            }
-            if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
-            }
-
-            if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
-                return;
-            }
-        }
-
-        if (!isProcessing) {
-            startDownloadThread(resource);
-        }
-
-    }
-
-    /**
      * Returns the number of total size in bytes of a resource, or
      * -1 it the size is not known.
      *
@@ -406,30 +356,17 @@ public class ResourceTracker {
     }
 
     /**
-     * Start a new download thread.
-     * <p>
-     * Calls to this method should be synchronized on lock.
-     * </p>
-     * @param resource  resource to be download
-     */
-    private void startDownloadThread(Resource resource) {
-        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
-    }
-
-    /**
      * Return the resource matching the specified URL.
      *
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private Resource getResource(URL location) {
         synchronized (resources) {
-            for (Resource resource : resources) {
-                if (UrlUtils.urlEquals(resource.getLocation(), location))
-                    return resource;
-            }
+            return resources.stream()
+                    .filter(r -> UrlUtils.urlEquals(r.getLocation(), location))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalResourceDescriptorException("Location does not specify a resource being tracked."));
         }
-
-        throw new IllegalResourceDescriptorException("Location does not specify a resource being tracked.");
     }
 
     /**
@@ -446,7 +383,7 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            startDownload(resource);
+            ResourceDownloader.startDownload(resource, lock);
         }
 
         // wait for completion
