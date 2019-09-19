@@ -364,7 +364,7 @@ public class ResourceTracker {
         synchronized (resources) {
             return resources.stream()
                     .filter(r -> UrlUtils.urlEquals(r.getLocation(), location))
-                    .findAny()
+                    .findFirst()
                     .orElseThrow(() -> new IllegalResourceDescriptorException("Location does not specify a resource being tracked."));
         }
     }
