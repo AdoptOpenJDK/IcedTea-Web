@@ -29,7 +29,7 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
 
     private static final VersionString VERSION_11 = VersionString.fromString("1.1");
     private static final VersionString VERSION_20 = VersionString.fromString("2.0");
-    private static final VersionString VERSION_TWO = VersionString.fromString("version two");
+    private static final VersionString VERSION_STRING = VersionString.fromString("2.3.0 2.3.1");
     private static final DownloadOptions DLOPTS_NOPACK_USEVERSION = new DownloadOptions(false, true);
     private static final DownloadOptions DLOPTS_NOPACK_NOVERSION = new DownloadOptions(false, false);
 
@@ -83,8 +83,8 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
 
     @Test
     public void testGetNonVersionIdUrl() throws MalformedURLException {
-        URL result = getResultUrl("http://example.com/nonVersionIdUrl.jar", VERSION_TWO, DLOPTS_NOPACK_USEVERSION);
-        assertEquals("http://example.com/nonVersionIdUrl.jar", result.toString());
+        URL result = getResultUrl("http://example.com/nonVersionIdUrl.jar", VERSION_STRING, DLOPTS_NOPACK_USEVERSION);
+        assertEquals("http://example.com/nonVersionIdUrl.jar?version-id=2.3.0+2.3.1", result.toString());
     }
 
     @Test
@@ -315,27 +315,27 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
             Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, null, UpdatePolicy.NEVER);
             Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), null, UpdatePolicy.NEVER);
             Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), null, UpdatePolicy.NEVER);
-            assertOnServerWithHeader(ResourceUrlCreator.findBestUrl(r1).getRedirectURL());
-            assertVersionedOneOnServerWithHeader(ResourceUrlCreator.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getRedirectURL());
+            assertOnServerWithHeader(ResourceUrlCreator.findBestUrl(r1).getLocation());
+            assertVersionedOneOnServerWithHeader(ResourceUrlCreator.findBestUrl(r3).getLocation());
+            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getLocation());
+            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getLocation());
 
             fileForServerWithHeader.delete();
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(ResourceUrlCreator.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getRedirectURL());
+            assertVersionedOneOnServerWithHeader(ResourceUrlCreator.findBestUrl(r3).getLocation());
+            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getLocation());
+            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getLocation());
 
             versionedFileForServerWithHeader.delete();
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r1));
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r3));
-            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getRedirectURL());
+            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getLocation());
+            assertVersionedOneOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r4).getLocation());
 
             versionedFileForServerWithoutHeader.delete();
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r1));
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r3));
-            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getRedirectURL());
+            assertOnServerWithoutHeader(ResourceUrlCreator.findBestUrl(r2).getLocation());
             Assert.assertNull(ResourceUrlCreator.findBestUrl(r4));
 
             fileForServerWithoutHeader.delete();
