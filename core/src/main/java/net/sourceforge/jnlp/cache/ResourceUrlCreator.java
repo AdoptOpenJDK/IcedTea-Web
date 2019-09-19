@@ -49,8 +49,11 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -293,7 +296,11 @@ class ResourceUrlCreator {
                 .filter(s -> !isBlank(s))
                 .collect(Collectors.toList());
         if (requestVersion != null) {
-            queryParts.add("version-id=" + requestVersion.toString());
+            try {
+                queryParts.add("version-id=" + URLEncoder.encode(requestVersion.toString(), StandardCharsets.UTF_8.name()));
+            } catch (UnsupportedEncodingException e) {
+                LOG.error("Your system does not support " + StandardCharsets.UTF_8.name() + " encoding.", e);
+            }
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 

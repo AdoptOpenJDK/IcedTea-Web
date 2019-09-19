@@ -84,7 +84,7 @@ public class ResourceUrlCreatorTest extends NoStdOutErrTest{
     @Test
     public void testGetNonVersionIdUrl() throws MalformedURLException {
         URL result = getResultUrl("http://example.com/nonVersionIdUrl.jar", VERSION_STRING, DLOPTS_NOPACK_USEVERSION);
-        assertEquals("http://example.com/nonVersionIdUrl.jar?version-id=2.3.0 2.3.1", result.toString());
+        assertEquals("http://example.com/nonVersionIdUrl.jar?version-id=2.3.0+2.3.1", result.toString());
     }
 
     @Test
