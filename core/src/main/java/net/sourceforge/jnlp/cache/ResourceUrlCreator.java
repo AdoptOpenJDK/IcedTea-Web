@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -65,6 +66,7 @@ import java.util.stream.Collectors;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
+import static net.sourceforge.jnlp.runtime.JNLPRuntime.reloadPolicy;
 
 class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
@@ -93,9 +95,15 @@ class ResourceUrlCreator {
             return new UrlRequestResult(
                     connection.getResponseCode(),
                     connection.getLocationHeaderFieldUrl(),
+                    getJnlpVersionHeader(connection),
                     connection.getLastModified(),
                     connection.getContentLength());
         }
+    }
+
+    private static VersionId getJnlpVersionHeader(CloseableConnection connection) {
+        final String version = connection.getHeaderField("x-java-jnlp-version-id");
+        return version != null ? VersionId.fromString(version) : null;
     }
 
     /**

@@ -23,6 +23,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
@@ -417,7 +418,7 @@ public class Launcher {
             // look at the main jar for the main class.
             if (mainName == null) {
                 final JARDesc mainJarDesc = file.getResources().getMainJAR();
-                final File f = CacheUtil.getCacheFile(mainJarDesc.getLocation(), mainJarDesc.getVersion());
+                final File f = app.getClassLoader().getTracker().getCacheFile(mainJarDesc.getLocation());
                 if (f != null) {
                     final JarFile mainJar = new JarFile(f);
                     mainName = mainJar.getManifest().

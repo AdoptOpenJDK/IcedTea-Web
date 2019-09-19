@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -14,6 +15,7 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -114,7 +116,7 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromURL(final UrlRequestResult location) {
-        CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+        CacheEntry entry = new CacheEntry(resource.getLocation(), location.getVersion());
         entry.lock();
         try {
             resource.setDownloadLocation(location.getLocation());
@@ -122,14 +124,14 @@ class ResourceDownloader implements Runnable {
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             long size = location.getContentLength();
             long lm = location.getLastModified();
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            boolean current = CacheUtil.isCurrent(resource.getLocation(), location.getVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
                     entry.markForDelete();
                     entry.store();
                     // Old entry will still exist. (but removed at cleanup)
                     localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
+                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), location.getVersion());
                     newEntry.lock();
                     entry.unlock();
                     entry = newEntry;
@@ -187,28 +189,22 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromCache() {
-        final CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-        entry.lock();
+        final VersionId versionId = CacheUtil.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
+        final File localFile = CacheUtil.getCacheFile(resource.getLocation(), versionId);
 
-        try {
-            final File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+        if (localFile != null && localFile.exists()) {
+            long size = localFile.length();
 
-            if (localFile != null && localFile.exists()) {
-                long size = localFile.length();
-
-                synchronized (resource) {
-                    resource.setLocalFile(localFile);
-                    resource.setSize(size);
-                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
-                }
-            } else {
-                LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
+            synchronized (resource) {
+                resource.setLocalFile(localFile);
+                resource.setSize(size);
+                resource.setDownloadVersion(versionId);
+                resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
             }
-        } finally {
-            entry.unlock();
+        } else {
+            LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
         }
-
     }
 
     private void downloadResource() {
@@ -271,14 +267,16 @@ class ResourceDownloader implements Runnable {
                 }
             }
         } else {
-            resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
+            final File cacheFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
+            resource.setTransferred(cacheFile.length());
         }
 
         downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
     }
 
     private void writeDownloadToFile(final URL downloadLocation, final InputStream in) throws IOException {
-        try (final OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
+        final File outputFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
+        try (final OutputStream out = new FileOutputStream(outputFile)) {
             IOUtils.copy(in, out);
         }
     }

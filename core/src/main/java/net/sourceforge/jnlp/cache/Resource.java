@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -84,7 +85,7 @@ public class Resource {
     private final VersionString requestVersion;
 
     /** the version downloaded from server */
-    private VersionString downloadVersion;
+    private VersionId downloadVersion;
 
     /** amount in bytes transferred */
     private volatile long transferred = 0;
@@ -197,7 +198,7 @@ public class Resource {
     /**
      * @return the version downloaded from server
      */
-    VersionString getDownloadVersion() {
+    VersionId getDownloadVersion() {
         return downloadVersion;
     }
 
@@ -206,7 +207,7 @@ public class Resource {
      *
      * @param downloadVersion version of downloaded resource
      */
-    public void setDownloadVersion(final VersionString downloadVersion) {
+    public void setDownloadVersion(final VersionId downloadVersion) {
         this.downloadVersion = downloadVersion;
     }
 

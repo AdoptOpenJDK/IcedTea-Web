@@ -68,7 +68,7 @@ class XDownloadService implements DownloadService {
             return false;
 
         for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = CacheUtil.isCached(jars[i].getLocation(), resourceVersion);
+            allCached = CacheUtil.isAnyCached(jars[i].getLocation(), resourceVersion);
         }
 
         return allCached;
@@ -105,7 +105,7 @@ class XDownloadService implements DownloadService {
             return false;
 
         for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = CacheUtil.isCached(jars[i].getLocation(), null);
+            allCached = CacheUtil.isAnyCached(jars[i].getLocation(), jars[i].getVersion());
         }
 
         return allCached;

@@ -18,13 +18,12 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -117,32 +116,6 @@ public class CacheUtil {
         final ResourceTracker rt = new ResourceTracker();
         rt.addResource(location, version, null, policy);
         return rt.getCacheFile(location);
-    }
-
-    /**
-     * Returns the Permission object necessary to access the
-     * resource, or {@code null} if no permission is needed.
-     *
-     * @param location location of the resource
-     * @param version  the version, or {@code null}
-     * @return permissions of the location
-     */
-    public static Permission getReadPermission(final URL location, final VersionString version) {
-        Permission result = null;
-        if (CacheUtil.isCacheable(location)) {
-            final File file = CacheUtil.getCacheFile(location, version);
-            result = new FilePermission(file.getPath(), FILE_READ_ACTION);
-        } else {
-            // this is what URLClassLoader does
-            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
-                result = conn.getPermission();
-            } catch (IOException ioe) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
-                // should try to figure out the permission
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -384,7 +357,7 @@ public class CacheUtil {
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(final URL source, final VersionString version, long lastModified) {
+    public static boolean isCurrent(final URL source, final VersionId version, long lastModified) {
 
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
@@ -404,14 +377,28 @@ public class CacheUtil {
 
     /**
      * Returns true if the cache has a local copy of the contents of
-     * the URL matching the specified version string.
+     * the URL matching the specified version.
      *
      * @param source  the source URL
-     * @param version the versions to check for
+     * @param version the version to check for
      * @return true if the source is in the cache
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCached(final URL source, final VersionString version) {
+    public static boolean isAnyCached(final URL source, final VersionString version) {
+        final VersionId versionId = getBestMatchingVersionInCache(source, version);
+        return versionId != null;
+    }
+
+    /**
+     * Returns true if the cache has a local copy of the contents of
+     * the URL matching the specified version.
+     *
+     * @param source  the source URL
+     * @param version the version to check for
+     * @return true if the source is in the cache
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    public static boolean isCached(final URL source, final VersionId version) {
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
@@ -444,6 +431,16 @@ public class CacheUtil {
         return true;
     }
 
+    public static VersionId getBestMatchingVersionInCache(final URL source, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
+    public static Set<VersionId> getAllMatchingVersionInCache(final URL source, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
     /**
      * Returns the file for the locally cached contents of the
      * source.  This method returns the file location only and does
@@ -455,7 +452,10 @@ public class CacheUtil {
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static File getCacheFile(final URL source, final VersionString version) {
+    public static File getCacheFile(final URL source, final VersionId version) {
+
+        // TODO: handle Version
+
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
@@ -546,7 +546,10 @@ public class CacheUtil {
      * @param version the version id of the local file
      * @return the file location in the cache.
      */
-    public static File makeNewCacheFile(final URL source, final VersionString version) {
+    public static File makeNewCacheFile(final URL source, final VersionId version) {
+
+        // TODO: handle Version
+
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             File cacheFile = null;
@@ -578,22 +581,6 @@ public class CacheUtil {
             }
             return cacheFile;
         }
-    }
-
-    /**
-     * Returns a buffered output stream open for writing to the
-     * cache file.
-     *
-     * @param source  the remote location
-     * @param version the file version to write to
-     * @return the stream to write to resource
-     * @throws IOException if IO breaks
-     */
-    public static OutputStream getOutputStream(final URL source, final VersionString version) throws IOException {
-        final File localFile = getCacheFile(source, version);
-        final OutputStream out = new FileOutputStream(localFile);
-
-        return new BufferedOutputStream(out);
     }
 
     /**

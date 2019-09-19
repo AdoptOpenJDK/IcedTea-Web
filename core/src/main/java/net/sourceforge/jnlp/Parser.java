@@ -46,6 +46,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -287,8 +288,9 @@ public final class Parser {
      *
      * @return version of file
      */
-    public VersionString getFileVersion() {
-        return getVersionString(root, JNLPFile.VERSION_ATTRIBUTE, null);
+    public VersionId getFileVersion() {
+        final String version = getAttribute(root, JNLPFile.VERSION_ATTRIBUTE, null);
+        return (version == null) ? null : VersionId.fromString(version);
     }
 
     /**

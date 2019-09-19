@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -46,7 +47,7 @@ public class CacheEntry {
     private final URL location;
 
     /** the requested version */
-    private final VersionString version;
+    private final VersionId version;
 
     /** info about the cached file */
     private final PropertiesFile properties;
@@ -58,7 +59,7 @@ public class CacheEntry {
      * @param location the remote resource location
      * @param version the version of the resource
      */
-    CacheEntry(final URL location, final VersionString version) {
+    CacheEntry(final URL location, final VersionId version) {
         this.location = location;
         this.version = version;
         
@@ -68,7 +69,7 @@ public class CacheEntry {
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
-    static void markForDelete(URL location, final VersionString version) {
+    static void markForDelete(URL location, final VersionId version) {
         CacheEntry entry = new CacheEntry(location, version);
         entry.lock();
         try {

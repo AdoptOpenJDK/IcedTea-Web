@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -108,6 +109,10 @@ public class ResourceTracker {
      */
     public ResourceTracker(boolean prefetch) {
         this.prefetch = prefetch;
+    }
+
+    public void addResource(URL location, final VersionId version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
+        addResource(location, version.asVersionString(), options, updatePolicy);
     }
 
     /**

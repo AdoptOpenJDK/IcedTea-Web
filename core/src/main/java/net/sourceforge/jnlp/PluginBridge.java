@@ -31,6 +31,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -113,7 +114,7 @@ public final class PluginBridge extends JNLPFile {
                         int width, int height, final PluginParameters params, JNLPFileFactory factory)
             throws Exception {
         specVersion = VersionString.fromString("1.0");
-        fileVersion = VersionString.fromString("1.1");
+        fileVersion = VersionId.fromString("1.1");
         this.codeBase = codebase;
         this.sourceLocation = documentBase;
         this.params = params;

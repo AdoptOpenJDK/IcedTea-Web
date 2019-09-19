@@ -53,7 +53,7 @@ public class AppletInstance extends ApplicationInstance {
      * @param loader classloader for this instance
      * @param applet applet of this instance
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet) {
+    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet) {
         super(file, group, loader);
 
         this.applet = applet;
@@ -81,7 +81,7 @@ public class AppletInstance extends ApplicationInstance {
      * @param applet applet of this instance
      * @param cont Container where to place applet
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, ClassLoader loader, Applet applet, Container cont) {
+    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, Container cont) {
         super(file, group, loader);
         this.applet = applet;
         this.environment = new AppletEnvironment(file, this, cont);

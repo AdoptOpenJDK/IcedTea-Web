@@ -71,7 +71,7 @@ public class ApplicationInstance {
     private final ThreadGroup group;
 
     /** the classloader */
-    private final ClassLoader loader;
+    private final JNLPClassLoader loader;
 
     /**
      * <p>
@@ -105,7 +105,7 @@ public class ApplicationInstance {
      * @param group thread group to which it belongs
      * @param loader loader for this application
      */
-    public ApplicationInstance(JNLPFile file, ThreadGroup group, ClassLoader loader) {
+    public ApplicationInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader) {
         this.file = file;
         this.group = group;
         this.loader = loader;
@@ -425,7 +425,7 @@ public class ApplicationInstance {
      * @return the classloader of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
-    public ClassLoader getClassLoader() throws IllegalStateException {
+    public JNLPClassLoader getClassLoader() throws IllegalStateException {
         if (stopped)
             throw new IllegalStateException();
 
