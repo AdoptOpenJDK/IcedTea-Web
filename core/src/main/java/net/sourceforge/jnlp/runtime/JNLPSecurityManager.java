@@ -22,7 +22,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
-import sun.awt.AWTSecurityManager;
 import sun.awt.AppContext;
 
 import java.awt.Window;
@@ -45,7 +44,7 @@ import java.security.Permission;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.17 $
  */
-class JNLPSecurityManager extends AWTSecurityManager {
+class JNLPSecurityManager extends SecurityManager {
 
     private final static Logger LOG = LoggerFactory.getLogger(JNLPSecurityManager.class);
 
@@ -421,33 +420,6 @@ class JNLPSecurityManager extends AWTSecurityManager {
 
     protected void disableExit() {
         exitAllowed = false;
-    }
-
-    /**
-     * This returns the appropriate {@link AppContext}. Hooks in AppContext
-     * check if the current {@link SecurityManager} is an instance of
-     * AWTSecurityManager and if so, call this method to give it a chance to
-     * return the appropriate appContext based on the application that is
-     * running.
-     * <p>
-     * This can be called from any thread (possibly a swing thread) to find out
-     * the AppContext for the thread (which may correspond to a particular
-     * applet).
-     * </p>
-     */
-    @Override
-    public AppContext getAppContext() {
-        ApplicationInstance app = getApplication();
-        if (app == null) {
-            /*
-             * if we cannot find an application based on the code on the stack,
-             * then assume it is the main application
-             */
-            return mainAppContext;
-        } else {
-            return app.getAppContext();
-        }
-
     }
 
     /**
