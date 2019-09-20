@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -118,10 +119,26 @@ public class ResourceTracker {
      *
      * @param location the location of the resource
      * @param version the resource version
+     * @param updatePolicy whether to check for updates if already in cache
+     */
+    public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
+        addResource(location, version, new DownloadOptions(false, false), updatePolicy);
+    }
+
+    /**
+     * Add a resource identified by the specified location and
+     * version.  The tracker only downloads one version of a given
+     * resource per instance (ie cannot download both versions 1 and
+     * 2 of a resource in the same tracker).
+     *
+     * @param location the location of the resource
+     * @param version the resource version
      * @param options options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
+        Assert.requireNonNull(options, "options");
+
         if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
         }
@@ -132,8 +149,7 @@ public class ResourceTracker {
             LOG.error("Normalization of " + location.toString() + " has failed", ex);
         }
 
-        final DownloadOptions downloadOptions = options == null ? new DownloadOptions(false, false) : options;
-        Resource resource = Resource.createResource(location, version, downloadOptions, updatePolicy);
+        Resource resource = Resource.createResource(location, version, options, updatePolicy);
 
         synchronized (resources) {
             if (resources.contains(resource))
