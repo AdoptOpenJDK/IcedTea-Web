@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
@@ -111,8 +112,12 @@ public class ResourceTracker {
         this.prefetch = prefetch;
     }
 
-    public void addResource(URL location, final VersionId version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
-        addResource(location, version.asVersionString(), options, updatePolicy);
+    public void addResource(URL location, final VersionId version, final UpdatePolicy updatePolicy) {
+        addResource(location, version.asVersionString(), new DownloadOptions(false, false), updatePolicy);
+    }
+
+    public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
+        addResource(location, version, new DownloadOptions(false, false), updatePolicy);
     }
 
     /**
@@ -127,6 +132,8 @@ public class ResourceTracker {
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
+        Assert.requireNonNull(options, "options");
+
         if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
         }
@@ -137,13 +144,12 @@ public class ResourceTracker {
             LOG.error("Normalization of " + location.toString() + " has failed", ex);
         }
 
-        final DownloadOptions downloadOptions = options == null ? new DownloadOptions(false, false) : options;
-        Resource resource = Resource.createResource(location, version, downloadOptions, updatePolicy);
+        Resource resource = Resource.createResource(location, version, options, updatePolicy);
 
         synchronized (resources) {
-            if (resources.contains(resource))
+            if (resources.contains(resource)) {
                 return;
-            resource.addTracker(this);
+            }
             resources.add(resource);
         }
 
@@ -171,7 +177,6 @@ public class ResourceTracker {
         synchronized (resources) {
             Resource resource = getResource(location);
             resources.remove(resource);
-            resource.removeTracker(this);
         }
     }
 

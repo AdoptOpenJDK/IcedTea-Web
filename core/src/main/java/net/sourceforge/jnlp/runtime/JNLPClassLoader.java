@@ -1307,7 +1307,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                             continue;
                                         }
 
-                                        tracker.addResource(new File(extractedJarLocation).toURL(), (VersionString) null, null, null);
+                                        tracker.addResource(new File(extractedJarLocation).toURL(), (VersionString) null, null);
 
                                         URL codebase = file.getCodeBase();
                                         if (codebase == null) {
@@ -1610,7 +1610,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
         tracker.addResource(desc.getLocation(),
                 desc.getVersion(),
-                null,
                 updatePolicy
         );
 

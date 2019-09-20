@@ -378,7 +378,7 @@ public class JNLPFile {
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version, null, policy);
+            tracker.addResource(location, version, policy);
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
         }

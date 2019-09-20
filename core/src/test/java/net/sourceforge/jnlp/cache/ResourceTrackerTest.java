@@ -218,7 +218,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         URL url = downloadServer.getUrl("resource");
 
         ResourceTracker rt = new ResourceTracker();
-        rt.addResource(url, (VersionString) null, null, UpdatePolicy.FORCE);
+        rt.addResource(url, (VersionString) null, UpdatePolicy.FORCE);
         File downloadFile = rt.getCacheFile(url);
 
         assertTrue(downloadFile.exists() && downloadFile.isFile());

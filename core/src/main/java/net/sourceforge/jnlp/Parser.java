@@ -537,7 +537,7 @@ public final class Parser {
      */
     private JARDesc getJAR(final Node node) throws ParseException {
         boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
-        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
+        final URL location = getRequiredURL(node, JARDesc.HREF_ATTRIBUTE, base, strict);
         final VersionString versionString = getVersionString(node, JARDesc.VERSION_ATTRIBUTE, null);
         final String part = getAttribute(node, JARDesc.PART_ATTRIBUTE, null);
         final boolean main = "true".equals(getAttribute(node, JARDesc.MAIN_ATTRIBUTE, "false"));
@@ -562,7 +562,7 @@ public final class Parser {
     private ExtensionDesc getExtension(final Node node) throws ParseException {
         final String name = getAttribute(node, ExtensionDesc.NAME_ATTRIBUTE, null);
         final VersionString version = getVersionString(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
-        final URL location = getRequiredURL(node, ResourcesDesc.HREF_ATTRIBUTE, base, strict);
+        final URL location = getRequiredURL(node, ExtensionDesc.HREF_ATTRIBUTE, base, strict);
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 

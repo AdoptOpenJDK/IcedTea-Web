@@ -105,7 +105,7 @@ public class CacheUtil {
      */
     private static File getCachedResourceFile(final URL location, final VersionString version, final UpdatePolicy policy) {
         final ResourceTracker rt = new ResourceTracker();
-        rt.addResource(location, version, null, policy);
+        rt.addResource(location, version, policy);
         return rt.getCacheFile(location);
     }
 
