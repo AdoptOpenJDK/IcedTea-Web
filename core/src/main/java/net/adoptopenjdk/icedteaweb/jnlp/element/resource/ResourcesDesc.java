@@ -49,7 +49,6 @@ public class ResourcesDesc {
     public static final String EXTENSION_ELEMENT = "extension";
     public static final String PROPERTY_ELEMENT = "property";
     public static final String PACKAGE_ELEMENT = "package";
-    public static final String HREF_ATTRIBUTE = "href";
 
     /**
      * the locales of these resources
@@ -95,7 +94,7 @@ public class ResourcesDesc {
      */
     public JREDesc[] getJREs() {
         final List<JREDesc> lresources = getResources(JREDesc.class);
-        return lresources.toArray(new JREDesc[lresources.size()]);
+        return lresources.toArray(new JREDesc[0]);
     }
 
     public static JARDesc getMainJAR(final JARDesc[] jars) {
@@ -129,7 +128,7 @@ public class ResourcesDesc {
      */
     public JARDesc[] getJARs() {
         final List<JARDesc> lresources = getResources(JARDesc.class);
-        return lresources.toArray(new JARDesc[lresources.size()]);
+        return lresources.toArray(new JARDesc[0]);
     }
 
     /**
@@ -147,7 +146,7 @@ public class ResourcesDesc {
                 lresources.remove(i);
         }
 
-        return lresources.toArray(new JARDesc[lresources.size()]);
+        return lresources.toArray(new JARDesc[0]);
     }
 
     /**
@@ -155,7 +154,7 @@ public class ResourcesDesc {
      */
     public ExtensionDesc[] getExtensions() {
         final List<ExtensionDesc> lresources = getResources(ExtensionDesc.class);
-        return lresources.toArray(new ExtensionDesc[lresources.size()]);
+        return lresources.toArray(new ExtensionDesc[0]);
     }
 
     /**
@@ -163,7 +162,7 @@ public class ResourcesDesc {
      */
     public PackageDesc[] getPackages() {
         final List<PackageDesc> lresources = getResources(PackageDesc.class);
-        return lresources.toArray(new PackageDesc[lresources.size()]);
+        return lresources.toArray(new PackageDesc[0]);
     }
 
     /**
@@ -182,7 +181,7 @@ public class ResourcesDesc {
                 lresources.remove(i);
         }
 
-        return lresources.toArray(new PackageDesc[lresources.size()]);
+        return lresources.toArray(new PackageDesc[0]);
     }
 
     /**
@@ -190,7 +189,7 @@ public class ResourcesDesc {
      */
     public PropertyDesc[] getProperties() {
         final List<PropertyDesc> lresources = getResources(PropertyDesc.class);
-        return lresources.toArray(new PropertyDesc[lresources.size()]);
+        return lresources.toArray(new PropertyDesc[0]);
     }
 
     /**
