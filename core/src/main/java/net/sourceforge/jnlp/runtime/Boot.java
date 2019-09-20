@@ -397,7 +397,7 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app
-                CacheUtil.clearCache(optionArgs.get(0), true, true);
+                CacheUtil.deleteFromCache(optionArgs.get(0));
             } else {
                 // clear all cache
                 CacheUtil.clearCache();

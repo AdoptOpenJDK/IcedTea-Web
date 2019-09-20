@@ -150,29 +150,12 @@ public class CacheUtil {
         return true;
     }
 
-    public static boolean clearCache(final String cacheId, boolean jnlpPath, boolean domain) {
+    public static boolean deleteFromCache(final String cacheId) {
         // clear one app
         if (cannotClearCache()) {
             return false;
         }
 
-        LOG.warn("Clearing cache for: {}", cacheId);
-        List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
-        int found = 0;
-        int files = 0;
-        for (CacheId id : ids) {
-            if (id.getId().equalsIgnoreCase(cacheId)) {
-                found++;
-                files += id.files.size();
-            }
-        }
-        if (found == 0) {
-            LOG.error("No ID matching {} found!", cacheId);
-        }
-        if (found > 1) {
-            LOG.error("More then one ID is matching {}!", cacheId);
-        }
-        LOG.info("Alerting: {} of files ", files);
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         synchronized (lruHandler) {
             lruHandler.lock();
@@ -183,8 +166,9 @@ public class CacheUtil {
                             if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
                                 PropertiesFile pf = new PropertiesFile(new File(path.toString()));
                                 // if jnlp-path in .info equals path of app to delete mark to delete
-                                String jnlpPath1 = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                if (cacheId.equalsIgnoreCase(jnlpPath1) || cacheId.equalsIgnoreCase(getDomain(path))) {
+                                final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                                final String domain = getDomain(path);
+                                if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
                                     pf.setProperty("delete", "true");
                                     pf.store();
                                     LOG.info("marked for deletion: {}", path);

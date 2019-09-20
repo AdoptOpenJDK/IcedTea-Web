@@ -107,10 +107,10 @@ public class CacheAppViewer extends JDialog {
                     @Override
                     public void run() {
                         if (idTabs.getSelectedComponent()==jnlpPaths){
-                            CacheUtil.clearCache(appsByJnlpPath.getSelectedValue().getId(), true, false);
+                            CacheUtil.deleteFromCache(appsByJnlpPath.getSelectedValue().getId());
                         }
                         if (idTabs.getSelectedComponent()==domains){
-                            CacheUtil.clearCache(appsByDomain.getSelectedValue().getId(), false, true);
+                            CacheUtil.deleteFromCache(appsByDomain.getSelectedValue().getId());
                         }
                         CacheAppViewer.this.getContentPane().removeAll();
                         CacheAppViewer.this.pack();
