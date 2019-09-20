@@ -54,8 +54,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -91,8 +89,7 @@ public class CacheUtil {
                 return null;
                 //returning null seems to be better
             }
-            // TODO: Should be toURI().toURL()
-            return f.toURL();
+            return f.toURI().toURL();
         } catch (MalformedURLException ex) {
             return location;
         }
@@ -106,7 +103,7 @@ public class CacheUtil {
      * @param policy   update policy of resource
      * @return location in ITW cache on filesystem
      */
-    public static File getCachedResourceFile(final URL location, final VersionString version, final UpdatePolicy policy) {
+    private static File getCachedResourceFile(final URL location, final VersionString version, final UpdatePolicy policy) {
         final ResourceTracker rt = new ResourceTracker();
         rt.addResource(location, version, null, policy);
         return rt.getCacheFile(location);
@@ -126,7 +123,7 @@ public class CacheUtil {
         CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
         File cacheDir = lruHandler.getCacheDir().getFile();
 
-        if (!checkToClearCache()) {
+        if (cannotClearCache()) {
             return false;
         }
         LOG.debug("Clearing cache directory: {}", cacheDir);
@@ -153,7 +150,7 @@ public class CacheUtil {
 
     public static boolean clearCache(final String application, boolean jnlpPath, boolean domain) {
         // clear one app
-        if (!checkToClearCache()) {
+        if (cannotClearCache()) {
             return false;
         }
 
@@ -178,26 +175,20 @@ public class CacheUtil {
         synchronized (lruHandler) {
             lruHandler.lock();
             try {
-                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
-                    @Override
-                    public boolean test(Path t) {
-                        return Files.isRegularFile(t);
-                    }
-                }).forEach(new Consumer<Path>() {
-                    @Override
-                    public void accept(Path path) {
-                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                            // if jnlp-path in .info equals path of app to delete mark to delete
-                            String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                            if (application.equalsIgnoreCase(jnlpPath) || application.equalsIgnoreCase(getDomain(path))) {
-                                pf.setProperty("delete", "true");
-                                pf.store();
-                                LOG.info("marked for deletion: {}", path);
+                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath()))
+                        .filter(t -> Files.isRegularFile(t))
+                        .forEach(path -> {
+                            if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
+                                PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                                // if jnlp-path in .info equals path of app to delete mark to delete
+                                String jnlpPath1 = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                                if (application.equalsIgnoreCase(jnlpPath1) || application.equalsIgnoreCase(getDomain(path))) {
+                                    pf.setProperty("delete", "true");
+                                    pf.store();
+                                    LOG.info("marked for deletion: {}", path);
+                                }
                             }
-                        }
-                    }
-                });
+                        });
                 if (OsUtil.isWindows()) {
                     WindowsShortcutManager.removeWindowsShortcuts(application.toLowerCase());
                 }
@@ -213,12 +204,14 @@ public class CacheUtil {
         return true;
     }
 
-    public static boolean checkToClearCache() {
-        if (!okToClearCache()) {
-            LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
-            return false;
+    private static boolean cannotClearCache() {
+        if (okToClearCache()) {
+            final File cacheRoot = CacheLRUWrapper.getInstance().getCacheDir().getFile();
+            return !cacheRoot.isDirectory();
         }
-        return CacheLRUWrapper.getInstance().getCacheDir().getFile().isDirectory();
+
+        LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
+        return true;
     }
 
     public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
@@ -228,8 +221,8 @@ public class CacheUtil {
                 LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.files.size());
                 for (Object[] o : id.getFiles()) {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < o.length; i++) {
-                        Object object = o[i];
+                    for (Object value : o) {
+                        Object object = value;
                         if (object == null) {
                             object = "??";
                         }
@@ -249,7 +242,6 @@ public class CacheUtil {
      * This method load all known IDs of applications and  will gather all members, which share the id
      *
      * @param filter - regex to filter keys
-     * @return
      */
     public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
@@ -257,42 +249,36 @@ public class CacheUtil {
             lruHandler.lock();
             final List<CacheId> r = new ArrayList<>();
             try {
-                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath())).filter(new Predicate<Path>() {
-                    @Override
-                    public boolean test(Path t) {
-                        return Files.isRegularFile(t);
-                    }
-                }).forEach(new Consumer<Path>() {
-                    @Override
-                    public void accept(Path path) {
-                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                            if (jnlpPath) {
-                                // if jnlp-path in .info equals path of app to delete mark to delete
-                                String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                if (jnlpPath != null && jnlpPath.matches(filter)) {
-                                    CacheId jnlpPathId = new CacheJnlpId(jnlpPath);
-                                    if (!r.contains(jnlpPathId)) {
-                                        r.add(jnlpPathId);
-                                        jnlpPathId.populate();
+                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath()))
+                        .filter(t -> Files.isRegularFile(t))
+                        .forEach(path -> {
+                            if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
+                                final PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                                if (jnlpPath) {
+                                    // if jnlp-path in .info equals path of app to delete mark to delete
+                                    String jnlpPath1 = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                                    if (jnlpPath1 != null && jnlpPath1.matches(filter)) {
+                                        CacheId jnlpPathId = new CacheJnlpId(jnlpPath1);
+                                        if (!r.contains(jnlpPathId)) {
+                                            r.add(jnlpPathId);
+                                            jnlpPathId.populate();
 
+                                        }
+                                    }
+                                }
+                                if (domain) {
+                                    String domain1 = getDomain(path);
+                                    if (domain1.matches(filter)) {
+                                        CacheId domainId = new CacheDomainId(domain1);
+                                        if (!r.contains(domainId)) {
+                                            r.add(domainId);
+                                            domainId.populate();
+
+                                        }
                                     }
                                 }
                             }
-                            if (domain) {
-                                String domain = getDomain(path);
-                                if (domain != null && domain.matches(filter)) {
-                                    CacheId domainId = new CacheDomainId(domain);
-                                    if (!r.contains(domainId)) {
-                                        r.add(domainId);
-                                        domainId.populate();
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                        });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
@@ -351,7 +337,7 @@ public class CacheUtil {
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(final URL source, final VersionId version, long lastModified) {
+    static boolean isCurrent(final URL source, final VersionId version, long lastModified) {
 
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
@@ -392,7 +378,7 @@ public class CacheUtil {
      * @return true if the source is in the cache
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCached(final URL source, final VersionId version) {
+    private static boolean isCached(final URL source, final VersionId version) {
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
 
@@ -413,19 +399,17 @@ public class CacheUtil {
      * @return whether this resource can be cached
      */
     public static boolean isCacheable(URL source) {
-        if (source == null)
+        if (source == null) {
             return false;
-
-        if (source.getProtocol().equals("file")) {
+        } else if (source.getProtocol().equals("file")) {
             return false;
-        }
-        if (source.getProtocol().equals("jar")) {
+        } else if (source.getProtocol().equals("jar")) {
             return false;
         }
         return true;
     }
 
-    public static VersionId getBestMatchingVersionInCache(final URL source, final VersionString version) {
+    static VersionId getBestMatchingVersionInCache(final URL source, final VersionString version) {
         // TODO: handle Version
         throw new RuntimeException("not implemented");
     }
@@ -540,7 +524,7 @@ public class CacheUtil {
      * @param version the version id of the local file
      * @return the file location in the cache.
      */
-    public static File makeNewCacheFile(final URL source, final VersionId version) {
+    static File makeNewCacheFile(final URL source, final VersionId version) {
 
         // TODO: handle Version
 
@@ -662,8 +646,8 @@ public class CacheUtil {
         byte[] sum = md.digest(candidate.getBytes(UTF_8));
         //convert the byte to hex format method 2
         StringBuilder hexString = new StringBuilder();
-        for (int i = 0; i < sum.length; i++) {
-            hexString.append(Integer.toHexString(0xFF & sum[i]));
+        for (byte b : sum) {
+            hexString.append(Integer.toHexString(0xFF & b));
         }
         String extension = "";
         int i = origName.lastIndexOf('.');
@@ -705,7 +689,7 @@ public class CacheUtil {
                 if (!tracker.checkResource(url))
                     urlList.add(url);
             }
-            final URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
+            final URL[] undownloaded = urlList.toArray(new URL[urlList.size()]);
 
             listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
 
@@ -789,8 +773,10 @@ public class CacheUtil {
 
                     long maxSize = -1; // Default
                     try {
-                        maxSize = Long.parseLong(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE));
+                        final String maxSizePropertyValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE);
+                        maxSize = Long.parseLong(maxSizePropertyValue);
                     } catch (NumberFormatException nfe) {
+                        // ignore, maxSize will stay at -1
                     }
 
                     maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
@@ -864,14 +850,14 @@ public class CacheUtil {
             File f = new File(s);
             try {
                 FileUtils.recursiveDelete(f, f);
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
     }
 
     static class CacheJnlpId extends CacheId {
 
-        public CacheJnlpId(String id) {
+        CacheJnlpId(String id) {
             super(id);
         }
 
@@ -904,7 +890,7 @@ public class CacheUtil {
 
     static class CacheDomainId extends CacheId {
 
-        public CacheDomainId(String id) {
+        CacheDomainId(String id) {
             super(id);
         }
 
@@ -946,7 +932,7 @@ public class CacheUtil {
 
         protected final String id;
 
-        public CacheId(String id) {
+        CacheId(String id) {
             this.id = id;
         }
 

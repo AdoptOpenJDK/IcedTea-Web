@@ -61,7 +61,7 @@ import java.util.Set;
  */
 class CacheLRUWrapper {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
 
     /*
      * back-end of how LRU is implemented This file is to keep track of the most
