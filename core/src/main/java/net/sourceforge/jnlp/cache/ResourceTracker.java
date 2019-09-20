@@ -262,7 +262,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                wait(new Resource[]{getResource(location)}, 0);
+                wait(new Resource[]{resource}, 0);
             }
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
