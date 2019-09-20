@@ -113,9 +113,10 @@ public class Resource {
      * Creates and returns a shared Resource object representing the given
      * location and version.
      *
-     * @param location       final location of resource
-     * @param requestVersion final version of resource
-     * @param updatePolicy   final policy for updating
+     * @param location        final location of resource
+     * @param requestVersion  final version of resource
+     * @param downloadOptions hint for downloading
+     * @param updatePolicy    final policy for updating
      * @return new resource, which is already added in resources list
      */
     static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {

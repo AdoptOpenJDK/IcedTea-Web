@@ -83,7 +83,7 @@ public class NativeLibraryStorageTest {
     static NativeLibraryStorage nativeLibraryStorageWithCache(URL... urlsToCache) {
         ResourceTracker tracker = new ResourceTracker();
         for (URL urlToCache : urlsToCache) {
-            tracker.addResource(urlToCache, VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
+            tracker.addResource(urlToCache, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
         }
 
         return new NativeLibraryStorage(tracker);

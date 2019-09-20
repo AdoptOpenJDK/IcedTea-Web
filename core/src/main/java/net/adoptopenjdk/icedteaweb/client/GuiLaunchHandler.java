@@ -116,7 +116,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
         final ResourceTracker resourceTracker = new ResourceTracker(true);
         if (splashImageURL != null) {
-            resourceTracker.addResource(splashImageURL, file.getFileVersion(), null, policy);
+            resourceTracker.addResource(splashImageURL, file.getFileVersion(), policy);
         }
         synchronized (mutex) {
             SwingUtils.invokeAndWait(new Runnable() {
