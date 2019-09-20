@@ -65,6 +65,8 @@ public class SplashUtilsTest {
     @Before
     public void setUp() {
         envVars.clear(System.getenv().keySet().toArray(new String[0]));
+        
+        JNLPRuntime.setShowWebSplash(true);
     }
 
     @Test
@@ -167,6 +169,20 @@ public class SplashUtilsTest {
         SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
+    }
+    
+    @Test
+    public void testGetSplashScreen8() {
+        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
+        
+        JNLPRuntime.setShowWebSplash(false);
+
+        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
+        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
+        assertThat(sa.getSplashReason(), is(APPLET));
+
+        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        assertThat(sw, is(nullValue()));
     }
 
     static void modifyIsWebstartApplicationRuntime(boolean isWebstartApplication) {

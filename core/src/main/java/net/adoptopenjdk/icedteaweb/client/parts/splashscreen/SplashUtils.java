@@ -148,6 +148,10 @@ public class SplashUtils {
     private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
         try {
             if (SplashReason.JAVAWS == splashReason) {
+            	// the command line arg -Xnosplash overrules the env var
+            	if (!JNLPRuntime.isShowWebSplash()) {
+            		return NO_SPLASH;
+            	}
                 return System.getenv(ICEDTEA_WEB_SPLASH);
             }
             else if (SplashReason.APPLET == splashReason) {

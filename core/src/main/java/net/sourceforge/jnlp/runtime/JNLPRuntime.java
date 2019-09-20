@@ -188,6 +188,9 @@ public class JNLPRuntime {
 
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
+    
+    /** flag to prevent show the splash screen at start of webstart application **/
+    private static boolean showWebSplash = true;
 
     /**
      * Returns whether the JNLP runtime environment has been
@@ -910,6 +913,17 @@ public class JNLPRuntime {
         return history;
     }
 
+	/**
+	 * @param showWebSplash show splash screen at start of webstart application
+	 */
+	public static void setShowWebSplash(boolean showWebSplash) {
+		JNLPRuntime.showWebSplash = showWebSplash;
+	}
 
-
+    /**
+     * @return show splash screen at start of webstart application 
+     */
+    public static boolean isShowWebSplash() {
+        return showWebSplash;
+    }
 }
