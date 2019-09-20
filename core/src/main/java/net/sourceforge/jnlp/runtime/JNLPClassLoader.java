@@ -2096,26 +2096,16 @@ public class JNLPClassLoader extends URLClassLoader {
     void removeJars(JARDesc[] jars) {
 
         for (JARDesc eachJar : jars) {
+            final URL location = eachJar.getLocation();
+            final VersionString version = eachJar.getVersion();
+
             try {
-                tracker.removeResource(eachJar.getLocation());
+                tracker.removeResource(location);
             } catch (Exception e) {
                 LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
-            for (VersionId versionId : CacheUtil.getAllMatchingVersionInCache(eachJar.getLocation(), eachJar.getVersion())) {
-                File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), versionId);
-                String directoryUrl = CacheUtil.getCacheParentDirectory(cachedFile.getAbsolutePath());
-
-                File directory = new File(directoryUrl);
-
-                LOG.info("Deleting cached file: {}", cachedFile.getAbsolutePath());
-
-                cachedFile.delete();
-
-                LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
-
-                directory.delete();
-            }
+            CacheUtil.removeFiles(location, version);
         }
     }
 

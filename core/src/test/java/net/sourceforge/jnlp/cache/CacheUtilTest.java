@@ -170,16 +170,16 @@ public class CacheUtilTest {
     
     @Test
     public void CacheID(){
-        CacheUtil.CacheId cj11 = new CacheUtil.CacheJnlpId("a");
-        CacheUtil.CacheId cj12 = new CacheUtil.CacheJnlpId("a");
-        CacheUtil.CacheId cj2 = new CacheUtil.CacheJnlpId("b");
-        CacheUtil.CacheId cj31 = new CacheUtil.CacheJnlpId(null);
-        CacheUtil.CacheId cj32 = new CacheUtil.CacheJnlpId(null);
-        CacheUtil.CacheId cd11 = new CacheUtil.CacheDomainId("a");
-        CacheUtil.CacheId cd12 = new CacheUtil.CacheDomainId("a");
-        CacheUtil.CacheId cd2 = new CacheUtil.CacheDomainId("b");
-        CacheUtil.CacheId cd31 = new CacheUtil.CacheDomainId(null);
-        CacheUtil.CacheId cd32 = new CacheUtil.CacheDomainId(null);
+        CacheId cj11 = new CacheId.CacheJnlpId("a");
+        CacheId cj12 = new CacheId.CacheJnlpId("a");
+        CacheId cj2 = new CacheId.CacheJnlpId("b");
+        CacheId cj31 = new CacheId.CacheJnlpId(null);
+        CacheId cj32 = new CacheId.CacheJnlpId(null);
+        CacheId cd11 = new CacheId.CacheDomainId("a");
+        CacheId cd12 = new CacheId.CacheDomainId("a");
+        CacheId cd2 = new CacheId.CacheDomainId("b");
+        CacheId cd31 = new CacheId.CacheDomainId(null);
+        CacheId cd32 = new CacheId.CacheDomainId(null);
         
         Assert.assertEquals(cj11, cj11);
         Assert.assertEquals(cj11, cj12);

@@ -377,13 +377,8 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
             List<String> optionArgs = optionParser.getMainArgs();
-            if (optionArgs.size() > 0) {
-                //clear one app
-                CacheUtil.listCacheIds(optionArgs.get(0), true, true);
-            } else {
-                // clear all cache
-                CacheUtil.listCacheIds(".*", true, true);
-            }
+            final String arg = optionArgs.size() > 0 ? optionArgs.get(0) : ".*";
+            CacheUtil.logCacheIds(arg);
             return null;
         }
 

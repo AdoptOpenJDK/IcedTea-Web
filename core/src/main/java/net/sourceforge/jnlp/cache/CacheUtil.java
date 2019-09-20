@@ -27,35 +27,18 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.os.OsUtil;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.PropertiesFile;
-import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -116,92 +99,99 @@ public class CacheUtil {
      * <p>
      * Note: Because of how our caching system works, deleting jars of another javaws
      * process is using them can be quite disastrous. Hence why Launcher creates lock files
-     * and we check for those by calling {@link #okToClearCache()}
+     * and we check for those.
      *
-     * @return true if the cache could be cleared and was cleared
+     * @return true if the cache could and was cleared
      */
     public static boolean clearCache() {
-        // clear all cache
-        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        File cacheDir = lruHandler.getCacheDir().getFile();
-
-        if (cannotClearCache()) {
-            return false;
-        }
-        LOG.debug("Clearing cache directory: {}", cacheDir);
-        synchronized (lruHandler) {
-            lruHandler.lock();
-            try {
-                cacheDir = cacheDir.getCanonicalFile();
-                // remove windows shortcuts before cache dir is gone
-                if (OsUtil.isWindows()) {
-                    WindowsShortcutManager.removeWindowsShortcuts("ALL");
-                }
-                FileUtils.recursiveDelete(cacheDir, cacheDir);
-                cacheDir.mkdir();
-                lruHandler.clearLRUSortedEntries();
-                lruHandler.store();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                lruHandler.unlock();
-            }
-        }
-        return true;
+        return CacheLRUWrapper.getInstance().clearCache();
     }
 
     public static boolean deleteFromCache(final String cacheId) {
-        // clear one app
-        if (cannotClearCache()) {
-            return false;
-        }
-
-        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        synchronized (lruHandler) {
-            lruHandler.lock();
-            try {
-                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath()))
-                        .filter(t -> Files.isRegularFile(t))
-                        .forEach(path -> {
-                            if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                                PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                                // if jnlp-path in .info equals path of app to delete mark to delete
-                                final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                final String domain = getDomain(path);
-                                if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
-                                    pf.setProperty("delete", "true");
-                                    pf.store();
-                                    LOG.info("marked for deletion: {}", path);
-                                }
-                            }
-                        });
-                if (OsUtil.isWindows()) {
-                    WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
-                }
-                // clean the cache of entries now marked for deletion
-                cleanCache();
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                lruHandler.unlock();
-            }
-        }
-        return true;
+        return CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
     }
 
-    private static boolean cannotClearCache() {
-        if (okToClearCache()) {
-            final File cacheRoot = CacheLRUWrapper.getInstance().getCacheDir().getFile();
-            return !cacheRoot.isDirectory();
-        }
-
-        LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
-        return true;
+    /**
+     * This method load all known IDs of applications and  will gather all members, which share the id
+     *
+     * @param filter - regex to filter keys
+     */
+    public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
+        return CacheLRUWrapper.getInstance().getCacheIds(filter, jnlpPath, domain);
     }
 
-    public static void listCacheIds(String filter, boolean jnlpPath, boolean domain) {
-        List<CacheId> items = getCacheIds(filter, jnlpPath, domain);
+    /**
+     * This will remove all old cache items.
+     */
+    public static void cleanCache() {
+        CacheLRUWrapper.getInstance().cleanCache();
+    }
+
+    /**
+     * Returns the file for the locally cached contents of the
+     * source.  This method returns the file location only and does
+     * not download the resource.  The latest version of the
+     * resource that matches the specified version will be returned.
+     *
+     * @param source  the source {@link URL}
+     * @param version the version of the local file
+     * @return the file location in the cache, or {@code null} if no versions cached
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    public static File getCacheFile(final URL source, final VersionId version) {
+
+        // TODO: handle Version
+
+        if (!isCacheable(source)) {
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
+        }
+
+        return CacheLRUWrapper.getInstance().getCacheFile(source, version);
+    }
+
+    public static void removeFiles(URL location, VersionString version) {
+        CacheLRUWrapper.getInstance().deleteFromCache(location, version);
+    }
+
+    /**
+     * This will create a new entry for the cache item. It is however not
+     * initialized but any future calls to getCacheFile with the source and
+     * version given to here, will cause it to return this item.
+     *
+     * @param source  the source URL
+     * @param version the version id of the local file
+     * @return the file location in the cache.
+     */
+    static File makeNewCacheFile(final URL source, final VersionId version) {
+        return CacheLRUWrapper.getInstance().makeNewCacheFile(source, version);
+    }
+
+    /**
+     * Returns true if the cache has a local copy of the contents of
+     * the URL matching the specified version.
+     *
+     * @param location the location URL
+     * @param version  the version to check for
+     * @return true if the source is in the cache
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    public static boolean isAnyCached(final URL location, final VersionString version) {
+        final VersionId versionId = getBestMatchingVersionInCache(location, version);
+        return versionId != null;
+    }
+
+    static VersionId getBestMatchingVersionInCache(final URL location, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
+    public static Set<VersionId> getAllMatchingVersionInCache(final URL location, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
+    public static void logCacheIds(String filter) {
+        List<CacheId> items = getCacheIds(filter, true, true);
         if (JNLPRuntime.isDebug()) {
             for (CacheId id : items) {
                 LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.files.size());
@@ -220,94 +210,6 @@ public class CacheUtil {
         } else {
             for (CacheId id : items) {
                 LOG.info(id.getId());
-            }
-        }
-    }
-
-    /**
-     * This method load all known IDs of applications and  will gather all members, which share the id
-     *
-     * @param filter - regex to filter keys
-     */
-    public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
-        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        synchronized (lruHandler) {
-            lruHandler.lock();
-            final List<CacheId> r = new ArrayList<>();
-            try {
-                Files.walk(Paths.get(lruHandler.getCacheDir().getFile().getCanonicalPath()))
-                        .filter(t -> Files.isRegularFile(t))
-                        .forEach(path -> {
-                            if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                                final PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                                if (jnlpPath) {
-                                    // if jnlp-path in .info equals path of app to delete mark to delete
-                                    String jnlpPath1 = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                    if (jnlpPath1 != null && jnlpPath1.matches(filter)) {
-                                        CacheId jnlpPathId = new CacheJnlpId(jnlpPath1);
-                                        if (!r.contains(jnlpPathId)) {
-                                            r.add(jnlpPathId);
-                                            jnlpPathId.populate();
-
-                                        }
-                                    }
-                                }
-                                if (domain) {
-                                    String domain1 = getDomain(path);
-                                    if (domain1.matches(filter)) {
-                                        CacheId domainId = new CacheDomainId(domain1);
-                                        if (!r.contains(domainId)) {
-                                            r.add(domainId);
-                                            domainId.populate();
-
-                                        }
-                                    }
-                                }
-                            }
-                        });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                lruHandler.unlock();
-            }
-            return r;
-        }
-    }
-
-    /**
-     * Returns a boolean indicating if it ok to clear the netx application cache at this point
-     *
-     * @return true if the cache can be cleared at this time without problems
-     */
-    private static boolean okToClearCache() {
-        File otherJavawsRunning = PathsAndFiles.MAIN_LOCK.getFile();
-        FileLock locking = null;
-        try {
-            if (otherJavawsRunning.isFile()) {
-                FileOutputStream fis = new FileOutputStream(otherJavawsRunning);
-
-                FileChannel channel = fis.getChannel();
-                locking = channel.tryLock();
-                if (locking == null) {
-                    LOG.info("Other instances of javaws are running");
-                    return false;
-                }
-                LOG.info("No other instances of javaws are running");
-                return true;
-
-            } else {
-                LOG.info("No instance file found");
-                return true;
-            }
-        } catch (IOException e) {
-            return false;
-        } finally {
-            if (locking != null) {
-                try {
-                    locking.release();
-                } catch (IOException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                }
             }
         }
     }
@@ -350,20 +252,6 @@ public class CacheUtil {
      * @return true if the source is in the cache
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isAnyCached(final URL source, final VersionString version) {
-        final VersionId versionId = getBestMatchingVersionInCache(source, version);
-        return versionId != null;
-    }
-
-    /**
-     * Returns true if the cache has a local copy of the contents of
-     * the URL matching the specified version.
-     *
-     * @param source  the source URL
-     * @param version the version to check for
-     * @return true if the source is in the cache
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
     private static boolean isCached(final URL source, final VersionId version) {
         if (!isCacheable(source))
             throw new IllegalArgumentException(source + " is not a cacheable resource");
@@ -395,157 +283,7 @@ public class CacheUtil {
         return true;
     }
 
-    static VersionId getBestMatchingVersionInCache(final URL source, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
 
-    public static Set<VersionId> getAllMatchingVersionInCache(final URL source, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
-
-    /**
-     * Returns the file for the locally cached contents of the
-     * source.  This method returns the file location only and does
-     * not download the resource.  The latest version of the
-     * resource that matches the specified version will be returned.
-     *
-     * @param source  the source {@link URL}
-     * @param version the version of the local file
-     * @return the file location in the cache, or {@code null} if no versions cached
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    public static File getCacheFile(final URL source, final VersionId version) {
-
-        // TODO: handle Version
-
-        if (!isCacheable(source))
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-
-        File cacheFile = null;
-        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        synchronized (lruHandler) {
-            try {
-                lruHandler.lock();
-
-                // We need to reload the cacheOrder file each time
-                // since another plugin/javaws instance may have updated it.
-                lruHandler.load();
-                cacheFile = getCacheFileIfExist(urlToPath(source, ""));
-                if (cacheFile == null) { // We did not find a copy of it.
-                    cacheFile = makeNewCacheFile(source, version);
-                } else
-                    lruHandler.store();
-            } finally {
-                lruHandler.unlock();
-            }
-        }
-        return cacheFile;
-    }
-
-    /**
-     * This will return a File pointing to the location of cache item.
-     *
-     * @param urlPath Path of cache item within cache directory.
-     * @return File if we have searched before, {@code null} otherwise.
-     */
-    private static File getCacheFileIfExist(File urlPath) {
-        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        synchronized (lruHandler) {
-            File cacheFile = null;
-            List<Entry<String, String>> entries = lruHandler.getLRUSortedEntries();
-            // Start searching from the most recent to least recent.
-            for (Entry<String, String> e : entries) {
-                final String key = e.getKey();
-                final String path = e.getValue();
-
-                if (pathToURLPath(path).equals(urlPath.getPath())) { // Match found.
-                    cacheFile = new File(path);
-                    lruHandler.updateEntry(key);
-                    break; // Stop searching since we got newest one already.
-                }
-            }
-            return cacheFile;
-        }
-    }
-
-    /**
-     * Get the path to file minus the cache directory and indexed folder.
-     */
-    private static String pathToURLPath(String path) {
-        int len = CacheLRUWrapper.getInstance().getCacheDir().getFullPath().length();
-        int index = path.indexOf(File.separatorChar, len + 1);
-        return path.substring(index);
-    }
-
-    /**
-     * Returns the parent directory of the cached resource.
-     *
-     * @param filePath The path of the cached resource directory.
-     * @return parent dir of cache
-     */
-    public static String getCacheParentDirectory(String filePath) {
-        String path = filePath;
-        String tempPath;
-        String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getFullPath();
-
-        while (path.startsWith(cacheDir) && !path.equals(cacheDir)) {
-            tempPath = new File(path).getParent();
-
-            if (tempPath.equals(cacheDir))
-                break;
-
-            path = tempPath;
-        }
-        return path;
-    }
-
-    /**
-     * This will create a new entry for the cache item. It is however not
-     * initialized but any future calls to getCacheFile with the source and
-     * version given to here, will cause it to return this item.
-     *
-     * @param source  the source URL
-     * @param version the version id of the local file
-     * @return the file location in the cache.
-     */
-    static File makeNewCacheFile(final URL source, final VersionId version) {
-
-        // TODO: handle Version
-
-        final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        synchronized (lruHandler) {
-            File cacheFile = null;
-            try {
-                lruHandler.lock();
-                lruHandler.load();
-                for (long i = 0; i < Long.MAX_VALUE; i++) {
-                    String path = lruHandler.getCacheDir().getFullPath() + File.separator + i;
-                    File cDir = new File(path);
-                    if (!cDir.exists()) {
-                        // We can use this directory.
-                        try {
-                            cacheFile = urlToPath(source, path);
-                            FileUtils.createParentDir(cacheFile);
-                            File pf = new File(cacheFile.getPath() + CacheEntry.INFO_SUFFIX);
-                            FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
-                            lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
-                        } catch (IOException ioe) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
-                        }
-
-                        break;
-                    }
-                }
-
-                lruHandler.store();
-            } finally {
-                lruHandler.unlock();
-            }
-            return cacheFile;
-        }
-    }
 
     /**
      * Converts a URL into a local path string within the given directory. For
@@ -553,17 +291,17 @@ public class CacheUtil {
      * result in a File that is located somewhere within /tmp/
      *
      * @param location the url
-     * @param subdir   the subdirectory
+     * @param root   the subdirectory
      * @return the file
      */
-    public static File urlToPath(URL location, String subdir) {
-        if (subdir == null) {
+    public static File urlToPath(URL location, String root) {
+        if (root == null) {
             throw new NullPointerException();
         }
 
         StringBuilder path = new StringBuilder();
 
-        path.append(subdir);
+        path.append(root);
         path.append(File.separatorChar);
 
         path.append(location.getProtocol());
@@ -741,229 +479,4 @@ public class CacheUtil {
 
         return indicator.getListener(title, undownloaded);
     }
-
-
-    /**
-     * This will remove all old cache items.
-     */
-    public static void cleanCache() {
-        CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
-        if (okToClearCache()) {
-            // First we want to figure out which stuff we need to delete.
-            HashSet<String> keep = new HashSet<>();
-            HashSet<String> remove = new HashSet<>();
-            synchronized (lruHandler) {
-                try {
-                    lruHandler.lock();
-                    lruHandler.load();
-
-                    long maxSize = -1; // Default
-                    try {
-                        final String maxSizePropertyValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE);
-                        maxSize = Long.parseLong(maxSizePropertyValue);
-                    } catch (NumberFormatException nfe) {
-                        // ignore, maxSize will stay at -1
-                    }
-
-                    maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
-                    long curSize = 0;
-
-                    for (Entry<String, String> e : lruHandler.getLRUSortedEntries()) {
-                        // Check if the item is contained in cacheOrder.
-                        final String key = e.getKey();
-                        final String path = e.getValue();
-
-                        File file = new File(path);
-                        PropertiesFile pf = new PropertiesFile(new File(path + CacheEntry.INFO_SUFFIX));
-                        boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
-
-                        /*
-                         * This will get me the root directory specific to this cache item.
-                         * Example:
-                         *  cacheDir = /home/user1/.icedtea/cache
-                         *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
-                         *  rStr first becomes: /0/http/www.example.com/subdir/a.jar
-                         *  then rstr becomes: /home/user1/.icedtea/cache/0
-                         */
-                        String rStr = file.getPath().substring(lruHandler.getCacheDir().getFullPath().length());
-                        rStr = lruHandler.getCacheDir().getFullPath() + rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
-                        long len = file.length();
-
-                        if (keep.contains(file.getPath().substring(rStr.length()))) {
-                            lruHandler.removeEntry(key);
-                            continue;
-                        }
-
-                        /*
-                         * we remove entries from our lru if any of the following condition is met.
-                         * Conditions:
-                         *  - delete: file has been marked for deletion.
-                         *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
-                         *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
-                         *  on disk would exceed the maximum size.
-                         */
-                        if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
-                            lruHandler.removeEntry(key);
-                            remove.add(rStr);
-                            continue;
-                        }
-
-                        curSize += len;
-                        keep.add(file.getPath().substring(rStr.length()));
-
-                        for (File f : file.getParentFile().listFiles()) {
-                            if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
-                                try {
-                                    FileUtils.recursiveDelete(f, f);
-                                } catch (IOException e1) {
-                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
-                                }
-                            }
-
-                        }
-                    }
-                    lruHandler.store();
-                } finally {
-                    lruHandler.unlock();
-                }
-                removeSetOfDirectories(remove);
-            }
-        }
-    }
-
-    private static void removeSetOfDirectories(Set<String> remove) {
-        for (String s : remove) {
-            File f = new File(s);
-            try {
-                FileUtils.recursiveDelete(f, f);
-            } catch (IOException ignored) {
-            }
-        }
-    }
-
-    static class CacheJnlpId extends CacheId {
-
-        CacheJnlpId(String id) {
-            super(id);
-        }
-
-        @Override
-        public void populate() {
-            ArrayList<Object[]> all = CacheDirectory.generateData();
-            for (Object[] object : all) {
-                if (id.equals(object[6])) {
-                    this.files.add(object);
-                }
-            }
-        }
-
-        @Override
-        String getType() {
-            return "JNLP-PATH";
-        }
-
-        @Override
-        //hashcode in super is ok
-        public boolean equals(Object obj) {
-            if (obj instanceof CacheJnlpId) {
-                return super.equals(obj);
-            } else {
-                return false;
-            }
-        }
-
-    }
-
-    static class CacheDomainId extends CacheId {
-
-        CacheDomainId(String id) {
-            super(id);
-        }
-
-        @Override
-        public void populate() {
-            ArrayList<Object[]> all = CacheDirectory.generateData();
-            for (Object[] object : all) {
-                if (id.equals(object[3].toString())) {
-                    this.files.add(object);
-                }
-            }
-        }
-
-        @Override
-        String getType() {
-            return "DOMAIN";
-        }
-
-        @Override
-        //hashcode in super is ok
-        public boolean equals(Object obj) {
-            if (obj instanceof CacheDomainId) {
-                return super.equals(obj);
-            } else {
-                return false;
-            }
-        }
-
-    }
-
-    public abstract static class CacheId {
-
-        //last century array of objects instead of some nice class inherited from previous century
-        protected final List<Object[]> files = new ArrayList<>();
-
-        abstract void populate();
-
-        abstract String getType();
-
-        protected final String id;
-
-        CacheId(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public String toString() {
-            return id;
-        }
-
-        public List<Object[]> getFiles() {
-            return files;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof CacheId) {
-                CacheId c = (CacheId) obj;
-                if (c.id == null && this.id == null) {
-                    return true;
-                }
-                if (c.id == null) {
-                    return false;
-                }
-                return c.id.equals(this.id);
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(this.id);
-        }
-
-    }
-
-    private static String getDomain(Path path) {
-        final InfrastructureFileDescriptor cacheDir = CacheLRUWrapper.getInstance().getCacheDir();
-        final String relativeToCache = path.relativize(Paths.get(cacheDir.getFullPath())).toString();
-        final String[] parts = relativeToCache.split(Pattern.quote(File.separator));
-        return parts[3];
-    }
-
 }
