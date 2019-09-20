@@ -265,10 +265,9 @@ class CacheLRUWrapper {
             return false;
         }
         String value = props.getProperty(oldKey);
-        String folder = getIdForCacheFolder(value);
 
         props.remove(oldKey);
-        props.setProperty(System.currentTimeMillis() + "," + folder, value);
+        props.setProperty(generateKey(value), value);
         return true;
     }
 
