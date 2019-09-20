@@ -18,7 +18,6 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.PropertiesFile;
@@ -37,6 +36,8 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class CacheEntry {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
+
+    public static final String INFO_SUFFIX = ".info";
 
     private static final String KEY_CONTENT_LENGTH = "content-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
@@ -64,7 +65,7 @@ public class CacheEntry {
         this.version = version;
         
         final File cacheFile = CacheUtil.getCacheFile(location, version);
-        final File infoFile = new File(cacheFile.getPath() + CacheDirectory.INFO_SUFFIX);
+        final File infoFile = new File(cacheFile.getPath() + INFO_SUFFIX);
 
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }

@@ -40,12 +40,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class DirectoryNode {
-    private String name;
-    private File path;
-    private ArrayList<DirectoryNode> childNodes;
-    private DirectoryNode parent = null;
-    private File infoFile;
-
+    private final String name;
+    private final File path;
+    private final ArrayList<DirectoryNode> childNodes;
+    private final DirectoryNode parent;
+    private final File infoFile;
 
     /**
      * Create a new instance of DirectoryNode.
@@ -55,26 +54,22 @@ public class DirectoryNode {
      * @param parent The parent node.
      */
     DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
-        this(name, absPathToNode, null, parent);
+        this(name, absPathToNode, parent, null);
     }
-
     /**
      * Create a new instance of DirectoryNode.
-     * 
+     *
      * @param name Name representing this node.
-     * @param absPathToNode Absolute path to this node given as a File.
-     * @param childNodes List of children nodes.
+     * @param absPathToNode Absolute path to this node as a File.
      * @param parent The parent node.
+     * @param infoFile the info file used by the LRU Cache
      */
-    private DirectoryNode(String name, File absPathToNode, ArrayList<DirectoryNode> childNodes, DirectoryNode parent) {
+    DirectoryNode(String name, File absPathToNode, DirectoryNode parent, File infoFile) {
         this.name = name;
         this.path = absPathToNode;
-        this.childNodes = childNodes;
-        if (this.childNodes == null)
-            this.childNodes = new ArrayList<DirectoryNode>();
+        this.childNodes = new ArrayList<>();
         this.parent = parent;
-        if (!isDir())
-            this.infoFile = new File(this.getFile().getAbsolutePath().concat(CacheDirectory.INFO_SUFFIX));
+        this.infoFile = infoFile;
     }
 
     /**
@@ -83,12 +78,7 @@ public class DirectoryNode {
      * @param node Node to be appended.
      */
     void addChild(DirectoryNode node) {
-        try {
-            childNodes.add(node);
-        } catch (NullPointerException e) {
-            this.childNodes = new ArrayList<DirectoryNode>();
-            this.childNodes.add(node);
-        }
+        childNodes.add(node);
     }
 
     /**

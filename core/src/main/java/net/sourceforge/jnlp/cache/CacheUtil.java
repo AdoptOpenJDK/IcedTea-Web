@@ -36,12 +36,9 @@ import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import javax.jnlp.DownloadServiceListener;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilePermission;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
@@ -51,9 +48,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -64,7 +59,6 @@ import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -192,7 +186,7 @@ public class CacheUtil {
                 }).forEach(new Consumer<Path>() {
                     @Override
                     public void accept(Path path) {
-                        if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
                             PropertiesFile pf = new PropertiesFile(new File(path.toString()));
                             // if jnlp-path in .info equals path of app to delete mark to delete
                             String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
@@ -271,7 +265,7 @@ public class CacheUtil {
                 }).forEach(new Consumer<Path>() {
                     @Override
                     public void accept(Path path) {
-                        if (path.getFileName().toString().endsWith(CacheDirectory.INFO_SUFFIX)) {
+                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
                             PropertiesFile pf = new PropertiesFile(new File(path.toString()));
                             if (jnlpPath) {
                                 // if jnlp-path in .info equals path of app to delete mark to delete
@@ -564,7 +558,7 @@ public class CacheUtil {
                         try {
                             cacheFile = urlToPath(source, path);
                             FileUtils.createParentDir(cacheFile);
-                            File pf = new File(cacheFile.getPath() + CacheDirectory.INFO_SUFFIX);
+                            File pf = new File(cacheFile.getPath() + CacheEntry.INFO_SUFFIX);
                             FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
                             lruHandler.addEntry(lruHandler.generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
@@ -808,7 +802,7 @@ public class CacheUtil {
                         final String path = e.getValue();
 
                         File file = new File(path);
-                        PropertiesFile pf = new PropertiesFile(new File(path + CacheDirectory.INFO_SUFFIX));
+                        PropertiesFile pf = new PropertiesFile(new File(path + CacheEntry.INFO_SUFFIX));
                         boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
 
                         /*
@@ -883,7 +877,7 @@ public class CacheUtil {
 
         @Override
         public void populate() {
-            ArrayList<Object[]> all = generateData();
+            ArrayList<Object[]> all = CacheDirectory.generateData();
             for (Object[] object : all) {
                 if (id.equals(object[6])) {
                     this.files.add(object);
@@ -916,7 +910,7 @@ public class CacheUtil {
 
         @Override
         public void populate() {
-            ArrayList<Object[]> all = generateData();
+            ArrayList<Object[]> all = CacheDirectory.generateData();
             for (Object[] object : all) {
                 if (id.equals(object[3].toString())) {
                     this.files.add(object);
@@ -1002,44 +996,6 @@ public class CacheUtil {
         int i = relativeToCache.indexOf(File.separator);
         relativeToCache = relativeToCache.substring(0, i);
         return relativeToCache;
-    }
-
-    /**
-     * This creates the data for the table.
-     *
-     * @return ArrayList containing an Object array of data for each row in the
-     * table.
-     */
-    public static ArrayList<Object[]> generateData() {
-        DirectoryNode root = new DirectoryNode("Root", PathsAndFiles.CACHE_DIR.getFile(), null);
-        CacheDirectory.getDirStructure(root);
-        ArrayList<Object[]> data = new ArrayList<>();
-
-        for (DirectoryNode identifier : root.getChildren()) {
-            for (DirectoryNode type : identifier.getChildren()) {
-                for (DirectoryNode domain : type.getChildren()) {
-                    //after domain, there is optional port dir. It is skipped here (as is skipped path on domain)
-                    for (DirectoryNode leaf : CacheDirectory.getLeafData(domain)) {
-                        final File f = leaf.getFile();
-                        PropertiesFile pf = new PropertiesFile(new File(f.toString() + CacheDirectory.INFO_SUFFIX));
-                        // if jnlp-path in .info equals path of app to delete mark to delete
-                        String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                        Object[] o = {
-                                leaf,
-                                f.getParentFile(),
-                                type,
-                                domain,
-                                f.length(),
-                                new Date(f.lastModified()),
-                                jnlpPath
-                        };
-                        data.add(o);
-                    }
-                }
-            }
-        }
-
-        return data;
     }
 
 }

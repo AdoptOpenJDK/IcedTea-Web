@@ -37,31 +37,83 @@ exception statement from your version.
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 public final class CacheDirectory {
 
     /* Don't allow instantiation of this class */
     private CacheDirectory(){}
-    
-    public static final String INFO_SUFFIX = ".info";
 
     /**
-     * Get the structure of directory for keeping track of the protocol and
-     * domain.
-     * 
+     * This creates the data for the table.
+     *
+     * @return ArrayList containing an Object array of data for each row in the table.
+     */
+    public static ArrayList<Object[]> generateData() {
+        final DirectoryNode root = createDirStructure(PathsAndFiles.CACHE_DIR.getFile());
+        final ArrayList<Object[]> data = new ArrayList<>();
+
+        for (DirectoryNode identifier : root.getChildren()) {
+            for (DirectoryNode type : identifier.getChildren()) {
+                for (DirectoryNode domain : type.getChildren()) {
+                    //after domain, there is optional port dir. It is skipped here (as is skipped path on domain)
+                    for (DirectoryNode leaf : getLeafData(domain)) {
+                        final File f = leaf.getFile();
+                        final PropertiesFile pf = new PropertiesFile(new File(f.toString() + CacheEntry.INFO_SUFFIX));
+                        // if jnlp-path in .info equals path of app to delete mark to delete
+                        final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                        final Object[] o = {
+                                /* 0 */ leaf,
+                                /* 1 */ f.getParentFile(),
+                                /* 2 */ type,
+                                /* 3 */ domain,
+                                /* 4 */ f.length(),
+                                /* 5 */ new Date(f.lastModified()),
+                                /* 6 */ jnlpPath
+                        };
+                        data.add(o);
+                    }
+                }
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Create the entire DirectoryNode tree starting from the given root directory
+     *
+     * @param rootPath the root directory
+     * @return
+     */
+    private static DirectoryNode createDirStructure(File rootPath) {
+        final DirectoryNode root = new DirectoryNode("Root", rootPath, null);
+        initDirStructure(root);
+        return root;
+    }
+
+    /**
+     * Initialize the structure of directory for keeping track of the protocol and domain.
+     *
      * @param root Location of cache directory.
      */
-    static void getDirStructure(DirectoryNode root) {
+    private static void initDirStructure(DirectoryNode root) {
         final File[] files = root.getFile().listFiles();
         for (File f : files != null ? files : new File[0]) {
-            DirectoryNode node = new DirectoryNode(f.getName(), f, root);
-            if (f.isDirectory() || (!f.isDirectory() && !f.getName().endsWith(INFO_SUFFIX)))
-                root.addChild(node);
-            if (f.isDirectory())
-                getDirStructure(node);
+            if (f.isDirectory()) {
+                final DirectoryNode dirNode = new DirectoryNode(f.getName(), f, root);
+                root.addChild(dirNode);
+                initDirStructure(dirNode);
+            } else if (f.isFile() && !f.getName().endsWith(CacheEntry.INFO_SUFFIX)) {
+                final File infoFile = new File(f.getAbsolutePath() + CacheEntry.INFO_SUFFIX);
+                final DirectoryNode resourceNode = new DirectoryNode(f.getName(), f, root, infoFile);
+                root.addChild(resourceNode);
+            }
         }
     }
 
@@ -71,13 +123,14 @@ public final class CacheDirectory {
      * @param root The point where we want to start getting the leafs.
      * @return An ArrayList of DirectoryNode.
      */
-    static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
+    private static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
         ArrayList<DirectoryNode> temp = new ArrayList<>();
         for (DirectoryNode f : root.getChildren()) {
-            if (f.isDir())
+            if (f.isDir()) {
                 temp.addAll(getLeafData(f));
-            else if (!f.getName().endsWith(INFO_SUFFIX))
+            } else {
                 temp.add(f);
+            }
         }
         return temp;
     }

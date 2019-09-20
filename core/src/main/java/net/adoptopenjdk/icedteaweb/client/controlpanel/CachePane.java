@@ -211,7 +211,7 @@ public class CachePane extends JPanel {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
                     DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
                     File selectedFile = fileNode.getFile();
-                    File infoFile = new File(selectedFile + CacheDirectory.INFO_SUFFIX);
+                    File infoFile = new File(selectedFile + CacheEntry.INFO_SUFFIX);
                     String info = StreamUtils.readStreamAsString(new FileInputStream(infoFile), true);
                     t.setText(info);
                 } catch (Exception ex) {
@@ -435,7 +435,7 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            for (Object[] v : CacheUtil.generateData()) {
+            for (Object[] v : CacheDirectory.generateData()) {
                 tableModel.addRow(v);
             }
         } catch (Exception exception) {
