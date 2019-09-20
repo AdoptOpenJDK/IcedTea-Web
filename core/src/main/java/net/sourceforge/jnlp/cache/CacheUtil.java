@@ -29,6 +29,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -974,14 +976,10 @@ public class CacheUtil {
     }
 
     private static String getDomain(Path path) {
-        String relativeToCache = path.toAbsolutePath().toString().replace(CacheLRUWrapper.getInstance().getCacheDir().getFullPath(), "");
-        for (int x = 0; x < 3; x++) {
-            int i = relativeToCache.indexOf(File.separator);
-            relativeToCache = relativeToCache.substring(i + 1);
-        }
-        int i = relativeToCache.indexOf(File.separator);
-        relativeToCache = relativeToCache.substring(0, i);
-        return relativeToCache;
+        final InfrastructureFileDescriptor cacheDir = CacheLRUWrapper.getInstance().getCacheDir();
+        final String relativeToCache = path.relativize(Paths.get(cacheDir.getFullPath())).toString();
+        final String[] parts = relativeToCache.split(Pattern.quote(File.separator));
+        return parts[3];
     }
 
 }
