@@ -150,27 +150,27 @@ public class CacheUtil {
         return true;
     }
 
-    public static boolean clearCache(final String application, boolean jnlpPath, boolean domain) {
+    public static boolean clearCache(final String cacheId, boolean jnlpPath, boolean domain) {
         // clear one app
         if (cannotClearCache()) {
             return false;
         }
 
-        LOG.warn("Clearing cache for: {}", application);
+        LOG.warn("Clearing cache for: {}", cacheId);
         List<CacheId> ids = getCacheIds(".*", jnlpPath, domain);
         int found = 0;
         int files = 0;
         for (CacheId id : ids) {
-            if (id.getId().equalsIgnoreCase(application)) {
+            if (id.getId().equalsIgnoreCase(cacheId)) {
                 found++;
                 files += id.files.size();
             }
         }
         if (found == 0) {
-            LOG.error("No ID matching {} found!", application);
+            LOG.error("No ID matching {} found!", cacheId);
         }
         if (found > 1) {
-            LOG.error("More then one ID is matching {}!", application);
+            LOG.error("More then one ID is matching {}!", cacheId);
         }
         LOG.info("Alerting: {} of files ", files);
         final CacheLRUWrapper lruHandler = CacheLRUWrapper.getInstance();
@@ -184,7 +184,7 @@ public class CacheUtil {
                                 PropertiesFile pf = new PropertiesFile(new File(path.toString()));
                                 // if jnlp-path in .info equals path of app to delete mark to delete
                                 String jnlpPath1 = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                if (application.equalsIgnoreCase(jnlpPath1) || application.equalsIgnoreCase(getDomain(path))) {
+                                if (cacheId.equalsIgnoreCase(jnlpPath1) || cacheId.equalsIgnoreCase(getDomain(path))) {
                                     pf.setProperty("delete", "true");
                                     pf.store();
                                     LOG.info("marked for deletion: {}", path);
@@ -192,7 +192,7 @@ public class CacheUtil {
                             }
                         });
                 if (OsUtil.isWindows()) {
-                    WindowsShortcutManager.removeWindowsShortcuts(application.toLowerCase());
+                    WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
                 }
                 // clean the cache of entries now marked for deletion
                 cleanCache();
