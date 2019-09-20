@@ -138,7 +138,6 @@ public class ResourceTracker {
         synchronized (resources) {
             if (resources.contains(resource))
                 return;
-            resource.addTracker(this);
             resources.add(resource);
         }
 
@@ -166,7 +165,6 @@ public class ResourceTracker {
         synchronized (resources) {
             Resource resource = getResource(location);
             resources.remove(resource);
-            resource.removeTracker(this);
         }
     }
 

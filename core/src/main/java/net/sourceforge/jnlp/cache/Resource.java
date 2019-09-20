@@ -68,9 +68,6 @@ public class Resource {
     /** list of weak references of resources currently in use */
     private static final WeakList<Resource> resources = new WeakList<>();
 
-    /** weak list of trackers monitoring this resource */
-    private final WeakList<ResourceTracker> trackers = new WeakList<>();
-
     /** the remote location of the resource */
     private final URL location;
 
@@ -332,36 +329,6 @@ public class Resource {
     void resetStatus() {
         synchronized (status) {
             status.clear();
-        }
-    }
-
-    /**
-     * Removes the tracker to the list of trackers monitoring this
-     * resource.
-     *
-     * @param tracker tracker to be removed
-     */
-    void removeTracker(ResourceTracker tracker) {
-        synchronized (trackers) {
-            trackers.remove(tracker);
-            trackers.trimToSize();
-        }
-    }
-
-    /**
-     * Adds the tracker to the list of trackers monitoring this
-     * resource.
-     *
-     * @param tracker to observing resource
-     */
-    void addTracker(ResourceTracker tracker) {
-        synchronized (trackers) {
-            // prevent GC between contains and add
-            List<ResourceTracker> t = trackers.hardList();
-            if (!t.contains(tracker))
-                trackers.add(tracker);
-
-            trackers.trimToSize();
         }
     }
 
