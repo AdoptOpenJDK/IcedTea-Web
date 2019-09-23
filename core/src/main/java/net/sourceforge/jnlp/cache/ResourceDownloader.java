@@ -153,10 +153,10 @@ class ResourceDownloader implements Runnable {
 
             // update cache entry
             if (doUpdate) {
-                entry.setRemoteContentLength(size);
+                entry.setSize(size);
                 entry.setLastModified(lm);
             }
-            entry.setLastUpdated(System.currentTimeMillis());
+            entry.setDownloadedAt(System.currentTimeMillis());
             try {
                 //do not die here no matter of cost. Just metadata
                 //is the path from user best to store? He can run some jnlp from temp which then be stored

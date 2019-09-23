@@ -33,16 +33,16 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.10 $
  */
-public class CacheEntry {
+public class CacheEntry implements ResourceInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
 
-    public static final String INFO_SUFFIX = ".info";
+    static final String INFO_SUFFIX = ".info";
 
-    private static final String KEY_CONTENT_LENGTH = "content-length";
+    private static final String KEY_SIZE = "content-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
-    private static final String KEY_LAST_UPDATED = "last-updated";
-    public static final String KEY_JNLP_PATH = "jnlp-path";
+    private static final String KEY_DOWNLOADED_AT = "last-updated";
+    static final String KEY_JNLP_PATH = "jnlp-path";
 
     /** the remote resource location */
     private final URL location;
@@ -85,8 +85,14 @@ public class CacheEntry {
      * Returns the remote location this entry caches.
      * @return URL same as the one on which this entry was created
      */
+    @Override
     public URL getLocation() {
         return location;
+    }
+
+    @Override
+    public VersionId getVersion() {
+        return version;
     }
 
     /**
@@ -94,8 +100,9 @@ public class CacheEntry {
      * most recently checked for an update.
      * @return when the item was updated (in ms)
      */
-    long getLastUpdated() {
-        return getLongKey(KEY_LAST_UPDATED);
+    @Override
+    public long getDownloadedAt() {
+        return getLongKey(KEY_DOWNLOADED_AT);
     }
 
     /**
@@ -103,23 +110,25 @@ public class CacheEntry {
      * most recently checked for an update.
      * @param updatedTime the time (in ms) to be set as last updated time
      */
-    void setLastUpdated(long updatedTime) {
-        setLongKey(KEY_LAST_UPDATED, updatedTime);
+    void setDownloadedAt(long updatedTime) {
+        setLongKey(KEY_DOWNLOADED_AT, updatedTime);
     }
 
-    long getRemoteContentLength() {
-        return getLongKey(KEY_CONTENT_LENGTH);
+    @Override
+    public long getSize() {
+        return getLongKey(KEY_SIZE);
     }
 
-    void setRemoteContentLength(long length) {
-        setLongKey(KEY_CONTENT_LENGTH, length);
+    void setSize(long length) {
+        setLongKey(KEY_SIZE, length);
     }
 
     void setJnlpPath(String jnlpPath) {
         properties.setProperty(KEY_JNLP_PATH, jnlpPath);
     }
 
-    long getLastModified() {
+    @Override
+    public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
     }
 
@@ -154,7 +163,7 @@ public class CacheEntry {
             return false;
         }
         try {
-            long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
+            long cachedModified = getLastModified();
             LOG.info("{} - version {}: lastModified cache:{} actual:{}", location, version, cachedModified, lastModified);
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
@@ -177,7 +186,7 @@ public class CacheEntry {
 
         try {
             long cachedLength = localFile.length();
-            long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
+            long remoteLength = getSize();
 
             LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
 
@@ -213,7 +222,7 @@ public class CacheEntry {
     void storeEntryFields(long contentLength, long lastModified) {
         lock();
         try {
-            setRemoteContentLength(contentLength);
+            setSize(contentLength);
             setLastModified(lastModified);
             store();
         } finally {

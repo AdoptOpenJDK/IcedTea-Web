@@ -106,9 +106,9 @@ public class CacheEntryTest {
         long LAST_UPDATED = 1000;
 
         CacheEntry entry = new TestCacheEntry(url, version, null);
-        entry.setLastUpdated(LAST_UPDATED);
+        entry.setDownloadedAt(LAST_UPDATED);
 
-        assertEquals(LAST_UPDATED, entry.getLastUpdated());
+        assertEquals(LAST_UPDATED, entry.getDownloadedAt());
     }
 
     @Test
@@ -116,9 +116,9 @@ public class CacheEntryTest {
         long CONTENT_LENGTH = 1000;
 
         CacheEntry entry = new TestCacheEntry(url, version, null);
-        entry.setRemoteContentLength(CONTENT_LENGTH);
+        entry.setSize(CONTENT_LENGTH);
 
-        assertEquals(CONTENT_LENGTH, entry.getRemoteContentLength());
+        assertEquals(CONTENT_LENGTH, entry.getSize());
     }
 
     @Test
@@ -135,7 +135,7 @@ public class CacheEntryTest {
         File cachedFile = createFile("Foo");
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
-        entry.setRemoteContentLength(10000);
+        entry.setSize(10000);
 
         assertFalse(entry.isCached());
     }
@@ -146,7 +146,7 @@ public class CacheEntryTest {
         File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
-        entry.setRemoteContentLength(contents.length());
+        entry.setSize(contents.length());
 
         assertTrue(entry.isCached());
     }

@@ -66,7 +66,7 @@ public class UpdatePolicy {
      * @param entry entry which should be cared
      */
     boolean shouldUpdate(CacheEntry entry) {
-        long updated = entry.getLastUpdated();
+        long updated = entry.getDownloadedAt();
         long current = System.currentTimeMillis();
 
         return current - updated >= timeDiff;
