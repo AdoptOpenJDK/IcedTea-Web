@@ -38,6 +38,7 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -53,6 +54,8 @@ import net.sourceforge.jnlp.util.WindowsShortcutManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -285,6 +288,21 @@ class CacheLRUWrapper {
             }
             return r;
         }
+    }
+
+    void writeToCache(ResourceInfo info, InputStream inputStream) throws IOException {
+        final CacheEntry entry = new CacheEntry(info.getLocation(), info.getVersion());
+
+        final File outputFile = getCacheFile(info.getLocation(), info.getVersion());
+        LOG.debug("Downloading file: {} into: {}", info.getLocation(), outputFile.getCanonicalPath());
+        try (final OutputStream out = new FileOutputStream(outputFile)) {
+            IOUtils.copy(inputStream, out);
+        }
+
+        entry.setSize(info.getSize());
+        entry.setLastModified(info.getLastModified());
+        entry.setDownloadedAt(info.getDownloadedAt());
+        entry.store();
     }
 
     void deleteFromCache(URL location, VersionString version) {

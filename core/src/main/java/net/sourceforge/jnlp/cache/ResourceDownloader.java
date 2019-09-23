@@ -5,7 +5,6 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -15,15 +14,14 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.sourceforge.jnlp.cache.CacheUtil.isUpToDate;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -32,6 +30,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
+import static net.sourceforge.jnlp.cache.ResourceInfo.createInfoFromRemote;
 
 class ResourceDownloader implements Runnable {
 
@@ -250,35 +249,32 @@ class ResourceDownloader implements Runnable {
     }
 
     private void downloadFile(CloseableConnection connection, URL downloadLocation, StreamUnpacker unpacker) throws IOException {
-        CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
-        LOG.debug("Downloading file: {} into: {}", downloadLocation, downloadEntry.getCacheFile().getCanonicalPath());
-        if (!downloadEntry.isCurrent(connection.getLastModified())) {
-            try {
-                final InputStream packedStream = connection.getInputStream();
-                final InputStream unpackedStream = unpacker.unpack(packedStream);
-                writeDownloadToFile(downloadLocation, unpackedStream);
-            } catch (IOException ex) {
-                if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
-                    LOG.error(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket", ex);
-                    final InputStream packedStream = getInputStreamFromDirectSocket(connection.getURL(), downloadLocation);
-                    final InputStream unpackedStream = unpacker.unpack(packedStream);
-                    writeDownloadToFile(downloadLocation, unpackedStream);
-                } else {
-                    throw ex;
-                }
-            }
-        } else {
-            final File cacheFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
+        final VersionId version = resource.getDownloadVersion();
+        if (isUpToDate(downloadLocation, version, connection.getLastModified())) {
+            final File cacheFile = CacheUtil.getCacheFile(downloadLocation, version);
             resource.setTransferred(cacheFile.length());
-        }
+        } else {
+            final String versionHeaderField = connection.getHeaderField("x-java-jnlp-version-id");
+            final VersionId versionFromRemote = versionHeaderField != null ? VersionId.fromString(versionHeaderField) : resource.getDownloadVersion();
 
-        downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
+            final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
+            final InputStream unpackedStream = unpacker.unpack(downloadStream);
+            final ResourceInfo resourceInfo = createInfoFromRemote(downloadLocation, versionFromRemote, connection);
+            CacheUtil.writeToCache(resourceInfo, unpackedStream);
+            resource.setTransferred(resourceInfo.getSize());
+        }
     }
 
-    private void writeDownloadToFile(final URL downloadLocation, final InputStream in) throws IOException {
-        final File outputFile = CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion());
-        try (final OutputStream out = new FileOutputStream(outputFile)) {
-            IOUtils.copy(in, out);
+    private InputStream getDownloadInputStream(CloseableConnection connection, URL downloadLocation) throws IOException {
+        try {
+            return connection.getInputStream();
+        } catch (IOException ex) {
+            if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
+                LOG.error(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket", ex);
+                return getInputStreamFromDirectSocket(connection.getURL(), downloadLocation);
+            } else {
+                throw ex;
+            }
         }
     }
 

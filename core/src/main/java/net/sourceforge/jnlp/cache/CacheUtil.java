@@ -32,6 +32,8 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -449,5 +451,9 @@ public class CacheUtil {
             return null;
         }
         return CacheLRUWrapper.getInstance().getInfo(location, versionId);
+    }
+
+    static void writeToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
+        CacheLRUWrapper.getInstance().writeToCache(infoFromRemote, unpackedStream);
     }
 }
