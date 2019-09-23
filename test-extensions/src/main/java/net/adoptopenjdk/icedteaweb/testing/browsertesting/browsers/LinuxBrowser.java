@@ -37,9 +37,8 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 
 
 public abstract class LinuxBrowser implements Browser{
@@ -77,7 +76,7 @@ public abstract class LinuxBrowser implements Browser{
 
       @Override
     public String getDefaultPluginExpectedLocation() {
-        if (System.getProperty(OS_ARCH).contains("64")) {
+        if (JavaSystemProperties.getOsArch().contains("64")) {
             return "/usr/lib64/"+fsdir+"/plugins";
         } else {
             return "/usr/lib/"+fsdir+"/plugins";

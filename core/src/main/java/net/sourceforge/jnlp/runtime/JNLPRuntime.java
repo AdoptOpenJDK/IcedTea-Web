@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.client.GuiLaunchHandler;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
@@ -76,9 +77,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_HEADLESS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
 import static net.sourceforge.jnlp.runtime.ForkingStrategy.IF_JNLP_REQUIRES;
 
 /**
@@ -249,7 +247,7 @@ public class JNLPRuntime {
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
         System.setProperty("javawebstart.version", "javaws-" +
-                System.getProperty(JAVA_VERSION));
+                JavaSystemProperties.getJavaVersion());
 
         if (!isHeadless() && indicator == null)
             indicator = new DefaultDownloadIndicator();
@@ -325,7 +323,7 @@ public class JNLPRuntime {
             Class<?> trustManagerClass;
             Constructor<?> tmCtor;
 
-            if (System.getProperty(JAVA_VERSION).startsWith("1.6")) { // Java 6
+            if (JavaSystemProperties.getJavaVersion().startsWith("1.6")) { // Java 6
                 try {
                     trustManagerClass = Class.forName("net.sourceforge.jnlp.security.VariableX509TrustManagerJDK6");
                  } catch (ClassNotFoundException cnfe) {
@@ -740,7 +738,7 @@ public class JNLPRuntime {
         //if (GraphicsEnvironment.isHeadless()) // jdk1.4+ only
         //    headless = true;
         try {
-            if ("true".equalsIgnoreCase(System.getProperty(AWT_HEADLESS))) {
+            if ("true".equalsIgnoreCase(JavaSystemProperties.getAwtHeadless())) {
                 headless = true;
             }
             if (!headless) {
@@ -771,7 +769,7 @@ public class JNLPRuntime {
      */
     @Deprecated
     public static boolean isUnix() {
-        String sep = System.getProperty(FILE_SEPARATOR);
+        String sep = JavaSystemProperties.getFileSeparator();
         return (sep != null && sep.equals("/"));
     }
 

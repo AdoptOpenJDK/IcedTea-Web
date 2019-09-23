@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.security.KeyStores.Level;
@@ -56,7 +57,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_PASSWORD;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_TYPE;
 
 public class SecurityUtil {
 
@@ -243,7 +246,7 @@ public class SecurityUtil {
         FileInputStream fis = null;
 
         try {
-            File file = new File(System.getProperty(JAVA_HOME)
+            File file = new File(JavaSystemProperties.getJavaHome()
                                 + "/lib/security/cacerts");
             if (file.exists()) {
                 fis = new FileInputStream(file);
@@ -271,11 +274,10 @@ public class SecurityUtil {
         FileInputStream fis = null;
 
         try {
-            File file = new File(System.getProperty("javax.net.ssl.trustStore"));
-            String type = System.getProperty("javax.net.ssl.trustStoreType");
+            File file = new File(System.getProperty(SSL_TRUST_STORE));
+            String type = System.getProperty(SSL_TRUST_STORE_TYPE);
             //String provider = "SUN";
-            char[] password = System.getProperty(
-                                "javax.net.ssl.trustStorePassword").toCharArray();
+            char[] password = System.getProperty(SSL_TRUST_STORE_PASSWORD).toCharArray();
             if (file.exists()) {
                 fis = new FileInputStream(file);
                 caks = KeyStore.getInstance(type);

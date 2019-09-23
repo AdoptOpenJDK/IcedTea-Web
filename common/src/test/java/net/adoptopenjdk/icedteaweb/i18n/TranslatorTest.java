@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.i18n;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 
 public class TranslatorTest {
@@ -80,7 +80,7 @@ public class TranslatorTest {
     }
 
     private ResourceBundle createTestBundleWithMissingResourceFallback() throws IOException {
-        final File f = new File(System.getProperty(JAVA_IO_TMPDIR), "test.properties");
+        final File f = new File(JavaSystemProperties.getJavaTempDir(), "test.properties");
         f.createNewFile();
         f.deleteOnExit();
 
@@ -98,7 +98,7 @@ public class TranslatorTest {
     }
 
     private ResourceBundle createTestBundleWithoutMissingResourceFallback() throws IOException {
-        final File f = new File(System.getProperty(JAVA_IO_TMPDIR), "test2.properties");
+        final File f = new File(JavaSystemProperties.getJavaTempDir(), "test2.properties");
         f.createNewFile();
         f.deleteOnExit();
 

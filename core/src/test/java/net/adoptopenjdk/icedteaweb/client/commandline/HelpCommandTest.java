@@ -16,12 +16,12 @@
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.SUCCESS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.is;
  */
 public class HelpCommandTest extends AbstractCommandTest {
 
-    private static final String EOL = System.getProperty(LINE_SEPARATOR);
+    private static final String EOL = JavaSystemProperties.getLineSeparator();
 
     /**
      * Test whether the {@code -help}, command executes and terminates with {@link CommandLine#SUCCESS}.

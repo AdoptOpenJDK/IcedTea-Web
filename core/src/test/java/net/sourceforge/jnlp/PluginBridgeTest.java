@@ -22,6 +22,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -47,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 
 public class PluginBridgeTest extends NoStdOutErrTest{
@@ -93,7 +93,7 @@ public class PluginBridgeTest extends NoStdOutErrTest{
     @BeforeClass
     public static void setup() {
         originalCacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(JavaSystemProperties.getJavaTempDir() + File.separator + "tempcache");
     }
 
     @AfterClass

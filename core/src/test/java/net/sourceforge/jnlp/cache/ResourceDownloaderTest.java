@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -28,7 +29,6 @@ import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -96,14 +96,14 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     @BeforeClass
     public static void startServer() throws Exception {
         redirectErr();
-        testServer = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        testServer = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         redirectErrBack();
     }
 
     @BeforeClass
     public static void startServer2() throws Exception {
         redirectErr();
-        testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        testServerWithBrokenHead = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         testServerWithBrokenHead.setSupportingHeadRequest(false);
         redirectErrBack();
     }
@@ -120,7 +120,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @BeforeClass
     public static void setupCache() throws IOException {
-        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
+        File dir = new File(JavaSystemProperties.getJavaTempDir(), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
 
@@ -129,7 +129,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(new File(System.getProperty(JAVA_IO_TMPDIR), "tempcache").getCanonicalPath());
+        PathsAndFiles.CACHE_DIR.setValue(new File(JavaSystemProperties.getJavaTempDir(), "tempcache").getCanonicalPath());
     }
 
     @AfterClass

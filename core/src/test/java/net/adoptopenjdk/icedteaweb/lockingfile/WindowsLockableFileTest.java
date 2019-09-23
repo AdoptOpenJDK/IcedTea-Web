@@ -5,6 +5,7 @@
  */
 package net.adoptopenjdk.icedteaweb.lockingfile;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,7 +13,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_NAME;
 
 /**
  *
@@ -24,7 +25,7 @@ public class WindowsLockableFileTest {
 
     @BeforeClass
     public static void smuggleOs() {
-        os = System.getProperty(OS_NAME);
+        os = JavaSystemProperties.getOsName();
         System.setProperty(OS_NAME, "Windows for itw");
     }
 

@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
@@ -49,7 +50,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CountDownLatch;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.CACHE_INDEX_FILE_NAME;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -58,7 +58,7 @@ public class CacheLRUWrapperTest {
 
     // does no DeploymentConfiguration exist for this file name? 
     private static final String cacheIndexFileName = CACHE_INDEX_FILE_NAME + "_testing";
-    private static final File javaTmp = new File(System.getProperty(JAVA_IO_TMPDIR));
+    private static final File javaTmp = new File(JavaSystemProperties.getJavaTempDir());
     private static final File tmpCache;
     private static final File tmpIndexFile;
 
