@@ -32,7 +32,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -213,43 +212,12 @@ public class CacheUtil {
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    static boolean isCurrent(final URL source, final VersionId version, long lastModified) {
-
-        if (!isCacheable(source))
+    static boolean isUpToDate(final URL source, final VersionId version, long lastModified) {
+        if (!isCacheable(source)) {
             throw new IllegalArgumentException(source + " is not a cacheable resource");
-
-        try {
-            CacheEntry entry = new CacheEntry(source, version); // could pool this
-            boolean result = entry.isCurrent(lastModified);
-
-            LOG.info("isCurrent: {} = {}", source, result);
-
-            return result;
-        } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return isCached(source, version); // if can't connect return whether already in cache
         }
-    }
 
-    /**
-     * Returns true if the cache has a local copy of the contents of
-     * the URL matching the specified version.
-     *
-     * @param source  the source URL
-     * @param version the version to check for
-     * @return true if the source is in the cache
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    private static boolean isCached(final URL source, final VersionId version) {
-        if (!isCacheable(source))
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-
-        CacheEntry entry = new CacheEntry(source, version); // could pool this
-        boolean result = entry.isCached();
-
-        LOG.info("isCached: {} = {}", source, result);
-
-        return result;
+        return CacheLRUWrapper.getInstance().isUpToDate(source, version, lastModified);
     }
 
     /**

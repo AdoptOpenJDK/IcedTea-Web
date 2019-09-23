@@ -215,6 +215,30 @@ class CacheLRUWrapper {
         return path.substring(index);
     }
 
+    /**
+     * Returns whether there is a version of the URL contents in the
+     * cache and it is up to date.  This method may not return
+     * immediately.
+     *
+     * @param source      the source {@link URL}
+     * @param version     the versions to check for
+     * @param lastModified time in millis since epoch of last modification
+     * @return whether the cache contains the version
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    boolean isUpToDate(URL source, VersionId version, long lastModified) {
+        final CacheEntry entry = new CacheEntry(source, version);
+        final boolean isCached = entry.isCached();
+        if (! isCached) {
+            LOG.info("isCurrent: {} = false", source);
+            return false;
+        }
+
+        boolean isCurrent = entry.isCurrent(lastModified);
+        LOG.info("isCurrent: {} = {}", source, isCurrent);
+        return isCurrent;
+    }
+
     List<CacheId> getCacheIds(String filter, boolean jnlpPath, boolean domain) {
         synchronized (this) {
             lock();

@@ -124,8 +124,9 @@ class ResourceDownloader implements Runnable {
             File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             long size = location.getContentLength();
             long lm = location.getLastModified();
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), location.getVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
-            if (!current) {
+            final boolean isUpToDate = CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), lm);
+            final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
+            if (doUpdate) {
                 if (entry.isCached()) {
                     entry.markForDelete();
                     entry.store();
@@ -145,13 +146,13 @@ class ResourceDownloader implements Runnable {
                 resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
 
                 // check if up-to-date; if so set as downloaded
-                if (current) {
+                if (!doUpdate) {
                     resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
                 }
             }
 
             // update cache entry
-            if (!current) {
+            if (doUpdate) {
                 entry.setRemoteContentLength(size);
                 entry.setLastModified(lm);
             }
