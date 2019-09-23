@@ -25,7 +25,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.CacheDirectory;
-import net.sourceforge.jnlp.cache.CacheEntry;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -87,7 +86,7 @@ public class CachePane extends JPanel {
             Translator.R("CVCPColDomain"),
             Translator.R("CVCPColSize"),
             Translator.R("CVCPColLastModified"),
-        CacheEntry.KEY_JNLP_PATH
+            Translator.R("CVCPColJnlPath")
     };
     JTable cacheTable;
     private JButton deleteButton, refreshButton, doneButton, cleanAll, infoButton;
@@ -210,8 +209,7 @@ public class CachePane extends JPanel {
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
                     DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
-                    File selectedFile = fileNode.getFile();
-                    File infoFile = new File(selectedFile + CacheEntry.INFO_SUFFIX);
+                    File infoFile = fileNode.getInfoFile();
                     String info = StreamUtils.readStreamAsString(new FileInputStream(infoFile), true);
                     t.setText(info);
                 } catch (Exception ex) {
