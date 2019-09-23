@@ -33,6 +33,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -65,33 +66,20 @@ public class CacheUtil {
      * @param policy   how to handle update
      * @return either the location in the cache or the original location
      */
-    public static URL getCachedResourceURL(final URL location, final VersionString version, final UpdatePolicy policy) {
+    public static File downloadAndGetCacheFile(final URL location, final VersionString version, final UpdatePolicy policy) {
         try {
-            final File f = getCachedResourceFile(location, version, policy);
-            //url was pointing to nowhere eg 404
-            if (f == null) {
-                //originally  f.toUrl was throwing NPE
-                return null;
-                //returning null seems to be better
+            final ResourceTracker rt = new ResourceTracker();
+            rt.addResource(location, version, policy);
+            return rt.getCacheFile(location);
+        } catch (Exception ex) {
+            if (location.toString().startsWith("file:")) {
+                try {
+                    return new File(location.toURI());
+                } catch (URISyntaxException ignored) {
+                }
             }
-            return f.toURI().toURL();
-        } catch (MalformedURLException ex) {
-            return location;
+            return null;
         }
-    }
-
-    /**
-     * This is returning File object of cached resource originally from URL
-     *
-     * @param location original location of blob
-     * @param version  version of resource
-     * @param policy   update policy of resource
-     * @return location in ITW cache on filesystem
-     */
-    private static File getCachedResourceFile(final URL location, final VersionString version, final UpdatePolicy policy) {
-        final ResourceTracker rt = new ResourceTracker();
-        rt.addResource(location, version, policy);
-        return rt.getCacheFile(location);
     }
 
     /**

@@ -389,55 +389,40 @@ public class XDesktopEntry implements GenericDesktopEntry {
                     iconSize);
         }
 
-        String location = null;
+        File cacheFile;
         if (uiconLocation != null) {
-            //this throws npe, if url (specified in jnlp) points to 404
-            URL urlLocation = CacheUtil.getCachedResourceURL(uiconLocation, null, UpdatePolicy.SESSION);
-            if (urlLocation == null) {
-                cantCache();
-            }
-            location = urlLocation.toString();
-            if (!location.startsWith("file:")) {
-                cantCache();
-            }
+            cacheFile  = CacheUtil.downloadAndGetCacheFile(uiconLocation, null, UpdatePolicy.SESSION);
         } else {
-                URL urlLocation = getFavIconUrl(file);
-                if (urlLocation == null) {
-                    cantCache();
-                }
-                location = urlLocation.toString();
-                if (!location.startsWith("file:")) {
-                    cantCache();
-                }
+            cacheFile = downloadFavIcon(file);
+        }
 
+        if (cacheFile == null) {
+            cantCache();
         }
-        if (location != null) {
-            String origLocation = location.substring("file:".length());
-            this.iconLocation = origLocation;
-            // icons are never uninstalled by itw. however, system clears them on its own.. sometimes.
-            // once the -Xclearcache is run, system MAY clean it later, and so image wil be lost.
-            // copy icon somewhere where -Xclearcache can not
-            PathsAndFiles.ICONS_DIR.getFile().mkdirs();
-            File source = new File(origLocation);
-            String targetName = source.getName();
-            if (targetName.equals(FAVICON)) {
-                targetName = file.getNotNullProbableCodeBase().getHost() + ".ico";
-            }
-            File target = null;
-            if (OsUtil.isWindows() &&
-                (targetName.toLowerCase().endsWith(GIF)  || 
-                 targetName.toLowerCase().endsWith(JPG)  || 
-                 targetName.toLowerCase().endsWith(JPEG) || 
-                 targetName.toLowerCase().endsWith(PNG))) {
-                target = convertToIco(source, targetName);
-            }
-            if (target == null) {
-                target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
-                Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-            this.iconLocation = target.getAbsolutePath();
-            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + origLocation);
+
+        this.iconLocation = cacheFile.getAbsolutePath();
+        // icons are never uninstalled by itw. however, system clears them on its own.. sometimes.
+        // once the -Xclearcache is run, system MAY clean it later, and so image wil be lost.
+        // copy icon somewhere where -Xclearcache can not
+        PathsAndFiles.ICONS_DIR.getFile().mkdirs();
+        String targetName = cacheFile.getName();
+        if (targetName.equals(FAVICON)) {
+            targetName = file.getNotNullProbableCodeBase().getHost() + ".ico";
         }
+        File target = null;
+        if (OsUtil.isWindows() &&
+            (targetName.toLowerCase().endsWith(GIF)  ||
+             targetName.toLowerCase().endsWith(JPG)  ||
+             targetName.toLowerCase().endsWith(JPEG) ||
+             targetName.toLowerCase().endsWith(PNG))) {
+            target = convertToIco(cacheFile, targetName);
+        }
+        if (target == null) {
+            target = new File(PathsAndFiles.ICONS_DIR.getFile(), targetName);
+            Files.copy(cacheFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        this.iconLocation = target.getAbsolutePath();
+        OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + cacheFile.getAbsolutePath());
     }
     
     private File convertToIco(final File source, final String targetName) {
@@ -545,25 +530,25 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 path + separator + FAVICON);
     }
 
-    private static URL getFavIconUrl(JNLPFile file) {
+    private static File downloadFavIcon(JNLPFile file) {
         try {
             for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("/", path, file);
                 //JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
                 //this MAY throw npe, if url (specified in jnlp) points to 404
                 //the below works just fine
-                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
-                if (urlLocation != null) {
-                    return urlLocation;
+                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null, UpdatePolicy.SESSION);
+                if (cacheFile != null) {
+                    return cacheFile;
                 }
             }
             //the icon is much more likely to be found behind / then behind \/
             //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
             for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("\\", path, file);
-                URL urlLocation = CacheUtil.getCachedResourceURL(favico, null, UpdatePolicy.SESSION);
-                if (urlLocation != null) {
-                    return urlLocation;
+                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null, UpdatePolicy.SESSION);
+                if (cacheFile != null) {
+                    return cacheFile;
                 }
             }
         } catch (Exception ex) {
