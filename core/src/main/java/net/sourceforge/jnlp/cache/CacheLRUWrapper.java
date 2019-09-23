@@ -230,12 +230,12 @@ class CacheLRUWrapper {
         final CacheEntry entry = new CacheEntry(source, version);
         final boolean isCached = entry.isCached();
         if (! isCached) {
-            LOG.info("isCurrent: {} = false", source);
+            LOG.info("isUpToDate: {} = false", source);
             return false;
         }
 
         boolean isCurrent = entry.isCurrent(lastModified);
-        LOG.info("isCurrent: {} = {}", source, isCurrent);
+        LOG.info("isUpToDate: {} = {}", source, isCurrent);
         return isCurrent;
     }
 
