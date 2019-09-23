@@ -124,6 +124,10 @@ class CacheLRUWrapper {
 
     private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
 
+    ResourceInfo getInfo(URL location, VersionId versionId) {
+        return new CacheEntry(location, versionId);
+    }
+
     File getCacheFile(URL source, VersionId version) {
         File cacheFile = null;
         synchronized (this) {
@@ -532,7 +536,7 @@ class CacheLRUWrapper {
         return recentlyUsedPropertiesFile;
     }
 
-   private static class CacheLRUWrapperHolder{
+    private static class CacheLRUWrapperHolder {
        private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
    }
 

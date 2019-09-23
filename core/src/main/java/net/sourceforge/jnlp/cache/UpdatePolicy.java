@@ -65,7 +65,7 @@ public class UpdatePolicy {
      * up-to-date.
      * @param entry entry which should be cared
      */
-    boolean shouldUpdate(CacheEntry entry) {
+    boolean shouldUpdate(ResourceInfo entry) {
         long updated = entry.getDownloadedAt();
         long current = System.currentTimeMillis();
 

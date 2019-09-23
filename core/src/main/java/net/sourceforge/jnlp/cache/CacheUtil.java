@@ -435,4 +435,19 @@ public class CacheUtil {
 
         return indicator.getListener(title, undownloaded);
     }
+
+    static ResourceInfo getInfoFromCache(URL location, VersionString versionString) {
+        if (!isCacheable(location)) {
+            return null;
+        }
+        if (versionString == null) {
+            return CacheLRUWrapper.getInstance().getInfo(location, null);
+        }
+
+        final VersionId versionId = getBestMatchingVersionInCache(location, versionString);
+        if (versionId == null) {
+            return null;
+        }
+        return CacheLRUWrapper.getInstance().getInfo(location, versionId);
+    }
 }

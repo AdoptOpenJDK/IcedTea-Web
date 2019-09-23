@@ -197,9 +197,9 @@ public class ResourceTracker {
         }
 
         if (updatePolicy != UpdatePolicy.ALWAYS && updatePolicy != UpdatePolicy.FORCE) { // save loading entry props file
-            CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion());
+            ResourceInfo entry = CacheUtil.getInfoFromCache(resource.getLocation(), resource.getRequestVersion());
 
-            if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
+            if (entry != null && !updatePolicy.shouldUpdate(entry)) {
                 LOG.info("not updating: {}", resource.getLocation());
 
                 synchronized (resource) {
