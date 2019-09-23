@@ -184,13 +184,17 @@ public class CacheEntry implements ResourceInfo {
             return false;
         }
 
+        if (! properties.containsKey(KEY_SIZE)) {
+            return false;
+        }
+
         try {
             long cachedLength = localFile.length();
             long remoteLength = getSize();
 
             LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
 
-            return remoteLength < 0 || cachedLength == remoteLength;
+            return cachedLength == remoteLength;
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 

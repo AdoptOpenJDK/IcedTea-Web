@@ -158,6 +158,7 @@ public class CacheEntryTest {
         File cachedFile = createFile(contents);
 
         CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
+        entry.setSize(cachedFile.length());
         entry.setLastModified(lastModified);
 
         assertTrue(entry.isCurrent(lastModified));
