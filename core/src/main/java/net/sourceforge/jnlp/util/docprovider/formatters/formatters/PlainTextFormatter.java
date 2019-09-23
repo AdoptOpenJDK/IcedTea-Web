@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.util.docprovider.formatters.formatters;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import java.nio.charset.Charset;
@@ -55,7 +56,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
     
     public static String getLineSeparator() {
         return java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction("line.separator"));
+                new sun.security.action.GetPropertyAction(JavaSystemPropertiesConstants.LINE_SEPARATOR));
     }
 
     private final String paragraphIndentation;

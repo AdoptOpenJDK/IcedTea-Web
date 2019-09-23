@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration;
 
-import net.adoptopenjdk.icedteaweb.JvmPropertyConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.Boot;
@@ -31,7 +31,7 @@ public class ItwLauncher {
 
     private static int launchItw(String jnlpUrl, List<CommandLineOptions> additionalArgs, String... arguments) throws Exception {
         final String javaBinary = "/bin/java".replace('/', File.separatorChar);
-        final String pathToJavaBinary = System.getProperty(JvmPropertyConstants.JAVA_HOME) + javaBinary;
+        final String pathToJavaBinary = JavaSystemProperties.getJavaHome() + javaBinary;
 
         final String pathToJavawsJar = Boot.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 
@@ -88,7 +88,7 @@ public class ItwLauncher {
         final String DOUBLE_QUOTE = "\"";
 
 
-        final String osName = System.getProperty("os.name");
+        final String osName = JavaSystemProperties.getOsName();
         if (osName.toLowerCase().contains("mac")) {
             return original;
         }

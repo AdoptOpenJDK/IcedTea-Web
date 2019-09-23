@@ -47,36 +47,50 @@ import java.util.Objects;
 import java.util.PropertyPermission;
 import java.util.Set;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ARRAY_LEGACY_MERGE_SORT;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.AWT_AA_FONT_SETTINGS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.BROWSER;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.BROWSER_STAR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.EXIT_VM;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.FILE_SEPARATOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.HTTP_AGENT;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.HTTP_KEEP_ALIVE;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_CLASS_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_PLUGIN;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_SPEC_NAME;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_SPEC_VENDOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_SPEC_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VENDOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VENDOR_URL;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JNLP;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.PATH_SEPARATOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.STOP_THREAD;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_NAME;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_SPEC_NAME;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_SPEC_VENDOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_VENDOR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_VERSION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.WEBSTART_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ARRAY_LEGACY_MERGE_SORT;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_AA_FONT_SETTINGS;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_ERASE_BACKGROUND_ON_RESIZE;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_NO_ERASE_BACKGROUND;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_SYNC_LWREQUESTS;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_WINDOW_LOCATION_BY_PLATFORM;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.BROWSER;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.BROWSER_STAR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.EXIT_VM;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.FILE_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_KEEP_ALIVE;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA2D_D3D;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA2D_DPI_AWARE;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA2D_NO_DDRAW;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA2D_OPENGL;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVAWS;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_CLASS_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_PLUGIN;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_SPEC_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_SPEC_VENDOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_SPEC_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_VENDOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_VENDOR_URL;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JAVA_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.JNLP;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.LINE_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_ARCH;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.PATH_SEPARATOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.STOP_THREAD;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SWING_BOLD_METAL;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SWING_DEFAULT_LF;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SWING_METAL_THEME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SWING_NO_XP;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SWING_USE_SYSTEM_FONT;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_SPEC_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_SPEC_VENDOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_VENDOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_VERSION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.WEBSTART_JAUTHENTICATOR;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.WEBSTART_VERSION;
 import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
 import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
 
@@ -216,20 +230,20 @@ public class SecurityDesc {
             new PropertyPermission(AWT_AA_FONT_SETTINGS, PROPERTY_RW_ACTION),
             new PropertyPermission(HTTP_AGENT, PROPERTY_RW_ACTION),
             new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION),
-            new PropertyPermission("java.awt.syncLWRequests", PROPERTY_RW_ACTION),
-            new PropertyPermission("java.awt.Window.locationByPlatform", PROPERTY_RW_ACTION),
-            new PropertyPermission("javaws.cfg.jauthenticator", PROPERTY_RW_ACTION),
-            new PropertyPermission("javax.swing.defaultlf", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.awt.noerasebackground", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.awt.erasebackgroundonresize", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.java2d.d3d", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.java2d.dpiaware", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.java2d.noddraw", PROPERTY_RW_ACTION),
-            new PropertyPermission("sun.java2d.opengl", PROPERTY_RW_ACTION),
-            new PropertyPermission("swing.boldMetal", PROPERTY_RW_ACTION),
-            new PropertyPermission("swing.metalTheme", PROPERTY_RW_ACTION),
-            new PropertyPermission("swing.noxp", PROPERTY_RW_ACTION),
-            new PropertyPermission("swing.useSystemFontSettings", PROPERTY_RW_ACTION),
+            new PropertyPermission(AWT_SYNC_LWREQUESTS, PROPERTY_RW_ACTION),
+            new PropertyPermission(AWT_WINDOW_LOCATION_BY_PLATFORM, PROPERTY_RW_ACTION),
+            new PropertyPermission(WEBSTART_JAUTHENTICATOR, PROPERTY_RW_ACTION),
+            new PropertyPermission(SWING_DEFAULT_LF, PROPERTY_RW_ACTION),
+            new PropertyPermission(AWT_NO_ERASE_BACKGROUND, PROPERTY_RW_ACTION),
+            new PropertyPermission(AWT_ERASE_BACKGROUND_ON_RESIZE, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVA2D_D3D, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVA2D_DPI_AWARE, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVA2D_NO_DDRAW, PROPERTY_RW_ACTION),
+            new PropertyPermission(JAVA2D_OPENGL, PROPERTY_RW_ACTION),
+            new PropertyPermission(SWING_BOLD_METAL, PROPERTY_RW_ACTION),
+            new PropertyPermission(SWING_METAL_THEME, PROPERTY_RW_ACTION),
+            new PropertyPermission(SWING_NO_XP, PROPERTY_RW_ACTION),
+            new PropertyPermission(SWING_USE_SYSTEM_FONT, PROPERTY_RW_ACTION),
     };
 
     /**

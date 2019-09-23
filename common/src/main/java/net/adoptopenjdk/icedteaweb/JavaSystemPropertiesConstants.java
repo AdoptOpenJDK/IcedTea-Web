@@ -1,8 +1,6 @@
 package net.adoptopenjdk.icedteaweb;
 
-public interface JvmPropertyConstants {
-
-    String ARRAY_LEGACY_MERGE_SORT = "java.util.Arrays.useLegacyMergeSort";
+public interface JavaSystemPropertiesConstants {
 
     String JAVA_VERSION = "java.version";
 
@@ -42,6 +40,67 @@ public interface JvmPropertyConstants {
 
     String VM_NAME = "java.vm.name";
 
+    String USER_LANGUAGE = "user.language";
+
+    String USER_HOME = "user.home";
+
+    String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
+    String USER_DIR = "user.dir";
+
+    String USER_NAME = "user.name";
+
+    String JAVA_HOME = "java.home";
+
+    String AWT_HEADLESS = "java.awt.headless";
+
+    String AWT_AA_FONT_SETTINGS = "awt.useSystemAAFontSettings";
+
+
+
+
+    String SSL_TRUST_STORE = "javax.net.ssl.trustStore";
+
+    String SSL_TRUST_STORE_TYPE = "javax.net.ssl.trustStoreType";
+
+    String SSL_TRUST_STORE_PASSWORD = "javax.net.ssl.trustStorePassword";
+
+
+
+
+    String AWT_SYNC_LWREQUESTS = "java.awt.syncLWRequests";
+
+    String AWT_WINDOW_LOCATION_BY_PLATFORM = "java.awt.Window.locationByPlatform";
+
+    String WEBSTART_JAUTHENTICATOR = "javaws.cfg.jauthenticator";
+
+    String SWING_DEFAULT_LF = "javax.swing.defaultlf";
+
+    String AWT_NO_ERASE_BACKGROUND = "sun.awt.noerasebackground";
+
+    String AWT_ERASE_BACKGROUND_ON_RESIZE = "sun.awt.erasebackgroundonresize";
+
+    String JAVA2D_D3D = "sun.java2d.d3d";
+
+    String JAVA2D_DPI_AWARE = "sun.java2d.dpiaware";
+
+    String JAVA2D_NO_DDRAW = "sun.java2d.noddraw";
+
+    String JAVA2D_OPENGL = "sun.java2d.opengl";
+
+    String SWING_BOLD_METAL = "swing.boldMetal";
+
+    String SWING_METAL_THEME = "swing.metalTheme";
+
+    String SWING_NO_XP = "swing.noxp";
+
+    String SWING_USE_SYSTEM_FONT = "swing.useSystemFontSettings";
+
+
+
+
+    String ARRAY_LEGACY_MERGE_SORT = "java.util.Arrays.useLegacyMergeSort";
+
     String WEBSTART_VERSION = "javawebstart.version";
 
     String JAVA_PLUGIN = "javaplugin.*";
@@ -58,19 +117,11 @@ public interface JvmPropertyConstants {
 
     String STOP_THREAD = "stopThread";
 
-    String AWT_AA_FONT_SETTINGS = "awt.useSystemAAFontSettings";
-
     String HTTP_AGENT = "http.agent";
 
     String HTTP_KEEP_ALIVE = "http.keepAlive";
 
     String ITW_EDT_DEBUG = "icedtea-web.edt.debug";
-
-    String USER_LANGUAGE = "user.language";
-
-    String USER_HOME = "user.home";
-
-    String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
     String ITW_BIN_NAME = "icedtea-web.bin.name";
 
@@ -78,11 +129,4 @@ public interface JvmPropertyConstants {
 
     String USED_BROWSERS = "used.browsers";
 
-    String USER_DIR = "user.dir";
-
-    String USER_NAME = "user.name";
-
-    String JAVA_HOME = "java.home";
-
-    String AWT_HEADLESS = "java.awt.headless";
 }

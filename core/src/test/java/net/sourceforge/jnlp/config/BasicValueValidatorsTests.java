@@ -36,13 +36,12 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
 
 public class BasicValueValidatorsTests {
 
@@ -56,7 +55,7 @@ public class BasicValueValidatorsTests {
      * @return
      */
     public static boolean isOsWindows() {
-        return canBeWindows(System.getProperty(OS_NAME));
+        return canBeWindows(JavaSystemProperties.getOsName());
     }
     private static final FilePathValidator pv = new FilePathValidator();
     private final String neverLegal = "aaa/bb/cc";

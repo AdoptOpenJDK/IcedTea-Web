@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.config;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 
@@ -35,7 +36,7 @@ public class FilesystemConfiguration {
             try {
                 if (configHome.get() == null) {
                     final String xdgHome = System.getenv(ConfigurationConstants.XDG_CONFIG_HOME_VAR);
-                    final String baseHome = System.getProperty(ConfigurationConstants.HOME_PROP) + File.separator + ".config";
+                    final String baseHome = JavaSystemProperties.getUserHome() + File.separator + ".config";
                     configHome.set(Optional.ofNullable(xdgHome).orElse(baseHome));
                 }
             } finally {
@@ -51,7 +52,7 @@ public class FilesystemConfiguration {
             try {
                 if (cacheHome.get() == null) {
                     final String xdgHome = System.getenv(ConfigurationConstants.XDG_CACHE_HOME_VAR);
-                    final String baseHome = System.getProperty(ConfigurationConstants.HOME_PROP) + File.separator + ".cache";
+                    final String baseHome = JavaSystemProperties.getUserHome() + File.separator + ".cache";
                     cacheHome.set(Optional.ofNullable(xdgHome).orElse(baseHome));
                 }
             } finally {
@@ -67,7 +68,7 @@ public class FilesystemConfiguration {
             try {
                 if (dataHome.get() == null) {
                     final String xdgHome = System.getenv(ConfigurationConstants.XDG_DATA_HOME_VAR);
-                    final String baseHome = System.getProperty(ConfigurationConstants.HOME_PROP) +  File.separator + ".local" + File.separator + "share";
+                    final String baseHome = JavaSystemProperties.getUserHome() +  File.separator + ".local" + File.separator + "share";
                     dataHome.set(Optional.ofNullable(xdgHome).orElse(baseHome));
                 }
             } finally {
@@ -83,7 +84,7 @@ public class FilesystemConfiguration {
             try {
                 if (runtimeHome.get() == null) {
                     final String xdgHome = System.getenv(ConfigurationConstants.XDG_RUNTIME_DIR_VAR);
-                    final String baseHome = System.getProperty(ConfigurationConstants.TMP_PROP);
+                    final String baseHome = JavaSystemProperties.getJavaTempDir();
                     runtimeHome.set(Optional.ofNullable(xdgHome).orElse(baseHome));
                 }
             } finally {

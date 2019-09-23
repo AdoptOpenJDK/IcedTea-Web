@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 
 import java.io.File;
@@ -45,8 +46,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 /**
  * This class is able to backup and restore firefox profiles.
@@ -64,7 +63,7 @@ public class FirefoxProfilesOperator {
         if (backuped) {
             return;
         }
-        sourceDir = new File(System.getProperty(USER_HOME) + "/.mozilla/firefox/");
+        sourceDir = new File(JavaSystemProperties.getUserHome() + "/.mozilla/firefox/");
         final File f = File.createTempFile("backupedFirefox_", "_profiles.default");
         f.delete();
         f.mkdir();

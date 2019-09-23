@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_LOCATION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_LOCATION;
 
 /**
  * Implementation of {@link JvmLauncher} which uses the IcedTea-Web launcher to start a new JVM.

@@ -48,7 +48,7 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_EDT_DEBUG;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_EDT_DEBUG;
 
 /**
  * Swing / AWT utility class

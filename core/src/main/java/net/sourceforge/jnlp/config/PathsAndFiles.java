@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.config.FilesystemConfiguration;
 import net.adoptopenjdk.icedteaweb.config.Target;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -287,7 +288,7 @@ public class PathsAndFiles {
     private static class HomeFileDescriptor extends InfrastructureFileDescriptor {
 
         private HomeFileDescriptor(Target... target) {
-            super(ConfigurationConstants.ICEDTEA_SO, ".mozilla/plugins", System.getProperty(ConfigurationConstants.HOME_PROP), "FILEmozillauser", target);
+            super(ConfigurationConstants.ICEDTEA_SO, ".mozilla/plugins", JavaSystemProperties.getUserHome(), "FILEmozillauser", target);
         }
               @Override
         public String getSystemPathStubAcronym() {
@@ -333,7 +334,7 @@ public class PathsAndFiles {
     private static class SystemJavaFileDescriptor extends InfrastructureFileDescriptor {
 
         private SystemJavaFileDescriptor(String fileName, String pathSub, String description, Target... target) {
-            super(fileName, pathSub, System.getProperty(ConfigurationConstants.JAVA_PROP), description, target);
+            super(fileName, pathSub, JavaSystemProperties.getJavaHome(), description, target);
         }
 
         @Override
@@ -468,7 +469,7 @@ public class PathsAndFiles {
     private static class TmpUsrFileDescriptor extends InfrastructureFileDescriptor {
 
         private TmpUsrFileDescriptor(String fileName, String pathStub, String description) {
-            super(fileName, pathStub, System.getProperty(ConfigurationConstants.TMP_PROP) + File.separator + System.getProperty(ConfigurationConstants.USER_PROP), description, Target.JAVAWS);
+            super(fileName, pathStub, JavaSystemProperties.getJavaTempDir() + File.separator + JavaSystemProperties.getUserName(), description, Target.JAVAWS);
         }
 
         @Override

@@ -261,12 +261,8 @@ public interface ConfigurationConstants {
     String ICEDTEA_SO = "IcedTeaPlugin.so";
     String CACHE_INDEX_FILE_NAME = "recently_used";
     String WINDIR = "WINDIR";
-    String TMP_PROP = "java.io.tmpdir";
-    String JAVA_PROP = "java.home";
-    String USER_PROP = "user.name";
     String SECURITY_WORD = "security";
     String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
-    String HOME_PROP = "user.home";
     String XDG_CONFIG_HOME_VAR = "XDG_CONFIG_HOME";
     String XDG_CACHE_HOME_VAR = "XDG_CACHE_HOME";
     String XDG_RUNTIME_DIR_VAR = "XDG_RUNTIME_DIR";

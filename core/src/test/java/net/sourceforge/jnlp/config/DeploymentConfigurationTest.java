@@ -36,12 +36,13 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.config;
 
-import net.sourceforge.jnlp.PluginBridgeTest;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
+import net.sourceforge.jnlp.PluginBridgeTest;
 import net.sourceforge.jnlp.config.DeploymentConfiguration.ConfigType;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -55,7 +56,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
@@ -233,7 +233,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteNotOk404_1() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        ServerLauncher server = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         File f = File.createTempFile("itw", "checkUrlTest_404");
         f.delete();
         f.mkdir();
@@ -257,7 +257,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
 
     @Test
     public void testCheckUrlRemoteOk() throws ConfigurationException, IOException {
-        ServerLauncher server = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        ServerLauncher server = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         try {
             File f = File.createTempFile("itw", "checkUrlTest_remote");
             f.deleteOnExit();

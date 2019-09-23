@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.testing.AnnotationConditionChecker;
 import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.is;
 
 public class TeeOutputStreamTest {
 
-    private static final String EOL = System.getProperty(LINE_SEPARATOR);
+    private static final String EOL = JavaSystemProperties.getLineSeparator();
 
     private static final String[] TEST_STRINGS = new String[]{
             "Hello,\n\r\nWorld",

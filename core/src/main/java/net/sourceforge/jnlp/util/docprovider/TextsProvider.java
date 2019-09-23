@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.util.docprovider;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.Defaults;
@@ -65,7 +66,6 @@ import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_DIR;
 
 public abstract class TextsProvider {
 
@@ -400,7 +400,7 @@ public abstract class TextsProvider {
             boolean expand = Boolean.valueOf(argsList.get(argsList.size() - 2));
             switch (argsList.get(0)) {
                 case "all":
-                    generateAll(new File(System.getProperty(USER_DIR)), expand);
+                    generateAll(new File(JavaSystemProperties.getUserDir()), expand);
                     break;
                 case "html":
                     generateOnlineHtmlHelp(new File(argsList.get(1)), expand);

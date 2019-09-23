@@ -52,7 +52,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USED_BROWSERS;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.USED_BROWSERS;
 
 public class BrowserFactory {
 

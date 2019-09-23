@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.io;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import org.junit.Test;
 
@@ -8,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclFileAttributeView;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static net.adoptopenjdk.icedteaweb.io.FileUtils.INVALID_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -84,7 +84,7 @@ public class FileUtilsTest {
 
     @Test
     public void testCreateParentDir() throws Exception {
-        final File tmpdir = new File(System.getProperty(JAVA_IO_TMPDIR)), testParent = new File(tmpdir, "itw_test_create_parent_dir"), testChild = new File(testParent, "test_child_dir");
+        final File tmpdir = new File(JavaSystemProperties.getJavaTempDir()), testParent = new File(tmpdir, "itw_test_create_parent_dir"), testChild = new File(testParent, "test_child_dir");
         testChild.deleteOnExit();
         testParent.deleteOnExit();
         FileUtils.createParentDir(testChild);
@@ -98,7 +98,7 @@ public class FileUtilsTest {
         if (!OsUtil.isWindows()) {
             return;
         }
-        final File tmpdir = new File(System.getProperty(JAVA_IO_TMPDIR)), testfile = new File(tmpdir, "itw_test_create_restricted_file");
+        final File tmpdir = new File(JavaSystemProperties.getJavaTempDir()), testfile = new File(tmpdir, "itw_test_create_restricted_file");
         if (testfile.exists()) {
             assertTrue(testfile.delete());
         }

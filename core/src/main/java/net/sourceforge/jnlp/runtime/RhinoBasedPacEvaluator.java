@@ -58,7 +58,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.PropertyPermission;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.VM_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_NAME;
 import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
 
 /**

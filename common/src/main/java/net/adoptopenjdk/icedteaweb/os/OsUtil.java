@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.os;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 
 /**
  * Copied from RICO (https://github.com/rico-projects/rico)
@@ -14,7 +14,7 @@ public class OsUtil {
      * @return {@code true} if we are on windows.
      */
     public static boolean isWindows() {
-        String operSys = System.getProperty(OS_NAME).toLowerCase();
+        String operSys = JavaSystemProperties.getOsName().toLowerCase();
         return (operSys.contains(WIN));
     }
 }
