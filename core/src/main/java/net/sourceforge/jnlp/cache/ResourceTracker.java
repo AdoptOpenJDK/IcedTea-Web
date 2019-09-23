@@ -160,7 +160,7 @@ public class ResourceTracker {
         // if unnecessary.
         initResourceFromCache(resource, updatePolicy);
 
-        if (prefetch && resource.isSet(DOWNLOADED)) {
+        if (prefetch && !resource.isSet(DOWNLOADED)) {
             ResourceDownloader.startDownload(resource, lock);
         }
     }
