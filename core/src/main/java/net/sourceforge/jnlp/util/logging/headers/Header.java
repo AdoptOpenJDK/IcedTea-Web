@@ -37,6 +37,7 @@ exception statement from your version. */
 package net.sourceforge.jnlp.util.logging.headers;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -46,13 +47,11 @@ import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 
 import java.util.Date;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_NAME;
-
 public class Header {
 
     private static final Logger LOG = LoggerFactory.getLogger(Header.class);
 
-    static final String default_user = System.getProperty(USER_NAME);
+    static final String default_user = JavaSystemProperties.getUserName();
     static final String unknown = "unknown";
 
     public final String user;

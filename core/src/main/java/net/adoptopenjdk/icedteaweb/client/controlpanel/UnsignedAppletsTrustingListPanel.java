@@ -36,6 +36,7 @@
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.ExtendedAppletSecurityHelp;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
@@ -105,7 +106,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class UnsignedAppletsTrustingListPanel extends JPanel {
 
@@ -148,7 +148,7 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
      * for testing and playing
      */
     public static void main(String args[]) {
-        final String defaultDir = System.getProperty(USER_HOME) + "/Desktop/";
+        final String defaultDir = JavaSystemProperties.getUserHome() + "/Desktop/";
         final String defaultFileName1 = "terrorList1";
         final String defaultFileName2 = "terrorList2";
         final String defaultFile1 = defaultDir + defaultFileName1;

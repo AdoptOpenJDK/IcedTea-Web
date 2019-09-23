@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import org.junit.Assert;
@@ -48,8 +49,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 
 public class TextOutlineRendererTest {
 
@@ -141,7 +140,7 @@ public class TextOutlineRendererTest {
             if (name == null || name.trim().length() <= 0) {
                 name = "testImage";
             }
-            ImageIO.write(bi1, "png", new File(System.getProperty(USER_HOME) + "/Desktop/" + name + ".png"));
+            ImageIO.write(bi1, "png", new File(JavaSystemProperties.getUserHome() + "/Desktop/" + name + ".png"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

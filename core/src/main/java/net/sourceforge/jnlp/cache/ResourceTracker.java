@@ -113,7 +113,8 @@ public class ResourceTracker {
     }
 
     public void addResource(URL location, final VersionId version, final UpdatePolicy updatePolicy) {
-        addResource(location, version.asVersionString(), new DownloadOptions(false, false), updatePolicy);
+        final VersionString versionString = version != null ? version.asVersionString() : null;
+        addResource(location, versionString, new DownloadOptions(false, false), updatePolicy);
     }
 
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {

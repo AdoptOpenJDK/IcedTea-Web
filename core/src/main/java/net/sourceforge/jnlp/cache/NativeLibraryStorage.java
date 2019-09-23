@@ -1,10 +1,11 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,8 +16,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 
 /**
  * Handles loading and access of native code loading through a JNLP application or applet.
@@ -45,7 +44,7 @@ public class NativeLibraryStorage {
             LOG.info("Cleaning up native directory {}", jarEntryDirectory.getAbsolutePath());
             try {
                 FileUtils.recursiveDelete(jarEntryDirectory,
-                        new File(System.getProperty(JAVA_IO_TMPDIR)));
+                        new File(JavaSystemProperties.getJavaTempDir()));
                 jarEntryDirectory = null;
             } catch (IOException e) {
                 /*
@@ -150,7 +149,7 @@ public class NativeLibraryStorage {
      */
     private static File createNativeStoreDirectory() {
         final int rand = (int)((Math.random()*2 - 1) * Integer.MAX_VALUE);
-        File nativeDir = new File(System.getProperty(JAVA_IO_TMPDIR)
+        File nativeDir = new File(JavaSystemProperties.getJavaTempDir()
                              + File.separator + "netx-native-"
                              + (rand & 0xFFFF));
         File parent = nativeDir.getParentFile();

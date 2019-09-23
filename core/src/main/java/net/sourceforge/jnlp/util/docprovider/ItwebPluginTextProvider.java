@@ -36,14 +36,13 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util.docprovider;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.Formatter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
 
 import static net.sourceforge.jnlp.config.ConfigurationConstants.ICEDTEA_SO;
 
@@ -73,7 +72,7 @@ public class ItwebPluginTextProvider extends TextsProvider {
     public String getSynopsis() {
         //yes, this really returns arch of jdk. So just nicely looking, mostly ok workaround.
         //fix needs native code
-        String jdkArch = System.getProperty(OS_ARCH) + "x";
+        String jdkArch = JavaSystemProperties.getOsArch() + "x";
 
         String mozillas;
         if (expandVariables) {

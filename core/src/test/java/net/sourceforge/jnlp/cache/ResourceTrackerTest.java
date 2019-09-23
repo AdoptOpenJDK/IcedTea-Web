@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -59,16 +60,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.Predicate;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -186,7 +179,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @BeforeClass
     public static void setupDownloadServer() throws IOException {
-        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
+        File dir = new File(JavaSystemProperties.getJavaTempDir(), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
         redirectErr();
@@ -194,7 +187,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(JavaSystemProperties.getJavaTempDir() + File.separator + "tempcache");
     }
 
     @AfterClass

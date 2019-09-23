@@ -18,6 +18,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -71,15 +72,15 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.APPLET_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.JAVAFX_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc.INSTALLER_DESC_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.*;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.DESCRIPTION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.EXTENSIONS_ATTRIBUTE;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ICON_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.MIME_TYPE_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc.INFORMATION_ELEMENT;
@@ -506,7 +507,7 @@ public final class Parser {
     }
 
     private static void checkJreVersionWithSystemProperty(final VersionString version, final boolean strict) {
-        final String jreVersion = System.getProperty(JAVA_VERSION);
+        final String jreVersion = JavaSystemProperties.getJavaVersion();
         final boolean match = version.contains(jreVersion);
 
         if (!match) {

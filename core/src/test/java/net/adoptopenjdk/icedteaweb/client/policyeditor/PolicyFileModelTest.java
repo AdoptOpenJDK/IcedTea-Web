@@ -36,6 +36,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -65,7 +65,7 @@ public class PolicyFileModelTest {
     private static final Collection<PolicyParser.PrincipalEntry> EMPTY_PRINCIPALS = Collections.emptyList();
     private static final PolicyIdentifier EXAMPLE_IDENTIFIER = new PolicyIdentifier(EXAMPLE_CA, EMPTY_PRINCIPALS, EXAMPLE_CODEBASE);
     private static final PolicyIdentifier INVALID_IDENTIFIER = new PolicyIdentifier(null, EMPTY_PRINCIPALS, "invalidURL");
-    private static final String LINEBREAK = System.getProperty(LINE_SEPARATOR);
+    private static final String LINEBREAK = JavaSystemProperties.getLineSeparator();
 
     private static final String EXAMPLE_POLICY_1 = "grant {" + LINEBREAK
                                                            + "\tpermission some.java.permission \"somePermission\";" + LINEBREAK
