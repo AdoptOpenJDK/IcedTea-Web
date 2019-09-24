@@ -70,17 +70,6 @@ public class CacheEntry implements ResourceInfo {
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
-    static void markForDelete(URL location, final VersionId version) {
-        CacheEntry entry = new CacheEntry(location, version);
-        entry.lock();
-        try {
-            entry.markForDelete();
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
-    }
-
     /**
      * Returns the remote location this entry caches.
      * @return URL same as the one on which this entry was created
@@ -220,17 +209,6 @@ public class CacheEntry implements ResourceInfo {
             return true;
         } else {
             return false;
-        }
-    }
-
-    void storeEntryFields(long contentLength, long lastModified) {
-        lock();
-        try {
-            setSize(contentLength);
-            setLastModified(lastModified);
-            store();
-        } finally {
-            unlock();
         }
     }
 
