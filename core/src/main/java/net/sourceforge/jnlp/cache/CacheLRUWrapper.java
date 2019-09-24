@@ -299,10 +299,7 @@ class CacheLRUWrapper {
             IOUtils.copy(inputStream, out);
         }
 
-        entry.setSize(info.getSize());
-        entry.setLastModified(info.getLastModified());
-        entry.setDownloadedAt(info.getDownloadedAt());
-        entry.store();
+        entry.storeInfo(info);
     }
 
     void deleteFromCache(URL location, VersionString version) {

@@ -212,6 +212,18 @@ public class CacheEntry implements ResourceInfo {
         }
     }
 
+    void storeInfo(ResourceInfo info) {
+        lock();
+        try {
+            setLongKey(KEY_SIZE, info.getSize());
+            setLongKey(KEY_LAST_MODIFIED, info.getLastModified());
+            setLongKey(KEY_DOWNLOADED_AT, info.getDownloadedAt());
+            store();
+        } finally {
+            unlock();
+        }
+    }
+
     /**
      * Mark this entry for deletion at shutdown.
      */
