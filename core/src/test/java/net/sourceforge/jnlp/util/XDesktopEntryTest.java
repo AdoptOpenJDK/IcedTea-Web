@@ -42,9 +42,7 @@ import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridgeTest;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -89,12 +87,10 @@ public class XDesktopEntryTest {
     private static final String src8 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des8;
     private static final String src9 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des9;
     private static Map<String, String> backupedEnv;
-    private static boolean wasHtml;
     private static boolean wasJavaws;
 
     @BeforeClass
     public static void saveJnlpRuntimeHtml() {
-        wasHtml = JNLPRuntime.isHtml();
         wasJavaws = JNLPRuntime.isWebstartApplication();
     }
 
@@ -106,13 +102,11 @@ public class XDesktopEntryTest {
 
     @After
     public void restoreJnlpRuntimeHtml() throws Exception {
-        JNLPRuntime.setHtml(wasHtml);
         setIsWebstart(wasJavaws);
     }
 
     @AfterClass
     public static void restoreJnlpRuntimeHtmlFinally() throws Exception {
-        JNLPRuntime.setHtml(wasHtml);
         setIsWebstart(wasJavaws);
     }
 
@@ -317,38 +311,6 @@ public class XDesktopEntryTest {
         path = "not/best\\path/file\\path";
         r = XDesktopEntry.possibleFavIconLocations(path);
         Assert.assertEquals(r,commonResult);
-    }
-
-    private void testHtmlOccurrences(boolean html, boolean javaws, boolean menu, AccessWarningPaneComplexReturn.Shortcut type, int occurrences) throws Exception {
-        JNLPRuntime.setHtml(html);
-        setIsWebstart(javaws);
-        JNLPFile jnlpf = new DummyJnlpWithTitle();
-        XDesktopEntry xde = new XDesktopEntry(jnlpf);
-        AccessWarningPaneComplexReturn.ShortcutResult a = new AccessWarningPaneComplexReturn.ShortcutResult(true);
-        a.setBrowser("blah");
-        a.setFixHref(false);
-        a.setShortcutType(type);
-        String s = xde.getContent(menu, a, true);
-        Assert.assertEquals(occurrences, PluginBridgeTest.countOccurrences(s, "-html"));
-    }
-
-    @Test
-    public void htmlSwitchCorrectAccordingToJnlpRuntimeAndShortcutType() throws Exception {
-        AccessWarningPaneComplexReturn.Shortcut[] v = AccessWarningPaneComplexReturn.Shortcut.values();
-        for (AccessWarningPaneComplexReturn.Shortcut w : v) {
-            int var1 = 0;
-            if (w == AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML) {
-                var1 = 1;
-            }
-            testHtmlOccurrences(true, true, true, w, 1);
-            testHtmlOccurrences(true, false, false, w, var1);
-            testHtmlOccurrences(true, false, true, w, var1);
-            testHtmlOccurrences(true, true, false, w, 1);
-            testHtmlOccurrences(false, true, true, w, 0);
-            testHtmlOccurrences(false, false, false, w, var1);
-            testHtmlOccurrences(false, true, false, w, 0);
-            testHtmlOccurrences(false, false, true, w, var1);
-        }
     }
 
     private static class DummyJnlpWithTitle extends DummyJNLPFileWithJar {

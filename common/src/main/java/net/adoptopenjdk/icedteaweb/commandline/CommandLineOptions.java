@@ -33,7 +33,6 @@ public enum CommandLineOptions {
     OFFLINE("-Xoffline", "BXoffline"),
     TRUSTNONE("-Xtrustnone","BOTrustnone"),
     JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
-    HTML("-html","BOHtml", NumberOfArguments.ONE_OR_MORE),
     BROWSER("-browser", "BrowserArg", NumberOfArguments.ONE_OR_MORE),
     //itweb settings
     LIST("-list", "IBOList"),

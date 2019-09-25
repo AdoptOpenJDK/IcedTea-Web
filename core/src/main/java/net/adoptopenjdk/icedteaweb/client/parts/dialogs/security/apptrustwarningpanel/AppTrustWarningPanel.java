@@ -51,7 +51,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -193,11 +192,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
     protected String getAppletTitle() {
         String title;
         try {
-            if (file instanceof PluginBridge) {
-                title = file.getTitle();
-            } else {
-                title = file.getInformation().getTitle();
-            }
+            title = file.getInformation().getTitle();
         } catch (Exception e) {
             title = "";
         }

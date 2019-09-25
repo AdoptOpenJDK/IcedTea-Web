@@ -41,7 +41,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogP
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.TemporaryPermissionsButton;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
@@ -98,11 +97,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         }
 
         try {
-            if (file instanceof PluginBridge) {
-                from = file.getNotNullProbableCodeBase().toExternalForm();
-            } else {
-                from = file.getInformation().getHomepage().toExternalForm();
-            }
+            from = file.getInformation().getHomepage().toExternalForm();
         } catch (Exception e) {
         }
 

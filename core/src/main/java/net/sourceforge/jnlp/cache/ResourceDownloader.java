@@ -165,12 +165,7 @@ class ResourceDownloader implements Runnable {
                 if (jnlpPath == null || jnlpPath.equals("")) {
                     jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);
                     if (jnlpPath == null || jnlpPath.equals("")) {
-                        jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.HTML);
-                        if (jnlpPath == null || jnlpPath.equals("")) {
-                            LOG.info("Not-setting jnlp-path for missing main/jnlp/html argument");
-                        } else {
-                            entry.setJnlpPath(jnlpPath);
-                        }
+                        LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
                     } else {
                         entry.setJnlpPath(jnlpPath);
                     }

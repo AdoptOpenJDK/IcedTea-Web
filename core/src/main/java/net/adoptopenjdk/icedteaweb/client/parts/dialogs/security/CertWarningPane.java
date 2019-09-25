@@ -44,7 +44,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
@@ -135,8 +134,6 @@ public class CertWarningPane extends SecurityDialogPanel {
                     (cert instanceof X509Certificate)) {
                 name = SecurityUtil.getCN(((X509Certificate) cert)
                                         .getSubjectX500Principal().getName());
-            } else if (file instanceof PluginBridge) {
-                name = file.getTitle();
             } else {
                 name = file.getInformation().getTitle();
             }
@@ -152,11 +149,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         }
 
         try {
-            if (file instanceof PluginBridge) {
-                from = file.getCodeBase().getHost();
-            } else {
-                from = file.getInformation().getHomepage().toString();
-            }
+            from = file.getInformation().getHomepage().toString();
         } catch (Exception e) {
         }
 

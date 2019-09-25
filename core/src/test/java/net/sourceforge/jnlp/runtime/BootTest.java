@@ -92,7 +92,7 @@ public class BootTest extends NoStdOutErrTest {
     @Test
     public void getValidJnlpFileLocationFromCommandLineArgumentsWithHtmlArgument() {
         // given
-        String[] args = {"-nosecurity", "-Xnofork", "-html", "https://www.somedomain.com/some.jnlp"};
+        String[] args = {"-nosecurity", "-Xnofork", "https://www.somedomain.com/some.jnlp"};
         CommandLineOptionsParser optionsParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
         // when
