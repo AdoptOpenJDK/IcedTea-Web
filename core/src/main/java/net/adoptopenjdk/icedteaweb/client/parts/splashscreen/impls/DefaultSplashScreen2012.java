@@ -44,19 +44,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 
 public final class DefaultSplashScreen2012 extends BasicComponentSplashScreen  {
 
-    private final DefaultSplashScreen2012 self;
-    private final BasePainter painter;
     private final DefaultSplashScreens2012Commons commons;
 
-    public DefaultSplashScreen2012(int width, int height, SplashUtils.SplashReason splashReason) {
-        //setting width and height now is causing  unnecessary blinking
-        //setSplashHeight(height);
-        //setSplashWidth(width);
-        //to have this in inner classes
-        self = this;
+    public DefaultSplashScreen2012(SplashUtils.SplashReason splashReason) {
         setSplashReason(splashReason);
-        painter = new BasePainter(this);
-        commons = new DefaultSplashScreens2012Commons(painter, self);
+        commons = new DefaultSplashScreens2012Commons(new BasePainter(this), this);
     }
 
     @Override

@@ -25,6 +25,7 @@
 
 package net.adoptopenjdk.icedteaweb.testing.tools;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertificateAlgorithmId;
 import sun.security.x509.CertificateIssuerName;
@@ -47,8 +48,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_VERSION;
 
 
 public class CodeSignerCreator {
@@ -196,7 +195,7 @@ public class CodeSignerCreator {
         }
 
         private String getCertAndKeyGenClass() {
-            final String javaVersion = System.getProperty(JAVA_VERSION);
+            final String javaVersion = JavaSystemProperties.getJavaVersion();
             if (javaVersion.startsWith("1.7")) {
                 return  "sun.security.x509.CertAndKeyGen";
             } else if (javaVersion.startsWith("1.8") || javaVersion.startsWith("1.9")) {

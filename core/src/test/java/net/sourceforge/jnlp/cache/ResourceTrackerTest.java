@@ -36,6 +36,7 @@
  */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -59,16 +60,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.function.Predicate;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -80,66 +73,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
 
     private static Resource createResource(final String name) throws MalformedURLException {
-        return Resource.createResource(new URL("http://example.com/" + name + ".jar"), VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
-    }
-
-    @Test
-    public void testSelectByStatusOneMatchingResource() throws Exception {
-        Resource resource = createResource("oneMatchingResource");
-        Assert.assertNotNull(resource);
-        resource.setStatusFlag(DOWNLOADING);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertEquals(resource, result);
-    }
-
-    @Test
-    public void testSelectByStatusNoMatchingResource() throws Exception {
-        Resource resource = createResource("noMatchingResource");
-        Assert.assertNotNull(resource);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertNull(result);
-    }
-
-    @Test
-    public void testSelectByStatusExcludedResources() throws Exception {
-        Resource resource = createResource("excludedResources");
-        Assert.assertNotNull(resource);
-        resource.setStatusFlag(ERROR);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByStatus(resources, DOWNLOADING, ERROR);
-        Assert.assertNull(result);
-    }
-
-    @Test
-    public void testSelectByStatusMixedResources() throws Exception {
-        Resource r1 = createResource("mixedResources1");
-        Assert.assertNotNull(r1);
-        r1.setStatusFlag(CONNECTED);
-        r1.setStatusFlag(DOWNLOADING);
-        Resource r2 = createResource("mixedResources2");
-        Assert.assertNotNull(r2);
-        r2.setStatusFlag(CONNECTED);
-        r2.setStatusFlag(DOWNLOADING);
-        r2.setStatusFlag(ERROR);
-        List<Resource> resources = Arrays.asList(r1, r2);
-        Resource result = ResourceTracker.selectByStatus(resources, EnumSet.of(CONNECTED, DOWNLOADING), EnumSet.of(ERROR));
-        Assert.assertEquals(r1, result);
-    }
-
-    @Test
-    public void testSelectByFilterUninitialized() throws Exception {
-        Resource resource = createResource("filterUninitialized");
-        Assert.assertNotNull(resource);
-        List<Resource> resources = Arrays.asList(resource);
-        Resource result = ResourceTracker.selectByFilter(resources, new Predicate<Resource>() {
-            @Override
-            public boolean test(Resource t) {
-                return !t.isInitialized();
-            }
-        });
-        Assert.assertEquals(resource, result);
+        return Resource.createResource(new URL("http://example.com/" + name + ".jar"), VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
     }
 
     @Test
@@ -245,7 +179,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
     @BeforeClass
     public static void setupDownloadServer() throws IOException {
-        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
+        File dir = new File(JavaSystemProperties.getJavaTempDir(), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
         redirectErr();
@@ -253,7 +187,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(JavaSystemProperties.getJavaTempDir() + File.separator + "tempcache");
     }
 
     @AfterClass
@@ -277,7 +211,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         URL url = downloadServer.getUrl("resource");
 
         ResourceTracker rt = new ResourceTracker();
-        rt.addResource(url, null, null, UpdatePolicy.FORCE);
+        rt.addResource(url, null, UpdatePolicy.FORCE);
         File downloadFile = rt.getCacheFile(url);
 
         assertTrue(downloadFile.exists() && downloadFile.isFile());

@@ -67,7 +67,7 @@ public class SplashScreenTest extends JDialog {
         //setLocation(x, y);
         setLocationRelativeTo(null);
         this.pack();
-        panel = SplashUtils.getSplashScreen(width, height, SplashUtils.SplashReason.APPLET);
+        panel = SplashUtils.getSplashScreen(SplashUtils.SplashReason.APPLET);
         ie.setHomepage("http://someones.org/amazing?page");
         ie.setTitle("Testing information title");
         ie.setvendor("IcedTea-Web team");
@@ -165,7 +165,7 @@ public class SplashScreenTest extends JDialog {
         //not needed
         //panel.stopAnimation();
         if (swap) {
-            SplashErrorPanel r = SplashUtils.getErrorSplashScreen(panel.getSplashWidth(), panel.getSplashHeight(), SplashUtils.SplashReason.APPLET, null);
+            SplashErrorPanel r = SplashUtils.getErrorSplashScreen(SplashUtils.SplashReason.APPLET, null);
             r.setInformationElement(ie);
             app.remove(panel.getSplashComponent());
             r.setPercentage(panel.getPercentage());

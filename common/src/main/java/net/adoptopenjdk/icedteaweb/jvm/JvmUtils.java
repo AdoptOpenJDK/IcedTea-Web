@@ -1,22 +1,16 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
-import net.adoptopenjdk.icedteaweb.JvmPropertyConstants;
-
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS_JAR;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_LOCATION;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_LOCATION;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 public class JvmUtils {

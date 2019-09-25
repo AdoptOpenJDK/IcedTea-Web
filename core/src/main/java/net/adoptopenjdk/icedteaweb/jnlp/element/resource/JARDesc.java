@@ -28,6 +28,7 @@ import java.net.URL;
  * @version $Revision: 1.6 $
  */
 public class JARDesc {
+    public static final String HREF_ATTRIBUTE = "href";
     public static final String VERSION_ATTRIBUTE = "version";
     public static final String MAIN_ATTRIBUTE = "main";
     public static final String DOWNLOAD_ATTRIBUTE = "download";

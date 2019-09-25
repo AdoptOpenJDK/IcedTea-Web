@@ -72,17 +72,17 @@ public class ErrorSplashUtilsTest {
 
     private void assertErrorSplashReason(boolean isWebstartApplication, SplashUtils.SplashReason reason) {
         SplashUtilsTest.modifyIsWebstartApplicationRuntime(isWebstartApplication);
-        final SplashPanel p2 = SplashUtils.getErrorSplashScreen(100, 100, null);
+        final SplashPanel p2 = SplashUtils.getErrorSplashScreen(null);
         assertThat(p2.getSplashReason(), is(reason));
     }
 
     @Test
     public void testGetErrorSplashScreen1() {
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, null);
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sa.getSplashReason(), is(APPLET));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, new Exception("oj"));
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, new Exception("oj"));
         assertThat(sw, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
     }
@@ -92,11 +92,11 @@ public class ErrorSplashUtilsTest {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
         envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, new Exception("oj"));
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sa.getSplashReason(), is(APPLET));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, null);
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, null);
         assertThat(sw, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
     }
@@ -106,11 +106,11 @@ public class ErrorSplashUtilsTest {
         envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
         envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, null);
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sa.getSplashReason(), is(APPLET));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, new Exception("oj"));
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, new Exception("oj"));
         assertThat(sw, is(nullValue()));
     }
 
@@ -119,10 +119,10 @@ public class ErrorSplashUtilsTest {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
         envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, new Exception("oj"));
         assertThat(sa, is(nullValue()));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, new Exception("oj"));
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, new Exception("oj"));
         assertThat(sw, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
     }
@@ -132,10 +132,10 @@ public class ErrorSplashUtilsTest {
         envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
         envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, null);
         assertThat(sa, is(nullValue()));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, null);
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, null);
         assertThat(sw, is(nullValue()));
     }
 
@@ -144,11 +144,11 @@ public class ErrorSplashUtilsTest {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
         envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, new Exception("oj"));
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, new Exception("oj"));
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sa.getSplashReason(), is(APPLET));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, new Exception("oj"));
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, new Exception("oj"));
         assertThat(sw, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
     }
@@ -157,11 +157,11 @@ public class ErrorSplashUtilsTest {
     public void testGetErrorSplashScreen7() {
         envVars.set(ICEDTEA_WEB_SPLASH, "egtrutkyukl");
 
-        SplashPanel sa = SplashUtils.getErrorSplashScreen(100, 100, APPLET, null);
+        SplashPanel sa = SplashUtils.getErrorSplashScreen(APPLET, null);
         assertThat(sa, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sa.getSplashReason(), is(APPLET));
 
-        SplashPanel sw = SplashUtils.getErrorSplashScreen(100, 100, JAVAWS, null);
+        SplashPanel sw = SplashUtils.getErrorSplashScreen(JAVAWS, null);
         assertThat(sw, is(instanceOf(DefaultErrorSplashScreen2012.class)));
         assertThat(sw.getSplashReason(), is(JAVAWS));
     }

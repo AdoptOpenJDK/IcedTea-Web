@@ -74,7 +74,7 @@ public final class ErrorPainterTest {
 //    }
     @Test
     public void adjustForSizeTest() {
-        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(100, 100, SplashUtils.SplashReason.APPLET));
+        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET));
         bp.master.setSplashHeight(100);
         bp.master.setSplashWidth(100);
         bp.adjustForSize(100, 100);
@@ -94,7 +94,7 @@ public final class ErrorPainterTest {
 
     @Test
     public void adjustForSizeTest2() {
-        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(0, 0, SplashUtils.SplashReason.APPLET), false);
+        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET), false);
         Assert.assertNull(bp.prerenderedStuff);
         bp.master.setSplashHeight(10);
         bp.master.setSplashWidth(10);

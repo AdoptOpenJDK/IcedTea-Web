@@ -1,6 +1,6 @@
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
@@ -11,9 +11,7 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -21,11 +19,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -33,11 +29,9 @@ import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_IO_TMPDIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Ignore
 public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     public static ServerLauncher testServer;
@@ -46,9 +40,6 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
-
-    private static final String nameStub1 = "itw-server";
-    private static final String nameStub2 = "test-file";
 
     private static String cacheDir;
 
@@ -105,14 +96,14 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     @BeforeClass
     public static void startServer() throws Exception {
         redirectErr();
-        testServer = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        testServer = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         redirectErrBack();
     }
 
     @BeforeClass
     public static void startServer2() throws Exception {
         redirectErr();
-        testServerWithBrokenHead = ServerAccess.getIndependentInstance(System.getProperty(JAVA_IO_TMPDIR), ServerAccess.findFreePort());
+        testServerWithBrokenHead = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
         testServerWithBrokenHead.setSupportingHeadRequest(false);
         redirectErrBack();
     }
@@ -127,159 +118,9 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         testServerWithBrokenHead.stop();
     }
 
-    @Test
-    public void getUrlResponseCodeTestWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.HEAD).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_IMPLEMENTED, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequestOnNotWorkingHeadRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServerWithBrokenHead.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void getUrlResponseCodeTestGetRequest() throws Exception {
-        redirectErr();
-        try {
-            File f = File.createTempFile(nameStub1, nameStub2);
-            int i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_OK, i);
-            f.delete();
-            i = ResourceDownloader.getUrlResponseCodeWithRedirectionResult(testServer.getUrl(f.getName()), new HashMap<>(), HttpMethod.GET).getResponseCode();
-            Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, i);
-        } finally {
-            redirectErrBack();
-        }
-    }
-
-    @Test
-    public void findBestUrltest() throws Exception {
-        redirectErr();
-        try {
-            File fileForServerWithHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithHeader = new File(fileForServerWithHeader.getParentFile(), fileForServerWithHeader.getName() + "-2.0");
-            versionedFileForServerWithHeader.createNewFile();
-
-            File fileForServerWithoutHeader = File.createTempFile(nameStub1, nameStub2);
-            File versionedFileForServerWithoutHeader = new File(fileForServerWithoutHeader.getParentFile(), fileForServerWithoutHeader.getName() + "-2.0");
-            versionedFileForServerWithoutHeader.createNewFile();
-
-            ResourceDownloader resourceDownloader = new ResourceDownloader(null, null);
-            Resource r1 = Resource.createResource(testServer.getUrl(fileForServerWithHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r2 = Resource.createResource(testServerWithBrokenHead.getUrl(fileForServerWithoutHeader.getName()), null, UpdatePolicy.NEVER);
-            Resource r3 = Resource.createResource(testServer.getUrl(versionedFileForServerWithHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            Resource r4 = Resource.createResource(testServerWithBrokenHead.getUrl(versionedFileForServerWithoutHeader.getName()), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
-            assertOnServerWithHeader(resourceDownloader.findBestUrl(r1).getRedirectURL());
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            fileForServerWithHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            assertVersionedOneOnServerWithHeader(resourceDownloader.findBestUrl(r3).getRedirectURL());
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            versionedFileForServerWithHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            assertVersionedOneOnServerWithoutHeader(resourceDownloader.findBestUrl(r4).getRedirectURL());
-
-            versionedFileForServerWithoutHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            assertOnServerWithoutHeader(resourceDownloader.findBestUrl(r2).getRedirectURL());
-            Assert.assertNull(resourceDownloader.findBestUrl(r4));
-
-            fileForServerWithoutHeader.delete();
-            Assert.assertNull(resourceDownloader.findBestUrl(r1));
-            Assert.assertNull(resourceDownloader.findBestUrl(r3));
-            Assert.assertNull(resourceDownloader.findBestUrl(r2));
-            Assert.assertNull(resourceDownloader.findBestUrl(r4));
-        } finally {
-            redirectErrBack();
-        }
-
-    }
-
-    private void assertOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithoutHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServerWithBrokenHead.getPort());
-        assertVersion(u);
-    }
-
-    private void assertOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-    }
-
-    private void assertVersionedOneOnServerWithHeader(URL u) {
-        assertCommonComponentsOfUrl(u);
-        assertPort(u, testServer.getPort());
-        assertVersion(u);
-    }
-
-    private void assertCommonComponentsOfUrl(URL u) {
-        Assert.assertTrue(u.getProtocol().equals("http"));
-        Assert.assertTrue(u.getHost().equals("localhost"));
-        Assert.assertTrue(u.getPath().contains(nameStub1));
-        Assert.assertTrue(u.getPath().contains(nameStub2));
-        ServerAccess.logOutputReprint(u.toExternalForm());
-    }
-
-    private void assertPort(URL u, int port) {
-        Assert.assertTrue(u.getPort() == port);
-    }
-
-    private void assertVersion(URL u) {
-        Assert.assertTrue(u.getPath().contains("-2.0"));
-        Assert.assertTrue(u.getQuery().contains("version-id=1.0"));
-    }
-
     @BeforeClass
     public static void setupCache() throws IOException {
-        File dir = new File(System.getProperty(JAVA_IO_TMPDIR), "itw-down");
+        File dir = new File(JavaSystemProperties.getJavaTempDir(), "itw-down");
         dir.mkdirs();
         dir.deleteOnExit();
 
@@ -288,7 +129,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         redirectErrBack();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(System.getProperty(JAVA_IO_TMPDIR) + File.separator + "tempcache");
+        PathsAndFiles.CACHE_DIR.setValue(new File(JavaSystemProperties.getJavaTempDir(), "tempcache").getCanonicalPath());
     }
 
     @AfterClass
@@ -312,7 +153,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     private Resource setupResource(String fileName, String text) throws IOException {
         File f = setupFile(fileName, text);
         URL url = downloadServer.getUrl(fileName);
-        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
         return resource;
     }
 
@@ -323,7 +164,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
         File downloadedFile = resource.getLocalFile();
@@ -339,12 +180,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz", expected);
 
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
-        resource.setDownloadOptions(new DownloadOptions(true, false));
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
 
         resourceDownloader.run();
 
@@ -364,12 +204,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         setupFile("download-version__V1.0.jar", expected);
 
         URL url = downloadServer.getUrl("download-version.jar");
-        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
-        resource.setDownloadOptions(new DownloadOptions(false, true));
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
         File downloadedFile = resource.getLocalFile();
@@ -385,12 +224,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
         setupPackGzFile("download-packgz__V1.0", expected);
 
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
-        resource.setDownloadOptions(new DownloadOptions(true, true));
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
 
         resourceDownloader.run();
 
@@ -415,26 +253,26 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         String stringURL = "file://" + localFile.getAbsolutePath();
         URL url = new URL(stringURL);
 
-        Resource resource = Resource.createResource(url, null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
-        assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
+        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
     @Test
     public void testDownloadNotExistingResourceFails() throws IOException {
-        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, UpdatePolicy.NEVER);
+        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
 
         ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
-        resource.setStatusFlag(Resource.Status.PRECONNECT);
+        resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.run();
 
-        assertTrue(resource.hasFlags(EnumSet.of(Resource.Status.ERROR)));
+        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
     private void setupPackGzFile(String fileName, String version) throws IOException {

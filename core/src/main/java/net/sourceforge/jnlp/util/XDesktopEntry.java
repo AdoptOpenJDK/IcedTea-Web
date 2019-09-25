@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
@@ -58,7 +59,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.USER_HOME;
 import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.getJavaWsBin;
 
 /**
@@ -611,7 +611,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return findFreedesktopOrgDesktopPath();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return System.getProperty(USER_HOME) + "/Desktop";
+            return JavaSystemProperties.getUserHome() + "/Desktop";
         }
     }
 
@@ -626,9 +626,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * exists
      */
     private static String findFreedesktopOrgDesktopPath() throws IOException {
-        File userDirs = new File(System.getProperty(USER_HOME) + "/.config/user-dirs.dirs");
+        File userDirs = new File(JavaSystemProperties.getUserHome() + "/.config/user-dirs.dirs");
         if (!userDirs.exists()) {
-            return System.getProperty(USER_HOME) + "/Desktop/";
+            return JavaSystemProperties.getUserHome() + "/Desktop/";
         }
         return getFreedesktopOrgDesktopPathFrom(userDirs);
     }

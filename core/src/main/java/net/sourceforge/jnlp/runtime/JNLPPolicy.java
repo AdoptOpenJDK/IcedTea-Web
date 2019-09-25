@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -39,8 +40,6 @@ import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
-
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.JAVA_HOME;
 
 /**
  * Policy for JNLP environment.  This class delegates to the
@@ -91,7 +90,7 @@ public class JNLPPolicy extends Policy {
         systemJnlpPolicy = getPolicyFromConfig(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
-        String jre = System.getProperty(JAVA_HOME);
+        String jre = JavaSystemProperties.getJavaHome();
         jreExtDir = (new File(jre + File.separator + "lib" + File.separator + "ext")).toURI();
     }
 

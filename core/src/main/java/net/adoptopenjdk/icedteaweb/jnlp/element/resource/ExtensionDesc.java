@@ -40,6 +40,7 @@ public class ExtensionDesc {
     private final static Logger LOG = LoggerFactory.getLogger(ExtensionDesc.class);
 
     public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
+    public static final String HREF_ATTRIBUTE = "href";
     public static final String DOWNLOAD_ATTRIBUTE = "download";
     public static final String EXT_PART_ATTRIBUTE = "ext-part";
 

@@ -18,6 +18,7 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -64,9 +65,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.HTTP_AGENT;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_ARCH;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
 
@@ -218,8 +217,8 @@ public class JNLPFile {
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
-            defaultOS = System.getProperty(OS_NAME);
-            defaultArch = System.getProperty(OS_ARCH);
+            defaultOS = JavaSystemProperties.getOsName();
+            defaultArch = JavaSystemProperties.getOsArch();
         }
         catch (SecurityException ex) {
             // null values will still work, and app can set defaults later
@@ -377,7 +376,7 @@ public class JNLPFile {
 
         try {
             ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version, null, policy);
+            tracker.addResource(location, version, policy);
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
         }

@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.ITW_BIN_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**

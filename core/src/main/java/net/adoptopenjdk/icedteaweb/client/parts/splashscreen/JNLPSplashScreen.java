@@ -109,7 +109,7 @@ public class JNLPSplashScreen extends JDialog {
 
             if (splashImage == null) {
                 this.setLayout(new BorderLayout());
-                splash = SplashUtils.getSplashScreen(DEF_WIDTH, DEF_HEIGHT);
+                splash = SplashUtils.getSplashScreen();
                 if (splash != null) {
                     splash.startAnimation();
                     splash.setInformationElement(InformationElement.createFromJNLP(file));
@@ -182,7 +182,7 @@ public class JNLPSplashScreen extends JDialog {
     public void setErrorSplash(Throwable ex) {
         if (splash != null){
             this.remove(splash.getSplashComponent());
-            splash = SplashUtils.getErrorSplashScreen(splash.getSplashWidth(), splash.getSplashHeight(), ex);
+            splash = SplashUtils.getErrorSplashScreen(ex);
             this.add(splash.getSplashComponent());
             this.componentSplash = splash;
             this.validate();

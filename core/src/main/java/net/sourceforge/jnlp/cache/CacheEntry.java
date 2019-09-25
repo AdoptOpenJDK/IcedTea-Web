@@ -68,6 +68,17 @@ public class CacheEntry {
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
+    static void markForDelete(URL location, final VersionString version) {
+        CacheEntry entry = new CacheEntry(location, version);
+        entry.lock();
+        try {
+            entry.markForDelete();
+            entry.store();
+        } finally {
+            entry.unlock();
+        }
+    }
+
     /**
      * Returns the remote location this entry caches.
      * @return URL same as the one on which this entry was created
@@ -146,7 +157,7 @@ public class CacheEntry {
             return lastModified > 0 && lastModified <= cachedModified;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return cached;
+            return true;
         }
     }
 
@@ -194,6 +205,17 @@ public class CacheEntry {
             return true;
         } else {
             return false;
+        }
+    }
+
+    void storeEntryFields(long contentLength, long lastModified) {
+        lock();
+        try {
+            setRemoteContentLength(contentLength);
+            setLastModified(lastModified);
+            store();
+        } finally {
+            unlock();
         }
     }
 

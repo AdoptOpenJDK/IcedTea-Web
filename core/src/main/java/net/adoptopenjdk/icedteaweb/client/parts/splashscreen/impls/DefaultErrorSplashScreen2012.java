@@ -49,11 +49,7 @@ public final class DefaultErrorSplashScreen2012 extends BasicComponentErrorSplas
     private final ErrorPainter painter;
     private final DefaultSplashScreens2012Commons commons;
 
-    public DefaultErrorSplashScreen2012(int width, int height, SplashUtils.SplashReason splashReason, Throwable ex) {
-        //setting width and height now is causing  unnecessary blinking
-        //setSplashHeight(height);
-        //setSplashWidth(width);
-        //to have this in inner classes
+    public DefaultErrorSplashScreen2012(SplashUtils.SplashReason splashReason, Throwable ex) {
         setLoadingException(ex);
         setSplashReason(splashReason);
         painter = new ErrorPainter(this, true);

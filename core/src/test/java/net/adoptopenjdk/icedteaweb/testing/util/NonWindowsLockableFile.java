@@ -5,11 +5,12 @@
  */
 package net.adoptopenjdk.icedteaweb.testing.util;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.lockingfile.WindowsLockableFileTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import static net.adoptopenjdk.icedteaweb.JvmPropertyConstants.OS_NAME;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_NAME;
 
 /**
  *
@@ -21,7 +22,7 @@ public class NonWindowsLockableFile extends WindowsLockableFileTest {
 
     @BeforeClass
     public static void smuggleOs() {
-        os = System.getProperty(OS_NAME);
+        os = JavaSystemProperties.getOsName();
         System.setProperty(OS_NAME, "No Microsoft OS for itw");
     }
 

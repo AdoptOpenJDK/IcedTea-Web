@@ -59,7 +59,7 @@ import java.util.Set;
  * root of the file cache directory. The property key is a combination of a timestamp
  * and the cache folder id. The property value is the path to the cached item.
  */
-public class CacheLRUWrapper {
+class CacheLRUWrapper {
 
     private final static Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
 

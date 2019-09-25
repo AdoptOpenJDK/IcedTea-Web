@@ -4,11 +4,14 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Permission;
 import java.util.List;
 import java.util.Map;
+
+import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 /**
  * {@link Closeable} wrapper around a {@link URLConnection}.
@@ -81,6 +84,15 @@ public class CloseableConnection implements Closeable {
      */
     public String getHeaderField(final String name) {
         return delegate.getHeaderField(name);
+    }
+
+    /**
+     * @return HTTP header field "Location" as URL
+     * @throws MalformedURLException if the location string does not represent a valid URL
+     */
+    public URL getLocationHeaderFieldUrl() throws MalformedURLException {
+        final String location = getHeaderField("Location");
+        return isBlank(location) ? null : new URL(location);
     }
 
     /**

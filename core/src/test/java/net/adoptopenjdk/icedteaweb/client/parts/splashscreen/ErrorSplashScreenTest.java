@@ -65,7 +65,7 @@ public class ErrorSplashScreenTest extends JDialog {
         setLocationRelativeTo(null);
         this.pack();
         Exception ex = new Exception("Hi there");
-        panel = SplashUtils.getErrorSplashScreen(width, height, SplashUtils.SplashReason.JAVAWS, ex);
+        panel = SplashUtils.getErrorSplashScreen(SplashUtils.SplashReason.JAVAWS, ex);
         InformationElement ie = new InformationElement();
         ie.setHomepage("http://someones.org/amazing?page");
         ie.setTitle("Testing information title");
