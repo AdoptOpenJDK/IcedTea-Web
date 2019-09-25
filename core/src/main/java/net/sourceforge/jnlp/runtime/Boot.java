@@ -209,9 +209,6 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.TRUSTALL)) {
             JNLPRuntime.setTrustAll(true);
         }
-        if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            JNLPRuntime.setHtml(true);
-        }
         if (optionParser.hasOption(CommandLineOptions.TRUSTNONE)) {
             JNLPRuntime.setTrustNone(true);
         }
@@ -286,24 +283,20 @@ public final class Boot implements PrivilegedAction<Void> {
 
         Map<String, List<String>> extra = new HashMap<>();
 
-        if (optionParser.hasOption(CommandLineOptions.HTML)) {
-            new HtmlBoot(optionParser).run(extra);
-        } else {
-            final ParserSettings settings = init(extra);
-            if (settings != null) {
-                try {
-                    LOG.info("Proceeding with jnlp");
-                    Launcher launcher = new Launcher(true);
-                    launcher.setParserSettings(settings);
-                    launcher.setInformationToMerge(extra);
-                    launcher.launch(Boot.getFileLocation());
-                } catch (LaunchException ex) {
-                    // default handler prints this
-                    JNLPRuntime.exit(1);
-                } catch (Exception ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                    Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
-                }
+        final ParserSettings settings = init(extra);
+        if (settings != null) {
+            try {
+                LOG.info("Proceeding with jnlp");
+                Launcher launcher = new Launcher(true);
+                launcher.setParserSettings(settings);
+                launcher.setInformationToMerge(extra);
+                launcher.launch(Boot.getFileLocation());
+            } catch (LaunchException ex) {
+                // default handler prints this
+                JNLPRuntime.exit(1);
+            } catch (Exception ex) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
             }
         }
         return null;
@@ -351,16 +344,13 @@ public final class Boot implements PrivilegedAction<Void> {
 
     /**
      * Fetch the JNLP file location from command line arguments. If the {@link CommandLineOptionsParser} cannot parse
-     * a {@link CommandLineOptions#JNLP} or a a {@link CommandLineOptions#HTML} it returns the first command argument.
+     * a {@link CommandLineOptions#JNLP} it returns the first command argument.
      *
      * @return the file location or null if no file location can be found in the command line arguments.
      */
     static String getJnlpFileLocationFromCommandLineArguments(final CommandLineOptionsParser commandLineOptionsParser) {
         if (commandLineOptionsParser.hasOption(CommandLineOptions.JNLP)) {
             return fixJnlpProtocol(commandLineOptionsParser.getParam(CommandLineOptions.JNLP));
-        }
-        else if (commandLineOptionsParser.hasOption(CommandLineOptions.HTML)) {
-            return commandLineOptionsParser.getParam(CommandLineOptions.HTML);
         }
         else if (commandLineOptionsParser.mainArgExists()) {
             // so file location must be in the list of arguments, take the first one as best effort, ignore the others

@@ -93,7 +93,6 @@ public class CommandLineOptionsDefinition {
                 CommandLineOptions.OFFLINE,
                 CommandLineOptions.TRUSTNONE,
                 CommandLineOptions.JNLP,
-                CommandLineOptions.HTML,
                 CommandLineOptions.BROWSER);
     }
 

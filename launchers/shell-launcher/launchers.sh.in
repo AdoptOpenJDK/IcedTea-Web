@@ -28,6 +28,14 @@ if [ "x$ITW_LIBS" == "xEMBEDDED" ] ; then
  exit 1
 fi
 
+if [ -z ${ITW_NATIVEDEBUG_SUSPEND+x} ]; then
+      ITW_NATIVEDEBUG_SUSPEND="n"
+fi
+
+if [ -z "${ITW_NATIVEDEBUG_PORT+x}" ]; then
+    ITW_NATIVEDEBUG_PORT=9009
+fi
+
 ## resolve folder of this script, following all symlinks:
 ## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
@@ -198,10 +206,22 @@ k=$((k+1))
 COMMAND[k]="${MAIN_CLASS}"
 k=$((k+1))
 j=0
+
 while [ "$j" -lt "${#ARGS[@]}" ]; do
-  COMMAND[k]="${ARGS[$j]}"
-  j=$((j+1))
-  k=$((k+1))
+  if [ `echo "${ARGS[$j]}" | grep -e "-nativeDebug"` ]; then
+    COMMAND[k]="-Xdebug"
+    k=$((k+1))
+
+    COMMAND[k]="-Xrunjdwp:transport=dt_socket,server=,suspend=$ITW_NATIVEDEBUG_SUSPEND,address=$ITW_NATIVEDEBUG_PORT"
+
+    k=$((k+1))
+
+    j=$((j+1))
+  else
+    COMMAND[k]="${ARGS[$j]}"
+    j=$((j+1))
+    k=$((k+1))
+  fi
 done
 
 exec -a "`basename $SCRIPT_SOURCE`" "${COMMAND[@]}"

@@ -50,7 +50,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SigningState;
@@ -256,13 +255,7 @@ public class ManifestAttributesChecker {
             if (codebaseAtt.matches(codebase)) {
                 LOG.info("Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             } else {
-                if (file instanceof PluginBridge) {
-                    throw new LaunchException("Signed applets are not allowed to run when their actual Codebase does not match the Codebase specified in their manifest. Expected: "+
-                            file.getManifestAttributesReader().getCodebase().toString() + ". Actual: " +
-                            codebase + ". See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
-                } else {
-                    LOG.error("Application Codebase does NOT match the Codebase specified in the application''s manifest, and this application is signed. You are strongly discouraged from running this application. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
-                }
+                LOG.error("Application Codebase does NOT match the Codebase specified in the application''s manifest, and this application is signed. You are strongly discouraged from running this application. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             }
         }
 
@@ -300,22 +293,14 @@ public class ManifestAttributesChecker {
 
         final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
         validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
-        if (file instanceof PluginBridge) { // HTML applet
-            if (isNoneOrDefault(requestedPermissionLevel)) {
-                if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                    securityDelegate.setRunInSandbox();
-                }
+        if (isNoneOrDefault(requestedPermissionLevel)) {
+            if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
+                LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
+                securityDelegate.setRunInSandbox();
             }
-        } else { // JNLP
-            if (isNoneOrDefault(requestedPermissionLevel)) {
-                if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                    LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
-                    securityDelegate.setRunInSandbox();
-                }
-                if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
-                    LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
-                    securityDelegate.setRunInSandbox();
-                }
+            if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
+                LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
+                securityDelegate.setRunInSandbox();
             }
         }
     }
@@ -341,13 +326,7 @@ public class ManifestAttributesChecker {
     private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
         //conditions
         URL codebase = file.getCodeBase();
-        URL documentBase = null;
-        if (file instanceof PluginBridge) {
-            documentBase = file.getSourceLocation();
-        }
-        if (documentBase == null) {
-            documentBase = file.getCodeBase();
-        }
+        URL documentBase = file.getCodeBase();
 
         //cases
         Set<URL> usedUrls = new HashSet<>();

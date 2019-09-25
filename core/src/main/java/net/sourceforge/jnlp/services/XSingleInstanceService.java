@@ -20,7 +20,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.PluginBridge;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.jnlp.SingleInstanceListener;
@@ -111,7 +110,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
         // this is called after the application has started. so safe to use
         // JNLPRuntime.getApplication()
         JNLPFile jnlpFile = JNLPRuntime.getApplication().getJNLPFile();
-        if (!initialized || jnlpFile instanceof PluginBridge) {
+        if (!initialized) {
             // Either a new process or a new applet being handled by the plugin.
             checkSingleInstanceRunning(jnlpFile);
             initialized = true;
