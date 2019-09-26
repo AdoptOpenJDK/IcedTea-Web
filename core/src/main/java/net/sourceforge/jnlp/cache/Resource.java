@@ -359,6 +359,7 @@ public class Resource {
             // time spent in synchronized addResource determining if
             // Resource is already in a tracker, and better for offline
             // mode on some OS.
+            // TODO: handle Version
             return UrlUtils.urlEquals(location, ((Resource) other).location);
         }
         return false;
