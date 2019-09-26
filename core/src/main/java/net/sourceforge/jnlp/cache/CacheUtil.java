@@ -453,7 +453,7 @@ public class CacheUtil {
         return CacheLRUWrapper.getInstance().getInfo(location, versionId);
     }
 
-    static void writeToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
-        CacheLRUWrapper.getInstance().writeToCache(infoFromRemote, unpackedStream);
+    static void addToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
+        CacheLRUWrapper.getInstance().addToCache(infoFromRemote, unpackedStream);
     }
 }

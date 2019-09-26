@@ -2,14 +2,12 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -252,7 +250,7 @@ class ResourceDownloader implements Runnable {
             final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
             final InputStream unpackedStream = unpacker.unpack(downloadStream);
             final ResourceInfo resourceInfo = createInfoFromRemote(downloadLocation, versionFromRemote, connection);
-            CacheUtil.writeToCache(resourceInfo, unpackedStream);
+            CacheUtil.addToCache(resourceInfo, unpackedStream);
             resource.setTransferred(resourceInfo.getSize());
         }
     }

@@ -290,7 +290,7 @@ class CacheLRUWrapper {
         }
     }
 
-    void writeToCache(ResourceInfo info, InputStream inputStream) throws IOException {
+    void addToCache(ResourceInfo info, InputStream inputStream) throws IOException {
         final CacheEntry entry = new CacheEntry(info.getLocation(), info.getVersion());
 
         final File outputFile = getCacheFile(info.getLocation(), info.getVersion());
