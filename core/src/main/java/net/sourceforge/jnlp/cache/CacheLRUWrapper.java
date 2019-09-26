@@ -358,7 +358,7 @@ class CacheLRUWrapper {
                                 final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
                                 final String domain = getDomain(path);
                                 if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
-                                    pf.setProperty("delete", "true");
+                                    pf.setProperty(CacheEntry.KEY_DELETE, Boolean.toString(true));
                                     pf.store();
                                     LOG.info("marked for deletion: {}", path);
                                 }
@@ -446,7 +446,7 @@ class CacheLRUWrapper {
 
                         File file = new File(path);
                         PropertiesFile pf = new PropertiesFile(new File(path + CacheEntry.INFO_SUFFIX));
-                        boolean delete = Boolean.parseBoolean(pf.getProperty("delete"));
+                        boolean delete = Boolean.parseBoolean(pf.getProperty(CacheEntry.KEY_DELETE));
 
                         /*
                          * This will get me the root directory specific to this cache item.

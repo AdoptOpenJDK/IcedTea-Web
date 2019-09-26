@@ -45,6 +45,7 @@ public class CacheEntry implements ResourceInfo {
     private static final String KEY_LAST_MODIFIED = "last-modified";
     private static final String KEY_DOWNLOADED_AT = "last-updated";
     static final String KEY_JNLP_PATH = "jnlp-path";
+    static final String KEY_DELETE = "delete";
 
     /** the remote resource location */
     private final URL location;
@@ -238,7 +239,7 @@ public class CacheEntry implements ResourceInfo {
      * Mark this entry for deletion at shutdown.
      */
     void markForDelete() { // once marked it should not be unmarked.
-        properties.setProperty("delete", Boolean.toString(true));
+        properties.setProperty(KEY_DELETE, Boolean.toString(true));
     }
 
     /**
