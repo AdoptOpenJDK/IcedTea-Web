@@ -106,10 +106,6 @@ public final class Boot implements PrivilegedAction<Void> {
 
     private static CommandLineOptionsParser optionParser;
 
-    public static CommandLineOptionsParser getOptionParser() {
-        return optionParser;
-    }
-
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *

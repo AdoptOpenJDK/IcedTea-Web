@@ -783,7 +783,7 @@ public class JNLPRuntime {
         JNLPRuntime.jnlpPath = jnlpPath;
     }
 
-    static String getJnlpPath() {
+    public static String getJnlpPath() {
         return jnlpPath;
     }
 
