@@ -327,12 +327,12 @@ class CacheLRUWrapper {
      */
     private String getCacheParentDirectory(String path) {
         String tempPath;
-        String cacheDir = CacheLRUWrapper.getInstance().getCacheDir().getFullPath();
+        String cacheDirPath = cacheDir.getFullPath();
 
-        while (path.startsWith(cacheDir) && !path.equals(cacheDir)) {
+        while (path.startsWith(cacheDirPath) && !path.equals(cacheDirPath)) {
             tempPath = new File(path).getParent();
 
-            if (tempPath.equals(cacheDir))
+            if (tempPath.equals(cacheDirPath))
                 break;
 
             path = tempPath;
@@ -535,13 +535,6 @@ class CacheLRUWrapper {
             return cachedRecentlyUsedPropertiesFile;
         }
 
-    }
-
-    /**
-     * @return the cacheDir
-     */
-    InfrastructureFileDescriptor getCacheDir() {
-        return cacheDir;
     }
 
     /**
