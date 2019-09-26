@@ -120,7 +120,7 @@ class CacheLRUWrapper {
      *
      * @return an instance of the policy
      */
-    public static CacheLRUWrapper getInstance() {
+    static CacheLRUWrapper getInstance() {
         return  CacheLRUWrapperHolder.INSTANCE;
     }
 
@@ -551,7 +551,7 @@ class CacheLRUWrapper {
     /**
      * Update map for keeping track of recently used items.
      */
-    public synchronized void load() {
+    synchronized void load() {
         boolean loaded = getRecentlyUsedPropertiesFile().load();
         /*
          * clean up possibly corrupted entries
@@ -607,7 +607,7 @@ class CacheLRUWrapper {
      * Write file to disk.
      * @return true if properties were successfully stored, false otherwise
      */
-    public synchronized boolean store() {
+    synchronized boolean store() {
         if (getRecentlyUsedPropertiesFile().isHeldByCurrentThread()) {
             getRecentlyUsedPropertiesFile().store();
             return true;
@@ -693,18 +693,18 @@ class CacheLRUWrapper {
     /**
      * Lock the file to have exclusive access.
      */
-    public synchronized void lock() {
+    synchronized void lock() {
         getRecentlyUsedPropertiesFile().lock();
     }
 
     /**
      * Unlock the file.
      */
-    public synchronized void unlock() {
+    synchronized void unlock() {
         getRecentlyUsedPropertiesFile().unlock();
     }
 
-    public synchronized boolean containsKey(String key) {
+    synchronized boolean containsKey(String key) {
         return getRecentlyUsedPropertiesFile().containsKey(key);
     }
 
