@@ -45,6 +45,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
+import javax.jnlp.BasicService;
 import javax.swing.UIManager;
 import java.io.File;
 import java.net.URL;
@@ -226,6 +227,7 @@ public final class Boot implements PrivilegedAction<Void> {
         } else {
 
             JNLPRuntime.setInitialArguments(Arrays.asList(args));
+            JNLPRuntime.setJnlpPath(getJnlpFileLocationFromCommandLineArguments(optionParser));
 
             AccessController.doPrivileged(new Boot());
         }
@@ -311,35 +313,38 @@ public final class Boot implements PrivilegedAction<Void> {
      * Returns the url of file to open; does not return if no file was
      * specified, or if the file location was invalid.
      */
-    static URL getFileLocation() {
+    private static URL getFileLocation() {
 
         final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
 
         if (location == null) {
             handleMessage();
             JNLPRuntime.exit(1);
+            throw new RuntimeException("not reachable as system exits on the previous line");
         }
 
         LOG.info("JNLP file location: {}", location);
+        return locationToUrl(location);
+    }
 
-        URL url = null;
-
+    private static URL locationToUrl(String location) {
         try {
-            if (new File(location).exists()) // TODO: Should be toURI().toURL()
-            {
-                url = new File(location).toURL(); // Why use file.getCanonicalFile?
-            } else if (ServiceUtil.getBasicService() != null) {
-                LOG.warn("Warning, null basicService");
-                url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
+            if (new File(location).exists()) {
+                return new File(location).toURI().toURL(); // Why use file.getCanonicalFile?
             } else {
-                url = new URL(location);
+                final BasicService basicService = ServiceUtil.getBasicService();
+                if (basicService != null) {
+                    return new URL(basicService.getCodeBase(), location);
+                } else {
+                    LOG.warn("Warning, null basicService");
+                    return new URL(location);
+                }
             }
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             fatalError("Invalid jnlp file " + location);
+            return null;
         }
-
-        return url;
     }
 
     /**

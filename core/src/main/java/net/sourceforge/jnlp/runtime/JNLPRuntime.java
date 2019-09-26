@@ -185,6 +185,7 @@ public class JNLPRuntime {
 
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
+    private static String jnlpPath;
 
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
@@ -776,6 +777,14 @@ public class JNLPRuntime {
         if (securityManager != null)
             securityManager.checkPermission(new AllPermission());
         initialArguments = args;
+    }
+
+    static void setJnlpPath(String jnlpPath) {
+        JNLPRuntime.jnlpPath = jnlpPath;
+    }
+
+    static String getJnlpPath() {
+        return jnlpPath;
     }
 
     public static List<String> getInitialArguments() {
