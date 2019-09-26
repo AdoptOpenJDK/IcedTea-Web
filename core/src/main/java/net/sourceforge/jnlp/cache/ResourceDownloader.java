@@ -120,22 +120,23 @@ class ResourceDownloader implements Runnable {
         try {
             resource.setDownloadLocation(location.getLocation());
 
-            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             long size = location.getContentLength();
             long lm = location.getLastModified();
             final boolean isUpToDate = CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), lm);
             final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
-            if (doUpdate) {
-                if (entry.isCached()) {
-                    entry.markForDelete();
-                    entry.store();
-                    // Old entry will still exist. (but removed at cleanup)
-                    localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), location.getVersion());
-                    newEntry.lock();
-                    entry.unlock();
-                    entry = newEntry;
-                }
+
+            final File localFile;
+            if (doUpdate && entry.isCached()) {
+                entry.markForDelete();
+                entry.store();
+                // Old entry will still exist. (but removed at cleanup)
+                localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
+                CacheEntry newEntry = new CacheEntry(resource.getLocation(), location.getVersion());
+                newEntry.lock();
+                entry.unlock();
+                entry = newEntry;
+            } else {
+                localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             }
 
             synchronized (resource) {
