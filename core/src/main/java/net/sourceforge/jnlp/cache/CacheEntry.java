@@ -17,9 +17,11 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;
@@ -218,6 +220,14 @@ public class CacheEntry implements ResourceInfo {
             setLongKey(KEY_SIZE, info.getSize());
             setLongKey(KEY_LAST_MODIFIED, info.getLastModified());
             setLongKey(KEY_DOWNLOADED_AT, info.getDownloadedAt());
+
+            final String jnlpPath = JNLPRuntime.getJnlpPath();
+            if (StringUtils.isBlank(jnlpPath)) {
+                LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
+            } else {
+                properties.setProperty(KEY_JNLP_PATH, jnlpPath);
+            }
+
             store();
         } finally {
             unlock();
