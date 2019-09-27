@@ -114,14 +114,11 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromURL(final UrlRequestResult location) {
-        CacheEntry entry = new CacheEntry(resource.getLocation(), location.getVersion());
+        final CacheEntry entry = new CacheEntry(resource.getLocation(), location.getVersion());
+
         entry.lock();
         try {
-            resource.setDownloadLocation(location.getLocation());
-
-            long size = location.getContentLength();
-            long lm = location.getLastModified();
-            final boolean isUpToDate = CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), lm);
+            final boolean isUpToDate = CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
             final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
 
             final File localFile;
@@ -130,18 +127,15 @@ class ResourceDownloader implements Runnable {
                 entry.store();
                 // Old entry will still exist. (but removed at cleanup)
                 localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                CacheEntry newEntry = new CacheEntry(resource.getLocation(), location.getVersion());
-                newEntry.lock();
-                entry.unlock();
-                entry = newEntry;
             } else {
                 localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
             }
 
             synchronized (resource) {
+                resource.setDownloadLocation(location.getLocation());
                 resource.setLocalFile(localFile);
                 // resource.connection = connection;
-                resource.setSize(size);
+                resource.setSize(location.getContentLength());
                 resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
 
                 // check if up-to-date; if so set as downloaded
@@ -149,30 +143,6 @@ class ResourceDownloader implements Runnable {
                     resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
                 }
             }
-
-            // update cache entry
-            if (doUpdate) {
-                entry.setSize(size);
-                entry.setLastModified(lm);
-            }
-            entry.setDownloadedAt(System.currentTimeMillis());
-            try {
-                //do not die here no matter of cost. Just metadata
-                //is the path from user best to store? He can run some jnlp from temp which then be stored
-                //on contrary, this downloads the jnlp, we actually do not have jnlp parsed during first interaction
-                //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
-                //another issue is forking. If this (eg local) jnlp starts its second instance, the url *can* be different
-                //in contrary, usually si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
-                final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
-                if (StringUtils.isBlank(jnlpPath)) {
-                    LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
-                } else {
-                    entry.setJnlpPath(jnlpPath);
-                }
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            }
-            entry.store();
         } finally {
             entry.unlock();
         }

@@ -37,6 +37,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
@@ -172,6 +173,12 @@ class CacheLRUWrapper {
                             File pf = new File(cacheFile.getPath() + CacheEntry.INFO_SUFFIX);
                             FileUtils.createRestrictedFile(pf); // Create the info file for marking later.
                             addEntry(generateKey(cacheFile.getPath()), cacheFile.getPath());
+                            final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
+                            if (StringUtils.isBlank(jnlpPath)) {
+                                LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
+                            } else {
+                                FileUtils.saveFileUtf8(CacheEntry.KEY_JNLP_PATH + "=" + jnlpPath, pf);
+                            }
                         } catch (IOException ioe) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
                         }

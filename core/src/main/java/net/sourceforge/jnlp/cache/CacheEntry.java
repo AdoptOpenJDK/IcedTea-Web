@@ -115,10 +115,6 @@ public class CacheEntry implements ResourceInfo {
         setLongKey(KEY_SIZE, length);
     }
 
-    void setJnlpPath(String jnlpPath) {
-        properties.setProperty(KEY_JNLP_PATH, jnlpPath);
-    }
-
     @Override
     public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
