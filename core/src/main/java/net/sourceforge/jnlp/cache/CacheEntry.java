@@ -184,7 +184,7 @@ public class CacheEntry implements ResourceInfo {
             long cachedLength = localFile.length();
             long remoteLength = getSize();
 
-            LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
+            LOG.info("isCached: remote size:{} cached size:{}", remoteLength, cachedLength);
 
             return cachedLength == remoteLength;
         } catch (Exception ex) {
