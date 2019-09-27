@@ -231,6 +231,23 @@ class CacheLRUWrapper {
 
     /**
      * Returns whether there is a version of the URL contents in the
+     * cache.
+     *
+     * @param source      the source {@link URL}
+     * @param version     the versions to check for
+     * @return whether the cache contains the version
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    boolean isCached(URL source, VersionId version) {
+        final CacheEntry entry = new CacheEntry(source, version);
+
+        boolean isCurrent = entry.isCached();
+        LOG.info("isCached: {} = {}", source, isCurrent);
+        return isCurrent;
+    }
+
+    /**
+     * Returns whether there is a version of the URL contents in the
      * cache and it is up to date.  This method may not return
      * immediately.
      *

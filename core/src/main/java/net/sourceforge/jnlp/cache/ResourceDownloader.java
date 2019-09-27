@@ -118,11 +118,12 @@ class ResourceDownloader implements Runnable {
 
         entry.lock();
         try {
-            final boolean isUpToDate = CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
+            final boolean isCached = CacheUtil.isCached(resource.getLocation(), location.getVersion());
+            final boolean isUpToDate = isCached && CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
             final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
 
             final File localFile;
-            if (doUpdate && entry.isCached()) {
+            if (doUpdate && isCached) {
                 entry.markForDelete();
                 entry.store();
                 // Old entry will still exist. (but removed at cleanup)

@@ -205,6 +205,23 @@ public class CacheUtil {
 
     /**
      * Returns whether there is a version of the URL contents in the
+     * cache.
+     *
+     * @param source      the source {@link URL}
+     * @param version     the versions to check for
+     * @return whether the cache contains the version
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    static boolean isCached(final URL source, final VersionId version) {
+        if (!isCacheable(source)) {
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
+        }
+
+        return CacheLRUWrapper.getInstance().isCached(source, version);
+    }
+
+    /**
+     * Returns whether there is a version of the URL contents in the
      * cache and it is up to date.  This method may not return
      * immediately.
      *
