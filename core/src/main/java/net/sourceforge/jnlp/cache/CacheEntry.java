@@ -35,7 +35,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.10 $
  */
-public class CacheEntry implements ResourceInfo {
+class CacheEntry implements ResourceInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
 

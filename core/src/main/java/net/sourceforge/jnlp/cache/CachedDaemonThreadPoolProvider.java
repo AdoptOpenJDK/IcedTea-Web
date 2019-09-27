@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CachedDaemonThreadPoolProvider {
+class CachedDaemonThreadPoolProvider {
 
     /**
      * This is copypasted default factory from java.util.concurrent.Executors.

@@ -66,7 +66,6 @@ import java.util.stream.Collectors;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
-import static net.sourceforge.jnlp.runtime.JNLPRuntime.reloadPolicy;
 
 class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
