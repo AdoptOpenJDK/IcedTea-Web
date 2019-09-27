@@ -53,8 +53,8 @@ class SimpleRange {
     }
 
     /**
-     * Checks whether this version-id represents a plain (exact) version without any postfix modifiers.
-     * @return {@code true} if this version-id does not have any modifiers, {@code false} otherwise.
+     * Checks whether this simple-range represents a single version-id without any postfix modifiers.
+     * @return {@code true} if this simple-range does not have any modifiers, {@code false} otherwise.
      */
     boolean isExactVersion() {
         return modifier == NONE;

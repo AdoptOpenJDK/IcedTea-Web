@@ -111,14 +111,14 @@ public class VersionStringTest {
     }
 
     @Test
-    public void testContainsSingleVersionId() {
-        Assert.assertTrue(versionString("2.0").containsSingleVersionId());
-        Assert.assertTrue(versionString("1.1+").containsSingleVersionId());
-        Assert.assertTrue(versionString("1.1*").containsSingleVersionId());
-        Assert.assertTrue(versionString("1.4.0_04&1.4.1_02").containsSingleVersionId());
+    public void testContainsSingleVersionRange() {
+        Assert.assertTrue(versionString("2.0").containsSingleVersionRange());
+        Assert.assertTrue(versionString("1.1+").containsSingleVersionRange());
+        Assert.assertTrue(versionString("1.1*").containsSingleVersionRange());
+        Assert.assertTrue(versionString("1.4.0_04&1.4.1_02").containsSingleVersionRange());
 
-        Assert.assertFalse(versionString("1.0 2.0").containsSingleVersionId());
-        Assert.assertFalse(versionString("1.0+ 2.0*").containsSingleVersionId());
+        Assert.assertFalse(versionString("1.0 2.0").containsSingleVersionRange());
+        Assert.assertFalse(versionString("1.0+ 2.0*").containsSingleVersionRange());
     }
 
     @Test
