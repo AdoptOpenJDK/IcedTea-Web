@@ -235,11 +235,6 @@ class CacheLRUWrapper {
      */
     boolean isUpToDate(URL source, VersionId version, long lastModified) {
         final CacheEntry entry = new CacheEntry(source, version);
-        final boolean isCached = entry.isCached();
-        if (! isCached) {
-            LOG.info("isUpToDate: {} = false", source);
-            return false;
-        }
 
         boolean isCurrent = entry.isCurrent(lastModified);
         LOG.info("isUpToDate: {} = {}", source, isCurrent);
