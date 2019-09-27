@@ -658,7 +658,7 @@ class CacheLRUWrapper {
      * @param oldKey Key we wish to update.
      * @return true if we successfully updated value, false otherwise.
      */
-    synchronized boolean updateEntry(String oldKey) {
+    private synchronized boolean updateEntry(String oldKey) {
         PropertiesFile props = getRecentlyUsedPropertiesFile();
         if (!props.containsKey(oldKey)) {
             return false;
