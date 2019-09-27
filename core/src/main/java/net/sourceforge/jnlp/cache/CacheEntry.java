@@ -235,7 +235,13 @@ public class CacheEntry implements ResourceInfo {
      * Mark this entry for deletion at shutdown.
      */
     void markForDelete() { // once marked it should not be unmarked.
-        properties.setProperty(KEY_DELETE, Boolean.toString(true));
+        lock();
+        try {
+            properties.setProperty(KEY_DELETE, Boolean.toString(true));
+            store();
+        } finally {
+            unlock();
+        }
     }
 
     /**

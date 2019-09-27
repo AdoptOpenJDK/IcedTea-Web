@@ -265,6 +265,12 @@ class CacheLRUWrapper {
         return isCurrent;
     }
 
+    void invalidate(URL source, VersionId version) {
+        final CacheEntry entry = new CacheEntry(source, version);
+
+        entry.markForDelete();
+    }
+
     List<CacheId> getCacheIds(String filter, boolean jnlpPath, boolean domain) {
         synchronized (this) {
             lock();

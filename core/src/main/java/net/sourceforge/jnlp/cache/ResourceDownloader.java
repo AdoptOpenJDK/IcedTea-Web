@@ -1,7 +1,6 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
@@ -114,38 +113,28 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromURL(final UrlRequestResult location) {
-        final CacheEntry entry = new CacheEntry(resource.getLocation(), location.getVersion());
+        final boolean isCached = CacheUtil.isCached(resource.getLocation(), location.getVersion());
+        final boolean isUpToDate = isCached && CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
+        final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
 
-        entry.lock();
-        try {
-            final boolean isCached = CacheUtil.isCached(resource.getLocation(), location.getVersion());
-            final boolean isUpToDate = isCached && CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
-            final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
+        final File localFile;
+        if (doUpdate && isCached) {
+            localFile = CacheUtil.replaceExistingCacheFile(resource.getLocation(), location.getVersion());
+        } else {
+            localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+        }
 
-            final File localFile;
-            if (doUpdate && isCached) {
-                entry.markForDelete();
-                entry.store();
-                // Old entry will still exist. (but removed at cleanup)
-                localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            } else {
-                localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+        synchronized (resource) {
+            resource.setDownloadLocation(location.getLocation());
+            resource.setLocalFile(localFile);
+            // resource.connection = connection;
+            resource.setSize(location.getContentLength());
+            resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
+
+            // check if up-to-date; if so set as downloaded
+            if (!doUpdate) {
+                resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
             }
-
-            synchronized (resource) {
-                resource.setDownloadLocation(location.getLocation());
-                resource.setLocalFile(localFile);
-                // resource.connection = connection;
-                resource.setSize(location.getContentLength());
-                resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
-
-                // check if up-to-date; if so set as downloaded
-                if (!doUpdate) {
-                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
-                }
-            }
-        } finally {
-            entry.unlock();
         }
     }
 

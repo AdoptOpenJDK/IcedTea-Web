@@ -240,6 +240,24 @@ public class CacheUtil {
     }
 
     /**
+     * Invalidate the entry and make it eligible for removal.
+     *
+     * @param source      the source {@link URL}
+     * @param version     the versions
+     * @return the newly created cache file
+     * @throws IllegalArgumentException if the source is not cacheable
+     */
+    static File replaceExistingCacheFile(final URL source, final VersionId version) {
+        if (!isCacheable(source)) {
+            throw new IllegalArgumentException(source + " is not a cacheable resource");
+        }
+
+        // Old entry will still exist. (but removed at cleanup)
+        CacheLRUWrapper.getInstance().invalidate(source, version);
+        return makeNewCacheFile(source, version);
+    }
+
+    /**
      * Returns whether the resource can be cached as a local file;
      * if not, then URLConnection.openStream can be used to obtain
      * the contents.
