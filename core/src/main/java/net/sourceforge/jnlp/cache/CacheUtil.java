@@ -39,6 +39,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +56,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class CacheUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
+
+    private static final List<String> NON_CACHEABLE_PROTOCOLS = Arrays.asList("file", "jar");
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -266,14 +269,8 @@ public class CacheUtil {
      * @return whether this resource can be cached
      */
     public static boolean isCacheable(URL source) {
-        if (source == null) {
-            return false;
-        } else if (source.getProtocol().equals("file")) {
-            return false;
-        } else if (source.getProtocol().equals("jar")) {
-            return false;
-        }
-        return true;
+        final String protocol = source != null ? source.getProtocol() : null;
+        return !NON_CACHEABLE_PROTOCOLS.contains(protocol);
     }
 
 
