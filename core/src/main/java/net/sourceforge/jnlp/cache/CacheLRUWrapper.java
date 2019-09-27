@@ -108,7 +108,7 @@ class CacheLRUWrapper {
         if (!recentlyUsed.getFile().exists()) {
             try {
                 FileUtils.createParentDir(recentlyUsed.getFile());
-                FileUtils.createRestrictedFile(recentlyUsed.getFile(), true);
+                FileUtils.createRestrictedFile(recentlyUsed.getFile());
             } catch (IOException e) {
                 LOG.error("Error in creating recently used cache items file.", e);
             }
@@ -170,7 +170,7 @@ class CacheLRUWrapper {
                             cacheFile = CacheUtil.urlToPath(source, path);
                             FileUtils.createParentDir(cacheFile);
                             File pf = new File(cacheFile.getPath() + CacheEntry.INFO_SUFFIX);
-                            FileUtils.createRestrictedFile(pf, true); // Create the info file for marking later.
+                            FileUtils.createRestrictedFile(pf); // Create the info file for marking later.
                             addEntry(generateKey(cacheFile.getPath()), cacheFile.getPath());
                         } catch (IOException ioe) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);

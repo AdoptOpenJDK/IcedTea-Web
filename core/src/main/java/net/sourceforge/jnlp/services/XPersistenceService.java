@@ -110,7 +110,7 @@ class XPersistenceService implements PersistenceService {
         if (file.exists())
             throw new IOException("File already exists.");
 
-        FileUtils.createRestrictedFile(file, true);
+        FileUtils.createRestrictedFile(file);
 
         return maxsize;
     }

@@ -449,7 +449,7 @@ public class CertificatePane extends JPanel {
             final File keyStoreFile = KeyStores.getKeyStoreLocation(
                                 currentKeyStoreLevel, keyStoreType).getFile();
             if (!keyStoreFile.isFile()) {
-                FileUtils.createRestrictedFile(keyStoreFile, true);
+                FileUtils.createRestrictedFile(keyStoreFile);
             }
 
             SecurityUtil.storeKeyStore(ks, keyStoreFile);
@@ -528,7 +528,7 @@ public class CertificatePane extends JPanel {
                             keyStore.getKs().deleteEntry(alias);
                             File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                             if (!keyStoreFile.isFile()) {
-                                FileUtils.createRestrictedFile(keyStoreFile, true);
+                                FileUtils.createRestrictedFile(keyStoreFile);
                             }
                             SecurityUtil.storeKeyStore(keyStore.getKs(), keyStoreFile);
                         }

@@ -303,7 +303,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 throw new IOException(shortcutFile.getParentFile().toString());
             }
 
-            FileUtils.createRestrictedFile(shortcutFile, true);
+            FileUtils.createRestrictedFile(shortcutFile);
             FileUtils.saveFileUtf8(getContent(false, info, isSigned), shortcutFile);
 
             /*

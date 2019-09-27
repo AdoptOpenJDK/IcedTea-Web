@@ -66,7 +66,7 @@ class SingleInstanceLock {
      */
     public void createWithPort(int localPort) throws IOException {
 
-        FileUtils.createRestrictedFile(lockFile, true);
+        FileUtils.createRestrictedFile(lockFile);
         BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false));
         lockFileWriter.write(String.valueOf(localPort));
         lockFileWriter.newLine();

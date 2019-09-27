@@ -103,7 +103,7 @@ public class FileUtilsTest {
             assertTrue(testfile.delete());
         }
         testfile.deleteOnExit();
-        FileUtils.createRestrictedFile(testfile, true);
+        FileUtils.createRestrictedFile(testfile);
         boolean hasOwner = false;
         AclFileAttributeView view = Files.getFileAttributeView(testfile.toPath(), AclFileAttributeView.class);
         for (AclEntry ae : view.getAcl()) {

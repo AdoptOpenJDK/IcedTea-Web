@@ -804,7 +804,7 @@ public class JNLPRuntime {
             File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
             if (!netxRunningFile.exists()) {
                 FileUtils.createParentDir(netxRunningFile);
-                FileUtils.createRestrictedFile(netxRunningFile, true);
+                FileUtils.createRestrictedFile(netxRunningFile);
                 try (FileOutputStream fos = new FileOutputStream(netxRunningFile)) {
                     fos.write(message.getBytes());
                 }

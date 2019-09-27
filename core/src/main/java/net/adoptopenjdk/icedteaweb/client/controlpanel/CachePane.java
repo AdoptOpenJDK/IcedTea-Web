@@ -310,7 +310,7 @@ public class CachePane extends JPanel {
                     if (!netxRunningFile.exists()) {
                         try {
                             FileUtils.createParentDir(netxRunningFile);
-                            FileUtils.createRestrictedFile(netxRunningFile, true);
+                            FileUtils.createRestrictedFile(netxRunningFile);
                         } catch (IOException e1) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                         }

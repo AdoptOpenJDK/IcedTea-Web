@@ -66,7 +66,7 @@ public final class LogBasedFileLog implements SingleStreamLogger {
         try {
             File futureFile = new File(fileName);
             if (!futureFile.exists()) {
-                FileUtils.createRestrictedFile(futureFile, true);
+                FileUtils.createRestrictedFile(futureFile);
             }
             fh = new FileHandler(fileName, append);
             fh.setFormatter(new Formatter() {
