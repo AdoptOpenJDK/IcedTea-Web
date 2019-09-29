@@ -128,16 +128,7 @@ public class Cache {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
-
-    public static Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
+        return CacheLRUWrapper.getInstance().getBestMatchingVersionInCache(resource, version);
     }
 
     /**

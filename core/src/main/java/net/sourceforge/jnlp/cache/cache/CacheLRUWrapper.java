@@ -256,6 +256,16 @@ class CacheLRUWrapper {
         return isCurrent;
     }
 
+    VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
+    Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
+        // TODO: handle Version
+        throw new RuntimeException("not implemented");
+    }
+
     /**
      * Returns whether there is a version of the URL contents in the
      * cache and it is up to date.  This method may not return
@@ -338,7 +348,7 @@ class CacheLRUWrapper {
     }
 
     void deleteFromCache(URL location, VersionString version) {
-        for (VersionId versionId : Cache.getAllMatchingVersionInCache(location, version)) {
+        for (VersionId versionId : getAllMatchingVersionInCache(location, version)) {
             File cachedFile = getCacheFile(location, versionId);
             String directoryUrl = getCacheParentDirectory(cachedFile.getAbsolutePath());
 
