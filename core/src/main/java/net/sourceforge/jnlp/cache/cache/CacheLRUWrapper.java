@@ -213,20 +213,15 @@ class CacheLRUWrapper {
      */
     private File getCacheFileIfExist(File urlPath) {
         synchronized (this) {
-            File cacheFile = null;
-            List<Entry<String, String>> entries = getLRUSortedEntries();
-            // Start searching from the most recent to least recent.
+            final List<Entry<String, String>> entries = getLRUSortedEntries();
             for (Entry<String, String> e : entries) {
-                final String key = e.getKey();
                 final String path = e.getValue();
-
-                if (pathToURLPath(path).equals(urlPath.getPath())) { // Match found.
-                    cacheFile = new File(path);
-                    updateEntry(key);
-                    break; // Stop searching since we got newest one already.
+                if (pathToURLPath(path).equals(urlPath.getPath())) {
+                    updateEntry(e.getKey());
+                    return new File(path);
                 }
             }
-            return cacheFile;
+            return null;
         }
     }
 
