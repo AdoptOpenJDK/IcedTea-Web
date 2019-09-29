@@ -7,6 +7,8 @@ import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -19,7 +21,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.cache.Cache.isUpToDate;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -28,7 +29,8 @@ import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
-import static net.sourceforge.jnlp.cache.ResourceInfo.createInfoFromRemote;
+import static net.sourceforge.jnlp.cache.cache.Cache.isUpToDate;
+import static net.sourceforge.jnlp.cache.cache.ResourceInfo.createInfoFromRemote;
 
 class ResourceDownloader implements Runnable {
 

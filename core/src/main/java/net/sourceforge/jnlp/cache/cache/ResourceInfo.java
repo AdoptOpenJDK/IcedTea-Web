@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache.cache;
 
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
@@ -8,7 +8,7 @@ import java.net.URL;
 /**
  * Information about a resource.
  */
-interface ResourceInfo {
+public interface ResourceInfo {
     /**
      * @return URL as specified in the JNLP file
      */
@@ -35,54 +35,12 @@ interface ResourceInfo {
     long getDownloadedAt();
 
     static ResourceInfo createInfoFromRemote(URL location, VersionId version, CloseableConnection connection) {
-        return new ResourceInfoImpl(
+        return new ResourceInfoBean(
                 location,
                 version,
                 connection.getContentLength(),
                 connection.getLastModified(),
                 System.currentTimeMillis()
         );
-    }
-}
-
-class ResourceInfoImpl implements ResourceInfo {
-
-    private final URL location;
-    private final VersionId version;
-    private long size;
-    private long lastModified;
-    private long downloadedAt;
-
-    ResourceInfoImpl(URL location, VersionId version, long size, long lastModified, long downloadedAt) {
-        this.location = location;
-        this.version = version;
-        this.size = size;
-        this.lastModified = lastModified;
-        this.downloadedAt = downloadedAt;
-    }
-
-    @Override
-    public URL getLocation() {
-        return location;
-    }
-
-    @Override
-    public VersionId getVersion() {
-        return version;
-    }
-
-    @Override
-    public long getSize() {
-        return size;
-    }
-
-    @Override
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    @Override
-    public long getDownloadedAt() {
-        return downloadedAt;
     }
 }

@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.ManageJnlpResources;

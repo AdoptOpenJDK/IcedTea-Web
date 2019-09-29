@@ -17,13 +17,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.cache.Cache;
-import net.sourceforge.jnlp.cache.CacheId;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.ImageResources;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.CacheId;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.ImageResources;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;

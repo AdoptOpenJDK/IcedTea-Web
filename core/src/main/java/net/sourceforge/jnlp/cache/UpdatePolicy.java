@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
+
 /**
  * A policy that determines when a resource should be checked for
  * an updated version.

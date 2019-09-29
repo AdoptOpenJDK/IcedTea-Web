@@ -23,6 +23,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;

@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;

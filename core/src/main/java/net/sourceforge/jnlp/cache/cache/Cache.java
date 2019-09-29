@@ -1,7 +1,8 @@
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.sourceforge.jnlp.cache.CacheUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class Cache {
      * @return the newly created cache file
      * @throws IllegalArgumentException if the resource is not cacheable
      */
-    static File replaceExistingCacheFile(final URL resource, final VersionId version) {
+    public static File replaceExistingCacheFile(final URL resource, final VersionId version) {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
@@ -96,6 +97,14 @@ public class Cache {
         }
 
         return CacheLRUWrapper.getInstance().isCached(resource, version);
+    }
+
+    public static ResourceInfo getInfo(final URL resource, final VersionId version) {
+        if (!CacheUtil.isCacheable(resource)) {
+            throw new IllegalArgumentException(resource + " is not a cacheable resource");
+        }
+
+        return CacheLRUWrapper.getInstance().getInfo(resource, version);
     }
 
     /**

@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache.cache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public abstract class CacheId {
 
     abstract void populate();
 
-    abstract String getType();
+    public abstract String getType();
 
     protected final String id;
 
@@ -74,7 +74,7 @@ public abstract class CacheId {
         }
 
         @Override
-        String getType() {
+        public String getType() {
             return "JNLP-PATH";
         }
 
@@ -107,7 +107,7 @@ public abstract class CacheId {
         }
 
         @Override
-        String getType() {
+        public String getType() {
             return "DOMAIN";
         }
 

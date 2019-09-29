@@ -27,6 +27,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.CacheId;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -87,7 +90,7 @@ public class CacheUtil {
         List<CacheId> items = Cache.getCacheIds(filter, true, true);
         if (JNLPRuntime.isDebug()) {
             for (CacheId id : items) {
-                LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.files.size());
+                LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.getFiles().size());
                 for (Object[] o : id.getFiles()) {
                     StringBuilder sb = new StringBuilder();
                     for (Object value : o) {
@@ -322,14 +325,14 @@ public class CacheUtil {
             return null;
         }
         if (versionString == null) {
-            return CacheLRUWrapper.getInstance().getInfo(location, null);
+            return Cache.getInfo(location, null);
         }
 
         final VersionId versionId = Cache.getBestMatchingVersionInCache(location, versionString);
         if (versionId == null) {
             return null;
         }
-        return CacheLRUWrapper.getInstance().getInfo(location, versionId);
+        return Cache.getInfo(location, versionId);
     }
 
 }
