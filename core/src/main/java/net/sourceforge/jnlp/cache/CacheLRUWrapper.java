@@ -128,11 +128,20 @@ class CacheLRUWrapper {
 
     private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
 
+    File replaceExistingCacheFile(URL source, VersionId version) {
+        // Old entry will still exist. (but removed at cleanup)
+        invalidate(source, version);
+        return makeNewCacheFile(source, version);
+    }
+
     ResourceInfo getInfo(URL location, VersionId versionId) {
         return new CacheEntry(location, versionId);
     }
 
     File getCacheFile(URL source, VersionId version) {
+
+        // TODO: handle Version
+
         File cacheFile = null;
         synchronized (this) {
             try {
@@ -328,8 +337,8 @@ class CacheLRUWrapper {
     }
 
     void deleteFromCache(URL location, VersionString version) {
-        for (VersionId versionId : CacheUtil.getAllMatchingVersionInCache(location, version)) {
-            File cachedFile = CacheUtil.getCacheFile(location, versionId);
+        for (VersionId versionId : Cache.getAllMatchingVersionInCache(location, version)) {
+            File cachedFile = getCacheFile(location, versionId);
             String directoryUrl = getCacheParentDirectory(cachedFile.getAbsolutePath());
 
             File directory = new File(directoryUrl);

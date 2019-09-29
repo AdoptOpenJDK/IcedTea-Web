@@ -18,7 +18,7 @@ package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.ManageJnlpResources;
@@ -68,7 +68,7 @@ class XDownloadService implements DownloadService {
             return false;
 
         for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = CacheUtil.isAnyCached(jars[i].getLocation(), resourceVersion);
+            allCached = Cache.isAnyCached(jars[i].getLocation(), resourceVersion);
         }
 
         return allCached;
@@ -105,7 +105,7 @@ class XDownloadService implements DownloadService {
             return false;
 
         for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = CacheUtil.isAnyCached(jars[i].getLocation(), jars[i].getVersion());
+            allCached = Cache.isAnyCached(jars[i].getLocation(), jars[i].getVersion());
         }
 
         return allCached;

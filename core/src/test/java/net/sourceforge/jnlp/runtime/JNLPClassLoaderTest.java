@@ -47,7 +47,7 @@ import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -406,7 +406,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testRelativePathInUrl() throws Exception {
-        CacheUtil.clearCache();
+        Cache.clearCache();
         int port = ServerAccess.findFreePort();
         File dir = FileTestUtils.createTempDirectory();
         dir.deleteOnExit();
@@ -455,7 +455,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testEncodedPathIsNotDecodedForCache() throws Exception {
-        CacheUtil.clearCache();
+        Cache.clearCache();
         int port = ServerAccess.findFreePort();
         File dir = FileTestUtils.createTempDirectory();
         dir.deleteOnExit();
@@ -504,7 +504,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testRelativePathInNestedJars() throws Exception {
-        CacheUtil.clearCache();
+        Cache.clearCache();
         int port = ServerAccess.findFreePort();
         File dir = FileTestUtils.createTempDirectory();
         dir.deleteOnExit();
@@ -580,7 +580,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test(expected = Exception.class)
     public void testDifferentSignatureInManifestMf() throws Exception {
-        CacheUtil.clearCache();
+        Cache.clearCache();
         int port = ServerAccess.findFreePort();
         File dir = FileTestUtils.createTempDirectory();
         dir.deleteOnExit();

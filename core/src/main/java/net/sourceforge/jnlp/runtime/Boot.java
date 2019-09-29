@@ -34,6 +34,7 @@ import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -383,10 +384,10 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app
-                CacheUtil.deleteFromCache(optionArgs.get(0));
+                Cache.deleteFromCache(optionArgs.get(0));
             } else {
                 // clear all cache
-                CacheUtil.clearCache();
+                Cache.clearCache();
             }
             return null;
         }

@@ -194,7 +194,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     public static void teardownDownloadServer() {
         downloadServer.stop();
 
-        CacheUtil.clearCache();
+        Cache.clearCache();
         PathsAndFiles.CACHE_DIR.setValue(cacheDir);
     }
 

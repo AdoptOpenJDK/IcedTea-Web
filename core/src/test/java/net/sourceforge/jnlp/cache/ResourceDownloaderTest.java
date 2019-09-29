@@ -136,7 +136,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
     public static void teardownCache() {
         downloadServer.stop();
 
-        CacheUtil.clearCache();
+        Cache.clearCache();
         PathsAndFiles.CACHE_DIR.setValue(cacheDir);
     }
 

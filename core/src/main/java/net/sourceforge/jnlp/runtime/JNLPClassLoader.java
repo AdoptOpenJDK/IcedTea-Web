@@ -28,7 +28,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -40,6 +39,7 @@ import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
@@ -93,7 +93,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import java.util.jar.Manifest;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
@@ -990,7 +989,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         if (jnlp.getFileLocation().getProtocol().toLowerCase().equals("file")) {
                             jn = new File(jnlp.getFileLocation().getPath());
                         } else {
-                            jn = CacheUtil.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
+                            jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
                         }
 
                         InputStream jnlpStream = new FileInputStream(jn);
@@ -2069,7 +2068,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
-            CacheUtil.removeFiles(location, version);
+            Cache.deleteFromCache(location, version);
         }
     }
 
@@ -2130,7 +2129,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 foundLoader.removeJars(jarToRemove);
 
             } else if (action == DownloadAction.CHECK_CACHE) {
-                return CacheUtil.isAnyCached(ref, resourceVersion);
+                return Cache.isAnyCached(ref, resourceVersion);
             }
         }
         return false;

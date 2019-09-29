@@ -24,8 +24,8 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.CacheDirectory;
-import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.DirectoryNode;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -486,7 +486,7 @@ public class CachePane extends JPanel {
 
     public static void visualCleanCache(Component parent) {
         try {
-            boolean success = CacheUtil.clearCache();
+            boolean success = Cache.clearCache();
             if (!success) {
                 JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
             }

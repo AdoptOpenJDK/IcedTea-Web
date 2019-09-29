@@ -67,7 +67,7 @@ class CacheEntry implements ResourceInfo {
         this.location = location;
         this.version = version;
         
-        final File cacheFile = CacheUtil.getCacheFile(location, version);
+        final File cacheFile = Cache.getCacheFile(location, version);
         final File infoFile = new File(cacheFile.getPath() + INFO_SUFFIX);
 
         properties = new PropertiesFile(infoFile, R("CAutoGen"));
@@ -194,7 +194,7 @@ class CacheEntry implements ResourceInfo {
      * Seam for testing
      */
     File getCacheFile() {
-        return CacheUtil.getCacheFile(location, version);
+        return Cache.getCacheFile(location, version);
     }
 
     /**

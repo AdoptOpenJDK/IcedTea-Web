@@ -19,7 +19,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.cache.CacheUtil.isUpToDate;
+import static net.sourceforge.jnlp.cache.Cache.isUpToDate;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -113,15 +113,15 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromURL(final UrlRequestResult location) {
-        final boolean isCached = CacheUtil.isCached(resource.getLocation(), location.getVersion());
-        final boolean isUpToDate = isCached && CacheUtil.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
+        final boolean isCached = Cache.isCached(resource.getLocation(), location.getVersion());
+        final boolean isUpToDate = isCached && Cache.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
         final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
 
         final File localFile;
         if (doUpdate && isCached) {
-            localFile = CacheUtil.replaceExistingCacheFile(resource.getLocation(), location.getVersion());
+            localFile = Cache.replaceExistingCacheFile(resource.getLocation(), location.getVersion());
         } else {
-            localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+            localFile = Cache.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
         }
 
         synchronized (resource) {
@@ -139,8 +139,8 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromCache() {
-        final VersionId versionId = CacheUtil.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
-        final File localFile = CacheUtil.getCacheFile(resource.getLocation(), versionId);
+        final VersionId versionId = Cache.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
+        final File localFile = Cache.getCacheFile(resource.getLocation(), versionId);
 
         if (localFile != null && localFile.exists()) {
             long size = localFile.length();
@@ -201,7 +201,7 @@ class ResourceDownloader implements Runnable {
     private void downloadFile(CloseableConnection connection, URL downloadLocation, StreamUnpacker unpacker) throws IOException {
         final VersionId version = resource.getDownloadVersion();
         if (isUpToDate(downloadLocation, version, connection.getLastModified())) {
-            final File cacheFile = CacheUtil.getCacheFile(downloadLocation, version);
+            final File cacheFile = Cache.getCacheFile(downloadLocation, version);
             resource.setTransferred(cacheFile.length());
         } else {
             final String versionHeaderField = connection.getHeaderField("x-java-jnlp-version-id");
@@ -210,7 +210,7 @@ class ResourceDownloader implements Runnable {
             final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
             final InputStream unpackedStream = unpacker.unpack(downloadStream);
             final ResourceInfo resourceInfo = createInfoFromRemote(downloadLocation, versionFromRemote, connection);
-            CacheUtil.addToCache(resourceInfo, unpackedStream);
+            Cache.addToCache(resourceInfo, unpackedStream);
             resource.setTransferred(resourceInfo.getSize());
         }
     }

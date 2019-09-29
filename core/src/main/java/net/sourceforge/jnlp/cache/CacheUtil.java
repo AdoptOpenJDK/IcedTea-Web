@@ -32,8 +32,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -41,7 +39,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -86,104 +83,8 @@ public class CacheUtil {
         }
     }
 
-    /**
-     * Clears the cache by deleting all the Netx cache files
-     * <p>
-     * Note: Because of how our caching system works, deleting jars of another javaws
-     * process is using them can be quite disastrous. Hence why Launcher creates lock files
-     * and we check for those.
-     *
-     * @return true if the cache could and was cleared
-     */
-    public static boolean clearCache() {
-        return CacheLRUWrapper.getInstance().clearCache();
-    }
-
-    public static boolean deleteFromCache(final String cacheId) {
-        return CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
-    }
-
-    /**
-     * This method load all known IDs of applications and  will gather all members, which share the id
-     *
-     * @param filter - regex to filter keys
-     */
-    public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
-        return CacheLRUWrapper.getInstance().getCacheIds(filter, jnlpPath, domain);
-    }
-
-    /**
-     * This will remove all old cache items.
-     */
-    public static void cleanCache() {
-        CacheLRUWrapper.getInstance().cleanCache();
-    }
-
-    /**
-     * Returns the file for the locally cached contents of the
-     * source.  This method returns the file location only and does
-     * not download the resource.  The latest version of the
-     * resource that matches the specified version will be returned.
-     *
-     * @param source  the source {@link URL}
-     * @param version the version of the local file
-     * @return the file location in the cache, or {@code null} if no versions cached
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    public static File getCacheFile(final URL source, final VersionId version) {
-
-        // TODO: handle Version
-
-        if (!isCacheable(source)) {
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-        }
-
-        return CacheLRUWrapper.getInstance().getCacheFile(source, version);
-    }
-
-    public static void removeFiles(URL location, VersionString version) {
-        CacheLRUWrapper.getInstance().deleteFromCache(location, version);
-    }
-
-    /**
-     * This will create a new entry for the cache item. It is however not
-     * initialized but any future calls to getCacheFile with the source and
-     * version given to here, will cause it to return this item.
-     *
-     * @param source  the source URL
-     * @param version the version id of the local file
-     * @return the file location in the cache.
-     */
-    static File makeNewCacheFile(final URL source, final VersionId version) {
-        return CacheLRUWrapper.getInstance().makeNewCacheFile(source, version);
-    }
-
-    /**
-     * Returns true if the cache has a local copy of the contents of
-     * the URL matching the specified version.
-     *
-     * @param location the location URL
-     * @param version  the version to check for
-     * @return true if the source is in the cache
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    public static boolean isAnyCached(final URL location, final VersionString version) {
-        final VersionId versionId = getBestMatchingVersionInCache(location, version);
-        return versionId != null;
-    }
-
-    static VersionId getBestMatchingVersionInCache(final URL location, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
-
-    public static Set<VersionId> getAllMatchingVersionInCache(final URL location, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
-
     public static void logCacheIds(String filter) {
-        List<CacheId> items = getCacheIds(filter, true, true);
+        List<CacheId> items = Cache.getCacheIds(filter, true, true);
         if (JNLPRuntime.isDebug()) {
             for (CacheId id : items) {
                 LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.files.size());
@@ -204,60 +105,6 @@ public class CacheUtil {
                 LOG.info(id.getId());
             }
         }
-    }
-
-    /**
-     * Returns whether there is a version of the URL contents in the
-     * cache.
-     *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
-     * @return whether the cache contains the version
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    static boolean isCached(final URL source, final VersionId version) {
-        if (!isCacheable(source)) {
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-        }
-
-        return CacheLRUWrapper.getInstance().isCached(source, version);
-    }
-
-    /**
-     * Returns whether there is a version of the URL contents in the
-     * cache and it is up to date.  This method may not return
-     * immediately.
-     *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
-     * @param lastModified time in millis since epoch of last modification
-     * @return whether the cache contains the version
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    static boolean isUpToDate(final URL source, final VersionId version, long lastModified) {
-        if (!isCacheable(source)) {
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-        }
-
-        return CacheLRUWrapper.getInstance().isUpToDate(source, version, lastModified);
-    }
-
-    /**
-     * Invalidate the entry and make it eligible for removal.
-     *
-     * @param source      the source {@link URL}
-     * @param version     the versions
-     * @return the newly created cache file
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    static File replaceExistingCacheFile(final URL source, final VersionId version) {
-        if (!isCacheable(source)) {
-            throw new IllegalArgumentException(source + " is not a cacheable resource");
-        }
-
-        // Old entry will still exist. (but removed at cleanup)
-        CacheLRUWrapper.getInstance().invalidate(source, version);
-        return makeNewCacheFile(source, version);
     }
 
     /**
@@ -478,14 +325,11 @@ public class CacheUtil {
             return CacheLRUWrapper.getInstance().getInfo(location, null);
         }
 
-        final VersionId versionId = getBestMatchingVersionInCache(location, versionString);
+        final VersionId versionId = Cache.getBestMatchingVersionInCache(location, versionString);
         if (versionId == null) {
             return null;
         }
         return CacheLRUWrapper.getInstance().getInfo(location, versionId);
     }
 
-    static void addToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
-        CacheLRUWrapper.getInstance().addToCache(infoFromRemote, unpackedStream);
-    }
 }

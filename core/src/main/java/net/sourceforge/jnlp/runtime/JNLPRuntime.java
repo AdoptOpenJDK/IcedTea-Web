@@ -30,7 +30,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -833,7 +833,7 @@ public class JNLPRuntime {
             @Override
             public void run() {
                 markNetxStopped();
-                CacheUtil.cleanCache();
+                Cache.cleanCache();
             }
         });
     }

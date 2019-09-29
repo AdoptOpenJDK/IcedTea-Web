@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
+import net.sourceforge.jnlp.cache.Cache;
 import net.sourceforge.jnlp.cache.CacheId;
-import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -93,8 +93,8 @@ public class CacheAppViewer extends JDialog {
         idTabs.add(jnlpPaths);
         idTabs.add(domains);
         final JButton delete = new JButton(Translator.R("TIFPDeleteFiles"));
-        DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(CacheUtil.getCacheIds(".*", true, false));
-        DummyCacheIdListModel domainIds = new DummyCacheIdListModel(CacheUtil.getCacheIds(".*", false, true));
+        DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(Cache.getCacheIds(".*", true, false));
+        DummyCacheIdListModel domainIds = new DummyCacheIdListModel(Cache.getCacheIds(".*", false, true));
         final JList<CacheId> appsByJnlpPath = new JList<>();
         final JList<CacheId> appsByDomain = new JList<>();
         appsByJnlpPath.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -108,10 +108,10 @@ public class CacheAppViewer extends JDialog {
                     @Override
                     public void run() {
                         if (idTabs.getSelectedComponent()==jnlpPaths){
-                            CacheUtil.deleteFromCache(appsByJnlpPath.getSelectedValue().getId());
+                            Cache.deleteFromCache(appsByJnlpPath.getSelectedValue().getId());
                         }
                         if (idTabs.getSelectedComponent()==domains){
-                            CacheUtil.deleteFromCache(appsByDomain.getSelectedValue().getId());
+                            Cache.deleteFromCache(appsByDomain.getSelectedValue().getId());
                         }
                         CacheAppViewer.this.getContentPane().removeAll();
                         CacheAppViewer.this.pack();

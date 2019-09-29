@@ -203,7 +203,7 @@ public class ResourceTracker {
                 LOG.info("not updating: {}", resource.getLocation());
 
                 synchronized (resource) {
-                    resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
+                    resource.setLocalFile(Cache.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
                     resource.setSize(resource.getLocalFile().length());
                     resource.setTransferred(resource.getLocalFile().length());
                     resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
