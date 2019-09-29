@@ -85,24 +85,23 @@ class CacheLRUWrapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
 
-    /*
-     * back-end of how LRU is implemented This file is to keep track of the most
-     * recently used items. The items are to be kept with key = (current time
-     * accessed) followed by folder of item. value = path to file.
+    /**
+     * Returns an instance of the policy.
+     *
+     * @return an instance of the policy
      */
+    static CacheLRUWrapper getInstance() {
+        return CacheLRUWrapperHolder.INSTANCE;
+    }
 
     private final InfrastructureFileDescriptor recentlyUsedPropertiesFile;
     private final InfrastructureFileDescriptor cacheDir;
 
-    private CacheLRUWrapper() {
-        this(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
-    }
-
+    private PropertiesFile cachedRecentlyUsedPropertiesFile = null;
 
     /**
-     * testing constructor
      * @param recentlyUsed file to be used as recently_used file
-     * @param cacheDir dir with cache
+     * @param cacheDir     dir with cache
      */
     CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
         recentlyUsedPropertiesFile = recentlyUsed;
@@ -116,18 +115,6 @@ class CacheLRUWrapper {
             }
         }
     }
-
-    /**
-     * Returns an instance of the policy.
-     *
-     * @return an instance of the policy
-     */
-    static CacheLRUWrapper getInstance() {
-        return  CacheLRUWrapperHolder.INSTANCE;
-    }
-
-
-    private PropertiesFile cachedRecentlyUsedPropertiesFile = null ;
 
     File replaceExistingCacheFile(URL source, VersionId version) {
         // Old entry will still exist. (but removed at cleanup)
@@ -163,7 +150,7 @@ class CacheLRUWrapper {
         return cacheFile;
     }
 
-    File makeNewCacheFile(URL source, VersionId version) {
+    private File makeNewCacheFile(URL source, VersionId version) {
 
         // TODO: handle Version
 
@@ -237,8 +224,8 @@ class CacheLRUWrapper {
      * Returns whether there is a version of the URL contents in the
      * cache.
      *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
+     * @param source  the source {@link URL}
+     * @param version the versions to check for
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
@@ -255,7 +242,7 @@ class CacheLRUWrapper {
         throw new RuntimeException("not implemented");
     }
 
-    Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
+    private Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
         // TODO: handle Version
         throw new RuntimeException("not implemented");
     }
@@ -265,8 +252,8 @@ class CacheLRUWrapper {
      * cache and it is up to date.  This method may not return
      * immediately.
      *
-     * @param source      the source {@link URL}
-     * @param version     the versions to check for
+     * @param source       the source {@link URL}
+     * @param version      the versions to check for
      * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
@@ -279,7 +266,7 @@ class CacheLRUWrapper {
         return isCurrent;
     }
 
-    void invalidate(URL source, VersionId version) {
+    private void invalidate(URL source, VersionId version) {
         final CacheEntry entry = new CacheEntry(source, version);
 
         entry.markForDelete();
@@ -454,6 +441,7 @@ class CacheLRUWrapper {
         }
         return true;
     }
+
     /**
      * This will remove all old cache items.
      */
@@ -467,15 +455,7 @@ class CacheLRUWrapper {
                     lock();
                     load();
 
-                    long maxSize = -1; // Default
-                    try {
-                        final String maxSizePropertyValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE);
-                        maxSize = Long.parseLong(maxSizePropertyValue);
-                    } catch (NumberFormatException nfe) {
-                        // ignore, maxSize will stay at -1
-                    }
-
-                    maxSize = maxSize << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
+                    final long maxSize = getMaxSizeInBytes();
                     long curSize = 0;
 
                     for (Entry<String, String> e : getLRUSortedEntries()) {
@@ -522,15 +502,17 @@ class CacheLRUWrapper {
                         curSize += len;
                         keep.add(file.getPath().substring(rStr.length()));
 
-                        for (File f : file.getParentFile().listFiles()) {
-                            if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
-                                try {
-                                    FileUtils.recursiveDelete(f, f);
-                                } catch (IOException e1) {
-                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
+                        final File parentFile = file.getParentFile();
+                        if (parentFile != null) {
+                            for (File f : parentFile.listFiles()) {
+                                if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
+                                    try {
+                                        FileUtils.recursiveDelete(f, f);
+                                    } catch (IOException e1) {
+                                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
+                                    }
                                 }
                             }
-
                         }
                     }
                     store();
@@ -539,6 +521,17 @@ class CacheLRUWrapper {
                 }
                 removeDirectories(remove);
             }
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private long getMaxSizeInBytes() {
+        try {
+            final String maxSizePropertyValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE);
+            final long maxSizeInMegaBytes = Long.parseLong(maxSizePropertyValue);
+            return maxSizeInMegaBytes << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
+        } catch (NumberFormatException ignored) {
+            return -1;
         }
     }
 
@@ -561,7 +554,7 @@ class CacheLRUWrapper {
             cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
             return cachedRecentlyUsedPropertiesFile;
         }
-        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())){
+        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())) {
             //The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
             return cachedRecentlyUsedPropertiesFile;
         } else {
@@ -583,10 +576,6 @@ class CacheLRUWrapper {
         return recentlyUsedPropertiesFile;
     }
 
-    private static class CacheLRUWrapperHolder {
-       private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper();
-   }
-
     /**
      * Update map for keeping track of recently used items.
      */
@@ -607,10 +596,10 @@ class CacheLRUWrapper {
      *
      * @return true, if cache was corrupted and affected entry removed
      */
-    private boolean checkData () {
+    private boolean checkData() {
         boolean modified = false;
         Set<Entry<Object, Object>> q = getRecentlyUsedPropertiesFile().entrySet();
-        for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext();) {
+        for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext(); ) {
             Entry<Object, Object> currentEntry = it.next();
 
             final String key = (String) currentEntry.getKey();
@@ -644,6 +633,7 @@ class CacheLRUWrapper {
 
     /**
      * Write file to disk.
+     *
      * @return true if properties were successfully stored, false otherwise
      */
     synchronized boolean store() {
@@ -657,7 +647,7 @@ class CacheLRUWrapper {
     /**
      * This adds a new entry to file.
      *
-     * @param key key we want path to be associated with.
+     * @param key  key we want path to be associated with.
      * @param path path to cache item.
      * @return true if we successfully added to map, false otherwise.
      */
@@ -717,7 +707,7 @@ class CacheLRUWrapper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     //although Properties are pretending to be <object,Object> they are always <String,String>
     //bug in jdk?
-    synchronized List<Entry<String, String>> getLRUSortedEntries() {
+    private synchronized List<Entry<String, String>> getLRUSortedEntries() {
         List<Entry<String, String>> entries = new ArrayList<>();
 
         for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
@@ -820,4 +810,7 @@ class CacheLRUWrapper {
         }
     }
 
+    private static class CacheLRUWrapperHolder {
+        private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
+    }
 }
