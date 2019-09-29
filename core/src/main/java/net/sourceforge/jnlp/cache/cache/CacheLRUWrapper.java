@@ -41,6 +41,7 @@ import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionIdComparator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -238,8 +239,10 @@ class CacheLRUWrapper {
     }
 
     VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
+        final VersionIdComparator versionComparator = new VersionIdComparator(version);
+        return getAllMatchingVersionInCache(resource, version).stream()
+                .max(versionComparator)
+                .orElse(null);
     }
 
     private Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
