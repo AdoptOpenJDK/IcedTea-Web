@@ -154,8 +154,8 @@ class CacheLRUWrapper {
                 cacheFile = getCacheFileIfExist(CacheUtil.urlToPath(source, ""));
                 if (cacheFile == null) { // We did not find a copy of it.
                     cacheFile = makeNewCacheFile(source, version);
-                } else
-                    store();
+                }
+                store();
             } finally {
                 unlock();
             }
@@ -213,15 +213,14 @@ class CacheLRUWrapper {
      */
     private File getCacheFileIfExist(File urlPath) {
         synchronized (this) {
-            final List<Entry<String, String>> entries = getLRUSortedEntries();
-            for (Entry<String, String> e : entries) {
-                final String path = e.getValue();
-                if (pathToURLPath(path).equals(urlPath.getPath())) {
-                    updateEntry(e.getKey());
-                    return new File(path);
-                }
-            }
-            return null;
+            return getLRUSortedEntries().stream()
+                    .filter(e -> pathToURLPath(e.getValue()).equals(urlPath.getPath()))
+                    .findFirst()
+                    .map(e -> {
+                        markEntryAsAccessed(e.getKey());
+                        return new File(e.getValue());
+                    })
+                    .orElse(null);
         }
     }
 
@@ -698,7 +697,7 @@ class CacheLRUWrapper {
      * @param oldKey Key we wish to update.
      * @return true if we successfully updated value, false otherwise.
      */
-    private synchronized boolean updateEntry(String oldKey) {
+    private synchronized boolean markEntryAsAccessed(String oldKey) {
         PropertiesFile props = getRecentlyUsedPropertiesFile();
         if (!props.containsKey(oldKey)) {
             return false;
