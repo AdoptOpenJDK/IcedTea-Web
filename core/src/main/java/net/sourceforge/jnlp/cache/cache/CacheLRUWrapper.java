@@ -807,4 +807,60 @@ class CacheLRUWrapper {
     private static class CacheLRUWrapperHolder {
         private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
+
+    private static class LruEntry implements Comparable<LruEntry> {
+        private final long folderId;
+        private final long lastAccessed;
+
+        private final URL resource;
+        private final VersionId version;
+        private final String relativePath;
+
+        /**
+         * Constructor to create an entry from a line in the "recently used" property file.
+         *
+         * @param key   the property key == folderId
+         * @param value = the property value == a sting representation of the remaining values
+         */
+        LruEntry(long key, String value) {
+            this(key, 0, null, null, null); // TODO
+        }
+
+        LruEntry(long folderId, long lastAccessed, URL resource, VersionId version, String relativePath) {
+            this.folderId = folderId;
+            this.lastAccessed = lastAccessed;
+            this.resource = resource;
+            this.version = version;
+            this.relativePath = relativePath;
+        }
+
+        File getCacheFile(InfrastructureFileDescriptor cacheDir) {
+            return new File(String.join("/", cacheDir.getFullPath(), Long.toString(folderId), relativePath));
+        }
+
+        String getPropertyKey() {
+            return Long.toString(folderId);
+        }
+
+        String getPropertyValue() {
+            return ""; // TODO
+        }
+
+        public boolean matches(URL resource, VersionString versionString) {
+            if (this.resource.equals(resource)) {
+                if (versionString == null && version == null) {
+                    return true;
+                }
+                if (versionString != null && version != null) {
+                    return versionString.contains(version);
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public int compareTo(LruEntry o) {
+            return Long.compare(this.lastAccessed, o.lastAccessed);
+        }
+    }
 }
