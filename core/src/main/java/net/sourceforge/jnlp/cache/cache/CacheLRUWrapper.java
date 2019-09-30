@@ -849,7 +849,7 @@ class CacheLRUWrapper {
         private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
 
-    private static class LruEntry implements Comparable<LruEntry> {
+    private static class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEntry> {
         private final long folderId;
         private final long lastAccessed;
 
@@ -863,11 +863,11 @@ class CacheLRUWrapper {
          * @param key   the property key == folderId
          * @param value = the property value == a sting representation of the remaining values
          */
-        LruEntry(long key, String value) {
+        LeastRecentlyUsedCacheEntry(long key, String value) {
             this(key, 0, null, null, null); // TODO
         }
 
-        LruEntry(long folderId, long lastAccessed, URL resource, VersionId version, String relativePath) {
+        LeastRecentlyUsedCacheEntry(long folderId, long lastAccessed, URL resource, VersionId version, String relativePath) {
             this.folderId = folderId;
             this.lastAccessed = lastAccessed;
             this.resource = resource;
@@ -900,7 +900,7 @@ class CacheLRUWrapper {
         }
 
         @Override
-        public int compareTo(LruEntry o) {
+        public int compareTo(LeastRecentlyUsedCacheEntry o) {
             return Long.compare(this.lastAccessed, o.lastAccessed);
         }
     }
