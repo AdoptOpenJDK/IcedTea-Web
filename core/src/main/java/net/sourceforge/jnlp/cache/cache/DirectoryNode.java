@@ -72,9 +72,48 @@ public class DirectoryNode {
         this.infoFile = infoFile;
     }
 
+    public boolean delete() {
+        if (Cache.deleteFromCache(path)) {
+            removeThisAndCleanParent();
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * This will recursively remove the parent folders if they are empty.
+     */
+    private void removeThisAndCleanParent() {
+        parent.childNodes.remove(this);
+        if (this.parent.parent == null) {
+            return; // parent is root.
+        }
+        if (this.parent.childNodes.isEmpty()) {
+            this.parent.removeThisAndCleanParent();
+        }
+    }
+
+    /**
+     * @deprecated should return {@link ResourceInfo} to not reveal internal information of the cache
+     */
+    @Deprecated
+    public File getInfoFile() {
+        return this.infoFile;
+    }
+
+    /**
+     * Check if this node is a directory.
+     *
+     * @return True if node is directory.
+     */
+    boolean isDir() {
+        return path.isDirectory();
+    }
+
     /**
      * Append the given node to the list of child nodes.
-     * 
+     *
      * @param node Node to be appended.
      */
     void addChild(DirectoryNode node) {
@@ -82,65 +121,25 @@ public class DirectoryNode {
     }
 
     /**
-     * Removes the node specified.
-     * 
-     * @param node Node to be removed from the list of children
-     */
-    public void removeChild(DirectoryNode node) {
-        this.childNodes.remove(node);
-    }
-
-    /**
-     * Retrieve the name of this node.
-     * 
-     * @return Name of this node.
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    public String toString() {
-        return this.name;
-    }
-
-    /**
      * Retrieve the file associated with this node.
-     * 
+     *
      * @return File that is associated with this node.
      */
-    public File getFile() {
+    File getFile() {
         return path;
     }
 
     /**
-     * Retrieve the parent node.
-     * 
-     * @return DirectoryNode representing the parent of the current node.
-     */
-    public DirectoryNode getParent() {
-        return parent;
-    }
-
-    /**
      * Retrieves the list of child nodes.
-     * 
+     *
      * @return ArrayList of type DirectoryNode containing all the child nodes.
      */
     ArrayList<DirectoryNode> getChildren() {
         return this.childNodes;
     }
 
-    /**
-     * Check if this node is a directory.
-     * 
-     * @return True if node is directory.
-     */
-    public boolean isDir() {
-        return path.isDirectory();
+    @Override
+    public String toString() {
+        return this.name;
     }
-
-    public File getInfoFile() {
-        return this.infoFile;
-    }
-
 }

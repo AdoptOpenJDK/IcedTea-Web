@@ -36,7 +36,6 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.cache.cache;
 
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
@@ -89,7 +88,7 @@ public final class CacheDirectory {
      * Create the entire DirectoryNode tree starting from the given root directory
      *
      * @param rootPath the root directory
-     * @return
+     * @return DirectoryNode tree
      */
     private static DirectoryNode createDirStructure(File rootPath) {
         final DirectoryNode root = new DirectoryNode("Root", rootPath, null);
@@ -133,21 +132,5 @@ public final class CacheDirectory {
             }
         }
         return temp;
-    }
-
-    /**
-     * This will recursively remove the parent folders if they are empty. 
-     * 
-     * @param fileNode node of file which parent is going to be cleaned
-     */
-    public static void cleanParent(DirectoryNode fileNode) {
-        DirectoryNode parent = fileNode.getParent();
-        if (parent.getParent() == null)
-            return; // Don't delete the root.
-        if (parent.getChildren().isEmpty()) {
-            FileUtils.deleteWithErrMesg(parent.getFile());
-            parent.getParent().removeChild(parent);
-            cleanParent(parent);
-        }
     }
 }

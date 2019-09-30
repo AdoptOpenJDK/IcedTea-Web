@@ -349,6 +349,35 @@ class CacheLRUWrapper {
         }
     }
 
+    boolean deleteFromCache(File path) {
+        try {
+            lock();
+            try {
+                final String absolutePath = path.getCanonicalFile().getAbsolutePath();
+                final String absoluteCacheDir = cacheDir.getFile().getCanonicalFile().getAbsolutePath();
+                if (!absolutePath.startsWith(absoluteCacheDir)) {
+                    return false;
+                }
+                final String relativePath = absolutePath.substring(absoluteCacheDir.length());
+                final String folderId = relativePath.split(Pattern.quote(File.separator))[0];
+                final File folder = new File(cacheDir.getFile(), folderId);
+                FileUtils.recursiveDelete(folder, cacheDir.getFile());
+                final PropertiesFile props = getRecentlyUsedPropertiesFile();
+                getLRUSortedEntries().stream()
+                        .map(Entry::getKey)
+                        .filter(k -> k.split(",")[1].equals(folderId))
+                        .peek(props::remove);
+                store();
+                return true;
+            } catch (IOException e) {
+                LOG.error("failed to delete {} - exception: {}", path, e.getMessage());
+                return false;
+            }
+        } finally {
+            unlock();
+        }
+    }
+
     /**
      * Returns the parent directory of the cached resource.
      *

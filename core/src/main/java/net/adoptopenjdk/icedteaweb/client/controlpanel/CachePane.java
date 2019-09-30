@@ -329,13 +329,9 @@ public class CachePane extends JPanel {
                         }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
                         DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
-                        if (fileNode.getFile().delete()) {
-                            updateRecentlyUsed(fileNode.getFile());
-                            fileNode.getParent().removeChild(fileNode);
-                            FileUtils.deleteWithErrMesg(fileNode.getInfoFile());
+                        if (fileNode.delete()) {
                             ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
                             cacheTable.getSelectionModel().clearSelection();
-                            CacheDirectory.cleanParent(fileNode);
                         }
                     } catch (Exception exception) {
                         // ignore
@@ -354,20 +350,6 @@ public class CachePane extends JPanel {
                 } finally {
                     restoreDisabled();
                 }
-            }
-
-            private void updateRecentlyUsed(File f) {
-                File recentlyUsedFile = new File(PathsAndFiles.getRecentlyUsedFile().getFullPath(config));
-                PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
-                pf.load();
-                Enumeration<Object> en = pf.keys();
-                while (en.hasMoreElements()) {
-                    String key = (String) en.nextElement();
-                    if (pf.get(key).equals(f.getAbsolutePath())) {
-                        pf.remove(key);
-                    }
-                }
-                pf.store();
             }
         });
     }

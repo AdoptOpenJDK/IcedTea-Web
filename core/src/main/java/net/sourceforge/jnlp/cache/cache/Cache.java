@@ -81,6 +81,10 @@ public class Cache {
         CacheLRUWrapper.getInstance().deleteFromCache(resource, version);
     }
 
+    static boolean deleteFromCache(File path) {
+        return CacheLRUWrapper.getInstance().deleteFromCache(path);
+    }
+
     /**
      * Returns whether there is a version of the URL contents in the
      * cache.
