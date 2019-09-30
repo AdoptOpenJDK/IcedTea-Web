@@ -110,6 +110,10 @@ public class Cache {
         return CacheLRUWrapper.getInstance().getInfo(resource, version);
     }
 
+    public static ResourceInfo getInfo(final File path) {
+        return CacheLRUWrapper.getInstance().getInfo(path);
+    }
+
     /**
      * Returns true if the cache has a local copy of the contents of
      * the URL matching the specified version.

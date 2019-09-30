@@ -56,6 +56,15 @@ class CacheEntry implements ResourceInfo {
     /** info about the cached file */
     private final PropertiesFile properties;
 
+    CacheEntry(File cacheFile) {
+        location = null;
+        version = null;
+        final File infoFile = new File(cacheFile.getPath() + INFO_SUFFIX);
+
+        properties = new PropertiesFile(infoFile, R("CAutoGen"));
+
+    }
+
     /**
      * Create a CacheEntry for the resources specified as a remote
      * URL.

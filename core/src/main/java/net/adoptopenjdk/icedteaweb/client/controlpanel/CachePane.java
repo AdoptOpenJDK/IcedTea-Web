@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.commandline.NonEditableTableModel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -28,9 +27,9 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.cache.cache.CacheDirectory;
 import net.sourceforge.jnlp.cache.cache.DirectoryNode;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.PropertiesFile;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -61,7 +60,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileLock;
@@ -69,7 +67,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
 
 public class CachePane extends JPanel {
@@ -209,9 +206,11 @@ public class CachePane extends JPanel {
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
                     DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
-                    File infoFile = fileNode.getInfoFile();
-                    String info = StreamUtils.readStreamAsString(new FileInputStream(infoFile), true);
-                    t.setText(info);
+                    final ResourceInfo resourceInfo = fileNode.getResourceInfo();
+                    t.setText("content-length: " + resourceInfo.getSize() + "\n" +
+                            "last-updated: " + resourceInfo.getDownloadedAt() + "\n" +
+                            "last-modified: " + resourceInfo.getLastModified()
+                    );
                 } catch (Exception ex) {
                     t.setText(ex.toString());
                 }

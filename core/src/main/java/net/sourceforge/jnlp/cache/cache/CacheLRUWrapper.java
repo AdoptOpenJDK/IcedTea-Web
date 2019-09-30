@@ -129,6 +129,10 @@ class CacheLRUWrapper {
         return new CacheEntry(location, versionId);
     }
 
+    ResourceInfo getInfo(File path) {
+        return new CacheEntry(path);
+    }
+
     File getCacheFile(URL source, VersionId version) {
 
         // TODO: handle Version
@@ -353,20 +357,13 @@ class CacheLRUWrapper {
         try {
             lock();
             try {
-                final String absolutePath = path.getCanonicalFile().getAbsolutePath();
-                final String absoluteCacheDir = cacheDir.getFile().getCanonicalFile().getAbsolutePath();
-                if (!absolutePath.startsWith(absoluteCacheDir)) {
-                    return false;
+                final String entryKey = getEntryKeyForFile(path);
+                if (entryKey == null) {
+                    return true; // not found means deleted
                 }
-                final String relativePath = absolutePath.substring(absoluteCacheDir.length());
-                final String folderId = relativePath.split(Pattern.quote(File.separator))[0];
-                final File folder = new File(cacheDir.getFile(), folderId);
+                final File folder = new File(cacheDir.getFile(), entryKey.split(",")[1]);
                 FileUtils.recursiveDelete(folder, cacheDir.getFile());
-                final PropertiesFile props = getRecentlyUsedPropertiesFile();
-                getLRUSortedEntries().stream()
-                        .map(Entry::getKey)
-                        .filter(k -> k.split(",")[1].equals(folderId))
-                        .peek(props::remove);
+                getRecentlyUsedPropertiesFile().remove(entryKey);
                 store();
                 return true;
             } catch (IOException e) {
@@ -376,6 +373,21 @@ class CacheLRUWrapper {
         } finally {
             unlock();
         }
+    }
+
+    private String getEntryKeyForFile(File path) throws IOException {
+        final String absolutePath = path.getCanonicalFile().getAbsolutePath();
+        final String absoluteCacheDir = cacheDir.getFile().getCanonicalFile().getAbsolutePath();
+        if (!absolutePath.startsWith(absoluteCacheDir)) {
+            return null;
+        }
+        final String relativePath = absolutePath.substring(absoluteCacheDir.length());
+        final String folderId = relativePath.split(Pattern.quote(File.separator))[0];
+        return getLRUSortedEntries().stream()
+                .map(Entry::getKey)
+                .filter(k -> k.split(",")[1].equals(folderId))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

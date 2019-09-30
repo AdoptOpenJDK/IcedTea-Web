@@ -114,6 +114,19 @@ public class PropertiesFile extends Properties {
     }
 
     /**
+     * Removes the key (and its corresponding value) from the properties.
+     *
+     * @return the previous value
+     */
+    @Override
+    public synchronized Object remove(Object key) {
+        if (lastStore == 0) {
+            load();
+        }
+        return super.remove(key);
+    }
+
+    /**
      * @return the file backing this properties object.
      */
     public File getStoreFile() {

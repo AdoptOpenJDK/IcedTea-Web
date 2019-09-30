@@ -109,8 +109,7 @@ public final class CacheDirectory {
                 root.addChild(dirNode);
                 initDirStructure(dirNode);
             } else if (f.isFile() && !f.getName().endsWith(CacheEntry.INFO_SUFFIX)) {
-                final File infoFile = new File(f.getAbsolutePath() + CacheEntry.INFO_SUFFIX);
-                final DirectoryNode resourceNode = new DirectoryNode(f.getName(), f, root, infoFile);
+                final DirectoryNode resourceNode = new DirectoryNode(f.getName(), f, root);
                 root.addChild(resourceNode);
             }
         }

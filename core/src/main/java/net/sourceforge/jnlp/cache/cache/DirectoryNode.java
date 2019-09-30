@@ -44,32 +44,19 @@ public class DirectoryNode {
     private final File path;
     private final ArrayList<DirectoryNode> childNodes;
     private final DirectoryNode parent;
-    private final File infoFile;
 
-    /**
-     * Create a new instance of DirectoryNode.
-     * 
-     * @param name Name representing this node.
-     * @param absPathToNode Absolute path to this node as a File.
-     * @param parent The parent node.
-     */
-    DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
-        this(name, absPathToNode, parent, null);
-    }
     /**
      * Create a new instance of DirectoryNode.
      *
      * @param name Name representing this node.
      * @param absPathToNode Absolute path to this node as a File.
      * @param parent The parent node.
-     * @param infoFile the info file used by the LRU Cache
      */
-    DirectoryNode(String name, File absPathToNode, DirectoryNode parent, File infoFile) {
+    DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
         this.name = name;
         this.path = absPathToNode;
         this.childNodes = new ArrayList<>();
         this.parent = parent;
-        this.infoFile = infoFile;
     }
 
     public boolean delete() {
@@ -94,12 +81,8 @@ public class DirectoryNode {
         }
     }
 
-    /**
-     * @deprecated should return {@link ResourceInfo} to not reveal internal information of the cache
-     */
-    @Deprecated
-    public File getInfoFile() {
-        return this.infoFile;
+    public ResourceInfo getResourceInfo() {
+        return Cache.getInfo(path);
     }
 
     /**
