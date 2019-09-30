@@ -175,7 +175,7 @@ class CacheEntry implements ResourceInfo {
      *
      * @return true if the resource is in the cache
      */
-    public boolean isCached() {
+    boolean isCached() {
         File localFile = getCacheFile();
         if (!localFile.exists()) {
             return false;
@@ -211,7 +211,7 @@ class CacheEntry implements ResourceInfo {
      *
      * @return True if successfully stored into file, false otherwise
      */
-    protected boolean store() {
+    boolean store() {
         if (properties.isHeldByCurrentThread()) {
             properties.store();
             return true;
@@ -256,14 +256,14 @@ class CacheEntry implements ResourceInfo {
     /**
      * Lock cache item.
      */
-    protected void lock() {
+    void lock() {
         properties.lock();
     }
 
     /**
      * Unlock cache item. Does not do anything if not holding the lock.
      */
-    protected void unlock() {
+    void unlock() {
         properties.unlock();
     }
 
