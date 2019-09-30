@@ -59,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -77,6 +78,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static net.adoptopenjdk.icedteaweb.StringUtils.urlDecode;
+import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 
 /**
  * This class helps maintain the ordering of most recently use cache items across
@@ -864,7 +868,17 @@ class CacheLRUWrapper {
          * @param value = the property value == a sting representation of the remaining values
          */
         LeastRecentlyUsedCacheEntry(long key, String value) {
-            this(key, 0, null, null, null); // TODO
+            try {
+                this.folderId = key;
+
+                final String[] values = value.split(" ");
+                this.lastAccessed = Long.parseLong(values[0]);
+                this.resource = new URL(urlDecode(values[1]));
+                this.version = VersionId.fromString(values[2]);
+                this.relativePath = urlDecode(values[3]);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         LeastRecentlyUsedCacheEntry(long folderId, long lastAccessed, URL resource, VersionId version, String relativePath) {
@@ -884,7 +898,7 @@ class CacheLRUWrapper {
         }
 
         String getPropertyValue() {
-            return ""; // TODO
+            return String.join(" ", Long.toString(lastAccessed), urlEncode(resource.toString()), version.toString(), urlEncode(relativePath));
         }
 
         public boolean matches(URL resource, VersionString versionString) {
