@@ -54,14 +54,14 @@ public final class CacheDirectory {
      * @return ArrayList containing an Object array of data for each row in the table.
      */
     public static ArrayList<Object[]> generateData() {
-        final DirectoryNode root = createDirStructure(PathsAndFiles.CACHE_DIR.getFile());
+        final FileNode root = createDirStructure(PathsAndFiles.CACHE_DIR.getFile());
         final ArrayList<Object[]> data = new ArrayList<>();
 
-        for (DirectoryNode identifier : root.getChildren()) {
-            for (DirectoryNode type : identifier.getChildren()) {
-                for (DirectoryNode domain : type.getChildren()) {
+        for (FileNode folderId : root.getChildren()) {
+            for (FileNode protocol : folderId.getChildren()) {
+                for (FileNode domain : protocol.getChildren()) {
                     //after domain, there is optional port dir. It is skipped here (as is skipped path on domain)
-                    for (DirectoryNode leaf : getLeafData(domain)) {
+                    for (FileNode leaf : getLeafData(domain)) {
                         final File f = leaf.getFile();
                         final PropertiesFile pf = new PropertiesFile(new File(f.toString() + CacheEntry.INFO_SUFFIX));
                         // if jnlp-path in .info equals path of app to delete mark to delete
@@ -69,7 +69,7 @@ public final class CacheDirectory {
                         final Object[] o = {
                                 /* 0 */ leaf,
                                 /* 1 */ f.getParentFile(),
-                                /* 2 */ type,
+                                /* 2 */ protocol,
                                 /* 3 */ domain,
                                 /* 4 */ f.length(),
                                 /* 5 */ new Date(f.lastModified()),
@@ -90,8 +90,8 @@ public final class CacheDirectory {
      * @param rootPath the root directory
      * @return DirectoryNode tree
      */
-    private static DirectoryNode createDirStructure(File rootPath) {
-        final DirectoryNode root = new DirectoryNode("Root", rootPath, null);
+    private static FileNode createDirStructure(File rootPath) {
+        final FileNode root = new FileNode("Root", rootPath, null);
         initDirStructure(root);
         return root;
     }
@@ -101,15 +101,15 @@ public final class CacheDirectory {
      *
      * @param root Location of cache directory.
      */
-    private static void initDirStructure(DirectoryNode root) {
+    private static void initDirStructure(FileNode root) {
         final File[] files = root.getFile().listFiles();
         for (File f : files != null ? files : new File[0]) {
             if (f.isDirectory()) {
-                final DirectoryNode dirNode = new DirectoryNode(f.getName(), f, root);
+                final FileNode dirNode = new FileNode(f, root);
                 root.addChild(dirNode);
                 initDirStructure(dirNode);
             } else if (f.isFile() && !f.getName().endsWith(CacheEntry.INFO_SUFFIX)) {
-                final DirectoryNode resourceNode = new DirectoryNode(f.getName(), f, root);
+                final FileNode resourceNode = new FileNode(f, root);
                 root.addChild(resourceNode);
             }
         }
@@ -121,9 +121,9 @@ public final class CacheDirectory {
      * @param root The point where we want to start getting the leafs.
      * @return An ArrayList of DirectoryNode.
      */
-    private static ArrayList<DirectoryNode> getLeafData(DirectoryNode root) {
-        ArrayList<DirectoryNode> temp = new ArrayList<>();
-        for (DirectoryNode f : root.getChildren()) {
+    private static ArrayList<FileNode> getLeafData(FileNode root) {
+        ArrayList<FileNode> temp = new ArrayList<>();
+        for (FileNode f : root.getChildren()) {
             if (f.isDir()) {
                 temp.addAll(getLeafData(f));
             } else {

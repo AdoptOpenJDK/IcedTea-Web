@@ -26,7 +26,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.cache.cache.CacheDirectory;
-import net.sourceforge.jnlp.cache.cache.DirectoryNode;
+import net.sourceforge.jnlp.cache.cache.FileNode;
 import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -205,7 +205,7 @@ public class CachePane extends JPanel {
                 int row = cacheTable.getSelectedRow();
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
-                    DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
+                    FileNode fileNode = ((FileNode) cacheTable.getModel().getValueAt(modelRow, 0));
                     final ResourceInfo resourceInfo = fileNode.getResourceInfo();
                     t.setText("content-length: " + resourceInfo.getSize() + "\n" +
                             "last-updated: " + resourceInfo.getDownloadedAt() + "\n" +
@@ -327,7 +327,7 @@ public class CachePane extends JPanel {
                             return;
                         }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
-                        DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
+                        FileNode fileNode = ((FileNode) cacheTable.getModel().getValueAt(modelRow, 0));
                         if (fileNode.delete()) {
                             ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
                             cacheTable.getSelectionModel().clearSelection();

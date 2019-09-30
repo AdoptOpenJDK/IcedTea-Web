@@ -39,11 +39,21 @@ package net.sourceforge.jnlp.cache.cache;
 import java.io.File;
 import java.util.ArrayList;
 
-public class DirectoryNode {
+public class FileNode {
     private final String name;
     private final File path;
-    private final ArrayList<DirectoryNode> childNodes;
-    private final DirectoryNode parent;
+    private final ArrayList<FileNode> childNodes;
+    private final FileNode parent;
+
+    /**
+     * Create a new instance of DirectoryNode.
+     *
+     * @param absPathToNode Absolute path to this node as a File.
+     * @param parent The parent node.
+     */
+    FileNode(File absPathToNode, FileNode parent) {
+        this(absPathToNode.getName(), absPathToNode, parent);
+    }
 
     /**
      * Create a new instance of DirectoryNode.
@@ -52,7 +62,7 @@ public class DirectoryNode {
      * @param absPathToNode Absolute path to this node as a File.
      * @param parent The parent node.
      */
-    DirectoryNode(String name, File absPathToNode, DirectoryNode parent) {
+    FileNode(String name, File absPathToNode, FileNode parent) {
         this.name = name;
         this.path = absPathToNode;
         this.childNodes = new ArrayList<>();
@@ -99,7 +109,7 @@ public class DirectoryNode {
      *
      * @param node Node to be appended.
      */
-    void addChild(DirectoryNode node) {
+    void addChild(FileNode node) {
         childNodes.add(node);
     }
 
@@ -117,7 +127,7 @@ public class DirectoryNode {
      *
      * @return ArrayList of type DirectoryNode containing all the child nodes.
      */
-    ArrayList<DirectoryNode> getChildren() {
+    ArrayList<FileNode> getChildren() {
         return this.childNodes;
     }
 
