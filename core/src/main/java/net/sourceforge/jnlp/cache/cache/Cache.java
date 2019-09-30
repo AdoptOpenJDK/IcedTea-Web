@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The Cache
@@ -154,8 +153,8 @@ public class Cache {
      * CACHE IDs
      * ***************/
 
-    public static boolean deleteFromCache(final String cacheId) {
-        return CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
+    public static void deleteFromCache(final String cacheId) {
+        CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
     }
 
     /**

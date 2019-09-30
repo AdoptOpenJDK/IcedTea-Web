@@ -369,43 +369,41 @@ class CacheLRUWrapper {
         return path;
     }
 
-    boolean deleteFromCache(String cacheId) {
-        // clear one app
-        if (cannotClearCache()) {
-            return false;
+    void deleteFromCache(String cacheId) {
+        if (!cannotClearCache()) {
+            deleteByCacheId(cacheId);
         }
+    }
 
-        synchronized (this) {
-            lock();
-            try {
-                Files.walk(Paths.get(cacheDir.getFile().getCanonicalPath()))
-                        .filter(t -> Files.isRegularFile(t))
-                        .forEach(path -> {
-                            if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                                PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                                // if jnlp-path in .info equals path of app to delete mark to delete
-                                final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                                final String domain = getDomain(path);
-                                if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
-                                    pf.setProperty(CacheEntry.KEY_DELETE, Boolean.toString(true));
-                                    pf.store();
-                                    LOG.info("marked for deletion: {}", path);
-                                }
+    private synchronized void deleteByCacheId(String cacheId) {
+        lock();
+        try {
+            Files.walk(Paths.get(cacheDir.getFile().getCanonicalPath()))
+                    .filter(t -> Files.isRegularFile(t))
+                    .forEach(path -> {
+                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
+                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
+                            // if jnlp-path in .info equals path of app to delete mark to delete
+                            final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
+                            final String domain = getDomain(path);
+                            if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
+                                pf.setProperty(CacheEntry.KEY_DELETE, Boolean.toString(true));
+                                pf.store();
+                                LOG.info("marked for deletion: {}", path);
                             }
-                        });
-                if (OsUtil.isWindows()) {
-                    WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
-                }
-                // clean the cache of entries now marked for deletion
-                cleanCache();
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                unlock();
+                        }
+                    });
+            if (OsUtil.isWindows()) {
+                WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
             }
+            // clean the cache of entries now marked for deletion
+            cleanCache();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            unlock();
         }
-        return true;
     }
 
     /**
