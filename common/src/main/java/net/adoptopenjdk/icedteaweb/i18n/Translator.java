@@ -16,6 +16,8 @@
 
 package net.adoptopenjdk.icedteaweb.i18n;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -28,7 +30,9 @@ import static java.lang.String.format;
  * Utility class to provide simple methods to help localize messages.
  */
 public class Translator {
+
     static final String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = "net.adoptopenjdk.icedteaweb.i18n.Messages";
+
     static final String MISSING_RESOURCE_PLACEHOLDER = "RNoResource";
 
     private static class TranslatorHolder {
@@ -42,7 +46,7 @@ public class Translator {
         }
     }
 
-    private final ResourceBundle resources;
+    private ResourceBundle resources;
 
     private Translator() {
         this(DEFAULT_RESOURCE_BUNDLE_BASE_NAME);
@@ -60,19 +64,15 @@ public class Translator {
     }
 
     Translator(ResourceBundle resources) {
-        this.resources = resources;
-    }
+        this.resources = resources; }
 
-    private static Translator getInstance() {
-        return TranslatorHolder.getTranslator();
-    }
 
     /**
      * Return a translated (localized) version of the message
      * @param message the message to translate
      * @return a string representing the localized message
      */
-    public static String R(String message) {
+    public static String R(final String message) {
         return R(message, new Object[0]);
     }
 
@@ -84,13 +84,25 @@ public class Translator {
     public static String R(final String message, final Object... params) {
         return getInstance().translate(message, params);
     }
-   
+
+    /**
+     * Sets a new {@link ResourceBundle} for the translater.
+     * @param resourceBundle the new resource bundle
+     */
+    public void changeResourceBundle(final ResourceBundle resourceBundle) {
+        this.resources = Assert.requireNonNull(resourceBundle, "resourceBundle");
+    }
+
+    public ResourceBundle getResources() {
+        return resources;
+    }
+
     /**
      * @return the localized resource string using the specified arguments.
      * @param key key to be found in properties
      * @param args params to be expanded to message
      */
-    protected String translate(final String key, final Object... args) {
+    public String translate(final String key, final Object... args) {
         return MessageFormat.format(translate(key), args);
     }
 
@@ -99,7 +111,7 @@ public class Translator {
      * specified key. If the message is empty, a null is
      * returned.
      */
-    private String translate(final String key) {
+    public String translate(final String key) {
         try {
             return resources.getString(key);
         }
@@ -117,5 +129,9 @@ public class Translator {
                 return translate(MISSING_RESOURCE_PLACEHOLDER, new Object[]{key, languageCode});
             }
         }
+    }
+
+    public static Translator getInstance() {
+        return TranslatorHolder.getTranslator();
     }
 }
