@@ -93,7 +93,8 @@ public class CommandLineOptionsDefinition {
                 CommandLineOptions.OFFLINE,
                 CommandLineOptions.TRUSTNONE,
                 CommandLineOptions.JNLP,
-                CommandLineOptions.BROWSER);
+                CommandLineOptions.BROWSER,
+                CommandLineOptions.NOSPLASH);
     }
 
     public static List<CommandLineOptions> getJavaWsOptions() {

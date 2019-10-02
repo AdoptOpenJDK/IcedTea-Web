@@ -219,6 +219,10 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.setAllowRedirect(true);
         }
 
+        if (optionParser.hasOption(CommandLineOptions.NOSPLASH)) {
+        	JNLPRuntime.setShowWebSplash(false);
+        }
+
         //if it is browser go by ots own, otherwise proceed with normal ITW logic
         if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
             String url = optionParser.getParam(CommandLineOptions.BROWSER);
