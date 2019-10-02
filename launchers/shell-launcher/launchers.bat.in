@@ -1,4 +1,5 @@
 @echo off
+echo.%* | find /I "-verbose">nul && ( @echo on ) || ( @echo off )
 setLocal EnableDelayedExpansion
 
 rem use JAVAWS_J_OPTIONS to pass java arguments, instead of -J opts for this script. This will be fixed in next releases
