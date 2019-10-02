@@ -17,23 +17,18 @@ rem convention to use for temporary variables use '_' prefix
 
 set "NASHORN=lib/ext/nashorn.jar"
 set "JRE=@JRE@"
-set "JAVA=%JRE%/bin/java"
-set "LAUNCHER_BOOTCLASSPATH=@LAUNCHER_BOOTCLASSPATH@"
 set "LAUNCHER_FLAGS=-Xms8m"
-set "CLASSNAME=@MAIN_CLASS@"
-set "BINARY_LOCATION=@BIN_LOCATION@.bat"
-set "SPLASH_LOCATION=@JAVAWS_SPLASH_LOCATION@"
+set "MAIN_CLASS=@MAIN_CLASS@"
+set "SPLASH_LOCATION=@SPLASH_PNG@"
 set "RUN_ARGS_LOCATION=@MODULARJDK_ARGS_LOCATION@"
-set "PROGRAM_NAME=@PROGRAM_NAME@"
-set "CP=%JRE%/lib/rt.jar;%JRE%/lib/ext/jfxrt.jar"
+set "ITW_LIBS=@ITW_LIBS@"
 
 rem individual parts of bootclasspath for more easy processing
-set "NETX_JAR=@NETX_JAR@"
-set "PLUGIN_JAR=@PLUGIN_JAR@"
-set "JSOBJECT_JAR=@JSOBJECT_JAR@"
-set "TAGSOUP_JAR=@TAGSOUP_JAR@"
-set "RHINO_JAR=@RHINO_JAR@"
-set "MSLINKS_JAR=@MSLINKS_JAR@"
+set "JAVAWS_SRC=@JAVAWS_JAR@"
+
+set "TAGSOUP_SRC=@TAGSOUP_JAR@"
+set "RHINO_SRC=@RHINO_JAR@"
+set "MSLINKS_SRC=@MSLINKS_JAR@"
 
 
 rem resolve folder of this script:
@@ -41,8 +36,12 @@ if "%ITW_HOME%" == "" (
   set "_BAD_SLASH_SCRIPT_DIR=%~dp0"
   set "_SCRIPT_DIR=!_BAD_SLASH_SCRIPT_DIR:\=/!"
   set "ITW_HOME=!_SCRIPT_DIR!../"
+  for /F %%i in ("!ITW_HOME!") do set "ITW_HOME=%%~fi"
+  if "!ITW_HOME:~-1!"=="\" set "ITW_HOME=!ITW_HOME:~0,-1!"
   set "_BAD_SLASH_SCRIPT_DIR=" & set "_SCRIPT_DIR="
 )
+
+set "PROGRAM_NAME=%~n0%~x0"
 
 rem resolve custom JRE:
 set "CUSTOM_JRE="
@@ -55,16 +54,6 @@ if not "%JAVA_HOME%" == "" (
   )
 )
 if "%CUSTOM_JRE%" == "" (
-  if not "%INST_JAVA_HOME%" == "" (
-    "%INST_JAVA_HOME%/bin/java.exe" -version > nul 2>&1
-    if errorlevel 0 if not errorlevel 1 (
-      set "CUSTOM_JRE=%INST_JAVA_HOME%"
-    ) else (
-      echo "Your custom JRE [%INST_JAVA_HOME%] read from INST_JAVA_HOME is not valid. Please fix this."
-    )
-  )
-)  
-if "%CUSTOM_JRE%" == "" (
   rem the following is for testing-only and not intended to be robust
   rem will not work from 32-bit firefox
   for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit"') do set "_version_key=%%a"
@@ -76,25 +65,40 @@ if "%CUSTOM_JRE%" == "" (
   if errorlevel 0 if not errorlevel 1 (
     set "CUSTOM_JRE=!_REG_JAVA_HOME!"
   ) else (
-    echo "Your custom JRE [!_REG_JAVA_HOME!] read from Registry HKLM\SOFTWARE\JavaSoft\Java Development Kit is not valid. Please fix this."  
+    echo "Your custom JRE [!_REG_JAVA_HOME!] read from Registry HKLM\SOFTWARE\JavaSoft\Java Development Kit is not valid. Please fix this."
   )
   set "_version_key=" & set "_version=" & set "_jh_key=" & set "_BAD_SLASH_JAVA_HOME=" & set "_REG_JAVA_HOME="
 )
+if "%CUSTOM_JRE%" == "" (
+  if not "%INST_JAVA_HOME%" == "" (
+    "%INST_JAVA_HOME%/bin/java.exe" -version > nul 2>&1
+    if errorlevel 0 if not errorlevel 1 (
+      set "CUSTOM_JRE=%INST_JAVA_HOME%"
+    ) else (
+      echo "Your custom JRE [%INST_JAVA_HOME%] read from INST_JAVA_HOME is not valid. Please fix this."
+    )
+  )
+)  
 
 
-rem Support portable ITW:
-if "%ITW_HOME%" == "" if not "%INST_ITW_HOME%" == "" (
-  set "ITW_HOME=%INST_ITW_HOME%"
+if "%ITW_LIBS%" == "BUNDLED" (
+  for /F %%i in ("!PROGRAM_NAME!") do set "BINARY_LOCATION=!ITW_HOME!/bin/%%~ni%%~xi"
+  for /F %%i in ("!SPLASH_PNG!") do set "SPLASH_LOCATION=!ITW_HOME!/libs/%%~ni%%~xi"
+  for /F %%i in ("!RUN_ARGS_LOCATION!") do set "RUN_ARGS_LOCATION=!ITW_HOME!/libs/%%~ni%%~xi"
+
+  for /F %%i in ("!JAVAWS_SRC!") do set "JAVAWS_JAR=!ITW_HOME!/libs/%%~ni%%~xi"
+
+  set "RHINO_JAR="
+  set "TAGSOUP_JAR="
+  set "MSLINKS_JAR="
+) else (
+  set "JAVAWS_JAR=!JAVAWS_SRC!"
+
+  set "RHINO_JAR=!RHINO_SRC!"
+  set "TAGSOUP_JAR=!TAGSOUP_SRC!"
+  set "MSLINKS_JAR=!MSLINKS_SRC!"
 )
-if not "%ITW_HOME%" == "" (
-  set "BINARY_LOCATION=%ITW_HOME%/bin/%PROGRAM_NAME%.bat"
-  set "SPLASH_LOCATION=%ITW_HOME%/share/icedtea-web/javaws_splash.png"
-  set "RUN_ARGS_LOCATION=%ITW_HOME%/bin/itw-modularjdk.args"
-  set "NETX_JAR=%ITW_HOME%/share/icedtea-web/javaws.jar"
-  set "PLUGIN_JAR=%ITW_HOME%/share/icedtea-web/plugin.jar"
-  set "JSOBJECT_JAR=%ITW_HOME%/share/icedtea-web/jsobject.jar"
-  set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:!NETX_JAR!;!PLUGIN_JAR!;!JSOBJECT_JAR!;%ITW_HOME%/win-deps-runtime/tagsoup.jar;%ITW_HOME%/win-deps-runtime/js.jar;%ITW_HOME%/win-deps-runtime/mslinks.jar"
-)
+set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;"
 
 
 rem Fix classpaths for custom JRE:
@@ -103,6 +107,8 @@ if not "%CUSTOM_JRE%" == "" (
   set "CP=%CUSTOM_JRE%/lib/rt.jar;%CUSTOM_JRE%/lib/ext/jfxrt.jar"
   set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%CUSTOM_JRE%/%NASHORN%"
 ) else (
+  set "JAVA=%JRE%/bin/java"
+  set "CP=%JRE%/lib/rt.jar;%JRE%/lib/ext/jfxrt.jar"
   set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%JRE%/%NASHORN%"
 )
 
@@ -179,7 +185,7 @@ if "%SPLASH%" == "true" (
   set "SPLASH="
 )
 
-"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%CLASSNAME%" %ARGS%
+"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%MAIN_CLASS%" %ARGS%
 
 SET "errno=%ERRORLEVEL%"
 
