@@ -78,8 +78,9 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    private ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
+    public ControlPanel(final DeploymentConfiguration config, final ControlPanelStyle style) {
         super();
+        Assert.requireNonNull(config, "config");
         Assert.requireNonNull(style, "style");
         setTitle(style.getDialogTitle());
         setIconImages(style.getDialogIcons());
