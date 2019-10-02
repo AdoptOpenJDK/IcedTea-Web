@@ -8,8 +8,16 @@ import javax.swing.JComponent;
 
 public class CacheSettingsPanelProvider implements ControlPanelProvider {
 
+    public static final String NAME = "TemporaryInternetFilesPanel";
+
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabCache");
     }
 

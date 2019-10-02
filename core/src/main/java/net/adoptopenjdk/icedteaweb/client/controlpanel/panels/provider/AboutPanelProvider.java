@@ -7,8 +7,15 @@ import javax.swing.JComponent;
 
 public class AboutPanelProvider implements ControlPanelProvider {
 
+    public static final String NAME = "AboutPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return "About Panel";
     }
 

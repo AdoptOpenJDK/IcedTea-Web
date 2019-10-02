@@ -188,7 +188,7 @@ public class ControlPanel extends JFrame {
 
         final Map<String, JComponent> panels = providers.values().stream()
                 .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
-                .collect(Collectors.toMap(ControlPanelProvider::getName, p -> p.createPanel(config), (u, v) -> {
+                .collect(Collectors.toMap(ControlPanelProvider::getTitle, p -> p.createPanel(config), (u, v) -> {
                     throw new IllegalStateException(String.format("Duplicate key %s", u));
                 }, LinkedHashMap::new));
 

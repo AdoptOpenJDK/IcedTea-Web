@@ -7,8 +7,17 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import javax.swing.JComponent;
 
 public class NetworkSettingsPanelProvider implements ControlPanelProvider {
+
+    public static final String NAME = "NetworkSettingsPanel";
+
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabNetwork");
     }
 
