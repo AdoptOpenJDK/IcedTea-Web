@@ -8,8 +8,15 @@ import javax.swing.JComponent;
 
 public class PolicySettingsPanelProvider implements ControlPanelProvider {
 
+    private static final String NAME = "PolicyPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabPolicy");
     }
 

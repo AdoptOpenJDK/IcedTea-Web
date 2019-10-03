@@ -8,8 +8,15 @@ import javax.swing.JComponent;
 
 public class SecuritySettingsPanelProvider implements ControlPanelProvider {
 
+    private static final String NAME = "SecuritySettingsPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabSecurity");
     }
 

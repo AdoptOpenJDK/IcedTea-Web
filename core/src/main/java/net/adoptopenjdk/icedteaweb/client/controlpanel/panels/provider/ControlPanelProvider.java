@@ -6,6 +6,8 @@ import javax.swing.JComponent;
 
 public interface ControlPanelProvider {
 
+    String getTitle();
+
     String getName();
 
     int getOrder();

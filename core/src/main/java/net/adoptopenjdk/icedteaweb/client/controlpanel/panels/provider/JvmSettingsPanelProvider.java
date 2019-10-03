@@ -7,8 +7,16 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import javax.swing.JComponent;
 
 public class JvmSettingsPanelProvider implements ControlPanelProvider {
+
+    private static final String NAME = "JVMPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabJVMSettings");
     }
 

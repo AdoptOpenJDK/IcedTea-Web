@@ -8,8 +8,15 @@ import javax.swing.JComponent;
 
 public class DebugSettingsPanelProvider implements ControlPanelProvider {
 
+    private static final String NAME = "DebuggingPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("CPTabDebugging");
     }
 

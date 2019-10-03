@@ -202,8 +202,8 @@ public class ControlPanel extends JFrame {
 
         final Map<String, JComponent> panels = providers.values().stream()
                 .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
-                .collect(Collectors.toMap(ControlPanelProvider::getName, p -> p.createPanel(config), (u, v) -> {
-                    throw new IllegalStateException(String.format("Duplicate key %s", u));
+                .collect(Collectors.toMap(ControlPanelProvider::getTitle, p -> p.createPanel(config), (u, v) -> {
+                    throw new IllegalStateException(String.format("Duplicate title %s", u));
                 }, LinkedHashMap::new));
 
         final CardLayout cardLayout = new CardLayout();
@@ -212,10 +212,10 @@ public class ControlPanel extends JFrame {
                 .map(JComponent::getMinimumSize)
                 .reduce((a, b) -> new Dimension(Math.max(a.width, b.width), Math.max(a.height, b.height)))
                 .orElse(new Dimension());
-        panels.forEach((name, component) -> {
+        panels.forEach((title, component) -> {
             component.setPreferredSize(minDimension);
-            settingsPanel.add(component, name);
-            cardLayout.addLayoutComponent(component, name);
+            settingsPanel.add(component, title);
+            cardLayout.addLayoutComponent(component, title);
         });
         final JPanel settingsDetailPanel = new JPanel();
         settingsDetailPanel.setLayout(new BorderLayout());
