@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class PolicySettingsPanelProvider implements ControlPanelProvider {
 
-    private static final String NAME = "PolicyPanel";
+    public static final String NAME = "PolicyPanel";
 
     @Override
     public String getName() {

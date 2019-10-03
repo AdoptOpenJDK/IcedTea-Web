@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class NetworkSettingsPanelProvider implements ControlPanelProvider {
 
-    private static final String NAME = "NetworkSettingsPanel";
+    public static final String NAME = "NetworkSettingsPanel";
 
     @Override
     public String getName() {

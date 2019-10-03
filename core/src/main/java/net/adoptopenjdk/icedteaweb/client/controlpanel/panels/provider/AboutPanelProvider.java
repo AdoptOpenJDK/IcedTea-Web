@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class AboutPanelProvider implements ControlPanelProvider {
 
-    private static final String NAME = "AboutPanel";
+    public static final String NAME = "AboutPanel";
 
     @Override
     public String getName() {
