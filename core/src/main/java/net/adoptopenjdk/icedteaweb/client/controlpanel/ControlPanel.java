@@ -46,6 +46,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.IOException;
@@ -161,7 +162,20 @@ public class ControlPanel extends JFrame {
             buttonPanel.add(button);
         }
 
-        return buttonPanel;
+
+        buttonPanel.setBackground(Color.WHITE);
+
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        final JPanel topBorder = new JPanel();
+        topBorder.setBackground(Color.GRAY);
+        topBorder.setPreferredSize(new Dimension(Integer.MAX_VALUE, 1));
+        topBorder.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        topBorder.setMinimumSize(new Dimension(1, 1));
+        wrapperPanel.add(topBorder, BorderLayout.NORTH);
+
+        return wrapperPanel;
     }
 
     /**
