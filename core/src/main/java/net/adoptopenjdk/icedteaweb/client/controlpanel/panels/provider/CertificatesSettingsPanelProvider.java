@@ -11,7 +11,7 @@ import java.awt.BorderLayout;
 
 public class CertificatesSettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "CertificatePane";
+    private static final String NAME = "CertificatePane";
 
     @Override
     public String getName() {

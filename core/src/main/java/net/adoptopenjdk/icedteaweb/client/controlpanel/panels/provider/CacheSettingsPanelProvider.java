@@ -8,8 +8,7 @@ import javax.swing.JComponent;
 
 public class CacheSettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "TemporaryInternetFilesPanel";
-
+    private static final String NAME = "TemporaryInternetFilesPanel";
 
     @Override
     public String getName() {

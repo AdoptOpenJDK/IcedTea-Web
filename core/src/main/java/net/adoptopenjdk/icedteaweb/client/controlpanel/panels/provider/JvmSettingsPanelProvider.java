@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class JvmSettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "JVMPanel";
+    private static final String NAME = "JVMPanel";
 
     @Override
     public String getName() {

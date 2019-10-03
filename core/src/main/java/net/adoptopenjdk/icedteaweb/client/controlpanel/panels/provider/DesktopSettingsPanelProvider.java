@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class DesktopSettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "DesktopShortcutPanel";
+    private static final String NAME = "DesktopShortcutPanel";
 
     @Override
     public String getName() {

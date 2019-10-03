@@ -9,7 +9,7 @@ import javax.swing.JComponent;
 
 public class UnsignedAppletsTrustingListPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "UnsignedAppletsTrustingListPanel";
+    private static final String NAME = "UnsignedAppletsTrustingListPanel";
 
     @Override
     public String getName() {

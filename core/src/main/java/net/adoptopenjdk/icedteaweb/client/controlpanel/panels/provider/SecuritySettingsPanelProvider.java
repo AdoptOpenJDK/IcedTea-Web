@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class SecuritySettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "SecuritySettingsPanel";
+    private static final String NAME = "SecuritySettingsPanel";
 
     @Override
     public String getName() {

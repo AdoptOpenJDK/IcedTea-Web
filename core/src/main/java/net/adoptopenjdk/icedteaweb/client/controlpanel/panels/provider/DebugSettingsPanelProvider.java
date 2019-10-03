@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 
 public class DebugSettingsPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "DebuggingPanel";
+    private static final String NAME = "DebuggingPanel";
 
     @Override
     public String getName() {

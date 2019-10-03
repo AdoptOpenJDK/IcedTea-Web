@@ -1,13 +1,14 @@
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider;
 
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.AboutPanel;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import javax.swing.JComponent;
 
 public class AboutPanelProvider implements ControlPanelProvider {
 
-    public static final String NAME = "AboutPanel";
+    private static final String NAME = "AboutPanel";
 
     @Override
     public String getName() {
@@ -16,7 +17,7 @@ public class AboutPanelProvider implements ControlPanelProvider {
 
     @Override
     public String getTitle() {
-        return "About Panel";
+        return Translator.R("CPTabAbout");
     }
 
     @Override
