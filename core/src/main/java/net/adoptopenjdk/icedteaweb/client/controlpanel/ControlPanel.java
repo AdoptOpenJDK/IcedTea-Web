@@ -203,7 +203,7 @@ public class ControlPanel extends JFrame {
         final Map<String, JComponent> panels = providers.values().stream()
                 .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
                 .collect(Collectors.toMap(ControlPanelProvider::getTitle, p -> p.createPanel(config), (u, v) -> {
-                    throw new IllegalStateException(String.format("Duplicate title %s", u));
+                    throw new IllegalStateException(String.format("Duplicate title %s and %s", u.getClass(), v.getClass()));
                 }, LinkedHashMap::new));
 
         final CardLayout cardLayout = new CardLayout();

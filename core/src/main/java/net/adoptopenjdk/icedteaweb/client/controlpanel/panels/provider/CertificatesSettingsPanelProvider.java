@@ -20,7 +20,7 @@ public class CertificatesSettingsPanelProvider implements ControlPanelProvider {
 
     @Override
     public String getTitle() {
-        return Translator.R("CPHeadCertificates");
+        return Translator.R("CPTabCertificate");
     }
 
     @Override
