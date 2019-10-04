@@ -6,14 +6,14 @@ import java.net.URL;
 
 class ResourceInfoBean implements ResourceInfo {
 
-    private final URL location;
+    private final URL resourceHref;
     private final VersionId version;
-    private long size;
-    private long lastModified;
-    private long downloadedAt;
+    private final long size;
+    private final long lastModified;
+    private final long downloadedAt;
 
-    ResourceInfoBean(URL location, VersionId version, long size, long lastModified, long downloadedAt) {
-        this.location = location;
+    ResourceInfoBean(URL resourceHref, VersionId version, long size, long lastModified, long downloadedAt) {
+        this.resourceHref = resourceHref;
         this.version = version;
         this.size = size;
         this.lastModified = lastModified;
@@ -21,8 +21,8 @@ class ResourceInfoBean implements ResourceInfo {
     }
 
     @Override
-    public URL getLocation() {
-        return location;
+    public URL getResourceHref() {
+        return resourceHref;
     }
 
     @Override

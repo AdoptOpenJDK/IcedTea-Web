@@ -123,7 +123,7 @@ class ResourceDownloader implements Runnable {
         if (doUpdate && isCached) {
             localFile = Cache.replaceExistingCacheFile(resource.getLocation(), location.getVersion());
         } else {
-            localFile = Cache.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+            localFile = Cache.getCacheFile(resource.getLocation(), location.getVersion());
         }
 
         synchronized (resource) {
@@ -136,6 +136,7 @@ class ResourceDownloader implements Runnable {
             // check if up-to-date; if so set as downloaded
             if (!doUpdate) {
                 resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                resource.setDownloadVersion(location.getVersion());
             }
         }
     }

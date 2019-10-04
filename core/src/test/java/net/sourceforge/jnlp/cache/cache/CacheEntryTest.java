@@ -37,104 +37,93 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.cache.cache;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.testing.util.CacheTestUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class CacheEntryTest {
 
-    /** A custom subclass that allows supplying num predefined cache file */
-    static class TestCacheEntry extends CacheEntry {
-        private File cacheFile;
-        public TestCacheEntry(final URL location, final VersionId version, final File cacheFile) {
-            super(location, version);
-            this.cacheFile = cacheFile;
-        }
-        @Override
-        protected File getCacheFile() {
-            return cacheFile;
-        }
-    }
+    private static URL url;
+    private static VersionId version;
 
-    private URL url;
-    private VersionId version;
+    private List<String> sharedBuffer;
 
-    private ByteArrayOutputStream baos;
-    private PrintStream out;
+    private File cacheFile;
+    private File infoFile;
 
-    @Before
-    public void setUp() throws MalformedURLException {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @BeforeClass
+    public static void setUpClass() throws MalformedURLException {
         url = new URL("http://example.com/example.jar");
         version = VersionId.fromString("1.0");
-        baos = new ByteArrayOutputStream();
-        out = new PrintStream(baos);
+    }
+
+    @Before
+    public void setUp() throws IOException {
+        sharedBuffer = new ArrayList<>();
+
+        final File tmpDir = temporaryFolder.newFolder();
+        cacheFile = new File(tmpDir, "example.jar");
+        infoFile = new File(tmpDir, CacheEntry.INFO_SUFFIX);
+
+        FileUtils.saveFileUtf8("", infoFile);
+        FileUtils.saveFileUtf8("", cacheFile);
     }
 
     @Test
     public void verifyLocationIsSame() {
-        CacheEntry entry = new TestCacheEntry(url, version, null);
-        assertEquals(url, entry.getLocation());
+        assertEquals(url, createEntry().getResourceHref());
     }
 
     @Test
-    public void verifyLastModifiedIsSetCorrectly() {
-        long LAST_MODIFIED = 1000;
+    public void verifyDataIsSetCorrectly() {
+        long LAST_MODIFIED = 999;
+        long DOWNLOADED_AT = 888;
+        long CONTENT_LENGTH = 777;
 
-        CacheEntry entry = new TestCacheEntry(url, version, null);
-        entry.setLastModified(LAST_MODIFIED);
+        final CacheEntry firstEntry = createEntry();
+        assertNotEquals(LAST_MODIFIED, firstEntry.getLastModified());
+        assertNotEquals(DOWNLOADED_AT, firstEntry.getDownloadedAt());
+        assertNotEquals(CONTENT_LENGTH, firstEntry.getSize());
 
-        assertEquals(LAST_MODIFIED, entry.getLastModified());
-    }
+        firstEntry.storeInfo(new ResourceInfoBean(url, version, CONTENT_LENGTH, LAST_MODIFIED, DOWNLOADED_AT));
 
-    @Test
-    public void verifyLastUpdatedIsSetCorrectly() {
-        long LAST_UPDATED = 1000;
-
-        CacheEntry entry = new TestCacheEntry(url, version, null);
-        entry.setDownloadedAt(LAST_UPDATED);
-
-        assertEquals(LAST_UPDATED, entry.getDownloadedAt());
-    }
-
-    @Test
-    public void verifyContentLengthIsSetCorrectly() {
-        long CONTENT_LENGTH = 1000;
-
-        CacheEntry entry = new TestCacheEntry(url, version, null);
-        entry.setSize(CONTENT_LENGTH);
-
-        assertEquals(CONTENT_LENGTH, entry.getSize());
+        final CacheEntry secondEntry = createEntry();
+        assertEquals(LAST_MODIFIED, secondEntry.getLastModified());
+        assertEquals(DOWNLOADED_AT, secondEntry.getDownloadedAt());
+        assertEquals(CONTENT_LENGTH, secondEntry.getSize());
     }
 
     @Test
     public void verifyNotCachedIfFileIsAbsent() {
-        File doesNotExist = new File("/foo/bar/baz/spam/eggs");
-
-        CacheEntry entry = new TestCacheEntry(url, version, doesNotExist);
-
-        assertFalse(entry.isCached());
+        assertTrue(cacheFile.delete());
+        assertFalse(createEntry().isCached());
     }
 
     @Test
-    public void verifyNotCachedIfContentLengthsDiffer() throws IOException {
-        File cachedFile = createFile("Foo");
-
-        CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
+    public void verifyNotCachedIfContentLengthsDiffer() {
+        final CacheEntry entry = createEntry();
         entry.setSize(10000);
 
         assertFalse(entry.isCached());
@@ -142,10 +131,10 @@ public class CacheEntryTest {
 
     @Test
     public void verifyCachedIfContentLengthsAreSame() throws IOException {
-        String contents = "Foo";
-        File cachedFile = createFile(contents);
+        final String contents = "Foo";
+        FileUtils.saveFileUtf8(contents, cacheFile);
 
-        CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
+        final CacheEntry entry = createEntry();
         entry.setSize(contents.length());
 
         assertTrue(entry.isCached());
@@ -153,12 +142,12 @@ public class CacheEntryTest {
 
     @Test
     public void verifyCurrentWhenCacheEntryHasSameTimeStamp() throws IOException {
-        long lastModified = 10;
-        String contents = "Foo";
-        File cachedFile = createFile(contents);
+        final long lastModified = 10;
+        final String contents = "Foo";
+        FileUtils.saveFileUtf8(contents, cacheFile);
 
-        CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
-        entry.setSize(cachedFile.length());
+        final CacheEntry entry = createEntry();
+        entry.setSize(cacheFile.length());
         entry.setLastModified(lastModified);
 
         assertTrue(entry.isCurrent(lastModified));
@@ -166,27 +155,21 @@ public class CacheEntryTest {
 
     @Test
     public void verifyNotCurrentWhenRemoteContentIsNewer() throws IOException {
-        long oldTimeStamp = 10;
-        long newTimeStamp = 100;
-        String contents = "Foo";
-        File cachedFile = createFile(contents);
+        final long oldTimeStamp = 10;
+        final long newTimeStamp = 100;
+        final String contents = "Foo";
+        FileUtils.saveFileUtf8(contents, cacheFile);
 
-        CacheEntry entry = new TestCacheEntry(url, version, cachedFile);
+        final CacheEntry entry = createEntry();
+        entry.setSize(cacheFile.length());
         entry.setLastModified(oldTimeStamp);
 
         assertFalse(entry.isCurrent(newTimeStamp));
     }
 
-    private static File createFile(String contents) throws IOException {
-        File cachedFile = File.createTempFile("CacheEntryTest", null);
-        Files.write(cachedFile.toPath(), contents.getBytes());
-        cachedFile.deleteOnExit();
-        return cachedFile;
-    }
-
-    @Test(timeout = 2000l)
-    public void testLock() throws IOException {
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+    @Test(timeout = 2000L)
+    public void testLock() {
+        final CacheEntry entry = createEntry();
         try {
             entry.lock();
             assertTrue(entry.isHeldByCurrentThread());
@@ -195,28 +178,28 @@ public class CacheEntryTest {
         }
     }
 
-    @Test(timeout = 2000l)
-    public void testUnlock() throws IOException {
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+    @Test(timeout = 2000L)
+    public void testUnlock() {
+        final CacheEntry entry = createEntry();
         try {
             entry.lock();
         } finally {
             entry.unlock();
         }
-        assertTrue(!entry.isHeldByCurrentThread());
+        assertFalse(entry.isHeldByCurrentThread());
     }
 
-    @Test(timeout = 2000l)
-    public void testStoreFailsWithoutLock() throws IOException {
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+    @Test(timeout = 2000L)
+    public void testStoreFailsWithoutLock() {
+        final CacheEntry entry = createEntry();
         long num = 10;
         entry.setLastModified(num);
-        assertTrue(!entry.store());
+        assertFalse(entry.store());
     }
 
-    @Test(timeout = 2000l)
-    public void testStoreWorksWithLocK() throws IOException {
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+    @Test(timeout = 2000L)
+    public void testStoreWorksWithLocK() {
+        final CacheEntry entry = createEntry();
         long num = 10;
         entry.setLastModified(num);
         try {
@@ -227,14 +210,14 @@ public class CacheEntryTest {
         }
     }
 
-    @Test(timeout = 2000l)
-    public void testMultithreadLockPreventsWrite() throws IOException, InterruptedException {
-        int numThreads = 100;
-        CountDownLatch doneSignal = new CountDownLatch(numThreads);
-        CountDownLatch writersDoneSignal = new CountDownLatch(numThreads);
+    @Test(timeout = 2000L)
+    public void testMultiThreadLockPreventsWrite() throws Exception {
+        final int numThreads = 100;
+        final CountDownLatch doneSignal = new CountDownLatch(numThreads);
+        final CountDownLatch writersDoneSignal = new CountDownLatch(numThreads);
 
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
-        Thread[] list = new Thread[numThreads];
+        final CacheEntry entry = createEntry();
+        final Thread[] list = new Thread[numThreads];
 
         for (int i=0; i<numThreads; i++) {
             list[i] = new Thread(new WriteWorker(i, entry, doneSignal, writersDoneSignal));
@@ -249,41 +232,45 @@ public class CacheEntryTest {
             list[i].join();
         }
 
-        String out = baos.toString();
+        final String out = String.join("\n", sharedBuffer);
         assertTrue(CacheTestUtils.stringContainsOnlySingleInstance(out, "true") && out.contains("false"));
     }
 
 
-    @Test(timeout = 2000l)
-    public void testMultithreadLockAllowsRead() throws IOException, InterruptedException {
-        int numThreads = 2;
-        int numWriterThreads = 1;
+    @Test(timeout = 2000L)
+    public void testMultiThreadLockAllowsRead() throws InterruptedException {
+        final int numThreads = 2;
+        final int numWriterThreads = 1;
 
-        CountDownLatch doneSignal = new CountDownLatch(numThreads);
-        CountDownLatch writersDoneSignal = new CountDownLatch(numWriterThreads);
+        final CountDownLatch doneSignal = new CountDownLatch(numThreads);
+        final CountDownLatch writersDoneSignal = new CountDownLatch(numWriterThreads);
 
-        TestCacheEntry entry = new TestCacheEntry(url, version, null);
+        final CacheEntry entry = createEntry();
 
-        Thread writerThread = new Thread(new WriteWorker(10, entry, doneSignal, writersDoneSignal));
+        final Thread writerThread = new Thread(new WriteWorker(10, entry, doneSignal, writersDoneSignal));
         writerThread.start();
 
-        Thread readerThread = new Thread(new ReadWorker(entry, writersDoneSignal, doneSignal));
+        final Thread readerThread = new Thread(new ReadWorker(entry, writersDoneSignal, doneSignal));
         readerThread.start();
 
         writerThread.join();
         readerThread.join();
 
-        String out = baos.toString();
+        final String out = String.join("\n", sharedBuffer);
         assertTrue(out.contains(":10:true") && out.contains(":read:10"));
+    }
+
+    private CacheEntry createEntry() {
+        return new CacheEntry(url, version, cacheFile, infoFile);
     }
 
     private class WriteWorker implements Runnable {
         private final long input;
-        private final TestCacheEntry entry;
+        private final CacheEntry entry;
         private final CountDownLatch doneSignal;
         private final CountDownLatch writersDoneSignal;
 
-        public WriteWorker(long input, TestCacheEntry entry, CountDownLatch doneSignal, CountDownLatch writersDoneSignal) {
+        WriteWorker(long input, CacheEntry entry, CountDownLatch doneSignal, CountDownLatch writersDoneSignal) {
             this.input = input;
             this.entry = entry;
             this.doneSignal = doneSignal;
@@ -294,19 +281,15 @@ public class CacheEntryTest {
             try {
                 entry.tryLock();
                 entry.setLastModified(input);
-                boolean result = entry.store();
-                synchronized (out) {
-                    out.println(":" + input + ":" + result);
-                    out.flush();
-                }
+                sharedBuffer.add(":" + input + ":" + entry.store());
                 //Let parent know outputting is done
                 doneSignal.countDown();
                 writersDoneSignal.countDown();
-                //Wait until everyone is done before continuing to clw.unlock()
+                //Wait until everyone is done before continuing to entry.unlock()
                 doneSignal.await();
             } catch (Exception e) {
                 e.printStackTrace();
-                fail();
+                fail(e.getMessage());
             } finally {
                 entry.unlock();
             }
@@ -314,32 +297,28 @@ public class CacheEntryTest {
     }
 
     private class ReadWorker implements Runnable {
-        private final TestCacheEntry entry;
 
+        private final CacheEntry entry;
         private final CountDownLatch writersDone;
+
         private final CountDownLatch doneSignal;
 
-        public ReadWorker(TestCacheEntry entry, CountDownLatch writersDone, CountDownLatch doneSignal) {
+        ReadWorker(CacheEntry entry, CountDownLatch writersDone, CountDownLatch doneSignal) {
             this.entry = entry;
             this.writersDone = writersDone;
             this.doneSignal = doneSignal;
         }
-
         @Override
         public void run() {
             try {
                 writersDone.await();
 
                 long lastModified = entry.getLastModified();
-                synchronized (out) {
-                    out.println(":read:" + lastModified);
-                    out.flush();
-                    doneSignal.countDown();
-                    doneSignal.await();
-                }
+                sharedBuffer.add(":read:" + lastModified);
+                doneSignal.countDown();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail();
+                fail(e.getMessage());
             }
         }
     }

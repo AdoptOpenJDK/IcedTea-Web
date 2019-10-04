@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
@@ -303,11 +304,7 @@ class ResourceUrlCreator {
                 .filter(s -> !isBlank(s))
                 .collect(Collectors.toList());
         if (requestVersion != null) {
-            try {
-                queryParts.add("version-id=" + URLEncoder.encode(requestVersion.toString(), StandardCharsets.UTF_8.name()));
-            } catch (UnsupportedEncodingException e) {
-                LOG.error("Your system does not support " + StandardCharsets.UTF_8.name() + " encoding.", e);
-            }
+            queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 

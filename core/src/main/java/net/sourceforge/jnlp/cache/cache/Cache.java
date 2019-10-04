@@ -49,12 +49,12 @@ public class Cache {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
-        return CacheLRUWrapper.getInstance().getCacheFile(resource, version);
+        return CacheLRUWrapper.getInstance().getOrCreateCacheFile(resource, version);
     }
 
     public static void addToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
-        if (!CacheUtil.isCacheable(infoFromRemote.getLocation())) {
-            throw new IllegalArgumentException(infoFromRemote.getLocation() + " is not a cacheable resource");
+        if (!CacheUtil.isCacheable(infoFromRemote.getResourceHref())) {
+            throw new IllegalArgumentException(infoFromRemote.getResourceHref() + " is not a cacheable resource");
         }
         CacheLRUWrapper.getInstance().addToCache(infoFromRemote, unpackedStream);
     }
@@ -74,15 +74,15 @@ public class Cache {
         return CacheLRUWrapper.getInstance().replaceExistingCacheFile(resource, version);
     }
 
+    public static void deleteFromCache(ResourceInfo info) {
+        CacheLRUWrapper.getInstance().deleteFromCache(info.getResourceHref(), info.getVersion());
+    }
+
     public static void deleteFromCache(URL resource, VersionString version) {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         CacheLRUWrapper.getInstance().deleteFromCache(resource, version);
-    }
-
-    static boolean deleteFromCache(File path) {
-        return CacheLRUWrapper.getInstance().deleteFromCache(path);
     }
 
     /**
@@ -107,11 +107,7 @@ public class Cache {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
 
-        return CacheLRUWrapper.getInstance().getInfo(resource, version);
-    }
-
-    public static ResourceInfo getInfo(final File path) {
-        return CacheLRUWrapper.getInstance().getInfo(path);
+        return CacheLRUWrapper.getInstance().getResourceInfo(resource, version).orElse(null);
     }
 
     /**
@@ -135,7 +131,7 @@ public class Cache {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
-        return CacheLRUWrapper.getInstance().getBestMatchingVersionInCache(resource, version);
+        return CacheLRUWrapper.getInstance().getBestMatchingVersionInCache(resource, version).orElse(null);
     }
 
     /**
@@ -161,10 +157,6 @@ public class Cache {
      * CACHE IDs
      * ***************/
 
-    public static void deleteFromCache(final String cacheId) {
-        CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
-    }
-
     /**
      * This method load all known IDs of applications and  will gather all members, which share the id
      *
@@ -172,5 +164,9 @@ public class Cache {
      */
     public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
         return CacheLRUWrapper.getInstance().getCacheIds(filter, jnlpPath, domain);
+    }
+
+    public static void deleteFromCache(final String cacheId) {
+        CacheLRUWrapper.getInstance().deleteFromCache(cacheId);
     }
 }

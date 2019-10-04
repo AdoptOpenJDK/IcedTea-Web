@@ -43,16 +43,16 @@ import org.junit.Test;
 public class CacheIdTest {
     @Test
     public void CacheID(){
-        CacheId cj11 = new CacheId.CacheJnlpId("a");
-        CacheId cj12 = new CacheId.CacheJnlpId("a");
-        CacheId cj2 = new CacheId.CacheJnlpId("b");
-        CacheId cj31 = new CacheId.CacheJnlpId(null);
-        CacheId cj32 = new CacheId.CacheJnlpId(null);
-        CacheId cd11 = new CacheId.CacheDomainId("a");
-        CacheId cd12 = new CacheId.CacheDomainId("a");
-        CacheId cd2 = new CacheId.CacheDomainId("b");
-        CacheId cd31 = new CacheId.CacheDomainId(null);
-        CacheId cd32 = new CacheId.CacheDomainId(null);
+        CacheId cj11 = CacheId.jnlpPathId("a");
+        CacheId cj12 = CacheId.jnlpPathId("a");
+        CacheId cj2 = CacheId.jnlpPathId("b");
+        CacheId cj31 = CacheId.jnlpPathId(null);
+        CacheId cj32 = CacheId.jnlpPathId(null);
+        CacheId cd11 = CacheId.domainId("a");
+        CacheId cd12 = CacheId.domainId("a");
+        CacheId cd2 = CacheId.domainId("b");
+        CacheId cd31 = CacheId.domainId(null);
+        CacheId cd32 = CacheId.domainId(null);
         
         Assert.assertEquals(cj11, cj11);
         Assert.assertEquals(cj11, cj12);

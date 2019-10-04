@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
@@ -148,23 +149,20 @@ public class CacheUtil {
         path.append(File.separatorChar);
         path.append(location.getHost());
         path.append(File.separatorChar);
-        /**
-         * This is a bit of imprecise. The usage of default port would be
-         * better, but it would cause terrible backward incompatibility.
-         */
+
         if (location.getPort() > 0) {
             path.append(location.getPort());
-            path.append(File.separatorChar);
+        } else {
+            path.append(location.getDefaultPort());
         }
-        String locationPath = location.getPath();
-        String query = "";
-        if (location.getQuery() != null) {
-            query = location.getQuery();
-        }
-        if (locationPath.contains("..") || query.contains("..")){
+        path.append(File.separatorChar);
+
+        final String locationPath = location.getPath();
+        final String queryPart = location.getQuery();
+        if (locationPath.contains("..") || (queryPart != null && queryPart.contains(".."))) {
             try {
                 /**
-                 * if path contains .. then it can harm lcoal system
+                 * if path contains .. then it can harm local system
                  * So without mercy, hash it
                  */
                 String hexed = hex(new File(locationPath).getName(), locationPath);
@@ -177,8 +175,8 @@ public class CacheUtil {
             }
         } else {
             path.append(locationPath.replace('/', File.separatorChar));
-            if (location.getQuery() != null && !location.getQuery().trim().isEmpty()) {
-                path.append(".").append(location.getQuery());
+            if (!StringUtils.isBlank(queryPart)) {
+                path.append(".").append(queryPart);
             }
 
             File candidate = new File(FileUtils.sanitizePath(path.toString()));
@@ -193,7 +191,7 @@ public class CacheUtil {
                      * chars hash in query) cuts to much.
                      */
                     String hexed = hex(candidate.getName(), candidate.getName());
-                    candidate = new File(candidate.getParentFile(), hexed.toString());
+                    candidate = new File(candidate.getParentFile(), hexed);
                 }
             } catch (NoSuchAlgorithmException ex) {
                 // should not occur, cite from javadoc:

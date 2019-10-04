@@ -41,17 +41,14 @@ import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionIdComparator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
-import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import java.io.File;
@@ -59,28 +56,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.StringUtils.urlDecode;
-import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
+import static net.adoptopenjdk.icedteaweb.CollectionUtils.isEmpty;
 
 /**
  * This class helps maintain the ordering of most recently use cache items across
@@ -92,363 +83,234 @@ class CacheLRUWrapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
 
-    /**
-     * Returns an instance of the policy.
-     *
-     * @return an instance of the policy
-     */
     static CacheLRUWrapper getInstance() {
         return CacheLRUWrapperHolder.INSTANCE;
     }
 
-    private final InfrastructureFileDescriptor recentlyUsedPropertiesFile;
-    private final InfrastructureFileDescriptor cacheDir;
-
-    private PropertiesFile cachedRecentlyUsedPropertiesFile = null;
+    private final LeastRecentlyUsedCacheIndexHolder cacheIndex;
+    private final InfrastructureFileDescriptor rootCacheDir;
 
     /**
      * @param recentlyUsed file to be used as recently_used file
      * @param cacheDir     dir with cache
      */
-    CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
-        recentlyUsedPropertiesFile = recentlyUsed;
-        this.cacheDir = cacheDir;
-        if (!recentlyUsed.getFile().exists()) {
-            try {
-                FileUtils.createParentDir(recentlyUsed.getFile());
-                FileUtils.createRestrictedFile(recentlyUsed.getFile());
-            } catch (IOException e) {
-                LOG.error("Error in creating recently used cache items file.", e);
-            }
-        }
+    private CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
+        this.cacheIndex = new LeastRecentlyUsedCacheIndexHolder(recentlyUsed);
+        this.rootCacheDir = cacheDir;
     }
 
-    File replaceExistingCacheFile(URL source, VersionId version) {
-        // Old entry will still exist. (but removed at cleanup)
-        invalidate(source, version);
-        return makeNewCacheFile(source, version);
+    File getOrCreateCacheFile(URL resourceHref, VersionId version) {
+        return cacheIndex.getSynchronized(idx -> {
+            final LeastRecentlyUsedCacheEntry entry = getOrCreateCacheEntry(idx, resourceHref, version);
+            return getCacheFile(entry);
+        });
     }
 
-    ResourceInfo getInfo(URL location, VersionId versionId) {
-        return new CacheEntry(location, versionId);
+    private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
+        return idx.findAndMarkAsAccessed(resourceHref, version)
+                .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, resourceHref, version));
     }
 
-    ResourceInfo getInfo(File path) {
-        return new CacheEntry(path);
+    File replaceExistingCacheFile(URL resourceHref, VersionId version) {
+        return cacheIndex.getSynchronized(idx -> {
+            // Old entry will still exist. (but removed at cleanup)
+            idx.markEntryForDeletion(resourceHref, version);
+            final LeastRecentlyUsedCacheEntry entry = createNewInfoFileAndIndexEntry(idx, resourceHref, version);
+            return getCacheFile(entry);
+        });
     }
 
-    File getCacheFile(URL source, VersionId version) {
-
-        // TODO: handle Version
-
-        synchronized (this) {
-            try {
-                lock();
-
-                // We need to reload the cacheOrder file each time
-                // since another plugin/javaws instance may have updated it.
-                load();
-                File cacheFile = getCacheFileIfExist(CacheUtil.urlToPath(source, ""));
-                if (cacheFile == null) { // We did not find a copy of it.
-                    cacheFile = makeNewCacheFile(source, version);
-                }
-                store();
-                return cacheFile;
-            } finally {
-                unlock();
-            }
-        }
+    private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
+        final File dir = makeNewCacheDir();
+        final String entryId = entryIdFromCacheDir(dir);
+        createInfoFile(dir);
+        return idx.createEntry(resourceHref, version, entryId);
     }
 
-    private File makeNewCacheFile(URL source, VersionId version) {
-
-        // TODO: handle Version
-
-        synchronized (this) {
-            try {
-                lock();
-                load();
-                for (long i = 0; i < Long.MAX_VALUE; i++) {
-                    String path = cacheDir.getFullPath() + File.separator + i;
-                    File cDir = new File(path);
-                    if (!cDir.exists()) {
-                        // We can use this directory.
-                        File cacheFile = createCacheFile(source, path);
-                        store();
-                        return cacheFile;
+    private File makeNewCacheDir() {
+        final String cacheDirPath = rootCacheDir.getFullPath();
+        for (int i = 0; i < 250; i++) {
+            for (int j = 0; j < 250; j++) {
+                String path = cacheDirPath + File.separator + i + File.separator + j;
+                File cDir = new File(path);
+                if (!cDir.exists()) {
+                    if (!cDir.isDirectory() && !cDir.mkdirs()) {
+                        throw new RuntimeException("Can't create directory " + cDir);
                     }
+                    return cDir;
                 }
-
-            } finally {
-                unlock();
             }
-            return null;
         }
+        throw new RuntimeException("Out of directories :-)");
     }
 
-    private File createCacheFile(URL source, String path) {
-        final File cacheFile = CacheUtil.urlToPath(source, path);
+    private void createInfoFile(File dir) {
         try {
-            FileUtils.createParentDir(cacheFile);
-            createInfoFile(cacheFile);
-            addEntry(generateKey(cacheFile.getPath()), cacheFile.getPath());
-        } catch (IOException ioe) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
-        }
-        return cacheFile;
-    }
+            final File infoFile = new File(dir, CacheEntry.INFO_SUFFIX);
+            FileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
 
-    private void createInfoFile(File cacheFile) throws IOException {
-        final File infoFile = new File(cacheFile.getPath() + CacheEntry.INFO_SUFFIX);
-        FileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
-
-        final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
-        if (StringUtils.isBlank(jnlpPath)) {
-            LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
-        } else {
-            FileUtils.saveFileUtf8(CacheEntry.KEY_JNLP_PATH + "=" + jnlpPath, infoFile);
-        }
-    }
-
-    /**
-     * This will return a File pointing to the location of cache item.
-     *
-     * @param urlPath Path of cache item within cache directory.
-     * @return File if we have searched before, {@code null} otherwise.
-     */
-    private File getCacheFileIfExist(File urlPath) {
-        synchronized (this) {
-            return getLRUSortedEntries().stream()
-                    .filter(e -> pathToURLPath(e.getValue()).equals(urlPath.getPath()))
-                    .findFirst()
-                    .map(e -> {
-                        markEntryAsAccessed(e.getKey());
-                        return new File(e.getValue());
-                    })
-                    .orElse(null);
-        }
-    }
-
-    /**
-     * Get the path to file minus the cache directory and indexed folder.
-     */
-    private String pathToURLPath(String path) {
-        final int len = cacheDir.getFullPath().length();
-        final int index = path.indexOf(File.separatorChar, len + 1);
-        return path.substring(index);
-    }
-
-    /**
-     * Returns whether there is a version of the URL contents in the
-     * cache.
-     *
-     * @param source  the source {@link URL}
-     * @param version the versions to check for
-     * @return whether the cache contains the version
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    boolean isCached(URL source, VersionId version) {
-        final CacheEntry entry = new CacheEntry(source, version);
-
-        boolean isCurrent = entry.isCached();
-        LOG.info("isCached: {} = {}", source, isCurrent);
-        return isCurrent;
-    }
-
-    VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
-        final VersionIdComparator versionComparator = new VersionIdComparator(version);
-        return getAllMatchingVersionInCache(resource, version).stream()
-                .max(versionComparator)
-                .orElse(null);
-    }
-
-    private Set<VersionId> getAllMatchingVersionInCache(final URL resource, final VersionString version) {
-        // TODO: handle Version
-        throw new RuntimeException("not implemented");
-    }
-
-    /**
-     * Returns whether there is a version of the URL contents in the
-     * cache and it is up to date.  This method may not return
-     * immediately.
-     *
-     * @param source       the source {@link URL}
-     * @param version      the versions to check for
-     * @param lastModified time in millis since epoch of last modification
-     * @return whether the cache contains the version
-     * @throws IllegalArgumentException if the source is not cacheable
-     */
-    boolean isUpToDate(URL source, VersionId version, long lastModified) {
-        final CacheEntry entry = new CacheEntry(source, version);
-
-        boolean isCurrent = entry.isCurrent(lastModified);
-        LOG.info("isUpToDate: {} = {}", source, isCurrent);
-        return isCurrent;
-    }
-
-    private void invalidate(URL source, VersionId version) {
-        final CacheEntry entry = new CacheEntry(source, version);
-        entry.markForDelete();
-    }
-
-    List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
-        synchronized (this) {
-            lock();
-            try {
-                final Set<CacheId> r = new LinkedHashSet<>();
-                Files.walk(Paths.get(cacheDir.getFile().getCanonicalPath()))
-                        .filter(t -> Files.isRegularFile(t))
-                        .filter(path -> path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX))
-                        .forEach(path -> {
-                            if (includeJnlpPath) {
-                                final File infoFile = new File(path.toString());
-                                final String jnlpPath = new PropertiesFile(infoFile).getProperty(CacheEntry.KEY_JNLP_PATH);
-                                if (jnlpPath != null && jnlpPath.matches(filter)) {
-                                    r.add(new CacheId.CacheJnlpId(jnlpPath));
-                                }
-                            }
-                            if (includeDomain) {
-                                final String domain = getDomain(path);
-                                if (domain != null && domain.matches(filter)) {
-                                    r.add(new CacheId.CacheDomainId(domain));
-                                }
-                            }
-                        });
-
-                return r.stream()
-                        .peek(CacheId::populate)
-                        .collect(Collectors.toList());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                unlock();
+            final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
+            if (StringUtils.isBlank(jnlpPath)) {
+                LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
+            } else {
+                FileUtils.saveFileUtf8(CacheEntry.KEY_JNLP_PATH + "=" + jnlpPath, infoFile);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create info file in dir " + dir);
         }
     }
 
     void addToCache(ResourceInfo info, InputStream inputStream) throws IOException {
-        final CacheEntry entry = new CacheEntry(info.getLocation(), info.getVersion());
+        final List<IOException> ex = new ArrayList<>();
 
-        final File outputFile = getCacheFile(info.getLocation(), info.getVersion());
-        LOG.debug("Downloading file: {} into: {}", info.getLocation(), outputFile.getCanonicalPath());
-        try (final OutputStream out = new FileOutputStream(outputFile)) {
-            IOUtils.copy(inputStream, out);
-        }
-
-        entry.storeInfo(info);
-    }
-
-    void deleteFromCache(URL location, VersionString version) {
-        for (final VersionId versionId : getAllMatchingVersionInCache(location, version)) {
-            final File cachedFile = getCacheFile(location, versionId);
-            final String directoryUrl = getCacheParentDirectory(cachedFile.getAbsolutePath());
-
-
-            LOG.info("Deleting cached file: {}", cachedFile.getAbsolutePath());
-            cachedFile.delete();
-
-            final File directory = new File(directoryUrl);
+        cacheIndex.runSynchronized(idx -> {
+            final LeastRecentlyUsedCacheEntry entry = getOrCreateCacheEntry(idx, info.getResourceHref(), info.getVersion());
+            final CacheEntry infoFile = getInfoFile(entry);
+            final File cacheFile = infoFile.getCacheFile();
             try {
-                LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
-                FileUtils.recursiveDelete(directory, directory);
-            } catch (IOException e) {
-                LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
-            }
-        }
-    }
-
-    boolean deleteFromCache(File path) {
-        try {
-            lock();
-            try {
-                final String entryKey = getEntryKeyForFile(path);
-                if (entryKey == null) {
-                    return true; // not found means deleted
+                LOG.debug("Downloading file: {} into: {}", info.getResourceHref(), cacheFile.getCanonicalPath());
+                try (final OutputStream out = new FileOutputStream(cacheFile)) {
+                    IOUtils.copy(inputStream, out);
                 }
-                final File folder = new File(cacheDir.getFile(), entryKey.split(",")[1]);
-                FileUtils.recursiveDelete(folder, cacheDir.getFile());
-                getRecentlyUsedPropertiesFile().remove(entryKey);
-                store();
-                return true;
+                infoFile.storeInfo(info);
             } catch (IOException e) {
-                LOG.error("failed to delete {} - exception: {}", path, e.getMessage());
-                return false;
+                ex.add(e);
             }
-        } finally {
-            unlock();
+        });
+
+        if (!ex.isEmpty()) {
+            throw ex.get(0);
         }
     }
 
-    private String getEntryKeyForFile(File path) throws IOException {
-        final String absolutePath = path.getCanonicalFile().getAbsolutePath();
-        final String absoluteCacheDir = cacheDir.getFile().getCanonicalFile().getAbsolutePath();
-        if (!absolutePath.startsWith(absoluteCacheDir)) {
-            return null;
-        }
-        final String relativePath = absolutePath.substring(absoluteCacheDir.length());
-        final String folderId = relativePath.split(Pattern.quote(File.separator))[0];
-        return getLRUSortedEntries().stream()
-                .map(Entry::getKey)
-                .filter(k -> k.split(",")[1].equals(folderId))
-                .findFirst()
-                .orElse(null);
+    Optional<ResourceInfo> getResourceInfo(URL resourceHref, VersionId version) {
+        return cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version)
+                .map(this::getInfoFile));
     }
 
     /**
-     * Returns the parent directory of the cached resource.
+     * Returns whether there is a version of the URL contents in the cache.
      *
-     * @param path The path of the cached resource directory.
-     * @return parent dir of cache
+     * @param resourceHref the resourceHref {@link URL}
+     * @param version      the versions to check for
+     * @return whether the cache contains the version
+     * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
-    private String getCacheParentDirectory(String path) {
-        final String cacheDirPath = cacheDir.getFullPath();
+    boolean isCached(URL resourceHref, VersionId version) {
+        final Boolean isCached = cacheIndex.getSynchronized(idx -> idx
+                .findAndMarkAsAccessed(resourceHref, version)
+                .map(e -> getInfoFile(e).isCached())
+                .orElse(false)
+        );
+        LOG.info("isCached: {} - (v: {}) = {}", resourceHref, version, isCached);
+        return isCached;
+    }
 
-        while (path.startsWith(cacheDirPath) && !path.equals(cacheDirPath)) {
-            final String parentPath = new File(path).getParent();
-            if (parentPath.equals(cacheDirPath)) {
-                break;
-            }
+    /**
+     * Returns whether there is a version of the URL contents in the cache and it is up to date.
+     *
+     * @param resourceHref the resourceHref {@link URL}
+     * @param version      the versions to check for
+     * @param lastModified time in millis since epoch of last modification
+     * @return whether the cache contains the version
+     * @throws IllegalArgumentException if the resourceHref is not cacheable
+     */
+    boolean isUpToDate(URL resourceHref, VersionId version, long lastModified) {
+        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx
+                .findAndMarkAsAccessed(resourceHref, version)
+                .map(e -> getInfoFile(e).isCurrent(lastModified))
+                .orElse(false)
+        );
+        LOG.info("isUpToDate: {} - (v: {}) = {}", resourceHref, version, isUpToDate);
+        return isUpToDate;
+    }
 
-            path = parentPath;
-        }
-        return path;
+    Optional<VersionId> getBestMatchingVersionInCache(final URL resourceHref, final VersionString version) {
+        return cacheIndex.getSynchronized(idx -> idx
+                .findBestAndMarkAsAccessed(resourceHref, version)
+                .map(LeastRecentlyUsedCacheEntry::getVersion)
+        );
+    }
+
+    List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
+        return cacheIndex.getSynchronized(idx -> {
+            final Map<String, CacheId> r = new LinkedHashMap<>();
+            idx.getAllUnDeletedEntries().forEach(entry -> {
+                final Object[] fileEntry = createPaneObjectArray(entry);
+                if (includeJnlpPath) {
+                    final CacheEntry infoFile = getInfoFile(entry);
+                    final String jnlpPath = infoFile.getJnlpPath();
+                    if (jnlpPath != null && jnlpPath.matches(filter)) {
+                        final CacheId cacheId = r.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
+                        cacheId.getFiles().add(fileEntry);
+                    }
+                }
+                if (includeDomain) {
+                    final String domain = entry.getDomain();
+                    if (domain != null && domain.matches(filter)) {
+                        final CacheId cacheId = r.computeIfAbsent(domain, CacheId::domainId);
+                        cacheId.getFiles().add(fileEntry);
+                    }
+                }
+            });
+
+            return new ArrayList<>(r.values());
+        });
+    }
+
+    private Object[] createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
+        final CacheEntry infoFile = getInfoFile(entry);
+
+        return new Object[]{
+                /* 0 */ infoFile,
+                /* 1 */ infoFile.getCacheFile().getParentFile(),
+                /* 2 */ entry.getProtocol(),
+                /* 3 */ entry.getDomain(),
+                /* 4 */ infoFile.getSize(),
+                /* 5 */ new Date(infoFile.getLastModified()),
+                /* 6 */ infoFile.getJnlpPath()
+        };
+    }
+
+    void deleteFromCache(URL resourceHref, VersionId version) {
+        cacheIndex.runSynchronized(idx -> idx
+                .find(resourceHref, version)
+                .ifPresent(entry -> deleteFromCache(idx, entry)));
+    }
+
+    void deleteFromCache(URL resourceHref, VersionString version) {
+        cacheIndex.runSynchronized(idx -> idx
+                .findAll(resourceHref, version)
+                .forEach(entry -> deleteFromCache(idx, entry)));
     }
 
     void deleteFromCache(String cacheId) {
-        if (!cannotClearCache()) {
-            deleteByCacheId(cacheId);
+        cacheIndex.runSynchronized(idx -> {
+            final List<LeastRecentlyUsedCacheEntry> allEntries = idx.getAllUnDeletedEntries();
+            allEntries.stream()
+                    .filter(entry -> cacheId.equals(entry.getDomain()) || cacheId.equals(getInfoFile(entry).getJnlpPath()))
+                    .forEach(entry -> deleteFromCache(idx, entry));
+        });
+        if (OsUtil.isWindows()) {
+            WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
         }
     }
 
-    private synchronized void deleteByCacheId(String cacheId) {
-        lock();
-        try {
-            Files.walk(Paths.get(cacheDir.getFile().getCanonicalPath()))
-                    .filter(t -> Files.isRegularFile(t))
-                    .forEach(path -> {
-                        if (path.getFileName().toString().endsWith(CacheEntry.INFO_SUFFIX)) {
-                            PropertiesFile pf = new PropertiesFile(new File(path.toString()));
-                            // if jnlp-path in .info equals path of app to delete mark to delete
-                            final String jnlpPath = pf.getProperty(CacheEntry.KEY_JNLP_PATH);
-                            final String domain = getDomain(path);
-                            if (cacheId.equalsIgnoreCase(jnlpPath) || cacheId.equalsIgnoreCase(domain)) {
-                                pf.setProperty(CacheEntry.KEY_DELETE, Boolean.toString(true));
-                                pf.store();
-                                LOG.info("marked for deletion: {}", path);
-                            }
-                        }
-                    });
-            if (OsUtil.isWindows()) {
-                WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
-            }
-            // clean the cache of entries now marked for deletion
-            cleanCache();
+    private void deleteFromCache(LeastRecentlyUsedCacheIndex idx, LeastRecentlyUsedCacheEntry entry) {
+        final File cacheFile = getCacheFile(entry);
+        final File directory = cacheFile.getParentFile();
 
+        LOG.info("Deleting cache file: {}", cacheFile.getAbsolutePath());
+        cacheFile.delete();
+
+        try {
+            LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
+            FileUtils.recursiveDelete(directory, directory);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            unlock();
+            LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
         }
+
+        idx.removeEntry(entry.getResourceHref(), entry.getVersion());
     }
 
     /**
@@ -465,109 +327,121 @@ class CacheLRUWrapper {
             return false;
         }
 
-        final String fullPath = cacheDir.getFullPath();
-        LOG.debug("Clearing cache directory: {}", fullPath);
-        synchronized (this) {
-            lock();
+        final File dir = rootCacheDir.getFile();
+        LOG.debug("Clearing cache directory: {}", dir);
+
+        cacheIndex.runSynchronized(idx -> {
+            deleteAll(dir.listFiles(File::isDirectory));
+            idx.clear();
+        });
+
+        if (OsUtil.isWindows()) {
+            WindowsShortcutManager.removeWindowsShortcuts("ALL");
+        }
+
+        return true;
+    }
+
+    private void deleteAll(Collection<File> files) {
+        deleteAll(files.toArray(new File[0]));
+    }
+
+    private void deleteAll(File... files) {
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
             try {
-                final File cacheDirFile = cacheDir.getFile().getCanonicalFile();
-                // remove windows shortcuts before cache dir is gone
-                if (OsUtil.isWindows()) {
-                    WindowsShortcutManager.removeWindowsShortcuts("ALL");
-                }
-                removeDirectories(Collections.singleton(fullPath));
-                cacheDirFile.mkdir();
-                clearLRUSortedEntries();
-                store();
+                FileUtils.recursiveDelete(file, file);
             } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                unlock();
+                LOG.error("Failed to delete directory {} - {}", file, e.getMessage());
             }
         }
-        return true;
     }
 
     /**
      * This will remove all old cache items.
      */
     void cleanCache() {
-        if (okToClearCache()) {
-            // First we want to figure out which stuff we need to delete.
-            final Set<String> keep = new HashSet<>();
-            final Set<String> remove = new HashSet<>();
-            synchronized (this) {
-                try {
-                    lock();
-                    load();
+        if (cannotClearCache()) {
+            return;
+        }
 
-                    final long maxSize = getMaxSizeInBytes();
-                    long curSize = 0;
+        final File[] levelOneDirs = rootCacheDir.getFile().listFiles(File::isDirectory);
+        if (levelOneDirs == null) {
+            cacheIndex.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
+        } else {
+            final Set<String> entryIds = collectAllEntryIdsFromFileSystem(levelOneDirs);
+            cacheIndex.runSynchronized(idx -> {
 
-                    for (final Entry<String, String> e : getLRUSortedEntries()) {
-                        // Check if the item is contained in cacheOrder.
-                        final String key = e.getKey();
-                        final String path = e.getValue();
+                final long maxSize = getMaxSizeInBytes();
+                long curSize = 0;
 
-                        final File file = new File(path);
-                        final PropertiesFile pf = new PropertiesFile(new File(path + CacheEntry.INFO_SUFFIX));
-                        boolean delete = Boolean.parseBoolean(pf.getProperty(CacheEntry.KEY_DELETE));
+                for (LeastRecentlyUsedCacheEntry entry : idx.getAllEntries()) {
+                    entryIds.remove(entry.getId());
 
-                        /*
-                         * This will get me the root directory specific to this cache item.
-                         * Example:
-                         *  cacheDir = /home/user1/.icedtea/cache
-                         *  file.getPath() = /home/user1/.icedtea/cache/0/http/www.example.com/subdir/a.jar
-                         *  relativePath = /0/http/www.example.com/subdir/a.jar
-                         *  cacheDirOfFile = /home/user1/.icedtea/cache/0
-                         */
-                        final String fullPath = cacheDir.getFullPath();
-                        final String relativePath = file.getPath().substring(fullPath.length());
-                        final String cacheDirOfFile = fullPath + relativePath.substring(0, relativePath.indexOf(File.separatorChar, 1));
+                    final CacheEntry infoFile = getInfoFile(entry);
+                    final File cacheFile = infoFile.getCacheFile();
+                    final File directory = cacheFile.getParentFile();
 
-                        if (keep.contains(file.getPath().substring(cacheDirOfFile.length()))) {
-                            removeEntry(key);
-                            continue;
+                    if (!infoFile.exists()) {
+                        idx.removeEntry(entry);
+                        if (directory.exists()) {
+                            deleteAll(directory);
                         }
+                        continue;
+                    }
 
-                        /*
-                         * we remove entries from our lru if any of the following condition is met.
-                         * Conditions:
-                         *  - delete: file has been marked for deletion.
-                         *  - !file.isFile(): if someone tampered with the directory, file doesn't exist.
-                         *  - maxSize >= 0 && curSize + len > maxSize: If a limit was set and the new size
-                         *  on disk would exceed the maximum size.
-                         */
-                        final long len = file.length();
-                        if (delete || !file.isFile() || (maxSize >= 0 && curSize + len > maxSize)) {
-                            removeEntry(key);
-                            remove.add(cacheDirOfFile);
-                            continue;
-                        }
+                    final long size = cacheFile.length();
+                    if (entry.isMarkedForDeletion() || !cacheFile.isFile() || (maxSize >= 0 && curSize + size > maxSize)) {
+                        idx.removeEntry(entry);
+                        deleteAll(directory);
+                        continue;
+                    }
 
-                        curSize += len;
-                        keep.add(file.getPath().substring(cacheDirOfFile.length()));
-
-                        final File[] siblings = file.getParentFile().listFiles();
-                        if (siblings != null) {
-                            for (File f : siblings) {
-                                if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
-                                    try {
-                                        FileUtils.recursiveDelete(f, f);
-                                    } catch (IOException e1) {
-                                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
-                                    }
-                                }
+                    final File[] cacheDirFiles = cacheFile.getParentFile().listFiles();
+                    if (null != cacheDirFiles) {
+                        for (File file : cacheDirFiles) {
+                            if (!file.equals(cacheFile) && !file.getName().equals(CacheEntry.INFO_SUFFIX)) {
+                                deleteAll(file);
                             }
                         }
+
                     }
-                    store();
-                } finally {
-                    unlock();
+
+                    curSize += size;
                 }
-                removeDirectories(remove);
+            });
+
+            // delete dirs with no entry in the least recently used index
+            final List<File> dirsWithNoEntryInTheIndex = entryIds.stream()
+                    .map(this::cacheDirFromEntryId)
+                    .collect(Collectors.toList());
+            deleteAll(dirsWithNoEntryInTheIndex);
+
+            // delete empty level one dirs
+            final List<File> emptyDirs = Arrays.stream(levelOneDirs)
+                    .filter(dir -> isEmpty(dir.list()))
+                    .collect(Collectors.toList());
+            deleteAll(emptyDirs);
+        }
+    }
+
+    private Set<String> collectAllEntryIdsFromFileSystem(File[] levelOneDirs) {
+        final Set<String> entryIds = new HashSet<>();
+        for (File levelOneDir : levelOneDirs) {
+            final File[] levelTwoDirs = levelOneDir.listFiles(File::isDirectory);
+            if (levelTwoDirs != null) {
+                for (File levelTwoDir : levelTwoDirs) {
+                    final String entryId = entryIdFromCacheDir(levelTwoDir);
+                    if (new File(levelTwoDir, CacheEntry.INFO_SUFFIX).isFile()) {
+                        entryIds.add(entryId);
+                    }
+                }
             }
         }
+        return entryIds;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -581,211 +455,41 @@ class CacheLRUWrapper {
         }
     }
 
-    private void removeDirectories(Set<String> remove) {
-        for (String s : remove) {
-            File f = new File(s);
-            try {
-                FileUtils.recursiveDelete(f, f);
-            } catch (IOException ignored) {
-            }
+    // Helpers
+
+    private File getCacheFile(LeastRecentlyUsedCacheEntry entry) {
+        final String[] idParts = entry.getId().split("-");
+        final String cacheFilName = getCacheFileName(entry.getResourceHref());
+        return new File(String.join("/", rootCacheDir.getFullPath(), idParts[0], idParts[1], cacheFilName));
+    }
+
+    private CacheEntry getInfoFile(LeastRecentlyUsedCacheEntry entry) {
+        final File cacheFile = getCacheFile(entry);
+        final File infoFile = new File(cacheFile.getParentFile(), CacheEntry.INFO_SUFFIX);
+        return new CacheEntry(entry, cacheFile, infoFile);
+    }
+
+    private String entryIdFromCacheDir(File dir) {
+        return dir.getParentFile().getName() + "-" + dir.getName();
+    }
+
+    private File cacheDirFromEntryId(String entryId) {
+        final String[] idParts = entryId.split("-");
+        return new File(String.join("/", rootCacheDir.getFullPath(), idParts[0], idParts[1]));
+    }
+
+    private String getCacheFileName(URL resourceHref) {
+        final String path = resourceHref.getPath();
+        final int i = path.lastIndexOf('/');
+        if (i < 0) {
+            return path;
         }
-    }
-
-    /**
-     * @return the recentlyUsedPropertiesFile
-     */
-    synchronized PropertiesFile getRecentlyUsedPropertiesFile() {
-        if (cachedRecentlyUsedPropertiesFile == null) {
-            //no properties file yet, create it
-            cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
-            return cachedRecentlyUsedPropertiesFile;
-        }
-        if (recentlyUsedPropertiesFile.getFile().equals(cachedRecentlyUsedPropertiesFile.getStoreFile())) {
-            //The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
-            return cachedRecentlyUsedPropertiesFile;
-        } else {
-            //the InfrastructureFileDescriptor was set to different location, move to it
-            if (cachedRecentlyUsedPropertiesFile.tryLock()) {
-                cachedRecentlyUsedPropertiesFile.store();
-                cachedRecentlyUsedPropertiesFile.unlock();
-            }
-            cachedRecentlyUsedPropertiesFile = new PropertiesFile(recentlyUsedPropertiesFile.getFile());
-            return cachedRecentlyUsedPropertiesFile;
-        }
-
-    }
-
-    /**
-     * Update map for keeping track of recently used items.
-     */
-    synchronized void load() {
-        final boolean loaded = getRecentlyUsedPropertiesFile().load();
-        /*
-         * clean up possibly corrupted entries
-         */
-        if (loaded && checkData()) {
-            LOG.warn("Cache is corrupt. Fixing...");
-            store();
-            LOG.warn("Cache was corrupt and has been fixed. It is strongly recommended that you run ''javaws -Xclearcache'' and rerun your application as soon as possible. You can also use via itw-settings Cache -> View files -> Purge");
-        }
-    }
-
-    /**
-     * check content of recentlyUsedPropertiesFile and remove invalid/corrupt entries
-     *
-     * @return true, if cache was corrupted and affected entry removed
-     */
-    private boolean checkData() {
-        boolean modified = false;
-        final Set<Entry<Object, Object>> q = getRecentlyUsedPropertiesFile().entrySet();
-        for (Iterator<Entry<Object, Object>> it = q.iterator(); it.hasNext(); ) {
-            final Entry<Object, Object> currentEntry = it.next();
-
-            final String key = (String) currentEntry.getKey();
-            final String path = (String) currentEntry.getValue();
-
-            // 1. check key format: "milliseconds,number"
-            try {
-                final String[] sa = key.split(",");
-                Long.parseLong(sa[0]);
-                Long.parseLong(sa[1]);
-            } catch (Exception ex) {
-                it.remove();
-                modified = true;
-                continue;
-            }
-
-            // 2. check path format - does the path look correct?
-            if (path != null) {
-                if (!path.contains(cacheDir.getFullPath())) {
-                    it.remove();
-                    modified = true;
-                }
-            } else {
-                it.remove();
-                modified = true;
-            }
-        }
-
-        return modified;
-    }
-
-    /**
-     * Write file to disk.
-     *
-     * @return true if properties were successfully stored, false otherwise
-     */
-    synchronized boolean store() {
-        final PropertiesFile props = getRecentlyUsedPropertiesFile();
-        if (props.isHeldByCurrentThread()) {
-            props.store();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * This adds a new entry to file.
-     *
-     * @param key  key we want path to be associated with.
-     * @param path path to cache item.
-     */
-    synchronized void addEntry(String key, String path) {
-        final PropertiesFile props = getRecentlyUsedPropertiesFile();
-        if (!props.containsKey(key)) {
-            props.setProperty(key, path);
-        }
-    }
-
-    /**
-     * This removed an entry from our map.
-     *
-     * @param key key we want to remove.
-     */
-    synchronized void removeEntry(String key) {
-        final PropertiesFile props = getRecentlyUsedPropertiesFile();
-        props.remove(key);
-    }
-
-    private String getIdForCacheFolder(String folder) {
-        final int len = cacheDir.getFullPath().length();
-        final int index = folder.indexOf(File.separatorChar, len + 1);
-        return folder.substring(len + 1, index);
-    }
-
-    /**
-     * This updates the given key to reflect it was recently accessed.
-     *
-     * @param oldKey Key we wish to update.
-     */
-    private synchronized void markEntryAsAccessed(String oldKey) {
-        final PropertiesFile props = getRecentlyUsedPropertiesFile();
-        if (props.containsKey(oldKey)) {
-            final String value = props.getProperty(oldKey);
-
-            props.remove(oldKey);
-            props.setProperty(generateKey(value), value);
-        }
-    }
-
-    /**
-     * Return a copy of the keys available.
-     *
-     * @return List of Strings sorted by ascending order.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    //although Properties are pretending to be <object,Object> they are always <String,String>
-    //bug in jdk?
-    private synchronized List<Entry<String, String>> getLRUSortedEntries() {
-        final List<Entry<String, String>> entries = new ArrayList<>();
-
-        for (Entry e : getRecentlyUsedPropertiesFile().entrySet()) {
-            entries.add(new AbstractMap.SimpleImmutableEntry(e));
-        }
-
-        // sort by keys in descending order.
-        entries.sort(Comparator.comparingLong(e -> Long.parseLong(e.getKey().split(",")[0])));
-        return entries;
-    }
-
-    /**
-     * Lock the file to have exclusive access.
-     */
-    synchronized void lock() {
-        getRecentlyUsedPropertiesFile().lock();
-    }
-
-    /**
-     * Unlock the file.
-     */
-    synchronized void unlock() {
-        getRecentlyUsedPropertiesFile().unlock();
-    }
-
-    /**
-     * Generate a key given the path to file. May or may not generate the same
-     * key given same path.
-     *
-     * @param path Path to generate a key with.
-     * @return String representing the a key.
-     */
-    String generateKey(String path) {
-        return System.currentTimeMillis() + "," + getIdForCacheFolder(path);
-    }
-
-    void clearLRUSortedEntries() {
-        getRecentlyUsedPropertiesFile().clear();
-    }
-
-    private String getDomain(Path path) {
-        final String relativeToCache = path.relativize(Paths.get(cacheDir.getFullPath())).toString();
-        final String[] parts = relativeToCache.split(Pattern.quote(File.separator));
-        return parts[3];
+        return path.substring(i+1);
     }
 
     private boolean cannotClearCache() {
         if (okToClearCache()) {
-            final File cacheRoot = cacheDir.getFile();
+            final File cacheRoot = rootCacheDir.getFile();
             return !cacheRoot.isDirectory();
         }
 
@@ -831,91 +535,8 @@ class CacheLRUWrapper {
         }
     }
 
-
-    /* **********
-     * only used in tests
-     * **********/
-
-    synchronized boolean containsKey(String key) {
-        return getRecentlyUsedPropertiesFile().containsKey(key);
-    }
-
-    synchronized boolean containsValue(String value) {
-        return getRecentlyUsedPropertiesFile().containsValue(value);
-    }
-
-    InfrastructureFileDescriptor getRecentlyUsedFile() {
-        return recentlyUsedPropertiesFile;
-    }
-
-
     private static class CacheLRUWrapperHolder {
         private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
 
-    private static class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEntry> {
-        private final long folderId;
-        private final long lastAccessed;
-
-        private final URL resource;
-        private final VersionId version;
-        private final String relativePath;
-
-        /**
-         * Constructor to create an entry from a line in the "recently used" property file.
-         *
-         * @param key   the property key == folderId
-         * @param value = the property value == a sting representation of the remaining values
-         */
-        LeastRecentlyUsedCacheEntry(long key, String value) {
-            try {
-                this.folderId = key;
-
-                final String[] values = value.split(" ");
-                this.lastAccessed = Long.parseLong(values[0]);
-                this.resource = new URL(urlDecode(values[1]));
-                this.version = VersionId.fromString(values[2]);
-                this.relativePath = urlDecode(values[3]);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        LeastRecentlyUsedCacheEntry(long folderId, long lastAccessed, URL resource, VersionId version, String relativePath) {
-            this.folderId = folderId;
-            this.lastAccessed = lastAccessed;
-            this.resource = resource;
-            this.version = version;
-            this.relativePath = relativePath;
-        }
-
-        File getCacheFile(InfrastructureFileDescriptor cacheDir) {
-            return new File(String.join("/", cacheDir.getFullPath(), Long.toString(folderId), relativePath));
-        }
-
-        String getPropertyKey() {
-            return Long.toString(folderId);
-        }
-
-        String getPropertyValue() {
-            return String.join(" ", Long.toString(lastAccessed), urlEncode(resource.toString()), version.toString(), urlEncode(relativePath));
-        }
-
-        public boolean matches(URL resource, VersionString versionString) {
-            if (this.resource.equals(resource)) {
-                if (versionString == null && version == null) {
-                    return true;
-                }
-                if (versionString != null && version != null) {
-                    return versionString.contains(version);
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public int compareTo(LeastRecentlyUsedCacheEntry o) {
-            return Long.compare(this.lastAccessed, o.lastAccessed);
-        }
-    }
 }

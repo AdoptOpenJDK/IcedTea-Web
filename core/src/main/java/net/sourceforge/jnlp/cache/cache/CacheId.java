@@ -7,24 +7,24 @@ import java.util.Objects;
 /**
  * ID for locating resources in the cache either by domain or jnlp-path.
  */
-public abstract class CacheId {
+public class CacheId {
 
-    //last century array of objects instead of some nice class inherited from previous century
-    protected final List<Object[]> files = new ArrayList<>();
-
-    abstract void populate();
-
-    public abstract String getType();
-
-    protected final String id;
-
-    CacheId(String id) {
-        this.id = id;
+    static CacheId domainId(String id) {
+        return new CacheId(id, "DOMAIN");
     }
 
-    @Override
-    public String toString() {
-        return id;
+    static CacheId jnlpPathId(String id) {
+        return new CacheId(id, "JNLP-PATH");
+    }
+
+    //last century array of objects instead of some nice class inherited from previous century
+    private final List<Object[]> files = new ArrayList<>();
+    private final String id;
+    private final String type;
+
+    private CacheId(String id, String type) {
+        this.id = id;
+        this.type = type;
     }
 
     public List<Object[]> getFiles() {
@@ -35,91 +35,26 @@ public abstract class CacheId {
         return id;
     }
 
+    public String getType() {
+        return type;
+    }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof CacheId) {
-            CacheId c = (CacheId) obj;
-            if (c.id == null && this.id == null) {
-                return true;
-            }
-            if (c.id == null) {
-                return false;
-            }
-            return c.id.equals(this.id);
-        } else {
-            return false;
-        }
+    public String toString() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CacheId cacheId = (CacheId) o;
+        return Objects.equals(id, cacheId.id) &&
+                type.equals(cacheId.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.id);
-    }
-
-    static class CacheJnlpId extends CacheId {
-
-        CacheJnlpId(String id) {
-            super(id);
-        }
-
-        @Override
-        public void populate() {
-            ArrayList<Object[]> all = CacheDirectory.generateData();
-            for (Object[] object : all) {
-                if (id.equals(object[6])) {
-                    this.files.add(object);
-                }
-            }
-        }
-
-        @Override
-        public String getType() {
-            return "JNLP-PATH";
-        }
-
-        @Override
-        //hashcode in super is ok
-        public boolean equals(Object obj) {
-            if (obj instanceof CacheJnlpId) {
-                return super.equals(obj);
-            } else {
-                return false;
-            }
-        }
-
-    }
-
-    static class CacheDomainId extends CacheId {
-
-        CacheDomainId(String id) {
-            super(id);
-        }
-
-        @Override
-        public void populate() {
-            ArrayList<Object[]> all = CacheDirectory.generateData();
-            for (Object[] object : all) {
-                if (id.equals(object[3].toString())) {
-                    this.files.add(object);
-                }
-            }
-        }
-
-        @Override
-        public String getType() {
-            return "DOMAIN";
-        }
-
-        @Override
-        //hashcode in super is ok
-        public boolean equals(Object obj) {
-            if (obj instanceof CacheDomainId) {
-                return super.equals(obj);
-            } else {
-                return false;
-            }
-        }
-
+        return Objects.hash(id, type);
     }
 }

@@ -12,7 +12,7 @@ public interface ResourceInfo {
     /**
      * @return URL as specified in the JNLP file
      */
-    URL getLocation();
+    URL getResourceHref();
 
     /**
      * @return version-id contained in the version-string of the JNLP file
@@ -34,9 +34,9 @@ public interface ResourceInfo {
      */
     long getDownloadedAt();
 
-    static ResourceInfo createInfoFromRemote(URL location, VersionId version, CloseableConnection connection) {
+    static ResourceInfo createInfoFromRemote(URL resourceHref, VersionId version, CloseableConnection connection) {
         return new ResourceInfoBean(
-                location,
+                resourceHref,
                 version,
                 connection.getContentLength(),
                 connection.getLastModified(),

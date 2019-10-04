@@ -27,7 +27,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -205,7 +204,7 @@ public class Resource {
      *
      * @param downloadVersion version of downloaded resource
      */
-    public void setDownloadVersion(final VersionId downloadVersion) {
+    void setDownloadVersion(final VersionId downloadVersion) {
         this.downloadVersion = downloadVersion;
     }
 
