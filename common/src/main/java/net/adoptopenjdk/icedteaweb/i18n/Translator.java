@@ -71,7 +71,7 @@ public class Translator {
         this.resources = new ChainedResourceBundle(resources, locale);
     }
 
-    private static Translator getInstance() {
+    public static Translator getInstance() {
         return TranslatorHolder.getTranslator();
     }
 
@@ -94,7 +94,7 @@ public class Translator {
      * @return a string representing the localized message
      */
     public static String R(String message) {
-        return getInstance().translate(message);
+        return getInstance().translate(message, new Object[0]);
     }
 
     /**
@@ -111,7 +111,7 @@ public class Translator {
      * @param args params to be expanded to message
      * @return the localized resource string using the specified arguments.
      */
-    String translate(final String key, final Object... args) {
+    public String translate(final String key, final Object... args) {
         return MessageFormat.format(translate(key), args);
     }
 
