@@ -11,9 +11,16 @@ import java.awt.BorderLayout;
 
 public class CertificatesSettingsPanelProvider implements ControlPanelProvider {
 
+    public static final String NAME = "CertificatePane";
+
     @Override
     public String getName() {
-        return Translator.R("CPHeadCertificates");
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
+        return Translator.R("CPTabCertificate");
     }
 
     @Override

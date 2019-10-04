@@ -8,8 +8,16 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import javax.swing.JComponent;
 
 public class UnsignedAppletsTrustingListPanelProvider implements ControlPanelProvider {
+
+    public static final String NAME = "UnsignedAppletsTrustingListPanel";
+
     @Override
     public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getTitle() {
         return Translator.R("APPEXTSECControlPanelExtendedAppletSecurityTitle");
     }
 
