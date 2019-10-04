@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.i18n;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -22,54 +21,39 @@ public class TranslatorTest {
     private static final String ARGUMENT_KEY = "argument.key";
     private static final String APOSTROPHE_KEY = "apostrophe.key";
 
-    private Translator translator;
-    private Translator translatorWithBundleWithoutMissingResourceFallback;
-
-    @Before
-    public void setup() throws IOException {
-        Locale.setDefault(Locale.ENGLISH);
-        translator = new Translator(createTestBundleWithMissingResourceFallback());
-        translatorWithBundleWithoutMissingResourceFallback = new Translator(createTestBundleWithoutMissingResourceFallback());
-    }
-
     @Test(expected = IllegalStateException.class)
     public void testTranslatorCreationWithMissingResourceBundle() {
-        new Translator("unknown.Messages");
+        new Translator("unknown.Messages", Locale.ENGLISH);
     }
 
     @Test
-    public void testTranslateWithRegularKey() {
-        String message = translator.translate(KEY);
+    public void testTranslateWithRegularKey() throws Exception {
+        String message = createTestTranslator().translate(KEY);
         assertEquals("value", message);
     }
 
     @Test
-    public void testTranslateWithRegularKeyAndArguments() {
-        String message = translator.translate(ARGUMENT_KEY, new Object[] {"argument1", "argument2"});
+    public void testTranslateWithRegularKeyAndArguments() throws Exception {
+        String message = createTestTranslator().translate(ARGUMENT_KEY, "argument1", "argument2");
         assertEquals("value argument1 argument2", message);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testTranslateWithNullKey() {
-        translator.translate(null);
+    public void testTranslateWithNullKey() throws Exception {
+        createTestTranslator().translate(null);
     }
 
     @Test
-    public void testTranslateNonExistingKey() {
-        String message = translator.translate(UNKNOWN_KEY);
+    public void testTranslateNonExistingKey() throws Exception {
+        String message = createTestTranslator().translate(UNKNOWN_KEY);
         assertEquals(UNKNOWN_KEY + "_en", message);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testTranslateNonExistingKeyWithBundleWithoutMissingResourceFallback() {
-        translatorWithBundleWithoutMissingResourceFallback.translate(UNKNOWN_KEY);
-    }
-
     @Test
-    public void testTranslateMessageWithApostrophe() {
+    public void testTranslateMessageWithApostrophe() throws Exception {
         //Message format requires apostrophes to be escaped by using two ''
         //The properties files follow this requirement
-        String message = translator.translate(APOSTROPHE_KEY);
+        String message = createTestTranslator().translate(APOSTROPHE_KEY);
         assertEquals("valuewith'", message);
     }
 
@@ -77,6 +61,25 @@ public class TranslatorTest {
     public void testExistenceOfMissingResourcePlaceholderInSingletonDefaultBundle() {
         String message = Translator.R(Translator.MISSING_RESOURCE_PLACEHOLDER);
         Assert.assertNotNull(message);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testTranslateNonExistingKeyWithBundleWithoutMissingResourceFallback() throws Exception {
+        new Translator(createTestBundleWithoutMissingResourceFallback(), Locale.ENGLISH).translate(UNKNOWN_KEY);
+    }
+
+    @Test
+    public void testChainingOfResourceBundle() {
+        final Translator translator = new Translator("net.adoptopenjdk.icedteaweb.i18n.res1", Locale.ENGLISH);
+        translator.addBundleImpl(ResourceBundle.getBundle("net.adoptopenjdk.icedteaweb.i18n.res2", Locale.ENGLISH));
+
+        assertEquals("11", translator.translate("foo"));
+        assertEquals("22", translator.translate("bar"));
+        assertEquals("22", translator.translate("baz"));
+    }
+
+    private Translator createTestTranslator() throws IOException {
+        return new Translator(createTestBundleWithMissingResourceFallback(), Locale.ENGLISH);
     }
 
     private ResourceBundle createTestBundleWithMissingResourceFallback() throws IOException {
@@ -92,9 +95,9 @@ public class TranslatorTest {
         fos.write(message.getBytes());
 
         final URL u = f.getParentFile().toURI().toURL();
-        final ClassLoader loader = new URLClassLoader(new URL[] {u});
+        final ClassLoader loader = new URLClassLoader(new URL[]{u});
 
-        return ResourceBundle.getBundle("test", Locale.getDefault(), loader);
+        return ResourceBundle.getBundle("test", Locale.ENGLISH, loader);
     }
 
     private ResourceBundle createTestBundleWithoutMissingResourceFallback() throws IOException {
@@ -107,8 +110,8 @@ public class TranslatorTest {
         fos.write(message.getBytes());
 
         final URL u = f.getParentFile().toURI().toURL();
-        final ClassLoader loader = new URLClassLoader(new URL[] {u});
+        final ClassLoader loader = new URLClassLoader(new URL[]{u});
 
-        return ResourceBundle.getBundle("test2", Locale.getDefault(), loader);
+        return ResourceBundle.getBundle("test2", Locale.ENGLISH, loader);
     }
 }
