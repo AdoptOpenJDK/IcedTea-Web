@@ -1,6 +1,6 @@
 dist: trusty
 language: java
-jdk: oraclejdk8
+jdk: openjdk8
 
 addons:
   apt:
@@ -8,6 +8,8 @@ addons:
       - xvfb
 
 install:
+  - wget -O ~ https://github.com/sormuras/bach/raw/8ca3ad9/install-jdk.sh
+  - chmod +x ~/install-jdk.sh
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
@@ -16,4 +18,15 @@ cache:
     - $HOME/.m2
 
 script:
-  - mvn clean verify -e
+  - mvn clean verify -e -fae || travis_terminate "$?"
+  - |
+      export JAVA_HOME=$HOME/openjdk11
+      ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x64_linux_hotspot_11.0.4_11.tar.gz --target $JAVA_HOME
+      mvn test -fae
+      result_11=$?; (exit "$result_11")
+  - |
+      export JAVA_HOME=$HOME/openjdk13
+      ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13%2B33/OpenJDK13U-jdk_x64_linux_hotspot_13_33.tar.gz --target $JAVA_HOME
+      mvn test -fae
+      result_11=$?; (exit "$result_13")
+  - '(exit "$(( result_11 ? result_11 : result_13))")'

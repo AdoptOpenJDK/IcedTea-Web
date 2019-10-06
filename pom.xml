@@ -119,6 +119,11 @@
                         <environmentVariables>
                             <ICEDTEA_WEB_SPLASH>DEFAULT</ICEDTEA_WEB_SPLASH>
                         </environmentVariables>
+                        <!--
+                        <parallel>suitesAndClasses</parallel>
+                        <parallelTestsTimeoutInSeconds>15</parallelTestsTimeoutInSeconds>
+                        <threadCount>2</threadCount>
+                        -->
                     </configuration>
                 </plugin>
 
