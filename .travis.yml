@@ -7,26 +7,52 @@ addons:
     packages:
       - xvfb
 
-install:
-  - wget -O ~ https://github.com/sormuras/bach/raw/8ca3ad9/install-jdk.sh
+x-test-install: &test-pre-install
+  - wget -O ~/install-jdk.sh https://github.com/sormuras/bach/raw/8ca3ad9/install-jdk.sh
   - chmod +x ~/install-jdk.sh
-  - export DISPLAY=':99.0'
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  - &x-setup
+    export DISPLAY=':99.0'; Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 cache:
   directories:
     - $HOME/.m2
 
-script:
-  - mvn clean verify -e -fae || travis_terminate "$?"
-  - |
-      export JAVA_HOME=$HOME/openjdk11
-      ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x64_linux_hotspot_11.0.4_11.tar.gz --target $JAVA_HOME
-      mvn test -fae
-      result_11=$?; (exit "$result_11")
-  - |
-      export JAVA_HOME=$HOME/openjdk13
-      ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13%2B33/OpenJDK13U-jdk_x64_linux_hotspot_13_33.tar.gz --target $JAVA_HOME
-      mvn test -fae
-      result_11=$?; (exit "$result_13")
-  - '(exit "$(( result_11 ? result_11 : result_13))")'
+jobs:
+  include:
+    - stage: Verify on J8
+      name: OpenJDK8
+      before_install:
+        - *x-setup
+      script:
+        - find > list-before
+        - mvn -T1C clean verify -e -fae
+        - |
+          for tgt in $TRAVIS_BUILD_DIR/*/target/; do
+            module=${tgt%/target/}
+            mkdir -p ~/.m2/artifact-temp/"$module"
+            cp -a --reflink=auto -- "$tgt" ~/.m2/artifact-temp/"$module"/
+          done
+        - find > list-after
+        - diff -aur list-before list-after; (( $? < 2 ))
+    - stage: Test
+      name: OpenJDK11-test
+      before_install: *test-pre-install
+      install:
+        - export JAVA_HOME=$HOME/openjdk11
+        - ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x64_linux_hotspot_11.0.4_11.tar.gz --target $JAVA_HOME
+      script:
+        - &restore-artifact
+          cp -a --reflink=auto -- ~/.m2/artifact-temp/* $TRAVIS_BUILD_DIR/
+        - &mvn-test
+          mvn surefire:test -e -fae
+    - stage: Test
+      name: OpenJDK13-test
+      before_install: *test-pre-install
+      install:
+        - export JAVA_HOME=$HOME/openjdk13
+        - ~/install-jdk.sh --url https://github.com/AdoptOpenJDK/openjdk13-binaries/releases/download/jdk-13%2B33/OpenJDK13U-jdk_x64_linux_hotspot_13_33.tar.gz --target $JAVA_HOME
+      script:
+        - *restore-artifact
+        - *mvn-test
+    - stage: Cleanup
+      script: rm -rf ~/.m2/artifact-temp/
