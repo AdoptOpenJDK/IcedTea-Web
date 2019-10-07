@@ -104,8 +104,8 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
         long avg = (end - start) / noLoops / 1000;
         ServerAccess.logErrorReprint("Average = " + avg + "ns");
 
-        // wait more than 4000 microseconds for noEntries=1000 is bad
-        assertTrue("convertPropertiesToEntries() must not take longer than 4000µs, but took in avg " + avg + "µs", avg < 4000);
+        // wait more than 5000 microseconds for noEntries=1000 is bad
+        assertTrue("convertPropertiesToEntries() must not take longer than 5000µs, but took in avg " + avg + "µs", avg < 5000);
     }
 
     @Test
