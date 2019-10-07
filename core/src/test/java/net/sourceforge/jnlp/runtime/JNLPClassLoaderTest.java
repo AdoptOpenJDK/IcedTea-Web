@@ -121,10 +121,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     @Test
     @Ignore
     public void constructorFileLeakTest() throws Exception {
-        File tempDirectory = temporaryFolder.newFolder();
-        File jarLocation = new File(tempDirectory, "test.jar");
-        FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
-
+        final File jarLocation = createJarWithoutContent();
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
 
         assertNoFileLeak(() -> {
@@ -140,10 +137,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
      * However, it is tricky without it erroring-out. */
     @Test
     public void isInvalidJarTest() throws Exception {
-        File tempDirectory = temporaryFolder.newFolder();
-        File jarLocation = new File(tempDirectory, "test.jar");
-        FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
-
+        final File jarLocation = createJarWithoutContent();
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
@@ -156,40 +150,32 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         File jarLocation = new File(tempDirectory, "test.jar");
 
         /* Test with main-class in manifest */
-        {
-            Manifest manifest = new Manifest();
-            manifest.getMainAttributes().put(MAIN_CLASS, "DummyClass");
-            FileTestUtils.createJarWithContents(jarLocation, manifest);
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(MAIN_CLASS, "DummyClass");
+        FileTestUtils.createJarWithContents(jarLocation, manifest);
 
-            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-            final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-            assertNoFileLeak(() -> assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
-        }
+        assertNoFileLeak(() -> assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
     }
 
     @Test
     @Ignore
     public void getMainClassNameTestEmpty() throws Exception {
         /* Test with-out any main-class specified */
-        {
-            File tempDirectory = temporaryFolder.newFolder();
-            File jarLocation = new File(tempDirectory, "test.jar");
-            FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+        File jarLocation = createJarWithoutContent();
 
-            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-            final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-            assertNoFileLeak(() -> assertNull(jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
-        }
+        assertNoFileLeak(() -> assertNull(jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
     }
 
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
     @Test
     public void checkForMainFileLeakTest() throws Exception {
-        File tempDirectory = temporaryFolder.newFolder();
-        File jarLocation = new File(tempDirectory, "test.jar");
-        FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+        File jarLocation = createJarWithoutContent();
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
@@ -227,11 +213,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void getCustomAttributesEmpty() throws Exception {
-        File tempDirectory = temporaryFolder.newFolder();
-        File jarLocation = new File(tempDirectory, "testX.jar");
-
-        /* Test with-out any attribute specified specified */
-        FileTestUtils.createJarWithContents(jarLocation /* No contents */);
+        File jarLocation = createJarWithoutContent();
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
@@ -601,5 +583,12 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
             as.stop();
         }
+    }
+
+    private File createJarWithoutContent() throws Exception {
+        File tempDirectory = temporaryFolder.newFolder();
+        File jarLocation = new File(tempDirectory, "test.jar");
+        FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
+        return jarLocation;
     }
 }
