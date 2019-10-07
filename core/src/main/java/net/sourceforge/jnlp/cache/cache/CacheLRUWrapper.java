@@ -36,7 +36,6 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
@@ -62,6 +61,7 @@ import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -100,10 +100,10 @@ class CacheLRUWrapper {
     }
 
     File getOrCreateCacheFile(URL resourceHref, VersionId version) {
-        return cacheIndex.getSynchronized(idx -> {
-            final LeastRecentlyUsedCacheEntry entry = getOrCreateCacheEntry(idx, resourceHref, version);
-            return getCacheFile(entry);
-        });
+        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
+                getOrCreateCacheEntry(idx, resourceHref, version)
+        );
+        return getCacheFile(entry);
     }
 
     private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
@@ -112,12 +112,12 @@ class CacheLRUWrapper {
     }
 
     File replaceExistingCacheFile(URL resourceHref, VersionId version) {
-        return cacheIndex.getSynchronized(idx -> {
+        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx -> {
             // Old entry will still exist. (but removed at cleanup)
             idx.markEntryForDeletion(resourceHref, version);
-            final LeastRecentlyUsedCacheEntry entry = createNewInfoFileAndIndexEntry(idx, resourceHref, version);
-            return getCacheFile(entry);
+            return createNewInfoFileAndIndexEntry(idx, resourceHref, version);
         });
+        return getCacheFile(entry);
     }
 
     private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
@@ -163,20 +163,21 @@ class CacheLRUWrapper {
     void addToCache(ResourceInfo info, InputStream inputStream) throws IOException {
         final List<IOException> ex = new ArrayList<>();
 
-        cacheIndex.runSynchronized(idx -> {
-            final LeastRecentlyUsedCacheEntry entry = getOrCreateCacheEntry(idx, info.getResourceHref(), info.getVersion());
-            final CacheEntry infoFile = getInfoFile(entry);
-            final File cacheFile = infoFile.getCacheFile();
-            try {
-                LOG.debug("Downloading file: {} into: {}", info.getResourceHref(), cacheFile.getCanonicalPath());
-                try (final OutputStream out = new FileOutputStream(cacheFile)) {
-                    IOUtils.copy(inputStream, out);
-                }
-                infoFile.storeInfo(info);
-            } catch (IOException e) {
-                ex.add(e);
+        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
+                getOrCreateCacheEntry(idx, info.getResourceHref(), info.getVersion())
+        );
+
+        final CacheEntry infoFile = getInfoFile(entry);
+        final File cacheFile = infoFile.getCacheFile();
+        try {
+            LOG.debug("Downloading file: {} into: {}", info.getResourceHref(), cacheFile.getCanonicalPath());
+            try (final OutputStream out = new FileOutputStream(cacheFile)) {
+                IOUtils.copy(inputStream, out);
             }
-        });
+            infoFile.storeInfo(info);
+        } catch (IOException e) {
+            ex.add(e);
+        }
 
         if (!ex.isEmpty()) {
             throw ex.get(0);
@@ -184,8 +185,8 @@ class CacheLRUWrapper {
     }
 
     Optional<ResourceInfo> getResourceInfo(URL resourceHref, VersionId version) {
-        return cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version)
-                .map(this::getInfoFile));
+        return cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
+                .map(this::getInfoFile);
     }
 
     /**
@@ -197,11 +198,9 @@ class CacheLRUWrapper {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isCached(URL resourceHref, VersionId version) {
-        final Boolean isCached = cacheIndex.getSynchronized(idx -> idx
-                .findAndMarkAsAccessed(resourceHref, version)
+        final Boolean isCached = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
                 .map(e -> getInfoFile(e).isCached())
-                .orElse(false)
-        );
+                .orElse(false);
         LOG.info("isCached: {} - (v: {}) = {}", resourceHref, version, isCached);
         return isCached;
     }
@@ -216,46 +215,46 @@ class CacheLRUWrapper {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isUpToDate(URL resourceHref, VersionId version, long lastModified) {
-        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx
-                .findAndMarkAsAccessed(resourceHref, version)
+        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
                 .map(e -> getInfoFile(e).isCurrent(lastModified))
-                .orElse(false)
-        );
+                .orElse(false);
         LOG.info("isUpToDate: {} - (v: {}) = {}", resourceHref, version, isUpToDate);
         return isUpToDate;
     }
 
     Optional<VersionId> getBestMatchingVersionInCache(final URL resourceHref, final VersionString version) {
-        return cacheIndex.getSynchronized(idx -> idx
-                .findBestAndMarkAsAccessed(resourceHref, version)
-                .map(LeastRecentlyUsedCacheEntry::getVersion)
-        );
+        return cacheIndex.getSynchronized(idx -> idx.findBestAndMarkAsAccessed(resourceHref, version))
+                .map(LeastRecentlyUsedCacheEntry::getVersion);
     }
 
     List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
-        return cacheIndex.getSynchronized(idx -> {
-            final Map<String, CacheId> r = new LinkedHashMap<>();
-            idx.getAllUnDeletedEntries().forEach(entry -> {
-                final Object[] fileEntry = createPaneObjectArray(entry);
-                if (includeJnlpPath) {
-                    final CacheEntry infoFile = getInfoFile(entry);
-                    final String jnlpPath = infoFile.getJnlpPath();
-                    if (jnlpPath != null && jnlpPath.matches(filter)) {
-                        final CacheId cacheId = r.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
-                        cacheId.getFiles().add(fileEntry);
-                    }
-                }
-                if (includeDomain) {
-                    final String domain = entry.getDomain();
-                    if (domain != null && domain.matches(filter)) {
-                        final CacheId cacheId = r.computeIfAbsent(domain, CacheId::domainId);
-                        cacheId.getFiles().add(fileEntry);
-                    }
-                }
-            });
+        if (!includeJnlpPath && !includeDomain) {
+            return Collections.emptyList();
+        }
 
-            return new ArrayList<>(r.values());
+        final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(LeastRecentlyUsedCacheIndex::getAllUnDeletedEntries);
+
+        final Map<String, CacheId> r = new LinkedHashMap<>();
+        entries.forEach(entry -> {
+            final Object[] fileEntry = createPaneObjectArray(entry);
+            if (includeJnlpPath) {
+                final CacheEntry infoFile = getInfoFile(entry);
+                final String jnlpPath = infoFile.getJnlpPath();
+                if (jnlpPath != null && jnlpPath.matches(filter)) {
+                    final CacheId cacheId = r.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
+                    cacheId.getFiles().add(fileEntry);
+                }
+            }
+            if (includeDomain) {
+                final String domain = entry.getDomain();
+                if (domain != null && domain.matches(filter)) {
+                    final CacheId cacheId = r.computeIfAbsent(domain, CacheId::domainId);
+                    cacheId.getFiles().add(fileEntry);
+                }
+            }
         });
+
+        return new ArrayList<>(r.values());
     }
 
     private Object[] createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
@@ -300,10 +299,10 @@ class CacheLRUWrapper {
         final File cacheFile = getCacheFile(entry);
         final File directory = cacheFile.getParentFile();
 
-        LOG.info("Deleting cache file: {}", cacheFile.getAbsolutePath());
-        cacheFile.delete();
-
         try {
+            LOG.info("Deleting cache file: {}", cacheFile.getAbsolutePath());
+            FileUtils.recursiveDelete(cacheFile, directory);
+
             LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
             FileUtils.recursiveDelete(directory, directory);
         } catch (IOException e) {
@@ -484,7 +483,7 @@ class CacheLRUWrapper {
         if (i < 0) {
             return path;
         }
-        return path.substring(i+1);
+        return path.substring(i + 1);
     }
 
     private boolean cannotClearCache() {
@@ -529,7 +528,7 @@ class CacheLRUWrapper {
                 try {
                     locking.release();
                 } catch (IOException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    LOG.error("failed to unlock the MAIN_LOCK", ex);
                 }
             }
         }
