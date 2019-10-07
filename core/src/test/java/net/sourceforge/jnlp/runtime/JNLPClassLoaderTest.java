@@ -50,6 +50,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -368,7 +369,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testRelativePathInUrl() throws Exception {
-        assertTrue(Cache.clearCache());
+        clearCache();
         final int port = ServerAccess.findFreePort();
         final File dir = temporaryFolder.newFolder("base");
         final File jar = new File(dir, "j1.jar");
@@ -419,7 +420,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testEncodedPathIsNotDecodedForCache() throws Exception {
-        assertTrue(Cache.clearCache());
+        clearCache();
         final int port = ServerAccess.findFreePort();
         final File dir = temporaryFolder.newFolder("base");
         final File jar = new File(dir, "j1.jar");
@@ -470,7 +471,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testRelativePathInNestedJars() throws Exception {
-        Cache.clearCache();
+        clearCache();
         final int port = ServerAccess.findFreePort();
         final File dir = temporaryFolder.newFolder();
         final File jar = new File(dir, "jar03_dotdotN1.jar");
@@ -557,7 +558,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test(expected = Exception.class)
     public void testDifferentSignatureInManifestMf() throws Exception {
-        Cache.clearCache();
+        clearCache();
         final int port = ServerAccess.findFreePort();
         final File dir = temporaryFolder.newFolder();
         final File jar = new File(dir, "jar03_dotdotN1.jar");
@@ -598,6 +599,18 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setDebug(verbose);
             getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
             as.stop();
+        }
+    }
+
+    private void clearCache() {
+        final File cacheDir = PathsAndFiles.CACHE_DIR.getFile();
+        if (cacheDir.isDirectory()) {
+            assertTrue("Failed to clear cache", Cache.clearCache());
+        } else {
+            if (cacheDir.isFile()) {
+                assertTrue("Failed to delete file blocking cache dir", cacheDir.delete());
+            }
+            assertTrue("Failed to create empty cache dir", cacheDir.mkdirs());
         }
     }
 
