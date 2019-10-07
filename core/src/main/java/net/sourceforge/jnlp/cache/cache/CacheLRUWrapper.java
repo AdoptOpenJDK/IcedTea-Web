@@ -222,9 +222,8 @@ class CacheLRUWrapper {
         return isUpToDate;
     }
 
-    Optional<VersionId> getBestMatchingVersionInCache(final URL resourceHref, final VersionString version) {
-        return cacheIndex.getSynchronized(idx -> idx.findBestAndMarkAsAccessed(resourceHref, version))
-                .map(LeastRecentlyUsedCacheEntry::getVersion);
+    Optional<LeastRecentlyUsedCacheEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
+        return cacheIndex.getSynchronized(idx -> idx.findBestAndMarkAsAccessed(resourceHref, version));
     }
 
     List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {

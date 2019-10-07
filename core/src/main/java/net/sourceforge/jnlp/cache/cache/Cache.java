@@ -123,15 +123,16 @@ public class Cache {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
-        final VersionId versionId = getBestMatchingVersionInCache(resource, version);
-        return versionId != null;
+        return CacheLRUWrapper.getInstance().getBestMatchingEntryInCache(resource, version).isPresent();
     }
 
     public static VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
         if (!CacheUtil.isCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
-        return CacheLRUWrapper.getInstance().getBestMatchingVersionInCache(resource, version).orElse(null);
+        return CacheLRUWrapper.getInstance().getBestMatchingEntryInCache(resource, version)
+                .map(LeastRecentlyUsedCacheEntry::getVersion)
+                .orElse(null);
     }
 
     /**

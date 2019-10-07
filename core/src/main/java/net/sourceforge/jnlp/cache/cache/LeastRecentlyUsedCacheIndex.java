@@ -94,7 +94,8 @@ class LeastRecentlyUsedCacheIndex {
      * @return the entry or {@code empty}, never {@code null}
      */
     Optional<LeastRecentlyUsedCacheEntry> findBestAndMarkAsAccessed(URL resourceHref, VersionString versionString) {
-        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, new VersionIdComparator(versionString));
+        final Comparator<VersionId> versionIdaComparator = versionString != null ? new VersionIdComparator(versionString) : (o1, o2) -> o1 == o2 ? 0 : 1;
+        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdaComparator);
         final Optional<LeastRecentlyUsedCacheEntry> result = findAll(resourceHref, versionString).stream()
                 .max(versionComparator);
 

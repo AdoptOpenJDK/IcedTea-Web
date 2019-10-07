@@ -142,22 +142,25 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromCache() {
-        final VersionId versionId = Cache.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
-        final File localFile = Cache.getCacheFile(resource.getLocation(), versionId);
+        if (Cache.isAnyCached(resource.getLocation(), resource.getRequestVersion())) {
+            final VersionId versionId = Cache.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
+            final File localFile = Cache.getCacheFile(resource.getLocation(), versionId);
 
-        if (localFile != null && localFile.exists()) {
-            long size = localFile.length();
+            if (localFile != null && localFile.exists()) {
+                long size = localFile.length();
 
-            synchronized (resource) {
-                resource.setLocalFile(localFile);
-                resource.setSize(size);
-                resource.setDownloadVersion(versionId);
-                resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                synchronized (resource) {
+                    resource.setLocalFile(localFile);
+                    resource.setSize(size);
+                    resource.setDownloadVersion(versionId);
+                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                }
+                return;
             }
-        } else {
-            LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
         }
+
+        LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
+        resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
     }
 
     private void downloadResource() {
