@@ -26,4 +26,13 @@ public interface ControlPanelStyle {
      * @return list of icons
      */
     List<? extends Image> getDialogIcons();
+
+    /**
+     * Returns true if the panel with the given unique name should be displayed in the control panel
+     * @param panelName the unique panel name
+     * @return true if the panel should be displayed
+     */
+    default boolean isPanelActive(final String panelName) {
+        return true;
+    }
 }

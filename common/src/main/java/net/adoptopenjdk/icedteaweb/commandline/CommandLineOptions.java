@@ -34,6 +34,7 @@ public enum CommandLineOptions {
     TRUSTNONE("-Xtrustnone","BOTrustnone"),
     JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
     BROWSER("-browser", "BrowserArg", NumberOfArguments.ONE_OR_MORE),
+    NOSPLASH("-Xnosplash","BXNoSplash"),
     //itweb settings
     LIST("-list", "IBOList"),
     GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),

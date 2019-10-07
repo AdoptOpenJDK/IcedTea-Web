@@ -74,6 +74,9 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>) -> bool {
             }
             return true;
         }
+        if key == "-Xnosplash" {
+            return true;
+        }
     }
     false
 }
@@ -316,6 +319,11 @@ pub mod tests_main {
         vec.push(("ICEDTEA_WEB_SPLASH".to_string(), "true".to_string()));
         vec.push(("---headless".to_string(), "-blah".to_string()));
         assert_eq!(super::is_splash_forbidden_testable(vec), false);
+
+        vec = Vec::new();
+        vec.push(("-blah".to_string(), "-blah".to_string()));
+        vec.push(("-Xnosplash".to_string(), "".to_string()));
+        assert_eq!(super::is_splash_forbidden_testable(vec), true);
     }
 
     #[test]

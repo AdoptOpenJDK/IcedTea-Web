@@ -46,6 +46,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.IOException;
@@ -78,8 +79,9 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    private ControlPanel(DeploymentConfiguration config, final ControlPanelStyle style) {
+    public ControlPanel(final DeploymentConfiguration config, final ControlPanelStyle style) {
         super();
+        Assert.requireNonNull(config, "config");
         Assert.requireNonNull(style, "style");
         setTitle(style.getDialogTitle());
         setIconImages(style.getDialogIcons());
@@ -87,7 +89,7 @@ public class ControlPanel extends JFrame {
         this.config = config;
 
         JPanel topPanel = style.createHeader();
-        JPanel mainPanel = createMainSettingsPanel();
+        JPanel mainPanel = createMainSettingsPanel(style);
         JPanel buttonPanel = createButtonPanel();
 
         add(topPanel, BorderLayout.PAGE_START);
@@ -160,7 +162,20 @@ public class ControlPanel extends JFrame {
             buttonPanel.add(button);
         }
 
-        return buttonPanel;
+
+        buttonPanel.setBackground(Color.WHITE);
+
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        final JPanel topBorder = new JPanel();
+        topBorder.setBackground(Color.GRAY);
+        topBorder.setPreferredSize(new Dimension(Integer.MAX_VALUE, 1));
+        topBorder.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        topBorder.setMinimumSize(new Dimension(1, 1));
+        wrapperPanel.add(topBorder, BorderLayout.NORTH);
+
+        return wrapperPanel;
     }
 
     /**
@@ -168,12 +183,13 @@ public class ControlPanel extends JFrame {
      * 
      * @return A panel with all the components in place.
      */
-    private JPanel createMainSettingsPanel() {
+    private JPanel createMainSettingsPanel(final ControlPanelStyle style) {
+        Assert.requireNonNull(style, "style");
         final Map<String, ControlPanelProvider> providers = new HashMap<>();
         final ServiceLoader<ControlPanelProvider> serviceLoader = ServiceLoader.load(ControlPanelProvider.class);
         serviceLoader.iterator().forEachRemaining(p -> {
             final String name = p.getName();
-            if (p.isActive()) {
+            if (p.isActive() && style.isPanelActive(p.getName())) {
                 if (providers.containsKey(name)) {
                     throw new IllegalStateException("More than 1 active view provider for control panel with name " + name + " found!");
                 }
@@ -186,8 +202,8 @@ public class ControlPanel extends JFrame {
 
         final Map<String, JComponent> panels = providers.values().stream()
                 .sorted(Comparator.comparingInt(ControlPanelProvider::getOrder))
-                .collect(Collectors.toMap(ControlPanelProvider::getName, p -> p.createPanel(config), (u, v) -> {
-                    throw new IllegalStateException(String.format("Duplicate key %s", u));
+                .collect(Collectors.toMap(ControlPanelProvider::getTitle, p -> p.createPanel(config), (u, v) -> {
+                    throw new IllegalStateException(String.format("Duplicate title %s and %s", u.getClass(), v.getClass()));
                 }, LinkedHashMap::new));
 
         final CardLayout cardLayout = new CardLayout();
@@ -196,10 +212,10 @@ public class ControlPanel extends JFrame {
                 .map(JComponent::getMinimumSize)
                 .reduce((a, b) -> new Dimension(Math.max(a.width, b.width), Math.max(a.height, b.height)))
                 .orElse(new Dimension());
-        panels.forEach((name, component) -> {
+        panels.forEach((title, component) -> {
             component.setPreferredSize(minDimension);
-            settingsPanel.add(component, name);
-            cardLayout.addLayoutComponent(component, name);
+            settingsPanel.add(component, title);
+            cardLayout.addLayoutComponent(component, title);
         });
         final JPanel settingsDetailPanel = new JPanel();
         settingsDetailPanel.setLayout(new BorderLayout());

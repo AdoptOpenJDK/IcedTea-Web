@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -106,6 +107,11 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     @Override
     @SuppressWarnings("empty-statement")
     public void launchInitialized(final JNLPFile file) {
+    	
+    	// if show splash is disabled skip create the splash screen
+    	if (!JNLPRuntime.isShowWebSplash()) {
+    		return;
+    	}
 
         int preferredWidth = 500;
         int preferredHeight = 400;
