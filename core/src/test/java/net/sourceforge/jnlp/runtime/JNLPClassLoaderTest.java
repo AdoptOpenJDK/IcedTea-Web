@@ -56,7 +56,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,6 +89,9 @@ import static org.junit.Assert.fail;
 
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     private static AppletSecurityLevel level;
     private static String askUser;
 
@@ -116,7 +121,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     @Test
     @Ignore
     public void constructorFileLeakTest() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test.jar");
         FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
 
@@ -135,7 +140,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
      * However, it is tricky without it erroring-out. */
     @Test
     public void isInvalidJarTest() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test.jar");
         FileTestUtils.createJarWithContents(jarLocation /* no contents*/);
 
@@ -147,7 +152,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void getMainClassNameTest() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test.jar");
 
         /* Test with main-class in manifest */
@@ -168,7 +173,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void getMainClassNameTestEmpty() throws Exception {
         /* Test with-out any main-class specified */
         {
-            File tempDirectory = FileTestUtils.createTempDirectory();
+            File tempDirectory = temporaryFolder.newFolder();
             File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation /* No contents */);
 
@@ -182,7 +187,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
     @Test
     public void checkForMainFileLeakTest() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test.jar");
         FileTestUtils.createJarWithContents(jarLocation /* No contents */);
 
@@ -200,7 +205,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void getCustomAttributes() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "testX.jar");
 
         /* Test with attributes in manifest */
@@ -222,7 +227,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void getCustomAttributesEmpty() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "testX.jar");
 
         /* Test with-out any attribute specified specified */
@@ -240,7 +245,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void checkOrderWhenReadingAttributes() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation1 = new File(tempDirectory, "test1.jar");
         File jarLocation2 = new File(tempDirectory, "test2.jar");
         File jarLocation3 = new File(tempDirectory, "test3.jar");
@@ -291,7 +296,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void tryNullManifest() throws Exception {
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test-npe.jar");
         File dummyContent = File.createTempFile("dummy", "context", tempDirectory);
         jarLocation.deleteOnExit();
@@ -357,7 +362,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     @Test
     public void testFindLibrary() throws Exception {
-        final File tempDirectory = FileTestUtils.createTempDirectory();
+        final File tempDirectory = temporaryFolder.newFolder();
         final String nativeLibName = "native";
 
         // Create jar to search in
@@ -386,7 +391,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void testRelativePathInUrl() throws Exception {
         Cache.clearCache();
         int port = ServerAccess.findFreePort();
-        File dir = FileTestUtils.createTempDirectory();
+        File dir = temporaryFolder.newFolder();
         dir.deleteOnExit();
         dir = new File(dir, "base");
         dir.mkdir();
@@ -432,7 +437,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void testEncodedPathIsNotDecodedForCache() throws Exception {
         Cache.clearCache();
         int port = ServerAccess.findFreePort();
-        File dir = FileTestUtils.createTempDirectory();
+        File dir = temporaryFolder.newFolder();
         dir.deleteOnExit();
         dir = new File(dir, "base");
         dir.mkdir();
@@ -479,7 +484,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void testRelativePathInNestedJars() throws Exception {
         Cache.clearCache();
         int port = ServerAccess.findFreePort();
-        File dir = FileTestUtils.createTempDirectory();
+        File dir = temporaryFolder.newFolder();
         dir.deleteOnExit();
         File jar = new File(dir, "jar03_dotdotN1.jar");
         File jnlp = new File(dir, "jar_03_dotdot_jarN1.jnlp");
@@ -559,7 +564,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void testDifferentSignatureInManifestMf() throws Exception {
         Cache.clearCache();
         int port = ServerAccess.findFreePort();
-        File dir = FileTestUtils.createTempDirectory();
+        File dir = temporaryFolder.newFolder();
         dir.deleteOnExit();
         File jar = new File(dir, "jar03_dotdotN1.jar");
         File jnlp = new File(dir, "jar_03_dotdot_jarN1.jnlp");
