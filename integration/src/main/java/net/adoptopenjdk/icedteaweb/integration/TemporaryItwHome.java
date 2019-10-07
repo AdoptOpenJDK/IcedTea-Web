@@ -9,7 +9,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.SavedRememberAction;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
@@ -17,7 +16,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -72,8 +70,8 @@ public class TemporaryItwHome implements TestRule {
         return tempCacheHome;
     }
 
-    public void createDeploymentProps(Map<String, String> deplyment) throws IOException, ConfigurationException {
-        Set<Map.Entry<String, String>> values = deplyment.entrySet();
+    public void createDeploymentProps(Map<String, String> deployment) throws IOException {
+        Set<Map.Entry<String, String>> values = deployment.entrySet();
         for (Map.Entry<String, String> e: values) {
             JNLPRuntime.getConfiguration().setProperty(e.getKey(), e.getValue());
         }
