@@ -76,15 +76,14 @@ import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 /**
  * This class helps maintain the ordering of most recently use cache items across
  * multiple jvm instances. The LRU information is stored as a properties file in the
- * root of the file cache directory. The property key is a combination of a timestamp
- * and the cache folder id. The property value is the path to the cached item.
+ * root of the file cache directory.
  */
-class CacheLRUWrapper {
+class LeastRecentlyUsedCache {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CacheLRUWrapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LeastRecentlyUsedCache.class);
 
-    static CacheLRUWrapper getInstance() {
-        return CacheLRUWrapperHolder.INSTANCE;
+    static LeastRecentlyUsedCache getInstance() {
+        return CacheHolder.INSTANCE;
     }
 
     private final LeastRecentlyUsedCacheIndexHolder cacheIndex;
@@ -94,7 +93,7 @@ class CacheLRUWrapper {
      * @param recentlyUsed file to be used as recently_used file
      * @param cacheDir     dir with cache
      */
-    private CacheLRUWrapper(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
+    private LeastRecentlyUsedCache(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
         this.cacheIndex = new LeastRecentlyUsedCacheIndexHolder(recentlyUsed);
         this.rootCacheDir = cacheDir;
     }
@@ -533,8 +532,8 @@ class CacheLRUWrapper {
         }
     }
 
-    private static class CacheLRUWrapperHolder {
-        private static final CacheLRUWrapper INSTANCE = new CacheLRUWrapper(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
+    private static class CacheHolder {
+        private static final LeastRecentlyUsedCache INSTANCE = new LeastRecentlyUsedCache(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
 
 }
