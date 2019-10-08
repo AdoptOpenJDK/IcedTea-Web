@@ -28,7 +28,6 @@ import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
-import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 import static net.sourceforge.jnlp.cache.ResourceUrlCreator.VERSION_ID_HEADER;
 import static net.sourceforge.jnlp.cache.cache.Cache.isUpToDate;
 import static net.sourceforge.jnlp.cache.cache.ResourceInfo.createInfoFromRemote;
@@ -61,13 +60,15 @@ class ResourceDownloader implements Runnable {
                 return;
             }
 
-            isProcessing = resource.isSet(PROCESSING);
+            isProcessing = resource.isBeingProcessed();
 
             if (!resource.isSet(CONNECTED) && !resource.isSet(CONNECTING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT, PROCESSING));
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PRECONNECT));
+                resource.startProcessing();
             }
             if (!resource.isSet(DOWNLOADED) && !resource.isSet(DOWNLOADING)) {
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD, PROCESSING));
+                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(PREDOWNLOAD));
+                resource.startProcessing();
             }
 
             if (!resource.isSet(PREDOWNLOAD) && !resource.isSet(PRECONNECT)) {
