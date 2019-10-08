@@ -487,10 +487,18 @@ class LeastRecentlyUsedCache {
     private boolean cannotClearCache() {
         if (okToClearCache()) {
             final File cacheRoot = rootCacheDir.getFile();
-            return !cacheRoot.isDirectory();
+            if (cacheRoot.isDirectory()) {
+                return false;
+            } else {
+                LOG.error("Cannot clear the cache as there exists no such directory {}", cacheRoot);
+                return true;
+            }
         }
 
-        LOG.error("Cannot clear the cache at this time. Try later. If the problem persists, try closing your browser(s) & JNLP applications. At the end you can try to kill all java applications. \\\\\\n You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
+        LOG.error("Cannot clear the cache at this time. Try later. " +
+                "If the problem persists, try closing your browser(s) & JNLP applications. " +
+                "At the end you can try to kill all java applications. " +
+                "You can clear cache by javaws -Xclearcache or via itw-settings Cache -> View files -> Purge");
         return true;
     }
 
@@ -520,6 +528,7 @@ class LeastRecentlyUsedCache {
                 return true;
             }
         } catch (IOException e) {
+            LOG.error("Failed to lock MAIN_LOCK (" + PathsAndFiles.MAIN_LOCK.getFullPath() + ")", e);
             return false;
         } finally {
             if (locking != null) {

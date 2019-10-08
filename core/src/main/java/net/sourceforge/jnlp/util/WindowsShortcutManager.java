@@ -31,6 +31,7 @@ public class WindowsShortcutManager {
             try {
                 remove(jnlpApp);
             } catch (IOException e) {
+                LOG.error("failed to update Windows shortcuts (" + getWindowsShortcutsFile() + ")", e);
                 throw new RuntimeException(e);
             }
         }
