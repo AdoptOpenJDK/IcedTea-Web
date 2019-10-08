@@ -71,6 +71,7 @@ import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
+    static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
     static final String ACCEPT_ENCODING = "Accept-Encoding";
     static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
     private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
@@ -102,7 +103,7 @@ class ResourceUrlCreator {
     }
 
     private static VersionId getJnlpVersionHeader(CloseableConnection connection) {
-        final String version = connection.getHeaderField("x-java-jnlp-version-id");
+        final String version = connection.getHeaderField(VERSION_ID_HEADER);
         return version != null ? VersionId.fromString(version) : null;
     }
 

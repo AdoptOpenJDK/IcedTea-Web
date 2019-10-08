@@ -29,6 +29,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
+import static net.sourceforge.jnlp.cache.ResourceUrlCreator.VERSION_ID_HEADER;
 import static net.sourceforge.jnlp.cache.cache.Cache.isUpToDate;
 import static net.sourceforge.jnlp.cache.cache.ResourceInfo.createInfoFromRemote;
 
@@ -210,7 +211,7 @@ class ResourceDownloader implements Runnable {
             final File cacheFile = Cache.getCacheFile(downloadLocation, version);
             resource.setTransferred(cacheFile.length());
         } else {
-            final String versionHeaderField = connection.getHeaderField("x-java-jnlp-version-id");
+            final String versionHeaderField = connection.getHeaderField(VERSION_ID_HEADER);
             final VersionId versionFromRemote = versionHeaderField != null ? VersionId.fromString(versionHeaderField) : resource.getDownloadVersion();
 
             final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
