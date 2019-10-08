@@ -71,7 +71,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.CollectionUtils.isEmpty;
+import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 
 /**
  * This class helps maintain the ordering of most recently use cache items across
@@ -420,7 +420,7 @@ class CacheLRUWrapper {
 
             // delete empty level one dirs
             final List<File> emptyDirs = Arrays.stream(levelOneDirs)
-                    .filter(dir -> isEmpty(dir.list()))
+                    .filter(dir -> isNullOrEmpty(dir.list()))
                     .collect(Collectors.toList());
             deleteAll(emptyDirs);
         }
