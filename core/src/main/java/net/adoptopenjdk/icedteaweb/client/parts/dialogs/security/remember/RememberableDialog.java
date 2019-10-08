@@ -60,7 +60,7 @@ public interface RememberableDialog {
     JNLPFile getFile();
     DialogResult readValue(String s);
 
-    List<Class<? extends RememberableDialog>> allRememberableDialog = Collections.unmodifiableList(Stream.of(
+    List<Class<? extends RememberableDialog>> ALL_REMEMBERABLE_DIALOG = Collections.unmodifiableList(Stream.of(
             AccessWarningPane.class,
             MatchingALACAttributePanel.class,
             PartiallySignedAppTrustWarningPanel.class,

@@ -87,7 +87,7 @@ public class RememberableDialogueEditor extends JDialog {
         getContentPane().removeAll();
         d.setLayout(new GridLayout(0, 4));
 
-        final List<Class<? extends RememberableDialog>> addableClasses = new ArrayList<>(RememberableDialog.allRememberableDialog);
+        final List<Class<? extends RememberableDialog>> addableClasses = new ArrayList<>(RememberableDialog.ALL_REMEMBERABLE_DIALOG);
         for (final Map.Entry<String, SavedRememberAction> entry : entries) {
             final String dialog = entry.getKey();
             for (int i = 0; i < addableClasses.size(); i++) {
