@@ -62,7 +62,6 @@ public class Resource {
         DOWNLOADING,
         DOWNLOADED,
         ERROR,
-        PROCESSING // in queue or being worked on
     }
 
     /** list of weak references of resources currently in use */
@@ -88,6 +87,9 @@ public class Resource {
 
     /** total size of the resource, or -1 if unknown */
     private volatile long size = -1;
+
+    /** true if this resource is being processed */
+    private volatile boolean isBeingProcessed = false;
 
     /** the status of the resource */
     private final EnumSet<Status> status = EnumSet.noneOf(Status.class);
@@ -242,12 +244,19 @@ public class Resource {
         this.size = size;
     }
 
+    public boolean isBeingProcessed() {
+        return isBeingProcessed;
+    }
+
+    public void startProcessing() {
+        isBeingProcessed = true;
+    }
+
     /**
      * @return the status of the resource
      */
     Set<Status> getCopyOfStatus() {
         return EnumSet.copyOf(status);
-
     }
 
     /**

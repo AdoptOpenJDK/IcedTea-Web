@@ -34,7 +34,6 @@ import java.util.List;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -195,7 +194,8 @@ public class ResourceTracker {
             // pretend that they are already downloaded; essentially
             // they will just 'pass through' the tracker as if they were
             // never added (for example, not affecting the total download size).
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
+            resource.startProcessing();
             return;
         }
 
@@ -209,7 +209,8 @@ public class ResourceTracker {
                     resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
                     resource.setSize(resource.getLocalFile().length());
                     resource.setTransferred(resource.getLocalFile().length());
-                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED, PROCESSING));
+                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
+                    resource.startProcessing();
                 }
                 return;
             }
