@@ -89,7 +89,7 @@ public class CachePane extends JPanel {
 
     /**
      * Creates a new instance of the CachePane.
-     * 
+     *
      * @param parent The parent dialog that uses this pane.
      * @param config configuration tobe worked on
      */
@@ -183,7 +183,7 @@ public class CachePane extends JPanel {
 
     /**
      * Create the buttons panel.
-     * 
+     *
      * @return JPanel containing the buttons.
      */
     private Component createButtonPanel() {
@@ -200,7 +200,7 @@ public class CachePane extends JPanel {
                 JDialog jd = new JDialog(parent, true);
                 JTextArea t = new JTextArea();
                 t.setEditable(false);
-                
+
                 int row = cacheTable.getSelectedRow();
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
@@ -384,7 +384,7 @@ public class CachePane extends JPanel {
                         cacheTable.setBackground(SystemColor.control);
                         // No data in cacheTable, so nothing to delete
                         deleteButton.setEnabled(false);
-                        infoButton.setEnabled(false);                        
+                        infoButton.setEnabled(false);
                     } else {
                         cacheTable.setEnabled(true);
                         cacheTable.setBackground(SystemColor.text);
@@ -411,7 +411,7 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            final List<CacheId> cacheIds = Cache.getCacheIds(".*", false, true);
+            final List<CacheId> cacheIds = Cache.getDomainCacheIds();
             for (CacheId cacheId : cacheIds) {
                 for (Object[] v : cacheId.getFiles()) {
                     tableModel.addRow(v);

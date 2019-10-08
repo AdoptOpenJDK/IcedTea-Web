@@ -88,7 +88,7 @@ public class CacheUtil {
     }
 
     public static void logCacheIds(String filter) {
-        List<CacheId> items = Cache.getCacheIds(filter, true, true);
+        List<CacheId> items = Cache.getCacheIds(filter);
         if (JNLPRuntime.isDebug()) {
             for (CacheId id : items) {
                 LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.getFiles().size());

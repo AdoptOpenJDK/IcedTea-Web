@@ -159,12 +159,26 @@ public class Cache {
      * ***************/
 
     /**
+     * This method load all known IDs of applications
+     */
+    public static List<CacheId> getJnlpCacheIds() {
+        return CacheLRUWrapper.getInstance().getCacheIds(".*", true, false);
+    }
+
+    /**
+     * This method load all known IDs of applications
+     */
+    public static List<CacheId> getDomainCacheIds() {
+        return CacheLRUWrapper.getInstance().getCacheIds(".*", false, true);
+    }
+
+    /**
      * This method load all known IDs of applications and  will gather all members, which share the id
      *
      * @param filter - regex to filter keys
      */
-    public static List<CacheId> getCacheIds(final String filter, final boolean jnlpPath, final boolean domain) {
-        return CacheLRUWrapper.getInstance().getCacheIds(filter, jnlpPath, domain);
+    public static List<CacheId> getCacheIds(final String filter) {
+        return CacheLRUWrapper.getInstance().getCacheIds(filter, true, true);
     }
 
     public static void deleteFromCache(final String cacheId) {

@@ -93,8 +93,8 @@ public class CacheAppViewer extends JDialog {
         idTabs.add(jnlpPaths);
         idTabs.add(domains);
         final JButton delete = new JButton(Translator.R("TIFPDeleteFiles"));
-        DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(Cache.getCacheIds(".*", true, false));
-        DummyCacheIdListModel domainIds = new DummyCacheIdListModel(Cache.getCacheIds(".*", false, true));
+        DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(Cache.getJnlpCacheIds());
+        DummyCacheIdListModel domainIds = new DummyCacheIdListModel(Cache.getDomainCacheIds());
         final JList<CacheId> appsByJnlpPath = new JList<>();
         final JList<CacheId> appsByDomain = new JList<>();
         appsByJnlpPath.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -144,7 +144,7 @@ public class CacheAppViewer extends JDialog {
     public void centerDialog() {
         ScreenFinder.centerWindowsToCurrentScreen(this);
     }
-    
+
     private static class DummyListSelectionListenerWithModel implements ListSelectionListener {
 
         private final JTextArea info;
@@ -156,7 +156,7 @@ public class CacheAppViewer extends JDialog {
             this.apps = apps;
             this.delete = delete;
         }
-        
+
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 info.setText("");
@@ -180,9 +180,9 @@ public class CacheAppViewer extends JDialog {
                 }
             }
         }
-    
+
     private static class DummyCacheIdListModel implements ListModel<CacheId> {
-        
+
         List<CacheId> content;
         public DummyCacheIdListModel(List<CacheId> content){
             this.content = content;
