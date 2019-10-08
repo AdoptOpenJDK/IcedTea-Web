@@ -155,7 +155,7 @@ class LeastRecentlyUsedCache {
                 FileUtils.saveFileUtf8(CacheEntry.KEY_JNLP_PATH + "=" + jnlpPath, infoFile);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create info file in dir " + dir);
+            throw new RuntimeException("Failed to create info file in dir " + dir, e);
         }
     }
 
