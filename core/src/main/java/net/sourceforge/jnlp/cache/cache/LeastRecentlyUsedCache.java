@@ -232,27 +232,27 @@ class LeastRecentlyUsedCache {
 
         final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(LeastRecentlyUsedCacheIndex::getAllUnDeletedEntries);
 
-        final Map<String, CacheId> r = new LinkedHashMap<>();
+        final Map<String, CacheId> result = new LinkedHashMap<>();
         entries.forEach(entry -> {
             final Object[] fileEntry = createPaneObjectArray(entry);
             if (includeJnlpPath) {
                 final CacheEntry infoFile = getInfoFile(entry);
                 final String jnlpPath = infoFile.getJnlpPath();
                 if (jnlpPath != null && jnlpPath.matches(filter)) {
-                    final CacheId cacheId = r.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
+                    final CacheId cacheId = result.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
                     cacheId.getFiles().add(fileEntry);
                 }
             }
             if (includeDomain) {
                 final String domain = entry.getDomain();
                 if (domain != null && domain.matches(filter)) {
-                    final CacheId cacheId = r.computeIfAbsent(domain, CacheId::domainId);
+                    final CacheId cacheId = result.computeIfAbsent(domain, CacheId::domainId);
                     cacheId.getFiles().add(fileEntry);
                 }
             }
         });
 
-        return new ArrayList<>(r.values());
+        return new ArrayList<>(result.values());
     }
 
     private Object[] createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
