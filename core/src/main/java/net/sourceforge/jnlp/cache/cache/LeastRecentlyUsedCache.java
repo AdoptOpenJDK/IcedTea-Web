@@ -133,10 +133,10 @@ class LeastRecentlyUsedCache {
                 String path = cacheDirPath + File.separator + i + File.separator + j;
                 File cDir = new File(path);
                 if (!cDir.exists()) {
-                    if (!cDir.isDirectory() && !cDir.mkdirs()) {
-                        throw new RuntimeException("Can't create directory " + cDir);
+                    if (cDir.mkdirs()) {
+                        return cDir;
                     }
-                    return cDir;
+                    throw new RuntimeException("Can't create directory " + cDir);
                 }
             }
         }
