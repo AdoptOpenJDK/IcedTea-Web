@@ -338,22 +338,23 @@ public final class FileUtils {
      * @param isDebug output debug information
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
-    private static DirectoryCheckResults testDirectoryPermissions(File file, boolean isDebug) {
+    private static DirectoryCheckResults testDirectoryPermissions(final File file, final boolean isDebug) {
         try {
-            file = file.getCanonicalFile();
+            final File canonicalFile = file.getCanonicalFile();
+            final File parentFile = canonicalFile.getParentFile();
+            if (parentFile == null || !parentFile.exists()) {
+                return null;
+            }
+            final List<File> policyDirectory = new ArrayList<>();
+            policyDirectory.add(parentFile);
+            final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
+            final DirectoryCheckResults result = validator.ensureDirs(isDebug);
+
+            return result;
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
-        if (file.getParentFile() == null || !file.getParentFile().exists()) {
-            return null;
-        }
-        final List<File> policyDirectory = new ArrayList<>();
-        policyDirectory.add(file.getParentFile());
-        final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
-        final DirectoryCheckResults result = validator.ensureDirs(isDebug);
-
-        return result;
     }
 
     /**
