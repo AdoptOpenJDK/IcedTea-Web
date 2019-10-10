@@ -554,7 +554,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * Load the extensions specified in the JNLP file.
      */
     void initializeExtensions() {
-        List<JNLPClassLoader> loaderList = new ArrayList<>();
+        final List<Exception> exceptions = new ArrayList<>();
+        final List<JNLPClassLoader> loaderList = new ArrayList<>();
         loaderList.add(this);
 
         final ExtensionDesc[] extDescs = resources.getExtensions();
@@ -565,9 +566,14 @@ public class JNLPClassLoader extends URLClassLoader {
                     JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
                     loaderList.add(loader);
                 } catch (Exception ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    exceptions.add(new Exception("Exception while initializing extension '" + ext.getLocation() + "'", ex));
                 }
             }
+        }
+
+        if (exceptions.size() > 0) {
+            exceptions.forEach(e -> LOG.error(e.getMessage(), e.getCause()));
+            throw new RuntimeException(exceptions.get(0));
         }
 
         loaders = loaderList.toArray(new JNLPClassLoader[0]);
