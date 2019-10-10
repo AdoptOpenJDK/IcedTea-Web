@@ -38,15 +38,37 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
-import net.sourceforge.jnlp.JNLPFile;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.AccessWarningPane;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingPermissionsAttributePanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.MatchingALACAttributePanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.PartiallySignedAppTrustWarningPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.UnsignedAppletTrustWarningPanel;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.sourceforge.jnlp.JNLPFile;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface RememberableDialog {
 
-    
-    public RememberPanelResult getRememberAction();
-    public DialogResult getValue();
-    public JNLPFile getFile();
-    public DialogResult readValue(String s);
-    
+    RememberPanelResult getRememberAction();
+    DialogResult getValue();
+    JNLPFile getFile();
+    DialogResult readValue(String s);
+
+    List<Class<? extends RememberableDialog>> ALL_REMEMBERABLE_DIALOG = Collections.unmodifiableList(Stream.of(
+            AccessWarningPane.class,
+            MatchingALACAttributePanel.class,
+            PartiallySignedAppTrustWarningPanel.class,
+            UnsignedAppletTrustWarningPanel.class,
+            MissingALACAttributePanel.class,
+            MissingPermissionsAttributePanel.class
+    )
+            .sorted(Comparator.comparing(Class::getSimpleName))
+            .collect(Collectors.toList()));
+
 }

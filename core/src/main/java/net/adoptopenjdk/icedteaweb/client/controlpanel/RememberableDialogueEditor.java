@@ -65,7 +65,6 @@ import java.util.Map;
  */
 public class RememberableDialogueEditor extends JDialog {
 
-    private final List<Class<? extends RememberableDialog>> allClasses;
     private final AppletSecurityActions actions;
 
     private AppletSecurityActions result;
@@ -78,7 +77,6 @@ public class RememberableDialogueEditor extends JDialog {
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         self = this;
         actions = (AppletSecurityActions) dialogs;
-        allClasses = ClassFinder.findAllMatchingTypes(RememberableDialog.class);
         recreateGui();
         this.setLocationRelativeTo(jFrame);
     }
@@ -89,7 +87,7 @@ public class RememberableDialogueEditor extends JDialog {
         getContentPane().removeAll();
         d.setLayout(new GridLayout(0, 4));
 
-        final List<Class<? extends RememberableDialog>> addableClasses = new ArrayList<>(allClasses);
+        final List<Class<? extends RememberableDialog>> addableClasses = new ArrayList<>(RememberableDialog.ALL_REMEMBERABLE_DIALOG);
         for (final Map.Entry<String, SavedRememberAction> entry : entries) {
             final String dialog = entry.getKey();
             for (int i = 0; i < addableClasses.size(); i++) {
