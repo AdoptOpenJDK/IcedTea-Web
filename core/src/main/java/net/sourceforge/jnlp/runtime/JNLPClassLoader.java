@@ -303,7 +303,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * comes.
      *
      */
-    protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
@@ -328,6 +328,13 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         this.securityDelegate = new SecurityDelegateImpl(this);
+
+        if (mainClass == null) {
+            final EntryPoint entryPoint = file.getEntryPointDesc();
+            if (entryPoint instanceof ApplicationDesc || entryPoint instanceof  AppletDesc) {
+                mainClass = entryPoint.getMainClass();
+            }
+        }
 
         // initialize extensions
         initializeExtensions();
@@ -547,37 +554,29 @@ public class JNLPClassLoader extends URLClassLoader {
      * Load the extensions specified in the JNLP file.
      */
     void initializeExtensions() {
-        ExtensionDesc[] extDescs = resources.getExtensions();
-
-        List<JNLPClassLoader> loaderList = new ArrayList<>();
-
+        final List<Exception> exceptions = new ArrayList<>();
+        final List<JNLPClassLoader> loaderList = new ArrayList<>();
         loaderList.add(this);
 
-        if (mainClass == null) {
-            Object obj = file.getEntryPointDesc();
-
-            if (obj instanceof ApplicationDesc) {
-                ApplicationDesc ad = (ApplicationDesc) file.getEntryPointDesc();
-                mainClass = ad.getMainClass();
-            } else if (obj instanceof AppletDesc) {
-                AppletDesc ad = (AppletDesc) file.getEntryPointDesc();
-                mainClass = ad.getMainClass();
+        final ExtensionDesc[] extDescs = resources.getExtensions();
+        if (extDescs != null) {
+            for (ExtensionDesc ext : extDescs) {
+                try {
+                    String uniqueKey = this.getJNLPFile().getUniqueKey();
+                    JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
+                    loaderList.add(loader);
+                } catch (Exception ex) {
+                    exceptions.add(new Exception("Exception while initializing extension '" + ext.getLocation() + "'", ex));
+                }
             }
         }
 
-        //if (ext != null) {
-        for (ExtensionDesc ext : extDescs) {
-            try {
-                String uniqueKey = this.getJNLPFile().getUniqueKey();
-                JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
-                loaderList.add(loader);
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            }
+        if (exceptions.size() > 0) {
+            exceptions.forEach(e -> LOG.error(e.getMessage(), e.getCause()));
+            throw new RuntimeException(exceptions.get(0));
         }
-        //}
 
-        loaders = loaderList.toArray(new JNLPClassLoader[loaderList.size()]);
+        loaders = loaderList.toArray(new JNLPClassLoader[0]);
     }
 
     /**

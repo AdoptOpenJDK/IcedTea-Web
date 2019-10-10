@@ -71,6 +71,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.asList;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.APPLET_DESC_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc.APPLICATION_DESC_ELEMENT;
@@ -826,24 +827,24 @@ public final class Parser {
     /**
      * Load the entry point descriptor element.
      *
-     * @return the entry point descriptor element
+     * @return the entry point descriptor element, never {@code null}
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      *
      * @see EntryPoint
-     *
      */
     public EntryPoint getEntryPointDesc(final Node parent) throws ParseException {
-        // check for other than one application type
-        if (1 < getChildNodes(parent, APPLET_DESC_ELEMENT).length
-                + getChildNodes(parent, APPLICATION_DESC_ELEMENT).length
-                + getChildNodes(parent, JAVAFX_DESC_ELEMENT).length
-                + getChildNodes(parent, INSTALLER_DESC_ELEMENT).length) {
-            throw new ParseException("Only one application-desc element allowed per JNLP file.");
-        }
+        final List<Node> candidates = new ArrayList<>();
+        candidates.addAll(asList(getChildNodes(parent, APPLET_DESC_ELEMENT)));
+        candidates.addAll(asList(getChildNodes(parent, APPLICATION_DESC_ELEMENT)));
+        candidates.addAll(asList(getChildNodes(parent, JAVAFX_DESC_ELEMENT)));
+        candidates.addAll(asList(getChildNodes(parent, INSTALLER_DESC_ELEMENT)));
 
-        Node child = parent.getFirstChild();
-        while (child != null) {
+        // check for exactly one application type
+        if (candidates.size() > 1) {
+            throw new ParseException("Only one application-desc element allowed per JNLP file.");
+        } else if (candidates.size() == 1) {
+            final Node child = candidates.get(0);
             final String name = child.getNodeName().getName();
 
             if (APPLET_DESC_ELEMENT.equals(name)) {
@@ -858,11 +859,10 @@ public final class Parser {
             if (JAVAFX_DESC_ELEMENT.equals(name)) {
                 return getApplicationDesc(ApplicationType.JAVAFX, child);
             }
-
-            child = child.getNextSibling();
+            throw new ParseException("Found application-desc with unsupported name '" + name + "'.");
         }
 
-        // not reached
+        // no EntryPoint found
         return null;
     }
 
