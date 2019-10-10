@@ -45,6 +45,7 @@ import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.CacheUtil;
@@ -76,6 +77,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+@NotThreadSafe
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;

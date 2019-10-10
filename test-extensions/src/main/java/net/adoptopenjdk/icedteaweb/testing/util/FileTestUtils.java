@@ -83,7 +83,8 @@ public class FileTestUtils {
     }
 
     /**
-     * Check the amount of file descriptors before and after a Runnable
+     * Check the amount of file descriptors before and after a Runnable.
+     * Is not thread-safe.
      */
     public static void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
         Thread.sleep(200);

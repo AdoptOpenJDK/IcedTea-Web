@@ -39,6 +39,7 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
+import net.jcip.annotations.NotThreadSafe;
 import org.junit.Test;
 
 import java.io.File;
@@ -51,6 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+@NotThreadSafe
 public class NativeLibraryStorageTest {
 
     /**************************************************************************
