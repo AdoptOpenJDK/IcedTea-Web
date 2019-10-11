@@ -53,43 +53,42 @@ public interface AppVerifier {
 
     /**
      * Checks if the app has already found trust in its publisher(s).
-     * @param certs The certs to search through and their cert information
+     *
+     * @param certs      The certs to search through and their cert information
      * @param signedJars A map of all the jars of this app and the number of
-     * signed entries each one has.
+     *                   signed entries each one has.
      * @return True if the app trusts its publishers.
      */
-    public boolean hasAlreadyTrustedPublisher(
-            Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars);
+    boolean hasAlreadyTrustedPublisher(Map<CertPath, CertInformation> certs, Map<String, Integer> signedJars);
 
     /**
      * Checks if the app has signer(s) whose certs along their chains are in CA certs.
-     * @param certs The certs to search through and their cert information
+     *
+     * @param certs      The certs to search through and their cert information
      * @param signedJars A map of all the jars of this app and the number of
-     * signed entries each one has.
+     *                   signed entries each one has.
      * @return True if the app has a root in the CA certs store.
      */
-    public boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars);
+    boolean hasRootInCacerts(Map<CertPath, CertInformation> certs, Map<String, Integer> signedJars);
 
     /**
      * Checks if the app's jars are covered by the provided certificates, enough
      * to consider the app fully signed.
-     * @param certs Any possible signer and their respective information regarding this app.
+     *
+     * @param certs      Any possible signer and their respective information regarding this app.
      * @param signedJars A map of all the jars of this app and the number of
-     * signed entries each one has.
+     *                   signed entries each one has.
      * @return true if jar is fully signed
      */
-    public boolean isFullySigned(Map<CertPath, CertInformation> certs,
-            Map<String, Integer> signedJars);
+    boolean isFullySigned(Map<CertPath, CertInformation> certs, Map<String, Integer> signedJars);
 
     /**
      * Prompt the user with requests for trusting the certificates used by this app
+     *
      * @param securityDelegate parental security
-     * @param jcv jar verifier
-     * @param file jnlp file to provide information
+     * @param jcv              jar verifier
+     * @param file             jnlp file to provide information
      * @throws LaunchException if it fails to verify
      */
-    public void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)
-            throws LaunchException;
+    void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file) throws LaunchException;
 }

@@ -91,7 +91,7 @@ public class HttpsCertVerifier implements CertVerifier {
      */
 
     @Override
-    public CertPath getCertPath(final CertPath certPath) { // Parameter ignored.
+    public CertPath getCertPath() { // Parameter ignored.
 
         final ArrayList<X509Certificate> list = new ArrayList<>();
         Collections.addAll(list, chain);
@@ -206,11 +206,6 @@ public class HttpsCertVerifier implements CertVerifier {
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
-        return false;
-    }
-
-    @Override
-    public boolean hasSigningIssues(final CertPath certPath) {
         return false;
     }
 }

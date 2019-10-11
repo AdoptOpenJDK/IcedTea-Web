@@ -105,7 +105,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     }
 
     private String getSigningInfo() {
-        CertInformation info = jcv.getCertInformation(jcv.getCertPath(null));
+        CertInformation info = jcv.getCertInformation(jcv.getCertPath());
 
         if (info != null && info.isRootInCacerts() && !info.hasSigningIssues()) {
             return R("SSigVerified");
@@ -160,7 +160,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     protected String getQuestionPanelText() {
         return SecurityDialogPanel.htmlWrap(R(getQuestionPanelTextKey()));
     }
-    
+
          @Override
     public DialogResult readValue(String s) {
         return YesNoSandbox.readValue(s);
@@ -184,5 +184,5 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     public String helpToStdIn() {
         return YesNoSandbox.sandbox().getAllowedValues().toString();
     }
-    
+
 }
