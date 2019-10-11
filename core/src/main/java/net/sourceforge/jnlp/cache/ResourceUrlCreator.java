@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.http.HttpUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -63,12 +64,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
 class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
+    static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
     static final String ACCEPT_ENCODING = "Accept-Encoding";
     static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
     private static final HttpMethod[] validRequestMethods = {HttpMethod.HEAD, HttpMethod.GET};
@@ -93,9 +96,15 @@ class ResourceUrlCreator {
             return new UrlRequestResult(
                     connection.getResponseCode(),
                     connection.getLocationHeaderFieldUrl(),
+                    getJnlpVersionHeader(connection),
                     connection.getLastModified(),
                     connection.getContentLength());
         }
+    }
+
+    private static VersionId getJnlpVersionHeader(CloseableConnection connection) {
+        final String version = connection.getHeaderField(VERSION_ID_HEADER);
+        return version != null ? VersionId.fromString(version) : null;
     }
 
     /**
@@ -296,11 +305,7 @@ class ResourceUrlCreator {
                 .filter(s -> !isBlank(s))
                 .collect(Collectors.toList());
         if (requestVersion != null) {
-            try {
-                queryParts.add("version-id=" + URLEncoder.encode(requestVersion.toString(), StandardCharsets.UTF_8.name()));
-            } catch (UnsupportedEncodingException e) {
-                LOG.error("Your system does not support " + StandardCharsets.UTF_8.name() + " encoding.", e);
-            }
+            queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 

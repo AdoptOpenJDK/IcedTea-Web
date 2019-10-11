@@ -18,10 +18,13 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
@@ -110,16 +113,11 @@ public class ResourceTracker {
         this.prefetch = prefetch;
     }
 
-    /**
-     * Add a resource identified by the specified location and
-     * version.  The tracker only downloads one version of a given
-     * resource per instance (ie cannot download both versions 1 and
-     * 2 of a resource in the same tracker).
-     *
-     * @param location the location of the resource
-     * @param version the resource version
-     * @param updatePolicy whether to check for updates if already in cache
-     */
+    public void addResource(URL location, final VersionId version, final UpdatePolicy updatePolicy) {
+        final VersionString versionString = version != null ? version.asVersionString() : null;
+        addResource(location, versionString, new DownloadOptions(false, false), updatePolicy);
+    }
+
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         addResource(location, version, new DownloadOptions(false, false), updatePolicy);
     }
@@ -151,8 +149,9 @@ public class ResourceTracker {
         Resource resource = Resource.createResource(location, version, options, updatePolicy);
 
         synchronized (resources) {
-            if (resources.contains(resource))
+            if (resources.contains(resource)) {
                 return;
+            }
             resources.add(resource);
         }
 
@@ -162,7 +161,7 @@ public class ResourceTracker {
         // if unnecessary.
         initResourceFromCache(resource, updatePolicy);
 
-        if (prefetch && resource.isSet(DOWNLOADED)) {
+        if (prefetch && !resource.isSet(DOWNLOADED)) {
             ResourceDownloader.startDownload(resource, lock);
         }
     }
@@ -200,13 +199,14 @@ public class ResourceTracker {
         }
 
         if (updatePolicy != UpdatePolicy.ALWAYS && updatePolicy != UpdatePolicy.FORCE) { // save loading entry props file
-            CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getDownloadVersion());
+            ResourceInfo entry = CacheUtil.getInfoFromCache(resource.getLocation(), resource.getRequestVersion());
 
-            if (entry.isCached() && !updatePolicy.shouldUpdate(entry)) {
+            if (entry != null && !updatePolicy.shouldUpdate(entry)) {
                 LOG.info("not updating: {}", resource.getLocation());
 
                 synchronized (resource) {
-                    resource.setLocalFile(CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
+                    resource.setLocalFile(Cache.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
+                    resource.setDownloadVersion(entry.getVersion());
                     resource.setSize(resource.getLocalFile().length());
                     resource.setTransferred(resource.getLocalFile().length());
                     resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
@@ -267,7 +267,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                wait(new Resource[]{getResource(location)}, 0);
+                wait(new Resource[]{resource}, 0);
             }
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

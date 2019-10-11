@@ -157,7 +157,7 @@ public final class FileUtils {
      * @throws IOException if IO fails
      */
     public static void createRestrictedDirectory(File directory) throws IOException {
-        createRestrictedFile(directory, true, true);
+        createRestrictedFile(directory, true);
     }
 
     /**
@@ -166,11 +166,10 @@ public final class FileUtils {
      * even the owner can not write to it.
      *
      * @param file path to file
-     * @param writableByOwner true if can be writable by owner
      * @throws IOException if IO fails
      */
-    public static void createRestrictedFile(File file, boolean writableByOwner) throws IOException {
-        createRestrictedFile(file, false, writableByOwner);
+    public static void createRestrictedFile(File file) throws IOException {
+        createRestrictedFile(file, false);
     }
 
     /**
@@ -238,7 +237,7 @@ public final class FileUtils {
      * is false, even the owner can not write to it. If isDir is true, then the
      * directory can be executed by the owner
      */
-    private static void createRestrictedFile(File file, boolean isDir, boolean writableByOwner) throws IOException {
+    private static void createRestrictedFile(File file, boolean isDir) throws IOException {
 
         File tempFile = new File(file.getCanonicalPath() + ".temp");
 
@@ -267,18 +266,16 @@ public final class FileUtils {
                     AclEntryPermission.EXECUTE,
                     AclEntryPermission.READ_ATTRIBUTES,
                     AclEntryPermission.READ_ACL,
-                    AclEntryPermission.SYNCHRONIZE));
-            if (writableByOwner) {
-                permissions.addAll(Arrays.asList(
-                        AclEntryPermission.WRITE_DATA,
-                        AclEntryPermission.APPEND_DATA,
-                        AclEntryPermission.WRITE_NAMED_ATTRS,
-                        AclEntryPermission.DELETE_CHILD,
-                        AclEntryPermission.WRITE_ATTRIBUTES,
-                        AclEntryPermission.DELETE,
-                        AclEntryPermission.WRITE_ACL,
-                        AclEntryPermission.WRITE_OWNER));
-            }
+                    AclEntryPermission.SYNCHRONIZE,
+                    AclEntryPermission.WRITE_DATA,
+                    AclEntryPermission.APPEND_DATA,
+                    AclEntryPermission.WRITE_NAMED_ATTRS,
+                    AclEntryPermission.DELETE_CHILD,
+                    AclEntryPermission.WRITE_ATTRIBUTES,
+                    AclEntryPermission.DELETE,
+                    AclEntryPermission.WRITE_ACL,
+                    AclEntryPermission.WRITE_OWNER
+            ));
 
             // filter ACL's leaving only root and owner
             AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
@@ -316,7 +313,7 @@ public final class FileUtils {
             }
 
             // allow owner to write
-            if (writableByOwner && !tempFile.setWritable(true, true)) {
+            if (!tempFile.setWritable(true, true)) {
                 throw new IOException("Acquiring write permissions on file " + tempFile + " failed");
             }
 
@@ -341,22 +338,23 @@ public final class FileUtils {
      * @param isDebug output debug information
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
-    public static DirectoryCheckResults testDirectoryPermissions(File file, boolean isDebug) {
+    private static DirectoryCheckResults testDirectoryPermissions(final File file, final boolean isDebug) {
         try {
-            file = file.getCanonicalFile();
+            final File canonicalFile = file.getCanonicalFile();
+            final File parentFile = canonicalFile.getParentFile();
+            if (parentFile == null || !parentFile.exists()) {
+                return null;
+            }
+            final List<File> policyDirectory = new ArrayList<>();
+            policyDirectory.add(parentFile);
+            final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
+            final DirectoryCheckResults result = validator.ensureDirs(isDebug);
+
+            return result;
         } catch (final IOException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             return null;
         }
-        if (file == null || file.getParentFile() == null || !file.getParentFile().exists()) {
-            return null;
-        }
-        final List<File> policyDirectory = new ArrayList<>();
-        policyDirectory.add(file.getParentFile());
-        final DirectoryValidator validator = new DirectoryValidator(policyDirectory);
-        final DirectoryCheckResults result = validator.ensureDirs(isDebug);
-
-        return result;
     }
 
     /**

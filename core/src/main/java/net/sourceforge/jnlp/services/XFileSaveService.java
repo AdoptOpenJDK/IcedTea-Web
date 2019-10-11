@@ -120,7 +120,7 @@ class XFileSaveService implements FileSaveService {
             if (!replace)
                 return;
         } else {
-            FileUtils.createRestrictedFile(file, true);
+            FileUtils.createRestrictedFile(file);
         }
 
         if (file.canWrite()) {

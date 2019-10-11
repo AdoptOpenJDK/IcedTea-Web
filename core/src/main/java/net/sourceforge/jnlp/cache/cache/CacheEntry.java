@@ -14,12 +14,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.cache.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;
@@ -33,58 +35,52 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.10 $
  */
-public class CacheEntry {
+class CacheEntry implements ResourceInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
 
-    private static final String KEY_CONTENT_LENGTH = "content-length";
+    static final String INFO_SUFFIX = ".info";
+
+    private static final String KEY_SIZE = "content-length";
     private static final String KEY_LAST_MODIFIED = "last-modified";
-    private static final String KEY_LAST_UPDATED = "last-updated";
-    public static final String KEY_JNLP_PATH = "jnlp-path";
+    private static final String KEY_DOWNLOADED_AT = "last-updated";
+    static final String KEY_JNLP_PATH = "jnlp-path";
 
     /** the remote resource location */
     private final URL location;
 
     /** the requested version */
-    private final VersionString version;
+    private final VersionId version;
+
+    /** the cache file */
+    private final File cacheFile;
 
     /** info about the cached file */
     private final PropertiesFile properties;
 
-    /**
-     * Create a CacheEntry for the resources specified as a remote
-     * URL.
-     *
-     * @param location the remote resource location
-     * @param version the version of the resource
-     */
-    CacheEntry(final URL location, final VersionString version) {
-        this.location = location;
-        this.version = version;
-        
-        final File cacheFile = CacheUtil.getCacheFile(location, version);
-        final File infoFile = new File(cacheFile.getPath() + CacheDirectory.INFO_SUFFIX);
-
-        properties = new PropertiesFile(infoFile, R("CAutoGen"));
+    CacheEntry(LeastRecentlyUsedCacheEntry lruEntry, File cacheFile, File infoFile) {
+        this(lruEntry.getResourceHref(), lruEntry.getVersion(), cacheFile, infoFile);
     }
 
-    static void markForDelete(URL location, final VersionString version) {
-        CacheEntry entry = new CacheEntry(location, version);
-        entry.lock();
-        try {
-            entry.markForDelete();
-            entry.store();
-        } finally {
-            entry.unlock();
-        }
+    CacheEntry(URL location, VersionId version, File cacheFile, File infoFile) {
+        this.location = location;
+        this.version = version;
+        this.cacheFile = cacheFile;
+        properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
     /**
      * Returns the remote location this entry caches.
      * @return URL same as the one on which this entry was created
      */
-    public URL getLocation() {
+    @Override
+    public URL getResourceHref() {
         return location;
+    }
+
+    @Override
+    public VersionId getVersion() {
+        return version;
     }
 
     /**
@@ -92,8 +88,9 @@ public class CacheEntry {
      * most recently checked for an update.
      * @return when the item was updated (in ms)
      */
-    long getLastUpdated() {
-        return getLongKey(KEY_LAST_UPDATED);
+    @Override
+    public long getDownloadedAt() {
+        return getLongKey(KEY_DOWNLOADED_AT);
     }
 
     /**
@@ -101,28 +98,34 @@ public class CacheEntry {
      * most recently checked for an update.
      * @param updatedTime the time (in ms) to be set as last updated time
      */
-    void setLastUpdated(long updatedTime) {
-        setLongKey(KEY_LAST_UPDATED, updatedTime);
+    void setDownloadedAt(long updatedTime) {
+        setLongKey(KEY_DOWNLOADED_AT, updatedTime);
     }
 
-    long getRemoteContentLength() {
-        return getLongKey(KEY_CONTENT_LENGTH);
+    @Override
+    public long getSize() {
+        return getLongKey(KEY_SIZE);
     }
 
-    void setRemoteContentLength(long length) {
-        setLongKey(KEY_CONTENT_LENGTH, length);
+    void setSize(long length) {
+        setLongKey(KEY_SIZE, length);
     }
 
-    void setJnlpPath(String jnlpPath) {
-        properties.setProperty(KEY_JNLP_PATH, jnlpPath);
-    }
-
-    long getLastModified() {
+    @Override
+    public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
     }
 
     void setLastModified(long modifyTime) {
         setLongKey(KEY_LAST_MODIFIED, modifyTime);
+    }
+
+    String getJnlpPath() {
+        return properties.getProperty(KEY_JNLP_PATH);
+    }
+
+    File getCacheFile() {
+        return cacheFile;
     }
 
     private long getLongKey(String key) {
@@ -137,6 +140,10 @@ public class CacheEntry {
         properties.setProperty(key, Long.toString(value));
     }
 
+    boolean exists() {
+        return properties.getStoreFile().isFile();
+    }
+
     /**
      * Returns whether there is a version of the URL contents in
      * the cache and it is up to date.
@@ -146,18 +153,19 @@ public class CacheEntry {
      */
     boolean isCurrent(long lastModified) {
         boolean cached = isCached();
-        LOG.info("{} - version {}: isCached {}", location, version, cached);
+        LOG.debug("{} - version {}: isCached {}", location, version, cached);
 
         if (!cached) {
             return false;
         }
         try {
-            long cachedModified = Long.parseLong(properties.getProperty(KEY_LAST_MODIFIED));
-            LOG.info("{} - version {}: lastModified cache:{} actual:{}", location, version, cachedModified, lastModified);
-            return lastModified > 0 && lastModified <= cachedModified;
+            long cachedModified = getLastModified();
+            final boolean isCurrent = lastModified > 0 && lastModified <= cachedModified;
+            LOG.debug("{} - version {}: lastModified cache:{} actual:{} -> {}", location, version, cachedModified, lastModified, isCurrent);
+            return isCurrent;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            return true;
+            return false;
         }
     }
 
@@ -167,19 +175,22 @@ public class CacheEntry {
      *
      * @return true if the resource is in the cache
      */
-    public boolean isCached() {
-        File localFile = getCacheFile();
-        if (!localFile.exists()) {
+    boolean isCached() {
+        if (!cacheFile.exists()) {
+            return false;
+        }
+
+        if (! properties.containsKey(KEY_SIZE)) {
             return false;
         }
 
         try {
-            long cachedLength = localFile.length();
-            long remoteLength = Long.parseLong(properties.getProperty(KEY_CONTENT_LENGTH, "-1"));
+            long cachedLength = cacheFile.length();
+            long remoteLength = getSize();
+            final boolean isCached = cachedLength == remoteLength;
 
-            LOG.info("isCached: remote:{} cached:{}", remoteLength, cachedLength);
-
-            return remoteLength < 0 || cachedLength == remoteLength;
+            LOG.debug("isCached: remote size:{} cached size:{} -> {}", remoteLength, cachedLength, isCached);
+            return isCached;
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
 
@@ -188,18 +199,11 @@ public class CacheEntry {
     }
 
     /**
-     * Seam for testing
-     */
-    File getCacheFile() {
-        return CacheUtil.getCacheFile(location, version);
-    }
-
-    /**
      * Save the current information for the cache entry.
      *
      * @return True if successfully stored into file, false otherwise
      */
-    protected boolean store() {
+    boolean store() {
         if (properties.isHeldByCurrentThread()) {
             properties.store();
             return true;
@@ -208,11 +212,20 @@ public class CacheEntry {
         }
     }
 
-    void storeEntryFields(long contentLength, long lastModified) {
+    void storeInfo(ResourceInfo info) {
         lock();
         try {
-            setRemoteContentLength(contentLength);
-            setLastModified(lastModified);
+            setLongKey(KEY_SIZE, info.getSize());
+            setLongKey(KEY_LAST_MODIFIED, info.getLastModified());
+            setLongKey(KEY_DOWNLOADED_AT, info.getDownloadedAt());
+
+            final String jnlpPath = JNLPRuntime.getJnlpPath();
+            if (StringUtils.isBlank(jnlpPath)) {
+                LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
+            } else {
+                properties.setProperty(KEY_JNLP_PATH, jnlpPath);
+            }
+
             store();
         } finally {
             unlock();
@@ -220,23 +233,16 @@ public class CacheEntry {
     }
 
     /**
-     * Mark this entry for deletion at shutdown.
-     */
-    void markForDelete() { // once marked it should not be unmarked.
-        properties.setProperty("delete", Boolean.toString(true));
-    }
-
-    /**
      * Lock cache item.
      */
-    protected void lock() {
+    void lock() {
         properties.lock();
     }
 
     /**
      * Unlock cache item. Does not do anything if not holding the lock.
      */
-    protected void unlock() {
+    void unlock() {
         properties.unlock();
     }
 
@@ -248,4 +254,8 @@ public class CacheEntry {
         return properties.isHeldByCurrentThread();
     }
 
+    @Override
+    public String toString() {
+        return cacheFile.getName();
+    }
 }

@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+
 import java.net.URL;
 
 /**
@@ -9,15 +11,18 @@ import java.net.URL;
 class UrlRequestResult {
     private final int responseCode;
     private final URL location; // HTTP header field "Location" as URL (redirection or newly created resource)
+    private final VersionId version;
     private final long lastModified;
     private final long contentLength;
 
-    UrlRequestResult(int responseCode, URL location, long lastModified, long contentLength) {
+    UrlRequestResult(int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
         if (isRedirectResponseCode(responseCode) && location == null) {
             throw new IllegalStateException("Redirect response code found but location URL is null.");
         }
+
         this.responseCode = responseCode;
         this.location = location;
+        this.version = version;
         this.lastModified = lastModified;
         this.contentLength = contentLength;
     }
@@ -29,11 +34,15 @@ class UrlRequestResult {
      * @return a new {@link UrlRequestResult} based on this with the given redirect url
      */
     UrlRequestResult withLocation(final URL location) {
-        return new UrlRequestResult(responseCode, location, lastModified, contentLength);
+        return new UrlRequestResult(responseCode, location, version, lastModified, contentLength);
     }
 
     URL getLocation() {
         return location;
+    }
+
+    VersionId getVersion() {
+        return version;
     }
 
     int getResponseCode() {

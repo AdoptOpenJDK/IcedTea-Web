@@ -58,7 +58,7 @@ public final class WriterBasedFileLog implements SingleStreamLogger {
         try {
             File futureFile = new File(fileName);
             if (!futureFile.exists()) {
-                FileUtils.createRestrictedFile(futureFile, true);
+                FileUtils.createRestrictedFile(futureFile);
             }
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName), append), StandardCharsets.UTF_8));
             log(FileLog.getHeadlineHeader().toString() + " writer-based impl.");

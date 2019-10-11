@@ -342,7 +342,7 @@ public class CertWarningPane extends SecurityDialogPanel {
             CertificateUtils.addToKeyStore(c, ks);
             File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
             if (!keyStoreFile.isFile()) {
-                FileUtils.createRestrictedFile(keyStoreFile, true);
+                FileUtils.createRestrictedFile(keyStoreFile);
             }
             SecurityUtil.storeKeyStore(ks, keyStoreFile);
             LOG.debug("certificate is now permanently trusted");

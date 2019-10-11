@@ -33,6 +33,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -136,7 +137,7 @@ public class JNLPFile {
      * The version attribute of the jnlp element specifies the version of the application being launched,
      * as well as the version of the JNLP file itself.
      */
-    protected VersionString fileVersion;
+    protected VersionId fileVersion;
 
     /**
      * Specifies the versions of the specification that this JNLP file requires.
@@ -525,7 +526,7 @@ public class JNLPFile {
     /**
      * @return the JNLP file's version.
      */
-    public VersionString getFileVersion() {
+    public VersionId getFileVersion() {
         return fileVersion;
     }
 

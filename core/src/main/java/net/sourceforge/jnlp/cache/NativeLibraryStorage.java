@@ -125,7 +125,7 @@ public class NativeLibraryStorage {
                     
                     File outFile = new File(jarEntryDirectory, name);
                     if (!outFile.isFile()) {
-                        FileUtils.createRestrictedFile(outFile, true);
+                        FileUtils.createRestrictedFile(outFile);
                     }
                     try(FileOutputStream out = new FileOutputStream(outFile)) {
                         IOUtils.copy(jarFile.getInputStream(e), out, 4096);

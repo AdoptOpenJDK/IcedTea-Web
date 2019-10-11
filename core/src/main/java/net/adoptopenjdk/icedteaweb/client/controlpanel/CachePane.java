@@ -18,20 +18,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.commandline.NonEditableTableModel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.cache.CacheDirectory;
-import net.sourceforge.jnlp.cache.CacheEntry;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.DirectoryNode;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.CacheId;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.sourceforge.jnlp.util.PropertiesFile;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -62,7 +59,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileLock;
@@ -70,7 +66,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
 
 public class CachePane extends JPanel {
@@ -87,14 +82,14 @@ public class CachePane extends JPanel {
             Translator.R("CVCPColDomain"),
             Translator.R("CVCPColSize"),
             Translator.R("CVCPColLastModified"),
-        CacheEntry.KEY_JNLP_PATH
+            Translator.R("CVCPColJnlPath")
     };
     JTable cacheTable;
     private JButton deleteButton, refreshButton, doneButton, cleanAll, infoButton;
 
     /**
      * Creates a new instance of the CachePane.
-     * 
+     *
      * @param parent The parent dialog that uses this pane.
      * @param config configuration tobe worked on
      */
@@ -188,7 +183,7 @@ public class CachePane extends JPanel {
 
     /**
      * Create the buttons panel.
-     * 
+     *
      * @return JPanel containing the buttons.
      */
     private Component createButtonPanel() {
@@ -205,15 +200,15 @@ public class CachePane extends JPanel {
                 JDialog jd = new JDialog(parent, true);
                 JTextArea t = new JTextArea();
                 t.setEditable(false);
-                
+
                 int row = cacheTable.getSelectedRow();
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
-                    DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
-                    File selectedFile = fileNode.getFile();
-                    File infoFile = new File(selectedFile + CacheDirectory.INFO_SUFFIX);
-                    String info = StreamUtils.readStreamAsString(new FileInputStream(infoFile), true);
-                    t.setText(info);
+                    ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
+                    t.setText("content-length: " + resourceInfo.getSize() + "\n" +
+                            "last-updated: " + resourceInfo.getDownloadedAt() + "\n" +
+                            "last-modified: " + resourceInfo.getLastModified()
+                    );
                 } catch (Exception ex) {
                     t.setText(ex.toString());
                 }
@@ -312,7 +307,7 @@ public class CachePane extends JPanel {
                     if (!netxRunningFile.exists()) {
                         try {
                             FileUtils.createParentDir(netxRunningFile);
-                            FileUtils.createRestrictedFile(netxRunningFile, true);
+                            FileUtils.createRestrictedFile(netxRunningFile);
                         } catch (IOException e1) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                         }
@@ -330,15 +325,10 @@ public class CachePane extends JPanel {
                             return;
                         }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
-                        DirectoryNode fileNode = ((DirectoryNode) cacheTable.getModel().getValueAt(modelRow, 0));
-                        if (fileNode.getFile().delete()) {
-                            updateRecentlyUsed(fileNode.getFile());
-                            fileNode.getParent().removeChild(fileNode);
-                            FileUtils.deleteWithErrMesg(fileNode.getInfoFile());
-                            ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
-                            cacheTable.getSelectionModel().clearSelection();
-                            CacheDirectory.cleanParent(fileNode);
-                        }
+                        ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
+                        Cache.deleteFromCache(resourceInfo);
+                        ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
+                        cacheTable.getSelectionModel().clearSelection();
                     } catch (Exception exception) {
                         // ignore
                     }
@@ -356,20 +346,6 @@ public class CachePane extends JPanel {
                 } finally {
                     restoreDisabled();
                 }
-            }
-
-            private void updateRecentlyUsed(File f) {
-                File recentlyUsedFile = new File(PathsAndFiles.getRecentlyUsedFile().getFullPath(config));
-                PropertiesFile pf = new PropertiesFile(recentlyUsedFile);
-                pf.load();
-                Enumeration<Object> en = pf.keys();
-                while (en.hasMoreElements()) {
-                    String key = (String) en.nextElement();
-                    if (pf.get(key).equals(f.getAbsolutePath())) {
-                        pf.remove(key);
-                    }
-                }
-                pf.store();
             }
         });
     }
@@ -408,7 +384,7 @@ public class CachePane extends JPanel {
                         cacheTable.setBackground(SystemColor.control);
                         // No data in cacheTable, so nothing to delete
                         deleteButton.setEnabled(false);
-                        infoButton.setEnabled(false);                        
+                        infoButton.setEnabled(false);
                     } else {
                         cacheTable.setEnabled(true);
                         cacheTable.setBackground(SystemColor.text);
@@ -435,8 +411,11 @@ public class CachePane extends JPanel {
 
             NonEditableTableModel tableModel;
             (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
-            for (Object[] v : CacheUtil.generateData()) {
-                tableModel.addRow(v);
+            final List<CacheId> cacheIds = Cache.getDomainCacheIds();
+            for (CacheId cacheId : cacheIds) {
+                for (Object[] v : cacheId.getFiles()) {
+                    tableModel.addRow(v);
+                }
             }
         } catch (Exception exception) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
@@ -488,7 +467,7 @@ public class CachePane extends JPanel {
 
     public static void visualCleanCache(Component parent) {
         try {
-            boolean success = CacheUtil.clearCache();
+            boolean success = Cache.clearCache();
             if (!success) {
                 JOptionPane.showMessageDialog(parent, Translator.R("CCannotClearCache"));
             }

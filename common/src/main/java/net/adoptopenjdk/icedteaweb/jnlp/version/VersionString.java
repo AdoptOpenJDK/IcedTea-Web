@@ -75,7 +75,7 @@ public class VersionString {
     /**
      * @return {@code true} if this version-string consists of only a single version-range, {@code false} otherwise.
      */
-    public boolean containsSingleVersionId() {
+    public boolean containsSingleVersionRange() {
         return versionRanges.length == 1;
     }
 

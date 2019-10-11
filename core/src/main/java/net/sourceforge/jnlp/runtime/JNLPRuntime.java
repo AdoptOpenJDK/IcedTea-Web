@@ -30,8 +30,8 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -185,6 +185,7 @@ public class JNLPRuntime {
 
     /** contains the arguments passed to the jnlp runtime */
     private static List<String> initialArguments;
+    private static String jnlpPath;
 
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
@@ -781,6 +782,14 @@ public class JNLPRuntime {
         initialArguments = args;
     }
 
+    static void setJnlpPath(String jnlpPath) {
+        JNLPRuntime.jnlpPath = jnlpPath;
+    }
+
+    public static String getJnlpPath() {
+        return jnlpPath;
+    }
+
     public static List<String> getInitialArguments() {
         return initialArguments;
     }
@@ -798,7 +807,7 @@ public class JNLPRuntime {
             File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
             if (!netxRunningFile.exists()) {
                 FileUtils.createParentDir(netxRunningFile);
-                FileUtils.createRestrictedFile(netxRunningFile, true);
+                FileUtils.createRestrictedFile(netxRunningFile);
                 try (FileOutputStream fos = new FileOutputStream(netxRunningFile)) {
                     fos.write(message.getBytes());
                 }
@@ -827,7 +836,7 @@ public class JNLPRuntime {
             @Override
             public void run() {
                 markNetxStopped();
-                CacheUtil.cleanCache();
+                Cache.cleanCache();
             }
         });
     }

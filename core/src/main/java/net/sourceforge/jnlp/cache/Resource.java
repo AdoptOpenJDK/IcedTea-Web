@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -80,7 +80,7 @@ public class Resource {
     private final VersionString requestVersion;
 
     /** the version downloaded from server */
-    private VersionString downloadVersion;
+    private VersionId downloadVersion;
 
     /** amount in bytes transferred */
     private volatile long transferred = 0;
@@ -197,7 +197,7 @@ public class Resource {
     /**
      * @return the version downloaded from server
      */
-    VersionString getDownloadVersion() {
+    VersionId getDownloadVersion() {
         return downloadVersion;
     }
 
@@ -206,7 +206,7 @@ public class Resource {
      *
      * @param downloadVersion version of downloaded resource
      */
-    public void setDownloadVersion(final VersionString downloadVersion) {
+    void setDownloadVersion(final VersionId downloadVersion) {
         this.downloadVersion = downloadVersion;
     }
 
@@ -367,6 +367,7 @@ public class Resource {
             // time spent in synchronized addResource determining if
             // Resource is already in a tracker, and better for offline
             // mode on some OS.
+            // TODO: handle Version
             return UrlUtils.urlEquals(location, ((Resource) other).location);
         }
         return false;

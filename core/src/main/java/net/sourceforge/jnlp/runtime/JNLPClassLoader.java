@@ -17,6 +17,8 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -42,6 +44,7 @@ import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
@@ -53,6 +56,7 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -89,9 +93,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import java.util.jar.Manifest;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
  * Classloader that takes it's resources from a JNLP file. If the JNLP file
@@ -587,7 +591,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         JARDesc jars[] = resources.getJARs();
         for (JARDesc jar : jars) {
-            Permission p = CacheUtil.getReadPermission(jar.getLocation(), jar.getVersion());
+            Permission p = getReadPermission(jar);
 
             if (p == null) {
                 LOG.info("Unable to add permission for {}", jar.getLocation());
@@ -596,6 +600,26 @@ public class JNLPClassLoader extends URLClassLoader {
                 LOG.info("Permission added: {}", p.toString());
             }
         }
+    }
+
+    private Permission getReadPermission(JARDesc jar) {
+        final URL location = jar.getLocation();
+
+        Permission result = null;
+        if (CacheUtil.isCacheable(location)) {
+            final File file1 = tracker.getCacheFile(location);
+            result = new FilePermission(file1.getPath(), FILE_READ_ACTION);
+        } else {
+            // this is what URLClassLoader does
+            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
+                result = conn.getPermission();
+            } catch (IOException ioe) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
+                // should try to figure out the permission
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -964,7 +988,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         if (jnlp.getFileLocation().getProtocol().toLowerCase().equals("file")) {
                             jn = new File(jnlp.getFileLocation().getPath());
                         } else {
-                            jn = CacheUtil.getCacheFile(jnlp.getFileLocation(), null);
+                            jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
                         }
 
                         InputStream jnlpStream = new FileInputStream(jn);
@@ -1255,7 +1279,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                             continue;
                                         }
 
-                                        tracker.addResource(new File(extractedJarLocation).toURL(), null, null);
+                                        tracker.addResource(new File(extractedJarLocation).toURL(), (VersionString) null, null);
 
                                         URL codebase = file.getCodeBase();
                                         if (codebase == null) {
@@ -1555,8 +1579,7 @@ public class JNLPClassLoader extends URLClassLoader {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override
             public Void run() {
-                Permission p = CacheUtil.getReadPermission(desc.getLocation(),
-                        desc.getVersion());
+                Permission p = getReadPermission(desc);
 
                 resourcePermissions.add(p);
 
@@ -2035,24 +2058,16 @@ public class JNLPClassLoader extends URLClassLoader {
     void removeJars(JARDesc[] jars) {
 
         for (JARDesc eachJar : jars) {
+            final URL location = eachJar.getLocation();
+            final VersionString version = eachJar.getVersion();
+
             try {
-                tracker.removeResource(eachJar.getLocation());
+                tracker.removeResource(location);
             } catch (Exception e) {
                 LOG.error("Failed to remove resource from tracker, continuing..", e);
             }
 
-            File cachedFile = CacheUtil.getCacheFile(eachJar.getLocation(), eachJar.getVersion());
-            String directoryUrl = CacheUtil.getCacheParentDirectory(cachedFile.getAbsolutePath());
-
-            File directory = new File(directoryUrl);
-
-            LOG.info("Deleting cached file: {}", cachedFile.getAbsolutePath());
-
-            cachedFile.delete();
-
-            LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
-
-            directory.delete();
+            Cache.deleteFromCache(location, version);
         }
     }
 
@@ -2113,7 +2128,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 foundLoader.removeJars(jarToRemove);
 
             } else if (action == DownloadAction.CHECK_CACHE) {
-                return CacheUtil.isCached(ref, resourceVersion);
+                return Cache.isAnyCached(ref, resourceVersion);
             }
         }
         return false;

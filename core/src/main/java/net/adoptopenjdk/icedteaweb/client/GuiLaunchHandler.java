@@ -59,7 +59,6 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     private volatile JNLPSplashScreen splashScreen = null;
     private final Object mutex = new Object();
-    private UpdatePolicy policy = UpdatePolicy.ALWAYS;
 
     public GuiLaunchHandler(OutputController outputStream) {
         super(outputStream);
@@ -122,7 +121,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
         final ResourceTracker resourceTracker = new ResourceTracker(true);
         if (splashImageURL != null) {
-            resourceTracker.addResource(splashImageURL, file.getFileVersion(), policy);
+            resourceTracker.addResource(splashImageURL, file.getFileVersion(), UpdatePolicy.ALWAYS);
         }
         synchronized (mutex) {
             SwingUtils.invokeAndWait(new Runnable() {

@@ -352,7 +352,7 @@ public final class KeyStores {
                 if (!parent.isDirectory() && !parent.mkdirs()) {
                     throw new IOException("unable to create " + parent);
                 }
-                FileUtils.createRestrictedFile(file, true);
+                FileUtils.createRestrictedFile(file);
 
                 ks = KeyStore.getInstance(KEYSTORE_TYPE);
                 SecurityUtil.loadKeyStore(ks, null);

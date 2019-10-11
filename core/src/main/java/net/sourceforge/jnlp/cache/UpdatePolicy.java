@@ -16,6 +16,8 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
+
 /**
  * A policy that determines when a resource should be checked for
  * an updated version.
@@ -65,8 +67,8 @@ public class UpdatePolicy {
      * up-to-date.
      * @param entry entry which should be cared
      */
-    boolean shouldUpdate(CacheEntry entry) {
-        long updated = entry.getLastUpdated();
+    boolean shouldUpdate(ResourceInfo entry) {
+        long updated = entry.getDownloadedAt();
         long current = System.currentTimeMillis();
 
         return current - updated >= timeDiff;

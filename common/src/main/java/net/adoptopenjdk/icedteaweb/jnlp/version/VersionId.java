@@ -75,6 +75,10 @@ public class VersionId implements Comparable<VersionId> {
         return new VersionId(versionId);
     }
 
+    public VersionString asVersionString() {
+        return VersionString.fromString(versionId);
+    }
+
     /**
      * Provides a string representation of this {@link VersionId}.
      *

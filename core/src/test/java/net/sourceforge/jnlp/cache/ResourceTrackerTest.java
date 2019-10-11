@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
+import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -194,7 +195,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     public static void teardownDownloadServer() {
         downloadServer.stop();
 
-        CacheUtil.clearCache();
+        Cache.clearCache();
         PathsAndFiles.CACHE_DIR.setValue(cacheDir);
     }
 
@@ -211,7 +212,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
         URL url = downloadServer.getUrl("resource");
 
         ResourceTracker rt = new ResourceTracker();
-        rt.addResource(url, null, UpdatePolicy.FORCE);
+        rt.addResource(url, (VersionString) null, UpdatePolicy.FORCE);
         File downloadFile = rt.getCacheFile(url);
 
         assertTrue(downloadFile.exists() && downloadFile.isFile());

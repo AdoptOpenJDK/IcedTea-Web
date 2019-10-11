@@ -36,6 +36,7 @@ import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.docprovider.IcedTeaWebTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.JavaWsTextsProvider;
@@ -45,6 +46,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 import sun.awt.SunToolkit;
 
+import javax.jnlp.BasicService;
 import javax.swing.UIManager;
 import java.io.File;
 import java.net.URL;
@@ -104,10 +106,6 @@ public final class Boot implements PrivilegedAction<Void> {
             + "\n";
 
     private static CommandLineOptionsParser optionParser;
-
-    public static CommandLineOptionsParser getOptionParser() {
-        return optionParser;
-    }
 
     /**
      * Launch the JNLP file specified by the command-line arguments.
@@ -230,6 +228,7 @@ public final class Boot implements PrivilegedAction<Void> {
         } else {
 
             JNLPRuntime.setInitialArguments(Arrays.asList(args));
+            JNLPRuntime.setJnlpPath(getJnlpFileLocationFromCommandLineArguments(optionParser));
 
             AccessController.doPrivileged(new Boot());
         }
@@ -315,35 +314,38 @@ public final class Boot implements PrivilegedAction<Void> {
      * Returns the url of file to open; does not return if no file was
      * specified, or if the file location was invalid.
      */
-    static URL getFileLocation() {
+    private static URL getFileLocation() {
 
         final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
 
         if (location == null) {
             handleMessage();
             JNLPRuntime.exit(1);
+            throw new RuntimeException("not reachable as system exits on the previous line");
         }
 
         LOG.info("JNLP file location: {}", location);
+        return locationToUrl(location);
+    }
 
-        URL url = null;
-
+    private static URL locationToUrl(String location) {
         try {
-            if (new File(location).exists()) // TODO: Should be toURI().toURL()
-            {
-                url = new File(location).toURL(); // Why use file.getCanonicalFile?
-            } else if (ServiceUtil.getBasicService() != null) {
-                LOG.warn("Warning, null basicService");
-                url = new URL(ServiceUtil.getBasicService().getCodeBase(), location);
+            if (new File(location).exists()) {
+                return new File(location).toURI().toURL(); // Why use file.getCanonicalFile?
             } else {
-                url = new URL(location);
+                final BasicService basicService = ServiceUtil.getBasicService();
+                if (basicService != null) {
+                    return new URL(basicService.getCodeBase(), location);
+                } else {
+                    LOG.warn("Warning, null basicService");
+                    return new URL(location);
+                }
             }
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             fatalError("Invalid jnlp file " + location);
+            return null;
         }
-
-        return url;
     }
 
     /**
@@ -371,13 +373,8 @@ public final class Boot implements PrivilegedAction<Void> {
 
         if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
             List<String> optionArgs = optionParser.getMainArgs();
-            if (optionArgs.size() > 0) {
-                //clear one app
-                CacheUtil.listCacheIds(optionArgs.get(0), true, true);
-            } else {
-                // clear all cache
-                CacheUtil.listCacheIds(".*", true, true);
-            }
+            final String arg = optionArgs.size() > 0 ? optionArgs.get(0) : ".*";
+            CacheUtil.logCacheIds(arg);
             return null;
         }
 
@@ -391,10 +388,10 @@ public final class Boot implements PrivilegedAction<Void> {
             List<String> optionArgs = optionParser.getMainArgs();
             if (optionArgs.size() > 0) {
                 //clear one app
-                CacheUtil.clearCache(optionArgs.get(0), true, true);
+                Cache.deleteFromCache(optionArgs.get(0));
             } else {
                 // clear all cache
-                CacheUtil.clearCache();
+                Cache.clearCache();
             }
             return null;
         }

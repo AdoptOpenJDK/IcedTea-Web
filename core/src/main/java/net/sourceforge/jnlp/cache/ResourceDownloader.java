@@ -1,14 +1,14 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.Boot;
+import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -29,6 +28,9 @@ import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
 import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
+import static net.sourceforge.jnlp.cache.ResourceUrlCreator.VERSION_ID_HEADER;
+import static net.sourceforge.jnlp.cache.cache.Cache.isUpToDate;
+import static net.sourceforge.jnlp.cache.cache.ResourceInfo.createInfoFromRemote;
 
 class ResourceDownloader implements Runnable {
 
@@ -115,79 +117,36 @@ class ResourceDownloader implements Runnable {
     }
 
     private void initializeFromURL(final UrlRequestResult location) {
-        CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-        entry.lock();
-        try {
+        final boolean isCached = Cache.isCached(resource.getLocation(), location.getVersion());
+        final boolean isUpToDate = isCached && Cache.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
+        final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
+
+        final File localFile;
+        if (doUpdate && isCached) {
+            localFile = Cache.replaceExistingCacheFile(resource.getLocation(), location.getVersion());
+        } else {
+            localFile = Cache.getCacheFile(resource.getLocation(), location.getVersion());
+        }
+
+        synchronized (resource) {
             resource.setDownloadLocation(location.getLocation());
+            resource.setLocalFile(localFile);
+            // resource.connection = connection;
+            resource.setSize(location.getContentLength());
+            resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
 
-            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
-            long size = location.getContentLength();
-            long lm = location.getLastModified();
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
-            if (!current) {
-                if (entry.isCached()) {
-                    entry.markForDelete();
-                    entry.store();
-                    // Old entry will still exist. (but removed at cleanup)
-                    localFile = CacheUtil.makeNewCacheFile(resource.getLocation(), resource.getDownloadVersion());
-                    CacheEntry newEntry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-                    newEntry.lock();
-                    entry.unlock();
-                    entry = newEntry;
-                }
+            // check if up-to-date; if so set as downloaded
+            if (!doUpdate) {
+                resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
+                resource.setDownloadVersion(location.getVersion());
             }
-
-            synchronized (resource) {
-                resource.setLocalFile(localFile);
-                // resource.connection = connection;
-                resource.setSize(size);
-                resource.changeStatus(EnumSet.of(PRECONNECT, CONNECTING), EnumSet.of(CONNECTED, PREDOWNLOAD));
-
-                // check if up-to-date; if so set as downloaded
-                if (current) {
-                    resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
-                }
-            }
-
-            // update cache entry
-            if (!current) {
-                entry.setRemoteContentLength(size);
-                entry.setLastModified(lm);
-            }
-            entry.setLastUpdated(System.currentTimeMillis());
-            try {
-                //do not die here no matter of cost. Just metadata
-                //is the path from user best to store? He can run some jnlp from temp which then be stored
-                //on contrary, this downloads the jnlp, we actually do not have jnlp parsed during first interaction
-                //in addition, downloaded name can be really nasty (some generated has from dynamic servlet.jnlp)
-                //another issue is forking. If this (eg local) jnlp starts its second instance, the url *can* be different
-                //in contrary, usually si no. as fork is reusing all args, and only adding xmx/xms and xnofork.
-                String jnlpPath = Boot.getOptionParser().getMainArg(); //get jnlp from args passed
-                if (jnlpPath == null || jnlpPath.equals("")) {
-                    jnlpPath = Boot.getOptionParser().getParam(CommandLineOptions.JNLP);
-                    if (jnlpPath == null || jnlpPath.equals("")) {
-                        LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
-                    } else {
-                        entry.setJnlpPath(jnlpPath);
-                    }
-                } else {
-                    entry.setJnlpPath(jnlpPath);
-                }
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            }
-            entry.store();
-        } finally {
-            entry.unlock();
         }
     }
 
     private void initializeFromCache() {
-        final CacheEntry entry = new CacheEntry(resource.getLocation(), resource.getRequestVersion());
-        entry.lock();
-
-        try {
-            final File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+        if (Cache.isAnyCached(resource.getLocation(), resource.getRequestVersion())) {
+            final VersionId versionId = Cache.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
+            final File localFile = Cache.getCacheFile(resource.getLocation(), versionId);
 
             if (localFile != null && localFile.exists()) {
                 long size = localFile.length();
@@ -195,16 +154,15 @@ class ResourceDownloader implements Runnable {
                 synchronized (resource) {
                     resource.setLocalFile(localFile);
                     resource.setSize(size);
+                    resource.setDownloadVersion(versionId);
                     resource.changeStatus(EnumSet.of(PREDOWNLOAD, DOWNLOADING), EnumSet.of(DOWNLOADED));
                 }
-            } else {
-                LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
-                resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
+                return;
             }
-        } finally {
-            entry.unlock();
         }
 
+        LOG.warn("You are trying to get resource {} but it is not in cache and could not be downloaded. Attempting to continue, but you may expect failure", resource.getLocation().toExternalForm());
+        resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(ERROR));
     }
 
     private void downloadResource() {
@@ -249,33 +207,32 @@ class ResourceDownloader implements Runnable {
     }
 
     private void downloadFile(CloseableConnection connection, URL downloadLocation, StreamUnpacker unpacker) throws IOException {
-        CacheEntry downloadEntry = new CacheEntry(downloadLocation, resource.getDownloadVersion());
-        LOG.debug("Downloading file: {} into: {}", downloadLocation, downloadEntry.getCacheFile().getCanonicalPath());
-        if (!downloadEntry.isCurrent(connection.getLastModified())) {
-            try {
-                final InputStream packedStream = connection.getInputStream();
-                final InputStream unpackedStream = unpacker.unpack(packedStream);
-                writeDownloadToFile(downloadLocation, unpackedStream);
-            } catch (IOException ex) {
-                if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
-                    LOG.error(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket", ex);
-                    final InputStream packedStream = getInputStreamFromDirectSocket(connection.getURL(), downloadLocation);
-                    final InputStream unpackedStream = unpacker.unpack(packedStream);
-                    writeDownloadToFile(downloadLocation, unpackedStream);
-                } else {
-                    throw ex;
-                }
-            }
+        final VersionId version = resource.getDownloadVersion();
+        if (isUpToDate(downloadLocation, version, connection.getLastModified())) {
+            final File cacheFile = Cache.getCacheFile(downloadLocation, version);
+            resource.setTransferred(cacheFile.length());
         } else {
-            resource.setTransferred(CacheUtil.getCacheFile(downloadLocation, resource.getDownloadVersion()).length());
-        }
+            final String versionHeaderField = connection.getHeaderField(VERSION_ID_HEADER);
+            final VersionId versionFromRemote = versionHeaderField != null ? VersionId.fromString(versionHeaderField) : resource.getDownloadVersion();
 
-        downloadEntry.storeEntryFields(connection.getContentLength(), connection.getLastModified());
+            final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
+            final InputStream unpackedStream = unpacker.unpack(downloadStream);
+            final ResourceInfo resourceInfo = createInfoFromRemote(downloadLocation, versionFromRemote, connection);
+            Cache.addToCache(resourceInfo, unpackedStream);
+            resource.setTransferred(resourceInfo.getSize());
+        }
     }
 
-    private void writeDownloadToFile(final URL downloadLocation, final InputStream in) throws IOException {
-        try (final OutputStream out = CacheUtil.getOutputStream(downloadLocation, resource.getDownloadVersion())) {
-            IOUtils.copy(in, out);
+    private InputStream getDownloadInputStream(CloseableConnection connection, URL downloadLocation) throws IOException {
+        try {
+            return connection.getInputStream();
+        } catch (IOException ex) {
+            if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
+                LOG.error(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket", ex);
+                return getInputStreamFromDirectSocket(connection.getURL(), downloadLocation);
+            } else {
+                throw ex;
+            }
         }
     }
 

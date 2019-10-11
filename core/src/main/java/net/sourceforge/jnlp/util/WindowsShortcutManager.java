@@ -25,44 +25,52 @@ public class WindowsShortcutManager {
         return  windowsShortcutsFile;
     }
 
-    public static void removeWindowsShortcuts(final String jnlpApp) throws IOException {
+    public static void removeWindowsShortcuts(final String jnlpApp) {
         LOG.debug("Clearing Windows shortcuts");
         if (getWindowsShortcutsFile().exists()) {
-            List<String> lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
-            Iterator it = lines.iterator();
-            boolean fDelete;
-            while (it.hasNext()) {
-                final String sItem = it.next().toString();
-                final String[] sArray = sItem.split(",");
-                final String application = sArray[0];
-                final String sPath = sArray[1];
-                // if application is codebase then delete files
-                if (application.equalsIgnoreCase(jnlpApp)) {
-                    fDelete = true;
-                    it.remove();
-                } else {
-                    fDelete = false;
-                }
-                if (jnlpApp.equals("ALL")) {
-                    fDelete = true;
-                }
-                if (fDelete) {
-                    LOG.info("Deleting item = {}", sPath);
-                    final File scList = new File(sPath);
-                    try {
-                        FileUtils.recursiveDelete(scList, scList);
-                    } catch (Exception e) {
-                        LOG.error("Error in deleting windows shortcuts file '" + sPath + "'", e);
-                    }
-                }
+            try {
+                remove(jnlpApp);
+            } catch (IOException e) {
+                throw new RuntimeException("failed to update Windows shortcuts (" + getWindowsShortcutsFile() + ")", e);
+            }
+        }
+    }
+
+    private static void remove(String jnlpApp) throws IOException {
+        List<String> lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
+        Iterator it = lines.iterator();
+        boolean fDelete;
+        while (it.hasNext()) {
+            final String sItem = it.next().toString();
+            final String[] sArray = sItem.split(",");
+            final String application = sArray[0];
+            final String sPath = sArray[1];
+            // if application is codebase then delete files
+            if (application.equalsIgnoreCase(jnlpApp)) {
+                fDelete = true;
+                it.remove();
+            } else {
+                fDelete = false;
             }
             if (jnlpApp.equals("ALL")) {
-                //delete shortcut list file
-                Files.deleteIfExists(getWindowsShortcutsFile().toPath());
-            } else {
-                //write file after application shortcuts have been removed
-                Files.write(getWindowsShortcutsFile().toPath(), lines, UTF_8);
+                fDelete = true;
             }
+            if (fDelete) {
+                LOG.info("Deleting item = {}", sPath);
+                final File scList = new File(sPath);
+                try {
+                    FileUtils.recursiveDelete(scList, scList);
+                } catch (Exception e) {
+                    LOG.error("Error in deleting windows shortcuts file '" + sPath + "'", e);
+                }
+            }
+        }
+        if (jnlpApp.equals("ALL")) {
+            //delete shortcut list file
+            Files.deleteIfExists(getWindowsShortcutsFile().toPath());
+        } else {
+            //write file after application shortcuts have been removed
+            Files.write(getWindowsShortcutsFile().toPath(), lines, UTF_8);
         }
     }
 }
