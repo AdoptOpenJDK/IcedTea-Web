@@ -61,16 +61,17 @@ public class NativeLibraryStorageTest {
 
     /* Associates an extension with whether it represents a native library */
     static class FileExtension {
-        public FileExtension(String extension, boolean isNative) {
+        FileExtension(String extension, boolean isNative) {
             this.extension = extension;
             this.isNative = isNative;
         }
+
         final String extension;
         final boolean isNative;
     }
 
-    static private List<FileExtension> makeExtensionsToTest() {
-        List<FileExtension> exts = new ArrayList<FileExtension>();
+    private static List<FileExtension> makeExtensionsToTest() {
+        List<FileExtension> exts = new ArrayList<>();
         exts.add(new FileExtension(".foobar", false)); /* Dummy non-native test extension */
         for (String ext : NativeLibraryStorage.NATIVE_LIBRARY_EXTENSIONS) {
             exts.add(new FileExtension(ext, true));
@@ -79,10 +80,10 @@ public class NativeLibraryStorageTest {
     }
 
     /* All the native library types we support, as well as one negative test */
-    static final List<FileExtension> extensionsToTest = makeExtensionsToTest();
+    private static final List<FileExtension> extensionsToTest = makeExtensionsToTest();
 
     /* Creates a NativeLibraryStorage object, caching the given URLs */
-    static NativeLibraryStorage nativeLibraryStorageWithCache(URL... urlsToCache) {
+    private static NativeLibraryStorage nativeLibraryStorageWithCache(URL... urlsToCache) {
         ResourceTracker tracker = new ResourceTracker();
         for (URL urlToCache : urlsToCache) {
             tracker.addResource(urlToCache, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
@@ -114,15 +115,7 @@ public class NativeLibraryStorageTest {
             final URL tempJarUrl = jarLocation.toURI().toURL();
             final NativeLibraryStorage storage = nativeLibraryStorageWithCache(tempJarUrl);
 
-            assertNoFileLeak( new Runnable () {
-                @Override
-                public void run() {
-                    storage.addSearchJar(tempJarUrl);
-                }
-            });
-
-            /* This check isn't critical, but ensures we do not accidentally add jars as search directories */
-            assertFalse(storage.getSearchDirectories().contains(tempJarUrl));
+            assertNoFileLeak(() -> storage.addSearchJar(tempJarUrl));
 
             /* If the file we added is native, it should be found
              * Due to an implementation detail, non-native files will not be found */
@@ -156,12 +149,12 @@ public class NativeLibraryStorageTest {
     }
 
     @Test
-    public void testCleanupTemporaryFolder() throws Exception {
+    public void testCleanupTemporaryFolder() {
         NativeLibraryStorage storage = nativeLibraryStorageWithCache(/* None needed */);
-        storage.ensureNativeStoreDirectory();
+        storage.getNativeStoreDirectory();
 
         /* The temporary native store directory should be our only search folder */
-        assertTrue(storage.getSearchDirectories().size() == 1);
+        assertEquals(1, storage.getSearchDirectories().size());
 
         File searchDirectory = storage.getSearchDirectories().get(0);
         assertTrue(searchDirectory.exists());
