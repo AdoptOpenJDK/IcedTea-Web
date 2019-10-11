@@ -593,21 +593,20 @@ public class JNLPClassLoader extends URLClassLoader {
     private Permission getReadPermission(JARDesc jar) {
         final URL location = jar.getLocation();
 
-        Permission result = null;
         if (CacheUtil.isCacheable(location)) {
             final File file1 = tracker.getCacheFile(location);
-            result = new FilePermission(file1.getPath(), FILE_READ_ACTION);
+            return new FilePermission(file1.getPath(), FILE_READ_ACTION);
         } else {
             // this is what URLClassLoader does
             try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
-                result = conn.getPermission();
+                return conn.getPermission();
             } catch (IOException ioe) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
-                // should try to figure out the permission
+                LOG.error("Exception while retrieving permissions from connection to " + location, ioe);
             }
         }
 
-        return result;
+        // should try to figure out the permission
+        return null;
     }
 
     /**
