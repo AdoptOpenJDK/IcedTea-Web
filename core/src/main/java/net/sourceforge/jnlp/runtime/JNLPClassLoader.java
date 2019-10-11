@@ -109,7 +109,7 @@ import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
  */
 public class JNLPClassLoader extends URLClassLoader {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPClassLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPClassLoader.class);
 
     // todo: initializePermissions should get the permissions from
     // extension classes too so that main file classes can load
@@ -117,17 +117,17 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Signed JNLP File and Template
      */
-    final public static String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
-    final public static String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
+    private static final String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
+    private static final String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
 
     /**
      * Actions to specify how cache is to be managed *
      */
-    public static enum DownloadAction {
+    enum DownloadAction {
         DOWNLOAD_TO_CACHE, REMOVE_FROM_CACHE, CHECK_CACHE
     }
 
-    public static enum SigningState {
+    public enum SigningState {
         FULL, PARTIAL, NONE
     }
 
@@ -352,7 +352,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     }
 
-    public static boolean isCertUnderestimated() {
+    private static boolean isCertUnderestimated() {
         return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
                 && !JNLPRuntime.isSecurityEnabled();
     }
@@ -363,10 +363,6 @@ public class JNLPClassLoader extends URLClassLoader {
         } else {
             throw ex;
         }
-    }
-
-    public boolean isStrict() {
-        return strict;
     }
 
     /**
@@ -484,7 +480,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
         JNLPClassLoader loader;
         String uniqueKey = file.getUniqueKey();
 
@@ -536,7 +532,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final String mainName, boolean enableCodeBase)
+    private static JNLPClassLoader getInstance(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final String mainName, boolean enableCodeBase)
             throws IOException, ParseException, LaunchException {
 
         JNLPClassLoader loader;
@@ -557,7 +553,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Load the extensions specified in the JNLP file.
      */
-    void initializeExtensions() {
+    private void initializeExtensions() {
         final List<Exception> exceptions = new ArrayList<>();
         final List<JNLPClassLoader> loaderList = new ArrayList<>();
         loaderList.add(this);
@@ -586,7 +582,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Make permission objects for the classpath.
      */
-    void initializeReadJarPermissions() {
+    private void initializeReadJarPermissions() {
         resourcePermissions = new ArrayList<>();
 
         JARDesc jars[] = resources.getJARs();
@@ -657,7 +653,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Load all of the JARs used in this JNLP file into the ResourceTracker for
      * downloading.
      */
-    void initializeResources() throws LaunchException {
+    private void initializeResources() throws LaunchException {
 
         JARDesc jars[] = resources.getJARs();
 
@@ -938,7 +934,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return true if this loader has the main jar
      */
-    public boolean hasMainJar() {
+    boolean hasMainJar() {
         return this.foundMainJar;
     }
 
@@ -1055,22 +1051,6 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    /*
-     * Sets whether applets are to be run sandboxed, regardless of JAR
-     * signing. This MUST be called before any call to initializeResources,
-     * setSecurity, activateJars, or any other method that sets the value
-     * of this.security or adds entries into this.jarLocationSecurityMap.
-     * @throws LaunchException if security settings have been initialized before
-     * this method is called
-     */
-    public void setRunInSandbox() throws LaunchException {
-        securityDelegate.setRunInSandbox();
-    }
-
-    public boolean userPromptedForSandbox() {
-        return securityDelegate.getRunInSandbox();
-    }
-
     /**
      * Add applet's codebase URL. This allows compatibility with applets that
      * load resources from their codebase instead of through JARs, but can slow
@@ -1097,7 +1077,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return the JNLP app for this classloader
      */
-    public ApplicationInstance getApplication() {
+    ApplicationInstance getApplication() {
         return app;
     }
 
@@ -1179,7 +1159,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    protected void addPermission(Permission p) {
+    void addPermission(Permission p) {
         runtimePermissions.add(p);
     }
 
@@ -1189,7 +1169,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param jars jar archives to be added
      */
-    protected void fillInPartJars(List<JARDesc> jars) {
+    private void fillInPartJars(List<JARDesc> jars) {
         //can not use iterator, will rise ConcurrentModificationException on jars.add(jar);
         for (int x = 0; x < jars.size(); x++) {
             String part = jars.get(x).getPart();
@@ -1215,7 +1195,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param jars the list of jars to load
      */
-    protected void activateJars(final List<JARDesc> jars) {
+    void activateJars(final List<JARDesc> jars) {
         PrivilegedAction<Void> activate = new PrivilegedAction<Void>() {
 
             @SuppressWarnings("deprecation")
@@ -1368,7 +1348,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param lib library to be found
      * @return location of library
      */
-    protected String findLibraryExt(String lib) {
+    private String findLibraryExt(String lib) {
         for (JNLPClassLoader loader : loaders) {
             String result = null;
 
@@ -1408,7 +1388,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param name name of class
      * @return the class found by name
      */
-    protected Class<?> findLoadedClassAll(String name) {
+    private Class<?> findLoadedClassAll(String name) {
         for (JNLPClassLoader loader : loaders) {
             Class<?> result;
 
@@ -1812,19 +1792,9 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Returns if the specified resource is available locally from a cached jar
-     *
-     * @param s The name of the resource
-     * @return Whether or not the resource is available locally
-     */
-    public boolean resourceAvailableLocally(String s) {
-        return jarEntries.contains(s);
-    }
-
-    /**
      * Adds whatever resources have already been downloaded in the background.
      */
-    protected void addAvailable() {
+    private void addAvailable() {
         // go through available, check tracker for it and all of its
         // part brothers being available immediately, add them.
 
@@ -1843,7 +1813,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws LaunchException Thrown if the signed JNLP file, within the main
      * jar, fails to be verified or does not match
      */
-    protected JNLPClassLoader addNextResource() throws LaunchException {
+    private JNLPClassLoader addNextResource() throws LaunchException {
         if (available.isEmpty()) {
             for (int i = 1; i < loaders.length; i++) {
                 JNLPClassLoader result = loaders[i].addNextResource();
@@ -1866,38 +1836,7 @@ public class JNLPClassLoader extends URLClassLoader {
         return this;
     }
 
-    // this part compatibility with previous classloader
-    /**
-     * @return title if available. Substitutions if not.
-     * @deprecated
-     */
-    @Deprecated
-    public String getExtensionName() {
-        String result = file.getInformation().getTitle();
-
-        if (result == null) {
-            result = file.getInformation().getDescription();
-        }
-        if (result == null && file.getFileLocation() != null) {
-            result = file.getFileLocation().toString();
-        }
-        if (result == null && file.getCodeBase() != null) {
-            result = file.getCodeBase().toString();
-        }
-
-        return result;
-    }
-
-    /**
-     * @return location if jnlp
-     * @deprecated
-     */
-    @Deprecated
-    public String getExtensionHREF() {
-        return file.getFileLocation().toString();
-    }
-
-    public boolean getSigning() {
+    boolean getSigning() {
         return signing == SigningState.FULL;
     }
 
@@ -1923,11 +1862,11 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    public SigningState getSigningState() {
+    private SigningState getSigningState() {
         return signing;
     }
 
-    protected SecurityDesc getSecurity() {
+    SecurityDesc getSecurity() {
         return security;
     }
 
@@ -1937,7 +1876,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param source the origin (remote) url of the code
      * @return The SecurityDescriptor for that source
      */
-    protected SecurityDesc getCodeSourceSecurity(URL source) {
+    private SecurityDesc getCodeSourceSecurity(URL source) {
         SecurityDesc sec = jarLocationSecurityMap.get(source);
         synchronized (alreadyTried) {
             if (sec == null && !alreadyTried.contains(source)) {
@@ -2141,7 +2080,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @throws SecurityException if caller is not trusted
      */
-    public void decrementLoaderUseCount() {
+    private void decrementLoaderUseCount() {
 
         // For use by trusted code only
         if (System.getSecurityManager() != null) {
@@ -2174,7 +2113,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return The appropriate AccessControlContext for loading classes for this
      * instance
      */
-    public AccessControlContext getAccessControlContextForClassLoading() {
+    private AccessControlContext getAccessControlContextForClassLoading() {
         AccessControlContext context = AccessController.getContext();
 
         try {
