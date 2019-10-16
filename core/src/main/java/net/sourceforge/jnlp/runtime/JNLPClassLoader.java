@@ -32,6 +32,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
@@ -145,7 +146,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * map from JNLPFile unique key to lock, the lock is needed to enforce
      * correct initialization of applets that share a unique key
      */
-    private static Map<String, ReentrantLock> uniqueKeyToLock = new HashMap<>();
+    private static final Map<String, ReentrantLock> uniqueKeyToLock = new HashMap<>();
 
     /**
      * Provides a search path & temporary storage for native code
@@ -170,7 +171,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * list of this, local and global loaders this loader uses
      */
-    private JNLPClassLoader loaders[] = null; // ..[0]==this
+    private JNLPClassLoader[] loaders = null; // ..[0]==this
 
     /**
      * whether to strictly adhere to the spec or not
@@ -212,7 +213,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * field may become shared data between multiple classloading threads. See
      * loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final List<JARDesc> available = Collections.synchronizedList(new ArrayList<JARDesc>());
+    private final List<JARDesc> available = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * the jar cert verifier tool to verify our jars
@@ -227,7 +228,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * multiple classloading threads/ See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final List<JarIndexAccess> jarIndexes = Collections.synchronizedList(new ArrayList<JarIndexAccess>());
+    private final List<JarIndexAccess> jarIndexes = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Set of classpath strings declared in the manifest.mf files Synchronized
@@ -235,7 +236,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * threads. See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final Set<String> classpaths = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> classpaths = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * File entries in the jar files available to this classloader Synchronized
@@ -243,7 +244,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * threads. See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final Set<String> jarEntries = Collections.synchronizedSet(new TreeSet<String>());
+    private final Set<String> jarEntries = Collections.synchronizedSet(new TreeSet<>());
 
     /**
      * Map of specific original (remote) CodeSource Urls to securitydesc
@@ -251,11 +252,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloading threads. See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final Map<URL, SecurityDesc> jarLocationSecurityMap
-            = Collections.synchronizedMap(new HashMap<URL, SecurityDesc>());
+    private final Map<URL, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
 
     /*Set to prevent once tried-to-get resources to be tried again*/
-    private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<URL>());
+    private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Loader for codebase (which is a path, rather than a file)
@@ -271,14 +271,14 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Name of the application's main class
      */
-    private String mainClass = null;
+    private String mainClass;
 
     /**
      * Variable to track how many times this loader is in use
      */
     private int useCount = 0;
 
-    private boolean enableCodeBase = false;
+    private boolean enableCodeBase;
 
     private final SecurityDelegate securityDelegate;
 
@@ -311,7 +311,7 @@ public class JNLPClassLoader extends URLClassLoader {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
-        strict = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
+        strict = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
         this.updatePolicy = policy;
@@ -353,7 +353,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     private static boolean isCertUnderestimated() {
-        return Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
+        return Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
                 && !JNLPRuntime.isSecurityEnabled();
     }
 
@@ -370,17 +370,12 @@ public class JNLPClassLoader extends URLClassLoader {
      * ClassLoader.
      */
     private void installShutdownHooks() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                /*
-                 * Delete only the native dir created by this classloader (if
-                 * there is one). Other classloaders (parent, peers) will all
-                 * cleanup things they created
-                 */
-                nativeLibraryStorage.cleanupTemporaryFolder();
-            }
-        });
+        /*
+         * Delete only the native dir created by this classloader (if
+         * there is one). Other classloaders (parent, peers) will all
+         * cleanup things they created
+         */
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> nativeLibraryStorage.cleanupTemporaryFolder()));
     }
 
     private void setSecurity() throws LaunchException {
@@ -499,10 +494,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 if (!file.isApplication()) {
                     // If this is an applet, we do need to consider its loader
                     loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
-
-                    if (baseLoader != null) {
-                        baseLoader.merge(loader);
-                    }
+                    baseLoader.merge(loader);
                 }
                 loader = baseLoader;
             }
@@ -527,7 +519,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      * @param enableCodeBase whether to enable codebase search or not
-     * @return classloader of this appp
+     * @return classloader of this app
      * @throws java.io.IOException when IO fails
      * @throws ParseException when parsing fails
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
@@ -585,7 +577,7 @@ public class JNLPClassLoader extends URLClassLoader {
     private void initializeReadJarPermissions() {
         resourcePermissions = new ArrayList<>();
 
-        JARDesc jars[] = resources.getJARs();
+        JARDesc[] jars = resources.getJARs();
         for (JARDesc jar : jars) {
             Permission p = getReadPermission(jar);
 
@@ -601,21 +593,20 @@ public class JNLPClassLoader extends URLClassLoader {
     private Permission getReadPermission(JARDesc jar) {
         final URL location = jar.getLocation();
 
-        Permission result = null;
         if (CacheUtil.isCacheable(location)) {
             final File file1 = tracker.getCacheFile(location);
-            result = new FilePermission(file1.getPath(), FILE_READ_ACTION);
+            return new FilePermission(file1.getPath(), FILE_READ_ACTION);
         } else {
             // this is what URLClassLoader does
             try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
-                result = conn.getPermission();
+                return conn.getPermission();
             } catch (IOException ioe) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ioe);
-                // should try to figure out the permission
+                LOG.error("Exception while retrieving permissions from connection to " + location, ioe);
             }
         }
 
-        return result;
+        // should try to figure out the permission
+        return null;
     }
 
     /**
@@ -655,7 +646,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private void initializeResources() throws LaunchException {
 
-        JARDesc jars[] = resources.getJARs();
+        JARDesc[] jars = resources.getJARs();
 
         if (jars.length == 0) {
 
@@ -744,7 +735,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 checkForMain(initialJars);
 
                 // If jar with main class was not found, check available resources
-                while (!foundMainJar && available != null && !available.isEmpty()) {
+                while (!foundMainJar && !available.isEmpty()) {
                     addNextResource();
                 }
 
@@ -752,8 +743,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 // jnlp's resources
                 foundMainJar = foundMainJar || hasMainInExtensions();
 
-                boolean externalAppletMainClass = (file.getEntryPointDesc() != null && !foundMainJar
-                        && (available == null || available.isEmpty()));
+                boolean externalAppletMainClass = file.getEntryPointDesc() != null && !foundMainJar && available.isEmpty();
 
                 // We do this check here simply to ensure that if there are no JARs at all,
                 // and also no main-class in the codebase (ie the applet doesn't really exist), we
@@ -785,12 +775,6 @@ public class JNLPClassLoader extends URLClassLoader {
                 //user does not trust this publisher
                 if (!jcv.isTriviallySigned()) {
                     checkTrustWithUser();
-                } else {
-                    /**
-                     * If the user trusts this publisher (i.e. the publisher's
-                     * certificate is in the user's trusted.certs file), we do
-                     * not show any dialogs.
-                     */
                 }
             } else {
 
@@ -853,7 +837,7 @@ public class JNLPClassLoader extends URLClassLoader {
         activateJars(initialJars);
     }
 
-    private void initializeManifestAttributesChecker() throws LaunchException {
+    private void initializeManifestAttributesChecker() {
         if (mac == null) {
             file.getManifestAttributesReader().setLoader(this);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
@@ -894,7 +878,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // The main class may be specified in the manifest
         if (mainClass == null) {
-            mainClass = file.getManifestAttributesReader().getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
+            mainClass = ManifestAttributesReader.getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
         }
 
         final String desiredJarEntryName = mainClass + ".class";
@@ -915,7 +899,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     String jeName = entry.getName().replaceAll("/", ".");
                     if (jeName.equals(desiredJarEntryName)) {
                         foundMainJar = true;
-                        verifySignedJNLP(jar, jarFile);
+                        verifySignedJNLP(jarFile);
                         break;
                     }
                 }
@@ -955,17 +939,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * Is called by checkForMain() to check if the jar file is signed and if it
      * contains a signed JNLP file.
      *
-     * @param jarDesc JARDesc of jar
      * @param jarFile the jar file
      * @throws LaunchException thrown if the signed JNLP file, within the main
      * jar, fails to be verified or does not match
      */
-    private void verifySignedJNLP(JARDesc jarDesc, JarFile jarFile)
-            throws LaunchException {
-
-        List<JARDesc> desc = new ArrayList<>();
-        desc.add(jarDesc);
-
+    private void verifySignedJNLP(JarFile jarFile) throws LaunchException {
         try {
             // NOTE: verification should have happened by now. In other words,
             // calling jcv.verifyJars(desc, tracker) here should have no affect.
@@ -1196,130 +1174,125 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars the list of jars to load
      */
     void activateJars(final List<JARDesc> jars) {
-        PrivilegedAction<Void> activate = new PrivilegedAction<Void>() {
+        PrivilegedAction<Void> activate = () -> doActivateJars(jars);
+        AccessController.doPrivileged(activate, acc);
+    }
 
-            @SuppressWarnings("deprecation")
-            @Override
-            public Void run() {
-                // transfer the Jars
-                waitForJars(jars);
+    private Void doActivateJars(List<JARDesc> jars) {
+        // transfer the Jars
+        waitForJars(jars);
 
-                for (JARDesc jar : jars) {
-                    available.remove(jar);
+        for (JARDesc jar : jars) {
+            available.remove(jar);
 
-                    // add jar
-                    File localFile = tracker.getCacheFile(jar.getLocation());
-                    try {
-                        URL location = jar.getLocation(); // non-cacheable, use source location
-                        if (localFile != null) {
-                            // TODO: Should be toURI().toURL()
-                            location = localFile.toURL(); // cached file
-                            // This is really not the best way.. but we need some way for
-                            // PluginAppletViewer::getCachedImageRef() to check if the image
-                            // is available locally, and it cannot use getResources() because
-                            // that prefetches the resource, which confuses MediaTracker.waitForAll()
-                            // which does a wait(), waiting for notification (presumably
-                            // thrown after a resource is fetched). This bug manifests itself
-                            // particularly when using The FileManager applet from Webmin.
-                            try (JarFile jarFile = new JarFile(localFile)) {
-                                for (JarEntry je : Collections.list(jarFile.entries())) {
+            // add jar
+            File localFile = tracker.getCacheFile(jar.getLocation());
+            try {
+                URL location = jar.getLocation(); // non-cacheable, use source location
+                if (localFile != null) {
+                    location = localFile.toURI().toURL(); // cached file
+                    // This is really not the best way.. but we need some way for
+                    // PluginAppletViewer::getCachedImageRef() to check if the image
+                    // is available locally, and it cannot use getResources() because
+                    // that prefetches the resource, which confuses MediaTracker.waitForAll()
+                    // which does a wait(), waiting for notification (presumably
+                    // thrown after a resource is fetched). This bug manifests itself
+                    // particularly when using The FileManager applet from Webmin.
+                    try (JarFile jarFile = new JarFile(localFile)) {
+                        for (JarEntry je : Collections.list(jarFile.entries())) {
 
-                                    // another jar in my jar? it is more likely than you think
-                                    if (je.getName().endsWith(".jar")) {
-                                        // We need to extract that jar so that it can be loaded
-                                        // (inline loading with "jar:..!/..." path will not work
-                                        // with standard classloader methods)
+                            // another jar in my jar? it is more likely than you think
+                            if (je.getName().endsWith(".jar")) {
+                                // We need to extract that jar so that it can be loaded
+                                // (inline loading with "jar:..!/..." path will not work
+                                // with standard classloader methods)
 
-                                        String name = je.getName();
-                                        if (name.contains("..")){
-                                            name=CacheUtil.hex(name, name);
-                                        }
-                                        String extractedJarLocation = localFile + ".nested/" + name;
-                                        File parentDir = new File(extractedJarLocation).getParentFile();
-                                        if (!parentDir.isDirectory() && !parentDir.mkdirs()) {
-                                            throw new RuntimeException("Unable to extract nested jar.");
-                                        }
-                                        FileOutputStream extractedJar = new FileOutputStream(extractedJarLocation);
-                                        InputStream is = jarFile.getInputStream(je);
+                                String name = je.getName();
+                                if (name.contains("..")){
+                                    name = CacheUtil.hex(name, name);
+                                }
+                                String extractedJarLocation = localFile + ".nested/" + name;
+                                File parentDir = new File(extractedJarLocation).getParentFile();
+                                if (!parentDir.isDirectory() && !parentDir.mkdirs()) {
+                                    throw new RuntimeException("Unable to extract nested jar.");
+                                }
+                                FileOutputStream extractedJar = new FileOutputStream(extractedJarLocation);
+                                InputStream is = jarFile.getInputStream(je);
 
-                                        byte[] bytes = new byte[1024];
-                                        int read = is.read(bytes);
-                                        int fileSize = read;
-                                        while (read > 0) {
-                                            extractedJar.write(bytes, 0, read);
-                                            read = is.read(bytes);
-                                            fileSize += read;
-                                        }
+                                byte[] bytes = new byte[1024];
+                                int read = is.read(bytes);
+                                int fileSize = read;
+                                while (read > 0) {
+                                    extractedJar.write(bytes, 0, read);
+                                    read = is.read(bytes);
+                                    fileSize += read;
+                                }
 
-                                        is.close();
-                                        extractedJar.close();
+                                is.close();
+                                extractedJar.close();
 
-                                        // 0 byte file? skip
-                                        if (fileSize <= 0) {
-                                            continue;
-                                        }
+                                // 0 byte file? skip
+                                if (fileSize <= 0) {
+                                    continue;
+                                }
 
-                                        tracker.addResource(new File(extractedJarLocation).toURL(), (VersionString) null, null);
+                                tracker.addResource(new File(extractedJarLocation).toURI().toURL(), (VersionString) null, null);
 
-                                        URL codebase = file.getCodeBase();
-                                        if (codebase == null) {
-                                            //FIXME: codebase should be the codebase of the Main Jar not
-                                            //the location. Although, it still works in the current state.
-                                            codebase = file.getResources().getMainJAR().getLocation();
-                                        }
+                                URL codebase = file.getCodeBase();
+                                if (codebase == null) {
+                                    //FIXME: codebase should be the codebase of the Main Jar not
+                                    //the location. Although, it still works in the current state.
+                                    codebase = file.getResources().getMainJAR().getLocation();
+                                }
 
-                                        final SecurityDesc jarSecurity = securityDelegate.getJarPermissions(codebase);
+                                final SecurityDesc jarSecurity = securityDelegate.getJarPermissions(codebase);
 
-                                        try {
-                                            URL fileURL = new URL("file://" + extractedJarLocation);
-                                            // there is no remote URL for this, so lets fake one
-                                            URL fakeRemote = new URL(jar.getLocation().toString() + "!" + je.getName());
-                                            CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
-                                            addURL(fakeRemote);
+                                try {
+                                    URL fileURL = new URL("file://" + extractedJarLocation);
+                                    // there is no remote URL for this, so lets fake one
+                                    URL fakeRemote = new URL(jar.getLocation().toString() + "!" + je.getName());
+                                    CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
+                                    addURL(fakeRemote);
 
-                                            jarLocationSecurityMap.put(fakeRemote, jarSecurity);
+                                    jarLocationSecurityMap.put(fakeRemote, jarSecurity);
 
-                                        } catch (MalformedURLException mfue) {
-                                            LOG.error("Unable to add extracted nested jar to classpath", mfue);
-                                        }
-                                    }
-
-                                    jarEntries.add(je.getName());
+                                } catch (MalformedURLException mfue) {
+                                    LOG.error("Unable to add extracted nested jar to classpath", mfue);
                                 }
                             }
+
+                            jarEntries.add(je.getName());
                         }
-
-                        addURL(jar.getLocation());
-
-                        // there is currently no mechanism to cache files per
-                        // instance.. so only index cached files
-                        if (localFile != null) {
-                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
-
-                            try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
-                                JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);
-                                if (index != null) {
-                                    jarIndexes.add(index);
-                                }
-                            }
-                        } else {
-                            CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
-                        }
-
-                        LOG.debug("Activate jar: {}", location);
-                    } catch (Exception ex) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                     }
-
-                    // some programs place a native library in any jar
-                    nativeLibraryStorage.addSearchJar(jar.getLocation());
                 }
 
-                return null;
-            }
-        };
+                addURL(jar.getLocation());
 
-        AccessController.doPrivileged(activate, acc);
+                // there is currently no mechanism to cache files per
+                // instance.. so only index cached files
+                if (localFile != null) {
+                    CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
+
+                    try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
+                        JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);
+                        if (index != null) {
+                            jarIndexes.add(index);
+                        }
+                    }
+                } else {
+                    CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
+                }
+
+                LOG.debug("Activate jar: {}", location);
+            } catch (Exception ex) {
+                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            }
+
+            // some programs place a native library in any jar
+            nativeLibraryStorage.addSearchJar(jar.getLocation());
+        }
+
+        return null;
     }
 
     /**
@@ -1371,7 +1344,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars the jars
      */
     private void waitForJars(List<JARDesc> jars) {
-        URL urls[] = new URL[jars.size()];
+        URL[] urls = new URL[jars.size()];
 
         for (int i = 0; i < jars.size(); i++) {
             JARDesc jar = jars.get(i);
@@ -1403,7 +1376,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
 
-        // Result is still null. Return what the codebaseloader
+        // Result is still null. Return what the codebase loader
         // has (which returns null if it is not loaded there either)
         if (codeBaseLoader != null) {
             return codeBaseLoader.findLoadedClassFromParent(name);
@@ -1449,7 +1422,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
 
                 return parent.loadClass(name);
-            } catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ignored) {
             }
         }
 
@@ -1459,7 +1432,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (result == null) {
             try {
                 result = loadClassExt(name);
-            } catch (ClassNotFoundException cnfe) {
+            } catch (ClassNotFoundException ignored) {
                 // Not found in external loader either
 
                 // Look in 'Class-Path' as specified in the manifest file
@@ -1493,7 +1466,6 @@ public class JNLPClassLoader extends URLClassLoader {
                 synchronized (jarIndexes) {
                     for (JarIndexAccess index : jarIndexes) {
                         // Non-generic code in sun.misc.JarIndex
-                        @SuppressWarnings("unchecked")
                         LinkedList<String> jarList = index.get(name.replace('.', '/'));
 
                         if (jarList != null) {
@@ -1556,15 +1528,12 @@ public class JNLPClassLoader extends URLClassLoader {
         );
 
         // Give read permissions to the cached jar file
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-            @Override
-            public Void run() {
-                Permission p = getReadPermission(desc);
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            Permission p = getReadPermission(desc);
 
-                resourcePermissions.add(p);
+            resourcePermissions.add(p);
 
-                return null;
-            }
+            return null;
         });
 
         final URL remoteURL = desc.getLocation();
@@ -1583,19 +1552,16 @@ public class JNLPClassLoader extends URLClassLoader {
             // having AllPermissions as those actions normally happen
             // during initialization. We therefore need to do those
             // actions as privileged.
-            AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
-                @Override
-                public Void run() throws Exception {
-                    jcv.add(jars, tracker);
+            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+                jcv.add(jars, tracker);
 
-                    checkTrustWithUser();
+                checkTrustWithUser();
 
-                    final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
+                final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
 
-                    jarLocationSecurityMap.put(remoteURL, security);
+                jarLocationSecurityMap.put(remoteURL, security);
 
-                    return null;
-                }
+                return null;
             });
 
             addURL(remoteURL);
@@ -1620,16 +1586,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 if (loader == this) {
                     final String fName = name;
                     return AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<Class<?>>() {
-                        @Override
-                        public Class<?> run() throws ClassNotFoundException {
-                            return JNLPClassLoader.super.findClass(fName);
-                        }
-                    }, getAccessControlContextForClassLoading());
+                            (PrivilegedExceptionAction<Class<?>>) () -> JNLPClassLoader.super.findClass(fName), getAccessControlContextForClassLoading());
                 } else {
                     return loader.findClass(name);
                 }
-            } catch (ClassNotFoundException | PrivilegedActionException ex) {
+            } catch (ClassNotFoundException | PrivilegedActionException ignored) {
             } catch (ClassFormatError cfe) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cfe);
             } catch (NullJnlpFileException ex) {
@@ -1657,12 +1618,12 @@ public class JNLPClassLoader extends URLClassLoader {
         // find it
         try {
             return findClass(name);
-        } catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ignored) {
         }
 
         // add resources until found
         while (true) {
-            JNLPClassLoader addedTo = null;
+            JNLPClassLoader addedTo;
 
             try {
                 addedTo = addNextResource();
@@ -1682,7 +1643,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             try {
                 return addedTo.findClass(name);
-            } catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ignored) {
             }
         }
     }
@@ -1749,14 +1710,8 @@ public class JNLPClassLoader extends URLClassLoader {
             if (loader == this) {
                 final String fName = name;
                 try {
-                    e = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<Enumeration<URL>>() {
-                        @Override
-                        public Enumeration<URL> run() throws IOException {
-                            return JNLPClassLoader.super.findResources(fName);
-                        }
-                    }, getAccessControlContextForClassLoading());
-                } catch (PrivilegedActionException pae) {
+                    e = AccessController.doPrivileged((PrivilegedExceptionAction<Enumeration<URL>>) () -> JNLPClassLoader.super.findResources(fName), getAccessControlContextForClassLoading());
+                } catch (PrivilegedActionException ignored) {
                 }
             } else {
                 e = loader.findResources(name);
@@ -1775,7 +1730,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         return resources;
                     }
                 }, getAccessControlContextForClassLoading()));
-            } catch (PrivilegedActionException pae) {
+            } catch (PrivilegedActionException ignored) {
             }
         }
 
@@ -2017,7 +1972,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * resource. If null, main JNLP's file location will be used instead.
      * @param part The name of the path.
      * @param version of jar to be downloaded
-     * @throws LaunchException
      */
     void initializeNewJarDownload(final URL ref, final String part, final VersionString version) {
         final JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
@@ -2170,31 +2124,21 @@ public class JNLPClassLoader extends URLClassLoader {
      * instantiating JNLPClassLoaders, by creating a fake SecurityDelegate that
      * does not require one.
      */
-    public static interface SecurityDelegate {
+    public interface SecurityDelegate {
 
-        public boolean isPluginApplet();
+         SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost);
 
-        public boolean userPromptedForPartialSigning();
+         SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException;
 
-        public boolean userPromptedForSandbox();
+         SecurityDesc getJarPermissions(final URL codebaseHost);
 
-        public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost);
+         void promptUserOnPartialSigning() throws LaunchException;
 
-        public SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException;
+         void setRunInSandbox() throws LaunchException;
 
-        public SecurityDesc getJarPermissions(final URL codebaseHost);
+         boolean getRunInSandbox();
 
-        public void promptUserOnPartialSigning() throws LaunchException;
-
-        public void setRunInSandbox() throws LaunchException;
-
-        public boolean getRunInSandbox();
-
-        public void addPermission(final Permission perm);
-
-        public void addPermissions(final PermissionCollection perms);
-
-        public void addPermissions(final Collection<Permission> perms);
+        void addPermissions(final Collection<Permission> perms);
     }
 
     /**
@@ -2206,16 +2150,13 @@ public class JNLPClassLoader extends URLClassLoader {
         private final JNLPClassLoader classLoader;
         private boolean runInSandbox;
         private boolean promptedForPartialSigning;
-        private boolean promptedForSandbox;
 
-        public SecurityDelegateImpl(final JNLPClassLoader classLoader) {
+        SecurityDelegateImpl(final JNLPClassLoader classLoader) {
             this.classLoader = classLoader;
             runInSandbox = false;
-            promptedForSandbox = false;
         }
 
-        @Override
-        public boolean isPluginApplet() {
+        boolean isPluginApplet() {
             return false;
         }
 
@@ -2318,7 +2259,6 @@ public class JNLPClassLoader extends URLClassLoader {
             JNLPRuntime.reloadPolicy();
             // ensure that we have the most up-to-date custom policy loaded since the user may have just launched PolicyEditor
             // to create a custom policy for the applet they are about to run
-            this.promptedForSandbox = true;
             this.runInSandbox = true;
         }
 
@@ -2336,27 +2276,8 @@ public class JNLPClassLoader extends URLClassLoader {
             return this.runInSandbox;
         }
 
-        @Override
-        public boolean userPromptedForPartialSigning() {
-            return this.promptedForPartialSigning;
-        }
-
-        @Override
-        public boolean userPromptedForSandbox() {
-            return this.promptedForSandbox;
-        }
-
-        @Override
-        public void addPermission(final Permission perm) {
+        void addPermission(final Permission perm) {
             classLoader.addPermission(perm);
-        }
-
-        @Override
-        public void addPermissions(final PermissionCollection perms) {
-            Enumeration<Permission> e = perms.elements();
-            while (e.hasMoreElements()) {
-                addPermission(e.nextElement());
-            }
         }
 
         @Override
@@ -2388,9 +2309,9 @@ public class JNLPClassLoader extends URLClassLoader {
         /**
          * Classes that are not found, so that findClass can skip them next time
          */
-        ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<String, URL[]>();
+        ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<>();
 
-        public CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
+        CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
             super(urls, cl);
             parentJNLPClassLoader = cl;
         }
@@ -2411,13 +2332,11 @@ public class JNLPClassLoader extends URLClassLoader {
 
             try {
                 return AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Class<?>>() {
-                    public Class<?> run() throws ClassNotFoundException {
-                        Class<?> c = CodeBaseClassLoader.super.findClass(name);
-                        parentJNLPClassLoader.checkPartialSigningWithUser();
-                        return c;
-                    }
-                }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                        (PrivilegedExceptionAction<Class<?>>) () -> {
+                            Class<?> c = CodeBaseClassLoader.super.findClass(name);
+                            parentJNLPClassLoader.checkPartialSigningWithUser();
+                            return c;
+                        }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
             } catch (PrivilegedActionException pae) {
                 notFoundResources.put(name, super.getURLs());
                 throw new ClassNotFoundException("Could not find class " + name, pae);
@@ -2448,7 +2367,7 @@ public class JNLPClassLoader extends URLClassLoader {
          * found, null otherwise
          * @see java.lang.ClassLoader#findLoadedClass(String)
          */
-        public Class<?> findLoadedClassFromParent(String name) {
+        Class<?> findLoadedClassFromParent(String name) {
             return findLoadedClass(name);
         }
 
@@ -2457,7 +2376,7 @@ public class JNLPClassLoader extends URLClassLoader {
          *
          * @return parent JNLPClassLoader
          */
-        public JNLPClassLoader getParentJNLPClassLoader() {
+        JNLPClassLoader getParentJNLPClassLoader() {
             return parentJNLPClassLoader;
         }
 
@@ -2495,12 +2414,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 try {
                     final String fName = name;
                     url = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<URL>() {
-                        public URL run() {
-                            return CodeBaseClassLoader.super.findResource(fName);
-                        }
-                    }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
-                } catch (PrivilegedActionException pae) {
+                            (PrivilegedExceptionAction<URL>) () -> CodeBaseClassLoader.super.findResource(fName), parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                } catch (PrivilegedActionException ignored) {
                 }
 
                 if (url == null) {
