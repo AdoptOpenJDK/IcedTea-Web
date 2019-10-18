@@ -185,7 +185,7 @@ public class CacheAppViewer extends JDialog {
 
     private static class DummyCacheIdListModel implements ListModel<CacheId> {
 
-        List<CacheId> content;
+        private final List<CacheId> content;
 
         public DummyCacheIdListModel(List<CacheId> content) {
             this.content = content;
@@ -202,17 +202,11 @@ public class CacheAppViewer extends JDialog {
         }
 
         @Override
-        public void addListDataListener(ListDataListener l) {
-
-        }
+        public void addListDataListener(ListDataListener l) {}
 
         @Override
-        public void removeListDataListener(ListDataListener l) {
-
-        }
+        public void removeListDataListener(ListDataListener l) {}
 
     }
-
-    ;
 }
 

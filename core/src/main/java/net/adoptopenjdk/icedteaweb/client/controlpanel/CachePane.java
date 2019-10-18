@@ -71,10 +71,13 @@ public class CachePane extends JPanel {
 
     private final static Logger LOG = LoggerFactory.getLogger(CachePane.class);
 
-    final JDialog parent;
-    final DeploymentConfiguration config;
+    private final JDialog parent;
+
+    private final DeploymentConfiguration config;
+
     private JComponent defaultFocusComponent;
-    String[] columns = {
+
+    private final String[] columns = {
             Translator.R("CVCPColName"),
             Translator.R("CVCPColPath"),
             Translator.R("CVCPColType"),
@@ -83,7 +86,9 @@ public class CachePane extends JPanel {
             Translator.R("CVCPColLastModified"),
             Translator.R("CVCPColJnlPath")
     };
-    JTable cacheTable;
+
+    private JTable cacheTable;
+
     private JButton deleteButton, refreshButton, doneButton, cleanAll, infoButton;
 
     /**
@@ -103,11 +108,11 @@ public class CachePane extends JPanel {
      * Add components to the pane.
      */
     private void addComponents() {
-        JPanel topPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        final JPanel topPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
 
-        TableModel model = new CacheTableModel();
+        final TableModel model = new CacheTableModel();
 
         cacheTable = new JTable(model);
         cacheTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
