@@ -81,6 +81,6 @@ class CachedDaemonThreadPoolProvider {
         }
     }
 
-    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newCachedThreadPool(new DaemonThreadFactory());
+    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(3, new DaemonThreadFactory());
 
 }

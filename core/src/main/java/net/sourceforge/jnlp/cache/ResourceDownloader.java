@@ -77,17 +77,46 @@ class ResourceDownloader implements Runnable {
         }
 
         if (!isProcessing) {
-            CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
+            final ResourceDownloader rd = new ResourceDownloader(resource, lock);
+            CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        rd.runInitialize();
+                        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    rd.runDownload();
+                                }
+                            });
+                    }
+                });
         }
     }
 
     @Override
     public void run() {
+        runInitialize();
+        runDownload();
+    }
+
+    public void runInitialize() {
         try {
             if (resource.isSet(PRECONNECT) && !resource.hasAllFlags(EnumSet.of(ERROR, CONNECTING, CONNECTED))) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECTING));
                 initializeResource();
             }
+        }
+        finally {
+            synchronized (lock) {
+                lock.notifyAll(); // wake up wait's to check for completion
+            }
+        }
+    }
+
+    public void runDownload() {
+        try {
             if (resource.isSet(PREDOWNLOAD) && !resource.hasAllFlags(EnumSet.of(ERROR, DOWNLOADING, DOWNLOADED))) {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADING));
                 downloadResource();
