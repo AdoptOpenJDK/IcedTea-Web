@@ -58,12 +58,6 @@ public interface CertVerifier {
     boolean getRootInCaCerts();
 
     /**
-     * @return  if there are signing issues with the certificate being verified
-     * @param certPath to be validated
-     */
-    boolean hasSigningIssues(CertPath certPath);
-
-    /**
      * @return  the details regarding issue with this certificate
      * @param certPath certificate
      */
@@ -71,9 +65,8 @@ public interface CertVerifier {
 
     /**
      * @return  a valid certificate path to this certificate being verified
-     * @param certPath to be read
      */
-    CertPath getCertPath(CertPath certPath);
+    CertPath getCertPath();
 
     /**
      * @return the application's publisher's certificate.
@@ -86,7 +79,7 @@ public interface CertVerifier {
      * may return the same certificate as getPublisher(CertPath certPath) in
      * the event that the application is self signed.
      * @param certPath certificate
-     *  
+     *
      */
     Certificate getRoot(CertPath certPath);
 }

@@ -1542,18 +1542,13 @@ public class JNLPClassLoader extends URLClassLoader {
         available.remove(desc); // Resource downloaded. Remove from available list.
 
         try {
-
-            // Verify if needed
-            final List<JARDesc> jars = new ArrayList<>();
-            jars.add(desc);
-
             // Decide what level of security this jar should have
             // The verification and security setting functions rely on
             // having AllPermissions as those actions normally happen
             // during initialization. We therefore need to do those
             // actions as privileged.
             AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
-                jcv.add(jars, tracker);
+                jcv.add(desc, tracker);
 
                 checkTrustWithUser();
 

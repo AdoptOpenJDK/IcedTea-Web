@@ -111,7 +111,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
      * Builds the JTree out of CertPaths.
      */
     void buildTree() {
-        certPath = parent.getCertVerifier().getCertPath(null);
+        certPath = parent.getCertVerifier().getCertPath();
         X509Certificate firstCert =
                         ((X509Certificate) certPath.getCertificates().get(0));
         String subjectString =
@@ -196,7 +196,7 @@ public class CertsInfoPane extends SecurityDialogPanel {
                                                         };
         return cert;
     }
-    
+
      private String jdkIndependentHexEncoder(byte[] signature) {
         try {
             return jdkIndependentHexEncoderImpl(signature);
@@ -408,12 +408,12 @@ public class CertsInfoPane extends SecurityDialogPanel {
     public DialogResult getDefaultPositiveAnswer() {
         return new Yes();
     }
-    
+
     @Override
     public DialogResult readFromStdIn(String what) {
         return Yes.readValue(what);
     }
-    
+
     @Override
     public String helpToStdIn() {
         return new Yes().getAllowedValues().toString();
