@@ -29,6 +29,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.CacheFile;
 import net.sourceforge.jnlp.cache.cache.CacheId;
 import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
@@ -43,6 +44,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -92,15 +95,16 @@ public class CacheUtil {
         if (JNLPRuntime.isDebug()) {
             for (CacheId id : items) {
                 LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.getFiles().size());
-                for (Object[] o : id.getFiles()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object value : o) {
-                        Object object = value;
-                        if (object == null) {
-                            object = "??";
-                        }
-                        sb.append(object.toString()).append(" ;  ");
-                    }
+                for (CacheFile cacheFile : id.getFiles()) {
+                    final StringBuilder sb = new StringBuilder();
+                    final Consumer<Object> appender = v -> sb.append(Optional.ofNullable(v).orElse("??")).append(" ;  ");
+                    appender.accept(cacheFile.getInfoFile());
+                    appender.accept(cacheFile.getParentFile());
+                    appender.accept(cacheFile.getProtocol());
+                    appender.accept(cacheFile.getDomain());
+                    appender.accept(cacheFile.getSize());
+                    appender.accept(cacheFile.getLastModified());
+                    appender.accept(cacheFile.getJnlpPath());
                     LOG.info("  * {}", sb);
                 }
             }

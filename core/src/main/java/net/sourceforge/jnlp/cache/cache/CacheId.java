@@ -18,7 +18,7 @@ public class CacheId {
     }
 
     //last century array of objects instead of some nice class inherited from previous century
-    private final List<Object[]> files = new ArrayList<>();
+    private final List<CacheFile> files = new ArrayList<>();
     private final String id;
     private final String type;
 
@@ -27,7 +27,7 @@ public class CacheId {
         this.type = type;
     }
 
-    public List<Object[]> getFiles() {
+    public List<CacheFile> getFiles() {
         return files;
     }
 

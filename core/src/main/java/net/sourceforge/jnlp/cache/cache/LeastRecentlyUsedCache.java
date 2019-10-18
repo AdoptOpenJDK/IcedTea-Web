@@ -62,7 +62,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -234,7 +233,7 @@ class LeastRecentlyUsedCache {
 
         final Map<String, CacheId> result = new LinkedHashMap<>();
         entries.forEach(entry -> {
-            final Object[] fileEntry = createPaneObjectArray(entry);
+            final CacheFile fileEntry = createPaneObjectArray(entry);
             if (includeJnlpPath) {
                 final CacheEntry infoFile = getInfoFile(entry);
                 final String jnlpPath = infoFile.getJnlpPath();
@@ -255,18 +254,9 @@ class LeastRecentlyUsedCache {
         return new ArrayList<>(result.values());
     }
 
-    private Object[] createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
+    private CacheFile createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
         final CacheEntry infoFile = getInfoFile(entry);
-
-        return new Object[]{
-                /* 0 */ infoFile,
-                /* 1 */ infoFile.getCacheFile().getParentFile(),
-                /* 2 */ entry.getProtocol(),
-                /* 3 */ entry.getDomain(),
-                /* 4 */ infoFile.getSize(),
-                /* 5 */ new Date(infoFile.getLastModified()),
-                /* 6 */ infoFile.getJnlpPath()
-        };
+        return new CacheFile(infoFile, entry);
     }
 
     void deleteFromCache(URL resourceHref, VersionId version) {

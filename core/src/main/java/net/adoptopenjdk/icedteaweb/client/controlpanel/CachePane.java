@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.commandline.NonEditableTableModel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -108,7 +107,7 @@ public class CachePane extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
 
-        TableModel model = new NonEditableTableModel(columns, 0);
+        TableModel model = new CacheTableModel();
 
         cacheTable = new JTable(model);
         cacheTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -327,7 +326,7 @@ public class CachePane extends JPanel {
                         int modelRow = cacheTable.convertRowIndexToModel(row);
                         ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
                         Cache.deleteFromCache(resourceInfo);
-                        ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
+                        ((CacheTableModel) cacheTable.getModel()).removeRow(modelRow);
                         cacheTable.getSelectionModel().clearSelection();
                     } catch (Exception exception) {
                         // ignore
@@ -409,14 +408,13 @@ public class CachePane extends JPanel {
             // Populating the cacheTable may take a while, so indicate busy by cursor
             parent.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-            NonEditableTableModel tableModel;
-            (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
+            CacheTableModel tableModel;
+            (tableModel = (CacheTableModel)cacheTable.getModel()).clear(); //Clears the table
             final List<CacheId> cacheIds = Cache.getDomainCacheIds();
             for (CacheId cacheId : cacheIds) {
-                for (Object[] v : cacheId.getFiles()) {
-                    tableModel.addRow(v);
-                }
+                tableModel.addAll(cacheId.getFiles());
             }
+
         } catch (Exception exception) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
         } finally {

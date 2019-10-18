@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.cache.cache.Cache;
+import net.sourceforge.jnlp.cache.cache.CacheFile;
 import net.sourceforge.jnlp.cache.cache.CacheId;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.ImageResources;
@@ -47,11 +48,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * This class will provide a visual way of viewing cache ids.
- *
- *
  */
 public class CacheAppViewer extends JDialog {
 
@@ -107,10 +108,10 @@ public class CacheAppViewer extends JDialog {
                 SwingUtils.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (idTabs.getSelectedComponent()==jnlpPaths){
+                        if (idTabs.getSelectedComponent() == jnlpPaths) {
                             Cache.deleteFromCache(appsByJnlpPath.getSelectedValue().getId());
                         }
-                        if (idTabs.getSelectedComponent()==domains){
+                        if (idTabs.getSelectedComponent() == domains) {
                             Cache.deleteFromCache(appsByDomain.getSelectedValue().getId());
                         }
                         CacheAppViewer.this.getContentPane().removeAll();
@@ -157,56 +158,61 @@ public class CacheAppViewer extends JDialog {
             this.delete = delete;
         }
 
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                info.setText("");
-                if (apps.getSelectedValue() != null) {
-                    for (Object[] o : apps.getSelectedValue().getFiles()) {
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < o.length; i++) {
-                            Object object = o[i];
-                            if (object == null) {
-                                object = "??";
-                            }
-                            sb.append(object.toString()).append(" ;  ");
-                        }
-                        info.setText(info.getText() + sb.toString() + "\n");
-                    }
-                    delete.setEnabled(true);
-                    delete.setText(Translator.R("TIFPDeleteFiles") + " - " + apps.getSelectedValue().getFiles().size());
-                } else {
-                    delete.setEnabled(false);
-                    delete.setText(Translator.R("TIFPDeleteFiles"));
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            info.setText("");
+            if (apps.getSelectedValue() != null) {
+                for (CacheFile cacheFile : apps.getSelectedValue().getFiles()) {
+                    final StringBuilder sb = new StringBuilder();
+                    final Consumer<Object> appender = v -> sb.append(Optional.ofNullable(v).orElse("??")).append(" ;  ");
+                    appender.accept(cacheFile.getInfoFile());
+                    appender.accept(cacheFile.getParentFile());
+                    appender.accept(cacheFile.getProtocol());
+                    appender.accept(cacheFile.getDomain());
+                    appender.accept(cacheFile.getSize());
+                    appender.accept(cacheFile.getLastModified());
+                    appender.accept(cacheFile.getJnlpPath());
+                    info.setText(info.getText() + sb.toString() + "\n");
                 }
+                delete.setEnabled(true);
+                delete.setText(Translator.R("TIFPDeleteFiles") + " - " + apps.getSelectedValue().getFiles().size());
+            } else {
+                delete.setEnabled(false);
+                delete.setText(Translator.R("TIFPDeleteFiles"));
             }
         }
+    }
 
     private static class DummyCacheIdListModel implements ListModel<CacheId> {
 
         List<CacheId> content;
-        public DummyCacheIdListModel(List<CacheId> content){
+
+        public DummyCacheIdListModel(List<CacheId> content) {
             this.content = content;
         }
-            @Override
-            public int getSize() {
-                return content.size();
-            }
 
-            @Override
-            public CacheId getElementAt(int index) {
-                return content.get(index);
-            }
+        @Override
+        public int getSize() {
+            return content.size();
+        }
 
-            @Override
-            public void addListDataListener(ListDataListener l) {
+        @Override
+        public CacheId getElementAt(int index) {
+            return content.get(index);
+        }
 
-            }
+        @Override
+        public void addListDataListener(ListDataListener l) {
 
-            @Override
-            public void removeListDataListener(ListDataListener l) {
+        }
 
-            }
+        @Override
+        public void removeListDataListener(ListDataListener l) {
 
-        };
+        }
+
+    }
+
+    ;
 }
 
