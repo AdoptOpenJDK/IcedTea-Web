@@ -356,27 +356,26 @@ public class ManifestAttributesChecker {
             if (jnlp != null) {
                 usedUrls.add(UrlUtils.removeFileName(jnlp.getSourceLocation()));
             }
+        }
 
-        }
-        LOG.debug("Found alaca URLs to be verified");
-        for (URL url : usedUrls) {
-            LOG.debug(" - {}", url.toExternalForm());
-        }
         if (usedUrls.isEmpty()) {
             //I hope this is the case, when the resources is/are
             //only codebase classes. Then it should be safe to return.
             LOG.debug("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
             return;
         }
-
         boolean allOk = true;
         for (URL u : usedUrls) {
-            if (UrlUtils.urlRelativeTo(u, codebase)
-                    && UrlUtils.urlRelativeTo(u, stripDocbase(documentBase))) {
-                LOG.debug("OK - {} is from codebase/docbase.", u.toExternalForm());
+            if(UrlUtils.urlRelativeTo(u, codebase)) {
+                if(UrlUtils.urlRelativeTo(u, stripDocbase(documentBase))) {
+                    LOG.debug("OK - '{}' is from codebase '{}' and docbase '{}'.", u.toExternalForm(), codebase, documentBase);
+                } else {
+                    allOk = false;
+                    LOG.warn("Warning! '{}' is NOT from documentBase '{}'.", u.toExternalForm(), documentBase);
+                }
             } else {
                 allOk = false;
-                LOG.warn("Warning! {} is NOT from codebase/docbase.", u.toExternalForm());
+                LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u.toExternalForm(), codebase);
             }
         }
         if (allOk) {
@@ -401,7 +400,7 @@ public class ManifestAttributesChecker {
         } else {
             for (URL foundUrl : usedUrls) {
                 if (!att.matches(foundUrl)) {
-                    throw new LaunchException("The resource from " + foundUrl + " does not match the  location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
+                    throw new LaunchException("The resource from " + foundUrl + " does not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
                 } else {
                     LOG.debug("The resource from {} does  match the  location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
                 }

@@ -118,7 +118,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
         Set<URL> s = new HashSet<>();
         s.add(new URL("http:/blah.com/blah"));
         s.add(new URL("http:/blah.com/blah/blah"));
-        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
+        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFile(new URL("https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
