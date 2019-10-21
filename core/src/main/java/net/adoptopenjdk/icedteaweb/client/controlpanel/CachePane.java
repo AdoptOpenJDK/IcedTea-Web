@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.commandline.NonEditableTableModel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -31,7 +30,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -72,19 +70,12 @@ public class CachePane extends JPanel {
 
     private final static Logger LOG = LoggerFactory.getLogger(CachePane.class);
 
-    final JDialog parent;
-    final DeploymentConfiguration config;
-    private JComponent defaultFocusComponent;
-    String[] columns = {
-            Translator.R("CVCPColName"),
-            Translator.R("CVCPColPath"),
-            Translator.R("CVCPColType"),
-            Translator.R("CVCPColDomain"),
-            Translator.R("CVCPColSize"),
-            Translator.R("CVCPColLastModified"),
-            Translator.R("CVCPColJnlPath")
-    };
-    JTable cacheTable;
+    private final JDialog parent;
+
+    private final DeploymentConfiguration config;
+
+    private JTable cacheTable;
+
     private JButton deleteButton, refreshButton, doneButton, cleanAll, infoButton;
 
     /**
@@ -104,11 +95,11 @@ public class CachePane extends JPanel {
      * Add components to the pane.
      */
     private void addComponents() {
-        JPanel topPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        final JPanel topPanel = new JPanel(new GridBagLayout());
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
 
-        TableModel model = new NonEditableTableModel(columns, 0);
+        final TableModel model = new CacheTableModel();
 
         cacheTable = new JTable(model);
         cacheTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -166,11 +157,11 @@ public class CachePane extends JPanel {
             }
         };
         // TableCellRenderer for path column
-        cacheTable.getColumn(this.columns[1]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[1]).setCellRenderer(tableCellRenderer);
         // TableCellRenderer for size column
-        cacheTable.getColumn(this.columns[4]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[4]).setCellRenderer(tableCellRenderer);
         // TableCellRenderer for last modified column
-        cacheTable.getColumn(this.columns[5]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[5]).setCellRenderer(tableCellRenderer);
 
         c.weightx = 1;
         c.weighty = 1;
@@ -327,7 +318,7 @@ public class CachePane extends JPanel {
                         int modelRow = cacheTable.convertRowIndexToModel(row);
                         ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
                         Cache.deleteFromCache(resourceInfo);
-                        ((NonEditableTableModel) cacheTable.getModel()).removeRow(modelRow);
+                        ((CacheTableModel) cacheTable.getModel()).removeRow(modelRow);
                         cacheTable.getSelectionModel().clearSelection();
                     } catch (Exception exception) {
                         // ignore
@@ -409,28 +400,18 @@ public class CachePane extends JPanel {
             // Populating the cacheTable may take a while, so indicate busy by cursor
             parent.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-            NonEditableTableModel tableModel;
-            (tableModel = (NonEditableTableModel)cacheTable.getModel()).setRowCount(0); //Clears the table
+            CacheTableModel tableModel;
+            (tableModel = (CacheTableModel)cacheTable.getModel()).clear(); //Clears the table
             final List<CacheId> cacheIds = Cache.getDomainCacheIds();
             for (CacheId cacheId : cacheIds) {
-                for (Object[] v : cacheId.getFiles()) {
-                    tableModel.addRow(v);
-                }
+                tableModel.addAll(cacheId.getFiles());
             }
+
         } catch (Exception exception) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
         } finally {
             // Reset cursor
             parent.getContentPane().setCursor(Cursor.getDefaultCursor());
-        }
-    }
-
-    /**
-     * Put focus onto default button.
-     */
-    public void focusOnDefaultButton() {
-        if (defaultFocusComponent != null) {
-            defaultFocusComponent.requestFocusInWindow();
         }
     }
 
