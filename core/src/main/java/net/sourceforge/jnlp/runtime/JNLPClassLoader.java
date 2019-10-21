@@ -1872,7 +1872,9 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // Codebase
-        addToCodeBaseLoader(extLoader.file.getCodeBase());
+        if (this.enableCodeBase) {
+            addToCodeBaseLoader(extLoader.file.getCodeBase());
+        }
 
         // native search paths
         for (File nativeDirectory : extLoader.nativeLibraryStorage.getSearchDirectories()) {
