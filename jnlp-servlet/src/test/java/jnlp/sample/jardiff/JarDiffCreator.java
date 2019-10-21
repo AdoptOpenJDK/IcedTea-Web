@@ -3,6 +3,9 @@ package jnlp.sample.jardiff;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * This class was used to create the JarDiff files that are used in unit tests.
+ */
 public class JarDiffCreator {
 
     public static void main(String[] args) throws Exception {

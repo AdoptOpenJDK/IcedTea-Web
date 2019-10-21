@@ -53,16 +53,6 @@ public class JarDiffTest {
         return createdJar;
     }
 
-    private String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
     private Map<String, String> getMd5Hashes(final String jarPath) throws Exception {
         final Map<String, String> entryToMd5 = new HashMap<>();
         try (final JarFile jarFile = new JarFile(jarPath)) {
@@ -82,4 +72,13 @@ public class JarDiffTest {
         return Collections.unmodifiableMap(entryToMd5);
     }
 
+    private String bytesToHex(final byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 }
