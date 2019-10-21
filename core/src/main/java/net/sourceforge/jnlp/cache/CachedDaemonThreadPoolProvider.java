@@ -36,12 +36,19 @@
  exception statement from your version. */
 package net.sourceforge.jnlp.cache;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class CachedDaemonThreadPoolProvider {
+
+    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(3, new DaemonThreadFactory());
+
+    public static Executor getThreadPool() {
+        return DAEMON_THREAD_POOL;
+    }
 
     /**
      * This is copypasted default factory from java.util.concurrent.Executors.
@@ -80,7 +87,5 @@ class CachedDaemonThreadPoolProvider {
             return t;
         }
     }
-
-    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(3, new DaemonThreadFactory());
 
 }

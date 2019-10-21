@@ -32,7 +32,7 @@ import static net.sourceforge.jnlp.cache.ResourceUrlCreator.VERSION_ID_HEADER;
 import static net.sourceforge.jnlp.cache.cache.Cache.isUpToDate;
 import static net.sourceforge.jnlp.cache.cache.ResourceInfo.createInfoFromRemote;
 
-class ResourceDownloader implements Runnable {
+class ResourceDownloader {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceDownloader.class);
 
@@ -78,27 +78,11 @@ class ResourceDownloader implements Runnable {
 
         if (!isProcessing) {
             final ResourceDownloader rd = new ResourceDownloader(resource, lock);
-            CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        rd.runInitialize();
-                        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    rd.runDownload();
-                                }
-                            });
-                    }
-                });
+            CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> {
+                rd.runInitialize();
+                CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> rd.runDownload());
+            });
         }
-    }
-
-    @Override
-    public void run() {
-        runInitialize();
-        runDownload();
     }
 
     public void runInitialize() {
@@ -107,8 +91,7 @@ class ResourceDownloader implements Runnable {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(CONNECTING));
                 initializeResource();
             }
-        }
-        finally {
+        } finally {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
@@ -121,8 +104,7 @@ class ResourceDownloader implements Runnable {
                 resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADING));
                 downloadResource();
             }
-        }
-        finally {
+        } finally {
             synchronized (lock) {
                 lock.notifyAll(); // wake up wait's to check for completion
             }
