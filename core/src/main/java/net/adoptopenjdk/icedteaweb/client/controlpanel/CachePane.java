@@ -30,7 +30,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -74,18 +73,6 @@ public class CachePane extends JPanel {
     private final JDialog parent;
 
     private final DeploymentConfiguration config;
-
-    private JComponent defaultFocusComponent;
-
-    private final String[] columns = {
-            Translator.R("CVCPColName"),
-            Translator.R("CVCPColPath"),
-            Translator.R("CVCPColType"),
-            Translator.R("CVCPColDomain"),
-            Translator.R("CVCPColSize"),
-            Translator.R("CVCPColLastModified"),
-            Translator.R("CVCPColJnlPath")
-    };
 
     private JTable cacheTable;
 
@@ -170,11 +157,11 @@ public class CachePane extends JPanel {
             }
         };
         // TableCellRenderer for path column
-        cacheTable.getColumn(this.columns[1]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[1]).setCellRenderer(tableCellRenderer);
         // TableCellRenderer for size column
-        cacheTable.getColumn(this.columns[4]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[4]).setCellRenderer(tableCellRenderer);
         // TableCellRenderer for last modified column
-        cacheTable.getColumn(this.columns[5]).setCellRenderer(tableCellRenderer);
+        cacheTable.getColumn(CacheTableModel.columns[5]).setCellRenderer(tableCellRenderer);
 
         c.weightx = 1;
         c.weighty = 1;
@@ -425,15 +412,6 @@ public class CachePane extends JPanel {
         } finally {
             // Reset cursor
             parent.getContentPane().setCursor(Cursor.getDefaultCursor());
-        }
-    }
-
-    /**
-     * Put focus onto default button.
-     */
-    public void focusOnDefaultButton() {
-        if (defaultFocusComponent != null) {
-            defaultFocusComponent.requestFocusInWindow();
         }
     }
 

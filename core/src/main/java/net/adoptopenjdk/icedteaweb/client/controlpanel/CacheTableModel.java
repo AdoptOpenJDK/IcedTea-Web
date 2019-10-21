@@ -12,7 +12,7 @@ public class CacheTableModel extends AbstractTableModel {
 
     private final List<CacheFile> data = new ArrayList<>();
 
-    private final String[] columns = {
+    public final static String[] columns = {
             Translator.R("CVCPColName"),
             Translator.R("CVCPColPath"),
             Translator.R("CVCPColType"),
@@ -22,38 +22,24 @@ public class CacheTableModel extends AbstractTableModel {
             Translator.R("CVCPColJnlPath")
     };
 
-
-
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
         final CacheFile cacheFile = data.get(rowIndex);
-        if(columnIndex == 0) {
-            return cacheFile.getInfoFile();
-        }
-        if(columnIndex == 1) {
-            return cacheFile.getParentFile();
-        }
-        if(columnIndex == 2) {
-            return cacheFile.getProtocol();
-        }
-        if(columnIndex == 3) {
-            return cacheFile.getDomain();
-        }
-        if(columnIndex == 4) {
-            return cacheFile.getSize();
-        }
-        if(columnIndex == 5) {
-            return cacheFile.getLastModified();
-        }
-        if(columnIndex == 6) {
-            return cacheFile.getJnlpPath();
+        switch (columnIndex) {
+            case 0: return cacheFile.getInfoFile();
+            case 1: return cacheFile.getParentFile();
+            case 2: return cacheFile.getProtocol();
+            case 3: return cacheFile.getDomain();
+            case 4: return cacheFile.getSize();
+            case 5: return cacheFile.getLastModified();
+            case 6: return cacheFile.getJnlpPath();
         }
         return null;
     }
 
     @Override
     public int getColumnCount() {
-        return 7;
+        return columns.length;
     }
 
     @Override
@@ -74,11 +60,6 @@ public class CacheTableModel extends AbstractTableModel {
     @Override
     public int getRowCount() {
         return data.size();
-    }
-
-    public void add(final CacheFile cacheFile) {
-        data.add(cacheFile);
-        fireTableRowsInserted(data.size() - 1, data.size() - 1);
     }
 
     public void addAll(final Collection<CacheFile> cacheFiles) {

@@ -17,11 +17,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.util.ImageResources;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.ImageResources;
 
 import javax.swing.JDialog;
 import java.awt.Container;
@@ -32,7 +32,6 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
@@ -77,21 +76,6 @@ public class CacheViewer extends JDialog {
 
         pack();
         this.topPanel.invokeLaterPopulateTable();
-
-        /* Set focus to default button when first activated */
-        WindowAdapter adapter = new WindowAdapter() {
-            private boolean gotFocus = false;
-
-            @Override
-            public void windowGainedFocus(WindowEvent we) {
-                // Once window gets focus, set initial focus
-                if (!gotFocus) {
-                    topPanel.focusOnDefaultButton();
-                    gotFocus = true;
-                }
-            }
-        };
-        addWindowFocusListener(adapter);
 
         // Add a KeyEventDispatcher to dispatch events when this CacheViewer has focus
         final CacheViewer cacheViewer = this;
