@@ -30,7 +30,7 @@ public class UpdatePolicy {
     // todo: implement session updating
 
     // todo: doesn't seem to work in the same JVM, probably because
-    // Resource is being held by a tracker so it isn't collected;
+    // HResource is being held by a tracker so it isn't collected;
     // then next time a tracker adds the resource even if
     // shouldUpdate==true it's state is already marked
     // CONNECTED|DOWNLOADED.  Let the resource be collected or reset

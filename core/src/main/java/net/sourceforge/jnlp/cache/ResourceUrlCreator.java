@@ -142,7 +142,7 @@ class ResourceUrlCreator {
                         continue;
                     }
                     if (response.isRedirect()) {
-                        LOG.debug("Resource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm(), response.getLocation().toExternalForm());
+                        LOG.debug("HResource {} got redirect {} code for {} request for {} adding {} to list of possible urls", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm(), response.getLocation().toExternalForm());
                         if (!JNLPRuntime.isAllowRedirect()) {
                             throw new RedirectionException("The resource " + url.toExternalForm() + " is being redirected (" + response.getResponseCode() + ") to " + response.getLocation().toExternalForm() + ". This is disabled by default. If you wont to allow it, run javaws with -allowredirect parameter.");
                         }

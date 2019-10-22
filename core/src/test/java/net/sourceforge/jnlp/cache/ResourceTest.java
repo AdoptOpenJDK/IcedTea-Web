@@ -116,44 +116,44 @@ public class ResourceTest {
     @Test
     public void testNewResourceIsUninitialized() throws Exception {
         Resource res = createResource("NewResource");
-        assertTrue("Resource should not have had any status flags set", isUninitialized(res));
+        assertTrue("HResource should not have had any status flags set", isUninitialized(res));
     }
 
     @Test
     public void testSetFlag() throws Exception {
         Resource res = createResource("SetFlag");
         res.changeStatus(null, EnumSet.of(PRECONNECT));
-        assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
+        assertFalse("HResource should have been initialized", isUninitialized(res));
+        assertTrue("HResource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("HResource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
     }
 
     @Test
     public void testSetMultipleFlags() throws Exception {
         Resource res = createResource("SetFlags");
         res.changeStatus(null, EnumSet.of(PRECONNECT, PREDOWNLOAD));
-        assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
-        assertTrue("Resource should have only had PRECONNECT and PREDOWNLOAD set", hasOnly(res, EnumSet.of(PRECONNECT, PREDOWNLOAD)));
+        assertFalse("HResource should have been initialized", isUninitialized(res));
+        assertTrue("HResource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("HResource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
+        assertTrue("HResource should have only had PRECONNECT and PREDOWNLOAD set", hasOnly(res, EnumSet.of(PRECONNECT, PREDOWNLOAD)));
     }
 
     @Test
     public void testChangeStatus() throws Exception {
         Resource res = createResource("ChangeStatus");
         res.changeStatus(null, EnumSet.of(PRECONNECT));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
+        assertTrue("HResource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("HResource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
 
         Collection<Resource.Status> downloadFlags = EnumSet.of(PREDOWNLOAD, DOWNLOADING, DOWNLOADED);
         Collection<Resource.Status> connectFlags = EnumSet.of(PRECONNECT, CONNECTING, CONNECTED);
         res.changeStatus(connectFlags, downloadFlags);
 
-        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
-        assertTrue("Resource should have had DOWNLOADING set", hasFlag(res, DOWNLOADING));
-        assertTrue("Resource should have had DOWNLOADED set", hasFlag(res, DOWNLOADED));
-        assertTrue("Resource should have only had PREDOWNLOAD{,ING,ED} flags set", hasOnly(res, downloadFlags));
-        assertFalse("Resource should not have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("HResource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
+        assertTrue("HResource should have had DOWNLOADING set", hasFlag(res, DOWNLOADING));
+        assertTrue("HResource should have had DOWNLOADED set", hasFlag(res, DOWNLOADED));
+        assertTrue("HResource should have only had PREDOWNLOAD{,ING,ED} flags set", hasOnly(res, downloadFlags));
+        assertFalse("HResource should not have had PRECONNECT set", hasFlag(res, PRECONNECT));
     }
 
     private static Resource createResource(String testName) throws MalformedURLException {

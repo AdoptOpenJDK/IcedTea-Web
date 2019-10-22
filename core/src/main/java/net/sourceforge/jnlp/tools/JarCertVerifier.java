@@ -204,7 +204,7 @@ public class JarCertVerifier implements CertVerifier {
      * Update the verifier to consider a new jar when verifying.
      *
      * @param jar     A new jars to be verified.
-     * @param tracker Resource tracker used to obtain the the jars from cache
+     * @param tracker HResource tracker used to obtain the the jars from cache
      * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
      */
     public void add(final JARDesc jar, final ResourceTracker tracker) throws Exception {
@@ -215,7 +215,7 @@ public class JarCertVerifier implements CertVerifier {
      * Update the verifier to consider new jars when verifying.
      *
      * @param jars    List of new jars to be verified.
-     * @param tracker Resource tracker used to obtain the the jars from cache
+     * @param tracker HResource tracker used to obtain the the jars from cache
      * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
      */
     public void add(final List<JARDesc> jars, final ResourceTracker tracker) throws Exception {
@@ -226,7 +226,7 @@ public class JarCertVerifier implements CertVerifier {
      * Verify the jars provided and update the state of this instance to match the new information.
      *
      * @param jars    List of new jars to be verified.
-     * @param tracker Resource tracker used to obtain the the jars from cache
+     * @param tracker HResource tracker used to obtain the the jars from cache
      * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
      */
     private void verifyJars(final List<JARDesc> jars, final ResourceTracker tracker) throws Exception {

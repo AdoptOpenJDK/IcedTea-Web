@@ -112,7 +112,7 @@ public class Resource {
     }
 
     /**
-     * Creates and returns a shared Resource object representing the given
+     * Creates and returns a shared HResource object representing the given
      * location and version.
      *
      * @param location        final location of resource
@@ -365,7 +365,7 @@ public class Resource {
             // this prevents the URL handler from looking up the IP
             // address and doing name resolution; much faster so less
             // time spent in synchronized addResource determining if
-            // Resource is already in a tracker, and better for offline
+            // HResource is already in a tracker, and better for offline
             // mode on some OS.
             // TODO: handle Version
             return UrlUtils.urlEquals(location, ((Resource) other).location);

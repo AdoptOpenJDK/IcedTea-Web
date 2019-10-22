@@ -1539,7 +1539,7 @@ public class JNLPClassLoader extends URLClassLoader {
         final URL remoteURL = desc.getLocation();
         final URL cachedUrl = tracker.getCacheURL(remoteURL); // blocks till download
 
-        available.remove(desc); // Resource downloaded. Remove from available list.
+        available.remove(desc); // HResource downloaded. Remove from available list.
 
         try {
             // Decide what level of security this jar should have
