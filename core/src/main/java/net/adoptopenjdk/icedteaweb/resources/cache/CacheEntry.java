@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache.cache;
+package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
@@ -148,7 +148,7 @@ class CacheEntry implements ResourceInfo {
      * Returns whether there is a version of the URL contents in
      * the cache and it is up to date.
      *
-     * @param lastModified - current time as get from server (in ms). Mostly value of "Last-Modified" http header'? 
+     * @param lastModified - current time as get from server (in ms). Mostly value of "Last-Modified" http header'?
      * @return whether the cache contains the version
      */
     boolean isCurrent(long lastModified) {

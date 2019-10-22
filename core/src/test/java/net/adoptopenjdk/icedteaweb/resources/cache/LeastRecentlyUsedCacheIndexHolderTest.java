@@ -35,11 +35,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.cache.cache;
+package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.ConversionResult;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.sourceforge.jnlp.cache.cache.LeastRecentlyUsedCacheIndex.ConversionResult;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.util.PropertiesFile;
@@ -56,7 +56,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
-import static net.sourceforge.jnlp.cache.cache.LeastRecentlyUsedCacheIndex.convertPropertiesToEntries;
+import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.convertPropertiesToEntries;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

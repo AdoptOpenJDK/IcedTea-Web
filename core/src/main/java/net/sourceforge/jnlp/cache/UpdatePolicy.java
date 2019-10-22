@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.sourceforge.jnlp.cache.cache.ResourceInfo;
+import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 
 /**
  * A policy that determines when a resource should be checked for

@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache.cache;
+package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import java.util.ArrayList;
 import java.util.List;
