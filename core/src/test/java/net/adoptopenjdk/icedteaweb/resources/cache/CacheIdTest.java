@@ -34,7 +34,7 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
-package net.sourceforge.jnlp.cache.cache;
+package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class CacheIdTest {
         CacheId cd2 = CacheId.domainId("b");
         CacheId cd31 = CacheId.domainId(null);
         CacheId cd32 = CacheId.domainId(null);
-        
+
         Assert.assertEquals(cj11, cj11);
         Assert.assertEquals(cj11, cj12);
         Assert.assertEquals(cd11, cd11);
@@ -62,12 +62,12 @@ public class CacheIdTest {
         Assert.assertEquals(cj31, cj32);
         Assert.assertEquals(cd31, cd31);
         Assert.assertEquals(cd31, cd32);
-        
+
         Assert.assertNotEquals(cj11, cj2);
         Assert.assertNotEquals(cj11, cj31);
         Assert.assertNotEquals(cd11, cd2);
         Assert.assertNotEquals(cd11, cd31);
-        
+
         Assert.assertNotEquals(cj11, cd11);
         Assert.assertNotEquals(cj2, cd2);
         Assert.assertNotEquals(cj31, cd31);

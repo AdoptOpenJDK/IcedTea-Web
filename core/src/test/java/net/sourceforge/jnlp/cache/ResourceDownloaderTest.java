@@ -2,10 +2,10 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.JarFile;

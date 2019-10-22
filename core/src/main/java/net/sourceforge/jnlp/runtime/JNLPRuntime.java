@@ -27,11 +27,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndica
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.cache.cache.Cache;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -189,7 +189,7 @@ public class JNLPRuntime {
 
     /** a lock which is held to indicate that an instance of netx is running */
     private static FileLock fileLock;
-    
+
     /** flag to prevent show the splash screen at start of webstart application **/
     private static boolean showWebSplash = true;
 
@@ -930,7 +930,7 @@ public class JNLPRuntime {
 	}
 
     /**
-     * @return show splash screen at start of webstart application 
+     * @return show splash screen at start of webstart application
      */
     public static boolean isShowWebSplash() {
         return showWebSplash;

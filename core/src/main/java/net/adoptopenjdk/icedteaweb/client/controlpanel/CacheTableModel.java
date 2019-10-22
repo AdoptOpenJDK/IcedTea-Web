@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.cache.cache.CacheFile;
+import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

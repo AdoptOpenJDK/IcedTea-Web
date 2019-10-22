@@ -22,10 +22,10 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
+import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
+import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.cache.cache.Cache;
-import net.sourceforge.jnlp.cache.cache.CacheId;
-import net.sourceforge.jnlp.cache.cache.ResourceInfo;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 
