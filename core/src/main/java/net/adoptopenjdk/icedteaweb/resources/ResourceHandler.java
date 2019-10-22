@@ -6,12 +6,10 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.cache.Resource;
 
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -19,11 +17,10 @@ import java.util.concurrent.TimeUnit;
 
 public class ResourceHandler {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
 
-    private final static Executor localExecutor = Executors.newCachedThreadPool();
-
-    private final static Executor remoteExecutor = Executors.newFixedThreadPool(6);
+    private static final Executor localExecutor = Executors.newCachedThreadPool();
+    private static final Executor remoteExecutor = Executors.newFixedThreadPool(6);
 
     private final ResourceCache cache;
 
@@ -31,16 +28,59 @@ public class ResourceHandler {
         this.cache = Assert.requireNonNull(cache, "cache");
     }
 
-    public Future<Void> getResource(final Resource resource) {
+    public Future<Resource> getResource(final Resource resource) {
         Assert.requireNonNull(resource, "resource");
 
+        final CompletableFuture<Resource> result = new CompletableFuture<>();
+
+        if (isAlreadyCompleted(resource)) {
+            result.complete(resource);
+        } else {
+            localExecutor.execute(() -> result.complete(downloadResource(resource)));
+        }
+
+        return result;
+    }
+
+    private boolean isAlreadyCompleted(Resource resource) {
+        synchronized (resource) {
+            return resource.isComplete();
+        }
+    }
+
+    private Resource downloadResource(final Resource resource) {
+        final boolean alreadyBeingProcessed;
+        synchronized (resource) {
+            alreadyBeingProcessed = resource.isBeingProcessed();
+            resource.startProcessing();
+        }
+
+        if (alreadyBeingProcessed) {
+            return waitForResource(resource);
+        }
+
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
-        final CompletableFuture<InitializationResult> result = initializer.init();
+        final InitializationResult initResult = initializer.init();
+        if (initResult.needsDownload()) {
+            final ResourceDownloader downloader = ResourceDownloader.of(resource, initResult.getDownloadUrls());
+            downloader.download();
+        }
+        return resource;
+    }
+
+    private Resource waitForResource(Resource resource) {
+        throw new RuntimeException("Not implemented yet!");
+    }
+
+    private Object oldCode(final Resource resource) {
+
+        final ResourceInitializer initializer = ResourceInitializer.of(resource);
+        final InitializationResult result = initializer.init();
         return result.handle((r, e) -> {
-            if(e != null) {
+            if (e != null) {
                 throw new RuntimeException("Error in initialization of resource", e);
             }
-            if(r.needsDownload()) {
+            if (r.needsDownload()) {
                 final ResourceDownloader downloader = ResourceDownloader.of(resource, r.getDownloadUrls());
                 try {
                     downloader.download().get();
@@ -105,7 +145,7 @@ public class ResourceHandler {
                         return ResourceRemoteEndpointHeadResult.fail(e);
                     }
                 }).filter(r -> r.isSucessfull())
-               // .sorted()
+                // .sorted()
                 .findFirst();
     }
 

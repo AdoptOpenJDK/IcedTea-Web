@@ -190,7 +190,7 @@ public class Resource {
     /**
      * @return the requested version
      */
-    VersionString getRequestVersion() {
+    public VersionString getRequestVersion() {
         return requestVersion;
     }
 
@@ -283,7 +283,7 @@ public class Resource {
         }
     }
 
-    boolean isComplete() {
+    public boolean isComplete() {
         synchronized (status) {
             return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
         }

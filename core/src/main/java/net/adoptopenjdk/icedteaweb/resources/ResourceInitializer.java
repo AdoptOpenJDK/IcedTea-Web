@@ -1,14 +1,18 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.cache.Resource;
-
-import java.util.concurrent.CompletableFuture;
 
 public interface ResourceInitializer {
 
     static ResourceInitializer of(final Resource resource) {
-        return null;
+        final VersionString requestVersion = resource.getRequestVersion();
+        if (requestVersion != null) {
+            return new VersionedResourceInitializer(resource);
+        } else {
+            return new UnversionedResourceInitializer(resource);
+        }
     }
 
-    CompletableFuture<InitializationResult> init();
+    InitializationResult init();
 }
