@@ -141,7 +141,7 @@ function docs() {
     local WIN_LOC_OVERWRITE="-Duser.language=$ID -Duser.country=$COUNTRY -Dfile.encoding=$ENCOD"
   fi
   mkdir -p $langDir
-  $JRE/bin/java \
+  "$JRE"/bin/java \
     $WIN_LOC_OVERWRITE \
     -cp `createCp $JAVAWS_SRC` \
     net.sourceforge.jnlp.util.docprovider.TextsProvider \
