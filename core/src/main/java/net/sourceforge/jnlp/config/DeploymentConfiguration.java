@@ -43,7 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -91,7 +90,7 @@ public final class DeploymentConfiguration {
         this(PathsAndFiles.USER_DEPLOYMENT_FILE);
     }
 
-    public DeploymentConfiguration(final InfrastructureFileDescriptor configFile) {
+    DeploymentConfiguration(final InfrastructureFileDescriptor configFile) {
         userDeploymentFileDescriptor = configFile;
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
