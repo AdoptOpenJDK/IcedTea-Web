@@ -28,7 +28,7 @@ public enum UpdatePolicy {
      */
     PROMPT_RUN("prompt-run");
 
-    private String value;
+    private final String value;
 
     UpdatePolicy(final String value) {
         this.value = value;
