@@ -121,7 +121,7 @@ public class Resource {
      * @param updatePolicy    final policy for updating
      * @return new resource, which is already added in resources list
      */
-    static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
+    public static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, downloadOptions, updatePolicy);
 
@@ -158,7 +158,7 @@ public class Resource {
      *
      * @return the url to use when downloading
      */
-    URL getDownloadLocation() {
+    public URL getDownloadLocation() {
         return downloadLocation;
     }
 
@@ -167,14 +167,14 @@ public class Resource {
      *
      * @param downloadLocation url to be downloaded
      */
-    void setDownloadLocation(URL downloadLocation) {
+    public void setDownloadLocation(URL downloadLocation) {
         this.downloadLocation = downloadLocation;
     }
 
     /**
      * @return the local file currently being downloaded
      */
-    File getLocalFile() {
+    public File getLocalFile() {
         return localFile;
     }
 
@@ -183,7 +183,7 @@ public class Resource {
      *
      * @param localFile location of stored resource
      */
-    void setLocalFile(File localFile) {
+    public void setLocalFile(File localFile) {
         this.localFile = localFile;
     }
 
@@ -197,7 +197,7 @@ public class Resource {
     /**
      * @return the version downloaded from server
      */
-    VersionId getDownloadVersion() {
+    public VersionId getDownloadVersion() {
         return downloadVersion;
     }
 
@@ -206,14 +206,14 @@ public class Resource {
      *
      * @param downloadVersion version of downloaded resource
      */
-    void setDownloadVersion(final VersionId downloadVersion) {
+    public void setDownloadVersion(final VersionId downloadVersion) {
         this.downloadVersion = downloadVersion;
     }
 
     /**
      * @return the amount in bytes transferred
      */
-    long getTransferred() {
+    public long getTransferred() {
         return transferred;
     }
 
@@ -222,7 +222,7 @@ public class Resource {
      *
      * @param transferred set the whole transferred amount to this value
      */
-    void setTransferred(long transferred) {
+    public void setTransferred(long transferred) {
         this.transferred = transferred;
     }
 
@@ -255,7 +255,7 @@ public class Resource {
     /**
      * @return the status of the resource
      */
-    Set<Status> getCopyOfStatus() {
+    public Set<Status> getCopyOfStatus() {
         return EnumSet.copyOf(status);
     }
 
@@ -265,7 +265,7 @@ public class Resource {
      * @param flag a status flag
      * @return true iff the flag is set
      */
-    boolean isSet(Status flag) {
+    public boolean isSet(Status flag) {
         synchronized (status) {
             return status.contains(flag);
         }
@@ -277,7 +277,7 @@ public class Resource {
      * @param flags a collection of flags
      * @return true iff all the flags are set
      */
-    boolean hasAllFlags(Collection<Status> flags) {
+    public boolean hasAllFlags(Collection<Status> flags) {
         synchronized (status) {
             return status.containsAll(flags);
         }
@@ -292,7 +292,7 @@ public class Resource {
     /**
      * @return the update policy for this resource
      */
-    UpdatePolicy getUpdatePolicy() {
+    public UpdatePolicy getUpdatePolicy() {
         return this.updatePolicy;
     }
 
@@ -322,7 +322,7 @@ public class Resource {
      * @param clear a collection of status flags to unset
      * @param add   a collection of status flags to set
      */
-    void changeStatus(Collection<Status> clear, Collection<Status> add) {
+    public void changeStatus(Collection<Status> clear, Collection<Status> add) {
         synchronized (status) {
             if (clear != null) {
                 status.removeAll(clear);
@@ -336,17 +336,17 @@ public class Resource {
     /**
      * Clear all flags
      */
-    void resetStatus() {
+    public void resetStatus() {
         synchronized (status) {
             status.clear();
         }
     }
 
-    DownloadOptions getDownloadOptions() {
+    public DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
     }
 
-    boolean isConnectable() {
+    public boolean isConnectable() {
         return JNLPRuntime.isConnectable(this.location);
     }
 
@@ -375,6 +375,6 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "location=" + location.toString() + " state=" + getStatusString();
+        return "location=" + location.toString() + " version=" + requestVersion + " state=" + getStatusString();
     }
 }

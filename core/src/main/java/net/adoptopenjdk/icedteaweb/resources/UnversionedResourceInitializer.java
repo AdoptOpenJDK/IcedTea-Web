@@ -1,11 +1,85 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
+import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.cache.Resource;
+import net.sourceforge.jnlp.cache.ResourceUrlCreator;
+import net.sourceforge.jnlp.cache.UrlRequestResult;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * ...
+ * Initializer for unversioned resources.
  */
-class UnversionedResourceInitializer implements ResourceInitializer {
+class UnversionedResourceInitializer extends BaseResourceInitializer {
+    private static final Logger LOG = LoggerFactory.getLogger(UnversionedResourceInitializer.class);
+
+    private boolean isCached;
+    private ResourceInfo info;
+
     UnversionedResourceInitializer(Resource resource) {
+        super(resource);
     }
+
+    @Override
+    public InitializationResult init() {
+        isCached = Cache.isCached(resource.getLocation(), null);
+        info = Cache.getInfo(resource.getLocation(), null);
+
+        if (needsUpdateCheck()) {
+            return checkForUpdate();
+        } else {
+            return initFromCache();
+        }
+    }
+
+    private InitializationResult checkForUpdate() {
+        final List<URL> candidateUrls = getUrlCandidates();
+        LOG.debug("Candidate URLs for {}: {}", resource, candidateUrls);
+        return getBestUrlByPingingWithHeadRequest(candidateUrls)
+                .map(requestResult -> {
+                    if (needsUpdate(requestResult)) {
+                        LOG.debug("Found best URL for {}: {}", resource, requestResult);
+                        return new InitializationResult(requestResult);
+                    } else {
+                        return initFromCache();
+                    }
+                })
+                .orElseGet(() -> {
+                    LOG.debug("Failed to determine best URL for {} will try all of {}", resource, candidateUrls);
+                    return new InitializationResult(candidateUrls);
+                });
+    }
+
+    private List<URL> getUrlCandidates() {
+        final List<URL> candidates = new ArrayList<>();
+
+        if (getDownloadOptions().useExplicitPack()) {
+            candidates.add(ResourceUrlCreator.getUrl(resource, true, false));
+        }
+        candidates.add(resource.getLocation());
+
+        return ResourceUrlCreator.prependHttps(candidates);
+    }
+
+    private boolean needsUpdateCheck() {
+        return !isCached
+                || info == null
+                || resource.getUpdatePolicy().shouldUpdate(info);
+    }
+
+    private boolean needsUpdate(final UrlRequestResult requestResult) {
+        return info == null
+                || requestResult.getLastModified() > info.getLastModified()
+                || requestResult.getContentLength() != info.getSize();
+    }
+
+    private InitializationResult initFromCache() {
+        return initFromCache(null);
+    }
+
 }

@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionIdComparator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -62,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,6 +72,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
 import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 
 /**
@@ -182,8 +185,8 @@ class LeastRecentlyUsedCache {
         }
     }
 
-    Optional<ResourceInfo> getResourceInfo(URL resourceHref, VersionId version) {
-        return cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
+    Optional<CacheEntry> getResourceInfo(URL resourceHref, VersionId version) {
+        return cacheIndex.getSynchronized(idx -> idx.find(resourceHref, version))
                 .map(this::getInfoFile);
     }
 
@@ -196,8 +199,8 @@ class LeastRecentlyUsedCache {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isCached(URL resourceHref, VersionId version) {
-        final Boolean isCached = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
-                .map(e -> getInfoFile(e).isCached())
+        final Boolean isCached = getResourceInfo(resourceHref, version)
+                .map(CacheEntry::isCached)
                 .orElse(false);
         LOG.info("isCached: {} - (v: {}) = {}", resourceHref, version, isCached);
         return isCached;
@@ -221,7 +224,21 @@ class LeastRecentlyUsedCache {
     }
 
     Optional<LeastRecentlyUsedCacheEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
-        return cacheIndex.getSynchronized(idx -> idx.findBestAndMarkAsAccessed(resourceHref, version));
+        final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
+        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdComparator);
+        return cacheIndex.getSynchronized(idx -> {
+            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAll(resourceHref, version);
+            final List<LeastRecentlyUsedCacheEntry> all = new ArrayList<>(allSet);
+            all.sort(versionComparator);
+
+            for (final LeastRecentlyUsedCacheEntry entry : all) {
+                if (getInfoFile(entry).isCached()) {
+                    return Optional.of(entry);
+                }
+            }
+
+            return Optional.empty();
+        });
     }
 
     List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {

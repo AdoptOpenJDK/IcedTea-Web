@@ -50,11 +50,8 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,7 +65,7 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 
-class ResourceUrlCreator {
+public class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
 
     static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
@@ -85,8 +82,10 @@ class ResourceUrlCreator {
      * HttpURLConnection.HTTP_OK and null if not.
      * @throws IOException if an I/O exception occurs.
      */
-    static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
+    public static UrlRequestResult getUrlResponseCodeWithRedirectionResult(final URL url, final Map<String, String> requestProperties, final HttpMethod requestMethod) throws IOException {
         try (final CloseableConnection connection = ConnectionFactory.openConnection(url, requestMethod, requestProperties)) {
+            connection.setConnectTimeout(5000);
+
             /* Fully consuming current request helps with connection re-use
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(connection);
@@ -169,11 +168,11 @@ class ResourceUrlCreator {
     }
 
     private static class RedirectionException extends RuntimeException {
+
         RedirectionException(String string) {
             super(string);
         }
     }
-
     /**
      * Returns a list of URLs that the resources might be downloadable from. The
      * Resources may not be downloadable from any of them. The returned order is
@@ -206,17 +205,20 @@ class ResourceUrlCreator {
         urls.add(getVersionedUrl(resource));
         urls.add(resource.getLocation());
 
-        final List<URL> result = new ArrayList<>();
+        return prependHttps(urls);
+    }
 
+    public static List<URL> prependHttps(List<URL> urls) {
+        final List<URL> result = new ArrayList<>();
         final boolean noHttpsPreferred = Boolean.parseBoolean(getConfiguration().getProperty(KEY_HTTPS_DONT_ENFORCE));
         if (!noHttpsPreferred) {
             //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
             for (final URL url : urls) {
                 if (url.getProtocol().equals("http") && url.getPort() < 0) { // port < 0 means default port
                     try {
-                        result.add(0, new URL("https", url.getHost(), url.getFile()));
+                        result.add(new URL("https" + url.toExternalForm().substring(4)));
                     } catch (MalformedURLException ex) {
-                        LOG.error("Error while creating URL for '" + url + "' and adding it to list of download locations", ex);
+                        LOG.error("Error while creating HTTPS URL from '" + url + "'", ex);
                     }
                 }
             }
@@ -236,7 +238,7 @@ class ResourceUrlCreator {
      * @return a URL for the resource or null if an appropriate URL can not be
      * found
      */
-    static URL getUrl(final Resource resource, final boolean usePack, final boolean useVersion) {
+    public static URL getUrl(final Resource resource, final boolean usePack, final boolean useVersion) {
         if (!(usePack || useVersion)) {
             throw new IllegalArgumentException("either pack200 or version required");
         }

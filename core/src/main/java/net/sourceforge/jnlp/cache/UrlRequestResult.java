@@ -8,14 +8,14 @@ import java.net.URL;
  * This class stores some result details such as response code, HTTP header field "Location", last modified
  * and content length of a url request.
  */
-class UrlRequestResult {
+public class UrlRequestResult {
     private final int responseCode;
     private final URL location; // HTTP header field "Location" as URL (redirection or newly created resource)
     private final VersionId version;
     private final long lastModified;
     private final long contentLength;
 
-    UrlRequestResult(int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
+    public UrlRequestResult(int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
         if (isRedirectResponseCode(responseCode) && location == null) {
             throw new IllegalStateException("Redirect response code found but location URL is null.");
         }
@@ -33,27 +33,27 @@ class UrlRequestResult {
      * @param location the location
      * @return a new {@link UrlRequestResult} based on this with the given redirect url
      */
-    UrlRequestResult withLocation(final URL location) {
+    public UrlRequestResult withLocation(final URL location) {
         return new UrlRequestResult(responseCode, location, version, lastModified, contentLength);
     }
 
-    URL getLocation() {
+    public URL getLocation() {
         return location;
     }
 
-    VersionId getVersion() {
+    public VersionId getVersion() {
         return version;
     }
 
-    int getResponseCode() {
+    public int getResponseCode() {
         return responseCode;
     }
 
-    long getContentLength() {
+    public long getContentLength() {
         return contentLength;
     }
 
-    long getLastModified() {
+    public long getLastModified() {
         return lastModified;
     }
 
@@ -61,7 +61,7 @@ class UrlRequestResult {
      * @return whether this {@link UrlRequestResult} represents a valid redirect with a location
      * and a redirect result code (one of 301-303 or 307-308)
      */
-    boolean isRedirect() {
+    public boolean isRedirect() {
         return isRedirectResponseCode(responseCode);
     }
 
@@ -79,7 +79,7 @@ class UrlRequestResult {
     /**
      * @return whether the return code is a success
      */
-    boolean isSuccess() {
+    public boolean isSuccess() {
         return String.valueOf(responseCode).startsWith("2");
     }
 

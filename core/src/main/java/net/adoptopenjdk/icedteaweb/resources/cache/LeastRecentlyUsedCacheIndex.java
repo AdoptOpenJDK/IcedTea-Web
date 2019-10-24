@@ -88,23 +88,6 @@ class LeastRecentlyUsedCacheIndex {
     }
 
     /**
-     * Finds the best matching cache entry.
-     * Will move the returned entry to the beginning of the cache (marked as accessed)
-     *
-     * @return the entry or {@code empty}, never {@code null}
-     */
-    Optional<LeastRecentlyUsedCacheEntry> findBestAndMarkAsAccessed(URL resourceHref, VersionString versionString) {
-        final Comparator<VersionId> versionIdaComparator = versionString != null ? new VersionIdComparator(versionString) : (o1, o2) -> o1 == o2 ? 0 : 1;
-        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdaComparator);
-        final Optional<LeastRecentlyUsedCacheEntry> result = findAll(resourceHref, versionString).stream()
-                .max(versionComparator);
-
-        result.ifPresent(this::markAccessed);
-
-        return result;
-    }
-
-    /**
      * @return all entries which are not marked for deletion
      */
     List<LeastRecentlyUsedCacheEntry> getAllUnDeletedEntries() {
@@ -183,7 +166,7 @@ class LeastRecentlyUsedCacheIndex {
         return dirty;
     }
 
-    private void markAccessed(LeastRecentlyUsedCacheEntry entry) {
+    void markAccessed(LeastRecentlyUsedCacheEntry entry) {
         final long now = System.currentTimeMillis();
         entries.remove(entry);
         entries.add(0, new LeastRecentlyUsedCacheEntry(entry.getId(), now, entry.getResourceHref(), entry.getVersion()));
