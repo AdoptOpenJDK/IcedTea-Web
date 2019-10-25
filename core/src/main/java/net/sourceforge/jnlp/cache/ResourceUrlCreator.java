@@ -202,7 +202,10 @@ public class ResourceUrlCreator {
             }
         }
 
-        urls.add(getVersionedUrl(resource.getLocation(), resource.getRequestVersion(), null));
+        final URL versionedUrl = getVersionedUrl(resource.getLocation(), resource.getRequestVersion(), null);
+        if(versionedUrl != null) {
+            urls.add(versionedUrl);
+        }
         urls.add(resource.getLocation());
 
         return prependHttps(urls);
