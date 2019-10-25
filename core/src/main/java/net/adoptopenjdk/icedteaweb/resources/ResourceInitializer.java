@@ -1,15 +1,8 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.cache.Resource;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-
-import java.io.File;
-import java.util.EnumSet;
-
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 
 public interface ResourceInitializer {
 
@@ -20,7 +13,11 @@ public interface ResourceInitializer {
 
         final VersionString requestVersion = resource.getRequestVersion();
         if (requestVersion != null) {
-            return new VersionedResourceInitializer(resource);
+            if (requestVersion.isExactVersion()) {
+                return new ExactVersionedResourceInitializer(resource);
+            } else {
+                return new RangeVersionedResourceInitializer(resource);
+            }
         } else {
             return new UnversionedResourceInitializer(resource);
         }

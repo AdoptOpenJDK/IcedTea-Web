@@ -202,7 +202,7 @@ public class ResourceUrlCreator {
             }
         }
 
-        urls.add(getVersionedUrl(resource));
+        urls.add(getVersionedUrl(resource.getLocation(), resource.getRequestVersion()));
         urls.add(resource.getLocation());
 
         return prependHttps(urls);
@@ -239,19 +239,33 @@ public class ResourceUrlCreator {
      * found
      */
     public static URL getUrl(final Resource resource, final boolean usePack, final boolean useVersion) {
-        if (!(usePack || useVersion)) {
-            throw new IllegalArgumentException("either pack200 or version required");
+        final boolean appendVersionToFileName = useVersion && resource.getRequestVersion() != null;
+
+        if (!usePack && !appendVersionToFileName) {
+            return null;
         }
 
-        final String location = resource.getLocation().toString();
-        final int lastSlash = resource.getLocation().toString().lastIndexOf('/');
+        final String url = resource.getLocation().toExternalForm();
+        final int firstQuestionmark = url.indexOf('?');
+
+        final String location;
+        final String query;
+        if (firstQuestionmark < 0) {
+            location = url;
+            query = "";
+        } else {
+            location = url.substring(0, firstQuestionmark);
+            query = url.substring(firstQuestionmark);
+        }
+
+        final int lastSlash = location.lastIndexOf('/');
         if (lastSlash == -1) {
-            return resource.getLocation();
+            return null;
         }
         final String filename = location.substring(lastSlash + 1);
 
         final String filenameWithVersion;
-        if (useVersion && resource.getRequestVersion() != null) {
+        if (appendVersionToFileName) {
             // With 'useVersion', j2-commons-cli.jar becomes, for example, j2-commons-cli__V1.0.jar
             final String[] parts = filename.split("\\.", -1 /* Keep blank strings*/);
 
@@ -278,10 +292,11 @@ public class ResourceUrlCreator {
             filenameWithVersionAndEnding = filenameWithVersion;
         }
 
-        final String urlLocation = location.substring(0, lastSlash + 1) + filenameWithVersionAndEnding;
+        final String urlLocation = location.substring(0, lastSlash + 1) + filenameWithVersionAndEnding + query;
         try {
             return new URL(urlLocation);
         } catch (MalformedURLException e) {
+            LOG.warn("Could not create versioned URL for {} and {} - Reason: {}", resource, e.getMessage());
             return null;
         }
     }
@@ -292,9 +307,10 @@ public class ResourceUrlCreator {
      *
      * @return url with version cared about
      */
-    static URL getVersionedUrl(final Resource resource) {
-        final URL resourceUrl = resource.getLocation();
-        final VersionString requestVersion = resource.getRequestVersion();
+    public static URL getVersionedUrl(URL resourceUrl, VersionString requestVersion) {
+        if (resourceUrl == null || requestVersion == null) {
+            return null;
+        }
 
         final String protocol = emptyIfNull(resourceUrl.getProtocol()) + "://";
         final String userInfoPart = emptyIfNull(resourceUrl.getUserInfo());
@@ -305,16 +321,16 @@ public class ResourceUrlCreator {
 
         final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
                 .filter(s -> !isBlank(s))
+                .filter(s -> !s.startsWith("version-id="))
                 .collect(Collectors.toList());
-        if (requestVersion != null) {
-            queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
-        }
+        queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 
         try {
             return new URL(protocol + userInfo + host + port + path + query);
         } catch (MalformedURLException e) {
-            return resourceUrl;
+            LOG.warn("Could not create versioned URL for {} and {} - Reason: {}", resourceUrl, requestVersion, e.getMessage());
+            return null;
         }
     }
 

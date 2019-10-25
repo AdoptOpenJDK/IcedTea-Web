@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.sourceforge.jnlp.cache.ResourceUrlCreator.getUrl;
+
 /**
  * Initializer for unversioned resources.
  */
@@ -58,9 +60,12 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
     private List<URL> getUrlCandidates() {
         final List<URL> candidates = new ArrayList<>();
 
-        if (getDownloadOptions().useExplicitPack()) {
-            candidates.add(ResourceUrlCreator.getUrl(resource, true, false));
+        final boolean usePack = getDownloadOptions().useExplicitPack();
+        final URL packUrl = getUrl(resource, usePack, false);
+        if (packUrl != null) {
+            candidates.add(packUrl);
         }
+
         candidates.add(resource.getLocation());
 
         return ResourceUrlCreator.prependHttps(candidates);
