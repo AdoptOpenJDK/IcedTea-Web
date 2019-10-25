@@ -39,7 +39,7 @@ import java.util.Properties;
  */
 public class PropertiesFile extends Properties {
 
-    private final static Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
 
     /**
      * the file to save to
@@ -111,6 +111,14 @@ public class PropertiesFile extends Properties {
             load();
         }
         return super.setProperty(key, value);
+    }
+
+    @Override
+    public synchronized boolean containsKey(Object key) {
+        if (lastStore == 0) {
+            load();
+        }
+        return super.containsKey(key);
     }
 
     /**
