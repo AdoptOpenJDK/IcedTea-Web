@@ -188,31 +188,27 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return true, if cache was corrupted and affected entry removed
      */
-    static ConversionResult convertPropertiesToEntries(Properties props) {
+    static ConversionResult convertPropertiesToEntries(PropertiesFile props) {
         boolean modified = false;
 
         // STEP 1
         // group all properties with the same ID together
         // throwing away entries which do not have a valid key
         final Map<String, Map<String, String>> id2ValueMap = new HashMap<>();
-        for (Map.Entry<Object, Object> propEntry : new HashSet<>(props.entrySet())) {
-            final Object rawKey = propEntry.getKey();
-            if (rawKey instanceof String) {
-                final String[] keyParts = splitKey((String) rawKey);
+        for (Map.Entry<String, String> propEntry : new HashSet<>(props.entrySet())) {
+            final String key = propEntry.getKey();
+            if (key != null) {
+                final String[] keyParts = splitKey(key);
                 if (keyParts.length == 2) {
-                    final Object rawValue = propEntry.getValue();
-                    if (rawValue == null || rawValue instanceof String) {
-                        final String value = (String) rawValue;
-                        id2ValueMap.computeIfAbsent(keyParts[0], k -> new HashMap<>()).put(keyParts[1], value);
-
-                        continue;
-                    }
+                    final String value = propEntry.getValue();
+                    id2ValueMap.computeIfAbsent(keyParts[0], k -> new HashMap<>()).put(keyParts[1], value);
+                    continue;
                 }
             }
 
             // if we reach this point something is wrong with the property
-            LOG.debug("found broken property: {}", rawKey);
-            props.remove(rawKey);
+            LOG.debug("found broken property: {}", key);
+            props.remove(key);
             modified = true;
         }
 

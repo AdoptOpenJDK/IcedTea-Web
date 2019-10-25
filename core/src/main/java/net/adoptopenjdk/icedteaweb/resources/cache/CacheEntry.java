@@ -180,7 +180,7 @@ class CacheEntry implements ResourceInfo {
             return false;
         }
 
-        if (! properties.containsKey(KEY_SIZE)) {
+        if (! properties.containsPropertyKey(KEY_SIZE)) {
             return false;
         }
 
