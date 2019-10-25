@@ -202,7 +202,7 @@ public class ResourceUrlCreator {
             }
         }
 
-        urls.add(getVersionedUrl(resource.getLocation(), resource.getRequestVersion()));
+        urls.add(getVersionedUrl(resource.getLocation(), resource.getRequestVersion(), null));
         urls.add(resource.getLocation());
 
         return prependHttps(urls);
@@ -307,7 +307,7 @@ public class ResourceUrlCreator {
      *
      * @return url with version cared about
      */
-    public static URL getVersionedUrl(URL resourceUrl, VersionString requestVersion) {
+    public static URL getVersionedUrl(URL resourceUrl, VersionString requestVersion, VersionId currentVersion) {
         if (resourceUrl == null || requestVersion == null) {
             return null;
         }
@@ -322,8 +322,12 @@ public class ResourceUrlCreator {
         final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
                 .filter(s -> !isBlank(s))
                 .filter(s -> !s.startsWith("version-id="))
+                .filter(s -> !s.startsWith("current-version-id="))
                 .collect(Collectors.toList());
         queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
+        if (currentVersion != null) {
+            queryParts.add("current-version-id=" + urlEncode(currentVersion.toString()));
+        }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 
         try {

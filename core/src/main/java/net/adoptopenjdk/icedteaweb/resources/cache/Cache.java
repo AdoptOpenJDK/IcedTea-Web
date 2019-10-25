@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The Cache
@@ -133,6 +134,15 @@ public class Cache {
         return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version)
                 .map(LeastRecentlyUsedCacheEntry::getVersion)
                 .orElse(null);
+    }
+
+    public static List<VersionId> getAllVersionsInCache(final URL resource) {
+        if (!CacheUtil.isCacheable(resource)) {
+            throw new IllegalArgumentException(resource + " is not a cacheable resource");
+        }
+        return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resource).stream()
+                .map(LeastRecentlyUsedCacheEntry::getVersion)
+                .collect(Collectors.toList());
     }
 
     /**

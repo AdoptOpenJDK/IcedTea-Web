@@ -241,6 +241,18 @@ class LeastRecentlyUsedCache {
         });
     }
 
+    List<LeastRecentlyUsedCacheEntry> getAllEntriesInCache(final URL resourceHref) {
+        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion);
+        return cacheIndex.getSynchronized(idx -> {
+            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAll(resourceHref);
+
+            return allSet.stream()
+                    .filter(entry -> getInfoFile(entry).isCached())
+                    .sorted(versionComparator)
+                    .collect(Collectors.toList());
+        });
+    }
+
     List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
         if (!includeJnlpPath && !includeDomain) {
             return Collections.emptyList();

@@ -61,6 +61,10 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
         return markedForDeletion;
     }
 
+    boolean matches(URL resource) {
+        return this.resourceHref.equals(resource);
+    }
+
     boolean matches(URL resource, VersionString versionString) {
         if (this.resourceHref.equals(resource)) {
             if (versionString == null && version == null) {

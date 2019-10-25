@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionIdComparator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -10,7 +9,6 @@ import net.sourceforge.jnlp.util.PropertiesFile;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Comparator.comparing;
 
 /**
  * Index of the cached resources.
@@ -73,6 +70,18 @@ class LeastRecentlyUsedCacheIndex {
         result.ifPresent(this::markAccessed);
 
         return result;
+    }
+
+    /**
+     * Finds all entries matching the resource independent of their version.
+     *
+     * @return a set of all matching entries, never {@code null}.
+     */
+    Set<LeastRecentlyUsedCacheEntry> findAll(URL resourceHref) {
+        return entries.stream()
+                .filter(e -> !e.isMarkedForDeletion())
+                .filter(e -> e.matches(resourceHref))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -166,7 +175,7 @@ class LeastRecentlyUsedCacheIndex {
         return dirty;
     }
 
-    void markAccessed(LeastRecentlyUsedCacheEntry entry) {
+    private void markAccessed(LeastRecentlyUsedCacheEntry entry) {
         final long now = System.currentTimeMillis();
         entries.remove(entry);
         entries.add(0, new LeastRecentlyUsedCacheEntry(entry.getId(), now, entry.getResourceHref(), entry.getVersion()));
