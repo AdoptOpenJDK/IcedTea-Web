@@ -84,7 +84,14 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
     private Future<UrlRequestResult> testSingleUrl(URL url) {
         final CompletableFuture<UrlRequestResult> result = new CompletableFuture<>();
-        remoteExecutor.execute(() -> result.complete(testUrl(url)));
+        remoteExecutor.execute(() -> {
+            try {
+                final UrlRequestResult response = testUrl(url);
+                result.complete(response);
+            } catch (Exception e) {
+                result.completeExceptionally(e);
+            }
+        });
         return result;
     }
 

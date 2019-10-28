@@ -28,7 +28,14 @@ public class ResourceHandler {
         if (isAlreadyCompleted()) {
             result.complete(resource);
         } else {
-            localExecutor.execute(() -> result.complete(downloadResource()));
+            localExecutor.execute(() -> {
+                try {
+                    final Resource finalResource = downloadResource();
+                    result.complete(finalResource);
+                } catch (Exception e) {
+                    result.completeExceptionally(e);
+                }
+            });
         }
 
         return result;
