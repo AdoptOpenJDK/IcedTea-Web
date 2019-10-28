@@ -27,7 +27,7 @@ public enum UpdateCheck {
      */
     BACKGROUND("background");
 
-    private String value;
+    private final String value;
 
     UpdateCheck(final String value) {
         this.value = value;

@@ -2200,29 +2200,31 @@ public class JNLPClassLoader extends URLClassLoader {
                             SecurityDesc.SANDBOX_PERMISSIONS,
                             codebaseHost);
                 }
-            } else /*
-             * Various combinations of the jars being signed and <security> tags being
-             * present are possible. They are treated as follows
-             *
-             * Jars          JNLP File         Result
-             *
-             * Signed        <security>        Appropriate Permissions
-             * Signed        no <security>     Sandbox
-             * Unsigned      <security>        Error
-             * Unsigned      no <security>     Sandbox
-             *
-             */ if (!runInSandbox && !classLoader.getSigning()
-                    && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
-                if (classLoader.jcv.allJarsSigned()) {
-                    LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
-                    consultCertificateSecurityException(ex);
-                    return consultResult(codebaseHost);
-                } else {
-                    LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
-                    consultCertificateSecurityException(ex);
-                    return consultResult(codebaseHost);
-                }
-            } else return consultResult(codebaseHost);
+            } else
+                /*
+                 * Various combinations of the jars being signed and <security> tags being
+                 * present are possible. They are treated as follows
+                 *
+                 * Jars          JNLP File         Result
+                 *
+                 * Signed        <security>        Appropriate Permissions
+                 * Signed        no <security>     Sandbox
+                 * Unsigned      <security>        Error
+                 * Unsigned      no <security>     Sandbox
+                 *
+                 */
+                if (!runInSandbox && !classLoader.getSigning()
+                        && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+                    if (classLoader.jcv.allJarsSigned()) {
+                        LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
+                        consultCertificateSecurityException(ex);
+                        return consultResult(codebaseHost);
+                    } else {
+                        LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
+                        consultCertificateSecurityException(ex);
+                        return consultResult(codebaseHost);
+                    }
+                } else return consultResult(codebaseHost);
         }
 
         private SecurityDesc consultResult(URL codebaseHost) {
