@@ -1481,17 +1481,12 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 if (jarList != null) {
                     for (String jarName : jarList) {
-                        JARDesc desc;
                         try {
-                            desc = new JARDesc(new URL(file.getCodeBase(), jarName),
+                            final JARDesc desc = new JARDesc(new URL(file.getCodeBase(), jarName),
                                     null, null, false, true, false, true);
-                        } catch (MalformedURLException mfe) {
-                            throw new ClassNotFoundException(name);
-                        }
-                        try {
                             addNewJar(desc);
-                        } catch (Exception e) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                        } catch (MalformedURLException mfe) {
+                            LOG.debug("encountered invalid URL for {} - {}", file.getCodeBase(), jarName);
                         }
                     }
 
