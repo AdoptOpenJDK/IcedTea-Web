@@ -502,7 +502,7 @@ public final class DeploymentConfiguration {
                 toSave.setProperty(key, newValue);
             }
             if (currentSetting != null && currentSetting.isLocked()) {
-                toSave.setProperty(key + LOCKED_POSTFIX, "");
+                toSave.setProperty(key + LOCKED_POSTFIX, "true");
             }
         }
 
