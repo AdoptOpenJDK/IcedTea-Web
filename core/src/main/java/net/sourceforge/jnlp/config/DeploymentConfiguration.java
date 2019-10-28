@@ -114,13 +114,11 @@ public final class DeploymentConfiguration {
     }
 
     public void lock(final String key) {
-        final String propertyKey = key + LOCKED_POSTFIX;
-        getSetting(propertyKey).ifPresent(s -> s.setLocked(true));
+        getSetting(key).ifPresent(s -> s.setLocked(true));
     }
 
     public void unlock(final String key) {
-        final String propertyKey = key + LOCKED_POSTFIX;
-        getSetting(propertyKey).ifPresent(s -> s.setLocked(false));
+        getSetting(key).ifPresent(s -> s.setLocked(false));
     }
 
     public void setLoadingException(final ConfigurationException ex) {
