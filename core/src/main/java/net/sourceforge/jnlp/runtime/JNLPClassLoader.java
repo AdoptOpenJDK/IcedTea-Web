@@ -1388,6 +1388,14 @@ public class JNLPClassLoader extends URLClassLoader {
     public interface ExceptionalSupplier<T, E extends Exception> {
 
         T call() throws E;
+
+        default T getResultOfCallOrNull() {
+            try {
+                return call();
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
     /**
@@ -1424,18 +1432,40 @@ public class JNLPClassLoader extends URLClassLoader {
         list.add(() -> loadFromJarIndexes(name));
 
         return list.stream()
-                .map(s -> getLoadedClassOrNull(s))
+                .map(ExceptionalSupplier::getResultOfCallOrNull)
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new ClassNotFoundException(name));
     }
 
-    private Class<?> getLoadedClassOrNull(ExceptionalSupplier<Class<?>, ClassNotFoundException> supplier) {
-        try {
-            return supplier.call();
-        } catch (final ClassNotFoundException e) {
-            return null;
+    private Class<?> loadClassFromParentClassloader(final String name) throws ClassNotFoundException {
+        // try parent classloader
+        ClassLoader parent = getParent();
+        if (parent == null) {
+            parent = ClassLoader.getSystemClassLoader();
         }
+        return parent.loadClass(name);
+    }
+
+    private Class<?> loadClassFromInternalManifestClasspath(final String name) throws ClassNotFoundException {
+        // Look in 'Class-Path' as specified in the manifest file
+
+        // This field synchronized before iterating over it since it may
+        // be shared data between threads
+        synchronized (classpaths) {
+            for (String classpath : classpaths) {
+                JARDesc desc;
+                try {
+                    URL jarUrl = new URL(file.getCodeBase(), classpath);
+                    desc = new JARDesc(jarUrl, null, null, false, true, false, true);
+                } catch (MalformedURLException mfe) {
+                    throw new ClassNotFoundException(name, mfe);
+                }
+                addNewJar(desc);
+            }
+        }
+
+        return loadClassExt(name);
     }
 
     private Class<?> loadFromJarIndexes(final String name) throws ClassNotFoundException {
@@ -1471,36 +1501,6 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
         throw new ClassNotFoundException(name);
-    }
-
-    private Class<?> loadClassFromInternalManifestClasspath(final String name) throws ClassNotFoundException {
-        // Look in 'Class-Path' as specified in the manifest file
-
-        // This field synchronized before iterating over it since it may
-        // be shared data between threads
-        synchronized (classpaths) {
-            for (String classpath : classpaths) {
-                JARDesc desc;
-                try {
-                    URL jarUrl = new URL(file.getCodeBase(), classpath);
-                    desc = new JARDesc(jarUrl, null, null, false, true, false, true);
-                } catch (MalformedURLException mfe) {
-                    throw new ClassNotFoundException(name, mfe);
-                }
-                addNewJar(desc);
-            }
-        }
-
-        return loadClassExt(name);
-    }
-
-    private Class<?> loadClassFromParentClassloader(final String name) throws ClassNotFoundException {
-        // try parent classloader
-        ClassLoader parent = getParent();
-        if (parent == null) {
-            parent = ClassLoader.getSystemClassLoader();
-        }
-        return parent.loadClass(name);
     }
 
     /**
