@@ -68,12 +68,12 @@ public class Setting<T> {
 
     private final String name;
     private final String description;
-    private final boolean locked;
     private final ValueValidator validator;
     private final String source;
     private final T defaultValue;
 
     private T value = null;
+    private boolean locked;
 
     /**
      * Creates a new Settings object
@@ -179,8 +179,13 @@ public class Setting<T> {
         this.value = value;
     }
 
+    public void setLocked(final boolean locked) {
+        this.locked = locked;
+    }
+
     @Override
     public String toString() {
         return value.toString();
     }
+
 }

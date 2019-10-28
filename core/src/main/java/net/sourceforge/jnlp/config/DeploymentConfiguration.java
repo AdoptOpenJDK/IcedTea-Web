@@ -43,7 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -59,6 +59,7 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROP
 public final class DeploymentConfiguration {
 
     private final static Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
+    public static final String LOCKED_POSTFIX = ".locked";
 
     private String userComments;
 
@@ -91,7 +92,7 @@ public final class DeploymentConfiguration {
         this(PathsAndFiles.USER_DEPLOYMENT_FILE);
     }
 
-    public DeploymentConfiguration(final InfrastructureFileDescriptor configFile) {
+    DeploymentConfiguration(final InfrastructureFileDescriptor configFile) {
         userDeploymentFileDescriptor = configFile;
         currentConfiguration = new HashMap<>();
         unchangeableConfiguration = new HashMap<>();
@@ -104,6 +105,21 @@ public final class DeploymentConfiguration {
         }
     }
 
+    private Optional<Setting<String>> getSetting(final String key) {
+        return Optional.ofNullable(getRaw().get(key));
+    }
+
+    public boolean isLocked(final String key) {
+        return getSetting(key).map(s -> s.isLocked()).orElse(false);
+    }
+
+    public void lock(final String key) {
+        getSetting(key).ifPresent(s -> s.setLocked(true));
+    }
+
+    public void unlock(final String key) {
+        getSetting(key).ifPresent(s -> s.setLocked(false));
+    }
 
     public void setLoadingException(final ConfigurationException ex) {
         loadingException = ex;
@@ -486,7 +502,7 @@ public final class DeploymentConfiguration {
                 toSave.setProperty(key, newValue);
             }
             if (currentSetting != null && currentSetting.isLocked()) {
-                toSave.setProperty(key + ".locked", "");
+                toSave.setProperty(key + LOCKED_POSTFIX, "true");
             }
         }
 
@@ -530,8 +546,8 @@ public final class DeploymentConfiguration {
 
         final Set<String> keys = properties.stringPropertyNames();
         for (final String key : keys) {
-            if (key.endsWith(".locked")) {
-                final String realKey = key.substring(0, key.length() - ".locked".length());
+            if (key.endsWith(LOCKED_POSTFIX)) {
+                final String realKey = key.substring(0, key.length() - LOCKED_POSTFIX.length());
                 final Setting<String> configValue = result.get(realKey);
                 final String value = configValue == null ? null : configValue.getValue();
                 result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
