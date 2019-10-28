@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;

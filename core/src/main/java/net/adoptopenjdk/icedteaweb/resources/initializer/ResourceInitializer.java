@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.cache.Resource;

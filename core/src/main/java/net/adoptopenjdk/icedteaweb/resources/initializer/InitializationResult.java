@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.sourceforge.jnlp.cache.UrlRequestResult;
 
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-class InitializationResult {
+public class InitializationResult {
 
     private final List<URL> urls;
     private final Optional<UrlRequestResult> requestResult;
@@ -29,11 +29,11 @@ class InitializationResult {
         this.requestResult = Optional.of(requestResult);
     }
 
-    boolean needsDownload() {
+    public boolean needsDownload() {
         return !urls.isEmpty();
     }
 
-    List<URL> getDownloadUrls() {
+    public List<URL> getDownloadUrls() {
         return urls;
     }
 }

@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;

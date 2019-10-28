@@ -1,5 +1,6 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.downloader;
 
+import net.adoptopenjdk.icedteaweb.resources.DownloadResult;
 import net.sourceforge.jnlp.cache.Resource;
 
 import java.net.URL;

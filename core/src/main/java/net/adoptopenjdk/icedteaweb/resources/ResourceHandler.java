@@ -2,6 +2,9 @@ package net.adoptopenjdk.icedteaweb.resources;
 
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
+import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
+import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.Resource;
 
 import java.util.concurrent.CompletableFuture;
