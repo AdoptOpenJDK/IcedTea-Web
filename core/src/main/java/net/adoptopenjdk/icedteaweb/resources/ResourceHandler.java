@@ -30,8 +30,7 @@ public class ResourceHandler {
         } else {
             localExecutor.execute(() -> {
                 try {
-                    final Resource finalResource = downloadResource();
-                    result.complete(finalResource);
+                    result.complete(downloadResource());
                 } catch (Exception e) {
                     result.completeExceptionally(e);
                 }

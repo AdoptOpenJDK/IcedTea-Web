@@ -44,7 +44,7 @@ class ExactVersionedResourceInitializer extends BaseResourceInitializer {
         return getBestUrlByPingingWithHeadRequest(candidateUrls)
                 .map(requestResult -> {
                     LOG.debug("Found best URL for {}: {}", resource, requestResult);
-                    return new InitializationResult(requestResult);
+                    return initFromHeadResult(requestResult);
                 })
                 .orElseGet(() -> {
                     LOG.debug("Failed to determine best URL for {} will try all of {}", resource, candidateUrls);

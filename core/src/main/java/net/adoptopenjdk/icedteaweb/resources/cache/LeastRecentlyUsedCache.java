@@ -161,7 +161,7 @@ class LeastRecentlyUsedCache {
         }
     }
 
-    void addToCache(ResourceInfo info, InputStream inputStream) throws IOException {
+    void addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
         final List<IOException> ex = new ArrayList<>();
 
         final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
@@ -175,7 +175,7 @@ class LeastRecentlyUsedCache {
             try (final OutputStream out = new FileOutputStream(cacheFile)) {
                 IOUtils.copy(inputStream, out);
             }
-            infoFile.storeInfo(info);
+            infoFile.storeInfo(info.getDownloadedAt(), info.getLastModified(), cacheFile.length());
         } catch (IOException e) {
             ex.add(e);
         }

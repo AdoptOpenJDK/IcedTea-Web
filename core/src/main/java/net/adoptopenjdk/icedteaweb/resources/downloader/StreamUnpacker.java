@@ -14,22 +14,23 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources.downloader;
 
-import net.adoptopenjdk.icedteaweb.io.IOUtils;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
 
 /**
- * Unpacker for Gzip streams.
+ * Allows to unpack an input stream.
  */
-class GzipUnpacker implements StreamUnpacker {
-    @Override
-    public InputStream unpack(InputStream input) throws IOException {
-        final byte[] content = IOUtils.readContent(new GZIPInputStream(input));
-        return new ByteArrayInputStream(content);
-    }
+public interface StreamUnpacker {
+
+    /**
+     * Unpacks the content of the input stream.
+     * Provides a new input stream with the unpacked content.
+     *
+     * @param input a compressed input stream
+     * @return an unpacked input stream
+     * @throws IOException if anything goes wrong
+     */
+    InputStream unpack(InputStream input) throws IOException;
 }

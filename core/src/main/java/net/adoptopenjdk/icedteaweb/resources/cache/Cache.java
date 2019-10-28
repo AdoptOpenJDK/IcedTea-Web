@@ -53,7 +53,7 @@ public class Cache {
         return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(resource, version);
     }
 
-    public static void addToCache(ResourceInfo infoFromRemote, InputStream unpackedStream) throws IOException {
+    public static void addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
         if (!CacheUtil.isCacheable(infoFromRemote.getResourceHref())) {
             throw new IllegalArgumentException(infoFromRemote.getResourceHref() + " is not a cacheable resource");
         }
@@ -65,7 +65,7 @@ public class Cache {
      *
      * @param resource the resource {@link URL}
      * @param version  the versions
-     * @return the newly created cache file
+     * @return the newly created cache file (which of course will be empty)
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static File replaceExistingCacheFile(final URL resource, final VersionId version) {

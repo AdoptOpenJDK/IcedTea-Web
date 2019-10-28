@@ -14,23 +14,26 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources.downloader;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Pack200;
+import java.util.zip.GZIPInputStream;
 
 /**
- * Allows to unpack an input stream.
+ * Unpacker for PACK200 and Gzip streams.
  */
-interface StreamUnpacker {
-
-    /**
-     * Unpacks the content of the input stream.
-     * Provides a new input stream with the unpacked content.
-     *
-     * @param input a compressed input stream
-     * @return an unpacked input stream
-     * @throws IOException if anything goes wrong
-     */
-    InputStream unpack(InputStream input) throws IOException;
+public class PackGzipUnpacker implements StreamUnpacker {
+    @Override
+    public InputStream unpack(InputStream input) throws IOException {
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (final JarOutputStream outputStream = new JarOutputStream(buffer)) {
+            Pack200.newUnpacker().unpack(new GZIPInputStream(input), outputStream);
+        }
+        return new ByteArrayInputStream(buffer.toByteArray());
+    }
 }

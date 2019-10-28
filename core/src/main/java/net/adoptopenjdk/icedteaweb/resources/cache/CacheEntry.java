@@ -66,7 +66,7 @@ class CacheEntry implements ResourceInfo {
         this.location = location;
         this.version = version;
         this.cacheFile = cacheFile;
-        properties = new PropertiesFile(infoFile, R("CAutoGen"));
+        this.properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
     /**
@@ -93,31 +93,14 @@ class CacheEntry implements ResourceInfo {
         return getLongKey(KEY_DOWNLOADED_AT);
     }
 
-    /**
-     * Sets the time in the local system clock that the file was
-     * most recently checked for an update.
-     * @param updatedTime the time (in ms) to be set as last updated time
-     */
-    void setDownloadedAt(long updatedTime) {
-        setLongKey(KEY_DOWNLOADED_AT, updatedTime);
-    }
-
     @Override
     public long getSize() {
         return getLongKey(KEY_SIZE);
     }
 
-    void setSize(long length) {
-        setLongKey(KEY_SIZE, length);
-    }
-
     @Override
     public long getLastModified() {
         return getLongKey(KEY_LAST_MODIFIED);
-    }
-
-    void setLastModified(long modifyTime) {
-        setLongKey(KEY_LAST_MODIFIED, modifyTime);
     }
 
     String getJnlpPath() {
@@ -198,26 +181,12 @@ class CacheEntry implements ResourceInfo {
         }
     }
 
-    /**
-     * Save the current information for the cache entry.
-     *
-     * @return True if successfully stored into file, false otherwise
-     */
-    boolean store() {
-        if (properties.isHeldByCurrentThread()) {
-            properties.store();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    void storeInfo(ResourceInfo info) {
-        lock();
+    void storeInfo(long downloadedAt, long lastModified, long size) {
+        properties.lock();
         try {
-            setLongKey(KEY_SIZE, info.getSize());
-            setLongKey(KEY_LAST_MODIFIED, info.getLastModified());
-            setLongKey(KEY_DOWNLOADED_AT, info.getDownloadedAt());
+            setLongKey(KEY_SIZE, size);
+            setLongKey(KEY_LAST_MODIFIED, lastModified);
+            setLongKey(KEY_DOWNLOADED_AT, downloadedAt);
 
             final String jnlpPath = JNLPRuntime.getJnlpPath();
             if (StringUtils.isBlank(jnlpPath)) {
@@ -226,32 +195,12 @@ class CacheEntry implements ResourceInfo {
                 properties.setProperty(KEY_JNLP_PATH, jnlpPath);
             }
 
-            store();
+            if (properties.isHeldByCurrentThread()) {
+                properties.store();
+            }
         } finally {
-            unlock();
+            properties.unlock();
         }
-    }
-
-    /**
-     * Lock cache item.
-     */
-    void lock() {
-        properties.lock();
-    }
-
-    /**
-     * Unlock cache item. Does not do anything if not holding the lock.
-     */
-    void unlock() {
-        properties.unlock();
-    }
-
-    boolean tryLock() {
-        return properties.tryLock();
-    }
-
-    boolean isHeldByCurrentThread() {
-        return properties.isHeldByCurrentThread();
     }
 
     @Override

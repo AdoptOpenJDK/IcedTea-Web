@@ -37,9 +37,8 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
     private static final Executor remoteExecutor = CachedDaemonThreadPoolProvider.getThreadPool();
 
-    static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
-    static final String ACCEPT_ENCODING = "Accept-Encoding";
-    static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
+    private static final String ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
 
     protected final Resource resource;
 
@@ -54,6 +53,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
             resource.setSize(cachedFile.length());
             resource.setLocalFile(cachedFile);
             resource.setDownloadVersion(version);
+            resource.setTransferred(cachedFile.length());
             resource.changeStatus(null, EnumSet.of(DOWNLOADED));
             resource.notifyAll();
         }
@@ -61,6 +61,14 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         LOG.debug("Use cached version of resource {}", resource);
 
         return new InitializationResult();
+    }
+
+    InitializationResult initFromHeadResult(UrlRequestResult requestResult) {
+        synchronized (resource) {
+            resource.setSize(requestResult.getContentLength());
+        }
+
+        return new InitializationResult(requestResult);
     }
 
     DownloadOptions getDownloadOptions() {
@@ -86,8 +94,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         final CompletableFuture<UrlRequestResult> result = new CompletableFuture<>();
         remoteExecutor.execute(() -> {
             try {
-                final UrlRequestResult response = testUrl(url);
-                result.complete(response);
+                result.complete(testUrl(url));
             } catch (Exception e) {
                 result.completeExceptionally(e);
             }
@@ -107,7 +114,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
                 if (!result511) {
                     throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
                 }
-                //try again, what to do with original resource was nowhere specified
+                //try again
                 return testUrl(url);
             }
             if (response.isRedirect()) {

@@ -46,7 +46,7 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
                 .map(requestResult -> {
                     if (needsUpdate(requestResult)) {
                         LOG.debug("Found best URL for {}: {}", resource, requestResult);
-                        return new InitializationResult(requestResult);
+                        return initFromHeadResult(requestResult);
                     } else {
                         return initFromCache();
                     }

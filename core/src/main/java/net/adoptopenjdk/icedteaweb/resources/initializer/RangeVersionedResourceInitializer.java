@@ -44,7 +44,7 @@ class RangeVersionedResourceInitializer extends BaseResourceInitializer {
                         return initFromCache(cachedVersion);
                     } else {
                         LOG.debug("Found best URL for {}: {}", resource, requestResult);
-                        return new InitializationResult(requestResult);
+                        return initFromHeadResult(requestResult);
                     }
                 })
                 .orElseGet(() -> {

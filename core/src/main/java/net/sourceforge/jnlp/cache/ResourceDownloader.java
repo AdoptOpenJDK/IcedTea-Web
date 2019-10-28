@@ -8,7 +8,11 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
+import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
+import net.adoptopenjdk.icedteaweb.resources.downloader.GzipUnpacker;
+import net.adoptopenjdk.icedteaweb.resources.downloader.NotUnpacker;
+import net.adoptopenjdk.icedteaweb.resources.downloader.PackGzipUnpacker;
+import net.adoptopenjdk.icedteaweb.resources.downloader.StreamUnpacker;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -22,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.resources.cache.Cache.isUpToDate;
-import static net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo.createInfoFromRemote;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -228,9 +231,9 @@ class ResourceDownloader {
 
             final InputStream downloadStream = getDownloadInputStream(connection, downloadLocation);
             final InputStream unpackedStream = unpacker.unpack(downloadStream);
-            final ResourceInfo resourceInfo = createInfoFromRemote(downloadLocation, versionFromRemote, connection);
-            Cache.addToCache(resourceInfo, unpackedStream);
-            resource.setTransferred(resourceInfo.getSize());
+            final DownloadInfo downloadInfo = new DownloadInfo(downloadLocation, versionFromRemote, connection.getLastModified());
+            Cache.addToCache(downloadInfo, unpackedStream);
+            resource.setTransferred(Cache.getInfo(downloadLocation, version).getSize());
         }
     }
 
