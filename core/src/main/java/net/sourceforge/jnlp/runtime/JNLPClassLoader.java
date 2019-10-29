@@ -87,6 +87,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -1383,6 +1384,20 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
+    @FunctionalInterface
+    public interface ExceptionalSupplier<T, E extends Exception> {
+
+        T call() throws E;
+
+        default T getResultOfCallOrNull() {
+            try {
+                return call();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
+
     /**
      * Find a JAR in the shared 'extension' classloaders, this classloader, or
      * one of the classloaders for the JNLP file's extensions. This method used
@@ -1408,93 +1423,79 @@ public class JNLPClassLoader extends URLClassLoader {
      * jarLocationSecurityMap
      */
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
-        Class<?> result = findLoadedClassAll(name);
+    public Class<?> loadClass(final String name) throws ClassNotFoundException {
+        final List<ExceptionalSupplier<Class<?>, ClassNotFoundException>> list = new ArrayList<>();
+        list.add(() -> findLoadedClassAll(name));
+        list.add(() -> loadClassFromParentClassloader(name));
+        list.add(() -> loadClassExt(name));
+        list.add(() -> loadClassFromInternalManifestClasspath(name));
+        list.add(() -> loadFromJarIndexes(name));
 
+        return list.stream()
+                .map(ExceptionalSupplier::getResultOfCallOrNull)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new ClassNotFoundException(name));
+    }
+
+    private Class<?> loadClassFromParentClassloader(final String name) throws ClassNotFoundException {
         // try parent classloader
-        if (result == null) {
-            try {
-                ClassLoader parent = getParent();
-                if (parent == null) {
-                    parent = ClassLoader.getSystemClassLoader();
-                }
-
-                return parent.loadClass(name);
-            } catch (ClassNotFoundException ignored) {
-            }
+        ClassLoader parent = getParent();
+        if (parent == null) {
+            parent = ClassLoader.getSystemClassLoader();
         }
+        return parent.loadClass(name);
+    }
 
-        // filter out 'bad' package names like java, javax
-        // validPackage(name);
-        // search this and the extension loaders
-        if (result == null) {
-            try {
-                result = loadClassExt(name);
-            } catch (ClassNotFoundException ignored) {
-                // Not found in external loader either
+    private Class<?> loadClassFromInternalManifestClasspath(final String name) throws ClassNotFoundException {
+        // Look in 'Class-Path' as specified in the manifest file
 
-                // Look in 'Class-Path' as specified in the manifest file
+        // This field synchronized before iterating over it since it may
+        // be shared data between threads
+        synchronized (classpaths) {
+            for (String classpath : classpaths) {
+                JARDesc desc;
                 try {
-                    // This field synchronized before iterating over it since it may
-                    // be shared data between threads
-                    synchronized (classpaths) {
-                        for (String classpath : classpaths) {
-                            JARDesc desc;
-                            try {
-                                URL jarUrl = new URL(file.getCodeBase(), classpath);
-                                desc = new JARDesc(jarUrl, null, null, false, true, false, true);
-                            } catch (MalformedURLException mfe) {
-                                throw new ClassNotFoundException(name, mfe);
-                            }
-                            addNewJar(desc);
-                        }
-                    }
-
-                    result = loadClassExt(name);
-                    return result;
-                } catch (ClassNotFoundException cnfe1) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cnfe1);
+                    URL jarUrl = new URL(file.getCodeBase(), classpath);
+                    desc = new JARDesc(jarUrl, null, null, false, true, false, true);
+                } catch (MalformedURLException mfe) {
+                    throw new ClassNotFoundException(name, mfe);
                 }
-
-                // As a last resort, look in any available indexes
-                // Currently this loads jars directly from the site. We cannot cache it because this
-                // call is initiated from within the applet, which does not have disk read/write permissions
-                // This field synchronized before iterating over it since it may
-                // be shared data between threads
-                synchronized (jarIndexes) {
-                    for (JarIndexAccess index : jarIndexes) {
-                        // Non-generic code in sun.misc.JarIndex
-                        LinkedList<String> jarList = index.get(name.replace('.', '/'));
-
-                        if (jarList != null) {
-                            for (String jarName : jarList) {
-                                JARDesc desc;
-                                try {
-                                    desc = new JARDesc(new URL(file.getCodeBase(), jarName),
-                                            null, null, false, true, false, true);
-                                } catch (MalformedURLException mfe) {
-                                    throw new ClassNotFoundException(name);
-                                }
-                                try {
-                                    addNewJar(desc);
-                                } catch (Exception e) {
-                                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                                }
-                            }
-
-                            // If it still fails, let it error out
-                            result = loadClassExt(name);
-                        }
-                    }
-                }
+                addNewJar(desc);
             }
         }
 
-        if (result == null) {
-            throw new ClassNotFoundException(name);
-        }
+        return loadClassExt(name);
+    }
 
-        return result;
+    private Class<?> loadFromJarIndexes(final String name) throws ClassNotFoundException {
+        // As a last resort, look in any available indexes
+        // Currently this loads jars directly from the site. We cannot cache it because this
+        // call is initiated from within the applet, which does not have disk read/write permissions
+        // This field synchronized before iterating over it since it may
+        // be shared data between threads
+        synchronized (jarIndexes) {
+            for (JarIndexAccess index : jarIndexes) {
+                // Non-generic code in sun.misc.JarIndex
+                LinkedList<String> jarList = index.get(name.replace('.', '/'));
+
+                if (jarList != null) {
+                    for (String jarName : jarList) {
+                        try {
+                            final JARDesc desc = new JARDesc(new URL(file.getCodeBase(), jarName),
+                                    null, null, false, true, false, true);
+                            addNewJar(desc);
+                        } catch (MalformedURLException mfe) {
+                            LOG.debug("encountered invalid URL for {} - {}", file.getCodeBase(), jarName);
+                        }
+                    }
+
+                    // If it still fails, let it error out
+                    return loadClassExt(name);
+                }
+            }
+        }
+        throw new ClassNotFoundException(name);
     }
 
     /**
