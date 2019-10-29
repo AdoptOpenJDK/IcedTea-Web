@@ -27,11 +27,15 @@ jobs:
         - find > list-before
         - mvn -T1C clean verify -e -fae
         - |
-          for tgt in $TRAVIS_BUILD_DIR/*/target/; do
-            module=${tgt%/target/}
-            mkdir -p ~/.m2/artifact-temp/"$module"
-            cp -a --reflink=auto -- "$tgt" ~/.m2/artifact-temp/"$module"/
-          done
+          copy_to_artf() {
+            for tgt in $TRAVIS_BUILD_DIR/*/"$1"; do
+              module=${tgt%"$1"}
+              mkdir -p ~/.m2/artifact-temp/"$module"
+              cp -a --reflink=auto -- "$tgt" ~/.m2/artifact-temp/"$module"/
+            done
+          }
+          copy_to_artf "target/"
+          copy_to_artf "dependency-reduced-pom.xml"
         - find > list-after
         - diff -aur list-before list-after; (( $? < 2 ))
     - stage: Test
