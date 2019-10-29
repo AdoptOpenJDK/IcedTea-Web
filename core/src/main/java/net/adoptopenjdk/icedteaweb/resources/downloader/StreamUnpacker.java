@@ -18,11 +18,31 @@ package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Allows to unpack an input stream.
  */
 public interface StreamUnpacker {
+
+    static StreamUnpacker toUnpack(final DownloadDetails downloadDetails) {
+        URL downloadFrom = downloadDetails.downloadFrom;
+        String contentEncoding = downloadDetails.contentEncoding;
+        boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
+        boolean gzip = "gzip".equals(contentEncoding);
+
+        // It's important to check packgz first. If a stream is both
+        // pack200 and gz encoded, then con.getContentEncoding() could
+        // return ".gz", so if we check gzip first, we would end up
+        // treating a pack200 file as a jar file.
+        if (packgz) {
+            return new PackGzipUnpacker();
+        } else if (gzip) {
+            return new GzipUnpacker();
+        }
+
+        return new NotUnpacker();
+    }
 
     /**
      * Unpacks the content of the input stream.

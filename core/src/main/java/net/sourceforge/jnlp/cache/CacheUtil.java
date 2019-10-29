@@ -289,7 +289,7 @@ public class CacheUtil {
         } catch (InterruptedException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         } finally {
-            if (listener != null)
+            if (indicator != null && listener != null)
                 indicator.disposeListener(listener);
         }
     }

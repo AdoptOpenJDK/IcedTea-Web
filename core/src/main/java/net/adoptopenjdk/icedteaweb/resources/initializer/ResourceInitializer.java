@@ -12,14 +12,14 @@ public interface ResourceInitializer {
         }
 
         final VersionString requestVersion = resource.getRequestVersion();
-        if (requestVersion != null) {
-            if (requestVersion.isExactVersion()) {
-                return new ExactVersionedResourceInitializer(resource);
-            } else {
-                return new RangeVersionedResourceInitializer(resource);
-            }
-        } else {
+        if (requestVersion == null) {
             return new UnversionedResourceInitializer(resource);
+        }
+
+        if (requestVersion.isExactVersion()) {
+            return new ExactVersionedResourceInitializer(resource);
+        } else {
+            return new RangeVersionedResourceInitializer(resource);
         }
     }
 

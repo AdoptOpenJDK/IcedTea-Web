@@ -24,15 +24,15 @@ class OfflineResourceInitializer extends BaseResourceInitializer {
     public InitializationResult init() {
         if (Cache.isAnyCached(resource.getLocation(), resource.getRequestVersion())) {
             final VersionId version = Cache.getBestMatchingVersionInCache(resource.getLocation(), resource.getRequestVersion());
-            initFromCache(version);
+            return initFromCache(version);
         } else {
             synchronized (resource) {
                 resource.changeStatus(null, EnumSet.of(ERROR));
                 resource.notifyAll();
                 LOG.warn("Resource '{}' not found in cache. Continuing but you may experience errors", resource.getLocation());
             }
+            return new InitializationResult();
         }
 
-        return new InitializationResult();
     }
 }

@@ -118,7 +118,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final File cacheFile = Cache.getCacheFile(resourceHref, version);
             return cacheFile.length();
         } else {
-            final StreamUnpacker unpacker = getStreamUnpacker(downloadDetails);
+            final StreamUnpacker unpacker = StreamUnpacker.toUnpack(downloadDetails);
             final CountingInputStream countingInputStream = new CountingInputStream(downloadDetails.inputStream);
             final InputStream unpackedStream = unpacker.unpack(countingInputStream);
             final DownloadInfo downloadInfo = new DownloadInfo(resourceHref, version, downloadDetails.lastModified);
@@ -132,25 +132,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     protected abstract VersionId getVersion(URL downloadFrom, final String versionHeaderValue);
 
     protected abstract boolean isUpToDate(final URL resourceHref, final VersionId version, final long lastModified);
-
-    private StreamUnpacker getStreamUnpacker(final DownloadDetails downloadDetails) {
-        URL downloadFrom = downloadDetails.downloadFrom;
-        String contentEncoding = downloadDetails.contentEncoding;
-        boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
-        boolean gzip = "gzip".equals(contentEncoding);
-
-        // It's important to check packgz first. If a stream is both
-        // pack200 and gz encoded, then con.getContentEncoding() could
-        // return ".gz", so if we check gzip first, we would end up
-        // treating a pack200 file as a jar file.
-        if (packgz) {
-            return new PackGzipUnpacker();
-        } else if (gzip) {
-            return new GzipUnpacker();
-        }
-
-        return new NotUnpacker();
-    }
 
     private DownloadDetails getDownloadDetails(final CloseableConnection connection) throws IOException {
         final URL downloadFrom = connection.getURL();
@@ -209,19 +190,4 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         }
     }
 
-    private static class DownloadDetails {
-        private final URL downloadFrom;
-        private final InputStream inputStream;
-        private final String contentEncoding;
-        private final String version;
-        private final long lastModified;
-
-        private DownloadDetails(URL downloadFrom, InputStream inputStream, String contentEncoding, String version, long lastModified) {
-            this.downloadFrom = downloadFrom;
-            this.inputStream = inputStream;
-            this.contentEncoding = contentEncoding;
-            this.version = version;
-            this.lastModified = lastModified;
-        }
-    }
 }
