@@ -136,11 +136,11 @@ public class Cache {
                 .orElse(null);
     }
 
-    public static List<VersionId> getAllVersionsInCache(final URL resource) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
+    public static List<VersionId> getAllVersionsInCache(final URL resourceHref) {
+        if (!CacheUtil.isCacheable(resourceHref)) {
+            throw new IllegalArgumentException(resourceHref + " is not a cacheable resource");
         }
-        return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resource).stream()
+        return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resourceHref).stream()
                 .map(LeastRecentlyUsedCacheEntry::getVersion)
                 .collect(Collectors.toList());
     }
