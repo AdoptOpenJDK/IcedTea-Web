@@ -14,7 +14,7 @@ public interface ControlPanelProvider {
 
     JComponent createPanel(DeploymentConfiguration config);
 
-    default boolean isActive() {
+    default boolean isActive(final DeploymentConfiguration config) {
         return true;
     }
 }
