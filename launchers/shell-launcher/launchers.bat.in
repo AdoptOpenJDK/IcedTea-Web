@@ -159,21 +159,33 @@ if "%ICEDTEA_WEB_SPLASH%" == "" (
   set "SPLASH=true"
 )
 
+if not defined ITW_NATIVEDEBUG_SUSPEND (
+  set "ITW_NATIVEDEBUG_SUSPEND=n"
+)
+if not defined ITW_NATIVEDEBUG_PORT (
+  set "ITW_NATIVEDEBUG_PORT=9009"
+)
+
 set "JAVA_ARGS="
 set "ARGS="
 
 for %%a IN (%*) do (
   set "_arg=%%a"
   set "_beg=!_arg:~0,2!"
+
   if "!_beg!" == "-J" (
     set "JAVA_ARGS=!JAVA_ARGS! !_arg:~2!"
   ) else (
-    set "ARGS=!ARGS! !_arg!"
-    if "!_arg:~0,1!" == "-" if not "x!_arg:headless=!" == "x!_arg!" (
-      set "SPLASH=false"
-    )
-    if "!_arg:~0,1!" == "-" if not "x!_arg:Xnosplash=!" == "x!_arg!" (
-      set "SPLASH=false"
+    if "!_arg:~0,1!" == "-" if not "x!_arg:nativeDebug=!" == "x!_arg!" (
+      set "ARGS=!ARGS! -Xdebug -Xrunjdwp:transport=dt_socket,server=,suspend=!ITW_NATIVEDEBUG_SUSPEND!,address=!ITW_NATIVEDEBUG_PORT!"
+    ) else (
+      set "ARGS=!ARGS! !_arg!"
+      if "!_arg:~0,1!" == "-" if not "x!_arg:headless=!" == "x!_arg!" (
+        set "SPLASH=false"
+      )
+      if "!_arg:~0,1!" == "-" if not "x!_arg:Xnosplash=!" == "x!_arg!" (
+        set "SPLASH=false"
+      )
     )
   )
 )
