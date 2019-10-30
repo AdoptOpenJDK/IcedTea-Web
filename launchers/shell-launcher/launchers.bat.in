@@ -172,6 +172,9 @@ for %%a IN (%*) do (
     if "!_arg:~0,1!" == "-" if not "x!_arg:headless=!" == "x!_arg!" (
       set "SPLASH=false"
     )
+    if "!_arg:~0,1!" == "-" if not "x!_arg:Xnosplash=!" == "x!_arg!" (
+      set "SPLASH=false"
+    )
   )
 )
 set "_arg=" & set "_beg="
