@@ -7,18 +7,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * ...
+ * Demo for {@link PrioritizedParallelExecutor}
  */
 public class PrioritizedParallelExecutorDemo {
 
     public static void main(String... args) throws Exception {
         System.out.println("START");
 
-        final Callable<Character> first = callable("FIRST", 6, new RuntimeException());
-//        final Callable<Character> first = callable("FIRST ", 6, 'a');
-        final Callable<Character> second = callable("SECOND", 2, 'b');
-        final Callable<Character> third = callable("THIRD ", 3, new RuntimeException());
-        final Callable<Character> fourth = callable("FOURTH", 8, 'c');
+        final Callable<Character> first = callable("FIRST", 3, new RuntimeException());
+//        final Callable<Character> first = callable("FIRST ", 3, 'a');
+//        final Callable<Character> second = callable("SECOND", 1, new RuntimeException());
+        final Callable<Character> second = callable("SECOND", 1, 'b');
+        final Callable<Character> third = callable("THIRD ", 2, new RuntimeException());
+//        final Callable<Character> third = callable("THIRD ", 2, 'c');
+        final Callable<Character> fourth = callable("FOURTH", 4, 'd');
         final List<Callable<Character>> callables = Arrays.asList(first, second, third, fourth);
 
         final ExecutorService executor = Executors.newFixedThreadPool(6);
@@ -35,7 +37,7 @@ public class PrioritizedParallelExecutorDemo {
     private static Callable<Character> callable(String name, long sleep, char result) {
         return () -> {
             try {
-                Thread.sleep(sleep * 1000);
+                Thread.sleep(sleep * 200);
             } catch (InterruptedException e) {
                 System.out.println("  Cancel  " + name);
                 throw e;
@@ -48,7 +50,7 @@ public class PrioritizedParallelExecutorDemo {
     private static Callable<Character> callable(String name, long sleep, Exception exception) {
         return () -> {
             try {
-                Thread.sleep(sleep * 1000);
+                Thread.sleep(sleep * 200);
             } catch (InterruptedException e) {
                 System.out.println("  Cancel  " + name);
                 throw e;

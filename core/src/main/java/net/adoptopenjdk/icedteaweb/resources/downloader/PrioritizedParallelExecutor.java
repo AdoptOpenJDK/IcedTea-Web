@@ -8,12 +8,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
- * ...
+ * Executor which will execute multiple {@link Callable Callables} in parallel.
+ * The callables must be sorted and have the highest priority callable as the first in list.
+ * The all executions are canceled as soon as the result is determined.
  */
 public class PrioritizedParallelExecutor {
 
@@ -44,11 +48,8 @@ public class PrioritizedParallelExecutor {
 
     private static class CancelingCallable<V> implements Callable<V> {
 
-        private enum STATE {RUNNING, SUCCESS, ERROR}
-
-        private final AtomicReference<STATE> state = new AtomicReference<>(STATE.RUNNING);
+        private final AtomicBoolean complete = new AtomicBoolean(false);
         private final AtomicReference<Future<V>> lowerPriority = new AtomicReference<>();
-        private final CompletableFuture<V> lowerPriorityResult = new CompletableFuture<>();
 
         private final Callable<V> delegate;
 
@@ -58,51 +59,34 @@ public class PrioritizedParallelExecutor {
 
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
-            final STATE currentState = state.get();
-            if (currentState == STATE.SUCCESS) {
+            if (complete.get()) {
                 lowerPriority.cancel(true);
-            }
-            if (currentState == STATE.ERROR) {
-                try {
-                    lowerPriorityResult.complete(lowerPriority.get());
-                } catch (Exception e) {
-                    lowerPriorityResult.completeExceptionally(e);
-                }
             }
         }
 
         @Override
         public V call() throws Exception {
-            try {
-                final V result = delegate.call();
-                state.set(STATE.SUCCESS);
-                final Future<V> lowerPriority = this.lowerPriority.get();
-                if (lowerPriority != null) {
-                    lowerPriority.cancel(true);
-                }
-                return result;
-            } catch (Exception e) {
-                state.set(STATE.ERROR);
-                final Future<V> lowerPriority = this.lowerPriority.get();
-                if (lowerPriority != null) {
-                    return lowerPriority.get();
-                } else {
-                    return lowerPriorityResult.get();
-                }
+            final V result = delegate.call();
+            cancelLowerPriority();
+            return result;
+        }
+
+        private void cancelLowerPriority() {
+            complete.set(true);
+            final Future<V> lowerPriority = this.lowerPriority.get();
+            if (lowerPriority != null) {
+                lowerPriority.cancel(true);
             }
         }
     }
 
     private static class ChainableFuture<V> implements Future<V> {
 
-        private enum STATE {RUNNING, SUCCESS, ERROR}
-
-        private final AtomicReference<STATE> state = new AtomicReference<>(STATE.RUNNING);
-        private final AtomicReference<Future<V>> lowerPriority = new AtomicReference<>();
+        private final AtomicBoolean terminatedExceptionally = new AtomicBoolean(false);
         private final CompletableFuture<V> lowerPriorityResult = new CompletableFuture<>();
+        private final AtomicReference<Future<V>> lowerPriority = new AtomicReference<>();
 
         private final Future<V> delegate;
-
 
         private ChainableFuture(Future<V> delegate) {
             this.delegate = delegate;
@@ -110,11 +94,10 @@ public class PrioritizedParallelExecutor {
 
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
-            final STATE currentState = this.state.get();
-            if (currentState == STATE.SUCCESS) {
-                lowerPriority.cancel(true);
-            }
-            if (currentState == STATE.ERROR) {
+
+            if (terminatedExceptionally.get()) {
+                // TODO: should the body of this if be executed in a separate thread to not block the current thread
+                //  which is about to plug together the future chain...
                 try {
                     lowerPriorityResult.complete(lowerPriority.get());
                 } catch (Exception e) {
@@ -125,12 +108,9 @@ public class PrioritizedParallelExecutor {
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            state.set(STATE.ERROR);
-            final Future<V> lowerPriority = this.lowerPriority.get();
-            if (lowerPriority != null) {
-                lowerPriority.cancel(mayInterruptIfRunning);
-            }
-            return delegate.cancel(mayInterruptIfRunning);
+            final boolean result = delegate.cancel(mayInterruptIfRunning);
+            cancelLowerPriority();
+            return result;
         }
 
         @Override
@@ -146,29 +126,28 @@ public class PrioritizedParallelExecutor {
         @Override
         public V get() throws InterruptedException, ExecutionException {
             try {
-                final V result = delegate.get();
-                cancelLowerPriority();
-                return result;
-            } catch (InterruptedException | ExecutionException e) {
+                return delegate.get();
+            } catch (ExecutionException e) {
                 return returnLowerPriority();
             }
         }
 
         @Override
         public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            final long start = System.nanoTime();
             try {
-                final V result = delegate.get(timeout, unit);
-                cancelLowerPriority();
-                return result;
-            } catch (InterruptedException | ExecutionException e) {
-                return returnLowerPriority();
+                return delegate.get(timeout, unit);
+            } catch (ExecutionException e) {
+                final long elapsed = System.nanoTime() - start;
+                final long remaining = unit.toNanos(timeout) - elapsed;
+                return returnLowerPriority(remaining, NANOSECONDS);
             } catch (TimeoutException e) {
-                return returnLowerPriorityImmediatelyOrThrow(e);
+                return returnLowerPriority(1, MILLISECONDS);
             }
         }
 
         private void cancelLowerPriority() {
-            state.set(STATE.SUCCESS);
+            terminatedExceptionally.set(true);
             final Future<V> lowerPriority = this.lowerPriority.get();
             if (lowerPriority != null) {
                 lowerPriority.cancel(true);
@@ -176,7 +155,7 @@ public class PrioritizedParallelExecutor {
         }
 
         private V returnLowerPriority() throws InterruptedException, ExecutionException {
-            state.set(STATE.ERROR);
+            terminatedExceptionally.set(true);
             final Future<V> lowerPriority = this.lowerPriority.get();
             if (lowerPriority != null) {
                 return lowerPriority.get();
@@ -185,13 +164,13 @@ public class PrioritizedParallelExecutor {
             }
         }
 
-        private V returnLowerPriorityImmediatelyOrThrow(TimeoutException e) throws InterruptedException, ExecutionException, TimeoutException {
-            state.set(STATE.ERROR);
+        private V returnLowerPriority(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            terminatedExceptionally.set(true);
             final Future<V> lowerPriority = this.lowerPriority.get();
             if (lowerPriority != null) {
-                return lowerPriority.get(1, MILLISECONDS);
+                return lowerPriority.get(timeout, unit);
             } else {
-                throw e;
+                return lowerPriorityResult.get(timeout, unit);
             }
         }
     }
