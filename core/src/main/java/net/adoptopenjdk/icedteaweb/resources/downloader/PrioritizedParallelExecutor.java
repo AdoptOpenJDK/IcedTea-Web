@@ -217,10 +217,14 @@ public class PrioritizedParallelExecutor {
             }
         }
 
-        private V returnLowerPriorityImmediately(TimeoutException e) throws InterruptedException, ExecutionException, TimeoutException {
+        private V returnLowerPriorityImmediately(TimeoutException e) throws TimeoutException {
             final Future<V> lowerPriorityFuture = this.lowerPriority.get();
-            if (lowerPriorityFuture != null && lowerPriorityFuture.isDone()) {
-                return lowerPriorityFuture.get();
+            if (lowerPriorityFuture != null && lowerPriorityFuture.isDone() && !lowerPriorityFuture.isCancelled()) {
+                try {
+                    return lowerPriorityFuture.get();
+                } catch (ExecutionException | InterruptedException ignored) {
+                    throw e;
+                }
             } else {
                 throw e;
             }
