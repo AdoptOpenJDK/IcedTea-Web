@@ -1,5 +1,8 @@
 .DS_Store
+.classpath
 .idea
+.project
+.settings/
 *.iml
 **/target
 **/dependency-reduced-pom.xml
