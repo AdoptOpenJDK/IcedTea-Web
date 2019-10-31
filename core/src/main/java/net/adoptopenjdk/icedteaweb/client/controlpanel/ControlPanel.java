@@ -189,7 +189,7 @@ public class ControlPanel extends JFrame {
         final ServiceLoader<ControlPanelProvider> serviceLoader = ServiceLoader.load(ControlPanelProvider.class);
         serviceLoader.iterator().forEachRemaining(p -> {
             final String name = p.getName();
-            if (p.isActive() && style.isPanelActive(p.getName())) {
+            if (p.isActive(this.config) && style.isPanelActive(p.getName())) {
                 if (providers.containsKey(name)) {
                     throw new IllegalStateException("More than 1 active view provider for control panel with name " + name + " found!");
                 }
