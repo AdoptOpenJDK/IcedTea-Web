@@ -17,21 +17,40 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 /**
  * Executor which will execute multiple {@link Callable Callables} in parallel.
  * The callables must be sorted and have the highest priority callable as the first in list.
- * The all executions are canceled as soon as the result is determined.
+ * Executions of lower priority are canceled as soon as a higher priority result has been successfully been returned.
+ * The final {@link Future} will complete as soon as the first callable completed successfully and all other callables
+ * with higher priority (if any) have completed exceptionally
  */
 public class PrioritizedParallelExecutor {
 
     private final ExecutorService executor;
 
+    /**
+     * Constructor
+     *
+     * @param executor the executor service which is used for executing the callables.
+     */
     public PrioritizedParallelExecutor(ExecutorService executor) {
         this.executor = executor;
     }
 
+    /**
+     * Executes the passed callables in parallel
+     * The callables must be sorted by priority with the highest priority as the first in list.
+     * Executions of lower priority are canceled as soon as a higher priority result has successfully been calculated.
+     * The returned {@link Future} will complete as soon as the first callable completed successfully and all other
+     * callables with higher priority (if any) have completed exceptionally.
+     *
+     * @param callables the callables to execute.
+     * @return a future holding the best result from all callables.
+     */
     public <V> Future<V> getSuccessfulResultWithHighestPriority(List<Callable<V>> callables) {
-        if (callables.isEmpty()) {
-            final CompletableFuture<V> result = new CompletableFuture<>();
-            result.completeExceptionally(new RuntimeException("No callable left to try"));
-            return result;
+        if (callables == null || callables.isEmpty()) {
+            throw new IllegalArgumentException("No callables");
+        }
+
+        if (callables.size() == 1) {
+            return executor.submit(callables.get(0));
         }
 
         final CancelingCallable<V> head = new CancelingCallable<>(callables.get(0));
@@ -46,6 +65,9 @@ public class PrioritizedParallelExecutor {
         return result;
     }
 
+    /**
+     * Wrapper around {@link Callable} which will cancel any lower priority after completing the call successfully.
+     */
     private static class CancelingCallable<V> implements Callable<V> {
 
         private final AtomicBoolean complete = new AtomicBoolean(false);
@@ -57,6 +79,14 @@ public class PrioritizedParallelExecutor {
             this.delegate = delegate;
         }
 
+        /**
+         * Set a lower priority to be canceled.
+         * This is not passed in the constructor as the value is not known then.
+         *
+         * If this callable has already been completed successfully then the passed future will be canceled immediately.
+         *
+         * @param lowerPriority the lower priority future to be canceled after completing this callable successfully.
+         */
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
             if (complete.get()) {
@@ -80,6 +110,11 @@ public class PrioritizedParallelExecutor {
         }
     }
 
+    /**
+     * Wrapper around {@link Future} which allows to construct a chain of futures.
+     * Lower priority futures are canceled if this future is canceled.
+     * If this future fails the result of the lower priority is returned.
+     */
     private static class ChainableFuture<V> implements Future<V> {
 
         private final AtomicBoolean terminatedExceptionally = new AtomicBoolean(false);
@@ -92,6 +127,12 @@ public class PrioritizedParallelExecutor {
             this.delegate = delegate;
         }
 
+        /**
+         * Set a lower priority to be canceled.
+         * This is not passed in the constructor as the value is not known then.
+         *
+         * @param lowerPriority the lower priority future to be canceled this future is canceled.
+         */
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
 
