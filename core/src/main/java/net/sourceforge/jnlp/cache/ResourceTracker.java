@@ -76,7 +76,7 @@ public class ResourceTracker {
 
     // todo: ability to restart/retry a hung download
 
-    // todo: move resource downloading/processing code into HResource
+    // todo: move resource downloading/processing code into Resource
     // class, threading stays in ResourceTracker
 
     // todo: get status method? and some way to convey error status

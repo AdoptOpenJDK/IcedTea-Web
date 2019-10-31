@@ -30,7 +30,7 @@ public class AppTrustWarningPanelTest {
     private static List<AppTrustWarningPanel> panelList = new ArrayList<AppTrustWarningPanel>();
     private static File appletSecurityBackup;
 
-    
+
     public static void backupAppletSecurity() throws IOException {
         appletSecurityBackup = File.createTempFile("appletSecurity", "itwTestBackup");
         FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), appletSecurityBackup);
@@ -126,8 +126,8 @@ public class AppTrustWarningPanelTest {
 
     private static void assertResultTextValid(String propertyName, Class<? extends AppTrustWarningPanel> panelType, String result) {
         assertNotNull(propertyName + " text should not be null for " + panelType, result);
-        assertFalse(propertyName + " text should not be No HResource for " + panelType, result.contains("RNoResource"));
-        assertFalse(propertyName + " label text resource should not be missing for " + panelType, result.contains("Missing HResource:"));
+        assertFalse(propertyName + " text should not be No Resource for " + panelType, result.contains("RNoResource"));
+        assertFalse(propertyName + " label text resource should not be missing for " + panelType, result.contains("Missing Resource:"));
         assertTrue(propertyName + " text should be html-wrapped for " + panelType,
                 result.startsWith("<html>") && result.endsWith("</html>"));
         assertFalse(propertyName + " should not have empty fields for " + panelType, result.matches(".*\\{\\d+\\}.*"));
