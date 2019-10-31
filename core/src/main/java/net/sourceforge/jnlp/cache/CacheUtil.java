@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -72,13 +71,12 @@ public class CacheUtil {
      *
      * @param location location of the resource
      * @param version  the version, or {@code null}
-     * @param policy   how to handle update
      * @return either the location in the cache or the original location
      */
-    public static File downloadAndGetCacheFile(final URL location, final VersionString version, final UpdatePolicy policy) {
+    public static File downloadAndGetCacheFile(final URL location, final VersionString version) {
         try {
             final ResourceTracker rt = new ResourceTracker();
-            rt.addResource(location, version, policy);
+            rt.addResource(location, version);
             return rt.getCacheFile(location);
         } catch (Exception ex) {
             if (location.toString().startsWith("file:")) {

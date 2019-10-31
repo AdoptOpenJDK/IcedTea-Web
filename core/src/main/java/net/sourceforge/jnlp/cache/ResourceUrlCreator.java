@@ -117,7 +117,7 @@ public class ResourceUrlCreator {
     static UrlRequestResult findBestUrl(final Resource resource) {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {
-            options = new DownloadOptions(false, false);
+            options = DownloadOptions.NONE;
         }
 
         List<URL> urls = ResourceUrlCreator.getUrls(resource, options);

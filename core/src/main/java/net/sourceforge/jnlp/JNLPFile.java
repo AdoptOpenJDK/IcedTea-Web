@@ -376,8 +376,8 @@ public class JNLPFile {
             throw new IllegalArgumentException("Null parameter");
 
         try {
-            ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version, policy);
+            ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
+            tracker.addResource(location, version);
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
         }

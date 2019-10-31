@@ -74,7 +74,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     DownloadOptions getDownloadOptions() {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {
-            return new DownloadOptions(false, false);
+            return DownloadOptions.NONE;
         }
         return options;
     }

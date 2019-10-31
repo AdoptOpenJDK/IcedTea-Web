@@ -103,6 +103,9 @@ public class ResourceTracker {
      */
     private final boolean prefetch;
 
+    private final DownloadOptions downloadOptions;
+    private final UpdatePolicy updatePolicy;
+
     /**
      * Creates a resource tracker that does not prefetch resources.
      */
@@ -111,21 +114,30 @@ public class ResourceTracker {
     }
 
     /**
+     * Creates a resource tracker that does not prefetch resources.
+     */
+    public ResourceTracker(boolean prefetch) {
+        this(prefetch, DownloadOptions.NONE, UpdatePolicy.ALWAYS);
+    }
+
+    /**
      * Creates a resource tracker.
      *
      * @param prefetch whether to download resources before requested.
      */
-    public ResourceTracker(boolean prefetch) {
+    public ResourceTracker(boolean prefetch, DownloadOptions downloadOptions, UpdatePolicy updatePolicy) {
         this.prefetch = prefetch;
+        this.downloadOptions = Assert.requireNonNull(downloadOptions, "downloadOptions");
+        this.updatePolicy = Assert.requireNonNull(updatePolicy, "updatePolicy");
     }
 
-    public void addResource(URL location, final VersionId version, final UpdatePolicy updatePolicy) {
+    public void addResource(URL location, final VersionId version) {
         final VersionString versionString = version != null ? version.asVersionString() : null;
-        addResource(location, versionString, new DownloadOptions(false, false), updatePolicy);
+        addResource(location, versionString, updatePolicy);
     }
 
-    public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
-        addResource(location, version, new DownloadOptions(false, false), updatePolicy);
+    public void addResource(URL location, final VersionString version) {
+        addResource(location, version, updatePolicy);
     }
 
     /**
@@ -136,15 +148,13 @@ public class ResourceTracker {
      *
      * @param location     the location of the resource
      * @param version      the resource version
-     * @param options      options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
-    public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
-        Assert.requireNonNull(options, "options");
+    public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(location, "location");
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
-        final Resource resource = createResource(normalizedLocation, version, options, updatePolicy);
+        final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
 
         if (addToResources(resource)) {
             initNoneCacheableResources(resource);

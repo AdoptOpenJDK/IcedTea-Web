@@ -181,17 +181,17 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * loads the resources
      */
-    private final ResourceTracker tracker = new ResourceTracker(true); // prefetch
+    private final ResourceTracker tracker;
 
     /**
      * the update policy for resources
      */
-    private UpdatePolicy updatePolicy;
+    private final UpdatePolicy updatePolicy;
 
     /**
      * the JNLP file
      */
-    private JNLPFile file;
+    private final JNLPFile file;
 
     /**
      * the resources section
@@ -314,6 +314,7 @@ public class JNLPClassLoader extends URLClassLoader {
         strict = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
+        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
@@ -682,8 +683,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jar.isEager()) {
                 initialJars.add(jar); // regardless of part
             }
-            tracker.addResource(jar.getLocation(),
-                    jar.getVersion(), file.getDownloadOptions(),
+            tracker.addResource(jar.getLocation(), jar.getVersion(),
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
 
@@ -1236,7 +1236,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     continue;
                                 }
 
-                                tracker.addResource(new File(extractedJarLocation).toURI().toURL(), (VersionString) null, null);
+                                tracker.addResource(new File(extractedJarLocation).toURI().toURL(), (VersionString) null);
 
                                 URL codebase = file.getCodeBase();
                                 if (codebase == null) {

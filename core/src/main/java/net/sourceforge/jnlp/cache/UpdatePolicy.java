@@ -27,29 +27,11 @@ import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
  */
 public class UpdatePolicy {
 
-    // todo: implement session updating
-
-    // todo: doesn't seem to work in the same JVM, probably because
-    // Resource is being held by a tracker so it isn't collected;
-    // then next time a tracker adds the resource even if
-    // shouldUpdate==true it's state is already marked
-    // CONNECTED|DOWNLOADED.  Let the resource be collected or reset
-    // to UNINITIALIZED.
-
     public static UpdatePolicy ALWAYS = new UpdatePolicy(0);
-    public static UpdatePolicy SESSION = new UpdatePolicy(-1);
     public static UpdatePolicy FORCE = new UpdatePolicy(Long.MIN_VALUE);
     public static UpdatePolicy NEVER = new UpdatePolicy(Long.MAX_VALUE);
 
     private final long timeDiff;
-
-    /**
-     * Create a new update policy; this policy always updates the
-     * entry unless the shouldUpdate method is overridden.
-     */
-    public UpdatePolicy() {
-        this(-1);
-    }
 
     /**
      * Create an update policy that only checks a file for being
