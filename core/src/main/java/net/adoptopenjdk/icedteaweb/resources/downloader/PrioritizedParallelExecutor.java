@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -82,7 +83,7 @@ public class PrioritizedParallelExecutor {
         /**
          * Set a lower priority to be canceled.
          * This is not passed in the constructor as the value is not known then.
-         *
+         * <p>
          * If this callable has already been completed successfully then the passed future will be canceled immediately.
          *
          * @param lowerPriority the lower priority future to be canceled after completing this callable successfully.
@@ -90,19 +91,19 @@ public class PrioritizedParallelExecutor {
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
             if (complete.get()) {
-                lowerPriority.cancel(true);
+                cancelLowerPriority();
             }
         }
 
         @Override
         public V call() throws Exception {
             final V result = delegate.call();
+            complete.set(true);
             cancelLowerPriority();
             return result;
         }
 
         private void cancelLowerPriority() {
-            complete.set(true);
             final Future<V> lowerPriority = this.lowerPriority.get();
             if (lowerPriority != null) {
                 lowerPriority.cancel(true);
@@ -137,13 +138,14 @@ public class PrioritizedParallelExecutor {
             this.lowerPriority.set(lowerPriority);
 
             if (terminatedExceptionally.get()) {
-                // TODO: should the body of this if be executed in a separate thread to not block the current thread
-                //  which is about to plug together the future chain...
-                try {
-                    lowerPriorityResult.complete(lowerPriority.get());
-                } catch (Exception e) {
-                    lowerPriorityResult.completeExceptionally(e);
-                }
+                Executors.newSingleThreadExecutor().execute(() -> {
+                            try {
+                                lowerPriorityResult.complete(lowerPriority.get());
+                            } catch (Exception e) {
+                                lowerPriorityResult.completeExceptionally(e);
+                            }
+                        }
+                );
             }
         }
 
