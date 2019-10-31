@@ -46,7 +46,7 @@ public class ResourceHandler {
         }
     }
 
-    private Resource downloadResource() {
+    private Resource downloadResource() throws InterruptedException {
         final boolean alreadyBeingProcessed;
         synchronized (resource) {
             alreadyBeingProcessed = resource.isBeingProcessed();
@@ -66,8 +66,16 @@ public class ResourceHandler {
         return resource;
     }
 
-    private Resource waitForResource() {
-        throw new RuntimeException("Not implemented yet!");
+    private Resource waitForResource() throws InterruptedException {
+        while (true) {
+            synchronized (resource) {
+                if (resource.isComplete()) {
+                    return resource;
+                }
+
+                resource.wait();
+            }
+        }
     }
 
 
