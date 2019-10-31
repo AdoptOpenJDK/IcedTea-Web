@@ -17,26 +17,26 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.cache.Resource.createResource;
+import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -88,13 +88,19 @@ public class ResourceTracker {
     // defines
     //    ResourceTracker.Downloader (download threads)
 
-      /** notified on initialization or download of a resource */
+    /**
+     * notified on initialization or download of a resource
+     */
     private static final Object lock = new Object(); // used to lock static structures
 
-    /** the resources known about by this resource tracker */
-    private final List<Resource> resources = new ArrayList<>();
+    /**
+     * the resources known about by this resource tracker
+     */
+    private final Map<URL, Resource> resources = new HashMap<>();
 
-    /** whether to download parts before requested */
+    /**
+     * whether to download parts before requested
+     */
     private final boolean prefetch;
 
     /**
@@ -128,40 +134,58 @@ public class ResourceTracker {
      * resource per instance (ie cannot download both versions 1 and
      * 2 of a resource in the same tracker).
      *
-     * @param location the location of the resource
-     * @param version the resource version
-     * @param options options to control download
+     * @param location     the location of the resource
+     * @param version      the resource version
+     * @param options      options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(options, "options");
+        Assert.requireNonNull(location, "location");
 
-        if (location == null) {
-            throw new IllegalResourceDescriptorException("location==null");
+        final URL normalizedLocation = normalizeUrlQuietly(location);
+        final Resource resource = createResource(normalizedLocation, version, options, updatePolicy);
+
+        if (addToResources(resource)) {
+            initNoneCacheableResources(resource);
+            startDownloadingIfPrefetch(resource);
         }
+    }
 
-        try {
-            location = UrlUtils.normalizeUrl(location);
-        } catch (Exception ex) {
-            LOG.error("Normalization of " + location.toString() + " has failed", ex);
-        }
-
-        Resource resource = Resource.createResource(location, version, options, updatePolicy);
-
+    /**
+     * @return {@code true} if no resource with the given URL is currently tracked.
+     */
+    private boolean addToResources(Resource resource) {
         synchronized (resources) {
-            if (resources.contains(resource)) {
-                return;
+            final Resource existingResource = resources.get(resource.getLocation());
+
+            if (existingResource == null) {
+                resources.put(resource.getLocation(), resource);
+            } else {
+                final VersionString newVersion = resource.getRequestVersion();
+                final VersionString existingVersion = existingResource.getRequestVersion();
+                if (!Objects.equals(existingVersion, newVersion)) {
+                    throw new IllegalStateException("Found two resources with location '" + resource.getLocation() +
+                            "' but different versions '" + newVersion + "' - '" + existingVersion + "'");
+                }
             }
-            resources.add(resource);
+
+            return existingResource == null;
         }
+    }
 
-        // checkCache may take a while (loads properties file).  this
-        // should really be synchronized on resources, but the worst
-        // case should be that the resource will be updated once even
-        // if unnecessary.
-        initResourceFromCache(resource, updatePolicy);
+    private void initNoneCacheableResources(final Resource resource) {
+        if (!CacheUtil.isCacheable(resource.getLocation())) {
+            // pretend that they are already downloaded; essentially
+            // they will just 'pass through' the tracker as if they were
+            // never added (for example, not affecting the total download size).
+            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
+            resource.startProcessing();
+        }
+    }
 
-        if (prefetch && !resource.isSet(DOWNLOADED)) {
+    private void startDownloadingIfPrefetch(Resource resource) {
+        if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
             ResourceDownloader.startDownload(resource, lock);
         }
     }
@@ -178,47 +202,7 @@ public class ResourceTracker {
     public void removeResource(URL location) {
         synchronized (resources) {
             Resource resource = getResource(location);
-            resources.remove(resource);
-        }
-    }
-
-    /**
-     * Check the cache for a resource, and initialize the resource
-     * as already downloaded if found.
-     *
-     * @param updatePolicy whether to check for updates if already in cache
-     */
-    private static void initResourceFromCache(final Resource resource, final UpdatePolicy updatePolicy) {
-        if (!CacheUtil.isCacheable(resource.getLocation())) {
-            // pretend that they are already downloaded; essentially
-            // they will just 'pass through' the tracker as if they were
-            // never added (for example, not affecting the total download size).
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
-            resource.startProcessing();
-            return;
-        }
-
-        if (updatePolicy != UpdatePolicy.ALWAYS && updatePolicy != UpdatePolicy.FORCE) { // save loading entry props file
-            ResourceInfo entry = CacheUtil.getInfoFromCache(resource.getLocation(), resource.getRequestVersion());
-
-            if (entry != null && !updatePolicy.shouldUpdate(entry)) {
-                LOG.info("not updating: {}", resource.getLocation());
-
-                synchronized (resource) {
-                    resource.setLocalFile(Cache.getCacheFile(resource.getLocation(), resource.getDownloadVersion()));
-                    resource.setDownloadVersion(entry.getVersion());
-                    resource.setSize(resource.getLocalFile().length());
-                    resource.setTransferred(resource.getLocalFile().length());
-                    resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
-                    resource.startProcessing();
-                }
-                return;
-            }
-        }
-
-        if (updatePolicy == UpdatePolicy.FORCE) { // ALWAYS update
-            // When we are "always" updating, we update for each instance. Reset resource status.
-            resource.resetStatus();
+            resources.remove(resource.getLocation());
         }
     }
 
@@ -237,13 +221,13 @@ public class ResourceTracker {
      * @see CacheUtil#isCacheable
      */
     public URL getCacheURL(URL location) {
-        try {
-            final File f = getCacheFile(location);
-            if (f != null) {
+        final File f = getCacheFile(location);
+        if (f != null) {
+            try {
                 return f.toURI().toURL();
+            } catch (MalformedURLException ex) {
+                LOG.error("Invalid URL {} - {}", f.toURI(), ex.getMessage());
             }
-        } catch (MalformedURLException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
 
         return location;
@@ -270,7 +254,7 @@ public class ResourceTracker {
                 wait(new Resource[]{resource}, 0);
             }
         } catch (InterruptedException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Interrupted while fetching resource {}: {}", location, ex.getMessage());
             return null; // need an error exception to throw
         }
         return getCacheFile(resource);
@@ -309,21 +293,14 @@ public class ResourceTracker {
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
-     * @param urls the resources to wait for
+     * @param urls    the resources to wait for
      * @param timeout the time in ms to wait before returning, 0 for no timeout
      * @return whether the resources downloaded before the timeout
-     * @throws java.lang.InterruptedException if thread is interrupted
+     * @throws java.lang.InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     boolean waitForResources(URL[] urls, long timeout) throws InterruptedException {
-        Resource[] lresources = new Resource[urls.length];
-
-        synchronized (resources) {
-            // keep the lock so getResource doesn't have to acquire it each time
-            for (int i = 0; i < urls.length; i++) {
-                lresources[i] = getResource(urls[i]);
-            }
-        }
+        Resource[] lresources = getResources(urls);
 
         if (lresources.length > 0) {
             return wait(lresources, timeout);
@@ -370,17 +347,31 @@ public class ResourceTracker {
         return getResource(location).getSize(); // atomic
     }
 
+    private Resource[] getResources(URL[] urls) {
+        Resource[] lresources = new Resource[urls.length];
+
+        synchronized (resources) {
+            // keep the lock so getResource doesn't have to acquire it each time
+            for (int i = 0; i < urls.length; i++) {
+                lresources[i] = getResource(urls[i]);
+            }
+        }
+        return lresources;
+    }
+
     /**
      * Return the resource matching the specified URL.
      *
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private Resource getResource(URL location) {
+        final URL normalizedLocation = normalizeUrlQuietly(location);
         synchronized (resources) {
-            return resources.stream()
-                    .filter(r -> UrlUtils.urlEquals(r.getLocation(), location))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalResourceDescriptorException("Location does not specify a resource being tracked."));
+            final Resource result = resources.get(normalizedLocation);
+            if (result == null) {
+                throw new IllegalResourceDescriptorException("Location does not specify a resource being tracked.");
+            }
+            return result;
         }
     }
 
@@ -388,7 +379,7 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
-     * @param timeout the timeout, or {@code 0} to wait until completed
+     * @param timeout   the timeout, or {@code 0} to wait until completed
      * @return {@code true} if the resources were downloaded or had errors,
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
