@@ -49,6 +49,7 @@ import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -240,14 +241,15 @@ public class CacheUtil {
 
         try {
             if (indicator == null) {
-                tracker.waitForResources(resources, 0);
+                tracker.waitForResources(resources);
                 return;
             }
 
             // see if resources can be downloaded very quickly; avoids
             // overhead of creating display components for the resources
-            if (tracker.waitForResources(resources, indicator.getInitialDelay()))
+            if (tracker.waitForResources(resources, indicator.getInitialDelay(), MILLISECONDS)) {
                 return;
+            }
 
             // only resources not starting out downloaded are displayed
             final List<URL> urlList = new ArrayList<>();
@@ -255,7 +257,7 @@ public class CacheUtil {
                 if (!tracker.checkResource(url))
                     urlList.add(url);
             }
-            final URL[] undownloaded = urlList.toArray(new URL[urlList.size()]);
+            final URL[] undownloaded = urlList.toArray(new URL[0]);
 
             listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
 
@@ -277,7 +279,7 @@ public class CacheUtil {
                             tracker.getTotalSize(url),
                             percent);
                 }
-            } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
+            } while (!tracker.waitForResources(resources, indicator.getUpdateRate(), MILLISECONDS));
 
             // make sure they read 100% until indicator closes
             for (URL url : undownloaded) {
@@ -287,7 +289,7 @@ public class CacheUtil {
                         100);
             }
         } catch (InterruptedException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Downloading of resources was interrupted", ex);
         } finally {
             if (indicator != null && listener != null)
                 indicator.disposeListener(listener);

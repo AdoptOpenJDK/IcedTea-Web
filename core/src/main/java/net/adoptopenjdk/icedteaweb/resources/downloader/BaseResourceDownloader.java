@@ -123,7 +123,8 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final InputStream unpackedStream = unpacker.unpack(countingInputStream);
             final DownloadInfo downloadInfo = new DownloadInfo(resourceHref, version, downloadDetails.lastModified);
 
-            Cache.addToCache(downloadInfo, unpackedStream);
+            final File cacheFile = Cache.addToCache(downloadInfo, unpackedStream);
+            resource.setLocalFile(cacheFile);
 
             return countingInputStream.numBytesRead();
         }

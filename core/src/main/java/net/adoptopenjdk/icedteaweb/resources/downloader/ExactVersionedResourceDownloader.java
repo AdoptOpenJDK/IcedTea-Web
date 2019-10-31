@@ -25,7 +25,7 @@ class ExactVersionedResourceDownloader extends BaseResourceDownloader {
             return versionId;
         }
 
-        if (downloadFrom.toString().contains(versionId.toString())) {
+        if (downloadFrom.getPath().contains(versionId.toString())) {
             return versionId;
         }
 

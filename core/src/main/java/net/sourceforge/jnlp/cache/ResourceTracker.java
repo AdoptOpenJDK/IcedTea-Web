@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceHandler;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -29,8 +30,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
@@ -84,14 +92,6 @@ public class ResourceTracker {
 
     // todo: might make a tracker be able to download more than one
     // version of a resource, but probably not very useful.
-
-    // defines
-    //    ResourceTracker.Downloader (download threads)
-
-    /**
-     * notified on initialization or download of a resource
-     */
-    private static final Object lock = new Object(); // used to lock static structures
 
     /**
      * the resources known about by this resource tracker
@@ -186,7 +186,7 @@ public class ResourceTracker {
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
-            ResourceDownloader.startDownload(resource, lock);
+            new ResourceHandler(resource).putIntoCache();
         }
     }
 
@@ -251,7 +251,7 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                wait(new Resource[]{resource}, 0);
+                wait(resource);
             }
         } catch (InterruptedException ex) {
             LOG.error("Interrupted while fetching resource {}: {}", location, ex.getMessage());
@@ -294,18 +294,30 @@ public class ResourceTracker {
      * available locally.
      *
      * @param urls    the resources to wait for
-     * @param timeout the time in ms to wait before returning, 0 for no timeout
+     * @throws java.lang.InterruptedException     if thread is interrupted
+     * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     */
+    void waitForResources(URL... urls) throws InterruptedException {
+        if (urls.length > 0) {
+            wait(getResources(urls));
+        }
+    }
+
+    /**
+     * Wait for a group of resources to be downloaded and made
+     * available locally.
+     *
+     * @param urls     the resources to wait for
+     * @param timeout  the time in ms to wait before returning, 0 for no timeout
+     * @param timeUnit the unit for timeout
      * @return whether the resources downloaded before the timeout
      * @throws java.lang.InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    boolean waitForResources(URL[] urls, long timeout) throws InterruptedException {
-        Resource[] lresources = getResources(urls);
-
-        if (lresources.length > 0) {
-            return wait(lresources, timeout);
+    boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
+        if (urls.length > 0) {
+            return wait(getResources(urls), timeout, timeUnit);
         }
-
         return true;
     }
 
@@ -379,48 +391,60 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
+     * @throws InterruptedException if another thread interrupted the wait
+     */
+    private void wait(Resource... resources) throws InterruptedException {
+        // save futures in list to allow parallel start of all resources
+        final List<Future<Resource>> futures = Stream.of(resources)
+                .map(ResourceHandler::new)
+                .map(ResourceHandler::putIntoCache)
+                .collect(Collectors.toList());
+
+        for (Future<Resource> future : futures) {
+            try {
+                future.get();
+            } catch (ExecutionException ignored) {
+            }
+        }
+    }
+
+    /**
+     * Wait for some resources.
+     *
+     * @param resources the resources to wait for
      * @param timeout   the timeout, or {@code 0} to wait until completed
      * @return {@code true} if the resources were downloaded or had errors,
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
      */
-    private boolean wait(Resource[] resources, long timeout) throws InterruptedException {
-        long startTime = System.currentTimeMillis();
-
-        // start them downloading / connecting in background
-        for (Resource resource : resources) {
-            ResourceDownloader.startDownload(resource, lock);
+    private boolean wait(Resource[] resources, long timeout, TimeUnit timeUnit) throws InterruptedException {
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("Timout must be bigger than 0");
         }
+        long startTime = System.nanoTime();
+        long nanoTimeout = timeUnit.toNanos(timeout);
 
-        // wait for completion
-        while (true) {
-            boolean finished = true;
+        // save futures in list to allow parallel start of all resources
+        final List<Future<Resource>> futures = Stream.of(resources)
+                .map(ResourceHandler::new)
+                .map(ResourceHandler::putIntoCache)
+                .collect(Collectors.toList());
 
-            synchronized (lock) {
-                // check for completion
-                for (Resource resource : resources) {
-                    if (!resource.isComplete()) {
-                        finished = false;
-                        break;
-                    }
-                }
+        for (Future<Resource> future : futures) {
+            final long nanoSinceStartOfMethod = System.nanoTime() - startTime;
+            final long waitTime = nanoTimeout - nanoSinceStartOfMethod;
 
-                if (finished) {
-                    return true;
-                }
+            if (waitTime <= 0) {
+                return false;
+            }
 
-                // wait
-                long waitTime = 0;
-
-                if (timeout > 0) {
-                    final long timeSinceStartOfMethod = System.currentTimeMillis() - startTime;
-                    waitTime = timeout - timeSinceStartOfMethod;
-                    if (waitTime <= 0)
-                        return false;
-                }
-
-                lock.wait(waitTime);
+            try {
+                future.get(waitTime, TimeUnit.NANOSECONDS);
+            } catch (TimeoutException e) {
+                return false;
+            } catch (ExecutionException ignored) {
             }
         }
+        return true;
     }
 }

@@ -7,7 +7,7 @@
   <resources>
     <j2se href="http://java.sun.com/products/autodl/j2se" version="1.8+" />
     <!-- absolute url is a must -->
-    <jar href="http://localhost:8080/%2E%2E/%2E%2E/%2E%2E/base/j1.jar" version="2.0"/>
+    <jar href="http://localhost:8080/%2E%2E/%2E%2E/%2E%2E/base/j1.jar"/>
   </resources>
 
   <application-desc main-class="Hello1" />

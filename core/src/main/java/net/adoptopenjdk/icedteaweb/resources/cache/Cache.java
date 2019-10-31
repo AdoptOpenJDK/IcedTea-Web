@@ -53,11 +53,11 @@ public class Cache {
         return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(resource, version);
     }
 
-    public static void addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
+    public static File addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
         if (!CacheUtil.isCacheable(infoFromRemote.getResourceHref())) {
             throw new IllegalArgumentException(infoFromRemote.getResourceHref() + " is not a cacheable resource");
         }
-        LeastRecentlyUsedCache.getInstance().addToCache(infoFromRemote, unpackedStream);
+        return LeastRecentlyUsedCache.getInstance().addToCache(infoFromRemote, unpackedStream);
     }
 
     /**
