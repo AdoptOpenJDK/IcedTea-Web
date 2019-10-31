@@ -9,11 +9,11 @@ IcedTeaWeb is an open source implementation of [JSR-56](http://www.jcp.org/en/js
 ## Development origin
 The project was formerly hosted as part of the [icedtea.classpath.org](https://icedtea.classpath.org) project but moved to github.
 
-The 1.7 and 1.8 release branches of IcedTeaWeb will be migrated to GitHub for fixing bugs in the previews releases.
-Next to this a new project structure will be established in the `master` branch.
-Here the project will be migrated to Maven and more usage of Java 8 APIs will be introduced the next month.
+The 1.7 and 1.8 release branches of IcedTeaWeb have been migrated to GitHub for fixing bugs in the previews releases.
+Next to this a new project structure has been established in the `master` branch.
+Here the project is being migrated to Maven and more usage of Java 8 APIs are being introduced.
 Based on this IcedTeaWeb can be transformed to a general WebStart / JNLP API that JDK and tool vendors can use to offer JNLP functionality.
-A good example is [OpenWebStart](https://dev.karakun.com/webstart/) that will be based on IcedTeaWeb.
+A good example is [OpenWebStart](https://openwebstart.com/) that will be based on IcedTeaWeb.
 
 All issues of the former Bugzilla issue tracker at classpath.org were already migrated to GitHub and marked by the `bugzilla-import` label.
 
