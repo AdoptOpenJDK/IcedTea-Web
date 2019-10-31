@@ -150,7 +150,7 @@ public class VersionString {
 
     @Override
     public boolean equals(final Object otherVersionString) {
-        if (otherVersionString == null || otherVersionString.getClass() != VersionRange.class) {
+        if (otherVersionString == null || otherVersionString.getClass() != VersionString.class) {
             return false;
         }
         final VersionString other = (VersionString) otherVersionString;
