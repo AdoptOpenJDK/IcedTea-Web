@@ -23,9 +23,9 @@ public class PrioritizedParallelExecutorDemo {
 //        final Callable<Character> first = callable("FIRST ", 3, 'a');
 //        final Callable<Character> second = callable("SECOND", 1, new RuntimeException());
         final Callable<Character> second = callable("SECOND", 1, 'b');
-        final Callable<Character> third = callable("THIRD", 2, new RuntimeException());
+        final Callable<Character> third = callable("THIRD", 3, new RuntimeException());
 //        final Callable<Character> third = callable("THIRD ", 2, 'c');
-        final Callable<Character> fourth = callable("FOURTH", 3, 'd');
+        final Callable<Character> fourth = callable("FOURTH", 2, 'd');
         final List<Callable<Character>> callables = Arrays.asList(first, second, third, fourth);
 
         final ExecutorService executor = Executors.newFixedThreadPool(6);

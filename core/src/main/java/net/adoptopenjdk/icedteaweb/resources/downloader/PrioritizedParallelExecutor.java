@@ -30,7 +30,7 @@ public class PrioritizedParallelExecutor {
      *
      * @param executor the executor service which is used for executing the callables.
      */
-    public PrioritizedParallelExecutor(ExecutorService executor) {
+    public PrioritizedParallelExecutor(final ExecutorService executor) {
         this.executor = executor;
     }
 
@@ -44,7 +44,7 @@ public class PrioritizedParallelExecutor {
      * @param callables the callables to execute.
      * @return a future holding the best result from all callables.
      */
-    public <V> Future<V> getSuccessfulResultWithHighestPriority(List<Callable<V>> callables) {
+    public <V> Future<V> getSuccessfulResultWithHighestPriority(final List<Callable<V>> callables) {
         if (callables == null || callables.isEmpty()) {
             throw new IllegalArgumentException("No callables");
         }
@@ -75,7 +75,7 @@ public class PrioritizedParallelExecutor {
 
         private final Callable<V> delegate;
 
-        private CancelingCallable(Callable<V> delegate) {
+        private CancelingCallable(final Callable<V> delegate) {
             this.delegate = delegate;
         }
 
@@ -87,7 +87,7 @@ public class PrioritizedParallelExecutor {
          *
          * @param lowerPriority the lower priority future to be canceled after completing this callable successfully.
          */
-        void setLowerPriority(Future<V> lowerPriority) {
+        void setLowerPriority(final Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
             if (complete.get()) {
                 executeInBackground(this::cancelLowerPriority);
@@ -123,7 +123,7 @@ public class PrioritizedParallelExecutor {
 
         private final Future<V> delegate;
 
-        private ChainableFuture(Future<V> delegate) {
+        private ChainableFuture(final Future<V> delegate) {
             this.delegate = delegate;
         }
 
@@ -133,15 +133,16 @@ public class PrioritizedParallelExecutor {
          *
          * @param lowerPriorityFuture the lower priority future.
          */
-        void setLowerPriority(Future<V> lowerPriorityFuture) {
+        void setLowerPriority(final Future<V> lowerPriorityFuture) {
             this.lowerPriority.set(lowerPriorityFuture);
 
             if (terminatedExceptionally.get()) {
-                executeInBackground(() -> completeLowerPriorityResult(lowerPriorityFuture));
+                executeInBackground(this::completeLowerPriorityResult);
             }
         }
 
-        private void completeLowerPriorityResult(Future<V> lowerPriorityFuture) {
+        private void completeLowerPriorityResult() {
+            final Future<V> lowerPriorityFuture = this.lowerPriority.get();
             try {
                 lowerPriorityResult.complete(lowerPriorityFuture.get());
             } catch (Exception e) {
@@ -150,7 +151,7 @@ public class PrioritizedParallelExecutor {
         }
 
         @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
+        public boolean cancel(final boolean mayInterruptIfRunning) {
             terminatedExceptionally.set(true);
             final boolean result = delegate.cancel(mayInterruptIfRunning);
             executeInBackground(this::cancelLowerPriority);
@@ -178,7 +179,7 @@ public class PrioritizedParallelExecutor {
         }
 
         @Override
-        public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             final long start = System.nanoTime();
             try {
                 return delegate.get(timeout, unit);
@@ -189,7 +190,7 @@ public class PrioritizedParallelExecutor {
                 return returnLowerPriority(remaining, NANOSECONDS);
             } catch (TimeoutException e) {
                 terminatedExceptionally.set(true);
-                return returnLowerPriorityImmediately(e);
+                return returnLowerPriorityImmediatelyOrThrow(e);
             }
         }
 
@@ -209,7 +210,7 @@ public class PrioritizedParallelExecutor {
             }
         }
 
-        private V returnLowerPriority(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        private V returnLowerPriority(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             final Future<V> lowerPriorityFuture = this.lowerPriority.get();
             if (lowerPriorityFuture != null) {
                 return lowerPriorityFuture.get(timeout, unit);
@@ -218,7 +219,7 @@ public class PrioritizedParallelExecutor {
             }
         }
 
-        private V returnLowerPriorityImmediately(TimeoutException e) throws TimeoutException {
+        private V returnLowerPriorityImmediatelyOrThrow(final TimeoutException e) throws TimeoutException {
             final Future<V> lowerPriorityFuture = this.lowerPriority.get();
             if (lowerPriorityFuture != null && lowerPriorityFuture.isDone() && !lowerPriorityFuture.isCancelled()) {
                 try {
