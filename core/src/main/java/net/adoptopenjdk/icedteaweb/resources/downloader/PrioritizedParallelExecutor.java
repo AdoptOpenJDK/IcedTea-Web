@@ -104,9 +104,9 @@ public class PrioritizedParallelExecutor {
         }
 
         private void cancelLowerPriority() {
-            final Future<V> lowerPriority = this.lowerPriority.get();
-            if (lowerPriority != null) {
-                lowerPriority.cancel(true);
+            final Future<V> lowerPriorityFuture = this.lowerPriority.get();
+            if (lowerPriorityFuture != null) {
+                lowerPriorityFuture.cancel(true);
             }
         }
     }
@@ -191,17 +191,17 @@ public class PrioritizedParallelExecutor {
 
         private void cancelLowerPriority() {
             terminatedExceptionally.set(true);
-            final Future<V> lowerPriority = this.lowerPriority.get();
-            if (lowerPriority != null) {
-                lowerPriority.cancel(true);
+            final Future<V> lowerPriorityFuture = this.lowerPriority.get();
+            if (lowerPriorityFuture != null) {
+                lowerPriorityFuture.cancel(true);
             }
         }
 
         private V returnLowerPriority() throws InterruptedException, ExecutionException {
             terminatedExceptionally.set(true);
-            final Future<V> lowerPriority = this.lowerPriority.get();
-            if (lowerPriority != null) {
-                return lowerPriority.get();
+            final Future<V> lowerPriorityFuture = this.lowerPriority.get();
+            if (lowerPriorityFuture != null) {
+                return lowerPriorityFuture.get();
             } else {
                 return lowerPriorityResult.get();
             }
@@ -209,9 +209,9 @@ public class PrioritizedParallelExecutor {
 
         private V returnLowerPriority(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             terminatedExceptionally.set(true);
-            final Future<V> lowerPriority = this.lowerPriority.get();
-            if (lowerPriority != null) {
-                return lowerPriority.get(timeout, unit);
+            final Future<V> lowerPriorityFuture = this.lowerPriority.get();
+            if (lowerPriorityFuture != null) {
+                return lowerPriorityFuture.get(timeout, unit);
             } else {
                 return lowerPriorityResult.get(timeout, unit);
             }
