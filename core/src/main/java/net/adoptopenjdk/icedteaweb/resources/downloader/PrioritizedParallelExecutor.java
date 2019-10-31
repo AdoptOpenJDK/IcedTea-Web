@@ -90,7 +90,7 @@ public class PrioritizedParallelExecutor {
         void setLowerPriority(Future<V> lowerPriority) {
             this.lowerPriority.set(lowerPriority);
             if (complete.get()) {
-                cancelLowerPriority();
+                executeInBackground(this::cancelLowerPriority);
             }
         }
 
@@ -131,20 +131,21 @@ public class PrioritizedParallelExecutor {
          * Set a lower priority to be canceled.
          * This is not passed in the constructor as the value is not known then.
          *
-         * @param lowerPriority the lower priority future to be canceled this future is canceled.
+         * @param lowerPriorityFuture the lower priority future.
          */
-        void setLowerPriority(Future<V> lowerPriority) {
-            this.lowerPriority.set(lowerPriority);
+        void setLowerPriority(Future<V> lowerPriorityFuture) {
+            this.lowerPriority.set(lowerPriorityFuture);
 
             if (terminatedExceptionally.get()) {
-                Executors.newSingleThreadExecutor().execute(() -> {
-                            try {
-                                lowerPriorityResult.complete(lowerPriority.get());
-                            } catch (Exception e) {
-                                lowerPriorityResult.completeExceptionally(e);
-                            }
-                        }
-                );
+                executeInBackground(() -> completeLowerPriorityResult(lowerPriorityFuture));
+            }
+        }
+
+        private void completeLowerPriorityResult(Future<V> lowerPriorityFuture) {
+            try {
+                lowerPriorityResult.complete(lowerPriorityFuture.get());
+            } catch (Exception e) {
+                lowerPriorityResult.completeExceptionally(e);
             }
         }
 
@@ -152,7 +153,7 @@ public class PrioritizedParallelExecutor {
         public boolean cancel(boolean mayInterruptIfRunning) {
             terminatedExceptionally.set(true);
             final boolean result = delegate.cancel(mayInterruptIfRunning);
-            cancelLowerPriority();
+            executeInBackground(this::cancelLowerPriority);
             return result;
         }
 
@@ -229,5 +230,9 @@ public class PrioritizedParallelExecutor {
                 throw e;
             }
         }
+    }
+
+    private static void executeInBackground(Runnable runnable) {
+        Executors.newSingleThreadExecutor().execute(runnable);
     }
 }
