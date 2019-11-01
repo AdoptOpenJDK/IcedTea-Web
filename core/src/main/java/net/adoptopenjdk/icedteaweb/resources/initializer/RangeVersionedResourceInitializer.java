@@ -39,13 +39,16 @@ class RangeVersionedResourceInitializer extends BaseResourceInitializer {
         return getBestUrlByPingingWithHeadRequest(candidateUrls)
                 .map(requestResult -> {
                     final VersionId remoteVersion = requestResult.getVersion();
-                    if (isCached && remoteVersion != null && cachedVersion != null
-                            && cachedVersion.compareTo(remoteVersion) >= 0) {
-                        return initFromCache(cachedVersion);
-                    } else {
-                        LOG.debug("Found best URL for {}: {}", resource, requestResult);
-                        return initFromHeadResult(requestResult);
+                    if (isCached && remoteVersion != null && cachedVersion != null) {
+                        if (cachedVersion.equals(remoteVersion) && resource.forceUpdateRequested()) {
+                            invalidateExistingEntryInCache(cachedVersion);
+                        } else if (cachedVersion.compareTo(remoteVersion) >= 0) {
+                            return initFromCache(cachedVersion);
+                        }
                     }
+
+                    LOG.debug("Found best URL for {}: {}", resource, requestResult);
+                    return initFromHeadResult(requestResult);
                 })
                 .orElseGet(() -> {
                     LOG.debug("Failed to determine best URL for {} will try all of {}", resource, candidateUrls);

@@ -297,6 +297,10 @@ public class Resource {
         return this.updatePolicy;
     }
 
+    public boolean forceUpdateRequested() {
+        return updatePolicy == UpdatePolicy.FORCE;
+    }
+
     /**
      * Returns a human-readable status string.
      */

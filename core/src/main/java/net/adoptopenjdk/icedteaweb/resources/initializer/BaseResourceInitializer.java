@@ -71,6 +71,12 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         return new InitializationResult(requestResult);
     }
 
+    void invalidateExistingEntryInCache(VersionId version) {
+        final URL location = resource.getLocation();
+        LOG.debug("Invalidating resource in cache: {} / {}", location, version);
+        Cache.replaceExistingCacheFile(location, version);
+    }
+
     DownloadOptions getDownloadOptions() {
         DownloadOptions options = resource.getDownloadOptions();
         if (options == null) {

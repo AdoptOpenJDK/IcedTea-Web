@@ -46,6 +46,7 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
                 .map(requestResult -> {
                     if (needsUpdate(requestResult)) {
                         LOG.debug("Found best URL for {}: {}", resource, requestResult);
+                        invalidateExistingEntryInCache(null);
                         return initFromHeadResult(requestResult);
                     } else {
                         return initFromCache();
@@ -74,13 +75,15 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
     private boolean needsUpdateCheck() {
         return !isCached
                 || info == null
-                || resource.getUpdatePolicy().shouldUpdate(info);
+                || resource.getUpdatePolicy().shouldUpdate(info)
+                || resource.forceUpdateRequested();
     }
 
     private boolean needsUpdate(final UrlRequestResult requestResult) {
         return info == null
                 || requestResult.getLastModified() > info.getLastModified()
-                || requestResult.getContentLength() != info.getSize();
+                || requestResult.getContentLength() != info.getSize()
+                || resource.forceUpdateRequested();
     }
 
     private InitializationResult initFromCache() {

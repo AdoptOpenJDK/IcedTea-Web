@@ -30,6 +30,11 @@ class RangeVersionedResourceDownloader extends BaseResourceDownloader {
 
     @Override
     protected boolean isUpToDate(URL resourceHref, VersionId version, long lastModified) {
-        return Cache.isCached(resourceHref, version);
+        final boolean cached = Cache.isCached(resourceHref, version);
+        if (cached && resource.forceUpdateRequested()) {
+            invalidateExistingEntryInCache(version);
+            return false;
+        }
+        return cached;
     }
 }

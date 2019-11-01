@@ -133,7 +133,7 @@ class ResourceDownloader {
     private void initializeFromURL(final UrlRequestResult location) {
         final boolean isCached = Cache.isCached(resource.getLocation(), location.getVersion());
         final boolean isUpToDate = isCached && Cache.isUpToDate(resource.getLocation(), location.getVersion(), location.getLastModified());
-        final boolean doUpdate = !isUpToDate || resource.getUpdatePolicy() == UpdatePolicy.FORCE;
+        final boolean doUpdate = !isUpToDate || resource.forceUpdateRequested();
 
         final File localFile;
         if (doUpdate && isCached) {
