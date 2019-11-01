@@ -145,7 +145,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         File downloadDir = downloadServer.getDir();
         File file = new File(downloadDir, fileName);
         file.createNewFile();
-        Files.write(file.toPath(), text.getBytes());
+        Files.write(file.toPath(), text.getBytes(UTF_8));
         file.deleteOnExit();
 
         return file;
@@ -157,6 +157,11 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
         return resource;
     }
+
+    private String readFile(File downloadedFile) throws IOException {
+        return new String(Files.readAllBytes(downloadedFile.toPath()), UTF_8);
+    }
+
 
     @Test
     public void testDownloadResource() throws IOException {
@@ -172,7 +177,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        String output = new String(Files.readAllBytes(downloadedFile.toPath()));
+        String output = readFile(downloadedFile);
         assertEquals(expected, output);
     }
 
@@ -218,7 +223,7 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        String output = new String(Files.readAllBytes(downloadedFile.toPath()));
+        String output = readFile(downloadedFile);
         assertEquals(expected, output);
     }
 
