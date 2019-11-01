@@ -28,7 +28,6 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +39,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.cache.Resource.createResource;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
@@ -157,7 +154,6 @@ public class ResourceTracker {
         final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
 
         if (addToResources(resource)) {
-            initNoneCacheableResources(resource);
             startDownloadingIfPrefetch(resource);
         }
     }
@@ -181,16 +177,6 @@ public class ResourceTracker {
             }
 
             return existingResource == null;
-        }
-    }
-
-    private void initNoneCacheableResources(final Resource resource) {
-        if (!CacheUtil.isCacheable(resource.getLocation())) {
-            // pretend that they are already downloaded; essentially
-            // they will just 'pass through' the tracker as if they were
-            // never added (for example, not affecting the total download size).
-            resource.changeStatus(EnumSet.noneOf(Resource.Status.class), EnumSet.of(DOWNLOADED, CONNECTED));
-            resource.startProcessing();
         }
     }
 

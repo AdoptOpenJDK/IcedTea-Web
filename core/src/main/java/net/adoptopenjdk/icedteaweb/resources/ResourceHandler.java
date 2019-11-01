@@ -5,12 +5,17 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.Resource;
 
+import java.io.File;
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 
 public class ResourceHandler {
 
@@ -25,6 +30,8 @@ public class ResourceHandler {
     public Future<Resource> putIntoCache() {
         final CompletableFuture<Resource> result = new CompletableFuture<>();
 
+        initNoneCacheableResources();
+
         if (isAlreadyCompleted()) {
             result.complete(resource);
         } else {
@@ -38,6 +45,27 @@ public class ResourceHandler {
         }
 
         return result;
+    }
+
+    private void initNoneCacheableResources() {
+        if (!CacheUtil.isCacheable(resource.getLocation())) {
+            resource.changeStatus(null, EnumSet.of(DOWNLOADED));
+
+            synchronized (resource) {
+                if (resource.isComplete()) {
+                    return;
+                }
+
+                if (resource.getLocation().getProtocol().equals("file")) {
+                    final File file = new File(resource.getLocation().getPath());
+                    resource.setSize(file.length());
+                    resource.setLocalFile(file);
+                    resource.setTransferred(file.length());
+                }
+                resource.changeStatus(null, EnumSet.of(DOWNLOADED));
+                resource.notifyAll();
+            }
+        }
     }
 
     private boolean isAlreadyCompleted() {
