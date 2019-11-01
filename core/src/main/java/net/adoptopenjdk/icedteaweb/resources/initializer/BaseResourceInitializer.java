@@ -17,7 +17,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
             resource.setLocalFile(cachedFile);
             resource.setDownloadVersion(version);
             resource.setTransferred(cachedFile.length());
-            resource.changeStatus(null, EnumSet.of(DOWNLOADED));
+            resource.setStatus(DOWNLOADED);
             resource.notifyAll();
         }
 

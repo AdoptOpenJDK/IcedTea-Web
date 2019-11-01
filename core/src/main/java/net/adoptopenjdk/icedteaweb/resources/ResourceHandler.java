@@ -9,7 +9,6 @@ import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.Resource;
 
 import java.io.File;
-import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -49,7 +48,7 @@ public class ResourceHandler {
 
     private void initNoneCacheableResources() {
         if (!CacheUtil.isCacheable(resource.getLocation())) {
-            resource.changeStatus(null, EnumSet.of(DOWNLOADED));
+            resource.setStatus(DOWNLOADED);
 
             synchronized (resource) {
                 if (resource.isComplete()) {
@@ -62,7 +61,7 @@ public class ResourceHandler {
                     resource.setLocalFile(file);
                     resource.setTransferred(file.length());
                 }
-                resource.changeStatus(null, EnumSet.of(DOWNLOADED));
+                resource.setStatus(DOWNLOADED);
                 resource.notifyAll();
             }
         }

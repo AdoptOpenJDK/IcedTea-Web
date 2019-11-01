@@ -19,16 +19,12 @@ package net.sourceforge.jnlp.cache;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * <p>
@@ -56,11 +52,7 @@ public class Resource {
     // only once, regardless of UpdatePolicy.  verify and fix.
 
     public enum Status {
-        PRECONNECT,
-        CONNECTING,
-        CONNECTED,
-        PREDOWNLOAD,
-        DOWNLOADING,
+        INCOMPLETE,
         DOWNLOADED,
         ERROR,
     }
@@ -93,7 +85,7 @@ public class Resource {
     private volatile boolean isBeingProcessed = false;
 
     /** the status of the resource */
-    private final EnumSet<Status> status = EnumSet.noneOf(Status.class);
+    private volatile Status status = Status.INCOMPLETE;
 
     /** Update policy for this resource */
     private final UpdatePolicy updatePolicy;
@@ -254,34 +246,13 @@ public class Resource {
     }
 
     /**
-     * @return the status of the resource
-     */
-    public Set<Status> getCopyOfStatus() {
-        return EnumSet.copyOf(status);
-    }
-
-    /**
      * Check if the specified flag is set.
      *
      * @param flag a status flag
      * @return true iff the flag is set
      */
     public boolean isSet(Status flag) {
-        synchronized (status) {
-            return status.contains(flag);
-        }
-    }
-
-    /**
-     * Check if all the specified flags are set.
-     *
-     * @param flags a collection of flags
-     * @return true iff all the flags are set
-     */
-    public boolean hasAllFlags(Collection<Status> flags) {
-        synchronized (status) {
-            return status.containsAll(flags);
-        }
+        return status == flag;
     }
 
     public boolean isComplete() {
@@ -305,54 +276,20 @@ public class Resource {
      * Returns a human-readable status string.
      */
     private String getStatusString() {
-        StringBuilder result = new StringBuilder();
-
-        synchronized (status) {
-            if (status.isEmpty()) {
-                return "<>";
-            }
-            for (Status stat : status) {
-                result.append(stat.toString()).append(" ");
-            }
-        }
-
-        return result.toString().trim();
+        return Objects.toString(status);
     }
 
     /**
-     * Changes the status by clearing the flags in the first
-     * parameter and setting the flags in the second.  This method
-     * is synchronized on this resource.
+     * Changes the status.
      *
-     * @param clear a collection of status flags to unset
-     * @param add   a collection of status flags to set
+     * @param status a collection of status flags to set
      */
-    public void changeStatus(Collection<Status> clear, Collection<Status> add) {
-        synchronized (status) {
-            if (clear != null) {
-                status.removeAll(clear);
-            }
-            if (add != null) {
-                status.addAll(add);
-            }
-        }
-    }
-
-    /**
-     * Clear all flags
-     */
-    public void resetStatus() {
-        synchronized (status) {
-            status.clear();
-        }
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
-    }
-
-    public boolean isConnectable() {
-        return JNLPRuntime.isConnectable(this.location);
     }
 
     @Override

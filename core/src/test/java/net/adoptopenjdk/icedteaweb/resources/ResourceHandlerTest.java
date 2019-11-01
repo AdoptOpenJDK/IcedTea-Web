@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.EnumSet;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -189,7 +188,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache().get();
 
-        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.DOWNLOADED)));
+        assertTrue(resource.isSet(Resource.Status.DOWNLOADED));
     }
 
     @Test
@@ -199,7 +198,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache().get();
 
-        assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
+        assertTrue(resource.isSet(Resource.Status.ERROR));
     }
 
     private void setupFile(String fileName, String text) throws Exception {

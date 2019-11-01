@@ -6,8 +6,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.cache.Resource;
 
-import java.util.EnumSet;
-
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 
 /**
@@ -27,7 +25,7 @@ class OfflineResourceInitializer extends BaseResourceInitializer {
             return initFromCache(version);
         } else {
             synchronized (resource) {
-                resource.changeStatus(null, EnumSet.of(ERROR));
+                resource.setStatus(ERROR);
                 resource.notifyAll();
                 LOG.warn("Resource '{}' not found in cache. Continuing but you may experience errors", resource.getLocation());
             }

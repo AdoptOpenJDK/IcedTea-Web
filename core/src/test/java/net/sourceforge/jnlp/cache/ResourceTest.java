@@ -42,23 +42,12 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Set;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
-import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTING;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
-import static net.sourceforge.jnlp.cache.Resource.Status.PRECONNECT;
-import static net.sourceforge.jnlp.cache.Resource.Status.PREDOWNLOAD;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ResourceTest {
-
-    public static final long INCREMENT_TRANSFERRED_CONSTANT = 10;
 
     @Test
     public void testGetLocation() throws Exception {
@@ -102,79 +91,13 @@ public class ResourceTest {
     }
 
     @Test
-    public void testStatusIsCopied() throws Exception {
-        String testName = "testStatus";
-        Resource res = createResource(testName);
-        Set<Resource.Status> original = res.getCopyOfStatus();
-        assertTrue("Original should be emtpy", original.isEmpty());
-        original.add(DOWNLOADING);
-        Set<Resource.Status> dummy = res.getCopyOfStatus();
-        assertFalse(dummy.equals(original));
-        assertFalse(dummy.contains(DOWNLOADING));
-    }
-
-    @Test
     public void testNewResourceIsUninitialized() throws Exception {
         Resource res = createResource("NewResource");
-        assertTrue("Resource should not have had any status flags set", isUninitialized(res));
-    }
-
-    @Test
-    public void testSetFlag() throws Exception {
-        Resource res = createResource("SetFlag");
-        res.changeStatus(null, EnumSet.of(PRECONNECT));
-        assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
-    }
-
-    @Test
-    public void testSetMultipleFlags() throws Exception {
-        Resource res = createResource("SetFlags");
-        res.changeStatus(null, EnumSet.of(PRECONNECT, PREDOWNLOAD));
-        assertFalse("Resource should have been initialized", isUninitialized(res));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
-        assertTrue("Resource should have only had PRECONNECT and PREDOWNLOAD set", hasOnly(res, EnumSet.of(PRECONNECT, PREDOWNLOAD)));
-    }
-
-    @Test
-    public void testChangeStatus() throws Exception {
-        Resource res = createResource("ChangeStatus");
-        res.changeStatus(null, EnumSet.of(PRECONNECT));
-        assertTrue("Resource should have had PRECONNECT set", hasFlag(res, PRECONNECT));
-        assertTrue("Resource should have only had PRECONNECT set", hasOnly(res, EnumSet.of(PRECONNECT)));
-
-        Collection<Resource.Status> downloadFlags = EnumSet.of(PREDOWNLOAD, DOWNLOADING, DOWNLOADED);
-        Collection<Resource.Status> connectFlags = EnumSet.of(PRECONNECT, CONNECTING, CONNECTED);
-        res.changeStatus(connectFlags, downloadFlags);
-
-        assertTrue("Resource should have had PREDOWNLOAD set", hasFlag(res, PREDOWNLOAD));
-        assertTrue("Resource should have had DOWNLOADING set", hasFlag(res, DOWNLOADING));
-        assertTrue("Resource should have had DOWNLOADED set", hasFlag(res, DOWNLOADED));
-        assertTrue("Resource should have only had PREDOWNLOAD{,ING,ED} flags set", hasOnly(res, downloadFlags));
-        assertFalse("Resource should not have had PRECONNECT set", hasFlag(res, PRECONNECT));
+        assertTrue("Resource should not have had any status flags set", res.isSet(Resource.Status.INCOMPLETE));
     }
 
     private static Resource createResource(String testName) throws MalformedURLException {
         final URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
         return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
     }
-
-    private static boolean hasOnly(Resource resource, Collection<Resource.Status> flags) {
-        final Set<Resource.Status> status = resource.getCopyOfStatus();
-        if (status.size() != flags.size()) {
-            return false;
-        }
-        return status.containsAll(flags);
-    }
-
-    private static boolean hasFlag(Resource resource, Resource.Status flag) {
-        return resource.isSet(flag);
-    }
-
-    private static boolean isUninitialized(Resource resource) {
-        return resource.getCopyOfStatus().isEmpty();
-    }
-
 }

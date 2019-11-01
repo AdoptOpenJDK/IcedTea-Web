@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADING;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 
 /**
@@ -65,7 +63,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .orElseGet(() -> {
                     LOG.warn("could not download resource {} from any of theses urls {}", resource, downloadUrls);
                     synchronized (resource) {
-                        resource.changeStatus(null, EnumSet.of(ERROR));
+                        resource.setStatus(ERROR);
                         resource.notifyAll();
                     }
                     return resource;
@@ -93,7 +91,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final long bytesTransferred = tryDownloading(downloadDetails);
 
             synchronized (resource) {
-                resource.changeStatus(EnumSet.of(DOWNLOADING), EnumSet.of(DOWNLOADED));
+                resource.setStatus(DOWNLOADED);
                 resource.setTransferred(bytesTransferred);
                 resource.notifyAll();
             }
