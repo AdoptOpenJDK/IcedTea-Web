@@ -1,19 +1,22 @@
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
+import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,135 +36,71 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@NotThreadSafe
 public class ResourceDownloaderTest extends NoStdOutErrTest {
 
-    public static ServerLauncher testServer;
-    public static ServerLauncher testServerWithBrokenHead;
-    public static ServerLauncher downloadServer;
+    private static ServerLauncher testServer;
+    private static ServerLauncher testServerWithBrokenHead;
+    private static ServerLauncher downloadServer;
 
     private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
+    private String cacheDir;
 
-    private static String cacheDir;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @BeforeClass
     //keeping silent outputs from launched jvm
     public static void redirectErr() {
-        for (int i = 0; i < backedUpStream.length; i++) {
-            if (backedUpStream[i] == null) {
-                switch (i) {
-                    case 0:
-                        backedUpStream[i] = System.out;
-                        break;
-                    case 1:
-                        backedUpStream[i] = System.err;
-                        break;
-                    case 2:
-                        backedUpStream[i] = OutputController.getLogger().getOut();
-                        break;
-                    case 3:
-                        backedUpStream[i] = OutputController.getLogger().getErr();
-                        break;
-                }
+        backedUpStream[0] = System.out;
+        backedUpStream[1] = System.err;
+        backedUpStream[2] = OutputController.getLogger().getOut();
+        backedUpStream[3] = OutputController.getLogger().getErr();
 
-            }
-
-        }
         currentErrorStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(currentErrorStream));
         System.setErr(new PrintStream(currentErrorStream));
         OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
         OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
 
+        JNLPRuntime.setDebug(true);
     }
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
         ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
+
         System.setOut(backedUpStream[0]);
         System.setErr(backedUpStream[1]);
         OutputController.getLogger().setOut(backedUpStream[2]);
         OutputController.getLogger().setErr(backedUpStream[3]);
-    }
 
-    @BeforeClass
-    public static void onDebug() {
-        JNLPRuntime.setDebug(true);
-    }
-
-    @AfterClass
-    public static void offDebug() {
         JNLPRuntime.setDebug(false);
     }
 
-    @BeforeClass
-    public static void startServer() throws Exception {
-        redirectErr();
-        testServer = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
-        redirectErrBack();
-    }
-
-    @BeforeClass
-    public static void startServer2() throws Exception {
-        redirectErr();
-        testServerWithBrokenHead = ServerAccess.getIndependentInstance(JavaSystemProperties.getJavaTempDir(), ServerAccess.findFreePort());
-        testServerWithBrokenHead.setSupportingHeadRequest(false);
-        redirectErrBack();
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        testServer.stop();
-    }
-
-    @AfterClass
-    public static void stopServer2() {
-        testServerWithBrokenHead.stop();
-    }
-
-    @BeforeClass
-    public static void setupCache() throws IOException {
-        File dir = new File(JavaSystemProperties.getJavaTempDir(), "itw-down");
-        dir.mkdirs();
-        dir.deleteOnExit();
-
-        redirectErr();
-        downloadServer = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), ServerAccess.findFreePort());
-        redirectErrBack();
+    @Before
+    public void startServer() throws Exception {
+        final File serverDir = temporaryFolder.newFolder();
 
         cacheDir = PathsAndFiles.CACHE_DIR.getFullPath();
-        PathsAndFiles.CACHE_DIR.setValue(new File(JavaSystemProperties.getJavaTempDir(), "tempcache").getCanonicalPath());
+        PathsAndFiles.CACHE_DIR.setValue(temporaryFolder.newFolder().getCanonicalPath());
+
+        testServer = ServerAccess.getIndependentInstance(serverDir.getAbsolutePath(), ServerAccess.findFreePort());
+        testServerWithBrokenHead = ServerAccess.getIndependentInstance(serverDir.getAbsolutePath(), ServerAccess.findFreePort());
+        testServerWithBrokenHead.setSupportingHeadRequest(false);
+        downloadServer = ServerAccess.getIndependentInstance(temporaryFolder.newFolder().getAbsolutePath(), ServerAccess.findFreePort());
+        Thread.sleep(20);
     }
 
-    @AfterClass
-    public static void teardownCache() {
+    @After
+    public void stopServer() {
+        testServerWithBrokenHead.stop();
+        testServer.stop();
         downloadServer.stop();
 
-        Cache.clearCache();
         PathsAndFiles.CACHE_DIR.setValue(cacheDir);
     }
-
-    private File setupFile(String fileName, String text) throws IOException {
-        File downloadDir = downloadServer.getDir();
-        File file = new File(downloadDir, fileName);
-        file.createNewFile();
-        Files.write(file.toPath(), text.getBytes(UTF_8));
-        file.deleteOnExit();
-
-        return file;
-    }
-
-    private Resource setupResource(String fileName, String text) throws IOException {
-        File f = setupFile(fileName, text);
-        URL url = downloadServer.getUrl(fileName);
-        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
-        return resource;
-    }
-
-    private String readFile(File downloadedFile) throws IOException {
-        return new String(Files.readAllBytes(downloadedFile.toPath()), UTF_8);
-    }
-
 
     @Test
     public void testDownloadResource() throws IOException {
@@ -285,6 +224,22 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         resourceDownloader.runDownload();
 
         assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
+    }
+
+    private File setupFile(String fileName, String text) throws IOException {
+        final File file = new File(downloadServer.getDir(), fileName);
+        Files.write(file.toPath(), text.getBytes(UTF_8));
+        return file;
+    }
+
+    private Resource setupResource(String fileName, String text) throws IOException {
+        setupFile(fileName, text);
+        final URL url = downloadServer.getUrl(fileName);
+        return Resource.createResource(url, null, null, UpdatePolicy.NEVER);
+    }
+
+    private String readFile(File downloadedFile) throws IOException {
+        return new String(Files.readAllBytes(downloadedFile.toPath()), UTF_8);
     }
 
     private void setupPackGzFile(String fileName, String version) throws IOException {
