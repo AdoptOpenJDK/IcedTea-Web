@@ -39,6 +39,8 @@ import static org.junit.Assert.assertTrue;
 @NotThreadSafe
 public class ResourceDownloaderTest extends NoStdOutErrTest {
 
+    private static final String MANIFEST_VERSION = "1.2";
+
     private static ServerLauncher testServer;
     private static ServerLauncher testServerWithBrokenHead;
     private static ServerLauncher downloadServer;
@@ -104,107 +106,99 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @Test
     public void testDownloadResource() throws IOException {
-        String expected = "testDownloadResource";
-        Resource resource = setupResource("download-resource", expected);
+        final String expected = "testDownloadResource";
+        final Resource resource = setupResource("download-resource", expected);
 
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.runInitialize();
         resourceDownloader.runDownload();
 
-        File downloadedFile = resource.getLocalFile();
+        final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        String output = readFile(downloadedFile);
+        final String output = readFile(downloadedFile);
         assertEquals(expected, output);
     }
 
     @Test
     public void testDownloadPackGzResource() throws IOException {
-        String expected = "1.2";
+        setupPackGzFile("download-packgz");
 
-        setupPackGzFile("download-packgz", expected);
+        final Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
 
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
-
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
 
         resourceDownloader.runInitialize();
         resourceDownloader.runDownload();
 
-        File downloadedFile = resource.getLocalFile();
+        final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        JarFile jf = new JarFile(downloadedFile);
-        Manifest m = jf.getManifest();
-        String actual = (String) m.getMainAttributes().get(Attributes.Name.MANIFEST_VERSION);
+        final JarFile jf = new JarFile(downloadedFile);
+        final Manifest m = jf.getManifest();
+        final String actual = (String) m.getMainAttributes().get(Attributes.Name.MANIFEST_VERSION);
 
-        assertEquals(expected, actual);
+        assertEquals(MANIFEST_VERSION, actual);
     }
 
     @Test
     public void testDownloadVersionedResource() throws IOException {
-        String expected = "testVersionedResource";
+        final String expected = "testVersionedResource";
         setupFile("download-version__V1.0.jar", expected);
 
-        URL url = downloadServer.getUrl("download-version.jar");
-        Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
+        final URL url = downloadServer.getUrl("download-version.jar");
+        final Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
 
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.runInitialize();
         resourceDownloader.runDownload();
 
-        File downloadedFile = resource.getLocalFile();
+        final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        String output = readFile(downloadedFile);
+        final String output = readFile(downloadedFile);
         assertEquals(expected, output);
     }
 
     @Test
     public void testDownloadVersionedPackGzResource() throws IOException {
-        String expected = "1.2";
+        setupPackGzFile("download-packgz__V1.0");
+        final Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
 
-        setupPackGzFile("download-packgz__V1.0", expected);
-
-        Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
-
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
-
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
 
         resourceDownloader.runInitialize();
         resourceDownloader.runDownload();
 
-        File downloadedFile = resource.getLocalFile();
+        final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
 
-        JarFile jf = new JarFile(downloadedFile);
-        Manifest m = jf.getManifest();
-        String actual = (String) m.getMainAttributes().get(Attributes.Name.MANIFEST_VERSION);
+        final JarFile jf = new JarFile(downloadedFile);
+        final Manifest m = jf.getManifest();
+        final String actual = (String) m.getMainAttributes().get(Attributes.Name.MANIFEST_VERSION);
 
-        assertEquals(expected, actual);
+        assertEquals(MANIFEST_VERSION, actual);
     }
 
     @Test
     public void testDownloadLocalResourceFails() throws IOException {
-        String expected = "local-resource";
-        File localFile = Files.createTempFile("download-local", ".temp").toFile();
-        localFile.createNewFile();
-        Files.write(localFile.toPath(), expected.getBytes());
-        localFile.deleteOnExit();
+        final String expected = "local-resource";
+        final File localFile = temporaryFolder.newFile();
+        Files.write(localFile.toPath(), expected.getBytes(UTF_8));
 
-        String stringURL = "file://" + localFile.getAbsolutePath();
-        URL url = new URL(stringURL);
+        final String stringURL = "file://" + localFile.getAbsolutePath();
+        final URL url = new URL(stringURL);
 
-        Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
+        final Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
 
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.runInitialize();
@@ -215,9 +209,9 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
 
     @Test
     public void testDownloadNotExistingResourceFails() throws IOException {
-        Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
+        final Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
 
-        ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
+        final ResourceDownloader resourceDownloader = new ResourceDownloader(resource, new Object());
 
         resource.changeStatus(null, EnumSet.of(Resource.Status.PRECONNECT));
         resourceDownloader.runInitialize();
@@ -226,48 +220,41 @@ public class ResourceDownloaderTest extends NoStdOutErrTest {
         assertTrue(resource.hasAllFlags(EnumSet.of(Resource.Status.ERROR)));
     }
 
-    private File setupFile(String fileName, String text) throws IOException {
+    private void setupFile(String fileName, String text) throws IOException {
         final File file = new File(downloadServer.getDir(), fileName);
         Files.write(file.toPath(), text.getBytes(UTF_8));
-        return file;
     }
 
     private Resource setupResource(String fileName, String text) throws IOException {
         setupFile(fileName, text);
         final URL url = downloadServer.getUrl(fileName);
-        return Resource.createResource(url, null, null, UpdatePolicy.NEVER);
+        return Resource.createResource(url, null, DownloadOptions.NONE, UpdatePolicy.NEVER);
     }
 
     private String readFile(File downloadedFile) throws IOException {
         return new String(Files.readAllBytes(downloadedFile.toPath()), UTF_8);
     }
 
-    private void setupPackGzFile(String fileName, String version) throws IOException {
-        File downloadDir = downloadServer.getDir();
+    private void setupPackGzFile(String fileName) throws IOException {
+        final File downloadDir = downloadServer.getDir();
 
-        File orig = new File(downloadDir, fileName + ".jar");
-        orig.deleteOnExit();
-        Manifest manifest = new Manifest();
-        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, version);
-        JarOutputStream target = new JarOutputStream(new FileOutputStream(orig), manifest);
-        target.close();
+        final File jar = new File(downloadDir, fileName + ".jar");
+        final Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, ResourceDownloaderTest.MANIFEST_VERSION);
+        final JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(jar), manifest);
+        jarOut.close();
 
-        File pack = new File(downloadDir, fileName + ".jar.pack");
-        pack.deleteOnExit();
+        final File pack = new File(downloadDir, fileName + ".jar.pack");
 
-        JarFile jarFile = new JarFile(orig.getAbsolutePath());
-        FileOutputStream fos = new FileOutputStream(pack);
-        Pack200.Packer p = Pack200.newPacker();
+        final JarFile jarFile = new JarFile(jar.getAbsolutePath());
+        final FileOutputStream fos = new FileOutputStream(pack);
+        final Pack200.Packer p = Pack200.newPacker();
         p.pack(jarFile, fos);
         fos.close();
 
-        File packgz = new File(downloadDir, fileName + ".jar.pack.gz");
-        packgz.deleteOnExit();
-        FileOutputStream gzfos = new FileOutputStream(packgz);
-        GZIPOutputStream gos = new GZIPOutputStream(gzfos);
-
+        final File packgz = new File(downloadDir, fileName + ".jar.pack.gz");
+        final GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(packgz));
         gos.write(Files.readAllBytes(pack.toPath()));
-        gos.finish();
         gos.close();
     }
 }
