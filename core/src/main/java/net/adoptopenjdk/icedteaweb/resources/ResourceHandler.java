@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 
 public class ResourceHandler {
 
@@ -29,14 +30,24 @@ public class ResourceHandler {
     public Future<Resource> putIntoCache() {
         final CompletableFuture<Resource> result = new CompletableFuture<>();
 
-        initNoneCacheableResources();
+        // the thread which is processing this resource will set its future onto the resource all other
+        // threads will return this future and ensure a resource is only processed by a single thread
+        synchronized (resource) {
+            final Future<Resource> futureResource = resource.getFutureThis();
+            if (futureResource != null) {
+                return futureResource;
+            }
+            resource.startProcessing(result);
+        }
 
-        if (isAlreadyCompleted()) {
+        if (resource.isComplete()) {
             result.complete(resource);
+        } else if (isNotCacheable()) {
+            result.complete(initNoneCacheableResources());
         } else {
             localExecutor.execute(() -> {
                 try {
-                    result.complete(downloadResource());
+                    result.complete(download());
                 } catch (Exception e) {
                     result.completeExceptionally(e);
                 }
@@ -46,44 +57,36 @@ public class ResourceHandler {
         return result;
     }
 
-    private void initNoneCacheableResources() {
-        if (!CacheUtil.isCacheable(resource.getLocation())) {
-            resource.setStatus(DOWNLOADED);
+    private boolean isNotCacheable() {
+        return !CacheUtil.isCacheable(resource.getLocation());
+    }
 
-            synchronized (resource) {
-                if (resource.isComplete()) {
-                    return;
-                }
+    private Resource initNoneCacheableResources() {
+        resource.setStatus(DOWNLOADED);
+        if (resource.getLocation().getProtocol().equals("file")) {
+            final File file = new File(resource.getLocation().getPath());
+            resource.setSize(file.length());
+            resource.setLocalFile(file);
+            resource.setTransferred(file.length());
+        }
+        return resource;
+    }
 
-                if (resource.getLocation().getProtocol().equals("file")) {
-                    final File file = new File(resource.getLocation().getPath());
-                    resource.setSize(file.length());
-                    resource.setLocalFile(file);
-                    resource.setTransferred(file.length());
+    private Resource download() {
+        int triesLeft = 2;
+        while (true) {
+            try {
+                return downloadResource();
+            } catch (Exception e) {
+                if (--triesLeft <= 0) {
+                    resource.setStatus(ERROR);
+                    throw e;
                 }
-                resource.setStatus(DOWNLOADED);
-                resource.notifyAll();
             }
         }
     }
 
-    private boolean isAlreadyCompleted() {
-        synchronized (resource) {
-            return resource.isComplete();
-        }
-    }
-
-    private Resource downloadResource() throws InterruptedException {
-        final boolean alreadyBeingProcessed;
-        synchronized (resource) {
-            alreadyBeingProcessed = resource.isBeingProcessed();
-            resource.startProcessing();
-        }
-
-        if (alreadyBeingProcessed) {
-            return waitForResource();
-        }
-
+    private Resource downloadResource() {
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {
@@ -91,17 +94,5 @@ public class ResourceHandler {
             downloader.download();
         }
         return resource;
-    }
-
-    private Resource waitForResource() throws InterruptedException {
-        while (true) {
-            synchronized (resource) {
-                if (resource.isComplete()) {
-                    return resource;
-                }
-
-                resource.wait();
-            }
-        }
     }
 }

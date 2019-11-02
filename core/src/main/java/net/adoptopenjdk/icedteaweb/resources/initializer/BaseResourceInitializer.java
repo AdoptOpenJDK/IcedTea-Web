@@ -48,14 +48,10 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     InitializationResult initFromCache(VersionId version) {
         final File cachedFile = Cache.getCacheFile(this.resource.getLocation(), version);
 
-        synchronized (resource) {
-            resource.setSize(cachedFile.length());
-            resource.setLocalFile(cachedFile);
-            resource.setDownloadVersion(version);
-            resource.setTransferred(cachedFile.length());
-            resource.setStatus(DOWNLOADED);
-            resource.notifyAll();
-        }
+        resource.setStatus(DOWNLOADED);
+        resource.setSize(cachedFile.length());
+        resource.setLocalFile(cachedFile);
+        resource.setTransferred(cachedFile.length());
 
         LOG.debug("Use cached version of resource {}", resource);
 
@@ -63,10 +59,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     }
 
     InitializationResult initFromHeadResult(UrlRequestResult requestResult) {
-        synchronized (resource) {
-            resource.setSize(requestResult.getContentLength());
-        }
-
+        resource.setSize(requestResult.getContentLength());
         return new InitializationResult(requestResult);
     }
 

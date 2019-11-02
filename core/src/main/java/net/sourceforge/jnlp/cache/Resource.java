@@ -24,6 +24,7 @@ import net.sourceforge.jnlp.util.WeakList;
 import java.io.File;
 import java.net.URL;
 import java.util.Objects;
+import java.util.concurrent.Future;
 
 /**
  * <p>
@@ -70,8 +71,8 @@ public class Resource {
     /** total size of the resource, or -1 if unknown */
     private volatile long size = -1;
 
-    /** true if this resource is being processed */
-    private volatile boolean isBeingProcessed = false;
+    /** A future to wait for completion of download of this resource */
+    private volatile Future<Resource> futureThis;
 
     /** the status of the resource */
     private volatile Status status = Status.INCOMPLETE;
@@ -189,12 +190,16 @@ public class Resource {
         this.size = size;
     }
 
-    public boolean isBeingProcessed() {
-        return isBeingProcessed;
+    boolean isBeingProcessed() {
+        return futureThis != null;
     }
 
-    public void startProcessing() {
-        isBeingProcessed = true;
+    public void startProcessing(Future<Resource> futureThis) {
+        this.futureThis = futureThis;
+    }
+
+    public Future<Resource> getFutureThis() {
+        return futureThis;
     }
 
     /**

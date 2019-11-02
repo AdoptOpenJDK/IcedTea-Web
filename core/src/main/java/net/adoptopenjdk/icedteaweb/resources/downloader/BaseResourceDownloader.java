@@ -62,10 +62,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .findFirst()
                 .orElseGet(() -> {
                     LOG.warn("could not download resource {} from any of theses urls {}", resource, downloadUrls);
-                    synchronized (resource) {
-                        resource.setStatus(ERROR);
-                        resource.notifyAll();
-                    }
+                    resource.setStatus(ERROR);
                     return resource;
                 });
     }
@@ -90,11 +87,8 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             final long bytesTransferred = tryDownloading(downloadDetails);
 
-            synchronized (resource) {
-                resource.setStatus(DOWNLOADED);
-                resource.setTransferred(bytesTransferred);
-                resource.notifyAll();
-            }
+            resource.setStatus(DOWNLOADED);
+            resource.setTransferred(bytesTransferred);
             return resource;
         } catch (Exception ex) {
             LOG.warn("Exception while downloading resource {} from {} - {}", resource, downloadFrom, ex.getMessage());
