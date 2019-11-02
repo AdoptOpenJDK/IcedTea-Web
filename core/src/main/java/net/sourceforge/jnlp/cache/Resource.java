@@ -47,23 +47,29 @@ import java.util.concurrent.Future;
  */
 public class Resource {
 
+    /** list of weak references of resources currently in use */
+    private static final WeakList<Resource> resources = new WeakList<>();
+
     public enum Status {
         INCOMPLETE,
         DOWNLOADED,
         ERROR,
     }
 
-    /** list of weak references of resources currently in use */
-    private static final WeakList<Resource> resources = new WeakList<>();
-
     /** the remote location of the resource */
     private final URL location;
 
-    /** the local file downloaded to */
-    private File localFile;
-
     /** the requested version */
     private final VersionString requestVersion;
+
+    /** Update policy for this resource */
+    private final UpdatePolicy updatePolicy;
+
+    /** Download options for this resource */
+    private final DownloadOptions downloadOptions;
+
+    /** the local file downloaded to */
+    private File localFile;
 
     /** amount in bytes transferred */
     private volatile long transferred = 0;
@@ -76,12 +82,6 @@ public class Resource {
 
     /** the status of the resource */
     private volatile Status status = Status.INCOMPLETE;
-
-    /** Update policy for this resource */
-    private final UpdatePolicy updatePolicy;
-
-    /** Download options for this resource */
-    private final DownloadOptions downloadOptions;
 
     /**
      * Create a resource.
