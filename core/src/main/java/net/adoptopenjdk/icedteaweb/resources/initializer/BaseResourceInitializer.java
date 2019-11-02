@@ -8,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -59,7 +58,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
     InitializationResult initFromHeadResult(UrlRequestResult requestResult) {
         resource.setSize(requestResult.getContentLength());
-        return new InitializationResult(requestResult);
+        return new InitializationResult(requestResult.getUrl());
     }
 
     void invalidateExistingEntryInCache(VersionId version) {
@@ -124,12 +123,10 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
             if (!response.isSuccess()) {
                 LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm());
+                return null;
             }
 
             LOG.debug("Best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
-            if (response.getLocation() == null) {
-                return response.withLocation(url);
-            }
             return response;
         } catch (IOException e) {
             LOG.debug("While processing {}  by {} for resource {} got {}", url, requestMethod, resource, e.getMessage());

@@ -3,7 +3,6 @@ package net.adoptopenjdk.icedteaweb.resources.initializer;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 

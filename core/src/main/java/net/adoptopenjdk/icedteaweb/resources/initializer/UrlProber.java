@@ -43,7 +43,6 @@ import net.adoptopenjdk.icedteaweb.http.HttpUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 
 import java.io.IOException;
 import java.net.URL;
@@ -74,6 +73,7 @@ class UrlProber {
             LOG.debug("URL connection '{}' header fields: {}", url, connection.getHeaderFields());
 
             return new UrlRequestResult(
+                    connection.getURL(),
                     connection.getResponseCode(),
                     connection.getLocationHeaderFieldUrl(),
                     getJnlpVersionHeader(connection),

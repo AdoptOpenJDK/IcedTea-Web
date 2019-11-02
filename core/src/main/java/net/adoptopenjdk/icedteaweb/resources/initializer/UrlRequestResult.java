@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.resources;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 
@@ -8,18 +8,21 @@ import java.net.URL;
  * This class stores some result details such as response code, HTTP header field "Location", last modified
  * and content length of a url request.
  */
-public class UrlRequestResult {
+class UrlRequestResult {
+
+    private final URL url;
     private final int responseCode;
-    private final URL location; // HTTP header field "Location" as URL (redirection or newly created resource)
+    private final URL location; // HTTP header field "Location" (used for redirection)
     private final VersionId version;
     private final long lastModified;
     private final long contentLength;
 
-    public UrlRequestResult(int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
+    UrlRequestResult(URL url, int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
         if (isRedirectResponseCode(responseCode) && location == null) {
             throw new IllegalStateException("Redirect response code found but location URL is null.");
         }
 
+        this.url = url;
         this.responseCode = responseCode;
         this.location = location;
         this.version = version;
@@ -27,29 +30,23 @@ public class UrlRequestResult {
         this.contentLength = contentLength;
     }
 
-    /**
-     * Create a new {@link UrlRequestResult} based on this with the given redirect url.
-     *
-     * @param location the location
-     * @return a new {@link UrlRequestResult} based on this with the given redirect url
-     */
-    public UrlRequestResult withLocation(final URL location) {
-        return new UrlRequestResult(responseCode, location, version, lastModified, contentLength);
+    URL getUrl() {
+        return url;
     }
 
-    public URL getLocation() {
+    URL getLocation() {
         return location;
     }
 
-    public VersionId getVersion() {
+    VersionId getVersion() {
         return version;
     }
 
-    public int getResponseCode() {
+    int getResponseCode() {
         return responseCode;
     }
 
-    public long getContentLength() {
+    long getContentLength() {
         return contentLength;
     }
 
@@ -61,7 +58,7 @@ public class UrlRequestResult {
      * @return whether this {@link UrlRequestResult} represents a valid redirect with a location
      * and a redirect result code (one of 301-303 or 307-308)
      */
-    public boolean isRedirect() {
+    boolean isRedirect() {
         return isRedirectResponseCode(responseCode);
     }
 
@@ -86,8 +83,10 @@ public class UrlRequestResult {
     @Override
     public String toString() {
         return ""
-                + "location: " + (location == null ? "null" : location.toExternalForm()) + "; "
+                + "url:" + url + "; "
                 + "responseCode:" + responseCode + "; "
+                + "location: " + location + "; "
+                + "version: " + version + "; "
                 + "lastModified: " + lastModified + "; "
                 + "contentLength: " + contentLength + "; ";
     }
