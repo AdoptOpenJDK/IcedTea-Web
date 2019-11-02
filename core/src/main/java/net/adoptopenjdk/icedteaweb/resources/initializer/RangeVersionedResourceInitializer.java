@@ -4,7 +4,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 
 import java.net.URL;
@@ -12,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionString.ANY_VERSION;
-import static net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator.getUrl;
-import static net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator.getVersionedUrl;
+import static net.adoptopenjdk.icedteaweb.resources.initializer.ResourceUrlCreator.getUrl;
+import static net.adoptopenjdk.icedteaweb.resources.initializer.ResourceUrlCreator.getVersionedUrl;
 
 /**
  * Initializer for resources with a version range.

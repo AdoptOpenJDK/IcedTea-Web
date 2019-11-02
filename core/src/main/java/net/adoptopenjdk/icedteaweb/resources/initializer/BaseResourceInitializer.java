@@ -8,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator;
 import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -106,7 +105,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
             final Map<String, String> requestProperties = new HashMap<>();
             requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
 
-            final UrlRequestResult response = ResourceUrlCreator.getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
+            final UrlRequestResult response = UrlProber.getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
             if (response.getResponseCode() == 511 && !InetSecurity511Panel.isSkip()) {
                 boolean result511 = SecurityDialogs.show511Dialogue(resource);
                 if (!result511) {
