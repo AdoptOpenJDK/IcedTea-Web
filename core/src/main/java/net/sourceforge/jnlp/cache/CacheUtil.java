@@ -23,7 +23,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -31,7 +30,6 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
-import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -170,7 +168,7 @@ public class CacheUtil {
                  * So without mercy, hash it
                  */
                 String hexed = hex(new File(locationPath).getName(), locationPath);
-                return new File(path.toString(), hexed.toString());
+                return new File(path.toString(), hexed);
             } catch (NoSuchAlgorithmException ex) {
                 // should not occur, cite from javadoc:
                 // every java implementation should support
@@ -322,20 +320,4 @@ public class CacheUtil {
 
         return indicator.getListener(title, undownloaded);
     }
-
-    static ResourceInfo getInfoFromCache(URL location, VersionString versionString) {
-        if (!isCacheable(location)) {
-            return null;
-        }
-        if (versionString == null) {
-            return Cache.getInfo(location, null);
-        }
-
-        final VersionId versionId = Cache.getBestMatchingVersionInCache(location, versionString);
-        if (versionId == null) {
-            return null;
-        }
-        return Cache.getInfo(location, versionId);
-    }
-
 }
