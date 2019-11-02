@@ -1,4 +1,4 @@
-/* 
+/*
  Copyright (C) 2013 Red Hat, Inc.
 
  This file is part of IcedTea.
@@ -43,9 +43,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributes;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestBoolean;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
@@ -243,7 +243,7 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
 
     }
-   
+
     @Test
     @Ignore
     public void removeTitle() throws Exception {

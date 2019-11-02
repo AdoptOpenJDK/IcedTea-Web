@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 @SuppressWarnings("serial")
 public class IllegalResourceDescriptorException extends IllegalArgumentException {

@@ -23,8 +23,8 @@
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 
 import java.io.IOException;
 import java.net.URL;

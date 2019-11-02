@@ -40,10 +40,10 @@ package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InformationElement;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.util.ImageResources;
 
 import javax.imageio.ImageIO;
@@ -129,8 +129,8 @@ public class JNLPSplashScreen extends JDialog {
             splash.setInformationElement(InformationElement.createFromJNLP(file));
         }
     }
-    
-    
+
+
 
     public boolean isSplashImageLoaded() {
         return splashImageLoaded;

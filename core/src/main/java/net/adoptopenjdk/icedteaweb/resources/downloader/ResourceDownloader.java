@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.Resource;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
 
 import java.net.URL;
 import java.util.List;

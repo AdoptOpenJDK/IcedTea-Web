@@ -6,12 +6,12 @@ import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
+import net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator;
+import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.cache.CachedDaemonThreadPoolProvider;
-import net.sourceforge.jnlp.cache.Resource;
-import net.sourceforge.jnlp.cache.ResourceUrlCreator;
-import net.sourceforge.jnlp.cache.UrlRequestResult;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 
 /**
  * Base class with commonly used methods.

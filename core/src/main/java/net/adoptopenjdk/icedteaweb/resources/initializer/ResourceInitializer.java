@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.Resource;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 public interface ResourceInitializer {

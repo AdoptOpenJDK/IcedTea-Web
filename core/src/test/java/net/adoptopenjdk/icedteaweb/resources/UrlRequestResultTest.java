@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import org.junit.Test;
 

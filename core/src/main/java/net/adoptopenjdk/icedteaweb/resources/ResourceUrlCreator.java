@@ -34,7 +34,7 @@ or based on this library.  If you modify this library, you may extend
 this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;

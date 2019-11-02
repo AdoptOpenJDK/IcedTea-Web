@@ -6,10 +6,10 @@ import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
-import net.sourceforge.jnlp.cache.CachedDaemonThreadPoolProvider;
-import net.sourceforge.jnlp.cache.Resource;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.ByteArrayInputStream;
@@ -27,8 +27,8 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 
 /**
  * Base class for resource downloader.

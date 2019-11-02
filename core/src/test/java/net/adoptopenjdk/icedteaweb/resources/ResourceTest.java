@@ -35,7 +35,7 @@
  exception statement from your version.
  */
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import org.junit.Test;
@@ -44,7 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ResourceTest {

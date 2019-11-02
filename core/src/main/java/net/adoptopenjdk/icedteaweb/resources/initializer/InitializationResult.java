@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources.initializer;
 
-import net.sourceforge.jnlp.cache.UrlRequestResult;
+import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 
 import java.net.URL;
 import java.util.ArrayList;

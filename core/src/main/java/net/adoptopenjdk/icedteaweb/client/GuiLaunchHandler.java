@@ -37,18 +37,19 @@ exception statement from your version. */
 
 package net.adoptopenjdk.icedteaweb.client;
 
-import java.net.URL;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.AbstractLaunchHandler;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
+
+import java.net.URL;
 
 /**
  * A {@link LaunchHandler} that gives feedback to the user using GUI elements

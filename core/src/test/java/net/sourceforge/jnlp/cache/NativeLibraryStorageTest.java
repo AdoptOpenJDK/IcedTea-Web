@@ -38,6 +38,8 @@ exception statement from your version.
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.jcip.annotations.NotThreadSafe;
 import org.junit.Test;

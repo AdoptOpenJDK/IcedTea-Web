@@ -5,8 +5,6 @@ import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.cache.Resource;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.JarFile;

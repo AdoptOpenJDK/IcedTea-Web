@@ -14,15 +14,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.ResourceHandler;
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
@@ -39,8 +39,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.cache.Resource.createResource;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
 /**
@@ -293,7 +293,7 @@ public class ResourceTracker {
      * @throws java.lang.InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    void waitForResources(URL... urls) throws InterruptedException {
+    public void waitForResources(URL... urls) throws InterruptedException {
         if (urls.length > 0) {
             wait(getResources(urls));
         }
@@ -310,7 +310,7 @@ public class ResourceTracker {
      * @throws java.lang.InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
+    public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
         if (urls.length > 0) {
             return wait(getResources(urls), timeout, timeUnit);
         }
@@ -324,7 +324,7 @@ public class ResourceTracker {
      * @return the number of bytes transferred
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    long getAmountRead(URL location) {
+    public long getAmountRead(URL location) {
         // not atomic b/c transferred is a long, but so what (each
         // byte atomic? so probably won't affect anything...)
         return getResource(location).getTransferred();
@@ -338,7 +338,7 @@ public class ResourceTracker {
      * @return resource availability
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    boolean checkResource(URL location) {
+    public boolean checkResource(URL location) {
         Resource resource = getResource(location);
         return resource.isComplete();
     }
@@ -351,7 +351,7 @@ public class ResourceTracker {
      * @return the number of bytes, or -1
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
-    long getTotalSize(URL location) {
+    public long getTotalSize(URL location) {
         return getResource(location).getSize(); // atomic
     }
 

@@ -3,10 +3,10 @@ package net.adoptopenjdk.icedteaweb.resources.initializer;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.sourceforge.jnlp.cache.Resource;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 
 /**
  * Class to initialize resources in case the application runs in offline mode.

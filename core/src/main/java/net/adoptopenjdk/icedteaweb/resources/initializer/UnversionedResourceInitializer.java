@@ -2,17 +2,17 @@ package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
+import net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator;
+import net.adoptopenjdk.icedteaweb.resources.UrlRequestResult;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
-import net.sourceforge.jnlp.cache.Resource;
-import net.sourceforge.jnlp.cache.ResourceUrlCreator;
-import net.sourceforge.jnlp.cache.UrlRequestResult;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.cache.ResourceUrlCreator.getUrl;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceUrlCreator.getUrl;
 
 /**
  * Initializer for unversioned resources.

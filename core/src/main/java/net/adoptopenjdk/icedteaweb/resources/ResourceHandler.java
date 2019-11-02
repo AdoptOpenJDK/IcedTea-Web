@@ -6,7 +6,6 @@ import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.Resource;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -14,8 +13,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
-import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 
 public class ResourceHandler {
 
