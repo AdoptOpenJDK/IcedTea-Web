@@ -635,7 +635,7 @@ public final class DeploymentConfiguration {
                 }
             }
         } catch (final Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.warn("Exception while loading comment form config file: {}", ex.getMessage());
         }
 
         return r.toString().trim();
