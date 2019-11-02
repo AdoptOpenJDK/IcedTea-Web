@@ -42,6 +42,9 @@
                                 <includes>
                                     <include>net.adoptopenjdk:*</include>
                                 </includes>
+                                <excludes>
+                                    <exclude>net.adoptopenjdk:icedtea-web-no-dependencies</exclude>
+                                </excludes>
                             </artifactSet>
                             <transformers>
                                 <transformer

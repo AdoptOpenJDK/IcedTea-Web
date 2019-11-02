@@ -21,6 +21,7 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.AdvancedProxySettingsDialog;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.DocumentAdapter;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
+import net.adoptopenjdk.icedteaweb.client.util.UiLock;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -66,14 +67,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
     private JPanel description;
     private final ArrayList<JPanel> proxyPanels = new ArrayList<>(); // The stuff with editable fields
 
-    /** List of properties used by this panel */
-    public static String[] properties = {
-            ConfigurationConstants.KEY_PROXY_TYPE,
-            ConfigurationConstants.KEY_PROXY_HTTP_HOST,
-            ConfigurationConstants.KEY_PROXY_HTTP_PORT,
-            ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
-            ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL
-    };
+    private final UiLock uiLock;
 
     /**
      * Creates a new instance of the network settings panel.
@@ -84,6 +78,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
     public NetworkSettingsPanel(DeploymentConfiguration config) {
         super();
         this.config = config;
+        this.uiLock = new UiLock(config);
         setLayout(new BorderLayout());
 
         addComponents();
@@ -120,13 +115,16 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
 
         JLabel addressLabel = new JLabel(Translator.R("NSAddress") + ":");
         JLabel portLabel = new JLabel(Translator.R("NSPort") + ":");
-        final JTextField addressField = new JTextField(config.getProperty(properties[1]), 10);
-        addressField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[1]));
+        final JTextField addressField = new JTextField(config.getProperty(ConfigurationConstants.KEY_PROXY_HTTP_HOST), 10);
+        addressField.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST));
+        uiLock.update(ConfigurationConstants.KEY_PROXY_HTTP_HOST, addressField);
+
 
         final JTextField portField = new JTextField(5);
         portField.setDocument(NetworkSettingsPanel.getPortNumberDocument());
-        portField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[2]));
-        portField.setText(config.getProperty(properties[2]));
+        portField.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT));
+        portField.setText(config.getProperty(ConfigurationConstants.KEY_PROXY_HTTP_PORT));
+        uiLock.update(ConfigurationConstants.KEY_PROXY_HTTP_PORT, portField);
 
         // Create the button which allows setting of other types of proxy.
         JButton advancedProxyButton = new JButton(Translator.R("NSAdvanced") + "...");
@@ -134,16 +132,17 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AdvancedProxySettingsDialog.showAdvancedProxySettingsDialog(config);
-                addressField.setText(config.getProperty(properties[1]));
-                portField.setText(config.getProperty(properties[2]));
+                addressField.setText(config.getProperty(ConfigurationConstants.KEY_PROXY_HTTP_HOST));
+                portField.setText(config.getProperty(ConfigurationConstants.KEY_PROXY_HTTP_PORT));
             }
         });
 
-        JCheckBox bypassCheckBox = new JCheckBox(Translator.R("NSBypassLocal"), Boolean.parseBoolean(config.getProperty(properties[3])));
+        JCheckBox bypassCheckBox = new JCheckBox(Translator.R("NSBypassLocal"), Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL)));
+        uiLock.update(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL, bypassCheckBox);
         bypassCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                config.setProperty(properties[3], String.valueOf(e.getStateChange() == ItemEvent.SELECTED));
+                config.setProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL, String.valueOf(e.getStateChange() == ItemEvent.SELECTED));
             }
         });
         c.gridy = 0;
@@ -165,21 +164,26 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         proxyServerPanel.add(proxyLocationPanel);
         proxyServerPanel.add(proxyBypassPanel);
 
-        JRadioButton directConnection = new JRadioButton(Translator.R("NSDirectConnection"), config.getProperty(properties[0]).equals("0"));
+        JRadioButton directConnection = new JRadioButton(Translator.R("NSDirectConnection"), config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE).equals("0"));
         directConnection.setActionCommand("0");
         directConnection.addActionListener(this);
+        uiLock.update(ConfigurationConstants.KEY_PROXY_TYPE, directConnection);
 
-        JRadioButton useProxyServer = new JRadioButton(Translator.R("NSManualProxy"), config.getProperty(properties[0]).equals("1"));
+
+        JRadioButton useProxyServer = new JRadioButton(Translator.R("NSManualProxy"), config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE).equals("1"));
         useProxyServer.setActionCommand("1");
         useProxyServer.addActionListener(this);
+        uiLock.update(ConfigurationConstants.KEY_PROXY_TYPE, useProxyServer);
 
-        JRadioButton useAutoProxyConfigScript = new JRadioButton(Translator.R("NSAutoProxy"), config.getProperty(properties[0]).equals("2"));
+        JRadioButton useAutoProxyConfigScript = new JRadioButton(Translator.R("NSAutoProxy"), config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE).equals("2"));
         useAutoProxyConfigScript.setActionCommand("2");
         useAutoProxyConfigScript.addActionListener(this);
+        uiLock.update(ConfigurationConstants.KEY_PROXY_TYPE, useAutoProxyConfigScript);
 
-        JRadioButton useBrowserSettings = new JRadioButton(Translator.R("NSBrowserProxy"), config.getProperty(properties[0]).equals("3"));
+        JRadioButton useBrowserSettings = new JRadioButton(Translator.R("NSBrowserProxy"), config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE).equals("3"));
         useBrowserSettings.setActionCommand("3");
         useBrowserSettings.addActionListener(this);
+        uiLock.update(ConfigurationConstants.KEY_PROXY_TYPE, useBrowserSettings);
 
         ButtonGroup modeSelect = new ButtonGroup();
         modeSelect.add(useBrowserSettings);
@@ -190,8 +194,9 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
         // Settings for Automatic Proxy Configuration Script
         JPanel proxyAutoPanel = new JPanel(new GridBagLayout());
         JLabel locationLabel = new JLabel(Translator.R("NSScriptLocation") + ":");
-        final JTextField locationField = new JTextField(config.getProperty(properties[4]), 20);
-        locationField.getDocument().addDocumentListener(new DocumentAdapter(config, properties[4]));
+        final JTextField locationField = new JTextField(config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL), 20);
+        locationField.getDocument().addDocumentListener(new DocumentAdapter(config, ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL));
+        uiLock.update(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL, locationField);
 
         c.gridx = 0;
         proxyAutoPanel.add(Box.createHorizontalStrut(20), c);
@@ -255,7 +260,7 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        config.setProperty(properties[0], e.getActionCommand());
+        config.setProperty(ConfigurationConstants.KEY_PROXY_TYPE, e.getActionCommand());
         setState();
     }
 
@@ -263,8 +268,8 @@ public class NetworkSettingsPanel extends JPanel implements ActionListener {
      * This enables and disables the appropriate panels.
      */
     private void setState() {
-        ((CardLayout) this.description.getLayout()).show(this.description, config.getProperty(properties[0]));
-        switch (config.getProperty(properties[0])) {
+        ((CardLayout) this.description.getLayout()).show(this.description, config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE));
+        switch (config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE)) {
             case "0":
                 for (JPanel panel : proxyPanels)
                     enablePanel(panel, false);

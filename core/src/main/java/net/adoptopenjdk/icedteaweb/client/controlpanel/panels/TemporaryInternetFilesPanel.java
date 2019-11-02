@@ -22,6 +22,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheAppViewer;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheViewer;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ComboItem;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
+import net.adoptopenjdk.icedteaweb.client.util.UiLock;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -89,11 +90,15 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
     private final JButton bCleanByApp;
     private final JPanel diskSpacePanel;
 
+    private final UiLock uiLock;
+
     public TemporaryInternetFilesPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPHeadTempInternetFiles"));
         this.config = config;
+        this.uiLock = new UiLock(config);
         setLayout(new BorderLayout());
         cacheSizeSpinner = new JSpinner();
+        uiLock.update(ConfigurationConstants.KEY_CACHE_MAX_SIZE, cacheSizeSpinner);
         limitCacheSizeCheckBox = new JCheckBox(Translator.R("TIFPLimitCacheSize"));
         cacheSizeWarningLabel = new JLabel();
         lCacheSize = new JLabel(Translator.R("TIFPCacheSize") + ":");
@@ -109,6 +114,8 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
                 new ComboItem("8", "8"),
                 new ComboItem(Translator.R("TIFPMax"), "9"),};
         cbCompression = new JComboBox<>(compressionOptions);
+        uiLock.update(ConfigurationConstants.KEY_CACHE_COMPRESSION_ENABLED, cbCompression);
+
         lCompression = new JLabel(Translator.R("TIFPCompressionLevel") + ":"); // Sets compression level for jar files.
 
         bLocation = new JButton(Translator.R("TIFPChange") + "...");
@@ -420,6 +427,8 @@ public class TemporaryInternetFilesPanel extends NamedBorderPanel {
     private void showCacheSizeSpinnerGUIElements(boolean bool){
         lCacheSize.setEnabled(bool);
         cacheSizeSpinner.setEnabled(bool);
+        uiLock.update(ConfigurationConstants.KEY_CACHE_MAX_SIZE, cacheSizeSpinner);
+
         cacheSizeWarningLabel.setEnabled(bool);
         long usableDiskSpace = getCurrentUsableSpace();
         if(bool == false) {

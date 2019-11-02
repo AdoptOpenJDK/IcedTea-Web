@@ -72,10 +72,10 @@ else
 fi
 
 if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
-  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep -v sources | grep -v javadoc`
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep -v sources | grep -v javadoc | grep -v shaded`
   readonly JAVAWS_SRC_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep sources`
 else
-  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep -v sources | grep -v javadoc`
+  readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep -v sources | grep -v javadoc | grep -v shaded`
   readonly JAVAWS_SRC_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep sources`
 fi
 
@@ -117,7 +117,7 @@ fi
 
 readonly SPLASH_PNG_SRC=`find $PROJECT_TOP/core/src |  grep /javaws_splash.png$`
 readonly JAVAWS_ICO_SRC=`find $SCRIPT_DIR |  grep /javaws.png$`
-readonly MODULARJDK_ARGS_FILE_SRC=`find $SCRIPT_DIR |  grep /itw-modularjdk.args$` 
+readonly MODULARJDK_ARGS_FILE_SRC=`find $SCRIPT_DIR |  grep /itw-modularjdk.args$`
 
 if [ "x$KCOV_HOME" == "x" ] ; then
   readonly KCOV_HOME=$HOME/kcov
