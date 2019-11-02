@@ -103,7 +103,7 @@ public class Resource {
      * @param updatePolicy    final policy for updating
      * @return new resource, which is already added in resources list
      */
-    public static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
+    static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, downloadOptions, updatePolicy);
 
@@ -136,7 +136,7 @@ public class Resource {
     /**
      * @return the local file currently being downloaded
      */
-    public File getLocalFile() {
+    File getLocalFile() {
         return localFile;
     }
 
@@ -194,11 +194,11 @@ public class Resource {
         return futureThis != null;
     }
 
-    public void startProcessing(Future<Resource> futureThis) {
+    void startProcessing(Future<Resource> futureThis) {
         this.futureThis = futureThis;
     }
 
-    public Future<Resource> getFutureThis() {
+    Future<Resource> getFutureThis() {
         return futureThis;
     }
 
@@ -208,11 +208,11 @@ public class Resource {
      * @param flag a status flag
      * @return true iff the flag is set
      */
-    public boolean isSet(Status flag) {
+    boolean isSet(Status flag) {
         return status == flag;
     }
 
-    public boolean isComplete() {
+    boolean isComplete() {
         return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
     }
 

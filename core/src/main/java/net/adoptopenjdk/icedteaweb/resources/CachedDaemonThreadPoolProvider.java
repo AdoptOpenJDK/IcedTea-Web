@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CachedDaemonThreadPoolProvider {
 
-    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(6, new DaemonThreadFactory());
+    private static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(6, new DaemonThreadFactory());
 
     public static Executor getThreadPool() {
         return DAEMON_THREAD_POOL;

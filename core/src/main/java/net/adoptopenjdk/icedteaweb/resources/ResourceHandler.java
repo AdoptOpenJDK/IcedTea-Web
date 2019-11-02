@@ -16,17 +16,17 @@ import java.util.concurrent.Future;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 
-public class ResourceHandler {
+class ResourceHandler {
 
     private static final Executor localExecutor = Executors.newCachedThreadPool();
 
     private final Resource resource;
 
-    public ResourceHandler(Resource resource) {
+    ResourceHandler(Resource resource) {
         this.resource = Assert.requireNonNull(resource, "resource");
     }
 
-    public Future<Resource> putIntoCache() {
+    Future<Resource> putIntoCache() {
         final CompletableFuture<Resource> result = new CompletableFuture<>();
 
         // the thread which is processing this resource will set its future onto the resource all other
