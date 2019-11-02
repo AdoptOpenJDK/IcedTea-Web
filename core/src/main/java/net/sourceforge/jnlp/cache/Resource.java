@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -46,10 +45,6 @@ import java.util.Objects;
  * @version $Revision: 1.9 $
  */
 public class Resource {
-    // todo: fix resources to handle different versions
-
-    // todo: IIRC, any resource is checked for being up-to-date
-    // only once, regardless of UpdatePolicy.  verify and fix.
 
     public enum Status {
         INCOMPLETE,
@@ -63,17 +58,11 @@ public class Resource {
     /** the remote location of the resource */
     private final URL location;
 
-    /** the location to use when downloading */
-    private URL downloadLocation;
-
     /** the local file downloaded to */
     private File localFile;
 
     /** the requested version */
     private final VersionString requestVersion;
-
-    /** the version downloaded from server */
-    private VersionId downloadVersion;
 
     /** amount in bytes transferred */
     private volatile long transferred = 0;
@@ -98,7 +87,6 @@ public class Resource {
      */
     private Resource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         this.location = location;
-        this.downloadLocation = location;
         this.requestVersion = requestVersion;
         this.downloadOptions = downloadOptions;
         this.updatePolicy = updatePolicy;
@@ -145,26 +133,6 @@ public class Resource {
     }
 
     /**
-     * Returns the URL to use for downloading the resource. This can be
-     * different from the original location since it may use a different
-     * file name to support versioning and compression
-     *
-     * @return the url to use when downloading
-     */
-    public URL getDownloadLocation() {
-        return downloadLocation;
-    }
-
-    /**
-     * Set the url to use for downloading the resource
-     *
-     * @param downloadLocation url to be downloaded
-     */
-    public void setDownloadLocation(URL downloadLocation) {
-        this.downloadLocation = downloadLocation;
-    }
-
-    /**
      * @return the local file currently being downloaded
      */
     public File getLocalFile() {
@@ -188,25 +156,9 @@ public class Resource {
     }
 
     /**
-     * @return the version downloaded from server
-     */
-    public VersionId getDownloadVersion() {
-        return downloadVersion;
-    }
-
-    /**
-     * Sets the version downloaded from server
-     *
-     * @param downloadVersion version of downloaded resource
-     */
-    public void setDownloadVersion(final VersionId downloadVersion) {
-        this.downloadVersion = downloadVersion;
-    }
-
-    /**
      * @return the amount in bytes transferred
      */
-    public long getTransferred() {
+    long getTransferred() {
         return transferred;
     }
 
@@ -256,9 +208,7 @@ public class Resource {
     }
 
     public boolean isComplete() {
-        synchronized (status) {
-            return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
-        }
+        return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
     }
 
     /**
@@ -270,13 +220,6 @@ public class Resource {
 
     public boolean forceUpdateRequested() {
         return updatePolicy == UpdatePolicy.FORCE;
-    }
-
-    /**
-     * Returns a human-readable status string.
-     */
-    private String getStatusString() {
-        return Objects.toString(status);
     }
 
     /**
@@ -294,11 +237,7 @@ public class Resource {
 
     @Override
     public int hashCode() {
-        // FIXME: should probably have a better hashcode than this, but considering
-        // #equals(Object) was already defined first (without also overriding hashcode!),
-        // this is just being implemented in line with that so we don't break HashMaps,
-        // HashSets, etc
-        return location.hashCode();
+        return Objects.hash(location, requestVersion);
     }
 
     @Override
@@ -317,6 +256,6 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "location=" + location.toString() + " version=" + requestVersion + " state=" + getStatusString();
+        return "location=" + location.toString() + " version=" + requestVersion + " state=" + status;
     }
 }
