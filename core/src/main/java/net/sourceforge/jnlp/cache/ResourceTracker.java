@@ -456,6 +456,10 @@ public class ResourceTracker {
 
         final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
 
+        if (url.getHost().equals("localhost") || url.getHost().startsWith("127.")) {
+           return true; // local url need not be in whitelist
+        }
+
         final List<String> whitelist = Arrays.stream(whitelistString.split("\\s*,\\s*")).collect(Collectors.toList());
         return whitelist.contains(urlString);
     }
