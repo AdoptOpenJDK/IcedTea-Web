@@ -16,8 +16,9 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -25,18 +26,23 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -134,7 +140,7 @@ public class ResourceTracker {
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
-        Assert.requireNonNull(options, "options");
+        requireNonNull(options, "options");
 
         if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
@@ -398,7 +404,14 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            ResourceDownloader.startDownload(resource, lock);
+            if (isWhitelistURL(resource.getLocation())) {
+                LOG.info(" Download Resource : " + resource.getLocation());
+                ResourceDownloader.startDownload(resource, lock);
+             } else {
+                 BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE + " Server Not In Whitelist: " + resource.getLocation());
+                 JNLPRuntime.exit(-1);
+            }
         }
 
         // wait for completion
@@ -431,5 +444,19 @@ public class ResourceTracker {
                 lock.wait(waitTime);
             }
         }
+    }
+
+    public boolean isWhitelistURL(final URL url) {
+        requireNonNull(url, "url");
+
+        final String whitelistString = JNLPRuntime.getConfiguration().getProperty(KEY_SECURITY_SERVER_WHITELIST);
+        if (whitelistString == null || (whitelistString != null && whitelistString.isEmpty())) {
+            return false; // No whitelist
+        }
+
+        final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
+
+        final List<String> whitelist = Arrays.stream(whitelistString.split("\\s*,\\s*")).collect(Collectors.toList());
+        return whitelist.contains(urlString);
     }
 }
