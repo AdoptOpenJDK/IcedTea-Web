@@ -17,8 +17,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
@@ -27,7 +29,8 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SE
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
-    private static final Executor localExecutor = Executors.newCachedThreadPool();
+    private static final Executor localExecutor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 2,
+            10L, TimeUnit.SECONDS, new SynchronousQueue<>());
 
     private static final String LOCALHOST = "localhost";
     private static final String IPV4_LOOPBACK_PREFIX = "127.";
