@@ -18,6 +18,8 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -25,6 +27,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.DownloadOptions;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
@@ -34,9 +37,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -67,6 +72,9 @@ import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
 public class ResourceTracker {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceTracker.class);
+
+    private static final String LOCALHOST = "localhost";
+    private static final String IPV4_LOOPBACK_PREFIX = "127.";
 
     // todo: use event listener arrays instead of lists
 
@@ -134,7 +142,7 @@ public class ResourceTracker {
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
-        Assert.requireNonNull(options, "options");
+        requireNonNull(options, "options");
 
         if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
@@ -398,7 +406,14 @@ public class ResourceTracker {
 
         // start them downloading / connecting in background
         for (Resource resource : resources) {
-            ResourceDownloader.startDownload(resource, lock);
+            if (isWhitelistURL(resource.getLocation())) {
+                LOG.info(" Download Resource : " + resource.getLocation());
+                ResourceDownloader.startDownload(resource, lock);
+             } else {
+                 BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE + " Server Not In Whitelist: " + resource.getLocation());
+                 JNLPRuntime.exit(-1);
+            }
         }
 
         // wait for completion
@@ -431,5 +446,18 @@ public class ResourceTracker {
                 lock.wait(waitTime);
             }
         }
+    }
+
+    private boolean isWhitelistURL(final URL url) {
+        Assert.requireNonNull(url, "url");
+
+        if (url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX)) {
+           return true; // local server need not be in whitelist
+        }
+
+        final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
+
+        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
+        return whitelist.isEmpty() || whitelist.contains(urlString);
     }
 }
