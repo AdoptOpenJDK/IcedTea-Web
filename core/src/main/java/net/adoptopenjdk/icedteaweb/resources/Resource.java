@@ -78,7 +78,7 @@ public class Resource {
     private volatile long size = -1;
 
     /** A future to wait for completion of download of this resource */
-    private volatile Future<Resource> futureThis;
+    private volatile Future<Resource> futureForDownlaoded;
 
     /** the status of the resource */
     private volatile Status status = Status.INCOMPLETE;
@@ -191,15 +191,15 @@ public class Resource {
     }
 
     boolean isBeingProcessed() {
-        return futureThis != null;
+        return futureForDownlaoded != null;
     }
 
     void startProcessing(Future<Resource> futureThis) {
-        this.futureThis = futureThis;
+        this.futureForDownlaoded = futureThis;
     }
 
-    Future<Resource> getFutureThis() {
-        return futureThis;
+    Future<Resource> getFutureForDownloaded() {
+        return futureForDownlaoded;
     }
 
     /**

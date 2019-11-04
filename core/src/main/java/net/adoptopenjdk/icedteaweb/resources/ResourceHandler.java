@@ -48,7 +48,7 @@ class ResourceHandler {
         // the thread which is processing this resource will set its future onto the resource all other
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
-            final Future<Resource> futureResource = resource.getFutureThis();
+            final Future<Resource> futureResource = resource.getFutureForDownloaded();
             if (futureResource != null) {
                 return futureResource;
             }
