@@ -60,9 +60,12 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
@@ -325,22 +328,23 @@ public class ManifestAttributesChecker {
 
     private void checkApplicationLibraryAllowableCodebaseAttribute() throws LaunchException {
         //conditions
-        URL codebase = file.getCodeBase();
-        URL documentBase = file.getCodeBase();
+        final URL codebase = file.getCodeBase();
 
         //cases
-        Set<URL> usedUrls = new HashSet<>();
-        URL sourceLocation = file.getSourceLocation();
-        ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
+        final Map<URL, Set<URL>> usedUrls = new HashMap<>();
+        final URL sourceLocation = file.getSourceLocation();
+        final ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
         if (sourceLocation != null) {
-            usedUrls.add(UrlUtils.removeFileName(sourceLocation));
+            final URL urlWithoutFileName = UrlUtils.removeFileName(sourceLocation);
+            usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(sourceLocation);
         }
         for (ResourcesDesc resourcesDesc : resourcesDescs) {
             ExtensionDesc[] ex = resourcesDesc.getExtensions();
             if (ex != null) {
                 for (ExtensionDesc extensionDesc : ex) {
                     if (extensionDesc != null) {
-                        usedUrls.add(UrlUtils.removeFileName(extensionDesc.getLocation()));
+                        final URL urlWithoutFileName = UrlUtils.removeFileName(extensionDesc.getLocation());
+                        usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(extensionDesc.getLocation());
                     }
                 }
             }
@@ -348,13 +352,15 @@ public class ManifestAttributesChecker {
             if (jars != null) {
                 for (JARDesc jarDesc : jars) {
                     if (jarDesc != null) {
-                        usedUrls.add(UrlUtils.removeFileName(jarDesc.getLocation()));
+                        final URL urlWithoutFileName = UrlUtils.removeFileName(jarDesc.getLocation());
+                        usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(jarDesc.getLocation());
                     }
                 }
             }
             JNLPFile jnlp = resourcesDesc.getJNLPFile();
             if (jnlp != null) {
-                usedUrls.add(UrlUtils.removeFileName(jnlp.getSourceLocation()));
+                final URL urlWithoutFileName = UrlUtils.removeFileName(jnlp.getSourceLocation());
+                usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(jnlp.getSourceLocation());
             }
         }
 
@@ -364,33 +370,37 @@ public class ManifestAttributesChecker {
             LOG.debug("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
             return;
         }
-        boolean allOk = true;
-        for (URL u : usedUrls) {
-            if(UrlUtils.urlRelativeTo(u, codebase)) {
-                if(UrlUtils.urlRelativeTo(u, stripDocbase(documentBase))) {
-                    LOG.debug("OK - '{}' is from codebase '{}' and docbase '{}'.", u.toExternalForm(), codebase, documentBase);
-                } else {
-                    allOk = false;
-                    LOG.warn("Warning! '{}' is NOT from documentBase '{}'.", u.toExternalForm(), documentBase);
-                }
+        final Set<URL> notOkUrls = new HashSet<>();
+        for (URL u : usedUrls.keySet()) {
+            if (UrlUtils.urlRelativeTo(u, codebase)) {
+                LOG.debug("OK - '{}' is from codebase '{}'.", u, codebase);
             } else {
-                allOk = false;
-                LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u.toExternalForm(), codebase);
+                notOkUrls.add(u);
+                LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u, codebase);
             }
         }
-        if (allOk) {
+        if (notOkUrls.isEmpty()) {
             //all resources are from codebase or document base. it is ok to proceed.
-            LOG.debug("All applications resources ({}) are from codebase/documentbase {}/{}, skipping Application-Library-Allowable-Codebase Attribute check.", usedUrls.toArray(new URL[0])[0], codebase, documentBase);
+            LOG.debug("All applications resources are from codebase {}, skipping Application-Library-Allowable-Codebase Attribute check.", codebase);
             return;
         }
 
-        ClasspathMatchers att = null;
+        final ClasspathMatchers att;
         if (signing != SigningState.NONE) {
             // we only consider values in manifest for signed apps (as they may be faked)
             att = file.getManifestAttributesReader().getApplicationLibraryAllowableCodebase();
+        } else {
+            att = null;
         }
+
+        final Set<URL> notOkResources = notOkUrls.stream()
+                .flatMap(notOk -> usedUrls.get(notOk).stream())
+                .collect(Collectors.toSet());
+
+        notOkResources.forEach(url -> LOG.warn("The resource '{}' is not from codebase '{}'", url, codebase));
+
         if (att == null) {
-            final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, documentBase, usedUrls);
+            final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, codebase, notOkResources);
             if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {
@@ -398,15 +408,16 @@ public class ManifestAttributesChecker {
                 return;
             }
         } else {
-            for (URL foundUrl : usedUrls) {
+            for (URL foundUrl : usedUrls.keySet()) {
                 if (!att.matches(foundUrl)) {
-                    throw new LaunchException("The resource from " + foundUrl + " does not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
+                    throw new LaunchException("The resources " + usedUrls.get(foundUrl) + " do not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
                 } else {
-                    LOG.debug("The resource from {} does  match the  location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
+                    LOG.debug("The resources from {} do  match the location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
                 }
             }
         }
-        final boolean userApproved = isLowSecurity() || SecurityDialogs.showMatchingALACAttributePanel(file, documentBase, usedUrls);
+
+        final boolean userApproved = isLowSecurity() || SecurityDialogs.showMatchingALACAttributePanel(file, codebase, notOkResources);
         if (!userApproved) {
             throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user.");
         } else {

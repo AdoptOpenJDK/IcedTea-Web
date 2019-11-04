@@ -40,12 +40,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROPERTIES;
@@ -262,6 +266,13 @@ public final class DeploymentConfiguration {
             return currentConfiguration.get(key).getValue();
         }
         return null;
+    }
+
+    public List<String> getPropertyAsList(final String key, final char separator) {
+        return Optional.ofNullable(getProperty(key))
+                .map(v -> v.split(Pattern.quote(Character.toString(separator))))
+                .map(Arrays::asList)
+                .orElseGet(Collections::emptyList);
     }
 
     /**

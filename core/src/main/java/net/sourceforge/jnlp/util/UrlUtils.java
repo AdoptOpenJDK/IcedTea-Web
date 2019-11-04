@@ -62,6 +62,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -226,15 +227,38 @@ public class UrlUtils {
      * @param remoteUrls list of urls
      * @return String containing html item list of those urls
      */
-    public static String setOfUrlsToHtmlList(final Iterable<URL> remoteUrls) {
+    public static String setOfUrlsToHtmlList(final Collection<URL> remoteUrls) {
+        return setOfUrlsToHtmlList(remoteUrls, 4);
+    }
+
+    /**
+     * Small utility function creating li list from collection of urls
+     *
+     * @param remoteUrls list of urls
+     * @return String containing html item list of those urls
+     */
+    private static String setOfUrlsToHtmlList(final Collection<URL> remoteUrls, final int max) {
         if (remoteUrls == null) {
             return "";
         }
+
         final StringBuilder sb = new StringBuilder();
         sb.append(UL_TAG_OPEN);
-        for (final URL url : remoteUrls) {
-            sb.append(LI_TAG_OPEN).append(url.toExternalForm()).append(LI_TAG_CLOSE);
+
+        remoteUrls.stream()
+                .limit(max)
+                .forEach(url -> {
+                    sb.append(LI_TAG_OPEN).append(url.toExternalForm()).append(LI_TAG_CLOSE);
+                });
+
+        if (remoteUrls.size() > max) {
+            sb.append(LI_TAG_OPEN)
+                    .append("and ")
+                    .append(remoteUrls.size() - max)
+                    .append(" more.")
+                    .append(LI_TAG_CLOSE);
         }
+
         sb.append(UL_TAG_CLOSE);
         return sb.toString();
     }
@@ -582,7 +606,7 @@ public class UrlUtils {
         w.write("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n");
         w.write("Referer: " + url.toExternalForm() + "\r\n");
         w.write("\r\n");
-        
+
         w.flush();
     }
 

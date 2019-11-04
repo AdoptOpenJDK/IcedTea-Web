@@ -2,12 +2,19 @@ package net.adoptopenjdk.icedteaweb.resources;
 
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
+import java.net.URL;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -15,10 +22,15 @@ import java.util.concurrent.Future;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 class ResourceHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
     private static final Executor localExecutor = Executors.newCachedThreadPool();
+
+    private static final String LOCALHOST = "localhost";
+    private static final String IPV4_LOOPBACK_PREFIX = "127.";
 
     private final Resource resource;
 
@@ -27,6 +39,7 @@ class ResourceHandler {
     }
 
     Future<Resource> putIntoCache() {
+        validateWithWhitelist();
         final CompletableFuture<Resource> result = new CompletableFuture<>();
 
         // the thread which is processing this resource will set its future onto the resource all other
@@ -93,5 +106,23 @@ class ResourceHandler {
             downloader.download();
         }
         return resource;
+    }
+
+    private void validateWithWhitelist() {
+        final URL url = resource.getLocation();
+        Assert.requireNonNull(url, "url");
+
+        if (url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX)) {
+            return; // local server need not be in whitelist
+        }
+
+        final String urlString = url.getProtocol() + "://" + url.getHost() + ((url.getPort() != -1) ? ":" + url.getPort() : "");
+
+        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
+        if (!whitelist.isEmpty() && !whitelist.contains(urlString)) {
+            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+            LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
+            JNLPRuntime.exit(-1);
+        }
     }
 }
