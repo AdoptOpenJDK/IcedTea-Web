@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -38,7 +39,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
 import static net.sourceforge.jnlp.cache.Resource.Status.DOWNLOADED;
 import static net.sourceforge.jnlp.cache.Resource.Status.ERROR;
@@ -94,13 +94,21 @@ public class ResourceTracker {
     // defines
     //    ResourceTracker.Downloader (download threads)
 
-      /** notified on initialization or download of a resource */
+    /**
+     * notified on initialization or download of a resource
+     */
     private static final Object lock = new Object(); // used to lock static structures
+    public static final String LOCALHOST = "localhost";
+    public static final String LOCAL_IP_PREFIX = "127.";
 
-    /** the resources known about by this resource tracker */
+    /**
+     * the resources known about by this resource tracker
+     */
     private final List<Resource> resources = new ArrayList<>();
 
-    /** whether to download parts before requested */
+    /**
+     * whether to download parts before requested
+     */
     private final boolean prefetch;
 
     /**
@@ -134,13 +142,13 @@ public class ResourceTracker {
      * resource per instance (ie cannot download both versions 1 and
      * 2 of a resource in the same tracker).
      *
-     * @param location the location of the resource
-     * @param version the resource version
-     * @param options options to control download
+     * @param location     the location of the resource
+     * @param version      the resource version
+     * @param options      options to control download
      * @param updatePolicy whether to check for updates if already in cache
      */
     public void addResource(URL location, final VersionString version, final DownloadOptions options, final UpdatePolicy updatePolicy) {
-        requireNonNull(options, "options");
+        Assert.requireNonNull(options, "options");
 
         if (location == null) {
             throw new IllegalResourceDescriptorException("location==null");
@@ -315,10 +323,10 @@ public class ResourceTracker {
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
-     * @param urls the resources to wait for
+     * @param urls    the resources to wait for
      * @param timeout the time in ms to wait before returning, 0 for no timeout
      * @return whether the resources downloaded before the timeout
-     * @throws java.lang.InterruptedException if thread is interrupted
+     * @throws java.lang.InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     boolean waitForResources(URL[] urls, long timeout) throws InterruptedException {
@@ -394,7 +402,7 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
-     * @param timeout the timeout, or {@code 0} to wait until completed
+     * @param timeout   the timeout, or {@code 0} to wait until completed
      * @return {@code true} if the resources were downloaded or had errors,
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
@@ -405,12 +413,12 @@ public class ResourceTracker {
         // start them downloading / connecting in background
         for (Resource resource : resources) {
             if (isWhitelistURL(resource.getLocation())) {
-                LOG.info(" Download Resource : " + resource.getLocation());
+                LOG.info("Download Resource: {}", resource.getLocation());
                 ResourceDownloader.startDownload(resource, lock);
-             } else {
-                 BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
-                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE + " Server Not In Whitelist: " + resource.getLocation());
-                 JNLPRuntime.exit(-1);
+            } else {
+                BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+                LOG.error("Server Not In Whitelist: {}", resource.getLocation());
+                JNLPRuntime.exit(-1);
             }
         }
 
@@ -447,10 +455,10 @@ public class ResourceTracker {
     }
 
     public boolean isWhitelistURL(final URL url) {
-        requireNonNull(url, "url");
+        Assert.requireNonNull(url, "url cannot be null");
 
-        if (url.getHost().equals("localhost") || url.getHost().startsWith("127.")) {
-           return true; // local server need not be in whitelist
+        if (url.getHost().equals(LOCALHOST) || url.getHost().startsWith(LOCAL_IP_PREFIX)) {
+            return true; // local server need not be in whitelist
         }
 
         final String whitelistString = JNLPRuntime.getConfiguration().getProperty(KEY_SECURITY_SERVER_WHITELIST);
@@ -458,7 +466,7 @@ public class ResourceTracker {
             return false; // No whitelist
         }
 
-        final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
+        final String urlString = url.getProtocol() + "://" + url.getHost() + ((url.getPort() != -1) ? ":" + url.getPort() : "");
         final List<String> whitelist = Arrays.stream(whitelistString.split("\\s*,\\s*")).collect(Collectors.toList());
         return whitelist.contains(urlString);
     }
