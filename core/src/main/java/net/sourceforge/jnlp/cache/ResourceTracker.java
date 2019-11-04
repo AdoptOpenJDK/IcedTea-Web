@@ -449,17 +449,16 @@ public class ResourceTracker {
     public boolean isWhitelistURL(final URL url) {
         requireNonNull(url, "url");
 
+        if (url.getHost().equals("localhost") || url.getHost().startsWith("127.")) {
+           return true; // local server need not be in whitelist
+        }
+
         final String whitelistString = JNLPRuntime.getConfiguration().getProperty(KEY_SECURITY_SERVER_WHITELIST);
         if (whitelistString == null || (whitelistString != null && whitelistString.isEmpty())) {
             return false; // No whitelist
         }
 
         final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
-
-        if (url.getHost().equals("localhost") || url.getHost().startsWith("127.")) {
-           return true; // local url need not be in whitelist
-        }
-
         final List<String> whitelist = Arrays.stream(whitelistString.split("\\s*,\\s*")).collect(Collectors.toList());
         return whitelist.contains(urlString);
     }
