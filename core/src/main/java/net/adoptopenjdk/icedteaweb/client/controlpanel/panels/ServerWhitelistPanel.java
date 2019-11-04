@@ -25,14 +25,13 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
+import java.util.Collections;
 
 /**
  * This provides a way for the user to display the server white list defined in <code>deployment.properties</code>.
  */
 @SuppressWarnings("serial")
 public class ServerWhitelistPanel extends NamedBorderPanel {
-
-    private final DeploymentConfiguration config;
 
     /**
      * This creates a new instance of the server white list panel.
@@ -41,19 +40,19 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
      */
     public ServerWhitelistPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPServerWhitelist"), new BorderLayout());
-        this.config = Assert.requireNonNull(config, "config");
 
-        addComponents();
-    }
+        Assert.requireNonNull(config, "config");
 
-    /**
-     * Add the components to the panel.
-     */
-    private void addComponents() {
-        final String csvWhitelist = config.getProperty("deployment.security.whitelist");
-        final String[] items = csvWhitelist.split("\\s*,\\s*");
-        final JList<String> jList = new JList<>(items);
+        final JList<String> jList = new JList<>(getSites(config));
         jList.setFixedCellHeight(20);
         add(new JScrollPane(jList), BorderLayout.CENTER);
+    }
+
+    private String[] getSites(DeploymentConfiguration config) {
+        final String csvWhitelist = config.getProperty("deployment.security.whitelist");
+        if (csvWhitelist == null) {
+            return new String[0];
+        }
+        return csvWhitelist.split(",");
     }
 }
