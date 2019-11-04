@@ -25,7 +25,10 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
-import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 /**
  * This provides a way for the user to display the server white list defined in <code>deployment.properties</code>.
@@ -43,16 +46,9 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
         Assert.requireNonNull(config, "config");
 
-        final JList<String> jList = new JList<>(getSites(config));
+        final List<String> whitelist = config.getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
+        final JList<String> jList = new JList<>(new Vector<>(whitelist));
         jList.setFixedCellHeight(20);
         add(new JScrollPane(jList), BorderLayout.CENTER);
-    }
-
-    private String[] getSites(DeploymentConfiguration config) {
-        final String csvWhitelist = config.getProperty("deployment.security.whitelist");
-        if (csvWhitelist == null) {
-            return new String[0];
-        }
-        return csvWhitelist.split(",");
     }
 }

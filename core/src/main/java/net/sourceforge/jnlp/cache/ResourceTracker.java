@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -33,10 +34,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.cache.Resource.Status.CONNECTED;
@@ -73,6 +72,9 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SE
 public class ResourceTracker {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceTracker.class);
+
+    private static final String LOCALHOST = "localhost";
+    private static final String IPV4_LOOPBACK_PREFIX = "127.";
 
     // todo: use event listener arrays instead of lists
 
@@ -446,20 +448,16 @@ public class ResourceTracker {
         }
     }
 
-    public boolean isWhitelistURL(final URL url) {
-        requireNonNull(url, "url");
+    private boolean isWhitelistURL(final URL url) {
+        Assert.requireNonNull(url, "url");
 
-        if (url.getHost().equals("localhost") || url.getHost().startsWith("127.")) {
+        if (url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX)) {
            return true; // local server need not be in whitelist
         }
 
-        final String whitelistString = JNLPRuntime.getConfiguration().getProperty(KEY_SECURITY_SERVER_WHITELIST);
-        if (whitelistString == null || (whitelistString != null && whitelistString.isEmpty())) {
-            return false; // No whitelist
-        }
-
         final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
-        final List<String> whitelist = Arrays.stream(whitelistString.split("\\s*,\\s*")).collect(Collectors.toList());
+
+        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
         return whitelist.contains(urlString);
     }
 }
