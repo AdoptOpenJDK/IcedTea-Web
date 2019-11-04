@@ -458,6 +458,6 @@ public class ResourceTracker {
         final String urlString = url.getProtocol() + "://" + url.getHost() +  ((url.getPort() != -1) ? ":" + url.getPort() : "");
 
         final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
-        return whitelist.contains(urlString);
+        return whitelist.isEmpty() || whitelist.contains(urlString);
     }
 }
