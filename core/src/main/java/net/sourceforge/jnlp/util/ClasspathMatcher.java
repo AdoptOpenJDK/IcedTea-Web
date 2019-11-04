@@ -33,7 +33,7 @@ public class ClasspathMatcher {
         /**
          * space separated list of ClasspathMatcher source strings
          *
-         * @param s string to be read 
+         * @param s string to be read
          * @return returns compiled matcher
          */
         public static ClasspathMatchers compile(String s) {
@@ -59,25 +59,12 @@ public class ClasspathMatcher {
         }
 
         public boolean matches(URL s) {
-            return or(s);
-        }
-
-        private boolean or(URL s) {
             for (ClasspathMatcher classpathMatcher : matchers) {
                 if (classpathMatcher.match(s, includePath)) {
                     return true;
                 }
             }
             return false;
-        }
-
-        private boolean and(URL s) {
-            for (ClasspathMatcher classpathMatcher : matchers) {
-                if (!classpathMatcher.match(s, includePath)) {
-                    return false;
-                }
-            }
-            return true;
         }
 
         @Override
@@ -116,7 +103,7 @@ public class ClasspathMatcher {
             //the http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
             //clearly says: *.example.com  matches  both
             //https://example.com, http://example.com
-            //it sounds like bug, but well, who am I...            
+            //it sounds like bug, but well, who am I...
             domainRegEx = domainToRegEx(domain);
             portRegEx = ClasspathMatcher.sourceToRegEx(port);
             pathRegEx = ClasspathMatcher.sourceToRegEx(path);
@@ -182,7 +169,7 @@ public class ClasspathMatcher {
         return r;
     }
 
-  
+
     private boolean match(URL url, boolean includePath) {
         String protocol = url.getProtocol();
         int port = url.getPort(); //negative if not set
@@ -207,7 +194,7 @@ public class ClasspathMatcher {
     public boolean match(URL url) {
         return match(url, false);
     }
-    
+
     public boolean matchWithPath(URL url) {
         return match(url, true);
     }
@@ -314,7 +301,7 @@ public class ClasspathMatcher {
         }
         return convertWildcardToRegEx(s);
     }
-    
+
     private static String convertWildcardToRegEx(String s) {
         if (s.startsWith("*") && s.endsWith("*")) {
             return "^.*" + Pattern.quote(s.substring(1, s.length() - 1)) + ".*$";
