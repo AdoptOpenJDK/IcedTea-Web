@@ -8,3 +8,4 @@ net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.UnsignedAppletsT
 net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.AboutPanelProvider
 net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.CacheSettingsPanelProvider
 net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.CertificatesSettingsPanelProvider
+net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.ServerWhitelistPanelProvider

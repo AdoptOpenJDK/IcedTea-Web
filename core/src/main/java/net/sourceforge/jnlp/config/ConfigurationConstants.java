@@ -277,4 +277,9 @@ public interface ConfigurationConstants {
     String KEY_LAUNCHER_RUST_CP_REMOVE = "deployment.launcher.rust.cp.remove";
     String KEY_LAUNCHER_RUST_BOOTCP_ADD = "deployment.launcher.rust.bootcp.add";
     String KEY_LAUNCHER_RUST_BOOTCP_REMOVE = "deployment.launcher.rust.bootcp.remove";
+
+    /*
+     * CSV
+     */
+    String KEY_SECURITY_SERVER_WHITELIST = "deployment.security.whitelist";
 }
