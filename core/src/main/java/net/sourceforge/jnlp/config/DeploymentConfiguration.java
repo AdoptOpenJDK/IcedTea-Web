@@ -270,7 +270,7 @@ public final class DeploymentConfiguration {
 
     public List<String> getPropertyAsList(final String key, final char separator) {
         return Optional.ofNullable(getProperty(key))
-                .map(v -> v.split(Pattern.quote(Character.toString(separator))))
+                .map(v -> v.split("\\s*" + Pattern.quote(Character.toString(separator)) + "\\s*"))
                 .map(Arrays::asList)
                 .orElseGet(Collections::emptyList);
     }

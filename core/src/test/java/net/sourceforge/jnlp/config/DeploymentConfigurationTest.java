@@ -51,12 +51,16 @@ import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DeploymentConfigurationTest extends NoStdOutErrTest {
@@ -260,7 +264,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
             server.stop();
         }
     }
-    
+
     @Test
     @Remote
     public void testCheckUrlRemoteNotOk404_2() throws ConfigurationException, IOException {
@@ -289,5 +293,19 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         } finally {
             server.stop();
         }
+    }
+
+    @Test
+    public void testGetPropertyAsList() throws Exception {
+        final String key = "foo";
+        final List<String> values = Arrays.asList("first", "second", "third" );
+
+        final DeploymentConfiguration config = new DeploymentConfiguration();
+        config.load();
+
+        config.setProperty(key, String.join(", ", values));
+        final List<String> result = config.getPropertyAsList(key, ',');
+
+        assertEquals(values, result);
     }
 }
