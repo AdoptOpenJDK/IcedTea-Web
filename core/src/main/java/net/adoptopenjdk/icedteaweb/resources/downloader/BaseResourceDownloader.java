@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
+import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
@@ -36,12 +37,17 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 abstract class BaseResourceDownloader implements ResourceDownloader {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceDownloader.class);
 
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+    private static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
+    private static final String LAST_MODIFIED_HEADER = "Last-Modified";
     private static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
+
+    private static final String ERROR_MIME_TYPE = "application/x-java-jnlp-error";
+    private static final String JAR_DIFF_MIME_TYPE = "application/x-java-archive-dif";
+
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
     private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
     private static final String INVALID_HTTP_RESPONSE = "Invalid Http response";
-    private static final String LAST_MODIFIED_HEADER = "Last-Modified";
-    private static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
 
     protected final Resource resource;
     private final List<URL> downloadUrls;
@@ -86,6 +92,11 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
             final DownloadDetails downloadDetails = getDownloadDetails(connection);
+
+            if (downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
+                final String serverResponse = StreamUtils.readStreamAsString(downloadDetails.inputStream);
+                throw new RuntimeException("Server error: " + serverResponse);
+            }
 
             final long bytesTransferred = tryDownloading(downloadDetails);
 
@@ -135,9 +146,10 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             final long lastModified = connection.getLastModified();
             final String version = connection.getHeaderField(VERSION_ID_HEADER);
-            final String contentEncoding = connection.getContentEncoding();
+            final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
+            final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final InputStream inputStream = connection.getInputStream();
-            return new DownloadDetails(downloadFrom, inputStream, contentEncoding, version, lastModified);
+            return new DownloadDetails(downloadFrom, inputStream, contentType, contentEncoding, version, lastModified);
         } catch (IOException ex) {
             if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
                 LOG.warn(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket");
@@ -163,10 +175,11 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
         final long lastModified = parseLong(headerMap.get(LAST_MODIFIED_HEADER), System.currentTimeMillis());
         final String version = headerMap.get(VERSION_ID_HEADER);
+        final String contentType = headerMap.get(CONTENT_TYPE_HEADER);
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
         final InputStream inputStream = new ByteArrayInputStream(body);
 
-        return new DownloadDetails(url, inputStream, contentEncoding, version, lastModified);
+        return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified);
     }
 
     private long parseLong(final String s, final long defaultValue) {
