@@ -201,7 +201,7 @@ class LeastRecentlyUsedCache {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isCached(URL resourceHref, VersionId version) {
-        final Boolean isCached = getResourceInfo(resourceHref, version)
+        final boolean isCached = getResourceInfo(resourceHref, version)
                 .map(CacheEntry::isCached)
                 .orElse(false);
         LOG.info("isCached: {} - (v: {}) = {}", resourceHref, version, isCached);
