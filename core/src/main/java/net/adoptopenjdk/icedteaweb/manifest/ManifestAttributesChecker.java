@@ -69,6 +69,7 @@ import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 public class ManifestAttributesChecker {
 
@@ -237,7 +238,7 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/manifest.html#codebase
      */
     private void checkCodebaseAttribute() throws LaunchException {
-        if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals("file")) {
+        if (file.getCodeBase() == null || file.getCodeBase().getProtocol().equals(FILE_PROTOCOL)) {
             LOG.warn("The application is a local file. Codebase validation is disabled. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             return;
         }

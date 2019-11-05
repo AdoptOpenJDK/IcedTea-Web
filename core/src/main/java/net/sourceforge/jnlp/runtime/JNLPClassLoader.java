@@ -97,6 +97,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
@@ -958,7 +959,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
-                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals("file")) {
+                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
                             jn = new File(jnlp.getFileLocation().getPath());
                         } else {
                             jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());

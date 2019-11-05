@@ -51,6 +51,7 @@ import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder.getLauncher;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * Launches JNLPFiles either in the foreground or background.
@@ -333,7 +334,7 @@ public class Launcher {
 
             boolean isLocal = false;
             boolean haveHref = false;
-            if ("file".equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
+            if (FILE_PROTOCOL.equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
                 isLocal = true;
             }
             if (file.getSourceLocation() != null) {

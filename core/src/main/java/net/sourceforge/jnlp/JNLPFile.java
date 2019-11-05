@@ -69,6 +69,7 @@ import java.util.Objects;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * <p>
@@ -301,7 +302,7 @@ public class JNLPFile {
         //(i.e. If the jnlp file being launched exist locally, but it
         //originated from a website, then download the one from the website
         //into the cache).
-        if (sourceLocation != null && "file".equals(location.getProtocol())) {
+        if (sourceLocation != null && FILE_PROTOCOL.equals(location.getProtocol())) {
             openURL(sourceLocation, version, policy);
         }
 

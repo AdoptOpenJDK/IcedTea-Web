@@ -78,6 +78,7 @@ import java.util.Date;
 import java.util.List;
 
 import static net.sourceforge.jnlp.runtime.ForkingStrategy.IF_JNLP_REQUIRES;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * <p>
@@ -431,7 +432,7 @@ public class JNLPRuntime {
     }
 
     public static boolean isConnectable(URL location) {
-        if (location.getProtocol().equals("file")) {
+        if (location.getProtocol().equals(FILE_PROTOCOL)) {
             return true;
         }
 

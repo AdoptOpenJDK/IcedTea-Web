@@ -48,6 +48,8 @@ import java.util.function.Consumer;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
+import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -60,7 +62,7 @@ public class CacheUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
 
-    private static final List<String> NON_CACHEABLE_PROTOCOLS = Arrays.asList("file", "jar");
+    private static final List<String> NON_CACHEABLE_PROTOCOLS = Arrays.asList(FILE_PROTOCOL, JAR_PROTOCOL);
 
     /**
      * Caches a resource and returns a URL for it in the cache;

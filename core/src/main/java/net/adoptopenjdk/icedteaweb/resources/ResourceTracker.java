@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
 /**
@@ -266,7 +267,7 @@ public class ResourceTracker {
             return resource.getLocalFile();
         }
 
-        if (location.getProtocol().equalsIgnoreCase("file")) {
+        if (location.getProtocol().equalsIgnoreCase(FILE_PROTOCOL)) {
             File file = UrlUtils.decodeUrlAsFile(location);
             if (file.exists()) {
                 return file;
