@@ -40,6 +40,8 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
     private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
     private static final String INVALID_HTTP_RESPONSE = "Invalid Http response";
+    private static final String LAST_MODIFIED_HEADER = "Last-Modified";
+    private static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
 
     protected final Resource resource;
     private final List<URL> downloadUrls;
@@ -61,7 +63,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .map(Optional::get)
                 .findFirst()
                 .orElseGet(() -> {
-                    LOG.warn("could not download resource {} from any of theses urls {}", resource, downloadUrls);
+                    LOG.error("could not download resource {} from any of theses urls {}", resource, downloadUrls);
                     resource.setStatus(ERROR);
                     return resource;
                 });
@@ -91,7 +93,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setTransferred(bytesTransferred);
             return resource;
         } catch (Exception ex) {
-            LOG.warn("Exception while downloading resource {} from {} - {}", resource, downloadFrom, ex.getMessage());
+            LOG.debug("Exception while downloading resource {} from {} - {}", resource, downloadFrom, ex.getMessage());
             throw ex;
         }
     }
@@ -159,9 +161,9 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .filter(a -> a.length != 2)
                 .collect(Collectors.toMap(a -> a[0], a -> a[1]));
 
-        final long lastModified = parseLong(headerMap.get("Last-Modified"), System.currentTimeMillis());
+        final long lastModified = parseLong(headerMap.get(LAST_MODIFIED_HEADER), System.currentTimeMillis());
         final String version = headerMap.get(VERSION_ID_HEADER);
-        final String contentEncoding = headerMap.get("Content-Encoding");
+        final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
         final InputStream inputStream = new ByteArrayInputStream(body);
 
         return new DownloadDetails(url, inputStream, contentEncoding, version, lastModified);
