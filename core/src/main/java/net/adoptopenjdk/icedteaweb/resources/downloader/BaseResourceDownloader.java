@@ -43,7 +43,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
 
     private static final String ERROR_MIME_TYPE = "application/x-java-jnlp-error";
-    private static final String JAR_DIFF_MIME_TYPE = "application/x-java-archive-dif";
+    static final String JAR_DIFF_MIME_TYPE = "application/x-java-archive-dif";
 
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
     private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
@@ -123,14 +123,18 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final File cacheFile = Cache.getCacheFile(resourceHref, version);
             return cacheFile.length();
         } else {
-            final StreamUnpacker unpacker = StreamUnpacker.toUnpack(downloadDetails);
             final CountingInputStream countingInputStream = new CountingInputStream(downloadDetails.inputStream);
-            final InputStream unpackedStream = unpacker.unpack(countingInputStream);
+
+            final StreamUnpacker compressionUpacker = StreamUnpacker.getCompressionUnpacker(downloadDetails);
+            final InputStream unpackedStream = compressionUpacker.unpack(countingInputStream);
+
+            final StreamUnpacker contentUnpacker = StreamUnpacker.getContentUnpacker(downloadDetails, resourceHref);
+            final InputStream unpackedContent = contentUnpacker.unpack(unpackedStream);
+
             final DownloadInfo downloadInfo = new DownloadInfo(resourceHref, version, downloadDetails.lastModified);
+            final File cacheFile = Cache.addToCache(downloadInfo, unpackedContent);
 
-            final File cacheFile = Cache.addToCache(downloadInfo, unpackedStream);
             resource.setLocalFile(cacheFile);
-
             return countingInputStream.numBytesRead();
         }
     }

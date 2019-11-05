@@ -16,16 +16,26 @@
 
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Allows to unpack an input stream.
  */
 interface StreamUnpacker {
 
-    static StreamUnpacker toUnpack(final DownloadDetails downloadDetails) {
+    static StreamUnpacker getCompressionUnpacker(final DownloadDetails downloadDetails) {
         final URL downloadFrom = downloadDetails.downloadFrom;
         final String contentEncoding = downloadDetails.contentEncoding;
         final boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
@@ -42,6 +52,26 @@ interface StreamUnpacker {
         }
 
         return new NotUnpacker();
+    }
+
+    static StreamUnpacker getContentUnpacker(DownloadDetails downloadDetails, URL resourceHref) {
+        final StreamUnpacker contentUnpacker;
+        if (downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
+            final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
+                    .map(query -> Stream.of(query.split(Pattern.quote("&"))))
+                    .map(stream -> stream.collect(Collectors.toMap(e -> e.split("=")[0], e -> e.split("=")[1])))
+                    .orElseGet(Collections::emptyMap);
+
+            final VersionId currentVersionId = Optional.ofNullable(querryParams.get("current-version-id"))
+                    .map(VersionId::fromString)
+                    .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + BaseResourceDownloader.JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
+
+            final File cacheFile = Cache.getCacheFile(resourceHref, currentVersionId);
+            contentUnpacker = new JarDiffUnpacker(cacheFile);
+        } else {
+            contentUnpacker = new NotUnpacker();
+        }
+        return contentUnpacker;
     }
 
     /**
