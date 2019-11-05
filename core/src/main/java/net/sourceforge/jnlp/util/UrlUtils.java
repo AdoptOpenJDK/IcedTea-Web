@@ -73,6 +73,9 @@ public class UrlUtils {
 
     public static final String FILE_PROTOCOL = "file";
     public static final String JAR_PROTOCOL = "jar";
+    public static final String HTTP_PROTOCOL = "http";
+    public static final String HTTPS_PROTOCOL = "https";
+
     public static final String SLASH = "/";
     public static final String BACKSLASH = "\\";
     public static final String UL_TAG_OPEN = "<ul>";

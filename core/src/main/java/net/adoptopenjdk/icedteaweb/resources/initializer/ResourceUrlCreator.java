@@ -53,6 +53,8 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
+import static net.sourceforge.jnlp.util.UrlUtils.HTTPS_PROTOCOL;
+import static net.sourceforge.jnlp.util.UrlUtils.HTTP_PROTOCOL;
 
 class ResourceUrlCreator {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceUrlCreator.class);
@@ -63,9 +65,9 @@ class ResourceUrlCreator {
         if (!noHttpsPreferred) {
             //preferring https and  overriding case, when application was moved to https, but the jnlp stayed intact
             for (final URL url : urls) {
-                if (url.getProtocol().equals("http") && url.getPort() < 0) { // port < 0 means default port
+                if (url.getProtocol().equals(HTTP_PROTOCOL) && url.getPort() < 0) { // port < 0 means default port
                     try {
-                        result.add(new URL("https" + url.toExternalForm().substring(4)));
+                        result.add(new URL(HTTPS_PROTOCOL + url.toExternalForm().substring(HTTP_PROTOCOL.length())));
                     } catch (MalformedURLException ex) {
                         LOG.error("Error while creating HTTPS URL from '" + url + "'", ex);
                     }

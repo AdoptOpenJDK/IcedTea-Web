@@ -37,6 +37,8 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
     private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
 
+    private static final int NETWORK_AUTHENTICATION_REQUIRED = 511;
+
     protected final Resource resource;
 
     BaseResourceInitializer(Resource resource) {
@@ -105,7 +107,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
             requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
 
             final UrlRequestResult response = UrlProber.getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
-            if (response.getResponseCode() == 511 && !InetSecurity511Panel.isSkip()) {
+            if (response.getResponseCode() == NETWORK_AUTHENTICATION_REQUIRED && !InetSecurity511Panel.isSkip()) {
                 boolean result511 = SecurityDialogs.show511Dialogue(resource);
                 if (!result511) {
                     throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
