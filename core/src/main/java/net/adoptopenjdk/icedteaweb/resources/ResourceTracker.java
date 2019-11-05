@@ -377,7 +377,7 @@ public class ResourceTracker {
         synchronized (resources) {
             final Resource result = resources.get(normalizedLocation);
             if (result == null) {
-                throw new IllegalResourceDescriptorException("Location does not specify a resource being tracked.");
+                throw new IllegalResourceDescriptorException("Location " + location + " does not specify a resource being tracked.");
             }
             return result;
         }
