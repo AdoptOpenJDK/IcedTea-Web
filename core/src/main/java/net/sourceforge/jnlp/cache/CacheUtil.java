@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -24,14 +23,13 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
-import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -49,6 +47,9 @@ import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
+import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
 
 /**
  * Provides static methods to interact with the cache, download
@@ -61,7 +62,7 @@ public class CacheUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CacheUtil.class);
 
-    private static final List<String> NON_CACHEABLE_PROTOCOLS = Arrays.asList("file", "jar");
+    private static final List<String> NON_CACHEABLE_PROTOCOLS = Arrays.asList(FILE_PROTOCOL, JAR_PROTOCOL);
 
     /**
      * Caches a resource and returns a URL for it in the cache;
@@ -71,13 +72,12 @@ public class CacheUtil {
      *
      * @param location location of the resource
      * @param version  the version, or {@code null}
-     * @param policy   how to handle update
      * @return either the location in the cache or the original location
      */
-    public static File downloadAndGetCacheFile(final URL location, final VersionString version, final UpdatePolicy policy) {
+    public static File downloadAndGetCacheFile(final URL location, final VersionString version) {
         try {
             final ResourceTracker rt = new ResourceTracker();
-            rt.addResource(location, version, policy);
+            rt.addResource(location, version);
             return rt.getCacheFile(location);
         } catch (Exception ex) {
             if (location.toString().startsWith("file:")) {
@@ -170,7 +170,7 @@ public class CacheUtil {
                  * So without mercy, hash it
                  */
                 String hexed = hex(new File(locationPath).getName(), locationPath);
-                return new File(path.toString(), hexed.toString());
+                return new File(path.toString(), hexed);
             } catch (NoSuchAlgorithmException ex) {
                 // should not occur, cite from javadoc:
                 // every java implementation should support
@@ -240,14 +240,15 @@ public class CacheUtil {
 
         try {
             if (indicator == null) {
-                tracker.waitForResources(resources, 0);
+                tracker.waitForResources(resources);
                 return;
             }
 
             // see if resources can be downloaded very quickly; avoids
             // overhead of creating display components for the resources
-            if (tracker.waitForResources(resources, indicator.getInitialDelay()))
+            if (tracker.waitForResources(resources, indicator.getInitialDelay(), MILLISECONDS)) {
                 return;
+            }
 
             // only resources not starting out downloaded are displayed
             final List<URL> urlList = new ArrayList<>();
@@ -255,7 +256,7 @@ public class CacheUtil {
                 if (!tracker.checkResource(url))
                     urlList.add(url);
             }
-            final URL[] undownloaded = urlList.toArray(new URL[urlList.size()]);
+            final URL[] undownloaded = urlList.toArray(new URL[0]);
 
             listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
 
@@ -277,7 +278,7 @@ public class CacheUtil {
                             tracker.getTotalSize(url),
                             percent);
                 }
-            } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
+            } while (!tracker.waitForResources(resources, indicator.getUpdateRate(), MILLISECONDS));
 
             // make sure they read 100% until indicator closes
             for (URL url : undownloaded) {
@@ -287,9 +288,9 @@ public class CacheUtil {
                         100);
             }
         } catch (InterruptedException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Downloading of resources was interrupted", ex);
         } finally {
-            if (listener != null)
+            if (indicator != null && listener != null)
                 indicator.disposeListener(listener);
         }
     }
@@ -321,20 +322,4 @@ public class CacheUtil {
 
         return indicator.getListener(title, undownloaded);
     }
-
-    static ResourceInfo getInfoFromCache(URL location, VersionString versionString) {
-        if (!isCacheable(location)) {
-            return null;
-        }
-        if (versionString == null) {
-            return Cache.getInfo(location, null);
-        }
-
-        final VersionId versionId = Cache.getBestMatchingVersionInCache(location, versionString);
-        if (versionId == null) {
-            return null;
-        }
-        return Cache.getInfo(location, versionId);
-    }
-
 }

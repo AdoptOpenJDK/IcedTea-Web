@@ -28,7 +28,6 @@ import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
@@ -69,7 +68,7 @@ import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.getJavaWsBin;
  *
  * @author Omair Majid
  *
- * 
+ *
  * This class builds also (freedesktop.org) menu entry out of a {@link JNLPFile}
  * Few notes valid November 2014:
  *    Mate/gnome 2/xfce - no meter of exec or icon put icon to defined/"others" Category
@@ -80,12 +79,12 @@ import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.getJavaWsBin;
  *          - name is GENERIC NAME and then little name
  *    Gnome 3 shell - exec must be valid program!
  *                  - also had issues with icon
- * 
+ *
  * conclusion:
  *  - backup icon to .config
  *  - use "Network" category
  *  - force valid launcher
- 
+
  * @author (not so proudly) Jiri Vanek
  */
 
@@ -196,7 +195,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         } else {
             return "browser_not_found";
         }
-        
+
     }
 
     /**
@@ -291,7 +290,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
     }
-    
+
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
@@ -333,7 +332,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public void refreshExistingShortcuts(boolean desktop, boolean menu) {
-        //TODO TODO TODO TODO TODO TODO TODO TODO 
+        //TODO TODO TODO TODO TODO TODO TODO TODO
         //check existing jnlp files
         //check launcher
         //get where it points
@@ -375,7 +374,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
         File cacheFile;
         if (uiconLocation != null) {
-            cacheFile  = CacheUtil.downloadAndGetCacheFile(uiconLocation, null, UpdatePolicy.SESSION);
+            cacheFile  = CacheUtil.downloadAndGetCacheFile(uiconLocation, null);
         } else {
             cacheFile = downloadFavIcon(file);
         }
@@ -408,12 +407,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
         this.iconLocation = target.getAbsolutePath();
         OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + cacheFile.getAbsolutePath());
     }
-    
+
     private File convertToIco(final File source, final String targetName) {
         try {
             BufferedImage img = ImageIO.read(source);
             short bitCount = (short)img.getColorModel().getPixelSize();
-            // Images with less than 32 bit color depth 
+            // Images with less than 32 bit color depth
             // are very hard to produce in ico format.
             // Therefore, the image is converted if necessary
             if (bitCount < 32)
@@ -432,16 +431,16 @@ public class XDesktopEntry implements GenericDesktopEntry {
             boolean written = ImageIO.write(img, PNG, bos);
             if (!written)
                 return null;
-                        
+
             final byte width  = (byte)(img.getWidth()  < 256 ? img.getWidth()   : 0);
             final byte height = (byte)(img.getHeight() < 256 ? img.getHeight()  : 0);
-            final byte colorCount = (byte)(bitCount < 8 ? Math.pow(2, bitCount) : 0);            
+            final byte colorCount = (byte)(bitCount < 8 ? Math.pow(2, bitCount) : 0);
             final byte[] imgBytes = bos.toByteArray();
             final int offset = 22;
             final int fileSize = imgBytes.length + offset;
             final ByteBuffer bytes = ByteBuffer.allocate(fileSize);
             bytes.order(ByteOrder.LITTLE_ENDIAN);
-            
+
             // Header
             bytes.putShort((short) 0);      // Reserved, must be 0
             bytes.putShort((short) 1);      // Image type: 1 for ico
@@ -458,9 +457,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
             // Image
             bytes.put(imgBytes);            // Image data
 
-            final File target = new File(PathsAndFiles.ICONS_DIR.getFile(), 
-                                         targetName.substring(0, 
-                                         targetName.lastIndexOf('.')) + ".ico"); 
+            final File target = new File(PathsAndFiles.ICONS_DIR.getFile(),
+                                         targetName.substring(0,
+                                         targetName.lastIndexOf('.')) + ".ico");
             try (FileOutputStream fos = new FileOutputStream(target)) {
                 fos.write(bytes.array());
                 fos.flush();
@@ -472,8 +471,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
             return null;
         }
     }
-    
-    String cacheAndGetIconLocation() {        
+
+    String cacheAndGetIconLocation() {
         try {
             cacheIcon();
         } catch (NonFileProtocolException ex) {
@@ -504,7 +503,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         return r;
     }
-    
+
     private static URL favUrl(String delimiter, String path, JNLPFile file) throws MalformedURLException {
         final String separator = path.endsWith(delimiter) ? "" : delimiter;
         return new URL(
@@ -521,7 +520,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 //JNLPFile.openURL(favico, null, UpdatePolicy.ALWAYS);
                 //this MAY throw npe, if url (specified in jnlp) points to 404
                 //the below works just fine
-                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null, UpdatePolicy.SESSION);
+                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null);
                 if (cacheFile != null) {
                     return cacheFile;
                 }
@@ -530,7 +529,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             //So rather duplicating the code here, then wait double time if the icon will be at the start of the path
             for (String path : possibleFavIconLocations(file.getNotNullProbableCodeBase().getPath())) {
                 URL favico = favUrl("\\", path, file);
-                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null, UpdatePolicy.SESSION);
+                File cacheFile = CacheUtil.downloadAndGetCacheFile(favico, null);
                 if (cacheFile != null) {
                     return cacheFile;
                 }
@@ -549,7 +548,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     private String getDesktopIconName() {
         return getDesktopIconName(file);
     }
-    
+
     static String getDesktopIconName(JNLPFile file) {
         return sanitize(file.createNameForDesktopFile());
     }
@@ -558,7 +557,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public File getDesktopIconFile() {
             return new File(getDesktop(), getDesktopIconFileName());
     }
-    
+
     static File getDesktop() {
         return new File(findFreedesktopOrgDesktopPathCatch());
     }
@@ -567,7 +566,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     public File getLinuxMenuIconFile() {
         return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
     }
-    
+
     @Override
     public String getDesktopIconFileName() {
         return getDesktopIconName() + ".desktop";
@@ -647,7 +646,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     private static final String MIC = "MAGIC_QUOTIN_ITW_CONSTANT_FOR_DUMMIES";
 
     private static String filterQuotes(String string) {
-        //get rid of " but not of 
+        //get rid of " but not of
         String s = string.replaceAll("\\\\\"", MIC);
         s = s.replaceAll("\"", "");
         s = s.replaceAll(MIC, "\\\"");
@@ -677,7 +676,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
 
     }
-    
+
      @Override
     public void createShortcutOnWindowsDesktop() {
         throw new UnsupportedOperationException("not supported on linux like systems");

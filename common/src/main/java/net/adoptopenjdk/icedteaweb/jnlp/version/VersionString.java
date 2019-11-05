@@ -46,6 +46,8 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  */
 public class VersionString {
 
+    public static VersionString ANY_VERSION = fromString("0+");
+
     private final VersionRange[] versionRanges;
 
     private VersionString(final VersionRange[] versionRanges) {
@@ -148,7 +150,7 @@ public class VersionString {
 
     @Override
     public boolean equals(final Object otherVersionString) {
-        if (otherVersionString == null || otherVersionString.getClass() != VersionRange.class) {
+        if (otherVersionString == null || otherVersionString.getClass() != VersionString.class) {
             return false;
         }
         final VersionString other = (VersionString) otherVersionString;

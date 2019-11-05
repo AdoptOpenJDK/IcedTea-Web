@@ -4,44 +4,33 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 
 import java.net.URL;
 
-class ResourceInfoBean implements ResourceInfo {
+public class DownloadInfo {
 
     private final URL resourceHref;
     private final VersionId version;
-    private final long size;
     private final long lastModified;
     private final long downloadedAt;
 
-    ResourceInfoBean(URL resourceHref, VersionId version, long size, long lastModified, long downloadedAt) {
+    public DownloadInfo(URL resourceHref, VersionId version, long lastModified) {
         this.resourceHref = resourceHref;
         this.version = version;
-        this.size = size;
         this.lastModified = lastModified;
-        this.downloadedAt = downloadedAt;
+        this.downloadedAt = System.currentTimeMillis();
     }
 
-    @Override
-    public URL getResourceHref() {
+    URL getResourceHref() {
         return resourceHref;
     }
 
-    @Override
-    public VersionId getVersion() {
+    VersionId getVersion() {
         return version;
     }
 
-    @Override
-    public long getSize() {
-        return size;
-    }
-
-    @Override
-    public long getLastModified() {
+    long getLastModified() {
         return lastModified;
     }
 
-    @Override
-    public long getDownloadedAt() {
+    long getDownloadedAt() {
         return downloadedAt;
     }
 }

@@ -33,6 +33,9 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.resources.IllegalResourceDescriptorException;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
@@ -42,10 +45,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
@@ -97,6 +97,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
@@ -182,17 +183,17 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * loads the resources
      */
-    private final ResourceTracker tracker = new ResourceTracker(true); // prefetch
+    private final ResourceTracker tracker;
 
     /**
      * the update policy for resources
      */
-    private UpdatePolicy updatePolicy;
+    private final UpdatePolicy updatePolicy;
 
     /**
      * the JNLP file
      */
-    private JNLPFile file;
+    private final JNLPFile file;
 
     /**
      * the resources section
@@ -313,6 +314,7 @@ public class JNLPClassLoader extends URLClassLoader {
         strict = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
+        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
@@ -681,8 +683,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jar.isEager()) {
                 initialJars.add(jar); // regardless of part
             }
-            tracker.addResource(jar.getLocation(),
-                    jar.getVersion(), file.getDownloadOptions(),
+            tracker.addResource(jar.getLocation(), jar.getVersion(),
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
 
@@ -958,7 +959,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
-                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals("file")) {
+                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
                             jn = new File(jnlp.getFileLocation().getPath());
                         } else {
                             jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
@@ -1235,7 +1236,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     continue;
                                 }
 
-                                tracker.addResource(new File(extractedJarLocation).toURI().toURL(), (VersionString) null, null);
+                                tracker.addResource(new File(extractedJarLocation).toURI().toURL(), (VersionString) null);
 
                                 URL codebase = file.getCodeBase();
                                 if (codebase == null) {

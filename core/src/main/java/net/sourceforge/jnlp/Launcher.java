@@ -23,12 +23,10 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
@@ -53,6 +51,7 @@ import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder.getLauncher;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * Launches JNLPFiles either in the foreground or background.
@@ -335,7 +334,7 @@ public class Launcher {
 
             boolean isLocal = false;
             boolean haveHref = false;
-            if ("file".equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
+            if (FILE_PROTOCOL.equalsIgnoreCase(location.getProtocol()) && new File(location.getFile()).exists()) {
                 isLocal = true;
             }
             if (file.getSourceLocation() != null) {

@@ -108,4 +108,8 @@ public class CloseableConnection implements Closeable {
     public long getContentLength() {
         return delegate.getContentLengthLong();
     }
+
+    public void setConnectTimeout(int timeout) {
+        delegate.setConnectTimeout(timeout);
+    }
 }

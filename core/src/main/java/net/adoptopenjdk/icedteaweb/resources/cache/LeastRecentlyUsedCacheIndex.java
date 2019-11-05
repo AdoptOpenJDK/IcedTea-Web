@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionIdComparator;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -10,7 +9,6 @@ import net.sourceforge.jnlp.util.PropertiesFile;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Comparator.comparing;
 
 /**
  * Index of the cached resources.
@@ -76,6 +73,18 @@ class LeastRecentlyUsedCacheIndex {
     }
 
     /**
+     * Finds all entries matching the resource independent of their version.
+     *
+     * @return a set of all matching entries, never {@code null}.
+     */
+    Set<LeastRecentlyUsedCacheEntry> findAll(URL resourceHref) {
+        return entries.stream()
+                .filter(e -> !e.isMarkedForDeletion())
+                .filter(e -> e.matches(resourceHref))
+                .collect(Collectors.toSet());
+    }
+
+    /**
      * Finds all entries matching the resource and version.
      *
      * @return a set of all matching entries, never {@code null}.
@@ -85,23 +94,6 @@ class LeastRecentlyUsedCacheIndex {
                 .filter(e -> !e.isMarkedForDeletion())
                 .filter(e -> e.matches(resourceHref, versionString))
                 .collect(Collectors.toSet());
-    }
-
-    /**
-     * Finds the best matching cache entry.
-     * Will move the returned entry to the beginning of the cache (marked as accessed)
-     *
-     * @return the entry or {@code empty}, never {@code null}
-     */
-    Optional<LeastRecentlyUsedCacheEntry> findBestAndMarkAsAccessed(URL resourceHref, VersionString versionString) {
-        final Comparator<VersionId> versionIdaComparator = versionString != null ? new VersionIdComparator(versionString) : (o1, o2) -> o1 == o2 ? 0 : 1;
-        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdaComparator);
-        final Optional<LeastRecentlyUsedCacheEntry> result = findAll(resourceHref, versionString).stream()
-                .max(versionComparator);
-
-        result.ifPresent(this::markAccessed);
-
-        return result;
     }
 
     /**
@@ -196,31 +188,27 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return true, if cache was corrupted and affected entry removed
      */
-    static ConversionResult convertPropertiesToEntries(Properties props) {
+    static ConversionResult convertPropertiesToEntries(PropertiesFile props) {
         boolean modified = false;
 
         // STEP 1
         // group all properties with the same ID together
         // throwing away entries which do not have a valid key
         final Map<String, Map<String, String>> id2ValueMap = new HashMap<>();
-        for (Map.Entry<Object, Object> propEntry : new HashSet<>(props.entrySet())) {
-            final Object rawKey = propEntry.getKey();
-            if (rawKey instanceof String) {
-                final String[] keyParts = splitKey((String) rawKey);
+        for (Map.Entry<String, String> propEntry : new HashSet<>(props.entrySet())) {
+            final String key = propEntry.getKey();
+            if (key != null) {
+                final String[] keyParts = splitKey(key);
                 if (keyParts.length == 2) {
-                    final Object rawValue = propEntry.getValue();
-                    if (rawValue == null || rawValue instanceof String) {
-                        final String value = (String) rawValue;
-                        id2ValueMap.computeIfAbsent(keyParts[0], k -> new HashMap<>()).put(keyParts[1], value);
-
-                        continue;
-                    }
+                    final String value = propEntry.getValue();
+                    id2ValueMap.computeIfAbsent(keyParts[0], k -> new HashMap<>()).put(keyParts[1], value);
+                    continue;
                 }
             }
 
             // if we reach this point something is wrong with the property
-            LOG.debug("found broken property: {}", rawKey);
-            props.remove(rawKey);
+            LOG.debug("found broken property: {}", key);
+            props.remove(key);
             modified = true;
         }
 

@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 
@@ -27,29 +27,11 @@ import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
  */
 public class UpdatePolicy {
 
-    // todo: implement session updating
-
-    // todo: doesn't seem to work in the same JVM, probably because
-    // Resource is being held by a tracker so it isn't collected;
-    // then next time a tracker adds the resource even if
-    // shouldUpdate==true it's state is already marked
-    // CONNECTED|DOWNLOADED.  Let the resource be collected or reset
-    // to UNINITIALIZED.
-
     public static UpdatePolicy ALWAYS = new UpdatePolicy(0);
-    public static UpdatePolicy SESSION = new UpdatePolicy(-1);
     public static UpdatePolicy FORCE = new UpdatePolicy(Long.MIN_VALUE);
     public static UpdatePolicy NEVER = new UpdatePolicy(Long.MAX_VALUE);
 
     private final long timeDiff;
-
-    /**
-     * Create a new update policy; this policy always updates the
-     * entry unless the shouldUpdate method is overridden.
-     */
-    public UpdatePolicy() {
-        this(-1);
-    }
 
     /**
      * Create an update policy that only checks a file for being
@@ -67,7 +49,7 @@ public class UpdatePolicy {
      * up-to-date.
      * @param entry entry which should be cared
      */
-    boolean shouldUpdate(ResourceInfo entry) {
+    public boolean shouldUpdate(ResourceInfo entry) {
         long updated = entry.getDownloadedAt();
         long current = System.currentTimeMillis();
 

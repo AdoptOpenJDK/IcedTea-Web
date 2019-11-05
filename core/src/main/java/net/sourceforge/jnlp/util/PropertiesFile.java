@@ -26,7 +26,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A properties object backed by a specified file without throwing
@@ -37,9 +41,14 @@ import java.util.Properties;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.4 $
  */
-public class PropertiesFile extends Properties {
+public class PropertiesFile {
 
-    private final static Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PropertiesFile.class);
+
+    /**
+     * actual properties
+     */
+    private final Properties delegate = new Properties();
 
     /**
      * the file to save to
@@ -55,6 +64,8 @@ public class PropertiesFile extends Properties {
      * time of last modification, lazy loaded on getProperty
      */
     private long lastStore;
+
+    private boolean dirty;
 
     /**
      * Create a properties object backed by the specified file.
@@ -80,24 +91,22 @@ public class PropertiesFile extends Properties {
      * @return the value of the specified key, or null if the key
      * does not exist.
      */
-    @Override
     public String getProperty(final String key) {
         if (lastStore == 0) {
             load();
         }
-        return super.getProperty(key);
+        return delegate.getProperty(key);
     }
 
     /**
      * @return the value of the specified key, or the default value
      * if the key does not exist.
      */
-    @Override
     public String getProperty(final String key, final String defaultValue) {
         if (lastStore == 0) {
             load();
         }
-        return super.getProperty(key, defaultValue);
+        return delegate.getProperty(key, defaultValue);
     }
 
     /**
@@ -105,12 +114,34 @@ public class PropertiesFile extends Properties {
      *
      * @return the previous value
      */
-    @Override
     public Object setProperty(final String key, final String value) {
         if (lastStore == 0) {
             load();
         }
-        return super.setProperty(key, value);
+        dirty = true;
+        return delegate.setProperty(key, value);
+    }
+
+    public boolean containsPropertyKey(String key) {
+        if (lastStore == 0) {
+            load();
+        }
+        return delegate.containsKey(key);
+    }
+
+    public boolean containsPropertyValue(String value) {
+        if (lastStore == 0) {
+            load();
+        }
+        return delegate.containsValue(value);
+    }
+
+    public void clear() {
+        if (lastStore == 0) {
+            load();
+        }
+        dirty = true;
+        delegate.clear();
     }
 
     /**
@@ -118,12 +149,23 @@ public class PropertiesFile extends Properties {
      *
      * @return the previous value
      */
-    @Override
-    public synchronized Object remove(Object key) {
+    public synchronized String remove(String key) {
         if (lastStore == 0) {
             load();
         }
-        return super.remove(key);
+        dirty = containsPropertyKey(key);
+        return (String) delegate.remove(key);
+    }
+
+    public Set<Map.Entry<String, String>> entrySet() {
+        if (lastStore == 0) {
+            load();
+        }
+        return delegate.entrySet().stream()
+                .filter(e -> e.getKey() instanceof String)
+                .filter(e -> e.getValue() instanceof String)
+                .map(e -> new SimpleImmutableEntry<>((String)e.getKey(), (String) e.getValue()))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -156,10 +198,12 @@ public class PropertiesFile extends Properties {
          *  - current file modification timestamp has not changed since last store AND current system time equals current file modification timestamp
          *    This is necessary because some filesystems seems only to provide accuracy of the timestamp on the level of seconds!
          */
-        if (lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
+        if (dirty || lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
             try (InputStream s = new FileInputStream(file)) {
-                load(s);
+                delegate.clear();
+                delegate.load(s);
                 lastStore = currentStore;
+                dirty = false;
                 return true;
             } catch (final IOException ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
@@ -175,10 +219,11 @@ public class PropertiesFile extends Properties {
         final File file = lockableFile.getFile();
         try (final FileOutputStream s = new FileOutputStream(file)) {
             file.getParentFile().mkdirs();
-            store(s, header);
+            delegate.store(s, header);
             // fsync()
             s.getChannel().force(true);
             lastStore = file.lastModified();
+            dirty = false;
         } catch (final IOException ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
@@ -216,5 +261,4 @@ public class PropertiesFile extends Properties {
     public boolean isHeldByCurrentThread() {
         return lockableFile.isHeldByCurrentThread();
     }
-
 }

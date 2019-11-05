@@ -1,4 +1,4 @@
-/* 
+/*
  Copyright (C) 2011 Red Hat, Inc.
 
  This file is part of IcedTea.
@@ -59,13 +59,13 @@ public class HttpUtils {
         try {
             consumeAndCloseConnection(c);
         } catch (final IOException ex) {
-            LOG.warn("Following exception should be harmless, but may help in finding root cause.", ex);
+            LOG.debug("Following exception should be harmless, but may help in finding root cause.", ex);
         }
     }
 
     /**
      * Ensure a CloseableHttpConnection is fully read, required for correct behavior.
-     * 
+     *
      * @param c connection to be closed
      * @throws IOException if an I/O exception occurs.
      */

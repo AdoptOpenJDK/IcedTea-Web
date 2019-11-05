@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 
@@ -9,17 +9,20 @@ import java.net.URL;
  * and content length of a url request.
  */
 class UrlRequestResult {
+
+    private final URL url;
     private final int responseCode;
-    private final URL location; // HTTP header field "Location" as URL (redirection or newly created resource)
+    private final URL location; // HTTP header field "Location" (used for redirection)
     private final VersionId version;
     private final long lastModified;
     private final long contentLength;
 
-    UrlRequestResult(int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
+    UrlRequestResult(URL url, int responseCode, URL location, VersionId version, long lastModified, long contentLength) {
         if (isRedirectResponseCode(responseCode) && location == null) {
             throw new IllegalStateException("Redirect response code found but location URL is null.");
         }
 
+        this.url = url;
         this.responseCode = responseCode;
         this.location = location;
         this.version = version;
@@ -27,14 +30,8 @@ class UrlRequestResult {
         this.contentLength = contentLength;
     }
 
-    /**
-     * Create a new {@link UrlRequestResult} based on this with the given redirect url.
-     *
-     * @param location the location
-     * @return a new {@link UrlRequestResult} based on this with the given redirect url
-     */
-    UrlRequestResult withLocation(final URL location) {
-        return new UrlRequestResult(responseCode, location, version, lastModified, contentLength);
+    URL getUrl() {
+        return url;
     }
 
     URL getLocation() {
@@ -53,7 +50,7 @@ class UrlRequestResult {
         return contentLength;
     }
 
-    long getLastModified() {
+    public long getLastModified() {
         return lastModified;
     }
 
@@ -79,15 +76,17 @@ class UrlRequestResult {
     /**
      * @return whether the return code is a success
      */
-    boolean isSuccess() {
+    public boolean isSuccess() {
         return String.valueOf(responseCode).startsWith("2");
     }
 
     @Override
     public String toString() {
         return ""
-                + "location: " + (location == null ? "null" : location.toExternalForm()) + "; "
+                + "url:" + url + "; "
                 + "responseCode:" + responseCode + "; "
+                + "location: " + location + "; "
+                + "version: " + version + "; "
                 + "lastModified: " + lastModified + "; "
                 + "contentLength: " + contentLength + "; ";
     }

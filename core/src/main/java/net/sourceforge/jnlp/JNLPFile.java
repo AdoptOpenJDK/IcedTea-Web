@@ -38,12 +38,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.LocaleUtils;
 import net.sourceforge.jnlp.util.LocaleUtils.Match;
@@ -69,6 +69,7 @@ import java.util.Objects;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * <p>
@@ -301,7 +302,7 @@ public class JNLPFile {
         //(i.e. If the jnlp file being launched exist locally, but it
         //originated from a website, then download the one from the website
         //into the cache).
-        if (sourceLocation != null && "file".equals(location.getProtocol())) {
+        if (sourceLocation != null && FILE_PROTOCOL.equals(location.getProtocol())) {
             openURL(sourceLocation, version, policy);
         }
 
@@ -376,8 +377,8 @@ public class JNLPFile {
             throw new IllegalArgumentException("Null parameter");
 
         try {
-            ResourceTracker tracker = new ResourceTracker(false); // no prefetch
-            tracker.addResource(location, version, policy);
+            ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
+            tracker.addResource(location, version);
             File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
         }

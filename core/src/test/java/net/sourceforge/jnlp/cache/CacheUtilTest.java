@@ -36,6 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerTest;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.Assert;

@@ -30,7 +30,7 @@ public class AppTrustWarningPanelTest {
     private static List<AppTrustWarningPanel> panelList = new ArrayList<AppTrustWarningPanel>();
     private static File appletSecurityBackup;
 
-    
+
     public static void backupAppletSecurity() throws IOException {
         appletSecurityBackup = File.createTempFile("appletSecurity", "itwTestBackup");
         FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), appletSecurityBackup);

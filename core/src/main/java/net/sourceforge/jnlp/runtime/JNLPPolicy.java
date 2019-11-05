@@ -41,6 +41,8 @@ import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
 
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
+
 /**
  * Policy for JNLP environment.  This class delegates to the
  * system policy but always grants permissions to the JNLP code
@@ -190,7 +192,7 @@ public class JNLPPolicy extends Policy {
             return true;
         }
 
-        if (sourceProtocol.equalsIgnoreCase("file")) {
+        if (sourceProtocol.equalsIgnoreCase(FILE_PROTOCOL)) {
             try {
                 final Path jreExtDirPath = Paths.get(jreExtDir);
                 final Path sourcePath = Paths.get(location.toURI());

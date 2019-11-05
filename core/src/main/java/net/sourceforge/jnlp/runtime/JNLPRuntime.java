@@ -27,11 +27,11 @@ import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndica
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -78,6 +78,7 @@ import java.util.Date;
 import java.util.List;
 
 import static net.sourceforge.jnlp.runtime.ForkingStrategy.IF_JNLP_REQUIRES;
+import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * <p>
@@ -431,7 +432,7 @@ public class JNLPRuntime {
     }
 
     public static boolean isConnectable(URL location) {
-        if (location.getProtocol().equals("file")) {
+        if (location.getProtocol().equals(FILE_PROTOCOL)) {
             return true;
         }
 

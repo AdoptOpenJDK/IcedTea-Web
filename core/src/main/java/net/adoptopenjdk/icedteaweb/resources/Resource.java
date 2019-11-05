@@ -14,20 +14,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.Future;
 
 /**
  * <p>
@@ -49,50 +46,21 @@ import java.util.Set;
  * @version $Revision: 1.9 $
  */
 public class Resource {
-    // todo: fix resources to handle different versions
-
-    // todo: IIRC, any resource is checked for being up-to-date
-    // only once, regardless of UpdatePolicy.  verify and fix.
-
-    public enum Status {
-        PRECONNECT,
-        CONNECTING,
-        CONNECTED,
-        PREDOWNLOAD,
-        DOWNLOADING,
-        DOWNLOADED,
-        ERROR,
-    }
 
     /** list of weak references of resources currently in use */
     private static final WeakList<Resource> resources = new WeakList<>();
 
+    public enum Status {
+        INCOMPLETE,
+        DOWNLOADED,
+        ERROR,
+    }
+
     /** the remote location of the resource */
     private final URL location;
 
-    /** the location to use when downloading */
-    private URL downloadLocation;
-
-    /** the local file downloaded to */
-    private File localFile;
-
     /** the requested version */
     private final VersionString requestVersion;
-
-    /** the version downloaded from server */
-    private VersionId downloadVersion;
-
-    /** amount in bytes transferred */
-    private volatile long transferred = 0;
-
-    /** total size of the resource, or -1 if unknown */
-    private volatile long size = -1;
-
-    /** true if this resource is being processed */
-    private volatile boolean isBeingProcessed = false;
-
-    /** the status of the resource */
-    private final EnumSet<Status> status = EnumSet.noneOf(Status.class);
 
     /** Update policy for this resource */
     private final UpdatePolicy updatePolicy;
@@ -100,12 +68,26 @@ public class Resource {
     /** Download options for this resource */
     private final DownloadOptions downloadOptions;
 
+    /** the local file downloaded to */
+    private File localFile;
+
+    /** amount in bytes transferred */
+    private volatile long transferred = 0;
+
+    /** total size of the resource, or -1 if unknown */
+    private volatile long size = -1;
+
+    /** A future to wait for completion of download of this resource */
+    private volatile Future<Resource> futureForDownlaoded;
+
+    /** the status of the resource */
+    private volatile Status status = Status.INCOMPLETE;
+
     /**
      * Create a resource.
      */
     private Resource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         this.location = location;
-        this.downloadLocation = location;
         this.requestVersion = requestVersion;
         this.downloadOptions = downloadOptions;
         this.updatePolicy = updatePolicy;
@@ -152,26 +134,6 @@ public class Resource {
     }
 
     /**
-     * Returns the URL to use for downloading the resource. This can be
-     * different from the original location since it may use a different
-     * file name to support versioning and compression
-     *
-     * @return the url to use when downloading
-     */
-    URL getDownloadLocation() {
-        return downloadLocation;
-    }
-
-    /**
-     * Set the url to use for downloading the resource
-     *
-     * @param downloadLocation url to be downloaded
-     */
-    void setDownloadLocation(URL downloadLocation) {
-        this.downloadLocation = downloadLocation;
-    }
-
-    /**
      * @return the local file currently being downloaded
      */
     File getLocalFile() {
@@ -183,31 +145,15 @@ public class Resource {
      *
      * @param localFile location of stored resource
      */
-    void setLocalFile(File localFile) {
+    public void setLocalFile(File localFile) {
         this.localFile = localFile;
     }
 
     /**
      * @return the requested version
      */
-    VersionString getRequestVersion() {
+    public VersionString getRequestVersion() {
         return requestVersion;
-    }
-
-    /**
-     * @return the version downloaded from server
-     */
-    VersionId getDownloadVersion() {
-        return downloadVersion;
-    }
-
-    /**
-     * Sets the version downloaded from server
-     *
-     * @param downloadVersion version of downloaded resource
-     */
-    void setDownloadVersion(final VersionId downloadVersion) {
-        this.downloadVersion = downloadVersion;
     }
 
     /**
@@ -222,7 +168,7 @@ public class Resource {
      *
      * @param transferred set the whole transferred amount to this value
      */
-    void setTransferred(long transferred) {
+    public void setTransferred(long transferred) {
         this.transferred = transferred;
     }
 
@@ -244,19 +190,16 @@ public class Resource {
         this.size = size;
     }
 
-    public boolean isBeingProcessed() {
-        return isBeingProcessed;
+    boolean isBeingProcessed() {
+        return futureForDownlaoded != null;
     }
 
-    public void startProcessing() {
-        isBeingProcessed = true;
+    void startProcessing(Future<Resource> futureThis) {
+        this.futureForDownlaoded = futureThis;
     }
 
-    /**
-     * @return the status of the resource
-     */
-    Set<Status> getCopyOfStatus() {
-        return EnumSet.copyOf(status);
+    Future<Resource> getFutureForDownloaded() {
+        return futureForDownlaoded;
     }
 
     /**
@@ -266,97 +209,40 @@ public class Resource {
      * @return true iff the flag is set
      */
     boolean isSet(Status flag) {
-        synchronized (status) {
-            return status.contains(flag);
-        }
-    }
-
-    /**
-     * Check if all the specified flags are set.
-     *
-     * @param flags a collection of flags
-     * @return true iff all the flags are set
-     */
-    boolean hasAllFlags(Collection<Status> flags) {
-        synchronized (status) {
-            return status.containsAll(flags);
-        }
+        return status == flag;
     }
 
     boolean isComplete() {
-        synchronized (status) {
-            return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
-        }
+        return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
     }
 
     /**
      * @return the update policy for this resource
      */
-    UpdatePolicy getUpdatePolicy() {
+    public UpdatePolicy getUpdatePolicy() {
         return this.updatePolicy;
     }
 
-    /**
-     * Returns a human-readable status string.
-     */
-    private String getStatusString() {
-        StringBuilder result = new StringBuilder();
-
-        synchronized (status) {
-            if (status.isEmpty()) {
-                return "<>";
-            }
-            for (Status stat : status) {
-                result.append(stat.toString()).append(" ");
-            }
-        }
-
-        return result.toString().trim();
+    public boolean forceUpdateRequested() {
+        return updatePolicy == UpdatePolicy.FORCE;
     }
 
     /**
-     * Changes the status by clearing the flags in the first
-     * parameter and setting the flags in the second.  This method
-     * is synchronized on this resource.
+     * Changes the status.
      *
-     * @param clear a collection of status flags to unset
-     * @param add   a collection of status flags to set
+     * @param status a collection of status flags to set
      */
-    void changeStatus(Collection<Status> clear, Collection<Status> add) {
-        synchronized (status) {
-            if (clear != null) {
-                status.removeAll(clear);
-            }
-            if (add != null) {
-                status.addAll(add);
-            }
-        }
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    /**
-     * Clear all flags
-     */
-    void resetStatus() {
-        synchronized (status) {
-            status.clear();
-        }
-    }
-
-    DownloadOptions getDownloadOptions() {
+    public DownloadOptions getDownloadOptions() {
         return this.downloadOptions;
-    }
-
-    boolean isConnectable() {
-        return JNLPRuntime.isConnectable(this.location);
     }
 
     @Override
     public int hashCode() {
-        // FIXME: should probably have a better hashcode than this, but considering
-        // #equals(Object) was already defined first (without also overriding hashcode!),
-        // this is just being implemented in line with that so we don't break HashMaps,
-        // HashSets, etc
-        return location.hashCode();
+        return Objects.hash(location, requestVersion);
     }
 
     @Override
@@ -367,14 +253,14 @@ public class Resource {
             // time spent in synchronized addResource determining if
             // Resource is already in a tracker, and better for offline
             // mode on some OS.
-            // TODO: handle Version
-            return UrlUtils.urlEquals(location, ((Resource) other).location);
+            final Resource otherResource = (Resource) other;
+            return UrlUtils.urlEquals(location, otherResource.location) && Objects.equals(requestVersion, otherResource.getRequestVersion());
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return "location=" + location.toString() + " state=" + getStatusString();
+        return "location=" + location.toString() + " version=" + requestVersion + " state=" + status;
     }
 }

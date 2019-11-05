@@ -39,6 +39,8 @@ package net.sourceforge.jnlp;
 
 public class DownloadOptions {
 
+    public static final DownloadOptions NONE = new DownloadOptions(false, false);
+
     private final boolean usePack200;
     private final boolean useVersion;
 

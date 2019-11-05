@@ -38,7 +38,9 @@ exception statement from your version.
 package net.sourceforge.jnlp.util;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,18 +54,18 @@ public class PropertiesFileTest {
 
     private PropertiesFile propertiesFile;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
     public void setup() throws IOException {
-        File lru = Files.createTempFile("properties_file", ".tmp").toFile();
-        lru.createNewFile();
-        lru.deleteOnExit();
-        propertiesFile = new PropertiesFile(lru);
+        propertiesFile = new PropertiesFile(temporaryFolder.newFile("properties_file"));
     }
 
     @Test
     public void testSetProperty() {
         propertiesFile.setProperty("key", "value");
-        assertTrue(propertiesFile.containsKey("key") && propertiesFile.containsValue("value"));
+        assertTrue(propertiesFile.containsPropertyKey("key") && propertiesFile.containsPropertyValue("value"));
     }
 
     @Test
@@ -110,7 +112,7 @@ public class PropertiesFileTest {
             assertTrue("File was not reloaded!", reloaded);
 
             // 3. add some entries and store
-            fillProperties(10);
+            fillProperties();
 
             propertiesFile.store();
             reloaded = propertiesFile.load();
@@ -121,8 +123,8 @@ public class PropertiesFileTest {
         }
     }
 
-    private void fillProperties(int noEntries) {
-        for(int i = 0; i < noEntries; i++) {
+    private void fillProperties() {
+        for(int i = 0; i < 10; i++) {
             propertiesFile.setProperty(String.valueOf(i), String.valueOf(i));
         }
     }
@@ -140,7 +142,7 @@ public class PropertiesFileTest {
     }
 
     @Test
-    public void testLoad() throws InterruptedException {
+    public void testLoad() {
         try {
             propertiesFile.lock();
 
@@ -150,7 +152,8 @@ public class PropertiesFileTest {
             propertiesFile.setProperty("shouldNotRemainAfterLoad", "def");
             propertiesFile.load();
 
-            assertFalse(propertiesFile.contains("shouldNotRemainAfterLoad"));
+            assertTrue(propertiesFile.containsPropertyKey("key"));
+            assertFalse(propertiesFile.containsPropertyKey("shouldNotRemainAfterLoad"));
         } finally {
             propertiesFile.unlock();
 
@@ -165,7 +168,7 @@ public class PropertiesFileTest {
             propertiesFile.setProperty("key", "value");
             propertiesFile.store();
 
-            Thread.sleep(1000l);
+            Thread.sleep(1000L);
 
             assertFalse(propertiesFile.load());
         } finally {
@@ -174,7 +177,7 @@ public class PropertiesFileTest {
     }
 
     @Test
-    public void testLock() throws IOException {
+    public void testLock() {
         try {
             propertiesFile.lock();
             assertTrue(propertiesFile.isHeldByCurrentThread());
@@ -184,12 +187,12 @@ public class PropertiesFileTest {
     }
 
     @Test
-    public void testUnlock() throws IOException {
+    public void testUnlock() {
         try {
             propertiesFile.lock();
         } finally {
             propertiesFile.unlock();
         }
-        assertTrue(!propertiesFile.isHeldByCurrentThread());
+        assertFalse(propertiesFile.isHeldByCurrentThread());
     }
 }

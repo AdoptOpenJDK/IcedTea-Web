@@ -34,7 +34,7 @@
  this exception to your version of the library, but you are not
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version. */
-package net.sourceforge.jnlp.cache;
+package net.adoptopenjdk.icedteaweb.resources;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -42,9 +42,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class CachedDaemonThreadPoolProvider {
+public class CachedDaemonThreadPoolProvider {
 
-    public static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(3, new DaemonThreadFactory());
+    private static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(6, new DaemonThreadFactory());
 
     public static Executor getThreadPool() {
         return DAEMON_THREAD_POOL;
