@@ -38,6 +38,7 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.sourceforge.jnlp.DownloadOptions;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
@@ -50,53 +51,45 @@ public class ResourceTest {
 
     @Test
     public void testGetLocation() throws Exception {
-        String testName = "GetLocation";
-        Resource res = createResource(testName);
-        URL location = res.getLocation();
-        URL sameUrl = new URL("http://example.com/applet" + testName + ".jar");
-        assertEquals("Locations should match each other", sameUrl, location);
-    }
+        final URL url = new URL("http://example.com/applet.jar");
+        final VersionString requestVersion = VersionString.fromString("1.0");
 
-    @Test
-    public void testGetRequestVersion() throws Exception {
-        final String testName = "GetRequestVersion";
-        final Resource res = createResource(testName);
-        final VersionString getVersion = res.getRequestVersion();
+        final Resource res = Resource.createResource(url, requestVersion, null, UpdatePolicy.ALWAYS);
 
-        assertTrue("Versions should match each other.", getVersion.contains("1.0"));
+        assertEquals("Locations should match each other", url, res.getLocation());
+        assertEquals("Versions should match each other.", res.getRequestVersion(), requestVersion);
     }
 
     @Test
     public void testTransferredIsZero() throws Exception {
-        String testName = "TransferredIsZero";
-        Resource res = createResource(testName);
+        final Resource res = createResource();
         assertEquals(0, res.getTransferred());
     }
 
     @Test
     public void testSizeIsNegativeOne() throws Exception {
-        String testName = "SizeIsNegativeOne";
-        Resource res = createResource(testName);
+        final Resource res = createResource();
         assertEquals(-1, res.getSize());
     }
 
     @Test
     public void testSetSize() throws Exception {
-        String testName = "SetSize";
-        Resource res = createResource(testName);
-        long original = res.getSize();
-        res.setSize(original + 10);
-        assertEquals(original + 10,res.getSize());
+        final Resource res = createResource();
+        final long newSize = res.getSize() + 10;
+
+        res.setSize(newSize);
+
+        assertEquals(newSize, res.getSize());
     }
 
     @Test
     public void testNewResourceIsUninitialized() throws Exception {
-        Resource res = createResource("NewResource");
+        Resource res = createResource();
         assertTrue("Resource should not have had any status flags set", res.isSet(Resource.Status.INCOMPLETE));
     }
 
-    private static Resource createResource(String testName) throws MalformedURLException {
-        final URL dummyUrl = new URL("http://example.com/applet" + testName + ".jar");
-        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
+    private static Resource createResource() throws MalformedURLException {
+        final URL dummyUrl = new URL("http://example.com/applet.jar");
+        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), DownloadOptions.NONE, UpdatePolicy.ALWAYS);
     }
 }
