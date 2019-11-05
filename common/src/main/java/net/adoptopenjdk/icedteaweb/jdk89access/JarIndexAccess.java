@@ -15,7 +15,7 @@ import java.util.jar.JarFile;
  */
 public class JarIndexAccess {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JarIndexAccess.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JarIndexAccess.class);
 
     private static final String CLASS_SUN_MISC_JAR_INDEX = "sun.misc.JarIndex";
     private static final String CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX = "jdk.internal.util.jar.JarIndex";
@@ -32,10 +32,10 @@ public class JarIndexAccess {
             jarIndexClass = Class.forName(CLASS_SUN_MISC_JAR_INDEX);
         } catch (ClassNotFoundException ex) {
             try {
-                LOG.error("Running jdk9+ ?", ex);
+                LOG.debug(CLASS_SUN_MISC_JAR_INDEX + " not found - Running jdk9+ ?");
                 jarIndexClass = Class.forName(CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX);
             } catch (ClassNotFoundException exx) {
-                LOG.error("ERROR", exx);
+                LOG.error(CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX + " not found");
                 throw new RuntimeException("JarIndex not found!");
             }
         }
