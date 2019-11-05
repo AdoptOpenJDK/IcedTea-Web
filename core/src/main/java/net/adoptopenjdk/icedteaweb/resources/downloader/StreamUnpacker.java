@@ -23,13 +23,13 @@ import java.net.URL;
 /**
  * Allows to unpack an input stream.
  */
-public interface StreamUnpacker {
+interface StreamUnpacker {
 
     static StreamUnpacker toUnpack(final DownloadDetails downloadDetails) {
-        URL downloadFrom = downloadDetails.downloadFrom;
-        String contentEncoding = downloadDetails.contentEncoding;
-        boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
-        boolean gzip = "gzip".equals(contentEncoding);
+        final URL downloadFrom = downloadDetails.downloadFrom;
+        final String contentEncoding = downloadDetails.contentEncoding;
+        final boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
+        final boolean gzip = "gzip".equals(contentEncoding);
 
         // It's important to check packgz first. If a stream is both
         // pack200 and gz encoded, then con.getContentEncoding() could
