@@ -168,6 +168,7 @@ if not defined ITW_NATIVEDEBUG_PORT (
 
 set "JAVA_ARGS="
 set "ARGS="
+set NATIVE_DEBUG=
 
 for %%a IN (%*) do (
   set "_arg=%%a"
@@ -176,8 +177,8 @@ for %%a IN (%*) do (
   if "!_beg!" == "-J" (
     set "JAVA_ARGS=!JAVA_ARGS! !_arg:~2!"
   ) else (
-    if "!_arg:~0,1!" == "-" if not "x!_arg:nativeDebug=!" == "x!_arg!" (
-      set "ARGS=!ARGS! -Xdebug -Xrunjdwp:transport=dt_socket,server=,suspend=!ITW_NATIVEDEBUG_SUSPEND!,address=!ITW_NATIVEDEBUG_PORT!"
+    if "!_arg:~0,1!" == "-" if "!_arg:~-11!" == "nativeDebug" (
+      set "NATIVE_DEBUG=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=!ITW_NATIVEDEBUG_SUSPEND!,address=!ITW_NATIVEDEBUG_PORT!"
     ) else (
       set "ARGS=!ARGS! !_arg!"
       if "!_arg:~0,1!" == "-" if not "x!_arg:headless=!" == "x!_arg!" (
@@ -200,7 +201,7 @@ if "%SPLASH%" == "true" (
   set "SPLASH="
 )
 
-"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" "%MAIN_CLASS%" %ARGS%
+"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" %NATIVE_DEBUG% "%MAIN_CLASS%" %ARGS%
 
 SET "errno=%ERRORLEVEL%"
 
