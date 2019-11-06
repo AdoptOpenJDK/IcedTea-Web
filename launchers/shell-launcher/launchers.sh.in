@@ -74,8 +74,8 @@ fi
 #check in $path
 if [ "x$CUSTOM_JRE" = "x" ] ; then
   while IFS=: read -d: -r path_entry; do
-    if [ -e "${path_entry}/javac" ] ; then
-     CUSTOM_JRE=$(dirname $(dirname $(readlink -f "$path_entry/javac")))
+    if [ -e "${path_entry}/java" ] ; then
+     CUSTOM_JRE=$(dirname $(dirname $(readlink -f "$path_entry/java")))
     fi;
   done <<< "${PATH}"
 
