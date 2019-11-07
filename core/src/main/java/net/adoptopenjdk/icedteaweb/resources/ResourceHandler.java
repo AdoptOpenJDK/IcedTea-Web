@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +31,7 @@ class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
     private static final Executor localExecutor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 2,
-            10L, TimeUnit.SECONDS, new SynchronousQueue<>());
+            10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     private static final String LOCALHOST = "localhost";
     private static final String IPV4_LOOPBACK_PREFIX = "127.";
