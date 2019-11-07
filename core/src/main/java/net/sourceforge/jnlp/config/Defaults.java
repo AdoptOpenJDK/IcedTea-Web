@@ -489,6 +489,11 @@ public class Defaults {
                     ValidatorFactory.createManifestAttributeCheckValidator()
             ),
             Setting.createDefault(
+                    ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
                     ConfigurationConstants.KEY_SYSTEM_CONFIG,
                     null,
                     ValidatorFactory.createUrlValidator()
@@ -539,6 +544,12 @@ public class Defaults {
                     ConfigurationConstants.KEY_LAUNCHER_RUST_BOOTCP_REMOVE,
                     "",
                     ValidatorFactory.createRustCpValidator()
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST,
+                    null,
+                    null
             )
     );
 

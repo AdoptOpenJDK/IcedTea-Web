@@ -372,9 +372,12 @@ public class ManifestAttributesChecker {
             return;
         }
         final Set<URL> notOkUrls = new HashSet<>();
+        final boolean skipResourcesFromFileSystem = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE));
         for (URL u : usedUrls.keySet()) {
             if (UrlUtils.urlRelativeTo(u, codebase)) {
                 LOG.debug("OK - '{}' is from codebase '{}'.", u, codebase);
+            } else if (skipResourcesFromFileSystem && FILE_PROTOCOL.equals(u.getProtocol())) {
+                LOG.debug("OK - '{}' is from file system", u);
             } else {
                 notOkUrls.add(u);
                 LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u, codebase);
