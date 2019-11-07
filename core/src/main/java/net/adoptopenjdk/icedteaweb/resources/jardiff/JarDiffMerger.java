@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -26,6 +26,9 @@ import java.util.zip.ZipEntry;
 public class JarDiffMerger {
 
     private static final Logger LOG = LoggerFactory.getLogger(JarDiffMerger.class);
+
+    private static final Pattern MOVED_PATH_PATTERN = Pattern.compile("(.+[^\\\\])\\s(.*)");
+    private static final String ESCAPED_WHITESPACE_PATTERN = Pattern.quote("\\ ");
 
     private static final String VERSION_INFORMATION = "version 1.0";
 
@@ -68,7 +71,7 @@ public class JarDiffMerger {
                 LOG.debug("JarDiff: Adding moved content '{}' -> '{}'", oldName, newName);
                 final JarEntry oldEntry = oldJar.getJarEntry(oldName);
                 if (oldEntry == null) {
-                    throw new IllegalStateException("Error in jardiff merge. Moved entry '" + oldEntry + "' can not be found in original jar");
+                    throw new IllegalStateException("Error in jardiff merge. Moved entry '" + oldName + "' can not be found in original jar");
                 }
                 try (final InputStream inputStream = oldJar.getInputStream(oldEntry)) {
                     writeEntry(inputStream, outputStream, newName);
@@ -138,14 +141,20 @@ public class JarDiffMerger {
 
     private static Set<MovedJar> getMovedContent(final JarFile jarDiff) throws IOException {
         final Set<MovedJar> result = getIndexFileLines(jarDiff).stream()
+                .map(String::trim)
                 .filter(l -> l.startsWith(MOVE_KEYWORD))
                 .map(l -> l.substring(MOVE_KEYWORD.length()).trim())
                 .map(l -> {
-                    List<String> sub = Arrays.asList(l.split(Pattern.quote(" ")));
-                    if (sub.size() != 2) {
-                        throw new IllegalStateException("More than 2 path definitions for move action: '" + l + "'");
+                    final Matcher matcher = MOVED_PATH_PATTERN.matcher(l);
+
+                    if (!matcher.matches() || matcher.groupCount() != 2) {
+                        throw new IllegalStateException("Found invalid move definition: '" + l + "'");
                     }
-                    return new MovedJar(sub.get(0), sub.get(1));
+
+                    final String first = matcher.group(1).replaceAll(ESCAPED_WHITESPACE_PATTERN, " ");
+                    final String second = matcher.group(2).replaceAll(ESCAPED_WHITESPACE_PATTERN, " ");
+
+                    return new MovedJar(first, second);
                 })
                 .collect(Collectors.toSet());
         return Collections.unmodifiableSet(result);
