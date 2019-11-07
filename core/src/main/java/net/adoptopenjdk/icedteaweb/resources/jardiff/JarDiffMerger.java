@@ -9,7 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,12 +21,11 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 public class JarDiffMerger {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JarDiffMerger.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JarDiffMerger.class);
 
     private static final String VERSION_INFORMATION = "version 1.0";
 
@@ -96,9 +95,7 @@ public class JarDiffMerger {
         Assert.requireNonBlank(name, "name");
 
         return collection.stream()
-                .filter(e -> Objects.equals(name, e.getName()))
-                .findAny()
-                .isPresent();
+                .anyMatch(e -> Objects.equals(name, e.getName()));
     }
 
     private static boolean containsOldName(final Collection<MovedJar> collection, final String oldName) {
@@ -106,37 +103,33 @@ public class JarDiffMerger {
         Assert.requireNonBlank(oldName, "oldName");
 
         return collection.stream()
-                .map(e -> e.getOldName())
-                .filter(n -> Objects.equals(n, oldName))
-                .findAny()
-                .isPresent();
+                .map(MovedJar::getOldName)
+                .anyMatch(n -> Objects.equals(n, oldName));
     }
 
     private static Set<JarEntry> getNewContent(final JarFile jarDiff) {
         return jarDiff.stream().filter(e -> !Objects.equals(e.getName(), INDEX_FILE)).collect(Collectors.toSet());
     }
 
-    private static Stream<String> getIndexFileLines(final JarFile jarDiff) throws IOException {
+    private static List<String> getIndexFileLines(final JarFile jarDiff) throws IOException {
         Assert.requireNonNull(jarDiff, "jarDiff");
         final ZipEntry indexEntry = jarDiff.getEntry(INDEX_FILE);
         if (indexEntry == null) {
             throw new IllegalStateException("Given JarFile '" + jarDiff.getName() + "' does not contain a JARDIFF index file");
         }
 
-        final ArrayList<String> lines = new ArrayList<>();
         try (final InputStream inputStream = jarDiff.getInputStream(indexEntry)) {
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             final String line = reader.readLine();
             if (line == null || !line.equals(VERSION_INFORMATION)) {
                 throw new IllegalStateException("Index file does is not based on jardiff version 1.0");
             }
-            lines.addAll(reader.lines().collect(Collectors.toList()));
+            return reader.lines().collect(Collectors.toList());
         }
-        return lines.stream();
     }
 
     private static Set<String> getRemovedContent(final JarFile jarDiff) throws IOException {
-        final Set<String> result = getIndexFileLines(jarDiff)
+        final Set<String> result = getIndexFileLines(jarDiff).stream()
                 .filter(l -> l.startsWith(REMOVE_KEYWORD))
                 .map(l -> l.substring(REMOVE_KEYWORD.length()).trim())
                 .collect(Collectors.toSet());
@@ -144,7 +137,7 @@ public class JarDiffMerger {
     }
 
     private static Set<MovedJar> getMovedContent(final JarFile jarDiff) throws IOException {
-        final Set<MovedJar> result = getIndexFileLines(jarDiff)
+        final Set<MovedJar> result = getIndexFileLines(jarDiff).stream()
                 .filter(l -> l.startsWith(MOVE_KEYWORD))
                 .map(l -> l.substring(MOVE_KEYWORD.length()).trim())
                 .map(l -> {
@@ -177,16 +170,16 @@ public class JarDiffMerger {
 
         private final String newName;
 
-        public MovedJar(final String oldLocation, final String newLocation) {
+        MovedJar(final String oldLocation, final String newLocation) {
             this.newName = newLocation;
             this.oldName = oldLocation;
         }
 
-        public String getOldName() {
+        String getOldName() {
             return oldName;
         }
 
-        public String getNewName() {
+        String getNewName() {
             return newName;
         }
     }
