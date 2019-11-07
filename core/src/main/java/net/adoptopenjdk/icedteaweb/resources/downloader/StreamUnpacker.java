@@ -17,6 +17,8 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 
 import java.io.File;
@@ -35,26 +37,36 @@ import java.util.stream.Stream;
  */
 interface StreamUnpacker {
 
+    Logger LOG = LoggerFactory.getLogger(StreamUnpacker.class);
+
+    String GZIP_ENCODING = "gzip";
+
+    String PACK_200_GZIP_ENCODING = "pack200-gzip";
+
+    String PACK_GZ_EXTENSION = ".pack.gz";
+
     static StreamUnpacker getCompressionUnpacker(final DownloadDetails downloadDetails) {
         final URL downloadFrom = downloadDetails.downloadFrom;
         final String contentEncoding = downloadDetails.contentEncoding;
-        final boolean packgz = "pack200-gzip".equals(contentEncoding) || downloadFrom.getPath().endsWith(".pack.gz");
-        final boolean gzip = "gzip".equals(contentEncoding);
+        final boolean packgz = PACK_200_GZIP_ENCODING.equals(contentEncoding) || downloadFrom.getPath().endsWith(PACK_GZ_EXTENSION);
+        final boolean gzip = GZIP_ENCODING.equals(contentEncoding);
 
         // It's important to check packgz first. If a stream is both
         // pack200 and gz encoded, then con.getContentEncoding() could
         // return ".gz", so if we check gzip first, we would end up
         // treating a pack200 file as a jar file.
         if (packgz) {
+            LOG.debug("Will use Pack200 for '{}'", downloadDetails.downloadFrom);
             return new PackGzipUnpacker();
         } else if (gzip) {
+            LOG.debug("Will use GZIP for '{}'", downloadDetails.downloadFrom);
             return new GzipUnpacker();
         }
 
         return new NotUnpacker();
     }
 
-    static StreamUnpacker getContentUnpacker(DownloadDetails downloadDetails, URL resourceHref) {
+    static StreamUnpacker getContentUnpacker(final DownloadDetails downloadDetails, final URL resourceHref) {
         final StreamUnpacker contentUnpacker;
         if (downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
             final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
@@ -62,13 +74,15 @@ interface StreamUnpacker {
                     .map(stream -> stream.collect(Collectors.toMap(e -> e.split("=")[0], e -> e.split("=")[1])))
                     .orElseGet(Collections::emptyMap);
 
-            final VersionId currentVersionId = Optional.ofNullable(querryParams.get("current-version-id"))
+            final VersionId currentVersionId = Optional.ofNullable(querryParams.get(BaseResourceDownloader.CURRENT_VERSION_ID_HEADER))
                     .map(VersionId::fromString)
                     .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + BaseResourceDownloader.JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
 
             final File cacheFile = Cache.getCacheFile(resourceHref, currentVersionId);
+            LOG.debug("Will use JarDiff for '{}'", resourceHref);
             contentUnpacker = new JarDiffUnpacker(cacheFile);
         } else {
+            LOG.debug("Will use no unpacker for '{}'", resourceHref);
             contentUnpacker = new NotUnpacker();
         }
         return contentUnpacker;

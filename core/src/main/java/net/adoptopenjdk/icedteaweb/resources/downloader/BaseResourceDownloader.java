@@ -37,10 +37,12 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 abstract class BaseResourceDownloader implements ResourceDownloader {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceDownloader.class);
 
+
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
     private static final String LAST_MODIFIED_HEADER = "Last-Modified";
     private static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
+    static final String CURRENT_VERSION_ID_HEADER = "current-version-id";
 
     private static final String ERROR_MIME_TYPE = "application/x-java-jnlp-error";
     static final String JAR_DIFF_MIME_TYPE = "application/x-java-archive-dif";
