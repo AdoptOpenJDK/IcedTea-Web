@@ -63,11 +63,11 @@ interface StreamUnpacker {
             return new GzipUnpacker();
         }
 
+        LOG.debug("Will use no compression-unpacker for '{}'", downloadDetails.downloadFrom);
         return new NotUnpacker();
     }
 
     static StreamUnpacker getContentUnpacker(final DownloadDetails downloadDetails, final URL resourceHref) {
-        final StreamUnpacker contentUnpacker;
         if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
             final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
                     .map(query -> Stream.of(query.split(Pattern.quote("&"))))
@@ -80,12 +80,11 @@ interface StreamUnpacker {
 
             final File cacheFile = Cache.getCacheFile(resourceHref, currentVersionId);
             LOG.debug("Will use JarDiff for '{}'", resourceHref);
-            contentUnpacker = new JarDiffUnpacker(cacheFile);
-        } else {
-            LOG.debug("Will use no unpacker for '{}'", resourceHref);
-            contentUnpacker = new NotUnpacker();
+            return new JarDiffUnpacker(cacheFile);
         }
-        return contentUnpacker;
+
+        LOG.debug("Will use no content-unpacker for '{}'", resourceHref);
+        return new NotUnpacker();
     }
 
     /**
