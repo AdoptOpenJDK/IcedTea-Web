@@ -95,7 +95,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
             final DownloadDetails downloadDetails = getDownloadDetails(connection);
 
-            if (downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
+            if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
                 final String serverResponse = StreamUtils.readStreamAsString(downloadDetails.inputStream);
                 throw new RuntimeException("Server error: " + serverResponse);
             }
@@ -155,6 +155,11 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final InputStream inputStream = connection.getInputStream();
+
+            if (! String.valueOf(connection.getResponseCode()).startsWith("2")) {
+                throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
+            }
+
             return new DownloadDetails(downloadFrom, inputStream, contentType, contentEncoding, version, lastModified);
         } catch (IOException ex) {
             if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {

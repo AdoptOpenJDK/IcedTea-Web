@@ -68,7 +68,7 @@ interface StreamUnpacker {
 
     static StreamUnpacker getContentUnpacker(final DownloadDetails downloadDetails, final URL resourceHref) {
         final StreamUnpacker contentUnpacker;
-        if (downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
+        if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
             final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
                     .map(query -> Stream.of(query.split(Pattern.quote("&"))))
                     .map(stream -> stream.collect(Collectors.toMap(e -> e.split("=")[0], e -> e.split("=")[1])))
