@@ -26,6 +26,7 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
+import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 
 class ResourceHandler {
 
@@ -80,7 +81,7 @@ class ResourceHandler {
     private Resource initNoneCacheableResources() {
         resource.setStatus(DOWNLOADED);
         if (resource.getLocation().getProtocol().equals(FILE_PROTOCOL)) {
-            final File file = new File(resource.getLocation().getPath());
+            final File file = new File(decodeUrlQuietly(resource.getLocation()).getPath());
             resource.setSize(file.length());
             resource.setLocalFile(file);
             resource.setTransferred(file.length());
