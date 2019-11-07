@@ -25,11 +25,13 @@ public class JarDiffTest {
 
     @ParameterizedTest
     @CsvSource({
-            "jar-1.jar, jar-2.jar, diff-1-to-2.jardiff",
-            "jar-2.jar, jar-3.jar, diff-2-to-3.jardiff",
-            "jar-3.jar, jar-4.jar, diff-3-to-4.jardiff",
-            "jar-4.jar, jar-5.jar, diff-4-to-5.jardiff",
-            "jar-5.jar, jar-6.jar, diff-5-to-6.jardiff",})
+            "version-1.jar, version-2.jar, diff-1-to-2.jardiff",
+            "version-2.jar, version-3.jar, diff-2-to-3.jardiff",
+            "version-3.jar, version-4.jar, diff-3-to-4.jardiff",
+            "version-4.jar, version-5.jar, diff-4-to-5.jardiff",
+            "version-5.jar, version-6.jar, diff-5-to-6.jardiff",
+            "version-6.jar, version-7.jar, diff-6-to-7.jardiff",
+            "version-7.jar, version-8.jar, diff-7-to-8.jardiff"})
     public void testFromVersion1ToVersion2(final String jar1Name, final String jar2Name, final String diffName, @TempDir Path cacheFolder) throws Exception {
         //given
         final URL jar1Url = JarDiffTest.class.getResource(jar1Name);
