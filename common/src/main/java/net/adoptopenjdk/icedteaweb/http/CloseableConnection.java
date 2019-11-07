@@ -45,13 +45,6 @@ public class CloseableConnection implements Closeable {
     }
 
     /**
-     * delegates to {@link URLConnection#getContentEncoding()}
-     */
-    public String getContentEncoding() {
-        return delegate.getContentEncoding();
-    }
-
-    /**
      * delegates to {@link URLConnection#getURL()}
      */
     public URL getURL() {
