@@ -198,7 +198,7 @@ public interface ConfigurationConstants {
      */
     String KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK = "deployment.manifest.attributes.check";
 
-    String KEY_ASSUME_FILE_STEM_IN_CODEBASE = "deployment.manifest.attributes.check.assumeFileSystemInCodebase";
+    String KEY_ASSUME_FILE_STEM_IN_CODEBASE = "deployment.assumeFileSystemInCodebase";
 
     /**
      * Console initial status.
