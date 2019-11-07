@@ -103,6 +103,38 @@ public class JarDiffMergerTest {
         Assert.assertEquals(originalHashes, createdHashes);
     }
 
+    @Test
+    public void testFromVersion6ToVersion7() throws Exception {
+        //given
+        final URL jar1Url = JarDiffMergerTest.class.getResource("version-6.jar");
+        final URL jar2Url = JarDiffMergerTest.class.getResource("version-7.jar");
+        final URL diffUrl = JarDiffMergerTest.class.getResource("diff-6-to-7.jardiff");
+
+        //when
+        final Path createdJar = merge(jar1Url, diffUrl);
+        final Map<String, String> originalHashes = getMd5Hashes(jar2Url.getFile());
+        final Map<String, String> createdHashes = getMd5Hashes(createdJar.toFile().getAbsolutePath());
+
+        //than
+        Assert.assertEquals(originalHashes, createdHashes);
+    }
+
+    @Test
+    public void testFromVersion7ToVersion8() throws Exception {
+        //given
+        final URL jar1Url = JarDiffMergerTest.class.getResource("version-7.jar");
+        final URL jar2Url = JarDiffMergerTest.class.getResource("version-8.jar");
+        final URL diffUrl = JarDiffMergerTest.class.getResource("diff-7-to-8.jardiff");
+
+        //when
+        final Path createdJar = merge(jar1Url, diffUrl);
+        final Map<String, String> originalHashes = getMd5Hashes(jar2Url.getFile());
+        final Map<String, String> createdHashes = getMd5Hashes(createdJar.toFile().getAbsolutePath());
+
+        //than
+        Assert.assertEquals(originalHashes, createdHashes);
+    }
+
     private Path merge(final URL jar1Url, final URL diffUrl) throws IOException {
         final Path tempDirectory = Files.createTempDirectory("jardiff");
         final Path createdJar = Paths.get(tempDirectory.toFile().getAbsolutePath(), "created.jar");
