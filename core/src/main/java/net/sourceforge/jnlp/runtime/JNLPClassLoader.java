@@ -701,12 +701,9 @@ public class JNLPClassLoader extends URLClassLoader {
         //A ZipException will propagate later on if the jar is invalid and not checked here
         if (shouldFilterInvalidJars()) {
             //We filter any invalid jars
-            Iterator<JARDesc> iterator = initialJars.iterator();
-            while (iterator.hasNext()) {
-                JARDesc jar = iterator.next();
+            for (JARDesc jar : initialJars) {
                 if (isInvalidJar(jar)) {
                     //Remove this jar as an available jar
-                    iterator.remove();
                     tracker.removeResource(jar.getLocation());
                     available.remove(jar);
                 }
