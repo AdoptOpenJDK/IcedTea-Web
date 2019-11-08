@@ -142,6 +142,13 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         //Top label
         String topLabelText = "";
         switch (type) {
+            case READ_WRITE_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    topLabelText = R("SFileReadWriteAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    topLabelText = R("SFileReadWriteAccess", R("AFileOnTheMachine"));
+                }
+                break;
             case READ_FILE:
                 if (extras != null && extras.length > 0 && extras[0] instanceof String) {
                     topLabelText = R("SFileReadAccess", FileUtils.displayablePath((String) extras[0]));

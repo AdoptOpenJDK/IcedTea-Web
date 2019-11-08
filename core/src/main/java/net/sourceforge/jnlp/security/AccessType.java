@@ -5,6 +5,7 @@ package net.sourceforge.jnlp.security;
  */
 public enum AccessType {
 
+    READ_WRITE_FILE,
     READ_FILE,
     WRITE_FILE,
     CREATE_DESKTOP_SHORTCUT,
