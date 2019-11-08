@@ -680,7 +680,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             available.add(jar);
 
-            if (jar.isEager()) {
+            if (jar.isEager() || jar.isMain()) {
                 initialJars.add(jar); // regardless of part
             }
             tracker.addResource(jar.getLocation(), jar.getVersion(),
