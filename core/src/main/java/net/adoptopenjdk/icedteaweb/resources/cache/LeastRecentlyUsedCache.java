@@ -49,6 +49,7 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import java.io.File;
@@ -74,6 +75,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * This class helps maintain the ordering of most recently use cache items across
@@ -154,7 +156,9 @@ class LeastRecentlyUsedCache {
             if (StringUtils.isBlank(jnlpPath)) {
                 LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
             } else {
-                FileUtils.saveFileUtf8(CacheEntry.KEY_JNLP_PATH + "=" + jnlpPath, infoFile);
+                final PropertiesFile propertiesFile = new PropertiesFile(infoFile, R("CAutoGen"));
+                propertiesFile.setProperty(CacheEntry.KEY_JNLP_PATH, jnlpPath);
+                propertiesFile.store();
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to create info file in dir " + dir, e);
