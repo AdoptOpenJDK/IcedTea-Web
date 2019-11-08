@@ -7,6 +7,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
+import net.adoptopenjdk.icedteaweb.resources.PrioritizedParallelExecutor;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
@@ -19,10 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 
@@ -32,7 +34,7 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 abstract class BaseResourceInitializer implements ResourceInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceInitializer.class);
 
-    private static final Executor remoteExecutor = CachedDaemonThreadPoolProvider.getThreadPool();
+    private static final ExecutorService remoteExecutor = CachedDaemonThreadPoolProvider.getThreadPool();
 
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
     private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
@@ -78,29 +80,21 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     }
 
     Optional<UrlRequestResult> getBestUrlByPingingWithHeadRequest(List<URL> urls) {
-        return urls.stream()
-                .map(this::testSingleUrl)
-                .map(this::futureToOptional)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(UrlRequestResult::isSuccess)
-                .findFirst()
-                ;
+        final List<Callable<UrlRequestResult>> callables = urls.stream()
+                .map(url -> (Callable<UrlRequestResult>) () -> testUrl(url))
+                .collect(Collectors.toList());
+
+        final PrioritizedParallelExecutor executor = new PrioritizedParallelExecutor(remoteExecutor);
+        final Future<UrlRequestResult> future = executor.getSuccessfulResultWithHighestPriority(callables);
+
+        try {
+            return Optional.ofNullable(future.get());
+        } catch (InterruptedException | ExecutionException e) {
+            return Optional.empty();
+        }
     }
 
-    private Future<UrlRequestResult> testSingleUrl(URL url) {
-        final CompletableFuture<UrlRequestResult> result = new CompletableFuture<>();
-        remoteExecutor.execute(() -> {
-            try {
-                result.complete(testUrl(url));
-            } catch (Exception e) {
-                result.completeExceptionally(e);
-            }
-        });
-        return result;
-    }
-
-    private UrlRequestResult testUrl(URL url) {
+    private UrlRequestResult testUrl(URL url) throws IOException {
         final HttpMethod requestMethod = HttpMethod.HEAD;
         try {
             final Map<String, String> requestProperties = new HashMap<>();
@@ -125,23 +119,14 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
             if (!response.isSuccess()) {
                 LOG.debug("For {} the server returned {} code for {} request for {}", resource.toString(), response.getResponseCode(), requestMethod, url.toExternalForm());
-                return null;
+                throw new RuntimeException("Server returned " + response.getResponseCode() + " for " + url);
             }
 
             LOG.debug("Best url for {} is {} by {}", resource.toString(), url.toString(), requestMethod);
             return response;
         } catch (IOException e) {
             LOG.debug("While processing {}  by {} for resource {} got {}", url, requestMethod, resource, e.getMessage());
-        }
-
-        return null;
-    }
-
-    private <R> Optional<R> futureToOptional(Future<R> future) {
-        try {
-            return Optional.ofNullable(future.get());
-        } catch (InterruptedException | ExecutionException e) {
-            return Optional.empty();
+            throw e;
         }
     }
 }
