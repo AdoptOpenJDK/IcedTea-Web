@@ -36,7 +36,6 @@
  exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.resources;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -46,7 +45,7 @@ public class CachedDaemonThreadPoolProvider {
 
     private static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(6, new DaemonThreadFactory());
 
-    public static Executor getThreadPool() {
+    public static ExecutorService getThreadPool() {
         return DAEMON_THREAD_POOL;
     }
 
