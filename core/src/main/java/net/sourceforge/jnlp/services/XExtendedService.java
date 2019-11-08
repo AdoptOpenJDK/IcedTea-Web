@@ -16,11 +16,12 @@
 
 package net.sourceforge.jnlp.services;
 
-import java.io.File;
-import java.io.IOException;
+import net.sourceforge.jnlp.security.AccessType;
+
 import javax.jnlp.ExtendedService;
 import javax.jnlp.FileContents;
-import net.sourceforge.jnlp.security.AccessType;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Implementation of ExtendedService
@@ -34,8 +35,7 @@ public class XExtendedService implements ExtendedService {
 
         File secureFile = new File(file.getPath());
 
-        /* FIXME: this opens a file with read/write mode, not just read or write */
-        if (ServiceUtil.checkAccess(AccessType.READ_FILE, new Object[] { secureFile.getAbsolutePath() })) {
+        if (ServiceUtil.checkAccess(AccessType.READ_WRITE_FILE, new Object[] { secureFile.getAbsolutePath() })) {
             return (FileContents) ServiceUtil.createPrivilegedProxy(FileContents.class,
                     new XFileContents(secureFile));
         } else {
