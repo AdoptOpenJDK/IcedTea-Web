@@ -1150,15 +1150,17 @@ public class JNLPClassLoader extends URLClassLoader {
     private void fillInPartJars(List<JARDesc> jars) {
         //can not use iterator, will rise ConcurrentModificationException on jars.add(jar);
         for (int x = 0; x < jars.size(); x++) {
-            String part = jars.get(x).getPart();
+            final String part = jars.get(x).getPart();
 
             // "available" field can be affected by two different threads
             // working in loadClass(String)
-            synchronized (available) {
-                for (JARDesc jar : available) {
-                    if (part != null && part.equals(jar.getPart())) {
-                        if (!jars.contains(jar)) {
-                            jars.add(jar);
+            if (part != null) {
+                synchronized (available) {
+                    for (JARDesc jar : available) {
+                        if (part.equals(jar.getPart())) {
+                            if (!jars.contains(jar)) {
+                                jars.add(jar);
+                            }
                         }
                     }
                 }
