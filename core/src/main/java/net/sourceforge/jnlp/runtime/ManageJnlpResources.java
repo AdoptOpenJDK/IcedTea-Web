@@ -45,6 +45,7 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ManageJnlpResources {
 
@@ -65,7 +66,7 @@ public class ManageJnlpResources {
             final ResourcesDesc resources = foundLoader.getJNLPFile().getResources();
 
             for (final JARDesc aJar : resources.getJARs(part)) {
-                if (version == null || version.equals(aJar.getVersion()))
+                if (Objects.equals(version, aJar.getVersion()))
                     foundJars.add(aJar);
             }
 
