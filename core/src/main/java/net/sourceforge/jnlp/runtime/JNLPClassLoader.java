@@ -632,15 +632,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Determine how invalid jars should be handled
-     *
-     * @return whether to filter invalid jars, or error later on
-     */
-    private boolean shouldFilterInvalidJars() {
-        return false;//Error is default behaviour
-    }
-
-    /**
      * Load all of the JARs used in this JNLP file into the ResourceTracker for
      * downloading.
      */
@@ -697,20 +688,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         waitForJars(initialJars); //download the jars first.
 
-        //A ZipException will propagate later on if the jar is invalid and not checked here
-        if (shouldFilterInvalidJars()) {
-            //We filter any invalid jars
-            for (JARDesc jar : initialJars) {
-                if (isInvalidJar(jar)) {
-                    //Remove this jar as an available jar
-                    tracker.removeResource(jar.getLocation());
-                    available.remove(jar);
-                }
-            }
-        }
-
         if (JNLPRuntime.isVerifying()) {
-
             try {
                 jcv.add(initialJars, tracker);
             } catch (Exception e) {
