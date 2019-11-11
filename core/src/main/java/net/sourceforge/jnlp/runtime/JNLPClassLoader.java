@@ -83,7 +83,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1145,6 +1144,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars jar archives to be added
      */
     private void fillInPartJars(List<JARDesc> jars) {
+        fillInPartJarsTestable(jars, available);
+    }
+
+    static void fillInPartJarsTestable(List<JARDesc> jars, List<JARDesc> available) {
         //can not use iterator, will rise ConcurrentModificationException on jars.add(jar);
         for (int x = 0; x < jars.size(); x++) {
             final String part = jars.get(x).getPart();
