@@ -22,6 +22,10 @@ public class JNLPClassLoaderRefactoringTest {
 
     private static final JARDesc partTwo_1 = jarDesc("file_4", "partTwo");
     private static final JARDesc partTwo_2 = jarDesc("file_5", "partTwo");
+    private static final JARDesc partTwo_3 = jarDesc("file_6", "partTwo");
+
+    private static final JARDesc partThree_1 = jarDesc("file_7", "partThree");
+    private static final JARDesc partThree_2 = jarDesc("file_8", "partThree");
 
 
     @Test
@@ -92,10 +96,28 @@ public class JNLPClassLoaderRefactoringTest {
         assertThat(jars, is(asList(partOne_1, partOne_2, partOne_3)));
     }
 
+    @Test
+    public void shouldAddJarsWithSamePartForAllJarsInInput() {
+        // given
+        final List<JARDesc> jars = asList(partOne_1, partTwo_1);
+        final List<JARDesc> available = asList(partOne_2, partOne_1, partOne_3, partTwo_1, partTwo_2, partTwo_3, partThree_1, partThree_2);
+
+        // when
+        JNLPClassLoader.fillInPartJarsTestable(jars, available);
+
+        // then
+        assertThat(jars, is(asList(partOne_1, partTwo_1, partOne_2, partOne_3, partTwo_2, partTwo_3)));
+    }
+
     private static JARDesc jarDesc(String fileName, String partName) {
         try {
             final URL url = new URL("http://localhost/" + fileName);
-            return new JARDesc(url, null, partName, false, false, false, false);
+            return new JARDesc(url, null, partName, false, false, false, false) {
+                @Override
+                public String toString() {
+                    return fileName;
+                }
+            };
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
