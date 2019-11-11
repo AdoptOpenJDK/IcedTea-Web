@@ -106,7 +106,7 @@ public class JNLPClassLoaderRefactoringTest {
         JNLPClassLoader.fillInPartJarsTestable(jars, available);
 
         // then
-        assertThat(jars, is(asList(partOne_1, partTwo_1, partOne_2, partOne_3, partTwo_2, partTwo_3)));
+        assertThat(jars, is(asList(partOne_1, partOne_2, partOne_3, partTwo_1, partTwo_2, partTwo_3)));
     }
 
     private static JARDesc jarDesc(String fileName, String partName) {

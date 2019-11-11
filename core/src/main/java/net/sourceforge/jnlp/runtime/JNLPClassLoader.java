@@ -83,6 +83,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1126,24 +1127,32 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     static void fillInPartJarsTestable(List<JARDesc> jars, List<JARDesc> available) {
-        //can not use iterator, will rise ConcurrentModificationException on jars.add(jar);
-        for (int x = 0; x < jars.size(); x++) {
-            final String part = jars.get(x).getPart();
+        final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
+        for (JARDesc jar : jars) {
+            result.add(jar);
+            result.addAll(getAllAvailableJarsInPart(jar.getPart(), available));
+        }
 
-            // "available" field can be affected by two different threads
-            // working in loadClass(String)
-            if (part != null) {
-                synchronized (available) {
-                    for (JARDesc jar : available) {
-                        if (part.equals(jar.getPart())) {
-                            if (!jars.contains(jar)) {
-                                jars.add(jar);
-                            }
-                        }
+        jars.clear();
+        jars.addAll(result);
+    }
+
+    private static LinkedHashSet<JARDesc> getAllAvailableJarsInPart(String part, List<JARDesc> available) {
+        final LinkedHashSet<JARDesc> jars = new LinkedHashSet<>();
+
+        // "available" field can be affected by two different threads
+        // working in loadClass(String)
+        if (part != null) {
+            synchronized (available) {
+                for (JARDesc jar : available) {
+                    if (part.equals(jar.getPart())) {
+                        jars.add(jar);
                     }
                 }
             }
         }
+
+        return jars;
     }
 
     /**
@@ -1755,15 +1764,22 @@ public class JNLPClassLoader extends URLClassLoader {
             return null;
         }
 
-        // add jar
-        List<JARDesc> jars = new ArrayList<>();
-        jars.add(available.get(0));
+        final List<JARDesc> jars = getNextJarsToLoad();
 
-        fillInPartJars(jars);
         checkForMain(jars);
         activateJars(jars);
 
         return this;
+    }
+
+    private List<JARDesc> getNextJarsToLoad() {
+        final JARDesc nextJar = available.get(0);
+
+        final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
+        result.add(nextJar);
+        result.addAll(getAllAvailableJarsInPart(nextJar.getPart(), available));
+
+        return new ArrayList<>(result);
     }
 
     boolean getSigning() {
