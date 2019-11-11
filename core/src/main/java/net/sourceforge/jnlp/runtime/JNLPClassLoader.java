@@ -1123,21 +1123,16 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars jar archives to be added
      */
     private void fillInPartJars(List<JARDesc> jars) {
-        fillInPartJarsTestable(jars, available);
-    }
-
-    static void fillInPartJarsTestable(List<JARDesc> jars, List<JARDesc> available) {
         final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
         for (JARDesc jar : jars) {
-            result.add(jar);
-            result.addAll(getAllAvailableJarsInPart(jar.getPart(), available));
+            result.addAll(getAllAvailableJarsInPart(jar.getPart()));
+            result.remove(jar);
         }
 
-        jars.clear();
         jars.addAll(result);
     }
 
-    private static LinkedHashSet<JARDesc> getAllAvailableJarsInPart(String part, List<JARDesc> available) {
+    private LinkedHashSet<JARDesc> getAllAvailableJarsInPart(String part) {
         final LinkedHashSet<JARDesc> jars = new LinkedHashSet<>();
 
         // "available" field can be affected by two different threads
@@ -1777,7 +1772,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
         result.add(nextJar);
-        result.addAll(getAllAvailableJarsInPart(nextJar.getPart(), available));
+        result.addAll(getAllAvailableJarsInPart(nextJar.getPart()));
 
         return new ArrayList<>(result);
     }
