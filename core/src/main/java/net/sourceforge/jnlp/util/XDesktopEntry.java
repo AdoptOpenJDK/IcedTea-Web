@@ -122,10 +122,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * Returns the contents of the {@link XDesktopEntry} as a String.
      * @param menu whether to create this icon to menu
      * @param info result of user's interference
-     * @param isSigned whether the app is signed
      * @return string with desktop shortcut specification
      */
-    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info) {
         File generatedJnlp = null;
 
         String fileContents = "[Desktop Entry]\n";
@@ -243,10 +242,9 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * Create a desktop shortcut for this desktop entry
      * @param menu how to create in menu
      * @param desktop how to create on desktop
-     * @param isSigned if it is signed
      */
     @Override
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
+    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
         boolean isDesktop = false;
         if (desktop != null && desktop.isCreate()) {
             isDesktop = true;
@@ -265,10 +263,10 @@ public class XDesktopEntry implements GenericDesktopEntry {
                 }
             }
             if (isDesktop) {
-                installDesktopLauncher(desktop, isSigned);
+                installDesktopLauncher(desktop);
             }
             if (isMenu) {
-                installMenuLauncher(menu, isSigned);
+                installMenuLauncher(menu);
             }
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -278,11 +276,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's menu.
      */
-    private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+    private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
-            FileUtils.saveFileUtf8(getContent(true, info, isSigned), f);
+            FileUtils.saveFileUtf8(getContent(true, info), f);
             LOG.info("Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
@@ -294,7 +292,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
-    private void installDesktopLauncher(AccessWarningPaneComplexReturn.ShortcutResult info, boolean isSigned) {
+    private void installDesktopLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
         File shortcutFile = getShortcutTmpFile();
         try {
 
@@ -303,7 +301,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             }
 
             FileUtils.createRestrictedFile(shortcutFile);
-            FileUtils.saveFileUtf8(getContent(false, info, isSigned), shortcutFile);
+            FileUtils.saveFileUtf8(getContent(false, info), shortcutFile);
 
             /*
              * Install the desktop entry

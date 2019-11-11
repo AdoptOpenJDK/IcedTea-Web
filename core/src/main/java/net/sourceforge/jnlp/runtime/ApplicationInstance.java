@@ -39,7 +39,6 @@ import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -242,7 +241,7 @@ public class ApplicationInstance {
 	        }
 	        AccessWarningPaneComplexReturn ics = getComplexReturn(sd);
 	        if (ics !=null && ics.toBoolean()) {
-	            entry.createDesktopShortcuts(ics.getMenu(), ics.getDesktop(), isSigned());
+	            entry.createDesktopShortcuts(ics.getMenu(), ics.getDesktop());
 	        }
         }
     }

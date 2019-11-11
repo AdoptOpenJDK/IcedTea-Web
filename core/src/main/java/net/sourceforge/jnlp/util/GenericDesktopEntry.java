@@ -17,9 +17,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+
 import java.io.File;
 import java.io.IOException;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 
 /**
  *
@@ -31,7 +32,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 public interface GenericDesktopEntry {
 
     //linux
-    void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned);
+    void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop);
 
     void refreshExistingShortcuts(boolean desktop, boolean menu);
 
