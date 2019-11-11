@@ -165,7 +165,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 
 
     @Override
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop, boolean isSigned) {
+    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
         throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
