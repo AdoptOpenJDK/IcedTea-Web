@@ -168,7 +168,7 @@ public class InformationDescTest {
         assertEquals(location2, info.getIconLocation(IconKind.DEFAULT, 15, 15));
 
         // match a smaller icon
-        assertEquals(location1, info.getIconLocation(IconKind.DEFAULT, 25, 25));
+        assertEquals(location2, info.getIconLocation(IconKind.DEFAULT, 25, 25));
     }
 
     @Test
