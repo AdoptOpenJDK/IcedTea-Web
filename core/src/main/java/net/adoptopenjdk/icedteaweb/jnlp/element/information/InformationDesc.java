@@ -214,7 +214,7 @@ public class InformationDesc {
      * Returns the URL of the icon with the given type and a size
      * closest to the requested width and height.
      * This method will only return an icon smaller than the
-     * specified width and height if there are no bigger icons exists.
+     * specified width and height if there exists no bigger icons.
      *
      * @param kind   the kind of icon to get
      * @param width  desired width of icon
