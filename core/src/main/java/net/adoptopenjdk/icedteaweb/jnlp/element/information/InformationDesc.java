@@ -211,39 +211,54 @@ public class InformationDesc {
     }
 
     /**
-     * Returns the URL of the icon closest to the specified size and
-     * kind.  This method will not return an icon smaller than the
-     * specified width and height unless there are no other icons
-     * available.
+     * Returns the URL of the icon with the given type and a size
+     * closest to the requested width and height.
+     * This method will only return an icon smaller than the
+     * specified width and height if there exists no bigger icons.
      *
      * @param kind   the kind of icon to get
      * @param width  desired width of icon
      * @param height desired height of icon
      * @return the closest icon by size or null if no icons declared
      */
-    public URL getIconLocation(IconKind kind, int width, int height) {
-        IconDesc[] icons = getIcons(kind);
-        if (icons.length == 0)
-            return null;
+    public URL getIconLocation(final IconKind kind, final int width, final int height) {
+        IconDesc smaller = null;
+        long smallerDistance = Long.MAX_VALUE;
 
-        IconDesc best = null;
-        for (IconDesc icon : icons) {
+        IconDesc bigger = null;
+        long biggerDistance = Long.MAX_VALUE;
+
+        for (final IconDesc icon : getIcons(kind)) {
             if (icon.getWidth() >= width && icon.getHeight() >= height) {
-                if (best == null) {
-                    best = icon;
+                final long distance = squareDistance(width, height, icon);
+                if (distance < biggerDistance) {
+                    bigger = icon;
+                    biggerDistance = distance;
                 }
-                if (icon.getWidth() <= best.getWidth() && icon.getHeight() <= best.getHeight()) {
-                    best = icon;
+            } else if (bigger == null) {
+                final long distance = squareDistance(width, height, icon);
+                if (distance < smallerDistance) {
+                    smaller = icon;
+                    smallerDistance = distance;
                 }
             }
         }
 
-        // FIXME if there's no larger icon, choose the closest smaller icon
-        // instead of the first
-        if (best == null)
-            best = icons[0];
+        if (bigger != null) {
+            return bigger.getLocation();
+        }
+        if (smaller != null) {
+            return smaller.getLocation();
+        }
 
-        return best.getLocation();
+        return null;
+    }
+
+    private long squareDistance(final int width, final int height, final IconDesc icon) {
+        final long widthDiff = width - icon.getWidth();
+        final long heightDiff = height - icon.getHeight();
+
+        return (widthDiff * widthDiff) + (heightDiff * heightDiff);
     }
 
     /**
