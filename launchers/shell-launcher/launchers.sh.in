@@ -71,6 +71,19 @@ if [ ! "x$JAVA_HOME" = "x" ] ; then
   echo "Warning! JAVA_HOME of $JAVA_HOME in play!"
   CUSTOM_JRE=$JAVA_HOME
 fi
+#check in $path
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  while IFS=: read -d: -r path_entry; do
+    if [ -e "${path_entry}/java" ] ; then
+     CUSTOM_JRE=$(dirname $(dirname $(readlink -f "$path_entry/java")))
+    fi;
+  done <<< "${PATH}"
+
+  if [ "x$CUSTOM_JRE" != "x" ] ; then
+    echo "Warning! Using JAVA as read from the \$PATH variable!"
+  fi;
+fi;
+
 set -ue
 
 # Support portable ITW:

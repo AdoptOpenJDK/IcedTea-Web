@@ -54,6 +54,21 @@ if not "%JAVA_HOME%" == "" (
   )
 )
 if "%CUSTOM_JRE%" == "" (
+  set "_PATH_JAVA_HOME="
+  for %%a in ("%PATH:;=";"%") do (
+    if exist "%%~a/java.exe" (
+      for %%b in ("%%~a") do set "_PATH_JAVA_HOME=%%~dpb"
+    )
+  )
+  "!_PATH_JAVA_HOME!/bin/java.exe" -version >nul 2>&1
+    if errorlevel 0 if not errorlevel 1 (
+      set CUSTOM_JRE=!_PATH_JAVA_HOME!
+    ) else (
+      echo Your JRE [!_PATH_JAVA_HOME!] read from the PATH environment variable is not valid. Please fix this.
+    )
+    set "_PATH_JAVA_HOME="
+)
+if "%CUSTOM_JRE%" == "" (
   rem the following is for testing-only and not intended to be robust
   rem will not work from 32-bit firefox
   for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit"') do set "_version_key=%%a"
