@@ -106,7 +106,7 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
 
         if (UrlUtils.isLocalFile(localUrl)) {
             // if it is known to us, just return the cached file
-            JarFile returnFile = new JarFile(localUrl.getPath());
+            JarFile returnFile = new JarFile(UrlUtils.decodeUrlQuietly(localUrl).getPath());
             
             try {
                 
