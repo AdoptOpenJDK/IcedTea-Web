@@ -30,11 +30,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
 
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
@@ -61,26 +58,23 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
     public SecuritySettingsPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPHeadSecurity"), new BorderLayout());
 
-        final Map<JCheckBox, String> propertyBasedCheckboxes = new LinkedHashMap<>();
-
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantSigned")), KEY_SECURITY_PROMPT_USER);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantUntrust")), KEY_SECURITY_ASKGRANTDIALOG_NOTINCA);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPWarnCertHostMismatch")), KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPShowSandboxWarning")), KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserAcceptJNLPSecurityRequests")), KEY_SECURITY_PROMPT_USER_FOR_JNLP);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.notEnforceHttps")), KEY_HTTPS_DONT_ENFORCE);
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.asumeFilesystemInCodebase")), KEY_ASSUME_FILE_STEM_IN_CODEBASE);
+        final List<PropertyToText> properties = Arrays.asList(
+                new PropertyToText(KEY_SECURITY_PROMPT_USER, "SGPAllowUserGrantSigned"),
+                new PropertyToText(KEY_SECURITY_ASKGRANTDIALOG_NOTINCA, "SGPAllowUserGrantUntrust"),
+                new PropertyToText(KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING, "SGPWarnCertHostMismatch"),
+                new PropertyToText(KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING, "SGPShowSandboxWarning"),
+                new PropertyToText(KEY_SECURITY_PROMPT_USER_FOR_JNLP, "SGPAllowUserAcceptJNLPSecurityRequests"),
+                new PropertyToText(KEY_HTTPS_DONT_ENFORCE, "security.panel.notEnforceHttps"),
+                new PropertyToText(KEY_ASSUME_FILE_STEM_IN_CODEBASE, "security.panel.asumeFilesystemInCodebase")
+        );
 
         final JPanel topPanel = new JPanel(new GridBagLayout());
 
-        final List<Map.Entry<JCheckBox, String>> entries = new ArrayList<>(propertyBasedCheckboxes.entrySet());
-
         final UiLock uiLock = new UiLock(config);
 
-        IntStream.range(0, entries.size()).forEach(index -> {
-            final Map.Entry<JCheckBox, String> entry = entries.get(index);
-            final JCheckBox checkBox = entry.getKey();
-            final String propertyName = entry.getValue();
+        properties.stream().forEach(p -> {
+            final JCheckBox checkBox = new JCheckBox(Translator.R(p.getPropertyTitleKey()));
+            final String propertyName = p.getPropertyName();
             final String value = config.getProperty(propertyName);
 
             checkBox.setSelected(Boolean.parseBoolean(value));
@@ -93,7 +87,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
             constraints.fill = GridBagConstraints.BOTH;
             constraints.gridx = 0;
             constraints.weightx = 1;
-            constraints.gridy = index;
+            constraints.gridy = properties.indexOf(p);
             topPanel.add(checkBox, constraints);
         });
 
@@ -103,9 +97,29 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
         fillerConstraints.gridx = 0;
         fillerConstraints.weightx = 1;
         fillerConstraints.weighty = 1;
-        fillerConstraints.gridy = entries.size() + 1;
+        fillerConstraints.gridy = properties.size() + 1;
         topPanel.add(filler, fillerConstraints);
 
         add(topPanel, BorderLayout.CENTER);
+    }
+
+    private class PropertyToText {
+
+        private final String propertyName;
+
+        private final String propertyTitleKey;
+
+        public PropertyToText(final String propertyName, final String propertyTitleKey) {
+            this.propertyName = propertyName;
+            this.propertyTitleKey = propertyTitleKey;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public String getPropertyTitleKey() {
+            return propertyTitleKey;
+        }
     }
 }
