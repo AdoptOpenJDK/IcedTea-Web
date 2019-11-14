@@ -18,124 +18,108 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.adoptopenjdk.icedteaweb.client.util.UiLock;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
+
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_PROMPT_USER;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP;
 
 /**
  * This provides a way for the user to modify the security settings through a
  * GUI.
- * 
+ *
  * @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
- * 
  */
 @SuppressWarnings("serial")
-public class SecuritySettingsPanel extends NamedBorderPanel implements ActionListener {
-
-    private final DeploymentConfiguration config;
-
-    // NOTE: All the ones listed with "Default" are in Oracle's implementation.
-    // Not shown on deployments.properties webpage. Add support for these later!
-    /** List of properties used by this panel */
-    public static String[] properties = { "deployment.security.askgrantdialog.show",
-            "deployment.security.askgrantdialog.notinca",
-            "deployment.security.browser.keystore.use", // default TRUE
-            "deployment.security.clientauth.keystore.auto", // Default FALSE
-            "deployment.security.jsse.hostmismatch.warning",
-            "deployment.security.https.warning.show", // Default FALSE
-            "deployment.security.sandbox.awtwarningwindow",
-            "deployment.security.sandbox.jnlp.enhanced",
-            "deployment.security.validation.crl", // Default TRUE
-            "deployment.security.validation.ocsp", // Default FALSE
-            "deployment.security.pretrust.list", // Default TRUE
-            "deployment.security.blacklist.check", // Default TRUE
-            "deployment.security.password.cache", // Default TRUE
-            "deployment.security.SSLv2Hello", // Default FALSE
-            "deployment.security.SSLv3", // Default TRUE
-            "deployment.security.TLSv1", // Default TRUE
-            //            "deployment.security.mixcode", // Default TRUE
-    };
+public class SecuritySettingsPanel extends NamedBorderPanel {
 
     /**
      * This creates a new instance of the security settings panel.
-     * 
-     * @param config
-     *            Loaded DeploymentConfiguration file.
+     *
+     * @param config Loaded DeploymentConfiguration file.
      */
-    public SecuritySettingsPanel(DeploymentConfiguration config) {
+    public SecuritySettingsPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPHeadSecurity"), new BorderLayout());
-        this.config = config;
 
-        addComponents();
-    }
+        final List<PropertyToText> properties = Arrays.asList(
+                new PropertyToText(KEY_SECURITY_PROMPT_USER, "SGPAllowUserGrantSigned"),
+                new PropertyToText(KEY_SECURITY_ASKGRANTDIALOG_NOTINCA, "SGPAllowUserGrantUntrust"),
+                new PropertyToText(KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING, "SGPWarnCertHostMismatch"),
+                new PropertyToText(KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING, "SGPShowSandboxWarning"),
+                new PropertyToText(KEY_SECURITY_PROMPT_USER_FOR_JNLP, "SGPAllowUserAcceptJNLPSecurityRequests"),
+                new PropertyToText(KEY_HTTPS_DONT_ENFORCE, "security.panel.notEnforceHttps"),
+                new PropertyToText(KEY_ASSUME_FILE_STEM_IN_CODEBASE, "security.panel.asumeFilesystemInCodebase")
+        );
 
-    /**
-     * Add the components to the panel.
-     */
-    private void addComponents() {
-        JPanel topPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        final JPanel topPanel = new JPanel(new GridBagLayout());
 
-        JLabel description = new JLabel("<html>" + Translator.R("CPSecurityDescription") + "<hr /></html>");
+        final UiLock uiLock = new UiLock(config);
 
-        JCheckBox[] securityGeneralOptions = { new JCheckBox(Translator.R("SGPAllowUserGrantSigned")),
-                new JCheckBox(Translator.R("SGPAllowUserGrantUntrust")),
-                new JCheckBox(Translator.R("SGPUseBrowserKeystore")),
-                new JCheckBox(Translator.R("SGPUsePersonalCertOneMatch")),
-                new JCheckBox(Translator.R("SGPWarnCertHostMismatch")),
-                new JCheckBox(Translator.R("SGPShowValid")),
-                new JCheckBox(Translator.R("SGPShowSandboxWarning")),
-                new JCheckBox(Translator.R("SGPAllowUserAcceptJNLPSecurityRequests")),
-                new JCheckBox(Translator.R("SGPCheckCertRevocationList")),
-                new JCheckBox(Translator.R("SGPEnableOnlineCertValidate")),
-                new JCheckBox(Translator.R("SGPEnableTrustedPublisherList")),
-                new JCheckBox(Translator.R("SGPEnableBlacklistRevocation")),
-                new JCheckBox(Translator.R("SGPEnableCachingPassword")),
-                new JCheckBox(Translator.R("SGPUseSSL2")),
-                new JCheckBox(Translator.R("SGPUseSSL3")),
-                new JCheckBox(Translator.R("SGPUseTLS1")), };
+        properties.stream().forEach(p -> {
+            final JCheckBox checkBox = new JCheckBox(Translator.R(p.getPropertyTitleKey()));
+            final String propertyName = p.getPropertyName();
+            final String value = config.getProperty(propertyName);
 
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 0;
-        c.weightx = 1;
+            checkBox.setSelected(Boolean.parseBoolean(value));
+            checkBox.addActionListener(e -> {
+                config.setProperty(propertyName, String.valueOf(checkBox.isSelected()));
+            });
+            uiLock.update(propertyName, checkBox);
 
-        topPanel.add(description, c);
+            final GridBagConstraints constraints = new GridBagConstraints();
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.gridx = 0;
+            constraints.weightx = 1;
+            constraints.gridy = properties.indexOf(p);
+            topPanel.add(checkBox, constraints);
+        });
 
-        // Only display the ones with properties that are valid or existent.
-        for (int i = 0; i < properties.length; i++) {
-            String s = config.getProperty(properties[i]);
-            if (s == null) {
-                securityGeneralOptions[i] = null;
-                continue;
-            }
-            securityGeneralOptions[i].setSelected(Boolean.parseBoolean(s));
-            securityGeneralOptions[i].setActionCommand(properties[i]);
-            securityGeneralOptions[i].addActionListener(this);
-            c.gridy = i + 1;
-            topPanel.add(securityGeneralOptions[i], c);
-        }
-
-        Component filler = Box.createRigidArea(new Dimension(1, 1));
-        c.weighty = 1;
-        c.gridy++;
-        topPanel.add(filler, c);
+        final Component filler = Box.createRigidArea(new Dimension(1, 1));
+        final GridBagConstraints fillerConstraints = new GridBagConstraints();
+        fillerConstraints.fill = GridBagConstraints.BOTH;
+        fillerConstraints.gridx = 0;
+        fillerConstraints.weightx = 1;
+        fillerConstraints.weighty = 1;
+        fillerConstraints.gridy = properties.size() + 1;
+        topPanel.add(filler, fillerConstraints);
 
         add(topPanel, BorderLayout.CENTER);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        config.setProperty(e.getActionCommand(), String.valueOf(((JCheckBox) e.getSource()).isSelected()));
+    private class PropertyToText {
+
+        private final String propertyName;
+
+        private final String propertyTitleKey;
+
+        public PropertyToText(final String propertyName, final String propertyTitleKey) {
+            this.propertyName = propertyName;
+            this.propertyTitleKey = propertyTitleKey;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public String getPropertyTitleKey() {
+            return propertyTitleKey;
+        }
     }
 }
