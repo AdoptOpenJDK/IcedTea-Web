@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
+import net.adoptopenjdk.icedteaweb.client.util.UiLock;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
@@ -72,6 +73,8 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
 
         final List<Map.Entry<JCheckBox, String>> entries = new ArrayList<>(propertyBasedCheckboxes.entrySet());
 
+        final UiLock uiLock = new UiLock(config);
+
         IntStream.range(0, entries.size()).forEach(index -> {
             final Map.Entry<JCheckBox, String> entry = entries.get(index);
             final JCheckBox checkBox = entry.getKey();
@@ -83,6 +86,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
             checkBox.addActionListener(e -> {
                 config.setProperty(propertyName, String.valueOf(checkBox.isSelected()));
             });
+            uiLock.update(propertyName, checkBox);
 
             final GridBagConstraints constraints = new GridBagConstraints();
             constraints.fill = GridBagConstraints.BOTH;
