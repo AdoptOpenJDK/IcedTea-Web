@@ -38,6 +38,11 @@ import java.util.stream.IntStream;
 
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_ASKGRANTDIALOG_NOTINCA;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_PROMPT_USER;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_PROMPT_USER_FOR_JNLP;
 
 /**
  * This provides a way for the user to modify the security settings through a
@@ -61,11 +66,11 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
 
         final Map<JCheckBox, String> propertyBasedCheckboxes = new LinkedHashMap<>();
 
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantSigned")), "deployment.security.askgrantdialog.show");
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantUntrust")), "deployment.security.askgrantdialog.notinca");
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPWarnCertHostMismatch")), "deployment.security.jsse.hostmismatch.warning");
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPShowSandboxWarning")), "deployment.security.sandbox.awtwarningwindow");
-        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserAcceptJNLPSecurityRequests")), "deployment.security.sandbox.jnlp.enhanced");
+        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantSigned")), KEY_SECURITY_PROMPT_USER);
+        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserGrantUntrust")), KEY_SECURITY_ASKGRANTDIALOG_NOTINCA);
+        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPWarnCertHostMismatch")), KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING);
+        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPShowSandboxWarning")), KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING);
+        propertyBasedCheckboxes.put(new JCheckBox(Translator.R("SGPAllowUserAcceptJNLPSecurityRequests")), KEY_SECURITY_PROMPT_USER_FOR_JNLP);
         propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.notEnforceHttps")), KEY_HTTPS_DONT_ENFORCE);
         propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.asumeFilesystemInCodebase")), KEY_ASSUME_FILE_STEM_IN_CODEBASE);
 
