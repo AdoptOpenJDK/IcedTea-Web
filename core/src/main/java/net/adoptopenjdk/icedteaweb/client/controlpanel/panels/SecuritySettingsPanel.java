@@ -53,16 +53,13 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_PR
 @SuppressWarnings("serial")
 public class SecuritySettingsPanel extends NamedBorderPanel {
 
-    private final DeploymentConfiguration config;
-
     /**
      * This creates a new instance of the security settings panel.
      *
      * @param config Loaded DeploymentConfiguration file.
      */
-    public SecuritySettingsPanel(DeploymentConfiguration config) {
+    public SecuritySettingsPanel(final DeploymentConfiguration config) {
         super(Translator.R("CPHeadSecurity"), new BorderLayout());
-        this.config = config;
 
         final Map<JCheckBox, String> propertyBasedCheckboxes = new LinkedHashMap<>();
 
@@ -74,7 +71,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
         propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.notEnforceHttps")), KEY_HTTPS_DONT_ENFORCE);
         propertyBasedCheckboxes.put(new JCheckBox(Translator.R("security.panel.asumeFilesystemInCodebase")), KEY_ASSUME_FILE_STEM_IN_CODEBASE);
 
-        JPanel topPanel = new JPanel(new GridBagLayout());
+        final JPanel topPanel = new JPanel(new GridBagLayout());
 
         final List<Map.Entry<JCheckBox, String>> entries = new ArrayList<>(propertyBasedCheckboxes.entrySet());
 
@@ -84,8 +81,7 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
             final Map.Entry<JCheckBox, String> entry = entries.get(index);
             final JCheckBox checkBox = entry.getKey();
             final String propertyName = entry.getValue();
-
-            String value = config.getProperty(propertyName);
+            final String value = config.getProperty(propertyName);
 
             checkBox.setSelected(Boolean.parseBoolean(value));
             checkBox.addActionListener(e -> {
@@ -101,8 +97,8 @@ public class SecuritySettingsPanel extends NamedBorderPanel {
             topPanel.add(checkBox, constraints);
         });
 
-        Component filler = Box.createRigidArea(new Dimension(1, 1));
-        GridBagConstraints fillerConstraints = new GridBagConstraints();
+        final Component filler = Box.createRigidArea(new Dimension(1, 1));
+        final GridBagConstraints fillerConstraints = new GridBagConstraints();
         fillerConstraints.fill = GridBagConstraints.BOTH;
         fillerConstraints.gridx = 0;
         fillerConstraints.weightx = 1;
