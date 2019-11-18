@@ -77,7 +77,7 @@ import static net.sourceforge.jnlp.runtime.ForkingStrategy.NEVER;
  */
 public final class Boot implements PrivilegedAction<Void> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Boot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Boot.class);
 
     // todo: decide whether a spawned netx (external launch)
     // should inherit the same options as this instance (store argv?)
@@ -113,7 +113,7 @@ public final class Boot implements PrivilegedAction<Void> {
      * @param args launching arguments
      */
     public static void main(String[] args) throws UnevenParameterException {
-        main(new ItwJvmLauncher(), args);
+        main(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
     }
 
     /**
@@ -122,7 +122,7 @@ public final class Boot implements PrivilegedAction<Void> {
      * @param launcher the JVM launcher
      * @param args launching arguments
      */
-    public static void main(final JvmLauncher launcher, final String[] args) {
+    public static void main(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
         JvmLauncherHolder.setLauncher(requireNonNull(launcher));
 
         // setup Swing EDT tracing:
@@ -230,7 +230,7 @@ public final class Boot implements PrivilegedAction<Void> {
             JNLPRuntime.setInitialArguments(Arrays.asList(args));
             JNLPRuntime.setJnlpPath(getJnlpFileLocationFromCommandLineArguments(optionParser));
 
-            AccessController.doPrivileged(new Boot());
+            AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
         }
     }
 
@@ -278,6 +278,13 @@ public final class Boot implements PrivilegedAction<Void> {
         return param.replaceFirst("^jnlp:", "http:").replaceFirst("^jnlps:", "https:");
     }
 
+
+    private final MenuAndDesktopIntegration menuAndDesktopIntegration;
+
+    public Boot(MenuAndDesktopIntegration menuAndDesktopIntegration) {
+        this.menuAndDesktopIntegration = menuAndDesktopIntegration;
+    }
+
     /**
      * The privileged part (jdk1.3 compatibility).
      */
@@ -290,7 +297,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (settings != null) {
             try {
                 LOG.info("Proceeding with jnlp");
-                Launcher launcher = new Launcher();
+                Launcher launcher = new Launcher(menuAndDesktopIntegration);
                 launcher.setParserSettings(settings);
                 launcher.setInformationToMerge(extra);
                 launcher.launch(Boot.getFileLocation());

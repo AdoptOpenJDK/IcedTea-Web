@@ -17,6 +17,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -30,6 +31,7 @@ import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.MenuAndDesktopIntegration;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.JarFile;
@@ -80,9 +82,16 @@ public class Launcher {
     /** the update policy */
     private final UpdatePolicy updatePolicy = JNLPRuntime.getDefaultUpdatePolicy();
 
+    /** the integration to the OS Desktop */
+    private final MenuAndDesktopIntegration menuAndDesktopIntegration;
+
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
+
+    public Launcher(MenuAndDesktopIntegration menuAndDesktopIntegration) {
+        this.menuAndDesktopIntegration = Assert.requireNonNull(menuAndDesktopIntegration, "menuAndDesktopIntegration");
+    }
 
     /**
      * @param settings  the parser settings to use when the Launcher initiates parsing of
@@ -365,7 +374,7 @@ public class Launcher {
 
             handler.launchInitialized(file);
 
-            final ApplicationInstance app = createApplication(file);
+            final ApplicationInstance app = createApplication(file, menuAndDesktopIntegration);
             app.initialize();
 
             String mainName = file.getApplication().getMainClass();
@@ -540,9 +549,9 @@ public class Launcher {
             // so initialize appletInstance before creating applet.
             final AppletInstance appletInstance;
             if (cont == null) {
-                 appletInstance = new AppletInstance(file, group, loader, null);
+                 appletInstance = new AppletInstance(file, group, loader, null, menuAndDesktopIntegration);
              } else {
-                 appletInstance = new AppletInstance(file, group, loader, null, cont);
+                 appletInstance = new AppletInstance(file, group, loader, null, cont, menuAndDesktopIntegration);
              }
 
              /*
@@ -575,15 +584,16 @@ public class Launcher {
     /**
      * Creates an Application.
      * @param file the JNLP file
+     * @param menuAndDesktopIntegration
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
+    private ApplicationInstance createApplication(final JNLPFile file, MenuAndDesktopIntegration menuAndDesktopIntegration) throws LaunchException {
         try {
             JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, false);
             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
-            ApplicationInstance app = new ApplicationInstance(file, group, loader);
+            ApplicationInstance app = new ApplicationInstance(file, group, loader, menuAndDesktopIntegration);
             loader.setApplication(app);
 
             return app;
