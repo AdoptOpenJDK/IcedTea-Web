@@ -60,6 +60,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import sun.net.www.protocol.jar.URLJarFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -547,6 +548,64 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES, ignoreBackup);
             getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
             as.stop();
+        }
+
+    }
+
+    @Test
+    public void testLoadClass() throws Exception {
+        // test with cache folder with space
+        final String cacheDir = temporaryFolder.newFolder("cache Folder").getCanonicalPath();
+        final File cacheBackup = PathsAndFiles.CACHE_DIR.getFile();
+        PathsAndFiles.CACHE_DIR.setValue(cacheDir);
+
+        final int port = ServerAccess.findFreePort();
+        final File dir = temporaryFolder.newFolder("base");
+        final File jar = new File(dir, "j1.jar");
+        final File jnlp = new File(dir + "/test.jnlp");
+        jnlp.getParentFile().mkdirs();
+
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/test.jnlp")) {
+            final String rawJnlpString = StreamUtils.readStreamAsString(is, UTF_8);
+            final String jnlpString = rawJnlpString.replaceAll("8080", "" + port);
+            Files.write(jnlp.toPath(), jnlpString.getBytes(UTF_8));
+        }
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/j1.jar")) {
+            try (final FileOutputStream out = new FileOutputStream(jar)) {
+                IOUtils.copy(is, out);
+            }
+        }
+
+        final boolean verifyBackup = JNLPRuntime.isVerifying();
+        final boolean trustBackup = JNLPRuntime.isTrustAll();
+        final boolean securityBackup = JNLPRuntime.isSecurityEnabled();
+        final boolean verbose = JNLPRuntime.isDebug();
+        final String manifestAttsBackup = getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
+
+        JNLPRuntime.setVerify(false);
+        JNLPRuntime.setTrustAll(true);
+        JNLPRuntime.setSecurityEnabled(false);
+        JNLPRuntime.setDebug(true);
+        getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
+
+        final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
+        try {
+            final URL jnlpUrl = new URL("http://localhost:" + port + "/test.jnlp");
+            final JNLPFile jnlpFile1 = new JNLPFile(jnlpUrl);
+            final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
+            classLoader1.loadClass("Hello1");
+        } finally {
+            JNLPRuntime.setVerify(verifyBackup);
+            JNLPRuntime.setTrustAll(trustBackup);
+            JNLPRuntime.setSecurityEnabled(securityBackup);
+            JNLPRuntime.setDebug(verbose);
+            getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
+            URLJarFile.setCallBack(null);
+            as.stop();
+
+            clearCache();
+            PathsAndFiles.CACHE_DIR.setValue(cacheBackup.getCanonicalPath());
         }
 
     }
