@@ -166,9 +166,8 @@ public class Launcher {
             tg.join();
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
-            final LaunchException launchException = launchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
-            if (launchException != null) {
-                throw launchException;
+            if (handler != null) {
+                handler.handleLaunchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
             }
             throw new RuntimeException(ex);
         }
@@ -584,7 +583,7 @@ public class Launcher {
     /**
      * Creates an Application.
      * @param file the JNLP file
-     * @param menuAndDesktopIntegration
+     * @param menuAndDesktopIntegration the integration to the OS Desktop
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
@@ -617,27 +616,10 @@ public class Launcher {
      */
     private LaunchException launchError(LaunchException ex) {
         if (handler != null) {
-            handler.launchError(ex);
+            handler.handleLaunchError(ex);
         }
 
         return ex;
-    }
-
-    /**
-     * Send a launch error to the handler, if set, and to the
-     * caller only if the handler indicated that the launch should
-     * continue despite the warning.
-     *
-     * @return an exception to throw if the launch should be aborted, or null otherwise
-     */
-    private LaunchException launchWarning(LaunchException ex) {
-        if (handler != null) {
-            if (!handler.launchWarning(ex))
-                // no need to destroy the app b/c it hasn't started
-                return ex;
-        } // chose to abort
-
-        return null; // chose to continue, or no handler
     }
 
     /**

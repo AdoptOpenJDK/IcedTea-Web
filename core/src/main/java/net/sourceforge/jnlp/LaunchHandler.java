@@ -33,7 +33,7 @@ public interface LaunchHandler {
      * non-parseable XML.
      * @param exception to be re-thrown as launch error
      */
-    public void launchError(LaunchException exception);
+    void handleLaunchError(LaunchException exception);
 
     /**
      * Called when launching the application can not be launched due
@@ -42,18 +42,16 @@ public interface LaunchHandler {
      * system from attempting to launch the application.
      *
      * @param warning exception to be consumed as warning
-     * @return true if the launch should continue, false to abort
      */
-    public boolean launchWarning(LaunchException warning);
+    void handleLaunchWarning(LaunchException warning);
 
     /**
      * Called when a security validation error occurs while
      * launching the application.
      *
      * @param error to be rethrown as launch error
-     * @return true to allow the application to continue, false to stop it.
      */
-    public boolean validationError(LaunchException error);
+    void validationError(LaunchException error);
 
     // this method will probably be replaced when real security
     // controller is in place.
@@ -66,7 +64,7 @@ public interface LaunchHandler {
      *
      * @param file the JNLP file of the instance that is starting
      */
-    public void launchInitialized(JNLPFile file);
+    void launchInitialized(JNLPFile file);
 
     /**
      * Called when an application, applet or installer is ready to start.
@@ -74,7 +72,7 @@ public interface LaunchHandler {
      *
      * @param application the application instance that is ready
      */
-    public void launchStarting(ApplicationInstance application);
+    void launchStarting(ApplicationInstance application);
 
     /**
      * Called when an application, applet, or installer has been
@@ -83,6 +81,6 @@ public interface LaunchHandler {
      *
      * @param application the launched application instance
      */
-    public void launchCompleted(ApplicationInstance application);
+    void launchCompleted(ApplicationInstance application);
 
 }
