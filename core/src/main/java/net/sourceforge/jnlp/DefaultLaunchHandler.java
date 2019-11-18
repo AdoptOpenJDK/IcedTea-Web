@@ -39,7 +39,7 @@ public class DefaultLaunchHandler extends AbstractLaunchHandler {
      * fatal error, such as the inability to find the main class
      * or non-parseable XML.
      */
-    public void launchError(LaunchException exception) {
+    public void handleLaunchError(LaunchException exception) {
         printMessage(exception);
     }
 
@@ -49,23 +49,17 @@ public class DefaultLaunchHandler extends AbstractLaunchHandler {
      * that is not strictly correct yet does not necessarily
      * prohibit the system from attempting to launch the
      * application.
-     *
-     * @return true if the launch should continue, false to abort
      */
-    public boolean launchWarning(LaunchException warning) {
+    public void handleLaunchWarning(LaunchException warning) {
         printMessage(warning);
-        return true;
     }
 
     /**
      * Called when a security validation error occurs while
      * launching the application.
-     *
-     * @return true to allow the application to continue, false to stop it.
      */
-    public boolean validationError(LaunchException error) {
+    public void validationError(LaunchException error) {
         printMessage(error);
-        return true;
     }
 
     /**

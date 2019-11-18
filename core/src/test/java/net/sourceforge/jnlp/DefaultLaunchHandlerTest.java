@@ -49,7 +49,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class DefaultLaunchHandlerTest {
 
@@ -57,7 +56,7 @@ public class DefaultLaunchHandlerTest {
 
         private static class AccessibleStream extends PrintStream {
 
-            public AccessibleStream(ByteArrayOutputStream out) {
+            AccessibleStream(ByteArrayOutputStream out) {
                 super(out);
             }
 
@@ -77,11 +76,11 @@ public class DefaultLaunchHandlerTest {
             }
         }
 
-        public String getStream1() {
+        String getStream1() {
             return ((AccessibleStream) (super.getOut())).getOut().toString();
         }
 
-        public String getStream2() {
+        String getStream2() {
             return ((AccessibleStream) (super.getErr())).getOut().toString();
         }
     }
@@ -108,9 +107,8 @@ public class DefaultLaunchHandlerTest {
 
         LaunchException warning = new LaunchException(null, null,
                 "severe", "warning type", "test warning", "this is a test of the warning");
-        boolean continueLaunch = handler.launchWarning(warning);
+        handler.handleLaunchWarning(warning);
 
-        assertTrue(continueLaunch);
         assertEquals("netx: warning type: test warning\n", l.getStream1());
     }
 
@@ -122,7 +120,7 @@ public class DefaultLaunchHandlerTest {
 
         LaunchException error = new LaunchException(null, null,
                 "severe", "error type", "test error", "this is a test of the error");
-        handler.launchError(error);
+        handler.handleLaunchError(error);
 
         assertEquals("netx: error type: test error\n", l.getStream1());
     }
@@ -136,7 +134,7 @@ public class DefaultLaunchHandlerTest {
         ParseException parse = new ParseException("no information element");
         LaunchException error = new LaunchException(null, parse,
                 "severe", "error type", "test error", "this is a test of the error");
-        handler.launchError(error);
+        handler.handleLaunchError(error);
 
         assertEquals("netx: error type: test error (no information element)\n", l.getStream1());
     }
@@ -151,7 +149,7 @@ public class DefaultLaunchHandlerTest {
         RuntimeException runtime = new RuntimeException("programmer made a mistake", parse);
         LaunchException error = new LaunchException(null, runtime,
                 "severe", "error type", "test error", "this is a test of the error");
-        handler.launchError(error);
+        handler.handleLaunchError(error);
 
         assertEquals("netx: error type: test error (programmer made a mistake (no information element))\n", l.getStream1());
     }

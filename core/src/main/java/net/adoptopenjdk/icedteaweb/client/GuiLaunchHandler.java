@@ -70,14 +70,11 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     }
 
     @Override
-    public void launchError(final LaunchException exception) {
+    public void handleLaunchError(final LaunchException exception) {
         BasicExceptionDialog.willBeShown();
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                closeSplashScreen();
-                BasicExceptionDialog.show(exception);
-            }
+        SwingUtils.invokeLater(() -> {
+            closeSplashScreen();
+            BasicExceptionDialog.show(exception);
         });
         printMessage(exception);
     }
@@ -96,12 +93,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     @Override
     public void launchStarting(ApplicationInstance application) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                closeSplashScreen();
-            }
-        });
+        SwingUtils.invokeLater(this::closeSplashScreen);
     }
 
     @Override
@@ -124,25 +116,17 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
             resourceTracker.addResource(splashImageURL, file.getFileVersion());
         }
         synchronized (mutex) {
-            SwingUtils.invokeAndWait(new Runnable() {
-
-                @Override
-                public void run() {
-                    splashScreen = new JNLPSplashScreen(resourceTracker, file);
-                    splashScreen.setSplashImageURL(splashImageURL);
-                }
+            SwingUtils.invokeAndWait(() -> {
+                splashScreen = new JNLPSplashScreen(resourceTracker, file);
+                splashScreen.setSplashImageURL(splashImageURL);
             });
         }
 
-        SwingUtils.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (splashScreen != null) {
-                    synchronized (mutex) {
-                        if (splashScreen.isSplashScreenValid()) {
-                            splashScreen.setVisible(true);
-                        }
+        SwingUtils.invokeLater(() -> {
+            if (splashScreen != null) {
+                synchronized (mutex) {
+                    if (splashScreen.isSplashScreenValid()) {
+                        splashScreen.setVisible(true);
                     }
                 }
             }
@@ -150,16 +134,14 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
     }
 
     @Override
-    public boolean launchWarning(LaunchException warning) {
+    public void handleLaunchWarning(LaunchException warning) {
         printMessage(warning);
-        return true;
     }
 
     @Override
-    public boolean validationError(LaunchException error) {
+    public void validationError(LaunchException error) {
         closeSplashScreen();
         printMessage(error);
-        return true;
     }
 
 }
