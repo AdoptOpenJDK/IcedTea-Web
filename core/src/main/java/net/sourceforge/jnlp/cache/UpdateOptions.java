@@ -6,8 +6,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
 
 public class UpdateOptions {
     // update details from the JNLP file
-    final private UpdateCheck updateCheck;
-    private UpdatePolicy updatePolicy;
+    private final UpdateCheck updateCheck;
+    private final UpdatePolicy updatePolicy;
 
     // update policy option values
     private boolean promptUpdateLaunchCachedVersion;
@@ -18,11 +18,6 @@ public class UpdateOptions {
         this.updateCheck = Assert.requireNonNull(updateCheck, "updateCheck");
         this.updatePolicy = Assert.requireNonNull(updatePolicy, "updatePolicy");
         alwaysDownloadUpdates =  updatePolicy == UpdatePolicy.ALWAYS; // initialize when policy is always
-    }
-
-    public UpdateOptions(final UpdateCheck updateCheck, final boolean alwaysDownloadUpdates) {
-        this.updateCheck = updateCheck;
-        this.alwaysDownloadUpdates = alwaysDownloadUpdates;
     }
 
     public void setAlwaysDownloadUpdates(final boolean alwaysDownloadUpdates) {
