@@ -516,10 +516,10 @@ public final class DeploymentConfiguration {
                 LOG.debug("Won't save property '{}' since its current value is its default value ('{}')", key, defaultValue);
             }
             if (currentSetting != null && currentSetting.isLocked()) {
-                LOG.debug("Will save lock state for property '{}'", key);
+                LOG.debug("Will lock property '{}'", key);
                 toSave.setProperty(key + LOCKED_POSTFIX, "true");
             } else {
-                LOG.debug("Will not save lock state for property '{}'", key);
+                LOG.debug("Will not lock property '{}'", key);
             }
         }
 
