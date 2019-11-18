@@ -213,7 +213,8 @@ public class JNLPFile {
      */
     private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
-    public static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
+    private static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
+    private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
 
     { // initialize defaults if security allows
@@ -404,22 +405,17 @@ public class JNLPFile {
     }
 
     public String getTitle(boolean kill) throws MissingTitleException {
-        String title = getTitleImpl();
-        if (title == null) {
-            title = "";
+        final String title = getTitleImpl();
 
-        }
-        if (title.trim().isEmpty() && kill) {
-            throw new MissingTitleException();
-        }
-        if (title.trim().isEmpty()) {
+        if (StringUtils.isBlank(title)) {
             LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
-            title = "Corrupted or missing title. Do not trust this application!";
-            LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + ": {}", title);
+            if (kill) {
+                throw new MissingTitleException();
+            }
+            LOG.warn("However there is to many applications known to suffer this issue, so providing fake: {}", FAKE_TITLE);
+            return FAKE_TITLE;
         }
-        else {
-            LOG.info("Acceptable title tag found, contains: {}", title);
-        }
+
         return title;
     }
 
