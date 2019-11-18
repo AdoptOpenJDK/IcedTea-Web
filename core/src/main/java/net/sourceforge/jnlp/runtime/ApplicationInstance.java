@@ -107,7 +107,7 @@ public class ApplicationInstance {
      */
     public void initialize() {
         installEnvironment();
-        MenuAndDesktopIntegration.addMenuAndDesktopEntries(file);
+        new ItwMenuAndDesktopIntegration().addMenuAndDesktopEntries(file);
     }
 
     /**
