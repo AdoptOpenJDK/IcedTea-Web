@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.cache;
+package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;

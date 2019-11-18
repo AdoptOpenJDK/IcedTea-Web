@@ -2,7 +2,6 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdatePolicy;
-import net.sourceforge.jnlp.cache.UpdateOptions;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
