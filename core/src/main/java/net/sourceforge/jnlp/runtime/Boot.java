@@ -290,7 +290,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (settings != null) {
             try {
                 LOG.info("Proceeding with jnlp");
-                Launcher launcher = new Launcher(true);
+                Launcher launcher = new Launcher();
                 launcher.setParserSettings(settings);
                 launcher.setInformationToMerge(extra);
                 launcher.launch(Boot.getFileLocation());

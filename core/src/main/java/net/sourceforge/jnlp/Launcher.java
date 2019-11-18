@@ -17,7 +17,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -68,63 +67,22 @@ import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
  */
 public class Launcher {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Launcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Launcher.class);
 
     // defines class Launcher.BgRunner, Launcher.TgThread
 
     /** shared thread group */
-    public static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
+    private static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
     /** the handler */
-    private final LaunchHandler handler;
+    private final LaunchHandler handler = JNLPRuntime.getDefaultLaunchHandler();
 
     /** the update policy */
-    private final UpdatePolicy updatePolicy;
-
-    /** whether to create an AppContext (if possible) */
-    private boolean context = true;
-
-    /** If the application should call JNLPRuntime.exit on fatal errors */
-    private final boolean exitOnFailure;
+    private final UpdatePolicy updatePolicy = JNLPRuntime.getDefaultUpdatePolicy();
 
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
-
-    /**
-     * Create a launcher with the runtime's default update policy
-     * and launch handler.
-     *
-     * @param exitOnFailure exit if there is an error (usually default, but false when being used from the plugin)
-     */
-    public Launcher(boolean exitOnFailure) {
-        this(null, null, exitOnFailure);
-    }
-
-    /**
-     * Create a launcher with an optional handler using the
-     * specified update policy and launch handler.
-     *
-     * @param handler the handler to use or null for no handler.
-     * @param policy the update policy to use or null for default policy.
-     * @param exitOnFailure exit if there is an error (usually default, but false when being used from the plugin)
-     */
-    public Launcher(final LaunchHandler handler, final UpdatePolicy policy, boolean exitOnFailure) {
-        this.handler = handler == null ? JNLPRuntime.getDefaultLaunchHandler() : handler;
-        this.updatePolicy = policy == null ? JNLPRuntime.getDefaultUpdatePolicy() : policy;
-        this.exitOnFailure = exitOnFailure;
-    }
-
-    /**
-     * Sets whether to launch the application in a new AppContext
-     * (a separate event queue, look and feel, etc).  If the
-     * sun.awt.SunToolkit class is not present then this method
-     * has no effect.  The default value is true.
-     * @param context appcontext to be set
-     */
-    public void setCreateAppContext(boolean context) {
-        this.context = context;
-    }
 
     /**
      * @param settings  the parser settings to use when the Launcher initiates parsing of
@@ -199,7 +157,11 @@ public class Launcher {
             tg.join();
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
-            throw launchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
+            final LaunchException launchException = launchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
+            if (launchException != null) {
+                throw launchException;
+            }
+            throw new RuntimeException(ex);
         }
 
         if (tg.getException() != null) {
@@ -340,9 +302,9 @@ public class Launcher {
             if (file.getSourceLocation() != null) {
                 haveHref = true;
             }
-            if (!isLocal && haveHref){
+            if (!isLocal && haveHref) {
                 //this is case when remote file have href to different file
-                if (!location.equals(file.getSourceLocation())){
+                if (!location.equals(file.getSourceLocation())) {
                     //mark local true, so the following condition will be true and
                     //new jnlp file will be downloaded
                     isLocal = true;
@@ -362,12 +324,7 @@ public class Launcher {
             }
             return file;
         } catch (Exception ex) {
-            if (ex instanceof LaunchException) {
-                throw (LaunchException) ex; // already sent to handler when first thrown
-            } else {
-                // IO and Parse
-                throw launchError(new LaunchException(null, ex, "Fatal", "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
-            }
+            throw launchError(new LaunchException(null, ex, "Fatal", "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
         }
     }
 
@@ -503,12 +460,11 @@ public class Launcher {
      * </p>
      *
      * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
      * @param cont container where to put application
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance launchApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
+    private ApplicationInstance launchApplet(final JNLPFile file, final Container cont) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -528,7 +484,7 @@ public class Launcher {
         AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, enableCodeBase, cont);
+            applet = createApplet(file, cont);
             applet.initialize();
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
@@ -543,35 +499,6 @@ public class Launcher {
             if (handler != null) {
                 handler.launchStarting(applet);
             }
-        }
-    }
-
-    /**
-     * Gets an ApplicationInstance, but does not launch the applet.
-     * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
-     * @param cont container where to put applet
-     * @return applet
-     * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
-     */
-    private ApplicationInstance getApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
-        if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
-        }
-        AppletInstance applet = null;
-        try {
-            ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, enableCodeBase, cont);
-            applet.initialize();
-            return applet;
-
-        } catch (InstanceExistsException ieex) {
-            LOG.info("Single instance applet is already running.");
-            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."));
-        } catch (LaunchException lex) {
-            throw launchError(lex);
-        } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -592,7 +519,6 @@ public class Launcher {
      * Create an AppletInstance.
      *
      * @param file the JNLP file
-     * @param enableCodeBase whether to add the codebase URL to the classloader
      * @param cont container where to put applet
      * @return applet
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
@@ -601,22 +527,18 @@ public class Launcher {
     //and then applets creates in little bit strange manner. This issue is visible with
     //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
-    private AppletInstance createApplet(final JNLPFile file, final boolean enableCodeBase, final Container cont) throws LaunchException {
-         AppletInstance appletInstance = null;
+    private AppletInstance createApplet(final JNLPFile file, final Container cont) throws LaunchException {
          try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, enableCodeBase);
+            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, true);
 
-            if (enableCodeBase) {
-                loader.enableCodeBase();
-            } else if (file.getResources().getJARs().length == 0) {
-                throw new ClassNotFoundException("Can't do a codebase look up and there are no jars. Failing sooner rather than later");
-            }
+             loader.enableCodeBase();
 
-            ThreadGroup group = Thread.currentThread().getThreadGroup();
+             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
             // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
+            final AppletInstance appletInstance;
             if (cont == null) {
                  appletInstance = new AppletInstance(file, group, loader, null);
              } else {
@@ -746,9 +668,7 @@ public class Launcher {
             try {
                 // Do not create new AppContext if we're using NetX and icedteaplugin.
                 // The plugin needs an AppContext too, but it has to be created earlier.
-                if (context) {
-                    SunToolkit.createNewAppContext();
-                }
+                SunToolkit.createNewAppContext();
 
                 doPerApplicationAppContextHacks();
 
@@ -756,8 +676,8 @@ public class Launcher {
                     application = launchApplication(file);
                 }
                 else if (file.isApplet()) {
-                    application = launchApplet(file, true, cont);
-                } // enable applet code base
+                    application = launchApplet(file, cont);
+                }
                 else if (file.isInstaller()) {
                     application = launchInstaller(file);
                 }
@@ -767,14 +687,12 @@ public class Launcher {
                             "File must be a JNLP application, applet, or installer type."));
                 }
             } catch (LaunchException ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                LOG.error("Launch exception", ex);
                 exception = ex;
                 // Exit if we can't launch the application.
-                if (exitOnFailure) {
-                    JNLPRuntime.exit(1);
-                }
+                JNLPRuntime.exit(1);
             }  catch (Throwable ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                LOG.error("General Throwable encountered:", ex);
                 throw new RuntimeException(ex);
             }
         }
