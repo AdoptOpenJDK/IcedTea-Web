@@ -210,6 +210,10 @@ public class InformationDesc {
         return icons.toArray(new IconDesc[icons.size()]);
     }
 
+    public URL getIconLocation(final IconKind kind, final int dimension) {
+        return getIconLocation(kind, dimension, dimension);
+    }
+
     /**
      * Returns the URL of the icon with the given type and a size
      * closest to the requested width and height.
