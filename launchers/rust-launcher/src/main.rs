@@ -15,6 +15,8 @@ use std::fmt::Write;
 use os_access::Os;
 use std::env;
 
+const NATIVE_DEBUG_ARG: &str = "-nativeDebug";
+
 #[cfg(not(windows))]
 fn get_os(debug: bool, al: bool) -> os_access::Linux {
     os_access::Linux::new(debug, al)
@@ -85,7 +87,7 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>, aargs: Vec<String>)
 
 fn is_native_debug_enabled(args: &Vec<String>) -> bool {
     for s in args {
-        if clean_param(s.to_string()) == ("-nativeDebug") {
+        if clean_param(s.to_string()) == NATIVE_DEBUG_ARG.to_string() {
             return true;
         }
     }
@@ -178,7 +180,7 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
             Some(value) => {
                 suspend = value;
             }
-            _none => {
+            None => {
                 suspend = String::from("n");
             }
         }
@@ -186,13 +188,13 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
             Some(value) => {
                 port = value;
             }
-            _none => {
+            None => {
                 port = String::from("9009");
             }
         }
 
         native_debug_toggle = String::from("-Xdebug");
-        native_debug_config = [String::from("-Xrunjdwp:transport=dt_socket,server=y,suspend="), suspend, String::from(",address="), port].concat();
+        native_debug_config = format!("-Xrunjdwp:transport=dt_socket,server=y,suspend={},address={}", suspend, port);
     } else {
         native_debug_toggle = String::from("");
         native_debug_config = String::from("");
@@ -304,7 +306,7 @@ fn clean_param(s: String) -> String {
 #[allow(non_snake_case)]
 fn include_not_dashJs_nor_native_debug(srcs: &Vec<std::string::String>, target: &mut Vec<std::string::String>) {
     for f in srcs.iter() {
-        if !f.to_string().starts_with("-J") && !f.to_string().starts_with("-nativeDebug") {
+        if !f.to_string().starts_with("-J") && !f.to_string().starts_with(NATIVE_DEBUG_ARG) {
             target.push(f.to_string());
         }
     }
