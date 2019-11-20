@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.proxy.pac;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -125,7 +125,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
     private String getProxiesWithoutCaching(URL url) {
         if (pacHelperFunctionContents == null) {
             LOG.error("Error loading pac functions");
-            return "DIRECT";
+            return PacConstants.DIRECT;
         }
 
         EvaluatePacAction evaluatePacAction = new EvaluatePacAction(pacContents, pacUrl.toString(),
@@ -265,7 +265,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
                 }
             } catch (Exception e) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                return "DIRECT";
+                return PacConstants.DIRECT;
             } finally {
                 Context.exit();
             }

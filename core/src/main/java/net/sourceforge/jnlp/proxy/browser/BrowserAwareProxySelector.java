@@ -34,15 +34,16 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
-package net.sourceforge.jnlp.browser;
+package net.sourceforge.jnlp.proxy.browser;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.JNLPProxySelector;
-import net.sourceforge.jnlp.runtime.PacEvaluator;
-import net.sourceforge.jnlp.runtime.PacEvaluatorFactory;
+import net.sourceforge.jnlp.proxy.JNLPProxySelector;
+import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
+import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
+import net.sourceforge.jnlp.proxy.pac.PacUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +56,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.AUTO_CONFIG_URL_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.HTTP_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.HTTP_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.PROXY_TYPE_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SHARE_SETTINGS_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SOCKS_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SOCKS_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SSL_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SSL_PROPERTY_NAME;
+
 /**
  * A ProxySelector which can read proxy settings from a browser's
  * configuration and use that.
@@ -65,17 +79,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
     private final static Logger LOG = LoggerFactory.getLogger(BrowserAwareProxySelector.class);
 
-    /* firefox's constants */
-    public static final int BROWSER_PROXY_TYPE_NONE = 0;
-    public static final int BROWSER_PROXY_TYPE_MANUAL = 1;
-    public static final int BROWSER_PROXY_TYPE_PAC = 2;
-    public static final int BROWSER_PROXY_TYPE_NONE2 = 3;
-    /** use gconf, WPAD and then env (and possibly others)*/
-    public static final int BROWSER_PROXY_TYPE_AUTO = 4;
-    /** use env variables */
-    public static final int BROWSER_PROXY_TYPE_SYSTEM = 5;
-
-    private int browserProxyType = BROWSER_PROXY_TYPE_NONE;
+    private BrowserProxyType browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
     private URL browserAutoConfigUrl;
     /** Whether the http proxy should be used for http, https, ftp and socket protocols */
     private Boolean browserUseSameProxy;
@@ -102,7 +106,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             initFromBrowserConfig();
         } catch (IOException e) {
             LOG.error("Unable to use Firefox''s proxy settings. Using \"DIRECT\" as proxy type.", e);
-            browserProxyType = PROXY_TYPE_NONE;
+            browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
         }
     }
 
@@ -113,15 +117,15 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
         Map<String, String> prefs = parseBrowserPreferences();
 
-        String type = prefs.get("network.proxy.type");
+        String type = prefs.get(PROXY_TYPE_PROPERTY_NAME);
         if (type != null) {
-            browserProxyType = Integer.valueOf(type);
+            browserProxyType = BrowserProxyType.getForConfigValue(Integer.valueOf(type));
         } else {
-            browserProxyType = BROWSER_PROXY_TYPE_AUTO;
+            browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_AUTO;
         }
 
         try {
-            String url = prefs.get("network.proxy.autoconfig_url");
+            String url = prefs.get(AUTO_CONFIG_URL_PROPERTY_NAME);
             if (url != null) {
                 browserAutoConfigUrl = new URL(url);
             }
@@ -129,25 +133,25 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
-        if (browserProxyType == BROWSER_PROXY_TYPE_PAC) {
+        if (browserProxyType == BrowserProxyType.BROWSER_PROXY_TYPE_PAC) {
             if (browserAutoConfigUrl != null) {
                 browserProxyAutoConfig = PacEvaluatorFactory.getPacEvaluator(browserAutoConfigUrl);
             }
         }
 
-        browserUseSameProxy = Boolean.valueOf(prefs.get("network.proxy.share_proxy_settings"));
+        browserUseSameProxy = Boolean.valueOf(prefs.get(SHARE_SETTINGS_PROPERTY_NAME));
 
-        browserHttpProxyHost = prefs.get("network.proxy.http");
-        browserHttpProxyPort = stringToPort(prefs.get("network.proxy.http_port"));
-        browserHttpsProxyHost = prefs.get("network.proxy.ssl");
-        browserHttpsProxyPort = stringToPort(prefs.get("network.proxy.ssl_port"));
-        browserFtpProxyHost = prefs.get("network.proxy.ftp");
-        browserFtpProxyPort = stringToPort(prefs.get("network.proxy.ftp_port"));
-        browserSocks4ProxyHost = prefs.get("network.proxy.socks");
-        browserSocks4ProxyPort = stringToPort(prefs.get("network.proxy.socks_port"));
+        browserHttpProxyHost = prefs.get(HTTP_PROPERTY_NAME);
+        browserHttpProxyPort = stringToPort(prefs.get(HTTP_PORT_PROPERTY_NAME));
+        browserHttpsProxyHost = prefs.get(SSL_PROPERTY_NAME);
+        browserHttpsProxyPort = stringToPort(prefs.get(SSL_PORT_PROPERTY_NAME));
+        browserFtpProxyHost = prefs.get(FTP_PROPERTY_NAME);
+        browserFtpProxyPort = stringToPort(prefs.get(FTP_PORT_PROPERTY_NAME));
+        browserSocks4ProxyHost = prefs.get(SOCKS_PROPERTY_NAME);
+        browserSocks4ProxyPort = stringToPort(prefs.get(SOCKS_PORT_PROPERTY_NAME));
     }
 
-    Map<String, String> parseBrowserPreferences() throws IOException {
+    public Map<String, String> parseBrowserPreferences() throws IOException {
         File preferencesFile = FirefoxPreferencesFinder.find();
         FirefoxPreferencesParser parser = new FirefoxPreferencesParser(preferencesFile);
         parser.parse();
@@ -181,7 +185,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      * </p>
      */
     @Override
-    protected List<Proxy> getFromBrowser(URI uri) {
+    public List<Proxy> getFromBrowser(URI uri) {
         List<Proxy> proxies = new ArrayList<Proxy>();
 
         String optionDescription = null;
@@ -229,7 +233,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      * browser.
      */
     private List<Proxy> getFromBrowserPAC(URI uri) {
-        if (browserAutoConfigUrl == null || uri.getScheme().equals("socket")) {
+        if (browserAutoConfigUrl == null || uri.getScheme().equals(SOCKET_SCHEMA)) {
             return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
         }
 
@@ -237,7 +241,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
         try {
             String proxiesString = browserProxyAutoConfig.getProxies(uri.toURL());
-            proxies.addAll(getProxiesFromPacResult(proxiesString));
+            proxies.addAll(PacUtils.getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             proxies.add(Proxy.NO_PROXY);

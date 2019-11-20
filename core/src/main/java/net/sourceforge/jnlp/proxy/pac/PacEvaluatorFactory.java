@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.proxy.pac;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -77,7 +77,7 @@ public class PacEvaluatorFactory {
 
         if (useRhino) {
             try {
-                Class<?> evaluator = Class.forName("net.sourceforge.jnlp.runtime.RhinoBasedPacEvaluator");
+                Class<?> evaluator = Class.forName("net.sourceforge.jnlp.proxy.pac.RhinoBasedPacEvaluator");
                 Constructor<?> constructor = evaluator.getConstructor(URL.class);
                 return (PacEvaluator) constructor.newInstance(pacUrl);
             } catch (ClassNotFoundException e) {

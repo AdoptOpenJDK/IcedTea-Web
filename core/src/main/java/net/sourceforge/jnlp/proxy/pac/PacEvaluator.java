@@ -1,4 +1,4 @@
-/* FakePacEvaluator.java
+/* PacEvaluator.java
    Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,23 +35,23 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.runtime;
-
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+package net.sourceforge.jnlp.proxy.pac;
 
 import java.net.URL;
 
 /**
- * A dummy PacEvaluator that always returns "DIRECT"
+ * This interface represents an object which can evaluate Proxy Auto Config
+ * files.
  */
-public class FakePacEvaluator implements PacEvaluator {
+public interface PacEvaluator {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FakePacEvaluator.class);
-
-    @Override
-    public String getProxies(URL url) {
-        LOG.error("Using Proxy Auto Config (PAC) files is not supported.");
-        return "DIRECT";
-    }
+    /**
+     * Get the proxies for accessing a given URL. The result is obtained by
+     * evaluating the PAC file with the given url (and the host) as input.
+     *
+     * @param url the url for which a proxy is desired
+     * @return a list of proxies in a string like
+     * <pre>"PROXY foo.example.com:8080; PROXY bar.example.com:8080; DIRECT"</pre>
+     */
+    String getProxies(URL url);
 }

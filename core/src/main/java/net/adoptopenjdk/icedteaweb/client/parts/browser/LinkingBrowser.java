@@ -36,15 +36,16 @@ exception statement from your version.
  */
 package net.adoptopenjdk.icedteaweb.client.parts.browser;
 
-import java.net.Authenticator;
-import java.net.ProxySelector;
-import java.net.URL;
+import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
+import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.security.JNLPAuthenticator;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.sourceforge.jnlp.browser.BrowserAwareProxySelector;
-import net.sourceforge.jnlp.security.JNLPAuthenticator;
+import java.net.Authenticator;
+import java.net.ProxySelector;
+import java.net.URL;
 
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 

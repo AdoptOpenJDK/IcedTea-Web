@@ -37,9 +37,10 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.browser;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.proxy.ProxyType;
+import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,7 +68,7 @@ public class BrowserAwareProxySelectorTest {
         }
 
         @Override
-        protected Map<String, String> parseBrowserPreferences() throws IOException {
+        public Map<String, String> parseBrowserPreferences() throws IOException {
             return browserPrefs;
         }
     }
@@ -82,7 +83,7 @@ public class BrowserAwareProxySelectorTest {
     @Before
     public void setUp() {
         config = new DeploymentConfiguration();
-        config.setProperty(ConfigurationConstants.KEY_PROXY_TYPE, String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER));
+        config.setProperty(ConfigurationConstants.KEY_PROXY_TYPE, String.valueOf(ProxyType.PROXY_TYPE_BROWSER.getConfigValue()));
 
         browserPrefs = new HashMap<String, String>();
     }

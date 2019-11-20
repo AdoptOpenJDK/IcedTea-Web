@@ -42,7 +42,7 @@ import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.adoptopenjdk.icedteaweb.config.validators.SecurityValueValidator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
-import net.sourceforge.jnlp.runtime.JNLPProxySelector;
+import net.sourceforge.jnlp.proxy.ProxyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -249,9 +249,9 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_TYPE,
-                    String.valueOf(JNLPProxySelector.PROXY_TYPE_BROWSER),
-                    ValidatorFactory.createRangedIntegerValidator(JNLPProxySelector.PROXY_TYPE_UNKNOWN,
-                            JNLPProxySelector.PROXY_TYPE_BROWSER)
+                    String.valueOf(ProxyType.PROXY_TYPE_BROWSER.getConfigValue()),
+                    ValidatorFactory.createRangedIntegerValidator(ProxyType.PROXY_TYPE_UNKNOWN.getConfigValue(),
+                            ProxyType.PROXY_TYPE_BROWSER.getConfigValue())
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SAME,
