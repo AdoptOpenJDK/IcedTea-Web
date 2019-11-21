@@ -99,7 +99,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
             try {
                 autoConfigUrl = new URL(autoConfigUrlProperty);
             } catch (final MalformedURLException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Can not parse auto config url for proxy: '" +autoConfigUrl + "'" , e);
             }
         }
 
