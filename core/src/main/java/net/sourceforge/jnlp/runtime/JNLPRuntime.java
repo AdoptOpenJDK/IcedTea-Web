@@ -899,6 +899,11 @@ public class JNLPRuntime {
     }
 
     public static void exit(int i) {
+        closeLoggerAndWaitForExceptionDialogsToBeClosed();
+        System.exit(i);
+    }
+
+    public static void closeLoggerAndWaitForExceptionDialogsToBeClosed() {
         try {
             OutputController.getLogger().close();
             while (BasicExceptionDialog.areShown()){
@@ -907,7 +912,6 @@ public class JNLPRuntime {
         } catch (Exception ex) {
             //to late
         }
-        System.exit(i);
     }
 
 
