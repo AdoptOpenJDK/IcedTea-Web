@@ -14,13 +14,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.proxy;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
+import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
+import net.sourceforge.jnlp.proxy.pac.PacUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -38,6 +42,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static net.sourceforge.jnlp.proxy.ProxyConstants.FTP_SCHEMA;
+import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTPS_SCHEMA;
+import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTP_SCHEMA;
+import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
+
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
  * configuration to determine what to do.
@@ -48,63 +57,49 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
     private final static Logger LOG = LoggerFactory.getLogger(JNLPProxySelector.class);
 
-    public static final int PROXY_TYPE_UNKNOWN = -1;
-    public static final int PROXY_TYPE_NONE = 0;
-    public static final int PROXY_TYPE_MANUAL = 1;
-    public static final int PROXY_TYPE_AUTO = 2;
-    public static final int PROXY_TYPE_BROWSER = 3;
-
-    /** The default port to use as a fallback. Currently squid's default port */
-    public static final int FALLBACK_PROXY_PORT = 3128;
-
     private PacEvaluator pacEvaluator = null;
-
-    /** The proxy type. See PROXY_TYPE_* constants */
-    private int proxyType = PROXY_TYPE_UNKNOWN;
 
     /** the URL to the PAC file */
     private URL autoConfigUrl = null;
 
-    /** a list of URLs that should be bypassed for proxy purposes */
-    private List<String> bypassList = null;
+
 
     /** whether localhost should be bypassed for proxy purposes */
     private boolean bypassLocal = false;
 
+
+
+    /** The proxy type. See PROXY_TYPE_* constants */
+    private final ProxyType proxyType;
+
+    private final String proxyHttpHost;
+    private final int proxyHttpPort;
+    private final String proxyHttpsHost;
+    private final int proxyHttpsPort;
+    private final String proxyFtpHost;
+    private final int proxyFtpPort;
+    private final String proxySocks4Host;
+    private final int proxySocks4Port;
+
+    /** a list of URLs that should be bypassed for proxy purposes */
+    private final List<String> bypassList;
+
     /**
      * whether the http proxy should be used for https and ftp protocols as well
      */
-    private boolean sameProxy = false;
-
-    private String proxyHttpHost;
-    private int proxyHttpPort;
-    private String proxyHttpsHost;
-    private int proxyHttpsPort;
-    private String proxyFtpHost;
-    private int proxyFtpPort;
-    private String proxySocks4Host;
-    private int proxySocks4Port;
-
-    // FIXME what is this? where should it be used?
-    private String overrideHosts = null;
+    private final boolean sameProxy;
 
     public JNLPProxySelector(DeploymentConfiguration config) {
-        parseConfiguration(config);
-    }
-
-    /**
-     * Initialize this ProxySelector by reading the configuration
-     */
-    private void parseConfiguration(DeploymentConfiguration config) {
-        proxyType = Integer.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE));
-
+        Assert.requireNonNull(config, "config");
+        final int proxyTypeConfigValue = Integer.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_TYPE));
+        proxyType = ProxyType.getForConfigValue(proxyTypeConfigValue);
         final String autoConfigUrlProperty = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
 
         if (autoConfigUrlProperty != null) {
             try {
                 autoConfigUrl = new URL(autoConfigUrlProperty);
-            } catch (MalformedURLException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            } catch (final MalformedURLException e) {
+                LOG.error("Can not parse auto config url for proxy: '" +autoConfigUrl + "'" , e);
             }
         }
 
@@ -140,8 +135,6 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
         proxySocks4Host = getHost(config, ConfigurationConstants.KEY_PROXY_SOCKS4_HOST);
         proxySocks4Port = getPort(config, ConfigurationConstants.KEY_PROXY_SOCKS4_PORT);
-
-        overrideHosts = config.getProperty(ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS);
     }
 
     /**
@@ -159,7 +152,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * Uses the given key to get a port from the configuration
      */
     private int getPort(DeploymentConfiguration config, String key) {
-        int proxyPort = FALLBACK_PROXY_PORT;
+        int proxyPort = ProxyConstants.FALLBACK_PROXY_PORT;
         String port;
         port = config.getProperty(key);
         if (port != null && port.trim().length() != 0) {
@@ -227,16 +220,16 @@ public abstract class JNLPProxySelector extends ProxySelector {
             String scheme = uri.getScheme();
             /* scheme can be http/https/ftp/socket */
             switch (scheme) {
-                case "http":
-                case "https":
-                case "ftp":
+                case HTTP_SCHEMA:
+                case HTTPS_SCHEMA:
+                case FTP_SCHEMA:
                     URL url = uri.toURL();
                     if (bypassLocal && isLocalHost(url.getHost())) {
                         return true;
                     }   if (bypassList.contains(url.getHost())) {
                     return true;
                 }   break;
-                case "socket":
+                case SOCKET_SCHEMA:
                     String host = uri.getHost();
                     if (bypassLocal && isLocalHost(host)) {
                         return true;
@@ -332,22 +325,22 @@ public abstract class JNLPProxySelector extends ProxySelector {
         if (sameProxy) {
             if (proxyHttpHost != null) {
                 SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
-                if ((scheme.equals("https") || scheme.equals("http") || scheme.equals("ftp"))) {
+                if ((scheme.equals(HTTPS_SCHEMA) || scheme.equals(HTTP_SCHEMA) || scheme.equals(FTP_SCHEMA))) {
                     Proxy proxy = new Proxy(Type.HTTP, sa);
                     proxies.add(proxy);
-                } else if (scheme.equals("socket") && sameProxyIncludesSocket) {
+                } else if (scheme.equals(SOCKET_SCHEMA) && sameProxyIncludesSocket) {
                     Proxy proxy = new Proxy(Type.SOCKS, sa);
                     proxies.add(proxy);
                     socksProxyAdded = true;
                 }
             }
-        } else if (scheme.equals("http") && proxyHttpHost != null) {
+        } else if (scheme.equals(HTTP_SCHEMA) && proxyHttpHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyHttpHost, proxyHttpPort);
             proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("https") && proxyHttpsHost != null) {
+        } else if (scheme.equals(HTTPS_SCHEMA) && proxyHttpsHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyHttpsHost, proxyHttpsPort);
             proxies.add(new Proxy(Type.HTTP, sa));
-        } else if (scheme.equals("ftp") && proxyFtpHost != null) {
+        } else if (scheme.equals(FTP_SCHEMA) && proxyFtpHost != null) {
             SocketAddress sa = new InetSocketAddress(proxyFtpHost, proxyFtpPort);
             proxies.add(new Proxy(Type.HTTP, sa));
         }
@@ -355,7 +348,6 @@ public abstract class JNLPProxySelector extends ProxySelector {
         if (!socksProxyAdded && (proxySocks4Host != null)) {
             SocketAddress sa = new InetSocketAddress(proxySocks4Host, proxySocks4Port);
             proxies.add(new Proxy(Type.SOCKS, sa));
-            socksProxyAdded = true;
         }
 
         if (proxies.isEmpty()) {
@@ -373,8 +365,8 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * @param uri uri to PAC
      * @return a List of valid Proxy objects
      */
-    protected List<Proxy> getFromPAC(URI uri) {
-        if (autoConfigUrl == null || uri.getScheme().equals("socket")) {
+    private List<Proxy> getFromPAC(URI uri) {
+        if (autoConfigUrl == null || uri.getScheme().equals(SOCKET_SCHEMA)) {
             return Arrays.asList(new Proxy[] { Proxy.NO_PROXY });
         }
 
@@ -382,7 +374,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
         try {
             String proxiesString = pacEvaluator.getProxies(uri.toURL());
-            proxies.addAll(getProxiesFromPacResult(proxiesString));
+            proxies.addAll(PacUtils.getProxiesFromPacResult(proxiesString));
         } catch (MalformedURLException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             proxies.add(Proxy.NO_PROXY);
@@ -398,56 +390,5 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * @return a list of proxies
      */
     protected abstract List<Proxy> getFromBrowser(URI uri);
-
-    /**
-     * Converts a proxy string from a browser into a List of Proxy objects
-     * suitable for java.
-     * @param pacString a string indicating proxies. For example
-     * "PROXY foo.bar:3128; DIRECT"
-     * @return a list of Proxy objects representing the parsed string. In
-     * case of malformed input, an empty list may be returned
-     */
-    public static List<Proxy> getProxiesFromPacResult(String pacString) {
-        List<Proxy> proxies = new ArrayList<>();
-
-        String[] tokens = pacString.split(";");
-        for (String token: tokens) {
-            if (token.startsWith("PROXY")) {
-                String hostPortPair = token.substring("PROXY".length()).trim();
-                if (!hostPortPair.contains(":")) {
-                    continue;
-                }
-                String host = hostPortPair.split(":")[0];
-                int port;
-                try {
-                    port = Integer.valueOf(hostPortPair.split(":")[1]);
-                } catch (NumberFormatException nfe) {
-                    continue;
-                }
-                SocketAddress sa = new InetSocketAddress(host, port);
-                proxies.add(new Proxy(Type.HTTP, sa));
-            } else if (token.startsWith("SOCKS")) {
-                String hostPortPair = token.substring("SOCKS".length()).trim();
-                if (!hostPortPair.contains(":")) {
-                    continue;
-                }
-                String host = hostPortPair.split(":")[0];
-                int port;
-                try {
-                    port = Integer.valueOf(hostPortPair.split(":")[1]);
-                } catch (NumberFormatException nfe) {
-                    continue;
-                }
-                SocketAddress sa = new InetSocketAddress(host, port);
-                proxies.add(new Proxy(Type.SOCKS, sa));
-            } else if (token.startsWith("DIRECT")) {
-                proxies.add(Proxy.NO_PROXY);
-            } else {
-                 LOG.debug("Unrecognized proxy token: {}", token);
-            }
-        }
-
-        return proxies;
-    }
 
 }
