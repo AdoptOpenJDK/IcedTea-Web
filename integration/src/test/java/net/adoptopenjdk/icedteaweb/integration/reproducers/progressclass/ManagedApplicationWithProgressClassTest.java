@@ -71,9 +71,10 @@ public class ManagedApplicationWithProgressClassTest implements IntegrationTest 
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, PROGRESS_CLASS_OUTPUT_FILE), containsString("MyDownloadServiceListener.progress called"));
     }

@@ -49,9 +49,10 @@ public class ManagedApplicationWithExtensionResourceStartedTest implements Integ
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, EXTENSION_OUTPUT_FILE), startsWith("Simple Java application loaded as extension resource"));
     }

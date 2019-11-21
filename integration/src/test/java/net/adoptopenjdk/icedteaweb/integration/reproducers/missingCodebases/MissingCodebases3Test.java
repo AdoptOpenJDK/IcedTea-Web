@@ -9,7 +9,6 @@ import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class MissingCodebases3Test implements IntegrationTest {
 
 
     @Test(timeout = 100_000)
-    public void codebaseMissingHrefFull() throws IOException, ConfigurationException {
+    public void codebaseMissingHrefFull() throws IOException {
         // given
         final String jnlpUrl = setupServer(wireMock, "MissingCodebases3.jnlp", MissingCodebases.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
@@ -40,9 +39,10 @@ public class MissingCodebases3Test implements IntegrationTest {
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }

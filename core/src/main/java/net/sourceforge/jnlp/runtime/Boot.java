@@ -16,7 +16,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificateViewer;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
@@ -113,16 +112,39 @@ public final class Boot implements PrivilegedAction<Integer> {
      * @param args launching arguments
      */
     public static void main(String[] args) throws UnevenParameterException {
-        main(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
+        final int status = mainWithReturnCode(args);
+        if (status != 0) {
+            System.exit(status);
+        }
+    }
+
+    /**
+     * Launch the JNLP file specified by the command-line arguments.
+     *
+     * @param args launching arguments
+     * @return the return code. 0 = SUCCESS anything else is an error
+     */
+    public static int mainWithReturnCode(String[] args) throws UnevenParameterException {
+        return mainWithReturnCode(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
     }
 
     /**
      * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
      *
-     * @param launcher the JVM launcher
-     * @param args     launching arguments
+     * @param launcher                  the JVM launcher
+     * @param menuAndDesktopIntegration integration for menu and desktop shortcut creation
+     * @param args                      launching arguments
+     * @return the return code. 0 = SUCCESS anything else is an error
      */
-    public static void main(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
+    public static int mainWithReturnCode(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
+        try {
+            return runMain(launcher, menuAndDesktopIntegration, args);
+        } finally {
+            JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
+        }
+    }
+
+    private static Integer runMain(JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, String[] args) {
         JvmLauncherHolder.setLauncher(requireNonNull(launcher));
 
         // setup Swing EDT tracing:
@@ -147,25 +169,23 @@ public final class Boot implements PrivilegedAction<Integer> {
                 CertificateViewer.main(null);
             } catch (Exception e) {
                 LOG.error("Exception while displaying the Certificate Viewer", e);
-            } finally {
-                //no matter what happens, terminate
-                JNLPRuntime.exit(0);
             }
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.VERSION)) {
             OutputController.getLogger().printOutLn(nameAndVersion);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.LICENSE)) {
             OutputController.getLogger().printOutLn(miniLicense);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.HELP1)) {
             printHelpMessage();
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         final List<String> properties = optionParser.getParams(CommandLineOptions.PROPERTY);
@@ -191,7 +211,7 @@ public final class Boot implements PrivilegedAction<Integer> {
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display(JAVAWS);
             }
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.UPDATE)) {
@@ -225,7 +245,7 @@ public final class Boot implements PrivilegedAction<Integer> {
         if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
             String url = optionParser.getParam(CommandLineOptions.BROWSER);
             LinkingBrowser.showStandAloneWindow(url, false);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         JNLPRuntime.setInitialArguments(Arrays.asList(args));
@@ -244,7 +264,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             List<String> optionArgs = optionParser.getMainArgs();
             final String arg = optionArgs.size() > 0 ? optionArgs.get(0) : ".*";
             CacheUtil.logCacheIds(arg);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.CLEARCACHE)) {
@@ -256,15 +276,10 @@ public final class Boot implements PrivilegedAction<Integer> {
                 // clear all cache
                 Cache.clearCache();
             }
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
-        final Integer result = AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
-
-        JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
-        if (result != 0) {
-            System.exit(result);
-        }
+        return AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
     }
 
     private static void printHelpMessage() {

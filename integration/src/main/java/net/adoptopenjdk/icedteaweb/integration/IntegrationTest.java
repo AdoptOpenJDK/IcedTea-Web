@@ -49,6 +49,8 @@ import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
  */
 public interface IntegrationTest {
 
+    int SUCCESS = 0;
+
     String PORT = "PORT";
     String MAIN_CLASS = "MAIN_CLASS";
 

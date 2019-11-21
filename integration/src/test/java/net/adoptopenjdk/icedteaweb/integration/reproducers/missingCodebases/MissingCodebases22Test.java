@@ -32,9 +32,10 @@ public class MissingCodebases22Test implements IntegrationTest {
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }
