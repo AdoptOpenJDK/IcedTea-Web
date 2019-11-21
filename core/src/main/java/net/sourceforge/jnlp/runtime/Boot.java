@@ -166,10 +166,11 @@ public final class Boot implements PrivilegedAction<Integer> {
         if (optionParser.hasOption(CommandLineOptions.VIEWER)) {
             try {
                 CertificateViewer.main(null);
+                return 0;
             } catch (Exception e) {
                 LOG.error("Exception while displaying the Certificate Viewer", e);
+                return 1;
             }
-            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.VERSION)) {
