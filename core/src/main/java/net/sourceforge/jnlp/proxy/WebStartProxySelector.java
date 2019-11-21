@@ -14,6 +14,7 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class WebStartProxySelector extends ProxySelector {
 
@@ -26,11 +27,11 @@ public class WebStartProxySelector extends ProxySelector {
     }
 
     private ProxyProvider getProvider(final DeploymentConfiguration config, final String providerName) throws Exception {
-        if (providerName == DeploymentConfigBasedProxyProvider.NAME) {
+        if (Objects.equals(providerName, DeploymentConfigBasedProxyProvider.NAME)) {
             return new DeploymentConfigBasedProxyProvider(config);
-        } else if (providerName == AutoConfigUrlProxyProvider.NAME) {
+        } else if (Objects.equals(providerName, AutoConfigUrlProxyProvider.NAME)) {
             return new AutoConfigUrlProxyProvider(config);
-        } else if (providerName == FirefoxProxyProvider.NAME) {
+        } else if (Objects.equals(providerName, FirefoxProxyProvider.NAME)) {
             return new FirefoxProxyProvider();
         }
         return new DirectProxyProvider();
