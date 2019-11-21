@@ -26,11 +26,11 @@ public class WebStartProxySelector extends ProxySelector {
     }
 
     private ProxyProvider getProvider(final DeploymentConfiguration config, final String providerName) throws Exception {
-        if(providerName == DeploymentConfigBasedProxyProvider.NAME) {
+        if (providerName == DeploymentConfigBasedProxyProvider.NAME) {
             return new DeploymentConfigBasedProxyProvider(config);
-        } else if(providerName == AutoConfigUrlProxyProvider.NAME) {
+        } else if (providerName == AutoConfigUrlProxyProvider.NAME) {
             return new AutoConfigUrlProxyProvider(config);
-        } else if(providerName == FirefoxProxyProvider.NAME) {
+        } else if (providerName == FirefoxProxyProvider.NAME) {
             return new FirefoxProxyProvider();
         }
         return new DirectProxyProvider();
