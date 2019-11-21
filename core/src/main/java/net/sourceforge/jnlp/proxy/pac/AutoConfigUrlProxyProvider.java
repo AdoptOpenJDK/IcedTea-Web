@@ -5,6 +5,7 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.ProxyProvider;
 
+import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
@@ -20,7 +21,7 @@ public class AutoConfigUrlProxyProvider implements ProxyProvider {
 
     private final DeploymentConfiguration config;
 
-    public AutoConfigUrlProxyProvider(final DeploymentConfiguration config) {
+    public AutoConfigUrlProxyProvider(final DeploymentConfiguration config) throws MalformedURLException {
         this.config = Assert.requireNonNull(config, "config");
         final String autoConfigUrlProperty = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
         if (autoConfigUrlProperty != null) {
