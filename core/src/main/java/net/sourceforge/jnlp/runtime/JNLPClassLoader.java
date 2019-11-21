@@ -799,7 +799,7 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             if (cachedFile == null) {
-                LOG.warn("JAR {} not found. Continuing.", jarDesc.getLocation());
+                LOG.warn("initializeResource JAR {} not found. Continuing.", jarDesc.getLocation());
                 continue; // JAR not found. Keep going.
             }
 
@@ -889,7 +889,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 final File localFile = tracker.getCacheFile(jar.getLocation());
 
                 if (localFile == null) {
-                    LOG.warn("JAR {} not found. Continuing.", jar.getLocation());
+                    LOG.warn("checkForMain JAR {} not found. Continuing.", jar.getLocation());
                     continue; // JAR not found. Keep going.
                 }
 

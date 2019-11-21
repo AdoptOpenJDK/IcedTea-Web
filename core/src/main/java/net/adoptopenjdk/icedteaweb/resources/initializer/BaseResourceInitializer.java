@@ -90,6 +90,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         try {
             return Optional.ofNullable(future.get());
         } catch (InterruptedException | ExecutionException e) {
+            LOG.debug("failed to determine best URL: {}",  e.getMessage());
             return Optional.empty();
         }
     }
