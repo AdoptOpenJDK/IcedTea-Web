@@ -14,6 +14,8 @@ import java.util.List;
 
 public class AutoConfigUrlProxyProvider implements ProxyProvider {
 
+    public final static String NAME = "AutoConfigUrlProxyProvider";
+
     private final DeploymentConfiguration config;
 
     public AutoConfigUrlProxyProvider(final DeploymentConfiguration config) {
@@ -34,4 +36,5 @@ public class AutoConfigUrlProxyProvider implements ProxyProvider {
             return Collections.singletonList(Proxy.NO_PROXY);
         }
     }
+
 }

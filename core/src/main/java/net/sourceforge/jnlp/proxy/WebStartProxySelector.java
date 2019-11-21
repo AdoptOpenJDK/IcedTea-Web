@@ -2,10 +2,10 @@ package net.sourceforge.jnlp.proxy;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.pac.AutoConfigUrlProxyProvider;
+import net.sourceforge.jnlp.proxy.browser.FirefoxProxyProvider;
 import net.sourceforge.jnlp.proxy.config.DeploymentConfigBasedProxyProvider;
 import net.sourceforge.jnlp.proxy.direct.DirectProxyProvider;
-import net.sourceforge.jnlp.proxy.browser.FirefoxProxyProvider;
+import net.sourceforge.jnlp.proxy.pac.AutoConfigUrlProxyProvider;
 
 import java.io.IOException;
 import java.net.Proxy;
@@ -21,15 +21,16 @@ public class WebStartProxySelector extends ProxySelector {
 
     public WebStartProxySelector(final DeploymentConfiguration config) throws Exception {
         Assert.requireNonNull(config, "config");
+
         proxyProvider = getProvider(config, config.getProperty("proxySelector.name"));
     }
 
     private ProxyProvider getProvider(final DeploymentConfiguration config, final String providerName) throws Exception {
-        if(providerName == "ConfigBasedProxy") {
+        if(providerName == DeploymentConfigBasedProxyProvider.NAME) {
             return new DeploymentConfigBasedProxyProvider(config);
-        } else if(providerName == "PacBasedProxy") {
+        } else if(providerName == AutoConfigUrlProxyProvider.NAME) {
             return new AutoConfigUrlProxyProvider(config);
-        } else if(providerName == "FirefoyBasedProxy") {
+        } else if(providerName == FirefoxProxyProvider.NAME) {
             return new FirefoxProxyProvider();
         }
         return new DirectProxyProvider();

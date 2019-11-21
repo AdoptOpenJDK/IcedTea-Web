@@ -7,4 +7,5 @@ import java.util.List;
 public interface ProxyProvider {
 
     List<Proxy> select(final URI uri) throws Exception;
+
 }

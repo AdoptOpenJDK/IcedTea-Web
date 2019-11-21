@@ -33,6 +33,8 @@ import static net.sourceforge.jnlp.proxy.util.ProxyConstants.SOCKET_SCHEMA;
 
 public class FirefoxProxyProvider implements ProxyProvider {
 
+    public final static String NAME = "FirefoxProxyProvider";
+
     private final URL browserAutoConfigUrl;
 
     private final BrowserProxyType browserProxyType;
@@ -111,4 +113,5 @@ public class FirefoxProxyProvider implements ProxyProvider {
         proxies.addAll(PacUtils.getProxiesFromPacResult(proxiesString));
         return proxies;
     }
+
 }

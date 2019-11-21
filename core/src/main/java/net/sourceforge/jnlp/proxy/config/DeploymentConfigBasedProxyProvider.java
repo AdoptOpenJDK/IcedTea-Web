@@ -17,6 +17,8 @@ public class DeploymentConfigBasedProxyProvider implements ProxyProvider {
 
     private final static Logger LOG = LoggerFactory.getLogger(DeploymentConfigBasedProxyProvider.class);
 
+    public final static String NAME = "DeploymentConfigBasedProxyProvider";
+
     private final DeploymentConfiguration config;
 
     public DeploymentConfigBasedProxyProvider(final DeploymentConfiguration config) {
@@ -68,4 +70,5 @@ public class DeploymentConfigBasedProxyProvider implements ProxyProvider {
         }
         return proxyHost;
     }
+
 }

@@ -13,4 +13,5 @@ public class DirectProxyProvider implements ProxyProvider {
     public List<Proxy> select(final URI uri) {
         return Collections.singletonList(Proxy.NO_PROXY);
     }
+
 }
