@@ -37,7 +37,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.browser;
 
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.proxy.old.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 
 import javax.swing.JFrame;

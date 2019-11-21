@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy;
+package net.sourceforge.jnlp.proxy.util;
 
 public interface ProxyConstants {
 

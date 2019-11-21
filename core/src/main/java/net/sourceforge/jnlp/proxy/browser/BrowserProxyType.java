@@ -1,7 +1,5 @@
 package net.sourceforge.jnlp.proxy.browser;
 
-import net.sourceforge.jnlp.proxy.ProxyType;
-
 import java.util.stream.Stream;
 
 public enum BrowserProxyType {

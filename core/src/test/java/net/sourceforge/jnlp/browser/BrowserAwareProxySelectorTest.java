@@ -39,8 +39,8 @@ package net.sourceforge.jnlp.browser;
 
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.ProxyType;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.proxy.util.ProxyType;
+import net.sourceforge.jnlp.proxy.old.BrowserAwareProxySelector;
 import org.junit.Before;
 import org.junit.Test;
 

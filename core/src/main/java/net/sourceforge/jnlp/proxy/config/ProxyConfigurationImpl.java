@@ -1,6 +1,7 @@
-package net.sourceforge.jnlp.proxy;
+package net.sourceforge.jnlp.proxy.config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ProxyConfigurationImpl implements ProxyConfiguration{
@@ -31,6 +32,8 @@ public class ProxyConfigurationImpl implements ProxyConfiguration{
      * whether the http proxy should be used for https and ftp protocols as well
      */
     private boolean useHttpForHttpsAndFtp;
+
+    private boolean useHttpForSocks;
 
     public void setHttpHost(final String httpHost) {
         this.httpHost = httpHost;
@@ -76,6 +79,10 @@ public class ProxyConfigurationImpl implements ProxyConfiguration{
         bypassList.add(url);
     }
 
+    public void setUseHttpForSocks(final boolean useHttpForSocks) {
+        this.useHttpForSocks = useHttpForSocks;
+    }
+
     @Override
     public String getHttpHost() {
         return httpHost;
@@ -118,7 +125,7 @@ public class ProxyConfigurationImpl implements ProxyConfiguration{
 
     @Override
     public List<String> getBypassList() {
-        return bypassList;
+        return Collections.unmodifiableList(bypassList);
     }
 
     @Override
@@ -129,5 +136,10 @@ public class ProxyConfigurationImpl implements ProxyConfiguration{
     @Override
     public boolean isUseHttpForHttpsAndFtp() {
         return useHttpForHttpsAndFtp;
+    }
+
+    @Override
+    public boolean isUseHttpForSocks() {
+        return useHttpForSocks;
     }
 }

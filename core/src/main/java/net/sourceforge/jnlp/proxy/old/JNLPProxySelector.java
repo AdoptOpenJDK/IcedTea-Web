@@ -14,7 +14,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-package net.sourceforge.jnlp.proxy;
+package net.sourceforge.jnlp.proxy.old;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
@@ -22,6 +22,9 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.proxy.config.ProxyConfigurationImpl;
+import net.sourceforge.jnlp.proxy.util.ProxyConstants;
+import net.sourceforge.jnlp.proxy.util.ProxyType;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
 import net.sourceforge.jnlp.proxy.pac.PacUtils;
@@ -42,10 +45,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static net.sourceforge.jnlp.proxy.ProxyConstants.FTP_SCHEMA;
-import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTPS_SCHEMA;
-import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTP_SCHEMA;
-import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
+import static net.sourceforge.jnlp.proxy.util.ProxyConstants.FTP_SCHEMA;
+import static net.sourceforge.jnlp.proxy.util.ProxyConstants.HTTPS_SCHEMA;
+import static net.sourceforge.jnlp.proxy.util.ProxyConstants.HTTP_SCHEMA;
+import static net.sourceforge.jnlp.proxy.util.ProxyConstants.SOCKET_SCHEMA;
 
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
@@ -59,35 +62,15 @@ public abstract class JNLPProxySelector extends ProxySelector {
 
     private PacEvaluator pacEvaluator = null;
 
-    /** the URL to the PAC file */
-    private URL autoConfigUrl = null;
-
-
-
-    /** whether localhost should be bypassed for proxy purposes */
-    private boolean bypassLocal = false;
-
-
 
     /** The proxy type. See PROXY_TYPE_* constants */
     private final ProxyType proxyType;
 
-    private final String proxyHttpHost;
-    private final int proxyHttpPort;
-    private final String proxyHttpsHost;
-    private final int proxyHttpsPort;
-    private final String proxyFtpHost;
-    private final int proxyFtpPort;
-    private final String proxySocks4Host;
-    private final int proxySocks4Port;
 
-    /** a list of URLs that should be bypassed for proxy purposes */
-    private final List<String> bypassList;
+    /** the URL to the PAC file */
+    private URL autoConfigUrl = null;
 
-    /**
-     * whether the http proxy should be used for https and ftp protocols as well
-     */
-    private final boolean sameProxy;
+    private final ProxyConfigurationImpl proxyConfiguration;
 
     public JNLPProxySelector(DeploymentConfiguration config) {
         Assert.requireNonNull(config, "config");
@@ -107,34 +90,27 @@ public abstract class JNLPProxySelector extends ProxySelector {
             pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
         }
 
-        bypassList = new ArrayList<>();
+        proxyConfiguration = new ProxyConfigurationImpl();
+        proxyConfiguration.setBypassLocal(Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL)));
+        proxyConfiguration.setUseHttpForHttpsAndFtp(Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME)));
+        proxyConfiguration.setHttpHost(getHost(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST));
+        proxyConfiguration.setHttpPort(getPort(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT));
+        proxyConfiguration.setHttpsHost(getHost(config, ConfigurationConstants.KEY_PROXY_HTTPS_HOST));
+        proxyConfiguration.setHttpsPort(getPort(config, ConfigurationConstants.KEY_PROXY_HTTPS_PORT));
+        proxyConfiguration.setFtpHost(getHost(config, ConfigurationConstants.KEY_PROXY_FTP_HOST));
+        proxyConfiguration.setFtpPort(getPort(config, ConfigurationConstants.KEY_PROXY_FTP_PORT));
+        proxyConfiguration.setSocksHost(getHost(config, ConfigurationConstants.KEY_PROXY_SOCKS4_HOST));
+        proxyConfiguration.setSocksPort(getPort(config, ConfigurationConstants.KEY_PROXY_SOCKS4_PORT));
         String proxyBypass = config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LIST);
         if (proxyBypass != null) {
             StringTokenizer tokenizer = new StringTokenizer(proxyBypass, ",");
             while (tokenizer.hasMoreTokens()) {
                 String host = tokenizer.nextToken();
                 if (host != null && host.trim().length() != 0) {
-                    bypassList.add(host);
+                    proxyConfiguration.addToBypassList(host);
                 }
             }
         }
-
-        bypassLocal = Boolean.valueOf(config
-                .getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL));
-
-        sameProxy = Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
-
-        proxyHttpHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST);
-        proxyHttpPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT);
-
-        proxyHttpsHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTPS_HOST);
-        proxyHttpsPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTPS_PORT);
-
-        proxyFtpHost = getHost(config, ConfigurationConstants.KEY_PROXY_FTP_HOST);
-        proxyFtpPort = getPort(config, ConfigurationConstants.KEY_PROXY_FTP_PORT);
-
-        proxySocks4Host = getHost(config, ConfigurationConstants.KEY_PROXY_SOCKS4_HOST);
-        proxySocks4Port = getPort(config, ConfigurationConstants.KEY_PROXY_SOCKS4_PORT);
     }
 
     /**
@@ -224,16 +200,16 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 case HTTPS_SCHEMA:
                 case FTP_SCHEMA:
                     URL url = uri.toURL();
-                    if (bypassLocal && isLocalHost(url.getHost())) {
+                    if (proxyConfiguration.isBypassLocal() && isLocalHost(url.getHost())) {
                         return true;
-                    }   if (bypassList.contains(url.getHost())) {
+                    }   if (proxyConfiguration.getBypassList().contains(url.getHost())) {
                     return true;
                 }   break;
                 case SOCKET_SCHEMA:
                     String host = uri.getHost();
-                    if (bypassLocal && isLocalHost(host)) {
+                    if (proxyConfiguration.isBypassLocal() && isLocalHost(host)) {
                         return true;
-                    }   if (bypassList.contains(host)) {
+                    }   if (proxyConfiguration.getBypassList().contains(host)) {
                     return true;
                 }   break;
             }
@@ -286,11 +262,11 @@ public abstract class JNLPProxySelector extends ProxySelector {
      * @return a List of Proxy objects
      */
     private List<Proxy> getFromConfiguration(URI uri) {
-        return getFromArguments(uri, sameProxy, false,
-                proxyHttpsHost, proxyHttpsPort,
-                proxyHttpHost, proxyHttpPort,
-                proxyFtpHost, proxyFtpPort,
-                proxySocks4Host, proxySocks4Port);
+        return getFromArguments(uri, proxyConfiguration.isUseHttpForHttpsAndFtp(), false,
+                proxyConfiguration.getHttpsHost(), proxyConfiguration.getHttpsPort(),
+                proxyConfiguration.getHttpHost(), proxyConfiguration.getHttpPort(),
+                proxyConfiguration.getFtpHost(), proxyConfiguration.getFtpPort(),
+                proxyConfiguration.getSocksHost(), proxyConfiguration.getSocksPort());
     }
 
     /**

@@ -34,13 +34,15 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
-package net.sourceforge.jnlp.proxy.browser;
+package net.sourceforge.jnlp.proxy.old;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.JNLPProxySelector;
+import net.sourceforge.jnlp.proxy.browser.BrowserProxyType;
+import net.sourceforge.jnlp.proxy.browser.FirefoxPreferencesFinder;
+import net.sourceforge.jnlp.proxy.browser.FirefoxPreferencesParser;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
 import net.sourceforge.jnlp.proxy.pac.PacUtils;
@@ -56,7 +58,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
+import static net.sourceforge.jnlp.proxy.util.ProxyConstants.SOCKET_SCHEMA;
 import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.AUTO_CONFIG_URL_PROPERTY_NAME;
 import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PORT_PROPERTY_NAME;
 import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PROPERTY_NAME;
