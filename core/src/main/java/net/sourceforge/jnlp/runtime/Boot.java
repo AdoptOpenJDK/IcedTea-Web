@@ -148,7 +148,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
             } finally {
                 //no matter what happens, terminate
-                return;
+                JNLPRuntime.exit(0);
             }
         }
 
@@ -163,7 +163,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (optionParser.hasOption(CommandLineOptions.HELP1)) {
-            handleMessage();
+            printHelpMessage();
             JNLPRuntime.exit(0);
         }
         List<String> properties = optionParser.getParams(CommandLineOptions.PROPERTY);
@@ -190,7 +190,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display(JAVAWS);
-                return;
+                JNLPRuntime.exit(0);
             }
         }
 
@@ -218,7 +218,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (optionParser.hasOption(CommandLineOptions.NOSPLASH)) {
-        	JNLPRuntime.setShowWebSplash(false);
+            JNLPRuntime.setShowWebSplash(false);
         }
 
         //if it is browser go by ots own, otherwise proceed with normal ITW logic
@@ -234,7 +234,7 @@ public final class Boot implements PrivilegedAction<Void> {
         }
     }
 
-    private static void handleMessage() {
+    private static void printHelpMessage() {
         final TextsProvider helpMessagesProvider = new JavaWsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
 
         String helpMessage = "\n";
@@ -326,7 +326,7 @@ public final class Boot implements PrivilegedAction<Void> {
         final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
 
         if (location == null) {
-            handleMessage();
+            printHelpMessage();
             JNLPRuntime.exit(1);
             throw new RuntimeException("not reachable as system exits on the previous line");
         }
