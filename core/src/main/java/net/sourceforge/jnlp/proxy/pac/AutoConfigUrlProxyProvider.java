@@ -16,18 +16,24 @@ public class AutoConfigUrlProxyProvider implements ProxyProvider {
 
     public final static String NAME = "AutoConfigUrlProxyProvider";
 
+    private final PacEvaluator pacEvaluator;
+
     private final DeploymentConfiguration config;
 
     public AutoConfigUrlProxyProvider(final DeploymentConfiguration config) {
         this.config = Assert.requireNonNull(config, "config");
+        final String autoConfigUrlProperty = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
+        if (autoConfigUrlProperty != null) {
+            final URL autoConfigUrl = new URL(autoConfigUrlProperty);
+            pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
+        } else {
+            pacEvaluator = null;
+        }
     }
 
     @Override
     public List<Proxy> select(final URI uri) throws Exception{
-        final String autoConfigUrlProperty = config.getProperty(ConfigurationConstants.KEY_PROXY_AUTO_CONFIG_URL);
-        if (autoConfigUrlProperty != null) {
-            final URL autoConfigUrl = new URL(autoConfigUrlProperty);
-            final PacEvaluator pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
+        if (pacEvaluator != null) {
             final String proxiesString = pacEvaluator.getProxies(uri.toURL());
             final List<Proxy> proxies = new ArrayList<>();
             proxies.addAll(PacUtils.getProxiesFromPacResult(proxiesString));
