@@ -22,7 +22,6 @@ import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder;
@@ -111,7 +110,7 @@ public final class Boot implements PrivilegedAction<Integer> {
      *
      * @param args launching arguments
      */
-    public static void main(String[] args) throws UnevenParameterException {
+    public static void main(String[] args) {
         final int status = mainWithReturnCode(args);
         if (status != 0) {
             System.exit(status);
@@ -124,7 +123,7 @@ public final class Boot implements PrivilegedAction<Integer> {
      * @param args launching arguments
      * @return the return code. 0 = SUCCESS anything else is an error
      */
-    public static int mainWithReturnCode(String[] args) throws UnevenParameterException {
+    public static int mainWithReturnCode(String[] args) {
         return mainWithReturnCode(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
     }
 
