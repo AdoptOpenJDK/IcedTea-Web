@@ -123,6 +123,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
         if (isUpToDate(resourceHref, version, downloadDetails.lastModified)) {
             final File cacheFile = Cache.getCacheFile(resourceHref, version);
+            resource.setLocalFile(cacheFile);
             return cacheFile.length();
         } else {
             final CountingInputStream countingInputStream = new CountingInputStream(downloadDetails.inputStream);
