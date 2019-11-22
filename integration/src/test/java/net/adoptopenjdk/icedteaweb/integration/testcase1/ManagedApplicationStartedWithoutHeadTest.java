@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.startsWith;
 /**
  * TODO: Scenario Description
  */
-public class ManagedApplicationStartedTest implements IntegrationTest {
+public class ManagedApplicationStartedWithoutHeadTest implements IntegrationTest {
     private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
 
     @Rule
@@ -44,7 +44,7 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
     @Test(timeout = 100_000)
     public void testSuccessfullyLaunchSimpleJavaApplication() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServerWithoutHeadAndFavicon(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -62,6 +62,5 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
         assertThat("Managed application return code", result2, is(0));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
-
     }
 }

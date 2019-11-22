@@ -22,9 +22,10 @@ public class ManagedApplicationFileWriter {
 
     public static void writeFile(final String fileName, final ThrowingConsumer<Writer> consumer) throws Exception {
         final PersistenceService persistenceService = (PersistenceService) ServiceManager.lookup("PersistenceService");
-        final String fileUrl = "http://localhost/" + fileName;
-        persistenceService.create(new URL(fileUrl), Long.MAX_VALUE);
-        final FileContents fileContents = persistenceService.get(new URL(fileUrl));
+        final URL fileUrl = new URL("http://localhost/" + fileName);
+        persistenceService.delete(fileUrl);
+        persistenceService.create(fileUrl, Long.MAX_VALUE);
+        final FileContents fileContents = persistenceService.get(fileUrl);
         if (Objects.nonNull(fileContents)) {
             try (final OutputStream outputStream = fileContents.getOutputStream(true)) {
                 final OutputStreamWriter writer = new OutputStreamWriter(outputStream);

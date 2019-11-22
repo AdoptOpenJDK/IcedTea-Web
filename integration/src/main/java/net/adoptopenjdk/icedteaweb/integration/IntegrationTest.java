@@ -38,7 +38,9 @@ import java.util.stream.Collectors;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.head;
+import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.find;
@@ -91,6 +93,44 @@ public interface IntegrationTest {
                 aResponse().withBody(fileContent("/javaws.ico"))
         ));
 
+
+        return "http://localhost:" + wireMock.port() + "/" + jnlpFilenames.get(0);
+    }
+
+    default String setupServerWithoutHeadAndFavicon(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
+        return setupServerWithoutHeadAndFavicon(wireMock, Arrays.asList(jnlpFilename), mainClass, resources);
+    }
+
+    default String setupServerWithoutHeadAndFavicon(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
+        for (String jnlpFilename : jnlpFilenames) {
+            wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
+                    serverError()
+            ));
+            wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
+                    aResponse().withBody(fileContent("jnlps/" + jnlpFilename,
+                            replace(PORT).with(wireMock.port())
+                                    .and(MAIN_CLASS).with(mainClass))
+                    )
+            ));
+        }
+
+        for (String resource : resources) {
+            final String resourcePath = "resources/" + resource;
+            wireMock.stubFor(head(urlEqualTo("/" + resourcePath)).willReturn(
+                    serverError()
+            ));
+            wireMock.stubFor(get(urlEqualTo("/" + resourcePath)).willReturn(
+                    aResponse().withBody(fileContent(resourcePath))
+            ));
+        }
+
+        final String favIconPath = "favicon.ico";
+        wireMock.stubFor(head(urlEqualTo("/" + favIconPath)).willReturn(
+                serverError()
+        ));
+        wireMock.stubFor(get(urlEqualTo("/" + favIconPath)).willReturn(
+                notFound()
+        ));
 
         return "http://localhost:" + wireMock.port() + "/" + jnlpFilenames.get(0);
     }
@@ -154,6 +194,4 @@ public interface IntegrationTest {
 
         throw new AssertionFailedError("found " + numHints + " cache files with name " + fileName);
     }
-
-
 }
