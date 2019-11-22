@@ -9,6 +9,10 @@ public class WinRegistry {
 
     }
 
+    public static boolean readBooleanFromRegistry(final RegistryScope scope, final String key, final String value) throws Exception {
+        return readBooleanFromRegistry(scope, key, value, 0);
+    }
+
     public static String readStringFromRegistry(final RegistryScope scope, final String key, final String value) throws Exception {
         return readStringFromRegistry(scope, key, value, 0);
     }
@@ -16,11 +20,20 @@ public class WinRegistry {
     public static String readStringFromRegistry(final RegistryScope scope, final String key, final String value, final int wow64) throws Exception {
         int[] handles = WindowsRegistryInternals.invokeOpenKey(scope.getPreferences(), scope.getRawValue(), WindowsRegistryInternals.toCstr(key), new Integer(KEY_READ | wow64));
         if (handles[1] != REG_SUCCESS) {
-            return null;
+            throw new RuntimeException("Error while reading from registry!");
         }
         byte[] valb = WindowsRegistryInternals.invokeQueryValueEx(scope.getPreferences(), handles[0], WindowsRegistryInternals.toCstr(value));
         WindowsRegistryInternals.invokeCloseKey(scope.getPreferences(), handles[0]);
         return (valb != null ? new String(valb).trim() : null);
     }
 
+    public static boolean readBooleanFromRegistry(final RegistryScope scope, final String key, final String value, final int wow64) throws Exception {
+        int[] handles = WindowsRegistryInternals.invokeOpenKey(scope.getPreferences(), scope.getRawValue(), WindowsRegistryInternals.toCstr(key), new Integer(KEY_READ | wow64));
+        if (handles[1] != REG_SUCCESS) {
+            throw new RuntimeException("Error while reading from registry!");
+        }
+        byte[] valb = WindowsRegistryInternals.invokeQueryValueEx(scope.getPreferences(), handles[0], WindowsRegistryInternals.toCstr(value));
+        WindowsRegistryInternals.invokeCloseKey(scope.getPreferences(), handles[0]);
+        return valb[valb.length -1] == 1;
+    }
 }

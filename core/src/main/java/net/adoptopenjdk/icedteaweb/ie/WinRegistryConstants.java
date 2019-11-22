@@ -10,4 +10,6 @@ public interface WinRegistryConstants {
 
     String PROXY_SERVER_REGISTRY_VAL = "ProxyServer";
     String PROXY_SERVER_OVERRIDE_VAL = "ProxyOverride";
+    String PROXY_ENABLED_VAL = "ProxyEnable";
+    String AUTO_CONFIG_URL_VAL = "AutoConfigURL";
 }
