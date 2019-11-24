@@ -16,6 +16,9 @@
 
 package net.adoptopenjdk.icedteaweb.integration;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.http.HttpHeader;
+import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import junit.framework.AssertionFailedError;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
@@ -38,7 +41,6 @@ import java.util.stream.Collectors;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.head;
-import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -63,74 +65,59 @@ public interface IntegrationTest {
     }
 
     default String setupServer(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
+        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", Long.toString(System.currentTimeMillis())));
+        final ResponseDefinitionBuilder headResponse = ok().withHeaders(lastModified);
+
+        return setupServer(lastModified, headResponse, wireMock, jnlpFilenames, mainClass, resources);
+    }
+
+    default String setupServerWithoutHead(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
+        return setupServerWithoutHead(wireMock, Arrays.asList(jnlpFilename), mainClass, resources);
+    }
+
+    default String setupServerWithoutHead(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
+        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", Long.toString(System.currentTimeMillis())));
+        final ResponseDefinitionBuilder headResponse = serverError();
+
+        return setupServer(lastModified, headResponse, wireMock, jnlpFilenames, mainClass, resources);
+    }
+
+    default String setupServer(HttpHeaders lastModified, ResponseDefinitionBuilder headResponse, WireMockRule wireMock, List<String> jnlpFilenames, Class<?> mainClass, String[] resources) throws IOException {
         for (String jnlpFilename : jnlpFilenames) {
             wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
-                    ok()
+                    headResponse
             ));
             wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
-                    aResponse().withBody(fileContent("jnlps/" + jnlpFilename,
-                            replace(PORT).with(wireMock.port())
-                                    .and(MAIN_CLASS).with(mainClass))
-                    )
+                    aResponse()
+                            .withBody(fileContent("jnlps/" + jnlpFilename,
+                                    replace(PORT).with(wireMock.port())
+                                            .and(MAIN_CLASS).with(mainClass)))
+                            .withHeaders(lastModified)
             ));
         }
 
         for (String resource : resources) {
             final String resourcePath = "resources/" + resource;
             wireMock.stubFor(head(urlEqualTo("/" + resourcePath)).willReturn(
-                    ok()
+                    headResponse
             ));
             wireMock.stubFor(get(urlEqualTo("/" + resourcePath)).willReturn(
-                    aResponse().withBody(fileContent(resourcePath))
+                    aResponse()
+                            .withBody(fileContent(resourcePath))
+                            .withHeaders(lastModified)
             ));
         }
 
         final String favIconPath = "favicon.ico";
         wireMock.stubFor(head(urlEqualTo("/" + favIconPath)).willReturn(
-                ok()
+                headResponse
         ));
         wireMock.stubFor(get(urlEqualTo("/" + favIconPath)).willReturn(
-                aResponse().withBody(fileContent("/javaws.ico"))
+                aResponse()
+                        .withBody(fileContent("/javaws.ico"))
+                        .withHeaders(lastModified)
         ));
 
-
-        return "http://localhost:" + wireMock.port() + "/" + jnlpFilenames.get(0);
-    }
-
-    default String setupServerWithoutHeadAndFavicon(WireMockRule wireMock, final String jnlpFilename, Class<?> mainClass, String... resources) throws IOException {
-        return setupServerWithoutHeadAndFavicon(wireMock, Arrays.asList(jnlpFilename), mainClass, resources);
-    }
-
-    default String setupServerWithoutHeadAndFavicon(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
-        for (String jnlpFilename : jnlpFilenames) {
-            wireMock.stubFor(head(urlEqualTo("/" + jnlpFilename)).willReturn(
-                    serverError()
-            ));
-            wireMock.stubFor(get(urlEqualTo("/" + jnlpFilename)).willReturn(
-                    aResponse().withBody(fileContent("jnlps/" + jnlpFilename,
-                            replace(PORT).with(wireMock.port())
-                                    .and(MAIN_CLASS).with(mainClass))
-                    )
-            ));
-        }
-
-        for (String resource : resources) {
-            final String resourcePath = "resources/" + resource;
-            wireMock.stubFor(head(urlEqualTo("/" + resourcePath)).willReturn(
-                    serverError()
-            ));
-            wireMock.stubFor(get(urlEqualTo("/" + resourcePath)).willReturn(
-                    aResponse().withBody(fileContent(resourcePath))
-            ));
-        }
-
-        final String favIconPath = "favicon.ico";
-        wireMock.stubFor(head(urlEqualTo("/" + favIconPath)).willReturn(
-                serverError()
-        ));
-        wireMock.stubFor(get(urlEqualTo("/" + favIconPath)).willReturn(
-                notFound()
-        ));
 
         return "http://localhost:" + wireMock.port() + "/" + jnlpFilenames.get(0);
     }

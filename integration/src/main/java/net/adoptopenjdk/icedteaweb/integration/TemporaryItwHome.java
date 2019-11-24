@@ -30,6 +30,7 @@ import java.util.Set;
 import static net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction.ALWAYS;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * JUnit Rule to set temporary config and cache directory for ITW within a test.
@@ -76,6 +77,12 @@ public class TemporaryItwHome implements TestRule {
 
     private void after() {
         if (saveTo != null) {
+            if (!saveTo.exists()) {
+                assertTrue(saveTo.mkdirs());
+            }
+            if (!saveTo.isDirectory()) {
+                fail(saveTo + " is not a directory");
+            }
             copyFolder(getConfigHome().toPath(), new File(saveTo, "config").toPath());
             copyFolder(getCacheHome().toPath(), new File(saveTo, "cache").toPath());
         }

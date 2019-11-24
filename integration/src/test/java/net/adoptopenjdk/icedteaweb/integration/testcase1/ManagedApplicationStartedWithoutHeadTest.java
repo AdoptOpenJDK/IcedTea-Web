@@ -44,7 +44,7 @@ public class ManagedApplicationStartedWithoutHeadTest implements IntegrationTest
     @Test(timeout = 100_000)
     public void testSuccessfullyLaunchSimpleJavaApplication() throws Exception {
         // given
-        final String jnlpUrl = setupServerWithoutHeadAndFavicon(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
+        final String jnlpUrl = setupServerWithoutHead(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
