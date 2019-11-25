@@ -42,6 +42,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 public class HttpUtilsTest {
 
@@ -63,6 +67,14 @@ public class HttpUtilsTest {
     @Test(expected = IOException.class)
     public void shouldThrowExceptionFromHttpConnection() throws IOException {
         HttpUtils.consumeAndCloseConnection(brokenHttpConnection());
+    }
+
+    @Test
+    public void testLastModifiedDate() {
+        final String someTimeString = "Wed, 21 Oct 2015 07:28:00 GMT";
+        final long someTimeDate = Date.parse(someTimeString);
+        final ZonedDateTime someTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(someTimeDate), ZoneOffset.UTC);
+        Assert.assertEquals(someTimeString, HttpUtils.lastModifiedDate(someTime));
     }
 
     //

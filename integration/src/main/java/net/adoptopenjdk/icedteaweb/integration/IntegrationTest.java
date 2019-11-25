@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.find;
+import static net.adoptopenjdk.icedteaweb.http.HttpUtils.lastModifiedDate;
 import static net.adoptopenjdk.icedteaweb.integration.MapBuilder.replace;
 
 /**
@@ -65,7 +68,7 @@ public interface IntegrationTest {
     }
 
     default String setupServer(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
-        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", Long.toString(System.currentTimeMillis())));
+        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", lastModifiedDate(ZonedDateTime.now(ZoneOffset.UTC))));
         final ResponseDefinitionBuilder headResponse = ok().withHeaders(lastModified);
 
         return setupServer(lastModified, headResponse, wireMock, jnlpFilenames, mainClass, resources);
@@ -76,7 +79,7 @@ public interface IntegrationTest {
     }
 
     default String setupServerWithoutHead(WireMockRule wireMock, final List<String> jnlpFilenames, Class<?> mainClass, String... resources) throws IOException {
-        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", Long.toString(System.currentTimeMillis())));
+        final HttpHeaders lastModified = new HttpHeaders().plus(new HttpHeader("last-modified", lastModifiedDate(ZonedDateTime.now(ZoneOffset.UTC))));
         final ResponseDefinitionBuilder headResponse = serverError();
 
         return setupServer(lastModified, headResponse, wireMock, jnlpFilenames, mainClass, resources);

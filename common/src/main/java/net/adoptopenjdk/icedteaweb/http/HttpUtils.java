@@ -41,6 +41,10 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class HttpUtils {
 
@@ -78,5 +82,10 @@ public class HttpUtils {
                 }
             }
         }
+    }
+
+    public static String lastModifiedDate(ZonedDateTime time) {
+        final ZonedDateTime timeUtc = time.withZoneSameInstant(ZoneOffset.UTC);
+        return DateTimeFormatter.ofPattern("E, dd MMM uuuu HH:mm:ss 'GMT'", Locale.US).format(timeUtc);
     }
 }
