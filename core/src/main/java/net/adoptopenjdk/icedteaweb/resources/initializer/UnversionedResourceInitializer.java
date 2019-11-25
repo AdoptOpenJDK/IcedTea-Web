@@ -80,9 +80,8 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
     }
 
     private boolean needsUpdate(final UrlRequestResult requestResult) {
-        final boolean result = info == null
-                || requestResult.getLastModified() > info.getLastModified()
-                || resource.forceUpdateRequested();
+        final boolean result = resource.forceUpdateRequested()
+                || ! Cache.isUpToDate(resource.getLocation(), null, requestResult.getLastModified());
         LOG.debug("needsUpdate: {} -> {}", resource.getLocation(), result);
         return result;
     }
