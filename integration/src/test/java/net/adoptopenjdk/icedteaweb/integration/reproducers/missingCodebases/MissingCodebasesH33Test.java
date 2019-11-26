@@ -4,13 +4,11 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
 import net.adoptopenjdk.icedteaweb.integration.reproducers.missingCodebases.applications.MissingCodebases;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +28,7 @@ public class MissingCodebasesH33Test implements IntegrationTest {
 
 
     @Test(timeout = 100_000)
-    public void codebaseMissingHrefNoneApp() throws IOException, ConfigurationException {
+    public void codebaseMissingHrefNoneApp() throws IOException {
         // given
         final String jnlpUrl = setupServer(wireMock, "MissingCodebasesH33.jnlp", MissingCodebases.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
@@ -41,9 +39,10 @@ public class MissingCodebasesH33Test implements IntegrationTest {
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless", "-verbose"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }

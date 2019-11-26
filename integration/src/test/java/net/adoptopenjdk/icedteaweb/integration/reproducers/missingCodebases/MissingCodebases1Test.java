@@ -3,7 +3,6 @@ package net.adoptopenjdk.icedteaweb.integration.reproducers.missingCodebases;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.reproducers.appletDescMainClassWithClass.applications.AppletDescMainClassWithClass;
 import net.adoptopenjdk.icedteaweb.integration.reproducers.missingCodebases.applications.MissingCodebases;
 import net.sourceforge.jnlp.runtime.Boot;
 import org.junit.Rule;
@@ -33,9 +32,10 @@ public class MissingCodebases1Test implements IntegrationTest {
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        Boot.main(args);
+        final int result = Boot.mainWithReturnCode(args);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }
