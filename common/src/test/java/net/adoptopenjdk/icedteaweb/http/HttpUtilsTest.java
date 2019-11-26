@@ -71,7 +71,7 @@ public class HttpUtilsTest {
 
     @Test
     public void testLastModifiedDate() {
-        final String someTimeString = "Wed, 21 Oct 2015 07:28:00 GMT";
+        final String someTimeString = "Wed, 21 Oct 2015 17:28:00 GMT";
         final long someTimeDate = Date.parse(someTimeString);
         final ZonedDateTime someTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(someTimeDate), ZoneOffset.UTC);
         Assert.assertEquals(someTimeString, HttpUtils.lastModifiedDate(someTime));
