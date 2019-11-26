@@ -57,15 +57,13 @@ public class ManagedApplicationWithProgressClassTest implements IntegrationTest 
         final String jnlpUrl = setupServer(wireMock, "ManagedApplicationWithProgressClass.jnlp", ProgressClassManagedApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
-        // pimp the initial delay so that the progress indicator really shows up
-        class TestDownloadIndicator extends DefaultDownloadIndicator {
+        final DefaultDownloadIndicator testDownloadIndicator = new DefaultDownloadIndicator() {
             @Override
             public int getInitialDelay() {
+                // pimp the initial delay so that the progress indicator really shows up
                 return 1;
             }
-        }
-
-        TestDownloadIndicator testDownloadIndicator = new TestDownloadIndicator();
+        };
 
         JNLPRuntime.setDefaultDownloadIndicator(testDownloadIndicator);
 

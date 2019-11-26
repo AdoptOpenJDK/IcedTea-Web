@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.reproducers.extensionresources.applications.ExtensionResourceManagedApplication.EXTENSION_OUTPUT_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -42,14 +43,13 @@ public class ManagedApplicationWithExtensionResourceStartedTest implements Integ
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testSuccessfullyLaunchApplicationWithExtensionResource() throws IOException {
+    public void testSuccessfullyLaunchApplicationWithExtensionResource() throws Exception {
         // given
         final String jnlpUrl = setupServer(wireMock, Arrays.asList("ManagedApplicationWithExtensionResource.jnlp", "ComponentExtension.jnlp"), ExtensionResourceManagedApplication.class, JAR_NAME);
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        final int result = Boot.mainWithReturnCode(args);
+        final int result = launchItwHeadless(jnlpUrl);
 
         // then
         assertThat(result, is(SUCCESS));
