@@ -70,8 +70,10 @@ public class CacheTableModel extends AbstractTableModel {
 
     public void clear() {
         final int size = data.size();
-        data.clear();
-        fireTableRowsDeleted(0, size - 1);
+        if (size > 0) {
+            data.clear();
+            fireTableRowsDeleted(0, size - 1);
+        }
     }
 
     public void removeRow(final int index) {
