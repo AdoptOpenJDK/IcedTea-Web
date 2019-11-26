@@ -38,22 +38,22 @@ class RegistryQuery {
                 .collect(Collectors.toMap(RegistryValue::getName, Function.identity()));
     }
 
-    private static RegistryValue parseSingleLine(String l) {
-        final int index = l.indexOf("REG_");
+    private static RegistryValue parseSingleLine(final String line) {
+        final int index = line.indexOf("REG_");
         if (index < 1) {
-            throw new IllegalArgumentException("Can not find type in: '" + l + "'");
+            throw new IllegalArgumentException("Can not find type in line: '" + line + "'");
         }
-        final String name = l.substring(0, index).trim();
-        final String[] typeAndValue = l.substring(index).split("\\s+", 2);
+        final String name = line.substring(0, index).trim();
+        final String[] typeAndValue = line.substring(index).split("\\s+", 2);
         if (typeAndValue.length != 2) {
-            throw new IllegalArgumentException("Can not parse value in line: '" + l + "'");
+            throw new IllegalArgumentException("Can not parse value in line: '" + line + "'");
         }
         final String value = typeAndValue[1].trim();
         try {
             final RegistryValueType type = RegistryValueType.valueOf(typeAndValue[0].trim());
             return new RegistryValue(name, type, value);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Can not parse type in line: '" + l + "'");
+            throw new IllegalArgumentException("Can not parse type in line: '" + line + "'");
         }
     }
 
