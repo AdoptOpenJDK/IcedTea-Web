@@ -28,6 +28,14 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_ENCODING_HEADER;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_TYPE_HEADER;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ERROR_MIME_TYPE;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.INVALID_HTTP_RESPONSE;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.LAST_MODIFIED_HEADER;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 
@@ -36,20 +44,6 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
  */
 abstract class BaseResourceDownloader implements ResourceDownloader {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceDownloader.class);
-
-
-    private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String CONTENT_ENCODING_HEADER = "Content-Encoding";
-    private static final String LAST_MODIFIED_HEADER = "Last-Modified";
-    private static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
-    static final String CURRENT_VERSION_ID_HEADER = "current-version-id";
-
-    private static final String ERROR_MIME_TYPE = "application/x-java-jnlp-error";
-    static final String JAR_DIFF_MIME_TYPE = "application/x-java-archive-dif";
-
-    private static final String ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
-    private static final String INVALID_HTTP_RESPONSE = "Invalid Http response";
 
     protected final Resource resource;
     private final List<URL> downloadUrls;
@@ -113,7 +107,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
     private CloseableConnection getDownloadConnection(final URL location) throws IOException {
         final Map<String, String> requestProperties = new HashMap<>();
-        requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
+        requestProperties.put(ACCEPT_ENCODING_HEADER, PACK_200_OR_GZIP);
         return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties);
     }
 

@@ -19,7 +19,7 @@ package net.adoptopenjdk.icedteaweb.integration.testcase1;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTest;
 import net.adoptopenjdk.icedteaweb.integration.TemporaryItwHome;
-import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication;
+import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SecureJavaApplication;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,15 +27,15 @@ import java.time.ZonedDateTime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
-import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_ENVIRONMENT_FILE;
+import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.HELLO_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
 /**
- * Test the successful access to a system environment variable by an ITW-managed application.
+ * TODO: Scenario Description
  */
-public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest {
+public class ManagedApplicationStartedWithoutHeadTest implements IntegrationTest {
     private static final String JAR_NAME = "App-SimpleJavaApplication.jar";
 
     @Rule
@@ -44,26 +44,34 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testReadingSystemEnvironment() throws Exception {
+    public void testSuccessfullyLaunchSimpleJavaApplication() throws Exception {
         // given
-        ZonedDateTime someTime = now();
+        final ZonedDateTime someTime = now();
         final String jnlpUrl = setupServer(wireMock)
-                .servingJnlp("SimpleJavaApplication.jnlp").withMainClass(SimpleJavaApplication.class)
-                .withHeadRequest().lastModifiedAt(someTime)
-                .withGetRequest().lastModifiedAt(someTime)
+                .servingJnlp("SimpleJavaApplication.jnlp").withMainClass(SecureJavaApplication.class)
+                .withHeadRequest().returnsServerError()
+                .withGetRequest().withoutLastModificationDate()
                 .servingResource(JAR_NAME).withoutVersion()
-                .withHeadRequest().lastModifiedAt(someTime)
+                .withHeadRequest().returnsServerError()
                 .withGetRequest().lastModifiedAt(someTime)
                 .getHttpUrl();
 
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final int result = launchItwHeadless(jnlpUrl, NO_SECURITY);
+        final int result = launchItwHeadless(jnlpUrl);
 
         // then
         assertThat("Managed application return code", result, is(0));
-        final String cachedFileAsString = getCachedFileAsString(tmpItwHome, SYSTEM_ENVIRONMENT_FILE);
-        assertThat(cachedFileAsString, containsString("USER"));
+        assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
+        assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
+
+        // when
+        final int result2 = launchItwHeadless(jnlpUrl);
+
+        // then
+        assertThat("Managed application return code", result2, is(0));
+        assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
+        assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
     }
 }

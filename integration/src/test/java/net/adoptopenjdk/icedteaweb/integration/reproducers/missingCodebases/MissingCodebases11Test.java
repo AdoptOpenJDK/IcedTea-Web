@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,7 +28,16 @@ public class MissingCodebases11Test implements IntegrationTest {
     @Test(timeout = 100_000)
     public void codebaseDotHrefFullApp() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "MissingCodebases11.jnlp", MissingCodebases.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("MissingCodebases11.jnlp").withMainClass(MissingCodebases.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when

@@ -51,6 +51,8 @@ import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CURRENT_VERSION_ID_QUERY_PARAM;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_QUERY_PARAM;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import static net.sourceforge.jnlp.util.UrlUtils.HTTPS_PROTOCOL;
@@ -172,12 +174,12 @@ class ResourceUrlCreator {
 
         final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
                 .filter(s -> !isBlank(s))
-                .filter(s -> !s.startsWith("version-id="))
-                .filter(s -> !s.startsWith("current-version-id="))
+                .filter(s -> !s.startsWith(VERSION_ID_QUERY_PARAM + "="))
+                .filter(s -> !s.startsWith(CURRENT_VERSION_ID_QUERY_PARAM + "="))
                 .collect(Collectors.toList());
-        queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
+        queryParts.add(VERSION_ID_QUERY_PARAM + "=" + urlEncode(requestVersion.toString()));
         if (currentVersion != null) {
-            queryParts.add("current-version-id=" + urlEncode(currentVersion.toString()));
+            queryParts.add(CURRENT_VERSION_ID_QUERY_PARAM + "=" + urlEncode(currentVersion.toString()));
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 
