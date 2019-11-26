@@ -391,7 +391,7 @@ class LeastRecentlyUsedCache {
         }
 
         final File[] levelOneDirs = rootCacheDir.getFile().listFiles(File::isDirectory);
-        if (levelOneDirs == null) {
+        if (isNullOrEmpty(levelOneDirs)) {
             cacheIndex.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
         } else {
             final Set<String> entryIds = collectAllEntryIdsFromFileSystem(levelOneDirs);
@@ -400,6 +400,7 @@ class LeastRecentlyUsedCache {
                 final long maxSize = getMaxSizeInBytes();
                 long curSize = 0;
 
+                final List<LeastRecentlyUsedCacheEntry> toDelete = new ArrayList<>();
                 for (LeastRecentlyUsedCacheEntry entry : idx.getAllEntries()) {
                     entryIds.remove(entry.getId());
 
@@ -408,32 +409,31 @@ class LeastRecentlyUsedCache {
                     final File directory = cacheFile.getParentFile();
 
                     if (!infoFile.exists()) {
-                        idx.removeEntry(entry);
-                        if (directory.exists()) {
-                            deleteAll(directory);
-                        }
+                        toDelete.add(entry);
+                        deleteAll(directory);
                         continue;
                     }
 
                     final long size = cacheFile.length();
                     if (entry.isMarkedForDeletion() || !cacheFile.isFile() || (maxSize >= 0 && curSize + size > maxSize)) {
-                        idx.removeEntry(entry);
+                        toDelete.add(entry);
                         deleteAll(directory);
                         continue;
                     }
 
-                    final File[] cacheDirFiles = cacheFile.getParentFile().listFiles();
-                    if (null != cacheDirFiles) {
+                    final File[] cacheDirFiles = directory.listFiles();
+                    if (!isNullOrEmpty(cacheDirFiles)) {
                         for (File file : cacheDirFiles) {
                             if (!file.equals(cacheFile) && !file.getName().equals(CacheEntry.INFO_SUFFIX)) {
                                 deleteAll(file);
                             }
                         }
-
                     }
 
                     curSize += size;
                 }
+
+                toDelete.forEach(idx::removeEntry);
             });
 
             // delete dirs with no entry in the least recently used index

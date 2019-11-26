@@ -13,9 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,9 +29,9 @@ class LeastRecentlyUsedCacheIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeastRecentlyUsedCacheIndex.class);
 
-    private static final String KEY_LAST_ACCESSED = "lastAccessed";
+    static final String KEY_LAST_ACCESSED = "lastAccessed";
     private static final String KEY_DELETE = "delete";
-    private static final String KEY_HREF = "href";
+    static final String KEY_HREF = "href";
     private static final String KEY_VERSION = "version";
 
     private final PropertiesFile propertiesFile;
@@ -54,8 +52,7 @@ class LeastRecentlyUsedCacheIndex {
     Optional<LeastRecentlyUsedCacheEntry> find(URL resourceHref, VersionId version) {
         return entries.stream()
                 .filter(e -> !e.isMarkedForDeletion())
-                .filter(e -> Objects.equals(version, e.getVersion()))
-                .filter(e -> Objects.equals(resourceHref, e.getResourceHref()))
+                .filter(e -> e.matches(resourceHref, version))
                 .findFirst();
     }
 
@@ -215,7 +212,6 @@ class LeastRecentlyUsedCacheIndex {
         // STEP 2
         // convert the properties to actual entries
         // collecting the IDs of the ones which have invalid data
-        final List<String> brokenIds = new ArrayList<>();
         final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>(id2ValueMap.size());
         for (Map.Entry<String, Map<String, String>> valuesEntry : id2ValueMap.entrySet()) {
             final Map<String, String> values = valuesEntry.getValue();
@@ -237,23 +233,18 @@ class LeastRecentlyUsedCacheIndex {
                 }
             } catch (Exception e) {
                 LOG.debug("found broken ID: {}", id);
-                brokenIds.add(id);
+                props.remove(id + '.' + KEY_LAST_ACCESSED);
+                props.remove(id + '.' + KEY_DELETE);
+                props.remove(id + '.' + KEY_HREF);
+                props.remove(id + '.' + KEY_VERSION);
+                modified = true;
             }
-        }
-
-        // STEP 3
-        // removing all properties belonging to broken IDs
-        for (String brokenId : brokenIds) {
-            props.remove(brokenId + '.' + KEY_LAST_ACCESSED);
-            props.remove(brokenId + '.' + KEY_DELETE);
-            props.remove(brokenId + '.' + KEY_HREF);
-            props.remove(brokenId + '.' + KEY_VERSION);
         }
 
         // make sure the entries are sorted most recent accessed to least recent accessed
         Collections.sort(entries);
 
-        return new ConversionResult(modified || !brokenIds.isEmpty(), entries);
+        return new ConversionResult(modified, entries);
     }
 
     private static String[] splitKey(String key) {
