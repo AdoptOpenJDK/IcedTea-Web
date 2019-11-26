@@ -27,6 +27,8 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
 
 /**
  * Base class with commonly used methods.
@@ -35,9 +37,6 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceInitializer.class);
 
     private static final ExecutorService remoteExecutor = CachedDaemonThreadPoolProvider.getThreadPool();
-
-    private static final String ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String PACK_200_OR_GZIP = "pack200-gzip, gzip";
 
     private static final int NETWORK_AUTHENTICATION_REQUIRED = 511;
 
@@ -99,7 +98,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         final HttpMethod requestMethod = HttpMethod.HEAD;
         try {
             final Map<String, String> requestProperties = new HashMap<>();
-            requestProperties.put(ACCEPT_ENCODING, PACK_200_OR_GZIP);
+            requestProperties.put(ACCEPT_ENCODING_HEADER, PACK_200_OR_GZIP);
 
             final UrlRequestResult response = UrlProber.getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
             if (response.getResponseCode() == NETWORK_AUTHENTICATION_REQUIRED && !InetSecurity511Panel.isSkip()) {

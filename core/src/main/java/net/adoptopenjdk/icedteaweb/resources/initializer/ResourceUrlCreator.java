@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 
 import java.net.MalformedURLException;
@@ -172,12 +173,12 @@ class ResourceUrlCreator {
 
         final List<String> queryParts = Arrays.stream(emptyIfNull(resourceUrl.getQuery()).split("&"))
                 .filter(s -> !isBlank(s))
-                .filter(s -> !s.startsWith("version-id="))
-                .filter(s -> !s.startsWith("current-version-id="))
+                .filter(s -> !s.startsWith(JnlpDownloadProtocolConstants.VERSION_ID_QUERY_PARAM + "="))
+                .filter(s -> !s.startsWith(JnlpDownloadProtocolConstants.CURRENT_VERSION_ID_QUERY_PARAM + "="))
                 .collect(Collectors.toList());
-        queryParts.add("version-id=" + urlEncode(requestVersion.toString()));
+        queryParts.add(JnlpDownloadProtocolConstants.VERSION_ID_QUERY_PARAM + "=" + urlEncode(requestVersion.toString()));
         if (currentVersion != null) {
-            queryParts.add("current-version-id=" + urlEncode(currentVersion.toString()));
+            queryParts.add(JnlpDownloadProtocolConstants.CURRENT_VERSION_ID_QUERY_PARAM + "=" + urlEncode(currentVersion.toString()));
         }
         final String query = queryParts.isEmpty() ? "" : "?" + String.join("&", queryParts);
 

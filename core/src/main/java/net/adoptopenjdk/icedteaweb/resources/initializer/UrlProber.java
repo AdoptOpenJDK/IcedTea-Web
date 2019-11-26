@@ -48,10 +48,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_HEADER;
+
 class UrlProber {
     private static final Logger LOG = LoggerFactory.getLogger(UrlProber.class);
-
-    private static final String VERSION_ID_HEADER = "x-java-jnlp-version-id";
 
     /**
      * Connects to the given URL, and grabs a response code and redirection if
