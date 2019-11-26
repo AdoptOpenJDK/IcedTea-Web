@@ -5,10 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
 
 public class RegistryQueryTest {
 
@@ -20,27 +18,31 @@ public class RegistryQueryTest {
         final List<String> lines = Arrays.asList(content.split(System.lineSeparator()));
 
         //When
-        final Set<RegistryValue> values = RegistryQuery.getRegistryValuesFromLines(key, lines);
+        final Map<String, RegistryValue> values = RegistryQuery.getRegistryValuesFromLines(key, lines);
 
         //Then
         Assert.assertEquals(14, values.size());
 
-        Assert.assertNotNull(findByName(values, "DisableCachingOfSSLPages"));
-        Assert.assertEquals(RegistryValueType.REG_DWORD, findByName(values, "DisableCachingOfSSLPages").getType());
-        Assert.assertEquals("0x0", findByName(values, "DisableCachingOfSSLPages").getValue());
-        Assert.assertFalse(findByName(values, "DisableCachingOfSSLPages").getValueAsBoolean());
+        final RegistryValue disableCachingOfSSLPages = values.get("DisableCachingOfSSLPages");
+        Assert.assertNotNull(disableCachingOfSSLPages);
+        Assert.assertEquals(RegistryValueType.REG_DWORD, disableCachingOfSSLPages.getType());
+        Assert.assertEquals("0x0", disableCachingOfSSLPages.getValue());
+        Assert.assertFalse(disableCachingOfSSLPages.getValueAsBoolean());
 
-        Assert.assertNotNull(findByName(values, "MigrateProxy"));
-        Assert.assertEquals(RegistryValueType.REG_DWORD, findByName(values, "MigrateProxy").getType());
-        Assert.assertEquals("0x1", findByName(values, "MigrateProxy").getValue());
-        Assert.assertTrue(findByName(values, "MigrateProxy").getValueAsBoolean());
+        final RegistryValue migrateProxy = values.get("MigrateProxy");
+        Assert.assertNotNull(migrateProxy);
+        Assert.assertEquals(RegistryValueType.REG_DWORD, migrateProxy.getType());
+        Assert.assertEquals("0x1", migrateProxy.getValue());
+        Assert.assertTrue(migrateProxy.getValueAsBoolean());
 
-        Assert.assertNotNull(findByName(values, "ProxyServer"));
-        Assert.assertEquals(RegistryValueType.REG_SZ, findByName(values, "ProxyServer").getType());
-        Assert.assertEquals("loooocalhost:80", findByName(values, "ProxyServer").getValue());
-    }
+        final RegistryValue proxyServer = values.get("ProxyServer");
+        Assert.assertNotNull(proxyServer);
+        Assert.assertEquals(RegistryValueType.REG_SZ, proxyServer.getType());
+        Assert.assertEquals("loooocalhost:80", proxyServer.getValue());
 
-    private RegistryValue findByName(Collection<RegistryValue> values, String name) {
-        return values.stream().filter(v -> Objects.equals(v.getName(), name)).findAny().orElse(null);
+        final RegistryValue user_agent = values.get("User Agent");
+        Assert.assertNotNull(user_agent);
+        Assert.assertEquals(RegistryValueType.REG_SZ, user_agent.getType());
+        Assert.assertEquals("Mozilla/4.0 (compatible; MSIE 8.0; Win32)", user_agent.getValue());
     }
 }

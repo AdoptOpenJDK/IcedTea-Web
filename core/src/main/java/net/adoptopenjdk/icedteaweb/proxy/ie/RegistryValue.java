@@ -29,7 +29,7 @@ public class RegistryValue {
     }
 
     public boolean getValueAsBoolean() {
-        if(type != RegistryValueType.REG_DWORD) {
+        if (type != RegistryValueType.REG_DWORD) {
             throw new IllegalStateException("Can not extract boolean value for value type " + type);
         }
         return Objects.equals(value, "0x1");

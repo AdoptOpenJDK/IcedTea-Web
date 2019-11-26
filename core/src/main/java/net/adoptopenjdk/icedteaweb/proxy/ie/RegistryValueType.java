@@ -11,5 +11,5 @@ public enum RegistryValueType {
     REG_NONE,
     REG_QWORD,
     REG_QWORD_LITTLE_ENDIAN,
-    REG_SZ;
+    REG_SZ,
 }
