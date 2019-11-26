@@ -1,10 +1,6 @@
-package net.adoptopenjdk.icedteaweb.ie;
+package net.adoptopenjdk.icedteaweb.proxy.ie;
 
 public interface WinRegistryConstants {
-
-    int REG_SUCCESS = 0;
-
-    int KEY_READ = 0x20019;
 
     String PROXY_REGISTRY_KEY = "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
 
