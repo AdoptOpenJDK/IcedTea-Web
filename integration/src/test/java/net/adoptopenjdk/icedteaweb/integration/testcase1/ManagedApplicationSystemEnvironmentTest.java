@@ -23,6 +23,8 @@ import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJava
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_ENVIRONMENT_FILE;
@@ -44,7 +46,16 @@ public class ManagedApplicationSystemEnvironmentTest implements IntegrationTest 
     @Test(timeout = 100_000)
     public void testReadingSystemEnvironment() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("SimpleJavaApplication.jnlp").withMainClass(SimpleJavaApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when

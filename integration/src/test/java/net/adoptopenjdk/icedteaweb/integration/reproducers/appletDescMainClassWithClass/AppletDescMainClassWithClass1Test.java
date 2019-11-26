@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,9 +26,18 @@ public class AppletDescMainClassWithClass1Test implements IntegrationTest {
 
 
     @Test(timeout = 100_000)
-    public void appletWithNormallMainClass() throws IOException {
+    public void appletWithNormalMainClass() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "AppletDescMainClassWithClass1.jnlp", AppletDescMainClassWithClass.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("AppletDescMainClassWithClass1.jnlp").withMainClass(AppletDescMainClassWithClass.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when

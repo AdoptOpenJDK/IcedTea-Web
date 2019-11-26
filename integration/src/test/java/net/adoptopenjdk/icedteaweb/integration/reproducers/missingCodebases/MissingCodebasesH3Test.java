@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +31,21 @@ public class MissingCodebasesH3Test implements IntegrationTest {
     @Test(timeout = 100_000)
     public void codebaseMissingHrefNone() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "MissingCodebasesH3.jnlp", MissingCodebases.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("MissingCodebasesH3.jnlp").withMainClass(MissingCodebases.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
-        Map<String, String> deplyment = new HashMap<>();
-        deplyment.put(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,"NONE" );
-        deplyment.put(ConfigurationConstants.KEY_SECURITY_LEVEL,"ALLOW_UNSIGNED" );
-        tmpItwHome.createDeploymentProps(deplyment);
+        Map<String, String> deployment = new HashMap<>();
+        deployment.put(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        deployment.put(ConfigurationConstants.KEY_SECURITY_LEVEL, "ALLOW_UNSIGNED");
+        tmpItwHome.createDeploymentProps(deployment);
 
         // when
         final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
@@ -44,7 +54,6 @@ public class MissingCodebasesH3Test implements IntegrationTest {
         // then
         assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
-        //assertThat(getCachedFileAsString(tmpItwHome, MissingCodebases.ID), containsString("init MissingCodebases"));
     }
 
 }

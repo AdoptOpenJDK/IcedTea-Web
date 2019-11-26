@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.reproducers.progressclass.applications.ProgressClassManagedApplication.PROGRESS_CLASS_OUTPUT_FILE;
@@ -54,7 +55,16 @@ public class ManagedApplicationWithProgressClassTest implements IntegrationTest 
     @Ignore
     public void testSuccessfullyLaunchSimpleJavaApplication() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "ManagedApplicationWithProgressClass.jnlp", ProgressClassManagedApplication.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("ManagedApplicationWithProgressClass.jnlp").withMainClass(ProgressClassManagedApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // pimp the initial delay so that the progress indicator really shows up

@@ -23,6 +23,8 @@ import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJava
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.SYSTEM_PROPERTIES_FILE;
@@ -44,7 +46,16 @@ public class SystemPropertiesSetTest implements IntegrationTest {
     @Test(timeout = 100_000)
     public void testLaunchWithSystemProperty() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithProperties.jnlp", SimpleJavaApplication.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("SimpleJavaApplicationWithProperties.jnlp").withMainClass(SimpleJavaApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -57,9 +68,8 @@ public class SystemPropertiesSetTest implements IntegrationTest {
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key2"), containsString("System Property Via Jnlp File2"));
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("key3"), containsString("SystemPropertyAsCommandLineArgument"));
 
-        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible 
-        // for the started application to detect the execution context. 
+        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible
+        // for the started application to detect the execution context.
         assertThat(getCachedFileAsProperties(tmpItwHome, SYSTEM_PROPERTIES_FILE).getProperty("deployment.javaws"), containsString("IcedTea-Web"));
     }
-
 }

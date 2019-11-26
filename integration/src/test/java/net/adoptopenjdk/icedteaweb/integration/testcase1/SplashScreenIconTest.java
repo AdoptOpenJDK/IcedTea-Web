@@ -23,6 +23,8 @@ import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SecureJava
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItw;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +45,19 @@ public class SplashScreenIconTest implements IntegrationTest {
     @Test(timeout = 100_000)
     public void testSplashIcon() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplicationWithSplash.jnlp", SecureJavaApplication.class, JAR_NAME, SPLASH_ICON);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("SimpleJavaApplicationWithSplash.jnlp").withMainClass(SecureJavaApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(SPLASH_ICON).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when

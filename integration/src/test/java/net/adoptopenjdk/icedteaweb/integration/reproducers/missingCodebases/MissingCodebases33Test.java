@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,16 @@ public class MissingCodebases33Test implements IntegrationTest {
     @Test(timeout = 100_000)
     public void codebaseMissingHrefFullApp() throws IOException {
         // given
-        final String jnlpUrl = setupServer(wireMock, "MissingCodebases33.jnlp", MissingCodebases.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("MissingCodebases33.jnlp").withMainClass(MissingCodebases.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
         Map<String, String> deplyment = new HashMap<>();
         deplyment.put(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,"NONE" );
