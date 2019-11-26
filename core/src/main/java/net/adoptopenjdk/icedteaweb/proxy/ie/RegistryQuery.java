@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 
 public class RegistryQuery {
 
+    public static Optional<RegistryValue> getRegistryValue(final String key, final String valueName) throws InterruptedException, ExecutionException, IOException {
+        return getAllValuesForKey(key).stream().filter(v -> Objects.equals(valueName, v.getName())).findFirst();
+    }
+
     public static Set<RegistryValue> getAllValuesForKey(final String key) throws IOException, InterruptedException, ExecutionException {
         final Process start = new ProcessBuilder().command("reg", "query", "\"" + key + "\"")
                 .redirectErrorStream(true)
@@ -30,7 +34,7 @@ public class RegistryQuery {
         return getRegistryValuesFromLines(key, lines);
     }
 
-    public static Set<RegistryValue> getRegistryValuesFromLines(final String key, final List<String> lines) {
+    protected static Set<RegistryValue> getRegistryValuesFromLines(final String key, final List<String> lines) {
         return lines.stream()
                 .filter(l -> !l.contains(key))
                 .map(l -> l.trim())
@@ -51,7 +55,7 @@ public class RegistryQuery {
                 }).collect(Collectors.toSet());
     }
 
-    public static Future<List<String>> getLines(final InputStream src) {
+    private static Future<List<String>> getLines(final InputStream src) {
         final CompletableFuture<List<String>> result = new CompletableFuture<>();
 
         Executors.newSingleThreadExecutor().execute(() -> {
@@ -69,7 +73,4 @@ public class RegistryQuery {
         return result;
     }
 
-    public static Optional<RegistryValue> getRegistryValue(final String key, final String valueName) throws InterruptedException, ExecutionException, IOException {
-        return getAllValuesForKey(key).stream().filter(v -> Objects.equals(valueName, v.getName())).findFirst();
-    }
 }
