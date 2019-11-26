@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 public class RegistryQuery {
 
     public static Set<RegistryValue> getAllValuesForKey(final String key) throws IOException, InterruptedException, ExecutionException {
-
-        //C:\Users\IEUser>reg query "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-
         final Process start = new ProcessBuilder().command("reg", "query", "\"" + key + "\"")
                 .redirectErrorStream(true)
                 .start();
