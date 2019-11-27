@@ -118,7 +118,7 @@ public class AppletTestSignedTests extends BrowserTest {
         Assert.assertTrue("AppletTestSigned stdout " + variable2Rule.toPassingString() + " but didn't", variable2Rule.evaluate(pr.stdout));
         //Assert.assertTrue("AppletTestSigned stdout " + killedRule.toPassingString() + " but didn't", killedRule.evaluate(pr.stdout));
         if (!javawsApplet) {
-            /*this is working correctly in most browser, but not in all. temporarily disabling
+            /*this is working correctly in most firefox, but not in all. temporarily disabling
             String s4 = "AppletTestSigned was stopped";
             Assert.assertTrue("AppletTestSigned stdout shouldt contain " + s4 + " but did", pr.stdout.contains(s4));
             String s5 = "AppletTestSigned will be destroyed";

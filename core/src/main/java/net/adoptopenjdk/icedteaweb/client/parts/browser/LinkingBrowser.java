@@ -80,7 +80,7 @@ public class LinkingBrowser extends JTabbedPane {
         linksPanel.setInternalBrowser(lBrowser);
         lBrowser.addDocumentChangedListener(linksPanel);
         this.addTab("html", lBrowser); //jeditorpane
-        this.addTab("links", new JScrollPane(linksPanel)); // set of found links - copyToClipboard, execute in browser, show...
+        this.addTab("links", new JScrollPane(linksPanel)); // set of found links - copyToClipboard, execute in firefox, show...
 
     }
 

@@ -184,7 +184,7 @@ class XBasicService implements BasicService {
 //        }
 // Ignorance of this code is the only regression against original code (if you assume most of the jnlps have jnlp suffix...) we had
 // anyway, also jnlp protocol should be handled via this, so while this can be set via 
-// ALWAYS-ASK, or directly via BROWSER of deployment.browser.path , it still should be better then it was
+// ALWAYS-ASK, or directly via BROWSER of deployment.firefox.path , it still should be better then it was
 // in all cases, the mime recognition is much harder then .jnlp suffix
 
             final String urls = url.toExternalForm();
@@ -208,7 +208,7 @@ class XBasicService implements BasicService {
                 final String cmd = promptForCommand(urls, false);
                 return exec(cmd, urls);
             } else {
-                LOG.debug("using default browser");
+                LOG.debug("using default firefox");
                 Desktop.getDesktop().browse(url.toURI());
                 return true;
             }

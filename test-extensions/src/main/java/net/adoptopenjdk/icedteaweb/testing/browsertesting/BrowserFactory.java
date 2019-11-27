@@ -151,7 +151,7 @@ public class BrowserFactory {
     /**
      *
      * @param testIn Bbrowsers which should be transformed to list of Browser
-     * @return all matching browser, if browser do not exists, this is ignored and run is silently continued
+     * @return all matching firefox, if firefox do not exists, this is ignored and run is silently continued
      */
     private List<Browser> translateAnnotationSilently(final Browsers[] testIn) {
         if (testIn==null) {
@@ -168,14 +168,14 @@ public class BrowserFactory {
             } else if (b == Browsers.one) {
                 final Browser bb = getRandom();
                 if (bb == null) {
-                    ServerAccess.logErrorReprint("You try to add random browser, but there is none");
+                    ServerAccess.logErrorReprint("You try to add random firefox, but there is none");
                 } else {
                     r.add(bb);
                 }
             } else {
                 final Browser bb = getBrowser(b);
                 if (bb == null) {
-                    ServerAccess.logErrorReprint("You try to add " + b.toString() + " browser, but it do not exists");
+                    ServerAccess.logErrorReprint("You try to add " + b.toString() + " firefox, but it do not exists");
                 } else {
                     r.add(bb);
                 }

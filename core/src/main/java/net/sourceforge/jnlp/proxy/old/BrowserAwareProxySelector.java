@@ -40,12 +40,11 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.browser.BrowserProxyType;
-import net.sourceforge.jnlp.proxy.browser.FirefoxPreferencesFinder;
-import net.sourceforge.jnlp.proxy.browser.FirefoxPreferencesParser;
-import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
-import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
-import net.sourceforge.jnlp.proxy.pac.PacUtils;
+import net.sourceforge.jnlp.proxy.firefox.FirefoxPreferencesFinder;
+import net.sourceforge.jnlp.proxy.firefox.FirefoxPreferencesParser;
+import net.sourceforge.jnlp.proxy.firefox.FirefoxProxyType;
+import net.sourceforge.jnlp.proxy.util.pac.PacUtils;
+import net.sourceforge.jnlp.proxy.util.pac.PacEvaluator;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,21 +57,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.AUTO_CONFIG_URL_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.FTP_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.FTP_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.HTTP_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.HTTP_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.PROXY_TYPE_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.SHARE_SETTINGS_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.SOCKS_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.SOCKS_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.SSL_PORT_PROPERTY_NAME;
+import static net.sourceforge.jnlp.proxy.firefox.FirefoxConstants.SSL_PROPERTY_NAME;
 import static net.sourceforge.jnlp.proxy.util.ProxyConstants.SOCKET_SCHEMA;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.AUTO_CONFIG_URL_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PORT_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.FTP_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.HTTP_PORT_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.HTTP_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.PROXY_TYPE_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SHARE_SETTINGS_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SOCKS_PORT_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SOCKS_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SSL_PORT_PROPERTY_NAME;
-import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SSL_PROPERTY_NAME;
 
 /**
- * A ProxySelector which can read proxy settings from a browser's
+ * A ProxySelector which can read proxy settings from a firefox's
  * configuration and use that.
  *
  * @see JNLPProxySelector
@@ -81,7 +80,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
     private final static Logger LOG = LoggerFactory.getLogger(BrowserAwareProxySelector.class);
 
-    private BrowserProxyType browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
+    private FirefoxProxyType browserProxyType = FirefoxProxyType.BROWSER_PROXY_TYPE_NONE;
     private URL browserAutoConfigUrl;
     /** Whether the http proxy should be used for http, https, ftp and socket protocols */
     private Boolean browserUseSameProxy;
@@ -97,7 +96,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     private PacEvaluator browserProxyAutoConfig = null;
 
     /**
-     * Create a new instance of this class, reading configuration from the browser
+     * Create a new instance of this class, reading configuration from the firefox
      */
     public BrowserAwareProxySelector(DeploymentConfiguration config) {
         super(config);
@@ -108,12 +107,12 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             initFromBrowserConfig();
         } catch (IOException e) {
             LOG.error("Unable to use Firefox''s proxy settings. Using \"DIRECT\" as proxy type.", e);
-            browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
+            browserProxyType = FirefoxProxyType.BROWSER_PROXY_TYPE_NONE;
         }
     }
 
     /**
-     * Initialize configuration by reading preferences from the browser (firefox)
+     * Initialize configuration by reading preferences from the firefox (firefox)
      */
     private void initFromBrowserConfig() throws IOException {
 
@@ -121,9 +120,9 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
         String type = prefs.get(PROXY_TYPE_PROPERTY_NAME);
         if (type != null) {
-            browserProxyType = BrowserProxyType.getForConfigValue(Integer.valueOf(type));
+            browserProxyType = FirefoxProxyType.getForConfigValue(Integer.valueOf(type));
         } else {
-            browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_AUTO;
+            browserProxyType = FirefoxProxyType.BROWSER_PROXY_TYPE_AUTO;
         }
 
         try {
@@ -135,9 +134,9 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
 
-        if (browserProxyType == BrowserProxyType.BROWSER_PROXY_TYPE_PAC) {
+        if (browserProxyType == FirefoxProxyType.BROWSER_PROXY_TYPE_PAC) {
             if (browserAutoConfigUrl != null) {
-                browserProxyAutoConfig = PacEvaluatorFactory.getPacEvaluator(browserAutoConfigUrl);
+                browserProxyAutoConfig = new PacEvaluator(browserAutoConfigUrl);
             }
         }
 
@@ -178,11 +177,11 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     /**
      * <p>
      * The main entry point for {@link BrowserAwareProxySelector}. Based on
-     * the browser settings, determines proxy information for a given URI.
+     * the firefox settings, determines proxy information for a given URI.
      * </p>
      * <p>
      * The appropriate proxy may be determined by reading static information
-     * from the browser's preferences file, or it may be computed dynamically,
+     * from the firefox's preferences file, or it may be computed dynamically,
      * by, for example, running javascript code.
      * </p>
      */
@@ -232,7 +231,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
     /**
      * Get an appropriate proxy for a given URI using a PAC specified in the
-     * browser.
+     * firefox.
      */
     private List<Proxy> getFromBrowserPAC(URI uri) {
         if (browserAutoConfigUrl == null || uri.getScheme().equals(SOCKET_SCHEMA)) {
@@ -254,7 +253,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
 
     /**
      * Get an appropriate proxy for the given URI using static information from
-     * the browser's preferences file.
+     * the firefox's preferences file.
      */
     private List<Proxy> getFromBrowserConfiguration(URI uri) {
         return getFromArguments(uri, browserUseSameProxy, true,

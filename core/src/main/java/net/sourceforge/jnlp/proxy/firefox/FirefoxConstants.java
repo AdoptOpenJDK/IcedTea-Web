@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.browser;
+package net.sourceforge.jnlp.proxy.firefox;
 
 public interface FirefoxConstants {
 

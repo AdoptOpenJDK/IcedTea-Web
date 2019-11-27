@@ -1,4 +1,4 @@
-/* RhinoBasedPacEvaluator.java
+/* PacEvaluator.java
    Copyright (C) 2011 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.proxy.pac;
+package net.sourceforge.jnlp.proxy.util.pac;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -67,9 +67,9 @@ import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file">The PAC File</a>
  */
-public class RhinoBasedPacEvaluator implements PacEvaluator {
+public class PacEvaluator {
 
-    private final static Logger LOG = LoggerFactory.getLogger(RhinoBasedPacEvaluator.class);
+    private final static Logger LOG = LoggerFactory.getLogger(PacEvaluator.class);
 
     private final String pacHelperFunctionContents;
     private final String pacContents;
@@ -81,7 +81,7 @@ public class RhinoBasedPacEvaluator implements PacEvaluator {
      *
      * @param pacUrl the url of the PAC file to use
      */
-    public RhinoBasedPacEvaluator(URL pacUrl) {
+    public PacEvaluator(URL pacUrl) {
         LOG.debug("Create Rhino-based PAC evaluator for '{}'", pacUrl);
         pacHelperFunctionContents = getHelperFunctionContents();
         this.pacUrl = pacUrl;

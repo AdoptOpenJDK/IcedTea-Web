@@ -113,7 +113,7 @@ public class LinksPanel extends JPanel implements DocumentChangedListener {
                 }
             });
             buttonsPanel.add(b1);
-            //if (browser != null) {
+            //if (firefox != null) {
             JButton b2 = new JButton(Translator.R("BrowserOpeninternal"));
             b2.addActionListener(new ActionListener() {
                 @Override

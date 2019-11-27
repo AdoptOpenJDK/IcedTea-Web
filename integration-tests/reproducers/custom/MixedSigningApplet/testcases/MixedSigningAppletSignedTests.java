@@ -54,7 +54,7 @@ import static org.junit.Assert.assertTrue;
 /*
  * All JNLP tests expect to be unable to perform restricted actions,
  * such as reading from System.getProperty. This is because partially signed
- * applet support (PR1592) is enabled *only* for browser plugin applets, and
+ * applet support (PR1592) is enabled *only* for firefox plugin applets, and
  * not for JNLP applets or applications. The expected result in all JNLP
  * tests is therefore an AccessControlException. Most plugin applets expect
  * AccessControlExceptions as well, since they test to ensure that the signed
@@ -103,7 +103,7 @@ public class MixedSigningAppletSignedTests extends BrowserTest {
     }
 
     /*
-     * All browser tests disabled due to requiring user intervention to run
+     * All firefox tests disabled due to requiring user intervention to run
      * (partially signed dialog will appear)
      */
     @Bug(id="PR1592")

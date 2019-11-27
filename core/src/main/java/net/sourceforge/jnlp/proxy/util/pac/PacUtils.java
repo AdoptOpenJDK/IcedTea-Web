@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.pac;
+package net.sourceforge.jnlp.proxy.util.pac;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -9,16 +9,16 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.proxy.pac.PacConstants.DIRECT;
-import static net.sourceforge.jnlp.proxy.pac.PacConstants.PROXY;
-import static net.sourceforge.jnlp.proxy.pac.PacConstants.SOCKS;
+import static net.sourceforge.jnlp.proxy.util.pac.PacConstants.DIRECT;
+import static net.sourceforge.jnlp.proxy.util.pac.PacConstants.PROXY;
+import static net.sourceforge.jnlp.proxy.util.pac.PacConstants.SOCKS;
 
 public class PacUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(PacUtils.class);
 
     /**
-     * Converts a proxy string from a browser into a List of Proxy objects
+     * Converts a proxy string from a firefox into a List of Proxy objects
      * suitable for java.
      * @param pacString a string indicating proxies. For example
      * "PROXY foo.bar:3128; DIRECT"

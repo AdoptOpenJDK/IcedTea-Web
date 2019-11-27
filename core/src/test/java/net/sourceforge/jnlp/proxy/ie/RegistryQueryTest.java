@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.proxy.ie;
+package net.sourceforge.jnlp.proxy.ie;
 
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import org.junit.Assert;

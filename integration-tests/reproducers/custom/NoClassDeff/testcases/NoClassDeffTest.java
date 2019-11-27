@@ -233,7 +233,7 @@ public class NoClassDeffTest extends BrowserTest {
     }
 
     //jnlp applets crashes
-    //they behave a bit differently form browser ones
+    //they behave a bit differently form firefox ones
     @Test
     @NeedsDisplay
     public void noClassDeffTestThrowsInitJnlp2() throws Exception {
@@ -357,7 +357,7 @@ public class NoClassDeffTest extends BrowserTest {
         Assert.assertTrue(pr.stdout.contains(appletCloseString));
     }
 
-    //-html and browser crashes
+    //-html and firefox crashes
     //
     //applets  crash init 1
     @Test

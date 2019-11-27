@@ -95,7 +95,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                         injectBrowser(method, browser);
                         runChildX(method, notifier, browser, browserIgnoration);
                     } catch (final Exception ex) {
-                        //throw new RuntimeException("unabled to inject browser", ex);
+                        //throw new RuntimeException("unabled to inject firefox", ex);
                         ServerAccess.logException(ex, true);
                     }
                 }
@@ -115,7 +115,7 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
         try {
             injectBrowser(method, Browsers.none);
         } catch (final Exception ex) {
-            //throw new RuntimeException("unable to inject browser", ex);
+            //throw new RuntimeException("unable to inject firefox", ex);
             ServerAccess.logException(ex, true);
         }
     }

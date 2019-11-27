@@ -432,7 +432,7 @@ public class Defaults {
             ),
 
             /*
-             * browser selection
+             * firefox selection
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_BROWSER_PATH,

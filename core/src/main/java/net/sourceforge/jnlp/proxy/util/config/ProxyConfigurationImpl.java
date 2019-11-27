@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.config;
+package net.sourceforge.jnlp.proxy.util.config;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1416,7 +1416,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * to provide atomic add/remove operations, and synchronizing on them when
      * iterating or performing multiple mutations. See bug report RH976833. On
      * some systems this bug will manifest itself as deadlock on every webpage
-     * with more than one Java applet, potentially also causing the browser
+     * with more than one Java applet, potentially also causing the firefox
      * process to hang. More information in the mailing list archives:
      * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
      * <p>

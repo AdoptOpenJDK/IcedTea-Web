@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.config;
+package net.sourceforge.jnlp.proxy.util.config;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.proxy.util.ProxyUtlis;

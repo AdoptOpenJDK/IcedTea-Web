@@ -55,7 +55,7 @@ public class CheckServicesTests extends BrowserTest{
         String s2 = "Codebase for applet was found in start()";
         Assert.assertTrue("CheckServices stdout should contain `" + s2 + "' but didn't.", pr.stdout.contains(s2));
         if (applet){
-            /*this is working correctly in most browser, but not in all. temporarily disabling
+            /*this is working correctly in most firefox, but not in all. temporarily disabling
         String s3 = "Codebase for applet was found in stop()";
         Assert.assertTrue("CheckServices stdout should contain `" + s3 + "' but didn't.", pr.stdout.contains(s3));
         String s4 = "Codebase for applet was found in destroy()";

@@ -241,7 +241,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             JNLPRuntime.setShowWebSplash(false);
         }
 
-        //if it is browser go by ots own, otherwise proceed with normal ITW logic
+        //if it is firefox go by ots own, otherwise proceed with normal ITW logic
         if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
             String url = optionParser.getParam(CommandLineOptions.BROWSER);
             LinkingBrowser.showStandAloneWindow(url, false);

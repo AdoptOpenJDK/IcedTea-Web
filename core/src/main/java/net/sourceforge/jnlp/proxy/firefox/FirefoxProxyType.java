@@ -1,8 +1,8 @@
-package net.sourceforge.jnlp.proxy.browser;
+package net.sourceforge.jnlp.proxy.firefox;
 
 import java.util.stream.Stream;
 
-public enum BrowserProxyType {
+public enum FirefoxProxyType {
 
     BROWSER_PROXY_TYPE_NONE(0),
     BROWSER_PROXY_TYPE_MANUAL(1),
@@ -12,7 +12,7 @@ public enum BrowserProxyType {
 
     private final int configValue;
 
-    BrowserProxyType(final int configValue) {
+    FirefoxProxyType(final int configValue) {
         this.configValue = configValue;
     }
 
@@ -20,8 +20,8 @@ public enum BrowserProxyType {
         return configValue;
     }
 
-    public static BrowserProxyType getForConfigValue(final int value) {
-        return Stream.of(BrowserProxyType.values())
+    public static FirefoxProxyType getForConfigValue(final int value) {
+        return Stream.of(FirefoxProxyType.values())
                 .filter(t -> value == t.getConfigValue())
                 .findFirst()
                 .orElse(BROWSER_PROXY_TYPE_NONE);

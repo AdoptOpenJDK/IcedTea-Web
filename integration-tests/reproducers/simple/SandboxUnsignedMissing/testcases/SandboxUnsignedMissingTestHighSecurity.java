@@ -162,7 +162,7 @@ public class SandboxUnsignedMissingTestHighSecurity extends BrowserTest {
             Assert.assertTrue(p.stderr.contains(aer.getCondition()));
     }
     
-    //browser do not support headless dialogues
+    //firefox do not support headless dialogues
     //@Test
     //@TestInBrowsers(testIn = Browsers.one)
     public void appletAllPermAllSecurity() throws Exception{

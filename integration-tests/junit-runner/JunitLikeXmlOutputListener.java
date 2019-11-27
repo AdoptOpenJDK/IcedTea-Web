@@ -182,7 +182,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
         try {
             testClass = description.getTestClass();
             String qs = description.getMethodName();
-            //handling @Browser'bugsIds marking of used browser
+            //handling @Browser'bugsIds marking of used firefox
             if (qs.contains(" - ")) {
                 qs = qs.replaceAll(" - .*", "");
             }
@@ -204,7 +204,7 @@ public class JunitLikeXmlOutputListener extends RunListener {
         boolean thisTestIsK2F = false;
         Remote remote =  LessVerboseTextListener.getAnnotation(testClass, testMethod.getName(), Remote.class);
         if (k2f != null) {
-            //determine if k2f in the current browser
+            //determine if k2f in the current firefox
             //??
             Browsers[] br = k2f.failsIn();
             if(0 == br.length){//the KnownToFail annotation without optional parameter

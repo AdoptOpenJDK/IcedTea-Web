@@ -68,7 +68,7 @@ public class AppletTestTests extends BrowserTest {
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
             //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
-            //just verify loging is recording browser
+            //just verify loging is recording firefox
             ProcessResult pr1 = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
             if (pr1.process == null) {
                 Assert.assertTrue("If proces was null here, then google-chrome had to not exist, and so "
@@ -81,7 +81,7 @@ public class AppletTestTests extends BrowserTest {
             evaluateApplet(pr1, false);
             Assert.assertTrue(pr1.wasTerminated);
             //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
-            // just verify loging is recording browser
+            // just verify loging is recording firefox
             ProcessResult pr = server.executeBrowser("/appletAutoTests2.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());
             evaluateApplet(pr, false);
             Assert.assertTrue(pr.wasTerminated);
@@ -106,7 +106,7 @@ public class AppletTestTests extends BrowserTest {
         Assert.assertTrue("AppletTest stdout should contains " + s2 + " bud didn't", pr.stdout.contains(s2));
         Assert.assertTrue("AppletTest stdout should contains " + s7 + " bud didn't", pr.stdout.contains(s7));
         if (!javawsApplet) {
-            /*this is working correctly in most browser, but not in all. temporarily disabling
+            /*this is working correctly in most firefox, but not in all. temporarily disabling
             String s4 = "applet was stopped";
             Assert.assertTrue("AppletTest stdout should contain " + s4 + " bud did't", pr.stdout.contains(s4));
             String s5 = "applet will be destroyed";
@@ -136,7 +136,7 @@ public class AppletTestTests extends BrowserTest {
     @NeedsDisplay
     public void AppletInBrowserTestXslowX() throws Exception {
         //System.out.println("connecting AppletInFirefoxTest request in " + getBrowser().toString());
-        //just verify loging is recording browser
+        //just verify loging is recording firefox
         ServerAccess.PROCESS_TIMEOUT = 30 * 1000;
         try {
             ProcessResult pr = server.executeBrowser("/appletAutoTests.html", new CountingClosingListenerImpl(), new CountingClosingListenerImpl());

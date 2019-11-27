@@ -115,7 +115,7 @@ public class ResourcesTest extends  BrowserTest{
     public void testBrowsers2() throws Exception {
         List<Browser> a = BrowserFactory.getFactory().getAllBrowsers();
         Assert.assertNotNull("returned browsers array must not be null", a);
-        Assert.assertTrue("at least one browser must be configured", a.size() > 0);
+        Assert.assertTrue("at least one firefox must be configured", a.size() > 0);
         for (Browser b : a) {
             testBrowser(b);
         }
@@ -320,7 +320,7 @@ public class ResourcesTest extends  BrowserTest{
             defaultPluginDir = new File(browser.getDefaultPluginExpectedLocation());
         }
         if (defaultPluginDir != null) {
-            Assert.assertTrue("browser's plugins  location should exist " + defaultPluginDir.toString() + " for " + browser.getID().toString(), defaultPluginDir.exists());
+            Assert.assertTrue("firefox's plugins  location should exist " + defaultPluginDir.toString() + " for " + browser.getID().toString(), defaultPluginDir.exists());
         }
 
         File userPluginDir = null;
@@ -339,7 +339,7 @@ public class ResourcesTest extends  BrowserTest{
             userPlugins = userPluginDir.listFiles();
         }
 
-        Assert.assertTrue("at least one of browser's plugins  directory should contains at least one file didn't. For " + browser.getID().toString(), defaultPlugins.length + userPlugins.length > 0);
+        Assert.assertTrue("at least one of firefox's plugins  directory should contains at least one file didn't. For " + browser.getID().toString(), defaultPlugins.length + userPlugins.length > 0);
 
         defaultPlugins = new File[0];
         if (defaultPluginDir != null && defaultPluginDir.isDirectory()) {
@@ -363,7 +363,7 @@ public class ResourcesTest extends  BrowserTest{
             });
         }
 
-        Assert.assertTrue("browser's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didn't for " + browser.getID().toString(),
+        Assert.assertTrue("firefox's plugins  directories should contains exactly one  " + LinuxBrowser.DEFAULT_PLUGIN_NAME + ", but didn't for " + browser.getID().toString(),
                 defaultPlugins.length + userPlugins.length == 1);
         String currentPath = server.getJavawsFile().getParentFile().getParentFile().getAbsolutePath();
 
@@ -375,7 +375,7 @@ public class ResourcesTest extends  BrowserTest{
         }
 
         String s = FileUtils.loadFileAsString(plugins[0], US_ASCII);
-        Assert.assertTrue("browser's plugins  should points to" + currentPath + ", but didn't",
+        Assert.assertTrue("firefox's plugins  should points to" + currentPath + ", but didn't",
                 s.contains(s));
     }
 }

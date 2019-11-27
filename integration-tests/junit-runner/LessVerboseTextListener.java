@@ -77,7 +77,7 @@ public class LessVerboseTextListener extends RunListener {
             KnownToFail k2f = getK2F(description);
             boolean thisTestIsK2F = false;
             if (k2f != null){
-                //determine if k2f in the current browser
+                //determine if k2f in the current firefox
                 Browsers[] br = k2f.failsIn();
                 if(0 == br.length){ //@KnownToFail with default optional parameter failsIn={}
                     thisTestIsK2F = true;

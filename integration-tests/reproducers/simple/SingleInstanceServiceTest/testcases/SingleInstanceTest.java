@@ -177,7 +177,7 @@ public class SingleInstanceTest extends BrowserTest {
         ProcessResult[] results = executeSingleInstanceCheck(htmlpApplet, htmlpApplet);
         String id = "htmlpAppletXhtmlpApplet";
         evaluateFirstInstance(results[0], id);
-        //the first browser is consuming all the output
+        //the first firefox is consuming all the output
         evaluateSecondInstance(results[0], id);
 
     }
@@ -197,7 +197,7 @@ public class SingleInstanceTest extends BrowserTest {
         ProcessResult[] results = executeSingleInstanceCheck(htmlJnlpHrefApplet, htmlJnlpHrefApplet);
         String id = "htmlJnlpHrefAppletXhtmlJnlpHrefApplet";
         evaluateFirstInstance(results[0], id);
-        //the first browser is consuming all the output
+        //the first firefox is consuming all the output
         evaluateSecondInstance(results[0], id);
 
     }

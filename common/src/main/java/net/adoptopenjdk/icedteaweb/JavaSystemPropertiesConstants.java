@@ -109,9 +109,9 @@ public interface JavaSystemPropertiesConstants {
 
     String JAVAWS = "javaws.*";
 
-    String BROWSER = "browser";
+    String BROWSER = "firefox";
 
-    String BROWSER_STAR = "browser.*";
+    String BROWSER_STAR = "firefox.*";
 
     String EXIT_VM = "exitVM";
 

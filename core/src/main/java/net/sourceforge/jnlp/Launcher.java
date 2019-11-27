@@ -167,7 +167,7 @@ public class Launcher {
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
             if (handler != null) {
-                handler.handleLaunchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
+                handler.handleLaunchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/firefox."));
             }
             throw new RuntimeException(ex);
         }
@@ -291,7 +291,7 @@ public class Launcher {
         } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/firefox from the command line and send a bug report."));
         }
     }
 
@@ -420,7 +420,7 @@ public class Launcher {
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/firefox from the command line and send a bug report."));
         }
     }
 
@@ -460,7 +460,7 @@ public class Launcher {
      * <p>
      * The enableCodeBase parameter adds the applet's codebase to
      * the locations searched for resources and classes.  This can
-     * slow down the applet loading but allows browser-style applets
+     * slow down the applet loading but allows firefox-style applets
      * that don't use JAR files exclusively to be run from a applet
      * JNLP file.  If the applet JNLP file does not specify any
      * resources then the code base will be enabled regardless of
@@ -502,7 +502,7 @@ public class Launcher {
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/firefox from the command line and send a bug report."));
         }finally{
             if (handler != null) {
                 handler.launchStarting(applet);

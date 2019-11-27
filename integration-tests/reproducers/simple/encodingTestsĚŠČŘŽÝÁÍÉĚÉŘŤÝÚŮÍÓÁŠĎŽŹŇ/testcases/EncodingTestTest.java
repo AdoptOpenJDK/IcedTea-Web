@@ -223,7 +223,7 @@ public class EncodingTestTest extends BrowserTest {
     }
 
     /**
-     * launching encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ.jar from encoding file with utf8/ISO-8859-2 uncompatible characters included also in args and jar filename in browser
+     * launching encodingTestsĚŠČŘŽÝÁÍÉĚÉŘŤÝÚŮÍÓÁŠĎŽŹŇ.jar from encoding file with utf8/ISO-8859-2 uncompatible characters included also in args and jar filename in firefox
      */
     public void testEncodingTest4(String encoding) throws Exception {
         ProcessResult pr = server.executeBrowser("/encodingTest4-" + encoding + ".html");

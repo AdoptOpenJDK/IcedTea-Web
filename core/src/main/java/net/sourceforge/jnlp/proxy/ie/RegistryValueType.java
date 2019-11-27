@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.proxy.ie;
+package net.sourceforge.jnlp.proxy.ie;
 
 public enum RegistryValueType {
     REG_BINARY,

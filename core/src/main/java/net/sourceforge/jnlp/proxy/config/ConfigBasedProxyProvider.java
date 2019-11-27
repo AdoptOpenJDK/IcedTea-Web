@@ -1,40 +1,33 @@
 package net.sourceforge.jnlp.proxy.config;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.ProxyProvider;
+import net.sourceforge.jnlp.proxy.util.config.AbstractConfigBasedProvider;
+import net.sourceforge.jnlp.proxy.util.config.ProxyConfiguration;
+import net.sourceforge.jnlp.proxy.util.config.ProxyConfigurationImpl;
 import net.sourceforge.jnlp.proxy.util.ProxyUtlis;
 
-import java.net.Proxy;
-import java.net.URI;
-import java.util.List;
 import java.util.StringTokenizer;
 
-public class DeploymentConfigBasedProxyProvider implements ProxyProvider {
+public class ConfigBasedProxyProvider extends AbstractConfigBasedProvider {
 
-    private final static Logger LOG = LoggerFactory.getLogger(DeploymentConfigBasedProxyProvider.class);
+    public final static String NAME = "ConfigBasedProxyProvider";
 
-    public final static String NAME = "DeploymentConfigBasedProxyProvider";
+    private final ProxyConfiguration proxyConfiguration;
 
-    private final DeploymentConfiguration config;
-
-    public DeploymentConfigBasedProxyProvider(final DeploymentConfiguration config) {
-        this.config = Assert.requireNonNull(config, "config");
+    public ConfigBasedProxyProvider(final DeploymentConfiguration config) {
+        this.proxyConfiguration = createConfiguration(config);
     }
 
     @Override
-    public List<Proxy> select(final URI uri) {
-        Assert.requireNonNull(uri, "uri");
-
-        final ProxyConfiguration configuration = getConfiguration();
-        Assert.requireNonNull(configuration, "configuration");
-        return configuration.createProxiesForUri(uri);
+    protected ProxyConfiguration getConfig() {
+        return proxyConfiguration;
     }
 
-    private ProxyConfiguration getConfiguration() {
+    private static ProxyConfiguration createConfiguration(final DeploymentConfiguration config) {
+        Assert.requireNonNull(config, "config");
+
         final ProxyConfigurationImpl proxyConfiguration = new ProxyConfigurationImpl();
         proxyConfiguration.setBypassLocal(Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL)));
         proxyConfiguration.setUseHttpForHttpsAndFtp(Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME)));
@@ -59,11 +52,11 @@ public class DeploymentConfigBasedProxyProvider implements ProxyProvider {
         return proxyConfiguration;
     }
 
-    private static int getPort(final DeploymentConfiguration config, String key) {
+    private static int getPort(final DeploymentConfiguration config, final String key) {
         return ProxyUtlis.toPort(config.getProperty(key));
     }
 
-    private static String getHost(final DeploymentConfiguration config, String key) {
+    private static String getHost(final DeploymentConfiguration config, final String key) {
         final String proxyHost = config.getProperty(key);
         if (proxyHost != null) {
             return proxyHost.trim();

@@ -470,7 +470,7 @@ public class HtmlBrowserPanel extends JPanel {
     }
 
     public static void warn() {
-        LOG.info("WARNING this is html 3.2 comatible browser, not intended for casual web browsing!");
+        LOG.info("WARNING this is html 3.2 comatible firefox, not intended for casual web browsing!");
         LOG.info("Provided without any warranty!");
     }
 

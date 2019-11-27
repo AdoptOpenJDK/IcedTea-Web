@@ -106,7 +106,7 @@ public class SharedClassLoaderApplet_dotCodeBaseTest extends BrowserTest {
             if (b && !launched) {
                 launched = true;
                 try {
-                    //should imidately return because browser is running, if not, launch ins another thread
+                    //should imidately return because firefox is running, if not, launch ins another thread
                     ProcessWrapper pw = new ProcessWrapper(server.getBrowserLocation(),
                             new ArrayList<String>(),
                             url);

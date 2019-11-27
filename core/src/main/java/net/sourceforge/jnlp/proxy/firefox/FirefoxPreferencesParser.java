@@ -35,7 +35,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.proxy.browser;
+package net.sourceforge.jnlp.proxy.firefox;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -44,6 +44,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,39 +58,28 @@ import java.util.Map;
  * FirefoxPreferencesParser p = new FirefoxPreferencesParser(prefsFile);
  * p.parse();
  * Map&lt;String,String&gt; prefs = p.getPreferences();
- * System.out.println("blink allowed: " + prefs.get("browser.blink_allowed"));
+ * System.out.println("blink allowed: " + prefs.get("firefox.blink_allowed"));
  * </code></pre>
  */
 public final class FirefoxPreferencesParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(FirefoxPreferencesParser.class);
 
-    File prefsFile = null;
-    Map<String, String> prefs = null;
-
-    /**
-     * Creates a new FirefoxPreferencesParser
-     * @param preferencesFile
-     */
-    public FirefoxPreferencesParser(File preferencesFile) {
-        prefsFile = preferencesFile;
-    }
-
     /**
      * Parse the preferences file
      * @throws IOException if an exception occurs while reading the
      * preferences file.
      */
-    public void parse() throws IOException {
+    public static Map<String, String> parse(File preferencesFile) throws IOException {
         /*
          * The Firefox preference file is actually in javascript. It does seem
          * to be nicely formatted, so it should be possible to hack reading it.
          * The correct way of course is to use a javascript library and extract
          * the user_pref object
          */
-        prefs = new HashMap<String, String>();
+        final Map<String, String> prefs = new HashMap<>();
 
-        BufferedReader reader = new BufferedReader(new FileReader(prefsFile));
+        BufferedReader reader = new BufferedReader(new FileReader(preferencesFile));
 
         try {
             while (true) {
@@ -143,19 +133,8 @@ public final class FirefoxPreferencesParser {
             reader.close();
         }
         LOG.info("Read {} entries from Firefox's preferences", prefs.size());
-    }
 
-    /**
-     * Get the firefox preferences as a map (key,value pair). Note that
-     * all values (including integers and booleans) are stored as a string, so
-     * conversion to an appropriate type may be required.
-     *
-     * @return a map containing firefox' preferences
-     */
-    public Map<String, String> getPreferences() {
-        HashMap<String, String> newMap = new HashMap<String, String>();
-        newMap.putAll(prefs);
-        return newMap;
+        return Collections.unmodifiableMap(prefs);
     }
 
 }

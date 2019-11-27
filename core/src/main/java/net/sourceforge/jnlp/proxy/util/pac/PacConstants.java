@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.pac;
+package net.sourceforge.jnlp.proxy.util.pac;
 
 public interface PacConstants {
 

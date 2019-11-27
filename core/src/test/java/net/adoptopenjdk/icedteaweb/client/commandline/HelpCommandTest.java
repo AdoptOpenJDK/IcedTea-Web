@@ -57,7 +57,7 @@ public class HelpCommandTest extends AbstractCommandTest {
                 "    itweb-settings command arguments" + EOL +
                 EOL +
                 "DESCRIPTION" + EOL +
-                "    itweb-settings is a command line and a GUI program to modify and edit settings used by the IcedTea-Web implementation of javaws and the browser plugin." + EOL +
+                "    itweb-settings is a command line and a GUI program to modify and edit settings used by the IcedTea-Web implementation of javaws and the firefox plugin." + EOL +
                 "    " + EOL +
                 "    If executed without any arguments, it starts up a GUI. Otherwise, it tries to do what is specified in the argument." + EOL +
                 "    " + EOL +

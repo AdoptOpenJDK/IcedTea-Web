@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.proxy.ie;
+package net.sourceforge.jnlp.proxy.ie;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-import static net.adoptopenjdk.icedteaweb.proxy.ie.WindowsProxyConstants.AUTO_CONFIG_URL_VAL;
-import static net.adoptopenjdk.icedteaweb.proxy.ie.WindowsProxyConstants.PROXY_ENABLED_VAL;
-import static net.adoptopenjdk.icedteaweb.proxy.ie.WindowsProxyConstants.PROXY_REGISTRY_KEY;
-import static net.adoptopenjdk.icedteaweb.proxy.ie.WindowsProxyConstants.PROXY_SERVER_OVERRIDE_VAL;
-import static net.adoptopenjdk.icedteaweb.proxy.ie.WindowsProxyConstants.PROXY_SERVER_REGISTRY_VAL;
+import static net.sourceforge.jnlp.proxy.ie.WindowsProxyConstants.AUTO_CONFIG_URL_VAL;
+import static net.sourceforge.jnlp.proxy.ie.WindowsProxyConstants.PROXY_ENABLED_VAL;
+import static net.sourceforge.jnlp.proxy.ie.WindowsProxyConstants.PROXY_REGISTRY_KEY;
+import static net.sourceforge.jnlp.proxy.ie.WindowsProxyConstants.PROXY_SERVER_OVERRIDE_VAL;
+import static net.sourceforge.jnlp.proxy.ie.WindowsProxyConstants.PROXY_SERVER_REGISTRY_VAL;
 
 public class WindowsProxy {
 

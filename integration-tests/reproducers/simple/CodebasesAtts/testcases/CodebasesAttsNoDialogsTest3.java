@@ -135,7 +135,7 @@ public class CodebasesAttsNoDialogsTest3 extends BrowserTest {
      * (agian representation of that  triple bug from CodebasesAttsNoDialogsTest1
      */
     //@Test test is disbaled. Is not testing much more then other CodebasesAttsNoDialogsTest1-3 tests and is fragile. Also its behaviour may change, if loading form non-codebase/docbase resources will be prohibited
-    //@TestInBrowsers(testIn = Browsers.one) hacked manually. We really do not wont to iterate this test browser-times
+    //@TestInBrowsers(testIn = Browsers.one) hacked manually. We really do not wont to iterate this test firefox-times
     public void threeServers__okValues() throws IOException, Exception {
         Browser localBrowser = BrowserFactory.getFactory().getRandom();
         setBrowser(localBrowser.getID());
@@ -175,7 +175,7 @@ public class CodebasesAttsNoDialogsTest3 extends BrowserTest {
                         for (int i = 0; i < servers.length; i++) {
                             totalCounter++;
                             ServerLauncher usedServer = servers[i];
-                            //server is caller, only because it knows javaws/browser location
+                            //server is caller, only because it knows javaws/firefox location
                             ServerAccess.LOGS_REPRINT = Force_Outputs;
                             ServerAccess.logOutputReprint(totalCounter + ") i=" + i + ", c=" + c + ", b=" + b + ", a=" + a);
                             ServerAccess.logOutputReprint(usedServer.getUrl().toExternalForm() + ": " + codebaseIn + ", " + jnlpHrefIn + ", " + jarIn);

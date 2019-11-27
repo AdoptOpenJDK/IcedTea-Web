@@ -77,7 +77,7 @@ public class ServerAccess {
      */
     private static final String JAVAWS_BUILD_BIN = "javaws.build.bin";
     /**
-     * property to set the different then default browser
+     * property to set the different then default firefox
      */
     public static final String DEFAULT_LOCALHOST_NAME = "localhost";
     public static final String DEFAULT_LOCALHOST_IP = "127.0.0.1";
@@ -223,7 +223,7 @@ public class ServerAccess {
     }
 
     /**
-     * @return - binary from where to lunch current browser
+     * @return - binary from where to lunch current firefox
      */
     private String getBrowserLocation() {
         if (this.currentBrowser == null) return UNSET_BROWSER;
@@ -400,18 +400,18 @@ public class ServerAccess {
     }
 
     /**
-     * @param resource relative resource to be opened in browser for current server instance.
-     * @return result of browser run
+     * @param resource relative resource to be opened in firefox for current server instance.
+     * @return result of firefox run
      */
     public ProcessResult executeBrowser(final String resource) throws Exception {
         return executeBrowser(getBrowserParams(), resource);
     }
 
     /**
-     * @param resource relative resource to be opened in browser for current server instance.
+     * @param resource relative resource to be opened in firefox for current server instance.
      * @param stdoutl  listener for stdout
      * @param stderrl  listener for stderr
-     * @return result of browser run
+     * @return result of firefox run
      */
     public ProcessResult executeBrowser(final String resource, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) throws Exception {
         return executeBrowser(getBrowserParams(), resource, stdoutl, stderrl);
@@ -424,13 +424,13 @@ public class ServerAccess {
 
     private ProcessResult executeBrowser(final List<String> otherargs, final URL url) throws Exception {
         final ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, url);
-        rpw.setReactingProcess(getCurrentBrowser());//current browser may be null, but it does not metter
+        rpw.setReactingProcess(getCurrentBrowser());//current firefox may be null, but it does not metter
         return rpw.execute();
     }
 
     private ProcessResult executeBrowser(final List<String> otherargs, final String resource, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) throws Exception {
         final ProcessWrapper rpw = new ProcessWrapper(getBrowserLocation(), otherargs, getUrlUponThisInstance(resource), stdoutl, stderrl, null);
-        rpw.setReactingProcess(getCurrentBrowser()); //current browser may be null, but it does not matter
+        rpw.setReactingProcess(getCurrentBrowser()); //current firefox may be null, but it does not matter
         return rpw.execute();
     }
 

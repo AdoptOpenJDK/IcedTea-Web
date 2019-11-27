@@ -144,7 +144,7 @@ public class SavingCookiesTests extends BrowserTest {
         ProcessResult save = server.executeBrowser("/SaveSessionCookie.html");
         ProcessResult check = server.executeBrowser("/CheckCookie.html");
         Assert.assertTrue("stdout should contain '" + ENTERING_CHECK + "' but did not.", check.stdout.contains(ENTERING_CHECK));
-        //Session cookies should NOT be intact upon browser close and re-open
+        //Session cookies should NOT be intact upon firefox close and re-open
         Assert.assertFalse("stdout should NOT contain '" + COOKIE_SESSION_CHECK + "' but did.", check.stdout.contains(COOKIE_SESSION_CHECK));
     }
 

@@ -42,8 +42,8 @@ import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.LinuxBrowser;
 import java.io.File;
 
 /**
- * When all represent all configured browser, one represents one random
- * (the first found) configured browser. Each other represents individual browsers
+ * When all represent all configured firefox, one represents one random
+ * (the first found) configured firefox. Each other represents individual browsers
  * 
  */
 public enum Browsers {
@@ -54,7 +54,7 @@ public enum Browsers {
 
     static {
         final String def = "chromium";
-        final String alt = "chromium-browser";
+        final String alt = "chromium-firefox";
         if (new File(LinuxBrowser.DEFAULT_BIN_PATH, alt).exists()) {
             CHROMIUM = alt;
         } else {

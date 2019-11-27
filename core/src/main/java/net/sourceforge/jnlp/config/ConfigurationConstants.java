@@ -220,12 +220,12 @@ public interface ConfigurationConstants {
 
     String KEY_AUTO_DOWNLOAD_JRE = "deployment.javaws.autodownload";
 
-    String KEY_BROWSER_PATH = "deployment.browser.path";
+    String KEY_BROWSER_PATH = "deployment.firefox.path";
 
     //for legacy reasons, also $BROWSER variable is supported
     String BROWSER_ENV_VAR = "BROWSER";
 
-    // both browser.path and BROWSER can ave those for-fun keys:
+    // both firefox.path and BROWSER can ave those for-fun keys:
     String ALWAYS_ASK = "ALWAYS-ASK";
 
     String INTERNAL_HTML = "INTERNAL-HTML";

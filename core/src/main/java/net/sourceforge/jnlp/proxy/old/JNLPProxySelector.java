@@ -22,12 +22,11 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.config.ProxyConfigurationImpl;
+import net.sourceforge.jnlp.proxy.util.config.ProxyConfigurationImpl;
 import net.sourceforge.jnlp.proxy.util.ProxyConstants;
 import net.sourceforge.jnlp.proxy.util.ProxyType;
-import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
-import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
-import net.sourceforge.jnlp.proxy.pac.PacUtils;
+import net.sourceforge.jnlp.proxy.util.pac.PacEvaluator;
+import net.sourceforge.jnlp.proxy.util.pac.PacUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -87,7 +86,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
         }
 
         if (autoConfigUrl != null) {
-            pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
+            pacEvaluator = new PacEvaluator(autoConfigUrl);
         }
 
         proxyConfiguration = new ProxyConfigurationImpl();
@@ -360,7 +359,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
     }
 
     /**
-     * Returns a list of proxies by querying the browser
+     * Returns a list of proxies by querying the firefox
      *
      * @param uri the uri to get proxies for
      * @return a list of proxies

@@ -278,7 +278,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -296,7 +296,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -314,7 +314,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -332,7 +332,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -350,7 +350,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -368,7 +368,7 @@ public class Http511Test extends BrowserTest {
             Assert.assertTrue(p.stdout.contains(AOK.getCondition()));
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
         }
@@ -688,7 +688,7 @@ public class Http511Test extends BrowserTest {
             //Assert.assertFalse(p.stderr.contains(aer.getCondition()));
         } finally {
             special511.stop();
-            //browser tests canbe run in loop, so @before/@after are not enoug
+            //firefox tests canbe run in loop, so @before/@after are not enoug
             resetAuthTokens();
             clearCache();
 
