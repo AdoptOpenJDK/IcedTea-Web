@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.proxy.util;
+package net.sourceforge.jnlp.proxy.old;
 
 import java.util.stream.Stream;
 

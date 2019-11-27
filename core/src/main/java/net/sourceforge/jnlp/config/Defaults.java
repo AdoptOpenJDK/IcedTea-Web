@@ -42,7 +42,7 @@ import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.adoptopenjdk.icedteaweb.config.validators.SecurityValueValidator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
-import net.sourceforge.jnlp.proxy.util.ProxyType;
+import net.sourceforge.jnlp.proxy.old.ProxyType;
 
 import java.util.Arrays;
 import java.util.List;

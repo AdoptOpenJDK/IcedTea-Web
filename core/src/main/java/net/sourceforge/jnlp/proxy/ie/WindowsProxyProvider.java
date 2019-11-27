@@ -82,12 +82,12 @@ public class WindowsProxyProvider implements ProxyProvider {
                     }
                     internalProvider = new SimpleConfigBasedProvider(proxyConfiguration);
                 } else {
-                    //TODO: ios this correct?
-                    internalProvider = new DirectProxyProvider();
+                    //TODO: is this correct?
+                    internalProvider = DirectProxyProvider.getInstance();
                 }
             }
         } else {
-            internalProvider = new DirectProxyProvider();
+            internalProvider = DirectProxyProvider.getInstance();
         }
     }
 

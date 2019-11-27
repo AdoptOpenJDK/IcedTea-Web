@@ -9,6 +9,9 @@ public class OsUtil {
 
     private final static String WIN = "win";
 
+    private final static String MAC = "mac";
+
+
     /**
      * Returns {@code true} if we are on windows.
      * @return {@code true} if we are on windows.
@@ -16,5 +19,10 @@ public class OsUtil {
     public static boolean isWindows() {
         String operSys = JavaSystemProperties.getOsName().toLowerCase();
         return (operSys.contains(WIN));
+    }
+
+    public static boolean isMac() {
+        String operSys = JavaSystemProperties.getOsName().toLowerCase();
+        return (operSys.contains(MAC));
     }
 }

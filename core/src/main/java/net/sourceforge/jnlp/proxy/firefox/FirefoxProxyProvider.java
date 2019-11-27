@@ -45,13 +45,13 @@ public class FirefoxProxyProvider implements ProxyProvider {
             } else if (browserProxyType == FirefoxProxyType.BROWSER_PROXY_TYPE_MANUAL) {
                 internalProvider = createForManualConfig(prefs);
             } else if (browserProxyType == FirefoxProxyType.BROWSER_PROXY_TYPE_NONE) {
-                internalProvider = new DirectProxyProvider();
+                internalProvider = DirectProxyProvider.getInstance();
             } else {
                 throw new IllegalStateException("Firefox Proxy Type '" + browserProxyType +"' is not supported");
             }
         } else {
             //TODO: is this an error or can there be no specification in firefox settings? - Against BROWSER_PROXY_TYPE_NONE
-            internalProvider = new DirectProxyProvider();
+            internalProvider = DirectProxyProvider.getInstance();
         }
     }
 

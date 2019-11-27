@@ -24,7 +24,6 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.util.config.ProxyConfigurationImpl;
 import net.sourceforge.jnlp.proxy.util.ProxyConstants;
-import net.sourceforge.jnlp.proxy.util.ProxyType;
 import net.sourceforge.jnlp.proxy.util.pac.PacEvaluator;
 import net.sourceforge.jnlp.proxy.util.pac.PacUtils;
 
