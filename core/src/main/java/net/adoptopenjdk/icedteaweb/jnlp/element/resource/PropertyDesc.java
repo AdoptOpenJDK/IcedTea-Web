@@ -18,8 +18,6 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import net.sourceforge.jnlp.LaunchException;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 /**
  * The property element describes a name/value pair that is available to the launched application
  * as a system property.
@@ -45,20 +43,20 @@ public class PropertyDesc {
         // allows empty property, not sure about validity of that.
         int equals = prop.indexOf("=");
         if (equals == -1) {
-            throw new LaunchException("Incorrect property format" + prop + " (should be key=value): ");
+            throw new LaunchException("Incorrect property format '" + prop + "' (should be key=value)");
         }
         final String key = prop.substring(0, equals);
-        final String value = prop.substring(equals + 1, prop.length());
+        final String value = prop.substring(equals + 1);
 
         return new PropertyDesc(key, value);
 
     }
 
     /** the key name */
-    final private String key;
+    private final String key;
 
     /** the value */
-    final private String value;
+    private final String value;
 
     /**
      * Creates a property descriptor.

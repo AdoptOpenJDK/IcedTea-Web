@@ -37,10 +37,6 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
         return id;
     }
 
-    long getLastAccessed() {
-        return lastAccessed;
-    }
-
     URL getResourceHref() {
         return resourceHref;
     }
@@ -65,8 +61,12 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
         return this.resourceHref.equals(resource);
     }
 
+    boolean matches(URL resource, VersionId versionId) {
+        return matches(resource) && Objects.equals(versionId, version);
+    }
+
     boolean matches(URL resource, VersionString versionString) {
-        if (this.resourceHref.equals(resource)) {
+        if (matches(resource)) {
             if (versionString == null && version == null) {
                 return true;
             }
@@ -79,7 +79,8 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
 
     @Override
     public int compareTo(LeastRecentlyUsedCacheEntry o) {
-        return Long.compare(this.lastAccessed, o.lastAccessed);
+        // this will sort in least recently used order
+        return Long.compare(o.lastAccessed, this.lastAccessed);
     }
 
     @Override
@@ -87,12 +88,11 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LeastRecentlyUsedCacheEntry entry = (LeastRecentlyUsedCacheEntry) o;
-        return resourceHref.equals(entry.resourceHref) &&
-                Objects.equals(version, entry.version);
+        return id.equals(entry.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceHref, version);
+        return Objects.hash(id);
     }
 }

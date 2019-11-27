@@ -51,11 +51,20 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
+import static java.time.ZoneOffset.UTC;
+import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.KEY_HREF;
+import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.KEY_LAST_ACCESSED;
 import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.convertPropertiesToEntries;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -175,6 +184,23 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
         assertFalse(entryTwo.isPresent());
     }
 
+    @Test
+    public void testSortingOfIndex() throws IOException {
+        // given
+        final List<String> ids = Arrays.asList("1-9", "0-1", "0-0", "1-3", "0-5");
+        prefillRecentlyUsedFile(ids);
+
+        final PropertiesFile propertiesFile = new PropertiesFile(recentlyUsedFile);
+        propertiesFile.load();
+
+        // when
+        final List<String> result = convertPropertiesToEntries(propertiesFile).entries.stream()
+                .map(LeastRecentlyUsedCacheEntry::getId)
+                .collect(Collectors.toList());
+
+        assertEquals(ids, result);
+    }
+
     private void fillCacheIndexFile() {
         // fill cache index file
         holder.runSynchronized(idx -> {
@@ -183,6 +209,19 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
                 idx.createEntry(url, v, "2-" + i);
             }
         });
+    }
+
+    private void prefillRecentlyUsedFile(List<String> ids) throws IOException {
+        final LocalDateTime now = LocalDateTime.now();
+        final Properties props = new Properties();
+        for (int i = 0; i < ids.size(); i++) {
+            final String id = ids.get(i);
+            final long lastAccessed = now.minusHours(i).toEpochSecond(UTC);
+            props.setProperty(id + '.' + KEY_LAST_ACCESSED, Long.toString(lastAccessed));
+            props.setProperty(id + '.' + KEY_HREF, url.toString());
+        }
+
+        props.store(new FileOutputStream(recentlyUsedFile), null);
     }
 
     private static class DummyInfrastructureFileDescriptor extends InfrastructureFileDescriptor {

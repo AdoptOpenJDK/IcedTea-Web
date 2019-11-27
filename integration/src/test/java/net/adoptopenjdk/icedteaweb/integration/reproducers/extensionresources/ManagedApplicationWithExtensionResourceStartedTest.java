@@ -25,9 +25,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.time.ZonedDateTime;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.reproducers.extensionresources.applications.ExtensionResourceManagedApplication.EXTENSION_OUTPUT_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -42,16 +43,28 @@ public class ManagedApplicationWithExtensionResourceStartedTest implements Integ
     public WireMockRule wireMock = new WireMockRule(wireMockConfig().dynamicPort());
 
     @Test(timeout = 100_000)
-    public void testSuccessfullyLaunchApplicationWithExtensionResource() throws IOException {
+    public void testSuccessfullyLaunchApplicationWithExtensionResource() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, Arrays.asList("ManagedApplicationWithExtensionResource.jnlp", "ComponentExtension.jnlp"), ExtensionResourceManagedApplication.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("ManagedApplicationWithExtensionResource.jnlp").withMainClass(ExtensionResourceManagedApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingExtensionJnlp("ComponentExtension.jnlp")
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
-        final String[] args = {"-jnlp", jnlpUrl, "-nosecurity", "-Xnofork", "-headless"};
-        Boot.main(args);
+        final int result = launchItwHeadless(jnlpUrl);
 
         // then
+        assertThat(result, is(SUCCESS));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, EXTENSION_OUTPUT_FILE), startsWith("Simple Java application loaded as extension resource"));
     }

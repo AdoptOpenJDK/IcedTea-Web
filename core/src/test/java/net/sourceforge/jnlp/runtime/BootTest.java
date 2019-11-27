@@ -49,7 +49,7 @@ import static org.junit.Assert.assertThat;
 public class BootTest extends NoStdOutErrTest {
 
     @Test
-    public void fixJnlpProtocolTest() throws Exception {
+    public void fixJnlpProtocolTest() {
         Assert.assertEquals("http://www.com/file.jnlp", Boot.fixJnlpProtocol("jnlp://www.com/file.jnlp"));
         Assert.assertEquals("https://www.com/file.jnlp", Boot.fixJnlpProtocol("jnlps://www.com/file.jnlp"));
         Assert.assertEquals("http://www.com/file.jnlp", Boot.fixJnlpProtocol("jnlp:http://www.com/file.jnlp"));

@@ -37,8 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParserType;
 
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
@@ -50,8 +48,6 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
  * Immutable and therefore thread-safe.
  */
 public class ParserSettings {
-
-    private static ParserSettings globalParserSettings = new ParserSettings();
 
     private final boolean isStrict;
     private final boolean extensionAllowed;
@@ -74,47 +70,17 @@ public class ParserSettings {
     }
 
     /** @return true if extensions to the spec are allowed */
-    public boolean isExtensionAllowed() {
+    boolean isExtensionAllowed() {
         return extensionAllowed;
     }
 
     /** @return true if parsing malformed xml is allowed */
-    public ParserType getParserType() {
+    ParserType getParserType() {
         return malformedXmlAllowed ? MALFORMED : NORMAL;
     }
 
     /** @return true if strict parsing mode is to be used */
-    public boolean isStrict() {
+    boolean isStrict() {
         return isStrict;
     }
-
-    /**
-     * @return the global parser settings in use.
-     */
-    public static ParserSettings getGlobalParserSettings() {
-        return globalParserSettings;
-    }
-
-    /**
-     * Set the global ParserSettings to match the given settings.
-     * @param parserSettings to be used
-     */
-    public static void setGlobalParserSettings(ParserSettings parserSettings) {
-        globalParserSettings = parserSettings;
-    }
-
-    /**
-     * @param optionParser to be read as source for globalParserSettings
-     * @return the ParserSettings to be used according to arguments specified
-     * at boot on the command line. These settings are also stored so they
-     * can be retrieved at a later time.
-     */
-    public static ParserSettings setGlobalParserSettingsFromOptionParser(CommandLineOptionsParser optionParser) {
-        ParserSettings settings = new
-                ParserSettings(optionParser.hasOption(CommandLineOptions.STRICT), true,
-                !optionParser.hasOption(CommandLineOptions.XML));
-        setGlobalParserSettings(settings);
-        return globalParserSettings;
-    }
-
 }

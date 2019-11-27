@@ -32,6 +32,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CURRENT_VERSION_ID_QUERY_PARAM;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.JAR_DIFF_MIME_TYPE;
+
 /**
  * Allows to unpack an input stream.
  */
@@ -68,15 +71,15 @@ interface StreamUnpacker {
     }
 
     static StreamUnpacker getContentUnpacker(final DownloadDetails downloadDetails, final URL resourceHref) {
-        if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(BaseResourceDownloader.JAR_DIFF_MIME_TYPE)) {
+        if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(JAR_DIFF_MIME_TYPE)) {
             final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
                     .map(query -> Stream.of(query.split(Pattern.quote("&"))))
                     .map(stream -> stream.collect(Collectors.toMap(e -> e.split("=")[0], e -> e.split("=")[1])))
                     .orElseGet(Collections::emptyMap);
 
-            final VersionId currentVersionId = Optional.ofNullable(querryParams.get(BaseResourceDownloader.CURRENT_VERSION_ID_HEADER))
+            final VersionId currentVersionId = Optional.ofNullable(querryParams.get(CURRENT_VERSION_ID_QUERY_PARAM))
                     .map(VersionId::fromString)
-                    .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + BaseResourceDownloader.JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
+                    .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
 
             final File cacheFile = Cache.getCacheFile(resourceHref, currentVersionId);
             LOG.debug("Will use JarDiff for '{}'", resourceHref);

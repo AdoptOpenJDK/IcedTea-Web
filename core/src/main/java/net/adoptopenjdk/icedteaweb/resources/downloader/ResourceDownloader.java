@@ -11,7 +11,7 @@ public interface ResourceDownloader {
     static ResourceDownloader of(Resource resource, List<URL> downloadUrls) {
         final VersionString version = resource.getRequestVersion();
         if (version == null) {
-            return new UnversiondResourceDownloader(resource, downloadUrls);
+            return new UnversionedResourceDownloader(resource, downloadUrls);
         }
         if (version.isExactVersion()) {
             return new ExactVersionedResourceDownloader(resource, downloadUrls);

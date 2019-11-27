@@ -16,14 +16,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificateViewer;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
-import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder;
@@ -75,7 +73,7 @@ import static net.sourceforge.jnlp.runtime.ForkingStrategy.NEVER;
  * (JAM)</a> - initial author
  * @version $Revision: 1.21 $
  */
-public final class Boot implements PrivilegedAction<Void> {
+public final class Boot implements PrivilegedAction<Integer> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Boot.class);
 
@@ -112,17 +110,40 @@ public final class Boot implements PrivilegedAction<Void> {
      *
      * @param args launching arguments
      */
-    public static void main(String[] args) throws UnevenParameterException {
-        main(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
+    public static void main(String[] args) {
+        final int status = mainWithReturnCode(args);
+        if (status != 0) {
+            System.exit(status);
+        }
+    }
+
+    /**
+     * Launch the JNLP file specified by the command-line arguments.
+     *
+     * @param args launching arguments
+     * @return the return code. 0 = SUCCESS anything else is an error
+     */
+    public static int mainWithReturnCode(String[] args) {
+        return mainWithReturnCode(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
     }
 
     /**
      * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
      *
-     * @param launcher the JVM launcher
-     * @param args launching arguments
+     * @param launcher                  the JVM launcher
+     * @param menuAndDesktopIntegration integration for menu and desktop shortcut creation
+     * @param args                      launching arguments
+     * @return the return code. 0 = SUCCESS anything else is an error
      */
-    public static void main(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
+    public static int mainWithReturnCode(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
+        try {
+            return runMain(launcher, menuAndDesktopIntegration, args);
+        } finally {
+            JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
+        }
+    }
+
+    private static Integer runMain(JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, String[] args) {
         JvmLauncherHolder.setLauncher(requireNonNull(launcher));
 
         // setup Swing EDT tracing:
@@ -137,6 +158,7 @@ public final class Boot implements PrivilegedAction<Void> {
         if (AppContext.getAppContext() == null) {
             SunToolkit.createNewAppContext();
         }
+
         if (optionParser.hasOption(CommandLineOptions.HEADLESS)) {
             JNLPRuntime.setHeadless(true);
         }
@@ -144,45 +166,43 @@ public final class Boot implements PrivilegedAction<Void> {
         if (optionParser.hasOption(CommandLineOptions.VIEWER)) {
             try {
                 CertificateViewer.main(null);
+                return 0;
             } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            } finally {
-                //no matter what happens, terminate
-                return;
+                LOG.error("Exception while displaying the Certificate Viewer", e);
+                return 1;
             }
         }
 
         if (optionParser.hasOption(CommandLineOptions.VERSION)) {
             OutputController.getLogger().printOutLn(nameAndVersion);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.LICENSE)) {
             OutputController.getLogger().printOutLn(miniLicense);
-            JNLPRuntime.exit(0);
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.HELP1)) {
-            handleMessage();
-            JNLPRuntime.exit(0);
+            printHelpMessage();
+            return 0;
         }
-        List<String> properties = optionParser.getParams(CommandLineOptions.PROPERTY);
+
+        final List<String> properties = optionParser.getParams(CommandLineOptions.PROPERTY);
         if (properties != null) {
             for (String prop : properties) {
                 try {
                     PropertyDesc propDesc = PropertyDesc.fromString(prop);
                     JNLPRuntime.getConfiguration().setProperty(propDesc.getKey(), propDesc.getValue());
                 } catch (LaunchException ex) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                    LOG.error(ex.getMessage());
                 }
             }
         }
 
         if (optionParser.hasOption(CommandLineOptions.ABOUT)) {
             handleAbout();
-            if (JNLPRuntime.isHeadless()) {
-                JNLPRuntime.exit(0);
-            } else {
+            if (!JNLPRuntime.isHeadless()) {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (Exception e) {
@@ -190,8 +210,8 @@ public final class Boot implements PrivilegedAction<Void> {
                 }
                 OutputController.getLogger().printOutLn(R("BLaunchAbout"));
                 AboutDialog.display(JAVAWS);
-                return;
             }
+            return 0;
         }
 
         if (optionParser.hasOption(CommandLineOptions.UPDATE)) {
@@ -218,23 +238,51 @@ public final class Boot implements PrivilegedAction<Void> {
         }
 
         if (optionParser.hasOption(CommandLineOptions.NOSPLASH)) {
-        	JNLPRuntime.setShowWebSplash(false);
+            JNLPRuntime.setShowWebSplash(false);
         }
 
         //if it is browser go by ots own, otherwise proceed with normal ITW logic
         if (optionParser.hasOption(CommandLineOptions.BROWSER)) {
             String url = optionParser.getParam(CommandLineOptions.BROWSER);
             LinkingBrowser.showStandAloneWindow(url, false);
-        } else {
-
-            JNLPRuntime.setInitialArguments(Arrays.asList(args));
-            JNLPRuntime.setJnlpPath(getJnlpFileLocationFromCommandLineArguments(optionParser));
-
-            AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
+            return 0;
         }
+
+        JNLPRuntime.setInitialArguments(Arrays.asList(args));
+        JNLPRuntime.setJnlpPath(getJnlpFileLocationFromCommandLineArguments(optionParser));
+
+        if (optionParser.hasOption(CommandLineOptions.NOSEC)) {
+            JNLPRuntime.setSecurityEnabled(false);
+        }
+        if (optionParser.hasOption(CommandLineOptions.OFFLINE)) {
+            JNLPRuntime.setOfflineForced(true);
+        }
+
+        JNLPRuntime.initialize(true);
+
+        if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
+            List<String> optionArgs = optionParser.getMainArgs();
+            final String arg = optionArgs.size() > 0 ? optionArgs.get(0) : ".*";
+            CacheUtil.logCacheIds(arg);
+            return 0;
+        }
+
+        if (optionParser.hasOption(CommandLineOptions.CLEARCACHE)) {
+            List<String> optionArgs = optionParser.getMainArgs();
+            if (optionArgs.size() > 0) {
+                //clear one app
+                Cache.deleteFromCache(optionArgs.get(0));
+            } else {
+                // clear all cache
+                Cache.clearCache();
+            }
+            return 0;
+        }
+
+        return AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
     }
 
-    private static void handleMessage() {
+    private static void printHelpMessage() {
         final TextsProvider helpMessagesProvider = new JavaWsTextsProvider(UTF_8, new PlainTextFormatter(), true, true);
 
         String helpMessage = "\n";
@@ -289,53 +337,49 @@ public final class Boot implements PrivilegedAction<Void> {
      * The privileged part (jdk1.3 compatibility).
      */
     @Override
-    public Void run() {
-
-        Map<String, List<String>> extra = new HashMap<>();
-
-        final ParserSettings settings = init(extra);
-        if (settings != null) {
-            try {
-                LOG.info("Proceeding with jnlp");
-                Launcher launcher = new Launcher(menuAndDesktopIntegration);
-                launcher.setParserSettings(settings);
-                launcher.setInformationToMerge(extra);
-                launcher.launch(Boot.getFileLocation());
-            } catch (LaunchException ex) {
-                // default handler prints this
-                JNLPRuntime.exit(1);
-            } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                Boot.fatalError("Unexpected" + ex.toString() + " at " + ex.getStackTrace()[0]);
+    public Integer run() {
+        try {
+            final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
+            if (location != null) {
+                launch(location);
+                return 0;
+            } else {
+                printHelpMessage();
+                return 1;
             }
+        } catch (LaunchException e) {
+            LOG.error("failed to launch", e);
+            return 1;
+        } catch (Exception e) {
+            LOG.error("Unexpected exception", e);
+            return 1;
         }
-        return null;
     }
 
-    static void fatalError(String message) {
-        LOG.error("netx: " + message);
-        JNLPRuntime.exit(1);
+    private void launch(String location) throws LaunchException {
+        LOG.info("Proceeding with jnlp");
+        Launcher launcher = new Launcher(menuAndDesktopIntegration);
+        launcher.setParserSettings(getParserSettings());
+        launcher.setInformationToMerge(getExtras());
+        launcher.launch(locationToUrl(location));
     }
 
-    /**
-     * Returns the url of file to open; does not return if no file was
-     * specified, or if the file location was invalid.
-     */
-    private static URL getFileLocation() {
+    private Map<String, List<String>> getExtras() {
+        final Map<String, List<String>> extra = new HashMap<>();
+        extra.put("arguments", optionParser.getParams(CommandLineOptions.ARG));
+        extra.put("parameters", optionParser.getParams(CommandLineOptions.PARAM));
+        extra.put("properties", optionParser.getParams(CommandLineOptions.PROPERTY));
+        return extra;
+    }
 
-        final String location = getJnlpFileLocationFromCommandLineArguments(optionParser);
+    private ParserSettings getParserSettings() {
+        final boolean strict = optionParser.hasOption(CommandLineOptions.STRICT);
+        final boolean strictXml = optionParser.hasOption(CommandLineOptions.XML);
+        return new ParserSettings(strict, true, !strictXml);
+    }
 
-        if (location == null) {
-            handleMessage();
-            JNLPRuntime.exit(1);
-            throw new RuntimeException("not reachable as system exits on the previous line");
-        }
-
+    private URL locationToUrl(String location) throws LaunchException {
         LOG.info("JNLP file location: {}", location);
-        return locationToUrl(location);
-    }
-
-    private static URL locationToUrl(String location) {
         try {
             if (new File(location).exists()) {
                 return new File(location).toURI().toURL(); // Why use file.getCanonicalFile?
@@ -349,9 +393,7 @@ public final class Boot implements PrivilegedAction<Void> {
                 }
             }
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            fatalError("Invalid jnlp file " + location);
-            return null;
+            throw new LaunchException("Invalid jnlp file " + location, e);
         }
     }
 
@@ -364,50 +406,11 @@ public final class Boot implements PrivilegedAction<Void> {
     static String getJnlpFileLocationFromCommandLineArguments(final CommandLineOptionsParser commandLineOptionsParser) {
         if (commandLineOptionsParser.hasOption(CommandLineOptions.JNLP)) {
             return fixJnlpProtocol(commandLineOptionsParser.getParam(CommandLineOptions.JNLP));
-        }
-        else if (commandLineOptionsParser.mainArgExists()) {
+        } else if (commandLineOptionsParser.mainArgExists()) {
             // so file location must be in the list of arguments, take the first one as best effort, ignore the others
             return fixJnlpProtocol(commandLineOptionsParser.getMainArg());
         }
         // no file location available as argument
         return null;
     }
-
-    static ParserSettings init(Map<String, List<String>> extra) {
-        JNLPRuntime.setSecurityEnabled(!optionParser.hasOption(CommandLineOptions.NOSEC));
-        JNLPRuntime.setOfflineForced(optionParser.hasOption(CommandLineOptions.OFFLINE));
-        JNLPRuntime.initialize(true);
-
-        if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
-            List<String> optionArgs = optionParser.getMainArgs();
-            final String arg = optionArgs.size() > 0 ? optionArgs.get(0) : ".*";
-            CacheUtil.logCacheIds(arg);
-            return null;
-        }
-
-        /*
-         * FIXME
-         * This should have been done with the rest of the argument parsing
-         * code. But we need to know what the cache and base directories are,
-         * and baseDir is initialized here
-         */
-        if (optionParser.hasOption(CommandLineOptions.CLEARCACHE)) {
-            List<String> optionArgs = optionParser.getMainArgs();
-            if (optionArgs.size() > 0) {
-                //clear one app
-                Cache.deleteFromCache(optionArgs.get(0));
-            } else {
-                // clear all cache
-                Cache.clearCache();
-            }
-            return null;
-        }
-
-        extra.put("arguments", optionParser.getParams(CommandLineOptions.ARG));
-        extra.put("parameters", optionParser.getParams(CommandLineOptions.PARAM));
-        extra.put("properties", optionParser.getParams(CommandLineOptions.PROPERTY));
-
-        return ParserSettings.setGlobalParserSettingsFromOptionParser(optionParser);
-    }
-
 }

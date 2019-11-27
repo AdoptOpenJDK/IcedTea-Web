@@ -23,6 +23,8 @@ import net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SecureJava
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static net.adoptopenjdk.icedteaweb.integration.ItwLauncher.launchItwHeadless;
 import static net.adoptopenjdk.icedteaweb.integration.testcase1.applications.SimpleJavaApplication.HELLO_FILE;
@@ -44,7 +46,16 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
     @Test(timeout = 100_000)
     public void testSuccessfullyLaunchSimpleJavaApplication() throws Exception {
         // given
-        final String jnlpUrl = setupServer(wireMock, "SimpleJavaApplication.jnlp", SecureJavaApplication.class, JAR_NAME);
+        final ZonedDateTime someTime = now();
+        final String jnlpUrl = setupServer(wireMock)
+                .servingJnlp("SimpleJavaApplication.jnlp").withMainClass(SecureJavaApplication.class)
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .servingResource(JAR_NAME).withoutVersion()
+                .withHeadRequest().lastModifiedAt(someTime)
+                .withGetRequest().lastModifiedAt(someTime)
+                .getHttpUrl();
+
         tmpItwHome.createTrustSettings(jnlpUrl);
 
         // when
@@ -54,5 +65,14 @@ public class ManagedApplicationStartedTest implements IntegrationTest {
         assertThat("Managed application return code", result, is(0));
         assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
         assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
+
+        // when
+        final int result2 = launchItwHeadless(jnlpUrl);
+
+        // then
+        assertThat("Managed application return code", result2, is(0));
+        assertThat(hasCachedFile(tmpItwHome, JAR_NAME), is(true));
+        assertThat(getCachedFileAsString(tmpItwHome, HELLO_FILE), startsWith("Hello"));
+
     }
 }

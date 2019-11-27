@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * ...
  */
-class UnversiondResourceDownloader extends BaseResourceDownloader {
-    UnversiondResourceDownloader(Resource resource, List<URL> downloadUrls) {
+class UnversionedResourceDownloader extends BaseResourceDownloader {
+    UnversionedResourceDownloader(Resource resource, List<URL> downloadUrls) {
         super(resource, downloadUrls);
     }
 

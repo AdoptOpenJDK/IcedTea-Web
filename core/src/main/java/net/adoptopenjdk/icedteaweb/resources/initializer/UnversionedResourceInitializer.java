@@ -71,17 +71,19 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
     }
 
     private boolean needsUpdateCheck() {
-        return !isCached
+        final boolean result = !isCached
                 || info == null
                 || resource.getUpdatePolicy().shouldUpdate(info)
                 || resource.forceUpdateRequested();
+        LOG.debug("needsUpdateCheck: {} -> {}", resource.getLocation(), result);
+        return result;
     }
 
     private boolean needsUpdate(final UrlRequestResult requestResult) {
-        return info == null
-                || requestResult.getLastModified() > info.getLastModified()
-                || requestResult.getContentLength() != info.getSize()
-                || resource.forceUpdateRequested();
+        final boolean result = resource.forceUpdateRequested()
+                || ! Cache.isUpToDate(resource.getLocation(), null, requestResult.getLastModified());
+        LOG.debug("needsUpdate: {} -> {}", resource.getLocation(), result);
+        return result;
     }
 
     private InitializationResult initFromCache() {
