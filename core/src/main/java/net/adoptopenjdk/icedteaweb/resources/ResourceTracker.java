@@ -257,9 +257,10 @@ public class ResourceTracker {
         return getCacheFile(resource);
     }
 
-    private static File getCacheFile(Resource resource) {
+    private static File getCacheFile(final Resource resource) {
         final URL location = resource.getLocation();
         if (resource.isSet(ERROR)) {
+            LOG.debug("Error flag set for resource '{}'. Can not return a local file for the resource", resource.getLocation());
             return null;
         }
 
@@ -282,6 +283,7 @@ public class ResourceTracker {
             // have it sense to try also filename with whole query here?
             // => location.getFile() ?
         }
+        LOG.debug("No local file defined for resource '{}'", resource.getLocation());
 
         return null;
     }

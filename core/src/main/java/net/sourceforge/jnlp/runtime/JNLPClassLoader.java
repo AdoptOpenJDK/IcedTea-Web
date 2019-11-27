@@ -596,8 +596,13 @@ public class JNLPClassLoader extends URLClassLoader {
         final URL location = jar.getLocation();
 
         if (CacheUtil.isCacheable(location)) {
-            final File file1 = tracker.getCacheFile(location);
-            return new FilePermission(file1.getPath(), FILE_READ_ACTION);
+            final File cacheFile = tracker.getCacheFile(location);
+            if(cacheFile != null) {
+                return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
+            } else {
+                LOG.debug("No cache file for cacheable resource '{}' found.", location);
+                return null;
+            }
         } else {
             // this is what URLClassLoader does
             try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
