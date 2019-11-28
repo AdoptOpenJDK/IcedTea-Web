@@ -169,7 +169,8 @@ public class OutputController extends BasicOutputController {
 
         final String separator = isMultiLine ? "\n" : " ";
 
-        return (withHeaders ? s.getHeader() + separator : "") +
+        final Header header = s.getHeader();
+        return (withHeaders ? header.toString() : header.toShortString()) + separator +
                 s.getMessage() +
                 (withStackTrace ? separator + s.getStackTrace() : "");
     }
