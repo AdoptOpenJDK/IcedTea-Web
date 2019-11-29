@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder.getLauncher;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -278,7 +277,7 @@ public class Launcher {
      */
     private void launchExternal(final JNLPFile file, final List<String> javawsArgs) throws LaunchException {
         try {
-            getLauncher().launchExternal(file, javawsArgs);
+            JNLPRuntime.getExtensionPoint().getJvmLauncher().launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {

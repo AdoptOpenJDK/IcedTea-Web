@@ -2,6 +2,8 @@ package net.adoptopenjdk.icedteaweb.extensionpoint;
 
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanelStyle;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.DefaultControlPanelStyle;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
+import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.runtime.ItwMenuAndDesktopIntegration;
@@ -20,6 +22,10 @@ import java.net.ProxySelector;
 public interface ExtensionPoint {
 
     ExtensionPoint DEFAULT = new ExtensionPoint() {};
+
+    default JvmLauncher getJvmLauncher() {
+        return new ItwJvmLauncher();
+    }
 
     default MenuAndDesktopIntegration getMenuAndDesktopIntegration(final DeploymentConfiguration configuration) {
         return new ItwMenuAndDesktopIntegration();
