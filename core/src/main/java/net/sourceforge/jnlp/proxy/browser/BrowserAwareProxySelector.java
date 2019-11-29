@@ -99,9 +99,7 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      */
     public BrowserAwareProxySelector(DeploymentConfiguration config) {
         super(config);
-    }
 
-    public void initialize() {
         try {
             initFromBrowserConfig();
         } catch (IOException e) {

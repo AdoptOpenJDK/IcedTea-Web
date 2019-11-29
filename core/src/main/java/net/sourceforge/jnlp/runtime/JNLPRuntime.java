@@ -31,10 +31,10 @@ import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -295,7 +295,6 @@ public class JNLPRuntime {
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
         BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(getConfiguration());
-        proxySelector.initialize();
         ProxySelector.setDefault(proxySelector);
 
         // Restrict access to netx classes

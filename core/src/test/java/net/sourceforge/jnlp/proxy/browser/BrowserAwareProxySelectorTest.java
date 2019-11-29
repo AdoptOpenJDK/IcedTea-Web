@@ -35,12 +35,11 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.browser;
+package net.sourceforge.jnlp.proxy.browser;
 
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.ProxyType;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -221,7 +220,6 @@ public class BrowserAwareProxySelectorTest {
 
     private static List<Proxy> getProxy(DeploymentConfiguration config, Map<String, String> browserPrefs, URI uri) {
         BrowserAwareProxySelector selector = new TestBrowserAwareProxySelector(config, browserPrefs);
-        selector.initialize();
 
         return selector.getFromBrowser(uri);
     }
