@@ -43,7 +43,6 @@ import net.sourceforge.jnlp.proxy.ProxyType;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
@@ -57,21 +56,6 @@ import static org.junit.Assert.assertEquals;
 
 public class BrowserAwareProxySelectorTest {
 
-    static class TestBrowserAwareProxySelector extends BrowserAwareProxySelector {
-
-        private final Map<String, String> browserPrefs;
-
-        public TestBrowserAwareProxySelector(DeploymentConfiguration config, Map<String, String> browserPrefs) {
-            super(config);
-            this.browserPrefs = browserPrefs;
-        }
-
-        @Override
-        public Map<String, String> parseBrowserPreferences() throws IOException {
-            return browserPrefs;
-        }
-    }
-
     private static final String PROXY_HOST = "foo";
     private static final int PROXY_PORT = 42;
     private static final InetSocketAddress PROXY_ADDRESS = new InetSocketAddress(PROXY_HOST, PROXY_PORT);
@@ -84,7 +68,7 @@ public class BrowserAwareProxySelectorTest {
         config = new DeploymentConfiguration();
         config.setProperty(ConfigurationConstants.KEY_PROXY_TYPE, String.valueOf(ProxyType.PROXY_TYPE_BROWSER.getConfigValue()));
 
-        browserPrefs = new HashMap<String, String>();
+        browserPrefs = new HashMap<>();
     }
 
     @Test
@@ -219,7 +203,17 @@ public class BrowserAwareProxySelectorTest {
     }
 
     private static List<Proxy> getProxy(DeploymentConfiguration config, Map<String, String> browserPrefs, URI uri) {
-        BrowserAwareProxySelector selector = new TestBrowserAwareProxySelector(config, browserPrefs);
+        BrowserAwareProxySelector selector = new BrowserAwareProxySelector(config, new PreferencesParser() {
+            @Override
+            public void parse() {
+                // do nothing
+            }
+
+            @Override
+            public Map<String, String> getPreferences() {
+                return browserPrefs;
+            }
+        } );
 
         return selector.getFromBrowser(uri);
     }

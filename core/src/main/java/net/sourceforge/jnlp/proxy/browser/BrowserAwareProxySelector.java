@@ -45,7 +45,6 @@ import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
 import net.sourceforge.jnlp.proxy.pac.PacUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Proxy;
@@ -77,7 +76,7 @@ import static net.sourceforge.jnlp.proxy.browser.FirefoxConstants.SSL_PROPERTY_N
  */
 public class BrowserAwareProxySelector extends JNLPProxySelector {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BrowserAwareProxySelector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BrowserAwareProxySelector.class);
 
     private BrowserProxyType browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
     private URL browserAutoConfigUrl;
@@ -98,10 +97,17 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
      * Create a new instance of this class, reading configuration from the browser
      */
     public BrowserAwareProxySelector(DeploymentConfiguration config) {
+        this(config, new FirefoxPreferencesParser());
+    }
+
+    /**
+     * visible for testing purposes
+     */
+    BrowserAwareProxySelector(DeploymentConfiguration config, PreferencesParser preferenceParser) {
         super(config);
 
         try {
-            initFromBrowserConfig();
+            initFromBrowserConfig(preferenceParser);
         } catch (IOException e) {
             LOG.error("Unable to use Firefox''s proxy settings. Using \"DIRECT\" as proxy type.", e);
             browserProxyType = BrowserProxyType.BROWSER_PROXY_TYPE_NONE;
@@ -111,9 +117,10 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
     /**
      * Initialize configuration by reading preferences from the browser (firefox)
      */
-    private void initFromBrowserConfig() throws IOException {
+    private void initFromBrowserConfig(PreferencesParser preferenceParser) throws IOException {
 
-        Map<String, String> prefs = parseBrowserPreferences();
+        preferenceParser.parse();
+        Map<String, String> prefs = preferenceParser.getPreferences();
 
         String type = prefs.get(PROXY_TYPE_PROPERTY_NAME);
         if (type != null) {
@@ -147,13 +154,6 @@ public class BrowserAwareProxySelector extends JNLPProxySelector {
         browserFtpProxyPort = stringToPort(prefs.get(FTP_PORT_PROPERTY_NAME));
         browserSocks4ProxyHost = prefs.get(SOCKS_PROPERTY_NAME);
         browserSocks4ProxyPort = stringToPort(prefs.get(SOCKS_PORT_PROPERTY_NAME));
-    }
-
-    public Map<String, String> parseBrowserPreferences() throws IOException {
-        File preferencesFile = FirefoxPreferencesFinder.find();
-        FirefoxPreferencesParser parser = new FirefoxPreferencesParser(preferencesFile);
-        parser.parse();
-        return parser.getPreferences();
     }
 
     /**

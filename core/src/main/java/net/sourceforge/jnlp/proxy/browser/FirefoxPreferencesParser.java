@@ -60,20 +60,11 @@ import java.util.Map;
  * System.out.println("blink allowed: " + prefs.get("browser.blink_allowed"));
  * </code></pre>
  */
-public final class FirefoxPreferencesParser {
+public final class FirefoxPreferencesParser implements PreferencesParser {
 
     private final static Logger LOG = LoggerFactory.getLogger(FirefoxPreferencesParser.class);
 
-    File prefsFile = null;
     Map<String, String> prefs = null;
-
-    /**
-     * Creates a new FirefoxPreferencesParser
-     * @param preferencesFile
-     */
-    public FirefoxPreferencesParser(File preferencesFile) {
-        prefsFile = preferencesFile;
-    }
 
     /**
      * Parse the preferences file
@@ -89,6 +80,7 @@ public final class FirefoxPreferencesParser {
          */
         prefs = new HashMap<String, String>();
 
+        File prefsFile = FirefoxPreferencesFinder.find();
         BufferedReader reader = new BufferedReader(new FileReader(prefsFile));
 
         try {
