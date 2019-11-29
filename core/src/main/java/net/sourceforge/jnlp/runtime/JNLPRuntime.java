@@ -958,8 +958,10 @@ public class JNLPRuntime {
 
             if (providers.size() == 0) {
                 INSTANCE = ExtensionPoint.DEFAULT;
+                LOG.debug("using DEFAULT extension point");
             } else if (providers.size() == 1) {
                 INSTANCE = providers.get(0);
+                LOG.debug("using {} extension point", INSTANCE.getClass().getName());
             } else {
                 final List<String> implNames = providers.stream().map(ep -> ep.getClass().getName()).collect(Collectors.toList());
                 final String msg = "Found more than one ExtensionPoint implementation: " + implNames;
