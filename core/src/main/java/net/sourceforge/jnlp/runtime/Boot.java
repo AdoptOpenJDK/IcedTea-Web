@@ -124,26 +124,25 @@ public final class Boot implements PrivilegedAction<Integer> {
      * @return the return code. 0 = SUCCESS anything else is an error
      */
     public static int mainWithReturnCode(String[] args) {
-        return mainWithReturnCode(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
+        return mainWithReturnCode(new ItwJvmLauncher(), args);
     }
 
     /**
      * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
      *
-     * @param launcher                  the JVM launcher
-     * @param menuAndDesktopIntegration integration for menu and desktop shortcut creation
-     * @param args                      launching arguments
+     * @param launcher the JVM launcher
+     * @param args     launching arguments
      * @return the return code. 0 = SUCCESS anything else is an error
      */
-    public static int mainWithReturnCode(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
+    public static int mainWithReturnCode(final JvmLauncher launcher, final String[] args) {
         try {
-            return runMain(launcher, menuAndDesktopIntegration, args);
+            return runMain(launcher, args);
         } finally {
             JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
         }
     }
 
-    private static Integer runMain(JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, String[] args) {
+    private static Integer runMain(JvmLauncher launcher, String[] args) {
         JvmLauncherHolder.setLauncher(requireNonNull(launcher));
 
         // setup Swing EDT tracing:
@@ -279,7 +278,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             return 0;
         }
 
-        return AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
+        return AccessController.doPrivileged(new Boot());
     }
 
     private static void printHelpMessage() {
@@ -327,12 +326,6 @@ public final class Boot implements PrivilegedAction<Integer> {
     }
 
 
-    private final MenuAndDesktopIntegration menuAndDesktopIntegration;
-
-    public Boot(MenuAndDesktopIntegration menuAndDesktopIntegration) {
-        this.menuAndDesktopIntegration = menuAndDesktopIntegration;
-    }
-
     /**
      * The privileged part (jdk1.3 compatibility).
      */
@@ -358,7 +351,7 @@ public final class Boot implements PrivilegedAction<Integer> {
 
     private void launch(String location) throws LaunchException {
         LOG.info("Proceeding with jnlp");
-        Launcher launcher = new Launcher(menuAndDesktopIntegration);
+        Launcher launcher = new Launcher();
         launcher.setParserSettings(getParserSettings());
         launcher.setInformationToMerge(getExtras());
         launcher.launch(locationToUrl(location));
