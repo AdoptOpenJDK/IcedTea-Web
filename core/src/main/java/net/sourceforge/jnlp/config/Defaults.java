@@ -251,7 +251,7 @@ public class Defaults {
                     ConfigurationConstants.KEY_PROXY_TYPE,
                     String.valueOf(ProxyType.PROXY_TYPE_BROWSER.getConfigValue()),
                     ValidatorFactory.createRangedIntegerValidator(ProxyType.PROXY_TYPE_UNKNOWN.getConfigValue(),
-                            ProxyType.PROXY_TYPE_BROWSER.getConfigValue())
+                            ProxyType.PROXY_TYPE_BROWSER.getConfigValue() + 1) // the +1 is a workaround until we support windows system proxy config
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SAME,
