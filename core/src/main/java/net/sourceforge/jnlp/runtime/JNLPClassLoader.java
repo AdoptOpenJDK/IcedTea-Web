@@ -597,7 +597,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         if (CacheUtil.isCacheable(location)) {
             final File cacheFile = tracker.getCacheFile(location);
-            if(cacheFile != null) {
+            if (cacheFile != null) {
                 return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
             } else {
                 LOG.debug("No cache file for cacheable resource '{}' found.", location);
@@ -649,7 +649,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (jars.length == 0) {
             LOG.debug("no jars defined in jnlp file '{}'", file.getSourceLocation());
 
-            if(loaders.length > 1) {
+            if (loaders.length > 1) {
                 LOG.debug("Checking extensions of jnlp file '{}'", file.getSourceLocation());
                 final boolean containsUnsigned = Stream.of(loaders)
                         .filter(l -> !l.getSigning())
