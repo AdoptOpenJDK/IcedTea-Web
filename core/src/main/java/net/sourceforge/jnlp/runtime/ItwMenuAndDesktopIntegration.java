@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * ...
  */
-class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
+public class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
     private static final Logger LOG = LoggerFactory.getLogger(ItwMenuAndDesktopIntegration.class);
 
     /**

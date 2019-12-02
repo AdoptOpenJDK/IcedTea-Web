@@ -52,10 +52,9 @@ public class AppletInstance extends ApplicationInstance {
      * @param group thread group of this instance
      * @param loader classloader for this instance
      * @param applet applet of this instance
-     * @param menuAndDesktopIntegration the integration to the OS Desktop
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, MenuAndDesktopIntegration menuAndDesktopIntegration) {
-        super(file, group, loader, menuAndDesktopIntegration);
+    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet) {
+        super(file, group, loader);
 
         this.applet = applet;
 
@@ -81,10 +80,9 @@ public class AppletInstance extends ApplicationInstance {
      * @param loader classloader for this instance
      * @param applet applet of this instance
      * @param cont Container where to place applet
-     * @param menuAndDesktopIntegration the integration to the OS Desktop
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, Container cont, MenuAndDesktopIntegration menuAndDesktopIntegration) {
-        super(file, group, loader, menuAndDesktopIntegration);
+    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, Container cont) {
+        super(file, group, loader);
         this.applet = applet;
         this.environment = new AppletEnvironment(file, this, cont);
     }

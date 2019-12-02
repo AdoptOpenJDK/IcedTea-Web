@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -91,7 +91,6 @@ public class LinkingBrowser extends JTabbedPane {
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
         BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(getConfiguration());
-        proxySelector.initialize();
         ProxySelector.setDefault(proxySelector);
         createFrame(url, socket, JFrame.EXIT_ON_CLOSE);
     }

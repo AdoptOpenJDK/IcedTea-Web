@@ -16,12 +16,12 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
@@ -51,9 +51,6 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-    /** the way to ask for menu/desktop integration */
-    private final MenuAndDesktopIntegration menuAndDesktopIntegration;
-
     /** the file */
     private final JNLPFile file;
 
@@ -81,13 +78,11 @@ public class ApplicationInstance {
      * @param file jnlpfile for which the instance do exists
      * @param group thread group to which it belongs
      * @param loader loader for this application
-     * @param menuAndDesktopIntegration the integration to the OS Desktop
      */
-    public ApplicationInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, MenuAndDesktopIntegration menuAndDesktopIntegration) {
+    public ApplicationInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader) {
         this.file = file;
         this.group = group;
         this.loader = loader;
-        this.menuAndDesktopIntegration = Assert.requireNonNull(menuAndDesktopIntegration, "menuAndDesktopIntegration");
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
     }
@@ -113,7 +108,8 @@ public class ApplicationInstance {
      */
     public void initialize() {
         installEnvironment();
-        menuAndDesktopIntegration.addMenuAndDesktopEntries(file);
+        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
+        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**
