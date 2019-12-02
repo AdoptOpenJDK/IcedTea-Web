@@ -23,6 +23,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.JVMPanel.JvmValidationResult;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.panels.provider.ControlPanelProvider;
+import net.adoptopenjdk.icedteaweb.extensionpoint.ExtensionPoint;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -83,7 +84,9 @@ public class ControlPanel extends JFrame {
         super();
         Assert.requireNonNull(config, "config");
 
-        final ControlPanelStyle style = JNLPRuntime.getExtensionPoint().createControlPanelStyle(config);
+        final ExtensionPoint extensionPoint = JNLPRuntime.getExtensionPoint();
+        final ControlPanelStyle style = extensionPoint.createControlPanelStyle(config);
+        extensionPoint.getTranslationResources().forEach(Translator::addBundle);
         setTitle(style.getDialogTitle());
         setIconImages(style.getDialogIcons());
 
