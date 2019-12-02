@@ -35,7 +35,6 @@ import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -298,7 +297,7 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        ProxySelector proxySelector = getExtensionPoint().getProxySelector(getConfiguration());
+        ProxySelector proxySelector = getExtensionPoint().createProxySelector(getConfiguration());
         ProxySelector.setDefault(proxySelector);
 
         // Restrict access to netx classes

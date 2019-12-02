@@ -109,7 +109,7 @@ public class ApplicationInstance {
     public void initialize() {
         installEnvironment();
         final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
-        JNLPRuntime.getExtensionPoint().getMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
+        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**

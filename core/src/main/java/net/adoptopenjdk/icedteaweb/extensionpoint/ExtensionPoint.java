@@ -23,19 +23,19 @@ public interface ExtensionPoint {
 
     ExtensionPoint DEFAULT = new ExtensionPoint() {};
 
-    default JvmLauncher getJvmLauncher() {
+    default JvmLauncher createJvmLauncher(final DeploymentConfiguration configuration) {
         return new ItwJvmLauncher();
     }
 
-    default MenuAndDesktopIntegration getMenuAndDesktopIntegration(final DeploymentConfiguration configuration) {
+    default MenuAndDesktopIntegration createMenuAndDesktopIntegration(final DeploymentConfiguration configuration) {
         return new ItwMenuAndDesktopIntegration();
     }
 
-    default ProxySelector getProxySelector(final DeploymentConfiguration configuration) {
+    default ProxySelector createProxySelector(final DeploymentConfiguration configuration) {
         return new BrowserAwareProxySelector(configuration);
     }
 
-    default ControlPanelStyle getControlPanelStyle(final DeploymentConfiguration configuration) {
+    default ControlPanelStyle createControlPanelStyle(final DeploymentConfiguration configuration) {
         return new DefaultControlPanelStyle();
     }
 }

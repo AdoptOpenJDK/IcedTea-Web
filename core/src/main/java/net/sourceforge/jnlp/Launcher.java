@@ -22,10 +22,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader;
@@ -277,7 +279,9 @@ public class Launcher {
      */
     private void launchExternal(final JNLPFile file, final List<String> javawsArgs) throws LaunchException {
         try {
-            JNLPRuntime.getExtensionPoint().getJvmLauncher().launchExternal(file, javawsArgs);
+            final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+            final JvmLauncher jvmLauncher = JNLPRuntime.getExtensionPoint().createJvmLauncher(config);
+            jvmLauncher.launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
             throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {

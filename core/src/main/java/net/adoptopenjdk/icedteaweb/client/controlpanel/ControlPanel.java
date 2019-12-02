@@ -83,7 +83,7 @@ public class ControlPanel extends JFrame {
         super();
         Assert.requireNonNull(config, "config");
 
-        final ControlPanelStyle style = JNLPRuntime.getExtensionPoint().getControlPanelStyle(config);
+        final ControlPanelStyle style = JNLPRuntime.getExtensionPoint().createControlPanelStyle(config);
         setTitle(style.getDialogTitle());
         setIconImages(style.getDialogIcons());
 
