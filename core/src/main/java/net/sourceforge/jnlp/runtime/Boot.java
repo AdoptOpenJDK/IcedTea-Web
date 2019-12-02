@@ -22,6 +22,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.browser.LinkingBrowser;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -132,6 +133,8 @@ public final class Boot implements PrivilegedAction<Integer> {
     private static Integer runMain(String[] args) {
         // setup Swing EDT tracing:
         SwingUtils.setup();
+
+        JNLPRuntime.getExtensionPoint().getTranslationResources().forEach(Translator::addBundle);
 
         optionParser = new CommandLineOptionsParser(args, CommandLineOptionsDefinition.getJavaWsOptions());
 
