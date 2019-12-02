@@ -23,14 +23,11 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
-import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
-import net.adoptopenjdk.icedteaweb.launch.JvmLauncherHolder;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.Launcher;
 import net.sourceforge.jnlp.ParserSettings;
@@ -57,7 +54,6 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.runtime.ForkingStrategy.NEVER;
@@ -120,32 +116,20 @@ public final class Boot implements PrivilegedAction<Integer> {
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
+     * This method is only public for integration testing. You should not call this method !!
+     *
      * @param args launching arguments
      * @return the return code. 0 = SUCCESS anything else is an error
      */
     public static int mainWithReturnCode(String[] args) {
-        return mainWithReturnCode(new ItwJvmLauncher(), new ItwMenuAndDesktopIntegration(), args);
-    }
-
-    /**
-     * Launch the JNLP file specified by the command-line arguments with the given JVM launch.
-     *
-     * @param launcher                  the JVM launcher
-     * @param menuAndDesktopIntegration integration for menu and desktop shortcut creation
-     * @param args                      launching arguments
-     * @return the return code. 0 = SUCCESS anything else is an error
-     */
-    public static int mainWithReturnCode(final JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, final String[] args) {
         try {
-            return runMain(launcher, menuAndDesktopIntegration, args);
+            return runMain(args);
         } finally {
             JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
         }
     }
 
-    private static Integer runMain(JvmLauncher launcher, MenuAndDesktopIntegration menuAndDesktopIntegration, String[] args) {
-        JvmLauncherHolder.setLauncher(requireNonNull(launcher));
-
+    private static Integer runMain(String[] args) {
         // setup Swing EDT tracing:
         SwingUtils.setup();
 
@@ -279,7 +263,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             return 0;
         }
 
-        return AccessController.doPrivileged(new Boot(menuAndDesktopIntegration));
+        return AccessController.doPrivileged(new Boot());
     }
 
     private static void printHelpMessage() {
@@ -327,12 +311,6 @@ public final class Boot implements PrivilegedAction<Integer> {
     }
 
 
-    private final MenuAndDesktopIntegration menuAndDesktopIntegration;
-
-    public Boot(MenuAndDesktopIntegration menuAndDesktopIntegration) {
-        this.menuAndDesktopIntegration = menuAndDesktopIntegration;
-    }
-
     /**
      * The privileged part (jdk1.3 compatibility).
      */
@@ -358,7 +336,7 @@ public final class Boot implements PrivilegedAction<Integer> {
 
     private void launch(String location) throws LaunchException {
         LOG.info("Proceeding with jnlp");
-        Launcher launcher = new Launcher(menuAndDesktopIntegration);
+        Launcher launcher = new Launcher();
         launcher.setParserSettings(getParserSettings());
         launcher.setInformationToMerge(getExtras());
         launcher.launch(locationToUrl(location));

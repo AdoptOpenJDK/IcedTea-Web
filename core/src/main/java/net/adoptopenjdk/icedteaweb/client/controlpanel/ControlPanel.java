@@ -79,10 +79,11 @@ public class ControlPanel extends JFrame {
      *            Loaded DeploymentsConfiguration file.
      * 
      */
-    public ControlPanel(final DeploymentConfiguration config, final ControlPanelStyle style) {
+    public ControlPanel(final DeploymentConfiguration config) {
         super();
         Assert.requireNonNull(config, "config");
-        Assert.requireNonNull(style, "style");
+
+        final ControlPanelStyle style = JNLPRuntime.getExtensionPoint().createControlPanelStyle(config);
         setTitle(style.getDialogTitle());
         setIconImages(style.getDialogIcons());
 
@@ -270,7 +271,7 @@ public class ControlPanel extends JFrame {
         }
 
         SwingUtils.invokeLater(() -> {
-            final ControlPanel editor = new ControlPanel(config, new DefaultControlPanelStyle());
+            final ControlPanel editor = new ControlPanel(config);
             editor.setVisible(true);
         });
     }

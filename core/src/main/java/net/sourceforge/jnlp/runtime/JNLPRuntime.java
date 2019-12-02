@@ -24,6 +24,7 @@ import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.extensionpoint.ExtensionPoint;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -31,7 +32,6 @@ import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DefaultLaunchHandler;
 import net.sourceforge.jnlp.LaunchHandler;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -74,8 +74,11 @@ import java.security.KeyStore;
 import java.security.Policy;
 import java.security.Security;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import static net.sourceforge.jnlp.runtime.ForkingStrategy.IF_JNLP_REQUIRES;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
@@ -294,8 +297,7 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        BrowserAwareProxySelector proxySelector = new BrowserAwareProxySelector(getConfiguration());
-        proxySelector.initialize();
+        ProxySelector proxySelector = getExtensionPoint().createProxySelector(getConfiguration());
         ProxySelector.setDefault(proxySelector);
 
         // Restrict access to netx classes
@@ -939,5 +941,32 @@ public class JNLPRuntime {
      */
     public static boolean isShowWebSplash() {
         return showWebSplash;
+    }
+
+    public static ExtensionPoint getExtensionPoint() {
+        return ExtensionPointHolder.INSTANCE;
+    }
+
+    private static class ExtensionPointHolder {
+        private static final ExtensionPoint INSTANCE;
+
+        static {
+            final List<ExtensionPoint> providers = new ArrayList<>();
+            final ServiceLoader<ExtensionPoint> serviceLoader = ServiceLoader.load(ExtensionPoint.class);
+            serviceLoader.iterator().forEachRemaining(providers::add);
+
+            if (providers.size() == 0) {
+                INSTANCE = ExtensionPoint.DEFAULT;
+                LOG.debug("using DEFAULT extension point");
+            } else if (providers.size() == 1) {
+                INSTANCE = providers.get(0);
+                LOG.debug("using {} extension point", INSTANCE.getClass().getName());
+            } else {
+                final List<String> implNames = providers.stream().map(ep -> ep.getClass().getName()).collect(Collectors.toList());
+                final String msg = "Found more than one ExtensionPoint implementation: " + implNames;
+                LOG.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        }
     }
 }

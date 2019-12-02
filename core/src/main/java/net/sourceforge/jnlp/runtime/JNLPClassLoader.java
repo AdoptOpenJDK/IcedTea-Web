@@ -83,7 +83,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -639,15 +639,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Determine how invalid jars should be handled
-     *
-     * @return whether to filter invalid jars, or error later on
-     */
-    private boolean shouldFilterInvalidJars() {
-        return false;//Error is default behaviour
-    }
-
-    /**
      * Load all of the JARs used in this JNLP file into the ResourceTracker for
      * downloading.
      */
@@ -710,23 +701,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         waitForJars(initialJars); //download the jars first.
 
-        //A ZipException will propagate later on if the jar is invalid and not checked here
-        if (shouldFilterInvalidJars()) {
-            //We filter any invalid jars
-            Iterator<JARDesc> iterator = initialJars.iterator();
-            while (iterator.hasNext()) {
-                JARDesc jar = iterator.next();
-                if (isInvalidJar(jar)) {
-                    //Remove this jar as an available jar
-                    iterator.remove();
-                    tracker.removeResource(jar.getLocation());
-                    available.remove(jar);
-                }
-            }
-        }
-
         if (JNLPRuntime.isVerifying()) {
-
             try {
                 jcv.add(initialJars, tracker);
             } catch (Exception e) {
@@ -1160,22 +1135,31 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param jars jar archives to be added
      */
     private void fillInPartJars(List<JARDesc> jars) {
-        //can not use iterator, will rise ConcurrentModificationException on jars.add(jar);
-        for (int x = 0; x < jars.size(); x++) {
-            String part = jars.get(x).getPart();
+        final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
+        for (JARDesc jar : jars) {
+            result.addAll(getAllAvailableJarsInPart(jar.getPart()));
+            result.remove(jar);
+        }
 
-            // "available" field can be affected by two different threads
-            // working in loadClass(String)
+        jars.addAll(result);
+    }
+
+    private LinkedHashSet<JARDesc> getAllAvailableJarsInPart(String part) {
+        final LinkedHashSet<JARDesc> jars = new LinkedHashSet<>();
+
+        // "available" field can be affected by two different threads
+        // working in loadClass(String)
+        if (part != null) {
             synchronized (available) {
                 for (JARDesc jar : available) {
-                    if (part != null && part.equals(jar.getPart())) {
-                        if (!jars.contains(jar)) {
-                            jars.add(jar);
-                        }
+                    if (part.equals(jar.getPart())) {
+                        jars.add(jar);
                     }
                 }
             }
         }
+
+        return jars;
     }
 
     /**
@@ -1787,15 +1771,22 @@ public class JNLPClassLoader extends URLClassLoader {
             return null;
         }
 
-        // add jar
-        List<JARDesc> jars = new ArrayList<>();
-        jars.add(available.get(0));
+        final List<JARDesc> jars = getNextJarsToLoad();
 
-        fillInPartJars(jars);
         checkForMain(jars);
         activateJars(jars);
 
         return this;
+    }
+
+    private List<JARDesc> getNextJarsToLoad() {
+        final JARDesc nextJar = available.get(0);
+
+        final LinkedHashSet<JARDesc> result = new LinkedHashSet<>();
+        result.add(nextJar);
+        result.addAll(getAllAvailableJarsInPart(nextJar.getPart()));
+
+        return new ArrayList<>(result);
     }
 
     boolean getSigning() {

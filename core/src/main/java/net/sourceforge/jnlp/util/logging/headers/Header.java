@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (C) 2009, 2013  Red Hat
 
 This file is part of IcedTea.
@@ -112,6 +112,10 @@ public class Header {
     @Override
     public String toString() {
         return toString(true, true, true, true, true, true, true);
+    }
+
+    public String toShortString() {
+        return toString(false, false, true, true, false, false, false);
     }
 
     public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
