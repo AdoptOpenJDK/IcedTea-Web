@@ -5,7 +5,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.DefaultControlPanelStyle;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.proxy.browser.BrowserAwareProxySelector;
+import net.sourceforge.jnlp.proxy.browser.FirefoxProxySelector;
 import net.sourceforge.jnlp.runtime.ItwMenuAndDesktopIntegration;
 import net.sourceforge.jnlp.runtime.MenuAndDesktopIntegration;
 
@@ -32,7 +32,7 @@ public interface ExtensionPoint {
     }
 
     default ProxySelector createProxySelector(final DeploymentConfiguration configuration) {
-        return new BrowserAwareProxySelector(configuration);
+        return new FirefoxProxySelector(configuration);
     }
 
     default ControlPanelStyle createControlPanelStyle(final DeploymentConfiguration configuration) {

@@ -54,7 +54,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class BrowserAwareProxySelectorTest {
+public class FirefoxProxySelectorTest {
 
     private static final String PROXY_HOST = "foo";
     private static final int PROXY_PORT = 42;
@@ -203,7 +203,7 @@ public class BrowserAwareProxySelectorTest {
     }
 
     private static List<Proxy> getProxy(DeploymentConfiguration config, Map<String, String> browserPrefs, URI uri) {
-        BrowserAwareProxySelector selector = new BrowserAwareProxySelector(config, new PreferencesParser() {
+        FirefoxProxySelector selector = new FirefoxProxySelector(config, new PreferencesParser() {
             @Override
             public void parse() {
                 // do nothing
