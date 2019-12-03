@@ -636,4 +636,8 @@ public class UrlUtils {
     public static boolean isLocalhost(URL url) {
         return url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX);
     }
+
+    public static boolean isLocalhost(URI url) {
+        return url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX);
+    }
 }
