@@ -95,6 +95,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
+import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
@@ -595,8 +596,13 @@ public class JNLPClassLoader extends URLClassLoader {
         final URL location = jar.getLocation();
 
         if (CacheUtil.isCacheable(location)) {
-            final File file1 = tracker.getCacheFile(location);
-            return new FilePermission(file1.getPath(), FILE_READ_ACTION);
+            final File cacheFile = tracker.getCacheFile(location);
+            if (cacheFile != null) {
+                return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
+            } else {
+                LOG.debug("No cache file for cacheable resource '{}' found.", location);
+                return null;
+            }
         } else {
             // this is what URLClassLoader does
             try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
@@ -638,22 +644,28 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private void initializeResources() throws LaunchException {
 
-        JARDesc[] jars = resources.getJARs();
+        final JARDesc[] jars = resources.getJARs();
 
         if (jars.length == 0) {
+            LOG.debug("no jars defined in jnlp file '{}'", file.getSourceLocation());
 
-            boolean allSigned = (loaders.length > 1) /* has extensions */;
-            for (int i = 1; i < loaders.length; i++) {
-                if (!loaders[i].getSigning()) {
-                    allSigned = false;
-                    break;
+            if (loaders.length > 1) {
+                LOG.debug("Checking extensions of jnlp file '{}'", file.getSourceLocation());
+                final boolean containsUnsigned = Stream.of(loaders)
+                        .filter(l -> !l.getSigning())
+                        .findAny()
+                        .isPresent();
+                if (containsUnsigned) {
+                    LOG.debug("At least one extension for jnlp file '{}' contains unsigned content", file.getSourceLocation());
+                    //TODO: is NONE really right? We do not kn ow if it is NONE or PARTIAL....
+                    signing = SigningState.NONE;
+                } else {
+                    LOG.debug("All extensions of jnlp file '{}' are fully signed", file.getSourceLocation());
+                    signing = SigningState.FULL;
                 }
-            }
-
-            if (allSigned) {
-                signing = SigningState.FULL;
             } else {
-                signing = SigningState.NONE;
+                LOG.debug("JNLP file {} does not contain any jars or extensions and therefore is marked as fully signed", file.getSourceLocation());
+                signing = SigningState.FULL;
             }
 
             //Check if main jar is found within extensions
