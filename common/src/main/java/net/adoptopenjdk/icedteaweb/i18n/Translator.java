@@ -152,7 +152,9 @@ public class Translator {
 
         void addBundle(ResourceBundle bundle) {
             Assert.requireNonNull(bundle, "bundle");
-            bundles.add(0, bundle);
+            if (!bundles.contains(bundle)) {
+                bundles.add(0, bundle);
+            }
         }
 
         @Override

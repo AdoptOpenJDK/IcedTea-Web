@@ -10,6 +10,9 @@ import net.sourceforge.jnlp.runtime.ItwMenuAndDesktopIntegration;
 import net.sourceforge.jnlp.runtime.MenuAndDesktopIntegration;
 
 import java.net.ProxySelector;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Extension point which allows to set a different implementation for an interface at runtime.
@@ -37,5 +40,9 @@ public interface ExtensionPoint {
 
     default ControlPanelStyle createControlPanelStyle(final DeploymentConfiguration configuration) {
         return new DefaultControlPanelStyle();
+    }
+
+    default List<String> getTranslationResources() {
+        return emptyList();
     }
 }
