@@ -88,6 +88,9 @@ public class UrlUtils {
     public static final String BACKSLASH_N = "\n";
     public static final String PARENT_DIR = "..";
 
+    private static final String LOCALHOST = "localhost";
+    private static final String IPV4_LOOPBACK_PREFIX = "127.";
+
     public static URL normalizeUrlAndStripParams(final URL url, final boolean encodeFileUrls) {
         if (url == null) {
             return null;
@@ -630,4 +633,7 @@ public class UrlUtils {
         return s;
     }
 
+    public static boolean isLocalhost(URL url) {
+        return url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX);
+    }
 }

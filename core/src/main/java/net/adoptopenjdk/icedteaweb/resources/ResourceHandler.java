@@ -12,6 +12,7 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -35,9 +36,6 @@ class ResourceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
     private static final Executor localExecutor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 2,
             10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-
-    private static final String LOCALHOST = "localhost";
-    private static final String IPV4_LOOPBACK_PREFIX = "127.";
 
     private final Resource resource;
 
@@ -119,7 +117,7 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
-        if (url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX)) {
+        if (UrlUtils.isLocalhost(url)) {
             return; // local server need not be in whitelist
         }
 
