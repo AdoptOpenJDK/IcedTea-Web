@@ -257,9 +257,10 @@ public class ResourceTracker {
         return getCacheFile(resource);
     }
 
-    private static File getCacheFile(Resource resource) {
+    private static File getCacheFile(final Resource resource) {
         final URL location = resource.getLocation();
         if (resource.isSet(ERROR)) {
+            LOG.debug("Error flag set for resource '{}'. Can not return a local file for the resource", resource.getLocation());
             return null;
         }
 
@@ -282,6 +283,7 @@ public class ResourceTracker {
             // have it sense to try also filename with whole query here?
             // => location.getFile() ?
         }
+        LOG.debug("No local file defined for resource '{}'", resource.getLocation());
 
         return null;
     }
@@ -291,7 +293,7 @@ public class ResourceTracker {
      * available locally.
      *
      * @param urls    the resources to wait for
-     * @throws java.lang.InterruptedException     if thread is interrupted
+     * @throws InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void waitForResources(URL... urls) throws InterruptedException {
@@ -308,7 +310,7 @@ public class ResourceTracker {
      * @param timeout  the time in ms to wait before returning, 0 for no timeout
      * @param timeUnit the unit for timeout
      * @return whether the resources downloaded before the timeout
-     * @throws java.lang.InterruptedException     if thread is interrupted
+     * @throws InterruptedException     if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
