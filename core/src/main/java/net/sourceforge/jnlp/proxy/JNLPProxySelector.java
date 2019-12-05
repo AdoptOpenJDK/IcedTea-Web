@@ -27,7 +27,6 @@ import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
 import net.sourceforge.jnlp.proxy.pac.PacUtils;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
@@ -36,7 +35,6 @@ import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +44,7 @@ import static net.sourceforge.jnlp.proxy.ProxyConstants.FTP_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTPS_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTP_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
+import static net.sourceforge.jnlp.util.UrlUtils.isLocalhost;
 
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
@@ -224,55 +223,25 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 case HTTPS_SCHEMA:
                 case FTP_SCHEMA:
                     URL url = uri.toURL();
-                    if (bypassLocal && isLocalHost(url.getHost())) {
+                    if (bypassLocal && isLocalhost(url.getHost())) {
                         return true;
-                    }   if (bypassList.contains(url.getHost())) {
-                    return true;
-                }   break;
+                    }
+                    if (bypassList.contains(url.getHost())) {
+                        return true;
+                    }
+                    break;
                 case SOCKET_SCHEMA:
                     String host = uri.getHost();
-                    if (bypassLocal && isLocalHost(host)) {
+                    if (bypassLocal && isLocalhost(host)) {
                         return true;
-                    }   if (bypassList.contains(host)) {
-                    return true;
-                }   break;
+                    }
+                    if (bypassList.contains(host)) {
+                        return true;
+                    }
+                    break;
             }
         } catch (MalformedURLException e) {
             return false;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return true if the host is the hostname or the IP address of the
-     * localhost
-     * @param  host host to verify
-     */
-    private boolean isLocalHost(String host) {
-
-        try {
-            if (InetAddress.getByName(host).isLoopbackAddress()) {
-                return true;
-            }
-        } catch (UnknownHostException e1) {
-            // continue
-        }
-
-        try {
-            if (host.equals(InetAddress.getLocalHost().getHostName())) {
-                return true;
-            }
-        } catch (UnknownHostException e) {
-            // continue
-        }
-
-        try {
-            if (host.equals(InetAddress.getLocalHost().getHostAddress())) {
-                return true;
-            }
-        } catch (UnknownHostException e) {
-            // continue
         }
 
         return false;

@@ -53,6 +53,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
@@ -60,6 +61,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -634,10 +636,45 @@ public class UrlUtils {
     }
 
     public static boolean isLocalhost(URL url) {
-        return url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX);
+        return isLocalhost(url.getHost());
     }
 
-    public static boolean isLocalhost(URI url) {
-        return url.getHost().equals(LOCALHOST) || url.getHost().startsWith(IPV4_LOOPBACK_PREFIX);
+    public static boolean isLocalhost(URI uri) {
+        return isLocalhost(uri.getHost());
     }
+
+    /**
+     * @return true if the host is the hostname or the IP address of the
+     * localhost
+     * @param  host host to verify
+     */
+    public static boolean isLocalhost(String host) {
+
+        try {
+            if (InetAddress.getByName(host).isLoopbackAddress()) {
+                return true;
+            }
+        } catch (UnknownHostException e1) {
+            // continue
+        }
+
+        try {
+            if (host.equals(InetAddress.getLocalHost().getHostName())) {
+                return true;
+            }
+        } catch (UnknownHostException e) {
+            // continue
+        }
+
+        try {
+            if (host.equals(InetAddress.getLocalHost().getHostAddress())) {
+                return true;
+            }
+        } catch (UnknownHostException e) {
+            // continue
+        }
+
+        return false;
+    }
+
 }
