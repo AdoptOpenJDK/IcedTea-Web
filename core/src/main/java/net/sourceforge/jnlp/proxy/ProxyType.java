@@ -8,7 +8,9 @@ public enum ProxyType {
     PROXY_TYPE_NONE(0),
     PROXY_TYPE_MANUAL(1),
     PROXY_TYPE_AUTO(2),
-    PROXY_TYPE_BROWSER(3);
+    PROXY_TYPE_BROWSER(3),
+    PROXY_TYPE_SYSTEM(4),
+    ;
 
     private final int configValue;
 
@@ -21,9 +23,15 @@ public enum ProxyType {
     }
 
     public static ProxyType getForConfigValue(final int value) {
-        return Stream.of(ProxyType.values())
+        final ProxyType result = Stream.of(ProxyType.values())
                 .filter(t -> value == t.getConfigValue())
                 .findFirst()
                 .orElse(PROXY_TYPE_UNKNOWN);
+
+        if (result == PROXY_TYPE_SYSTEM) {
+            return PROXY_TYPE_UNKNOWN; // fallback until system is supported
+        }
+
+        return result;
     }
 }
