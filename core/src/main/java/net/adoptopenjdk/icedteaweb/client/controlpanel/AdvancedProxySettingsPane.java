@@ -67,7 +67,7 @@ public class AdvancedProxySettingsPane extends JPanel {
         ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
         ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
         ConfigurationConstants.KEY_PROXY_SAME,
-        ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS
+        ConfigurationConstants.KEY_PROXY_BYPASS_LIST
     };
     private String[] fields = new String[properties.length];
 
