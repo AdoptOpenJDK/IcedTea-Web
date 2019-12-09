@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -932,19 +931,7 @@ public class JNLPFile {
 
         JREDesc[] jres = getResources().getJREs();
         for (JREDesc jre : jres) {
-            String initialHeapSize = jre.getInitialHeapSize();
-            if (initialHeapSize != null) {
-                newVMArgs.add("-Xms" + initialHeapSize);
-            }
-            String maxHeapSize = jre.getMaximumHeapSize();
-            if (maxHeapSize != null) {
-                newVMArgs.add("-Xmx" + maxHeapSize);
-            }
-            String vmArgsFromJre = jre.getVMArgs();
-            if (vmArgsFromJre != null) {
-                String[] args = vmArgsFromJre.split(" ");
-                newVMArgs.addAll(Arrays.asList(args));
-            }
+            newVMArgs.addAll(jre.getAllVmArgs());
         }
 
         return newVMArgs;
