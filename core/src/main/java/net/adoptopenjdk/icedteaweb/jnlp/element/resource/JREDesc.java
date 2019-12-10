@@ -16,13 +16,18 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.Character.isWhitespace;
+import static java.util.Collections.emptyList;
 
 
 /**
@@ -38,6 +43,8 @@ import java.util.regex.Pattern;
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
+    private static final char QUOTES = '"';
+
     public static final String VERSION_ATTRIBUTE = "version";
     public static final String HREF_ATTRIBUTE = "href";
     public static final String JAVA_VM_ARGS_ATTRIBUTE = "java-vm-args";
@@ -61,6 +68,7 @@ public class JREDesc {
 
     /** args to pass to the vm */
     private final String vmArgs;
+    private final List<String> parsedArguments;
 
     /** list of ResourceDesc objects */
     private final List<ResourcesDesc> resources;
@@ -83,6 +91,7 @@ public class JREDesc {
         this.version = version;
         this.location = location;
         this.vmArgs = vmArgs;
+        this.parsedArguments = parseArguments(vmArgs);
         this.initialHeapSize = checkHeapSize(initialHeapSize);
         this.maximumHeapSize = checkHeapSize(maximumHeapSize);
         this.resources = resources;
@@ -140,6 +149,59 @@ public class JREDesc {
      */
     public String getVMArgs() {
         return vmArgs;
+    }
+
+    /**
+     * @return a list of vm arguments which can be passed to a new java process.
+     */
+    public List<String> getAllVmArgs() {
+        final List<String> result = new ArrayList<>();
+        if (initialHeapSize != null) {
+            result.add("-Xms" + initialHeapSize);
+        }
+        if (maximumHeapSize != null) {
+            result.add("-Xmx" + maximumHeapSize);
+        }
+        result.addAll(parsedArguments);
+        return result;
+    }
+
+    private List<String> parseArguments(String args) throws ParseException {
+        if (StringUtils.isBlank(args)) {
+            return emptyList();
+        }
+
+        final List<String> result = new ArrayList<>();
+        boolean inQuotes = false;
+        boolean requireWhitespace = false;
+        StringBuilder next = new StringBuilder();
+        for (char c : args.toCharArray()) {
+            if (c == QUOTES) {
+                inQuotes = !inQuotes;
+                requireWhitespace = !inQuotes;
+            } else if (inQuotes || !isWhitespace(c)) {
+                if (requireWhitespace) {
+                    throw new ParseException("failed to parse vmArgs " + args);
+                }
+                next.append(c);
+            } else {
+                requireWhitespace = false;
+                if (next.length() > 0) {
+                    result.add(next.toString());
+                    next = new StringBuilder();
+                }
+            }
+        }
+
+        if (inQuotes) {
+            throw new ParseException("failed to parse vmArgs " + vmArgs);
+        }
+
+        if (next.length() > 0) {
+            result.add(next.toString());
+        }
+
+        return result;
     }
 
     /**
