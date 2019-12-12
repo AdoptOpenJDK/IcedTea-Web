@@ -59,7 +59,7 @@ public class LaunchExceptionTest {
         String output = baos.toString();
         assertNotNull(output);
         assertFalse(output.trim().length() == 0);
-        assertTrue(output.contains("LaunchException: severe: category: test exception test description"));
+        assertTrue(output.contains("LaunchException: Severe: category: test exception test description"));
         assertTrue(output.contains("NullPointerException: test"));
         int causedByAt = output.indexOf("Caused by:");
         assertTrue(causedByAt != -1);
