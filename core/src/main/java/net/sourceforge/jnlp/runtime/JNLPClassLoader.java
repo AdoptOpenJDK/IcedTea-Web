@@ -144,7 +144,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * map from JNLPFile unique key to shared classloader
      */
-    private static Map<String, JNLPClassLoader> uniqueKeyToLoader = new ConcurrentHashMap<>();
+    private static final Map<String, JNLPClassLoader> uniqueKeyToLoader = new ConcurrentHashMap<>();
 
     /**
      * map from JNLPFile unique key to lock, the lock is needed to enforce
@@ -155,7 +155,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Provides a search path & temporary storage for native code
      */
-    private NativeLibraryStorage nativeLibraryStorage;
+    private final NativeLibraryStorage nativeLibraryStorage;
 
     /**
      * security context
@@ -165,7 +165,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the permissions for the cached jar files
      */
-    private List<Permission> resourcePermissions;
+    private final List<Permission> resourcePermissions;
 
     /**
      * the app
@@ -200,7 +200,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the resources section
      */
-    private ResourcesDesc resources;
+    private final ResourcesDesc resources;
 
     /**
      * the security section
@@ -342,6 +342,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 mainClass = entryPoint.getMainClass();
             }
         }
+        resourcePermissions = new ArrayList<>();
 
         // initialize extensions
         initializeExtensions();
@@ -578,7 +579,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * Make permission objects for the classpath.
      */
     private void initializeReadJarPermissions() {
-        resourcePermissions = new ArrayList<>();
 
         JARDesc[] jars = resources.getJARs();
         for (JARDesc jar : jars) {
