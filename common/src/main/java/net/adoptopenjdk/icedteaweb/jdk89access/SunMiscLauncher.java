@@ -58,8 +58,8 @@ public class SunMiscLauncher {
             final ClassLoader cl = (ClassLoader) m.invoke(obj);
 
             return new ImageIcon(cl.getResource(resource));
-        } catch (Exception ex) {
-            LOG.error("sun.misc.Launcher not found. Running jdk9 or higher? Using insecure BootClassLoader", ex);
+        } catch (final Exception e) {
+            LOG.debug("sun.misc.Launcher not found. Looks like app is running jdk9 or higher");
             return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
         }
     }
