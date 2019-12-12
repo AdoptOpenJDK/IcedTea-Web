@@ -31,6 +31,10 @@ import java.util.List;
 public class LaunchException extends Exception {
 
 
+    public static final String MINOR = "Minor";
+    public static final String SEVERE = "Severe";
+    public static final String FATAL = "Fatal";
+
     public static class LaunchExceptionWithStamp{
         private final LaunchException ex;
         private final Date stamp;

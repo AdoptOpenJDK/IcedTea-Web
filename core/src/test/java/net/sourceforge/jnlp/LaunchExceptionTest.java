@@ -42,6 +42,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import static net.sourceforge.jnlp.LaunchException.SEVERE;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -51,7 +52,7 @@ public class LaunchExceptionTest {
     @Test
     public void testPrintStackTrace() {
         NullPointerException cause = new NullPointerException("test");
-        LaunchException exception = new LaunchException(null, cause, "severe", "category", "test exception", "test description");
+        LaunchException exception = new LaunchException(null, cause, SEVERE, "category", "test exception", "test description");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         exception.printStackTrace(new PrintStream(baos));

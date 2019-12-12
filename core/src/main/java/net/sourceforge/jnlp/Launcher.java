@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.LaunchException.FATAL;
+import static net.sourceforge.jnlp.LaunchException.MINOR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -159,7 +161,7 @@ public class Launcher {
         } catch (InterruptedException ex) {
             //By default, null is thrown here, and the message dialog is shown.
             if (handler != null) {
-                handler.handleLaunchWarning(new LaunchException(file, ex, "Minor", "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
+                handler.handleLaunchWarning(new LaunchException(file, ex, MINOR, "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
             }
             throw new RuntimeException(ex);
         }
@@ -283,9 +285,9 @@ public class Launcher {
             final JvmLauncher jvmLauncher = JNLPRuntime.getExtensionPoint().createJvmLauncher(config);
             jvmLauncher.launchExternal(file, javawsArgs);
         } catch (NullPointerException ex) {
-            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
+            throw launchError(new LaunchException(null, ex, FATAL, "External Launch Error", "Could not determine location of javaws.jar.", "An attempt was made to launch a JNLP file in another JVM, but the javaws.jar could not be located.  In order to launch in an external JVM, the runtime must be able to locate the javaws.jar file."));
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, "Fatal", "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(null, ex, FATAL, "External Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -326,7 +328,7 @@ public class Launcher {
             }
             return file;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, "Fatal", "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
+            throw launchError(new LaunchException(null, ex, FATAL, "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
         }
     }
 
@@ -339,7 +341,7 @@ public class Launcher {
      */
    private ApplicationInstance launchApplication(final JNLPFile file) throws LaunchException {
         if (!file.isApplication()) {
-            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
+            throw launchError(new LaunchException(file, null, FATAL, "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
         }
 
         try {
@@ -386,7 +388,7 @@ public class Launcher {
 
             if (mainName == null) {
                 throw launchError(new LaunchException(file, null,
-                        "Fatal", "Application Error", "Unknown Main-Class.",
+                        FATAL, "Application Error", "Unknown Main-Class.",
                         "Could not determine the main class for this application."));
             }
 
@@ -414,7 +416,7 @@ public class Launcher {
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(file, ex, FATAL, "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }
     }
 
@@ -468,7 +470,7 @@ public class Launcher {
      */
     private ApplicationInstance launchApplet(final JNLPFile file, final Container cont) throws LaunchException {
         if (!file.isApplet()) {
-            throw launchError(new LaunchException(file, null, "Fatal", "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
+            throw launchError(new LaunchException(file, null, FATAL, "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
 
         if (JNLPRuntime.getForksStrategy().needsToFork(file)) {
@@ -492,11 +494,11 @@ public class Launcher {
             return applet;
         } catch (InstanceExistsException ieex) {
             LOG.error("Single instance applet is already running.", ieex);
-            throw launchError(new LaunchException(file, ieex, "Fatal", "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."));
+            throw launchError(new LaunchException(file, ieex, FATAL, "Launch Error", "Could not launch JNLP file.", "Another instance of this applet already exists and only one may be run at the same time."));
         } catch (LaunchException lex) {
             throw launchError(lex);
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
+            throw launchError(new LaunchException(file, ex, FATAL, "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
         }finally{
             if (handler != null) {
                 handler.launchStarting(applet);
@@ -514,7 +516,7 @@ public class Launcher {
     private ApplicationInstance launchInstaller(final JNLPFile file) throws LaunchException {
         // TODO Check for an existing single instance once implemented.
         // ServiceUtil.checkExistingSingleInstance(file);
-        throw launchError(new LaunchException(file, null, "Fatal", "Unsupported Feature", "Installers not supported.", "JNLP installer files are not yet supported."));
+        throw launchError(new LaunchException(file, null, FATAL, "Unsupported Feature", "Installers not supported.", "JNLP installer files are not yet supported."));
     }
 
     /**
@@ -570,7 +572,7 @@ public class Launcher {
 
             return appletInstance;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."));
+            throw launchError(new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize applet.", "For more information click \"more information button\"."));
         }
     }
 
@@ -590,7 +592,7 @@ public class Launcher {
 
             return app;
         } catch (Exception ex) {
-            throw new LaunchException(file, ex, "Fatal", "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
+            throw new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
         }
     }
 
@@ -668,7 +670,7 @@ public class Launcher {
                 }
                 else {
                     throw launchError(new LaunchException(file, null,
-                            "Fatal", "Application Error", "Not a launchable JNLP file.",
+                            FATAL, "Application Error", "Not a launchable JNLP file.",
                             "File must be a JNLP application, applet, or installer type."));
                 }
             } catch (LaunchException ex) {
