@@ -675,7 +675,7 @@ public class JNLPClassLoader extends URLClassLoader {
             return;
         }
 
-        List<JARDesc> initialJars = new ArrayList<>();
+        final List<JARDesc> initialJars = new ArrayList<>();
 
         for (JARDesc jar : jars) {
 
@@ -684,6 +684,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jar.isEager() || jar.isMain()) {
                 initialJars.add(jar); // regardless of part
             }
+            // FIXME: this will trigger an eager download as the tracker is created with prefetch == true
             tracker.addResource(jar.getLocation(), jar.getVersion(),
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
