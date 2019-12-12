@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -9,6 +8,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 
 public class StringUtils {
 
@@ -90,7 +90,7 @@ public class StringUtils {
     public static boolean hasPrefixMatch(final String prefixString, final String[] available) {
         Assert.requireNonBlank(prefixString, "prefixString");
 
-        if (available == null || available.length == 0){
+        if (isNullOrEmpty(available)) {
             return true;
         }
 

@@ -98,6 +98,7 @@ import java.util.jar.JarEntry;
 import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.sourceforge.jnlp.LaunchException.FATAL;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
@@ -143,7 +144,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * map from JNLPFile unique key to shared classloader
      */
-    private static Map<String, JNLPClassLoader> uniqueKeyToLoader = new ConcurrentHashMap<>();
+    private static final Map<String, JNLPClassLoader> uniqueKeyToLoader = new ConcurrentHashMap<>();
 
     /**
      * map from JNLPFile unique key to lock, the lock is needed to enforce
@@ -154,7 +155,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Provides a search path & temporary storage for native code
      */
-    private NativeLibraryStorage nativeLibraryStorage;
+    private final NativeLibraryStorage nativeLibraryStorage;
 
     /**
      * security context
@@ -164,7 +165,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the permissions for the cached jar files
      */
-    private List<Permission> resourcePermissions;
+    private final List<Permission> resourcePermissions;
 
     /**
      * the app
@@ -199,7 +200,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the resources section
      */
-    private ResourcesDesc resources;
+    private final ResourcesDesc resources;
 
     /**
      * the security section
@@ -341,6 +342,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 mainClass = entryPoint.getMainClass();
             }
         }
+        resourcePermissions = new ArrayList<>();
 
         // initialize extensions
         initializeExtensions();
@@ -554,10 +556,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
         final ExtensionDesc[] extDescs = resources.getExtensions();
         if (extDescs != null) {
+            final String uniqueKey = this.getJNLPFile().getUniqueKey();
             for (ExtensionDesc ext : extDescs) {
                 try {
-                    String uniqueKey = this.getJNLPFile().getUniqueKey();
-                    JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
+                    final JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, enableCodeBase);
                     loaderList.add(loader);
                 } catch (Exception ex) {
                     exceptions.add(new Exception("Exception while initializing extension '" + ext.getLocation() + "'", ex));
@@ -577,7 +579,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * Make permission objects for the classpath.
      */
     private void initializeReadJarPermissions() {
-        resourcePermissions = new ArrayList<>();
 
         JARDesc[] jars = resources.getJARs();
         for (JARDesc jar : jars) {
@@ -651,10 +652,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (loaders.length > 1) {
                 LOG.debug("Checking extensions of jnlp file '{}'", file.getSourceLocation());
-                final boolean containsUnsigned = Stream.of(loaders)
-                        .filter(l -> !l.getSigning())
-                        .findAny()
-                        .isPresent();
+                final boolean containsUnsigned = Stream.of(loaders).anyMatch(l -> !l.getSigning());
                 if (containsUnsigned) {
                     LOG.debug("At least one extension for jnlp file '{}' contains unsigned content", file.getSourceLocation());
                     //TODO: is NONE really right? We do not kn ow if it is NONE or PARTIAL....
@@ -677,7 +675,7 @@ public class JNLPClassLoader extends URLClassLoader {
             return;
         }
 
-        List<JARDesc> initialJars = new ArrayList<>();
+        final List<JARDesc> initialJars = new ArrayList<>();
 
         for (JARDesc jar : jars) {
 
@@ -686,6 +684,7 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jar.isEager() || jar.isMain()) {
                 initialJars.add(jar); // regardless of part
             }
+            // FIXME: this will trigger an eager download as the tracker is created with prefetch == true
             tracker.addResource(jar.getLocation(), jar.getVersion(),
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
@@ -708,8 +707,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 //we caught an Exception from the JarCertVerifier class.
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                LaunchException ex = new LaunchException(null, null, "Fatal",
+                LOG.error("Exception while verifying jars", e);
+                LaunchException ex = new LaunchException(null, null, FATAL,
                         "Initialization Error", "A fatal error occurred while trying to verify jars.", "An exception has been thrown in class JarCertVerifier. Being unable to read the cacerts or trusted.certs files could be a possible cause for this exception.: " + e.getMessage());
                 consultCertificateSecurityException(ex);
             }
@@ -740,11 +739,11 @@ public class JNLPClassLoader extends URLClassLoader {
                         try {
                             codeBaseLoader.findClass(mainClass);
                         } catch (ClassNotFoundException extCnfe) {
-                            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, extCnfe);
-                            throw new LaunchException(file, extCnfe, "Fatal", "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
+                            LOG.error("Could not determine the main class for this application.", extCnfe);
+                            throw new LaunchException(file, extCnfe, FATAL, "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
                         }
                     } else {
-                        throw new LaunchException(file, null, "Fatal", "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
+                        throw new LaunchException(file, null, FATAL, "Initialization Error", "Unknown Main-Class.", "Could not determine the main class for this application.");
                     }
                 }
 
@@ -979,7 +978,7 @@ public class JNLPClassLoader extends URLClassLoader {
              * Throws LaunchException if signed JNLP file fails to be verified
              * or fails to match the launching JNLP file
              */
-            LaunchException ex = new LaunchException(file, null, "Fatal", "Application Error",
+            LaunchException ex = new LaunchException(file, null, FATAL, "Application Error",
                     "The signed JNLP file did not match the launching JNLP file.", R(e.getMessage()));
             consultCertificateSecurityException(ex);
             /*
@@ -988,7 +987,7 @@ public class JNLPClassLoader extends URLClassLoader {
              */
 
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("failed to validate the JNLP file itself", e);
 
             /*
              * After this exception is caught, it is escaped. If an exception is
@@ -1032,7 +1031,7 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     public void setApplication(ApplicationInstance app) {
         if (this.app != null) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new IllegalStateException("Application can only be set once"));
+            LOG.error("Application can only be set once");
             return;
         }
 
@@ -1086,7 +1085,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         throw new NullPointerException("Code source security was null");
                     }
                     if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, new NullPointerException("Warning! Code source security type was null"));
+                        LOG.error("Warning! Code source security type was null");
                     }
                     Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
                     if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
@@ -1119,7 +1118,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             return result;
         } catch (RuntimeException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Failed to get permissions", ex);
             throw ex;
         }
     }
@@ -1281,7 +1280,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 LOG.debug("Activate jar: {}", location);
             } catch (Exception ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                LOG.error("Error while activating jars", ex);
             }
 
             // some programs place a native library in any jar
@@ -1563,7 +1562,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // throw additional exceptions. So instead, just ignore it.
             // Exception => jar will not get added to classpath, which will
             // result in CNFE from loadClass.
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Failed to add jar " + desc.getLocation(), e);
         }
     }
 
@@ -1583,7 +1582,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             } catch (ClassNotFoundException | PrivilegedActionException ignored) {
             } catch (ClassFormatError cfe) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, cfe);
+                LOG.error("Error while trying to find class", cfe);
             } catch (NullJnlpFileException ex) {
                 throw new ClassNotFoundException(this.mainClass + " in main classloader ", ex);
             }
@@ -1655,7 +1654,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 result = e.nextElement();
             }
         } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Failed to find resource", e);
         }
 
         // If result is still null, look in the codebase loader
@@ -1680,7 +1679,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 lresources = findResourcesBySearching(name);
             }
         } catch (LaunchException le) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, le);
+            LOG.error("Failed to load resources", le);
         }
 
         return lresources;
@@ -1841,7 +1840,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     addNewJar(des);
                     sec = jarLocationSecurityMap.get(source);
                 } catch (Throwable t) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
+                    LOG.error("Error while getting security", t);
                     sec = null;
                 }
             }
@@ -2215,11 +2214,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 if (!runInSandbox && !classLoader.getSigning()
                         && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                     if (classLoader.jcv.allJarsSigned()) {
-                        LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
+                        LaunchException ex = new LaunchException(classLoader.file, null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
                         consultCertificateSecurityException(ex);
                         return consultResult(codebaseHost);
                     } else {
-                        LaunchException ex = new LaunchException(classLoader.file, null, "Fatal", "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
+                        LaunchException ex = new LaunchException(classLoader.file, null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
                         consultCertificateSecurityException(ex);
                         return consultResult(codebaseHost);
                     }
@@ -2254,7 +2253,7 @@ public class JNLPClassLoader extends URLClassLoader {
         public void setRunInSandbox() throws LaunchException {
             if (runInSandbox && classLoader.security != null
                     && !classLoader.jarLocationSecurityMap.isEmpty()) {
-                throw new LaunchException(classLoader.file, null, "Fatal", "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
+                throw new LaunchException(classLoader.file, null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
             }
 
             JNLPRuntime.reloadPolicy();

@@ -17,6 +17,7 @@
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.CollectionUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
@@ -45,7 +46,6 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.LocaleUtils;
 import net.sourceforge.jnlp.util.LocaleUtils.Match;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
@@ -64,10 +64,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
+import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -692,10 +695,8 @@ public class JNLPFile {
                 List<T> result = new ArrayList<>();
 
                 for (ResourcesDesc rescDesc : resources) {
-                    boolean hasUsableLocale = false;
-                    for (final Match match : Match.values()) {
-                        hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
-                    }
+                    final Locale[] locales = rescDesc.getLocales();
+                    final boolean hasUsableLocale = Stream.of(Match.values()).anyMatch(match -> localeMatches(locale, locales, match));
                     if (hasUsableLocale
                             && hasPrefixMatch(os, rescDesc.getOS())
                             && hasPrefixMatch(arch, rescDesc.getArch())) {
@@ -740,7 +741,7 @@ public class JNLPFile {
         for (ResourcesDesc rescDesc : resources) {
             boolean hasUsableLocale = false;
             for (Match match : Match.values()) {
-                hasUsableLocale |= LocaleUtils.localeMatches(locale, rescDesc.getLocales(), match);
+                hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
             }
             if (hasUsableLocale
                     && hasPrefixMatch(os, rescDesc.getOS())

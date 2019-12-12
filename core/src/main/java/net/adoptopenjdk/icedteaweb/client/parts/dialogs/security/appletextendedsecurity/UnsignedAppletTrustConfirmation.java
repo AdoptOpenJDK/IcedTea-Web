@@ -59,6 +59,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static net.sourceforge.jnlp.LaunchException.FATAL;
+
 public class UnsignedAppletTrustConfirmation {
 
     private final static Logger LOG = LoggerFactory.getLogger(UnsignedAppletTrustConfirmation.class);
@@ -201,7 +203,7 @@ public class UnsignedAppletTrustConfirmation {
 
         if (unsignedAppletsAreForbidden()) {
             LOG.debug("Not running unsigned applet at {} because unsigned applets are disallowed by security policy.", file.getCodeBase());
-            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was unsigned.", "The applet was unsigned.PolicyDenied");
+            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.PolicyDenied");
         }
 
         if (!unsignedConfirmationIsRequired()) {
@@ -214,7 +216,7 @@ public class UnsignedAppletTrustConfirmation {
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || !warningResponse.compareValue(Primitive.YES)) {
-            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was unsigned.", "The applet was unsigned.UserDenied");
+            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.UserDenied");
         }
 
     }
@@ -232,7 +234,7 @@ public class UnsignedAppletTrustConfirmation {
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || warningResponse.compareValue(Primitive.NO)) {
-            throw new LaunchException(file, null, "Fatal", "Application Error", "The applet was partially signed.", "The applet was partially signed.UserDenied");
+            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was partially signed.", "The applet was partially signed.UserDenied");
         }
 
         //this is due to possible YesNoSandboxLimited
