@@ -555,10 +555,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
         final ExtensionDesc[] extDescs = resources.getExtensions();
         if (extDescs != null) {
+            final String uniqueKey = this.getJNLPFile().getUniqueKey();
             for (ExtensionDesc ext : extDescs) {
                 try {
-                    String uniqueKey = this.getJNLPFile().getUniqueKey();
-                    JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, this.enableCodeBase);
+                    final JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, enableCodeBase);
                     loaderList.add(loader);
                 } catch (Exception ex) {
                     exceptions.add(new Exception("Exception while initializing extension '" + ext.getLocation() + "'", ex));
