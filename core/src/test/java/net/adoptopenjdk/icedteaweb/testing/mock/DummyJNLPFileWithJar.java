@@ -80,8 +80,9 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         }
         return localResources;
     }
+
     @Override
-    public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
+    public ResourcesDesc[] getResourcesDescs() {
         return new ResourcesDesc[] { getResources() };
     }
 

@@ -4,15 +4,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
 
 public class StringUtils {
 
-    private static final String WHITESPACE_CHARACTER_SEQUENCE = "\\s+";
+    public static final String EMPTY_STRING = "";
 
     private StringUtils() {
         // do not instantiate
@@ -75,38 +76,33 @@ public class StringUtils {
     }
 
     /**
-     * Checks whether the first part of the given prefixString is a prefix for any of the strings
-     * in the specified array. If no array is specified (empty or null) it is considered to be a
-     * match.
+     *  If a candidate is a prefix of the heyStack, then this is a match. If no candidates are specified, it matches any heyStack.
      *
-     * If the {@code prefixString} contains multiple words separated by a space character, the
-     * first word is taken as prefix for comparison.
+     * @implSpec See <b>JSR-56, Section 4. Application Resources - Overview</b>
+     * for a detailed specification of this use case.
      *
-     * @param prefixString the prefixString string
-     * @param available the strings to test
-     * @return true if the first part of the given prefixString is a prefix for any of the strings
-     * in the specified array or the specified array is empty or null, false otherwise
+     * @param heyStack the string to match candidates against
+     * @param candidates the strings to test as possible prefixes
+     * @return true if the any of the candidates is a prefix match of the heystack or if there are no candidates.
      */
-    public static boolean hasPrefixMatch(final String prefixString, final String[] available) {
-        Assert.requireNonBlank(prefixString, "prefixString");
+    public static boolean hasPrefixMatch(final String heyStack, final String... candidates) {
+        Assert.requireNonBlank(heyStack, "heyStack");
 
-        if (isNullOrEmpty(available)) {
+        if (candidates == null) {
+            return true;
+        }
+        final List<String> trimmedCandidates = Arrays.stream(candidates)
+                .filter(str -> !isBlank(str))
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
+
+        if (trimmedCandidates.isEmpty()) {
             return true;
         }
 
-        final String trimmedPrefix = prefixString.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
-
-        for (final String candidate : available) {
-            String trimmedCandidate = null;
-            if (candidate != null) {
-                trimmedCandidate = candidate.split(WHITESPACE_CHARACTER_SEQUENCE)[0];
-            }
-            if (trimmedCandidate != null && trimmedCandidate.startsWith(trimmedPrefix)) {
-                return true;
-            }
-        }
-
-        return false;
+        final String trimmedHeyStack = heyStack.trim().toLowerCase();
+        return trimmedCandidates.stream().anyMatch(trimmedHeyStack::startsWith);
     }
 
     public static String substringBeforeLast(final String s, final String separator) {

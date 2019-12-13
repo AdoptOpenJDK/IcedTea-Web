@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -8,12 +7,15 @@ import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.adoptopenjdk.icedteaweb.StringUtils.splitIntoMultipleLines;
+import static net.adoptopenjdk.icedteaweb.StringUtils.substringBeforeLast;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.blankOrNullString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -113,86 +115,51 @@ public class StringUtilsTest {
 
     @Test
     public void prefixShouldBeIncludedInArrayOfStrings() {
-        boolean result = hasPrefixMatch("Windows", new String[]{"Linux", "MacOS", "Windows10-beta"});
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("Windows", new String[]{"Windows"});
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("  Windows  ", new String[]{"Windows"});
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("Windows  ", new String[]{"Windows    "});
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("Windows 7", new String[]{"Windows7"}); // just compare the first prefix token
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("MacOS", new String[]{});
-        org.junit.Assert.assertTrue(result);
-
-        result = hasPrefixMatch("MacOS", null);
-        Assert.assertTrue(result);
+        assertTrue(hasPrefixMatch("Windows 7", "windows"));
+        assertTrue(hasPrefixMatch("Windows  ", " Windows    "));
+        assertTrue(hasPrefixMatch("Windows", "Windows"));
+        assertTrue(hasPrefixMatch("  Windows  ", "Windows"));
+        assertTrue(hasPrefixMatch("Windows  ", "Windows    "));
+        assertTrue(hasPrefixMatch("Windows 7", "Windows 7"));
+        assertTrue(hasPrefixMatch("MacOS"));
+        assertTrue(hasPrefixMatch("MacOS", (String[]) null));
     }
 
     @Test
     public void prefixShouldNotBeIncludedInArrayOfStrings() {
-        boolean result = hasPrefixMatch("MacOS", new String[]{"Linux", "Windows", null});
-        org.junit.Assert.assertFalse(result);
-
-        result = hasPrefixMatch("Win7", new String[]{"Win 7", "Win 7.1", "Windows10"});
-        org.junit.Assert.assertFalse(result);
-
-        result = hasPrefixMatch("Windows Mobile", new String[]{"Mobile"});
-        org.junit.Assert.assertFalse(result);
-
-        result = hasPrefixMatch("Windows 7", new String[]{"7"});
-        org.junit.Assert.assertFalse(result);
-
-        result = hasPrefixMatch("Windows 7", new String[]{"windows"});
-        org.junit.Assert.assertFalse(result);
-
-        result = hasPrefixMatch("Windows  ", new String[]{" Windows    "});
-        org.junit.Assert.assertFalse(result);
+        assertFalse(hasPrefixMatch("MacOS", "Linux", "Windows", null));
+        assertFalse(hasPrefixMatch("Win7", "Win 7", "Win 7.1", "Windows10"));
+        assertFalse(hasPrefixMatch("Windows Mobile", "Mobile"));
+        assertFalse(hasPrefixMatch("Windows 7", "7"));
+        assertFalse(hasPrefixMatch("Windows", "Linux", "MacOS", "Windows10-beta"));
     }
 
     @Test(expected = NullPointerException.class)
     public void testHasPrefixMatchWithNullPrefixString() {
-        hasPrefixMatch(null, new String[]{"windows"});
+        hasPrefixMatch(null, "windows");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testHasPrefixMatchWithEmptyPrefixString() {
-        hasPrefixMatch("", new String[]{"windows"});
+        hasPrefixMatch("", "windows");
     }
 
     @Test
     public void testSubstringBeforeLast() {
-        String source = StringUtils.substringBeforeLast("https://domain.com/substringtest", "/");
-        Assert.assertThat(source, equalTo("https://domain.com"));
-
-        source = StringUtils.substringBeforeLast("https://domain.com/substringtest/", "/");
-        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
+        assertThat(substringBeforeLast("https://domain.com/substringtest", "/"), equalTo("https://domain.com"));
+        assertThat(substringBeforeLast("https://domain.com/substringtest/", "/"), equalTo("https://domain.com/substringtest"));
     }
 
    @Test
     public void testSubstringBeforeLastWithNoStringMatch() {
-        String source = StringUtils.substringBeforeLast("no slash", "/");
-        Assert.assertThat(source, equalTo("no slash"));
-
-        source = StringUtils.substringBeforeLast("", "/");
-        Assert.assertThat(source, is(blankOrNullString()));
-
-        source = StringUtils.substringBeforeLast(null, "/");
-        Assert.assertThat(source, is(blankOrNullString()));
+       assertThat(substringBeforeLast("no slash", "/"), equalTo("no slash"));
+       assertThat(substringBeforeLast("", "/"), is(blankOrNullString()));
+       assertThat(substringBeforeLast(null, "/"), is(blankOrNullString()));
     }
 
     @Test
     public void testSubstringBeforeLastWithInvalidSeparator() {
-        String source = StringUtils.substringBeforeLast("https://domain.com/substringtest", "");
-        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
-
-        source = StringUtils.substringBeforeLast("https://domain.com/substringtest", null);
-        Assert.assertThat(source, equalTo("https://domain.com/substringtest"));
+        assertThat(substringBeforeLast("https://domain.com/substringtest", ""), equalTo("https://domain.com/substringtest"));
+        assertThat(substringBeforeLast("https://domain.com/substringtest", null), equalTo("https://domain.com/substringtest"));
     }
 }
