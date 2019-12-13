@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.AssociationDesc.ASSOCIATION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.DEFAULT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.DescriptionKind.ONE_LINE;
@@ -68,7 +69,7 @@ public class InformationDesc {
     /**
      * The locales for which the information element should be used.
      */
-    final private Locale[] locales;
+    private final Locale[] locales;
 
     /**
      * Specifies the operating system for which the information element should be considered. If the value is a
@@ -87,7 +88,7 @@ public class InformationDesc {
     /**
      * the data as list of key,value pairs
      */
-    private List<Object> info;
+    private final Map<String, List<Object>> info = new HashMap<>();
 
     public final boolean strict;
 
@@ -366,16 +367,9 @@ public class InformationDesc {
      * @param key key to find item
      * @return all items matching the specified key.
      */
-    public List<Object> getItems(final Object key) {
-        if (info == null)
-            return Collections.emptyList();
-
-        final List<Object> result = new ArrayList<>();
-        for (int i = 0; i < info.size(); i += 2)
-            if (info.get(i).equals(key))
-                result.add(info.get(i + 1));
-
-        return result;
+    public List<Object> getItems(final String key) {
+        final List<Object> items = info.get(key);
+        return items != null ? new ArrayList<>(items) : emptyList();
     }
 
     /**
@@ -387,26 +381,11 @@ public class InformationDesc {
      */
     public void addItem(final String key, final Object value) {
         Assert.requireNonNull(key, "key");
-
-        if (info == null)
-            info = new ArrayList<>();
-
-        info.add(key);
-        info.add(value);
+        info.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
     }
 
     public Map<String, List<Object>> getItems() {
-        final Map<String, List<Object>> result = new HashMap<>();
-
-        if (info != null) {
-            for (int i = 0; i < info.size(); i += 2) {
-                final String key = (String) info.get(i);
-                final Object value = info.get(i + 1);
-                result.computeIfAbsent(key, k -> new ArrayList()).add(value);
-            }
-        }
-
-        return result;
+        return new HashMap<>(info);
     }
 
 

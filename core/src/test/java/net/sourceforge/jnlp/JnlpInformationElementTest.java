@@ -111,7 +111,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         );
 
         // when
-        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", null);
+        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", "x86");
 
         // then
         assertThat(information.getTitle(), is("Titel"));
@@ -141,7 +141,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         );
 
         // when
-        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", null);
+        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Mac OS X", "x32");
 
         // then
         assertThat(information.getTitle(), is("Titel"));
@@ -218,7 +218,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
                 + "    <vendor>Vendor</vendor>\n"
                 + "    <description>Description</description>\n"
                 + "  </information>\n"
-                + "  <information locale=\"de\" os=\"Win10\">\n"
+                + "  <information locale=\"de\" os=\"Win\">\n"
                 + "    <vendor>Windows</vendor>\n"
                 + "    <description>Beschreibung</description>\n"
                 + "  </information>\n"
@@ -228,7 +228,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         );
 
         // when
-        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Win", null);
+        final InformationDesc information = jnlpFile.getInformation(Locale.GERMAN, "Win10", "x32");
 
         // then
         assertThat(information.getTitle(), is("Title"));
@@ -245,7 +245,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
                 + "    <vendor>Vendor</vendor>\n"
                 + "    <description>Description</description>\n"
                 + "  </information>\n"
-                + "  <information locale=\"en\" os=\"Mac OS X\" arch=\"x86_64\">\n"
+                + "  <information locale=\"en\" os=\"Mac OS X\" arch=\"x86\">\n"
                 + "    <vendor>Apple</vendor>\n"
                 + "  </information>\n"
                 + "  <resources>\n"
@@ -254,7 +254,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
         );
 
         // when
-        final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, null, "x86");
+        final InformationDesc information = jnlpFile.getInformation(Locale.ENGLISH, "Mac OS X", "x86_64");
 
         // then
         assertThat(information.getTitle(), is("Title"));

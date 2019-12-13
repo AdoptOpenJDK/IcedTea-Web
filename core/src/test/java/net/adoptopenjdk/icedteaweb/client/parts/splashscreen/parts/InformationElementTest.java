@@ -45,12 +45,16 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -78,20 +82,20 @@ public class InformationElementTest {
         }
 
         public String toXml() {
-            if (type.equals(homepage)) {
+            if (type.equals(HOMEPAGE_ELEMENT)) {
                 return "<" + type + " " + HomepageDesc.HREF_ATTRIBUTE + "=\"" + value + "\"/>";
             }
             return "<" + type + ">" + value + "</" + type + ">";
         }
     }
-    private final static TestInfoItem title = new TestInfoItem(InformationDesc.TITLE_ELEMENT, "title exp");
-    private final static TestInfoItem vendor = new TestInfoItem(InformationDesc.VENDOR_ELEMENT, "vendor exp");
-    private final static TestInfoItem homepage = new TestInfoItem(HomepageDesc.HOMEPAGE_ELEMENT, "http://homepage.exp");
-    private final static TestDescriptionInfoItem oneLineD = new TestDescriptionInfoItem("One Line", DescriptionKind.ONE_LINE);
-    private final static TestDescriptionInfoItem toolTipD = new TestDescriptionInfoItem("Tooltip", DescriptionKind.TOOLTIP);
-    private final static TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionKind.SHORT);
-    private final static TestDescriptionInfoItem short2D = new TestDescriptionInfoItem("short2", DescriptionKind.SHORT);
-    private final static TestDescriptionInfoItem noKindD = new TestDescriptionInfoItem("noKind", null);
+    private static final TestInfoItem title = new TestInfoItem(InformationDesc.TITLE_ELEMENT, "title exp");
+    private static final TestInfoItem vendor = new TestInfoItem(InformationDesc.VENDOR_ELEMENT, "vendor exp");
+    private static final TestInfoItem homepage = new TestInfoItem(HOMEPAGE_ELEMENT, "http://homepage.exp");
+    private static final TestDescriptionInfoItem oneLineD = new TestDescriptionInfoItem("One Line", DescriptionKind.ONE_LINE);
+    private static final TestDescriptionInfoItem toolTipD = new TestDescriptionInfoItem("Tooltip", DescriptionKind.TOOLTIP);
+    private static final TestDescriptionInfoItem short1D = new TestDescriptionInfoItem("short1", DescriptionKind.SHORT);
+    private static final TestDescriptionInfoItem short2D = new TestDescriptionInfoItem("short2", DescriptionKind.SHORT);
+    private static final TestDescriptionInfoItem noKindD = new TestDescriptionInfoItem("noKind", null);
     private static final String testJnlpHeader =
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
             + "<jnlp spec=\"1.0\" href=\"http://somehref.jnlp\" codebase=\"http://some.code.base\">\n"
@@ -108,93 +112,93 @@ public class InformationElementTest {
 
     @Test
     public void testSetGetTitle() {
-
-        InformationElement ie = new InformationElement();
-        Assert.assertNull("After creation value must be null", ie.getTitle());
+        final InformationElement ie = new InformationElement();
+        assertNull("After creation value must be null", ie.getTitle());
         ie.setTitle(title.getValue());
-        Assert.assertNotNull("After assignment value must NOT be null", ie.getTitle());
-        Assert.assertTrue("After assignment value must be included in output", ie.getTitle().contains(title.getValue()));
+        assertNotNull("After assignment value must NOT be null", ie.getTitle());
+        assertTrue("After assignment value must be included in output", ie.getTitle().contains(title.getValue()));
     }
 
     @Test
     public void testSetGetVendor() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNull("After creation value must be null", ie.getVendor());
+        final InformationElement ie = new InformationElement();
+        assertNull("After creation value must be null", ie.getVendor());
         ie.setvendor(vendor.getValue());
-        Assert.assertNotNull("After assignment value must NOT be null", ie.getVendor());
-        Assert.assertTrue("After assignment value must be included in output", ie.getVendor().contains(vendor.getValue()));
+        assertNotNull("After assignment value must NOT be null", ie.getVendor());
+        assertTrue("After assignment value must be included in output", ie.getVendor().contains(vendor.getValue()));
     }
 
     @Test
     public void testSetGetHomepage() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNull("After creation value must be null", ie.getHomepage());
+        final InformationElement ie = new InformationElement();
+        assertNull("After creation value must be null", ie.getHomepage());
         ie.setHomepage(homepage.getValue());
-        Assert.assertNotNull("After assignment value must NOT be null", ie.getHomepage());
-        Assert.assertTrue("After assignment value must be included in output", ie.getHomepage().contains(homepage.getValue()));
+        assertNotNull("After assignment value must NOT be null", ie.getHomepage());
+        assertTrue("After assignment value must be included in output", ie.getHomepage().contains(homepage.getValue()));
     }
 
     @Test
     public void addDescriptionTest() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should be empty", 0, ie.getDescriptions().size());
+        final InformationElement ie = new InformationElement();
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should be empty", 0, ie.getDescriptions().size());
         ie.addDescription(toolTipD.getValue(), toolTipD.getKind());
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should be empty", 1, ie.getDescriptions().size());
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should be empty", 1, ie.getDescriptions().size());
         ie.addDescription(short1D.getValue(), short1D.getKind());
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should be empty", 2, ie.getDescriptions().size());
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should be empty", 2, ie.getDescriptions().size());
         ie.addDescription(short2D.getValue(), short2D.getKind());
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should remain same", 2, ie.getDescriptions().size());
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should remain same", 2, ie.getDescriptions().size());
         ie.addDescription(oneLineD.getValue(), oneLineD.getKind());
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should be ", 3, ie.getDescriptions().size());
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should be ", 3, ie.getDescriptions().size());
         ie.addDescription(noKindD.getValue(), noKindD.getKind());
-        Assert.assertNotNull("Descriptions should never be null", ie.getDescriptions());
-        Assert.assertEquals("Descriptions should be ", 4, ie.getDescriptions().size());
+        assertNotNull("Descriptions should never be null", ie.getDescriptions());
+        assertEquals("Descriptions should be ", 4, ie.getDescriptions().size());
 
 
     }
 
     public void getBestMatchingDescriptionForSplashTest() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNull(ie.getBestMatchingDescriptionForSplash());
+        final InformationElement ie = new InformationElement();
+        assertNull(ie.getBestMatchingDescriptionForSplash());
         ie.addDescription(toolTipD.getValue(), toolTipD.getKind());
-        Assert.assertNull(ie.getBestMatchingDescriptionForSplash());
+        assertNull(ie.getBestMatchingDescriptionForSplash());
         ie.addDescription(short1D.getValue(), short1D.getKind());
-        Assert.assertNull(ie.getBestMatchingDescriptionForSplash());
+        assertNull(ie.getBestMatchingDescriptionForSplash());
         ie.addDescription(noKindD.getValue(), noKindD.getKind());
-        Assert.assertNotNull(ie.getBestMatchingDescriptionForSplash());
-        Assert.assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (noKindD.getValue()));
+        assertNotNull(ie.getBestMatchingDescriptionForSplash());
+        assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (noKindD.getValue()));
         ie.addDescription(oneLineD.getValue(), oneLineD.getKind());
-        Assert.assertNotNull(ie.getBestMatchingDescriptionForSplash());
-        Assert.assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (oneLineD.getValue()));
+        assertNotNull(ie.getBestMatchingDescriptionForSplash());
+        assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (oneLineD.getValue()));
         ie.addDescription(short2D.getValue(), short2D.getKind());
-        Assert.assertNotNull(ie.getBestMatchingDescriptionForSplash());
-        Assert.assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (oneLineD.getValue()));
+        assertNotNull(ie.getBestMatchingDescriptionForSplash());
+        assertEquals(ie.getBestMatchingDescriptionForSplash().getValue(), (oneLineD.getValue()));
 
 
     }
 
+    @Test
     public void getLongestDescriptionForSplashTest() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNull(ie.getLongestDescriptionForSplash());
+        final InformationElement ie = new InformationElement();
+        assertNull(ie.getLongestDescriptionForSplash());
         ie.addDescription(toolTipD.getValue(), toolTipD.getKind());
-        Assert.assertNotNull(ie.getLongestDescriptionForSplash());
-        Assert.assertEquals(ie.getLongestDescriptionForSplash().getValue(), (toolTipD.getValue()));
+        assertNotNull(ie.getLongestDescriptionForSplash());
+        assertEquals(ie.getLongestDescriptionForSplash().getValue(), (toolTipD.getValue()));
         ie.addDescription(oneLineD.getValue(), oneLineD.getKind());
-        Assert.assertNotNull(ie.getLongestDescriptionForSplash());
-        Assert.assertEquals(ie.getLongestDescriptionForSplash().getValue(), (oneLineD.getValue()));
+        assertNotNull(ie.getLongestDescriptionForSplash());
+        assertEquals(ie.getLongestDescriptionForSplash().getValue(), (oneLineD.getValue()));
         ie.addDescription(noKindD.getValue(), noKindD.getKind());
         ie.addDescription(oneLineD.getValue(), oneLineD.getKind());//disturb
-        Assert.assertNotNull(ie.getLongestDescriptionForSplash());
-        Assert.assertEquals(ie.getLongestDescriptionForSplash().getValue(), (noKindD.getValue()));
+        assertNotNull(ie.getLongestDescriptionForSplash());
+        assertEquals(ie.getLongestDescriptionForSplash().getValue(), (noKindD.getValue()));
         ie.addDescription(short1D.getValue(), short1D.getKind());
         ie.addDescription(toolTipD.getValue(), toolTipD.getKind());//disturb
-        Assert.assertNotNull(ie.getLongestDescriptionForSplash());
-        Assert.assertEquals(ie.getLongestDescriptionForSplash().getValue(), (short1D.getValue()));
+        assertNotNull(ie.getLongestDescriptionForSplash());
+        assertEquals(ie.getLongestDescriptionForSplash().getValue(), (short1D.getValue()));
 
     }
 
@@ -206,81 +210,65 @@ public class InformationElementTest {
 
     @Test
     public void getHeaderTest() {
-        InformationElement ie = new InformationElement();
-        Assert.assertNotNull("Header should never be null", ie.getHeader());
-        Assert.assertEquals(0, ie.getHeader().size());
+        final InformationElement ie = new InformationElement();
+        assertNotNull("Header should never be null", ie.getHeader());
+        assertEquals(0, ie.getHeader().size());
         ie.setvendor(vendor.getValue());
-        Assert.assertEquals(1, ie.getHeader().size());
+        assertEquals(1, ie.getHeader().size());
         ie.setTitle(title.getValue());
-        Assert.assertEquals(2, ie.getHeader().size());
+        assertEquals(2, ie.getHeader().size());
         ie.setHomepage(homepage.getValue());
-        Assert.assertEquals(3, ie.getHeader().size());
+        assertEquals(3, ie.getHeader().size());
         ie.setTitle(homepage.getValue());
-        Assert.assertEquals(3, ie.getHeader().size());
+        assertEquals(3, ie.getHeader().size());
         ie.addDescription(toolTipD.getValue());
-        Assert.assertEquals(3, ie.getHeader().size());
+        assertEquals(3, ie.getHeader().size());
         ie.addDescription(oneLineD.getValue());
-        Assert.assertEquals(3, ie.getHeader().size());
+        assertEquals(3, ie.getHeader().size());
     }
 
     @Test
     public void createFromJNLP() throws ParseException {
-        ParserSettings parser = new ParserSettings();
-        JNLPFile jnlpFile0 = null;
-        InformationElement ie0 = InformationElement.createFromJNLP(jnlpFile0);
-        Assert.assertNotNull(ie0);
-        String exJnlp1 = "<jnlp>this is invalid jnlp<jnlp>";
-        Exception ex = null;
-        JNLPFile jnlpFile1 = null;
-        try {
-            jnlpFile1 = new JNLPFile(new ByteArrayInputStream(exJnlp1.getBytes(UTF_8)), parser);
-        } catch (Exception eex) {
-            ex = eex;
-        }
-        Assert.assertNotNull(ex);
-        InformationElement ie1 = InformationElement.createFromJNLP(jnlpFile1);
-        Assert.assertNotNull(ie1);
+        final ParserSettings parser = new ParserSettings();
+        final InformationElement ie0 = InformationElement.createFromJNLP(null);
+        assertNotNull(ie0);
 
         //title, vendor and homepage are obligatory.. not so much to test
-        String exJnlp2 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes(UTF_8)), parser);
-        InformationElement ie2 = InformationElement.createFromJNLP(jnlpFile2);
-        Assert.assertNotNull(ie2);
-        Assert.assertEquals(3, ie2.getHeader().size());
-        Assert.assertEquals(0, ie2.getDescriptions().size());
+        final String exJnlp2 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
+        final JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes(UTF_8)), parser);
+        final InformationElement ie2 = InformationElement.createFromJNLP(jnlpFile2);
+        assertNotNull(ie2);
+        assertEquals(3, ie2.getHeader().size());
+        assertEquals(0, ie2.getDescriptions().size());
 
-        String exJnlp3 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes(UTF_8)), parser);
-        InformationElement ie3 = InformationElement.createFromJNLP(jnlpFile3);
-        Assert.assertNotNull(ie3);
-        Assert.assertEquals(3, ie3.getHeader().size());
-        Assert.assertEquals(1, ie3.getDescriptions().size());
+        final String exJnlp3 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
+        final JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes(UTF_8)), parser);
+        final InformationElement ie3 = InformationElement.createFromJNLP(jnlpFile3);
+        assertNotNull(ie3);
+        assertEquals(3, ie3.getHeader().size());
+        assertEquals(1, ie3.getDescriptions().size());
 
-        String exJnlp4 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes(UTF_8)), parser);
-        InformationElement ie4 = InformationElement.createFromJNLP(jnlpFile4);
-        Assert.assertNotNull(ie4);
-        Assert.assertEquals(3, ie4.getHeader().size());
-        Assert.assertEquals(1, ie4.getDescriptions().size());
+        final String exJnlp4 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
+        final JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes(UTF_8)), parser);
+        final InformationElement ie4 = InformationElement.createFromJNLP(jnlpFile4);
+        assertNotNull(ie4);
+        assertEquals(3, ie4.getHeader().size());
+        assertEquals(1, ie4.getDescriptions().size());
 
-        String exJnlp5 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes(UTF_8)), parser);
-        InformationElement ie5 = InformationElement.createFromJNLP(jnlpFile5);
-        Assert.assertNotNull(ie5);
-        Assert.assertEquals(3, ie5.getHeader().size());
-        Assert.assertEquals(2, ie5.getDescriptions().size());
-
-
+        final String exJnlp5 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
+        final JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes(UTF_8)), parser);
+        final InformationElement ie5 = InformationElement.createFromJNLP(jnlpFile5);
+        assertNotNull(ie5);
+        assertEquals(3, ie5.getHeader().size());
+        assertEquals(2, ie5.getDescriptions().size());
     }
-
 
     @Test
     public void toXml() {
-        TestInfoItem i1 = new TestInfoItem("aa", "bb");
-        Assert.assertTrue(i1.toXml().contains("aa"));
-        Assert.assertTrue(i1.toXml().contains("bb"));
-        Assert.assertTrue(i1.toXml().length() > 4);
+        final TestInfoItem i1 = new TestInfoItem("aa", "bb");
+        assertTrue(i1.toXml().contains("aa"));
+        assertTrue(i1.toXml().contains("bb"));
+        assertTrue(i1.toXml().length() > 4);
         JEditorPaneBasedExceptionDialogTest.assertMarkup(i1.toXml());
-
     }
 }

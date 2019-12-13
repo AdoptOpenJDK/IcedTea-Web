@@ -11,57 +11,57 @@ public class LocaleUtilsTest {
 
     @Test
     public void testCompareAll() {
-        Locale[] correctAvailable = { new Locale("en", "CA", "utf8") };
+        final Locale[] correctAvailable = { new Locale("en", "CA", "utf8") };
         Assert.assertTrue("Entire locale should match but did not.",
-                localeMatches(jvmLocale, correctAvailable, Match.LANG_COUNTRY_VARIANT));
+                localMatches(jvmLocale, Match.LANG_COUNTRY_VARIANT, correctAvailable));
 
-        Locale[] mismatchedAvailable = { new Locale("en", "CA", "utf16") };
+        final Locale[] mismatchedAvailable = { new Locale("en", "CA", "utf16") };
         Assert.assertFalse("Should not match variant but did.",
-                localeMatches(jvmLocale, mismatchedAvailable, Match.LANG_COUNTRY_VARIANT));
+                localMatches(jvmLocale, Match.LANG_COUNTRY_VARIANT, mismatchedAvailable));
     }
 
     @Test
     public void testLangAndCountry() {
-        Locale[] correctAvailable = { new Locale("en", "CA") };
+        final Locale[] correctAvailable = { new Locale("en", "CA") };
         Assert.assertTrue("Should match language and country, ignoring variant but did not.",
-                localeMatches(jvmLocale, correctAvailable, Match.LANG_COUNTRY));
+                localMatches(jvmLocale, Match.LANG_COUNTRY, correctAvailable));
 
-        Locale[] mismatchedAvailable = { new Locale("en", "EN") };
+        final Locale[] mismatchedAvailable = { new Locale("en", "EN") };
         Assert.assertFalse("Should not match country but did.",
-                localeMatches(jvmLocale, mismatchedAvailable, Match.LANG_COUNTRY));
+                localMatches(jvmLocale, Match.LANG_COUNTRY, mismatchedAvailable));
 
-        Locale[] extraMismatched = { new Locale("en", "CA", "utf16") };
+        final Locale[] extraMismatched = { new Locale("en", "CA", "utf16") };
         Assert.assertFalse("Should not match because of extra variant but did.",
-                localeMatches(jvmLocale, extraMismatched, Match.LANG_COUNTRY));
+                localMatches(jvmLocale, Match.LANG_COUNTRY, extraMismatched));
     }
 
     @Test
     public void testLangOnly() {
-        Locale[] correctAvailable = { new Locale("en") };
+        final Locale[] correctAvailable = { new Locale("en") };
         Assert.assertTrue("Should match only language but did not.",
-                localeMatches(jvmLocale, correctAvailable, Match.LANG));
+                localMatches(jvmLocale, Match.LANG, correctAvailable));
 
-        Locale[] mismatchedAvailable = { new Locale("fr", "CA", "utf8") };
+        final Locale[] mismatchedAvailable = { new Locale("fr", "CA", "utf8") };
         Assert.assertFalse("Should not match language but did.",
-                localeMatches(jvmLocale, mismatchedAvailable, Match.LANG));
+                localMatches(jvmLocale, Match.LANG, mismatchedAvailable));
 
-        Locale[] extraMismatched = { new Locale("en", "EN") };
+        final Locale[] extraMismatched = { new Locale("en", "EN") };
         Assert.assertFalse("Should not match because of extra country but did.",
-                localeMatches(jvmLocale, extraMismatched, Match.LANG));
+                localMatches(jvmLocale, Match.LANG, extraMismatched));
     }
 
     @Test
     public void testNoLocalAvailable() {
         // TODO we should rethink this decision, should always hand in an empty array of locales
         Assert.assertTrue("Null locales should match but did not.",
-                localeMatches(jvmLocale, null, Match.GENERALIZED));
+                localMatches(jvmLocale, Match.GENERALIZED));
 
-        Locale[] emptyAvailable = {};
+        final Locale[] emptyAvailable = {};
         Assert.assertTrue("Empty locales list should match but did not.",
-                localeMatches(jvmLocale, emptyAvailable, Match.GENERALIZED));
+                localMatches(jvmLocale, Match.GENERALIZED, emptyAvailable));
 
-        Locale[] mismatchAvailable = { new Locale("fr", "FR", "utf16") };
+        final Locale[] mismatchAvailable = { new Locale("fr", "FR", "utf16") };
         Assert.assertFalse("Locales list should not match generalized case but did.",
-                localeMatches(jvmLocale, mismatchAvailable, Match.GENERALIZED));
+                localMatches(jvmLocale, Match.GENERALIZED, mismatchAvailable));
     }
 }

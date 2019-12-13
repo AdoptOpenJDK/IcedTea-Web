@@ -17,7 +17,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.CollectionUtils;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
@@ -46,7 +45,6 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.LocaleUtils.Match;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
@@ -64,12 +62,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
+import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
-import static net.sourceforge.jnlp.util.LocaleUtils.localMatches;
 import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
@@ -597,41 +594,31 @@ public class JNLPFile {
             return new InformationDesc(new Locale[]{locale}, os, arch);
         }
 
-        final boolean strict = infos.stream().anyMatch(infoDesc -> infoDesc.strict);
-
+        final AtomicBoolean strict = new AtomicBoolean(false);
         final Map<String, List<Object>> mergedItems = new HashMap<>();
 
-        for (InformationDesc infoDesc : infos) {
-            for (Match precision : Match.values()) {
-                if (localMatches(locale, precision, infoDesc.getLocales())) {
-                    if (StringUtils.isBlank(os) || StringUtils.isBlank(infoDesc.getOs()) ||
-                            (Objects.nonNull(infoDesc.getOs()) && infoDesc.getOs().toLowerCase().startsWith(os.toLowerCase()))) {
-                        if (StringUtils.isBlank(arch) || StringUtils.isBlank(infoDesc.getArch()) ||
-                                (Objects.nonNull(infoDesc.getArch()) && infoDesc.getArch().toLowerCase().startsWith(arch.toLowerCase()))) {
-
-                            final Map<String, List<Object>> items = infoDesc.getItems();
-
-                            for (String key : items.keySet()) {
-                                if (mergedItems.containsKey(key)) {
-                                    final List<Object> values = mergedItems.get(key);
-                                    items.get(key).stream()
-                                            .filter(v -> !StringUtils.isBlank(v.toString()))
-                                            .forEach(values::add);
-                                }
-                                else {
-                                    mergedItems.put(key, infoDesc.getItems(key));
-                                }
-                            }
-                        }
+        infos.stream()
+                .filter(infoDesc -> localeMatches(infoDesc.getLocales(), locale))
+                .filter(infoDesc -> hasPrefixMatch(os, infoDesc.getOs()))
+                .filter(infoDesc -> hasPrefixMatch(arch, infoDesc.getArch()))
+                .peek(infoDesc -> {
+                    if (infoDesc.strict) {
+                        strict.set(true);
                     }
-                    break; // after first match of the locale break out of the precision loop.
-                }
-            }
-        }
+                })
+                .flatMap(infoDesc -> infoDesc.getItems().entrySet().stream())
+                .forEach(itemEntry -> {
+                    final List<Object> newValues = itemEntry.getValue().stream()
+                            .filter(v -> v != null)
+                            .filter(v -> !StringUtils.isBlank(v.toString()))
+                            .collect(toList());
 
-        return new InformationDesc(new Locale[]{locale}, os, arch, strict) {
+                    mergedItems.computeIfAbsent(itemEntry.getKey(), k -> new ArrayList<>()).addAll(newValues);
+                });
+
+        return new InformationDesc(new Locale[]{locale}, os, arch, strict.get()) {
             @Override
-            public List<Object> getItems(Object key) {
+            public List<Object> getItems(String key) {
                 final List<Object> result = mergedItems.get(key);
                 return result == null ? Collections.emptyList() : result;
             }
@@ -692,18 +679,9 @@ public class JNLPFile {
 
             @Override
             public <T> List<T> getResources(Class<T> launchType) {
-                List<T> result = new ArrayList<>();
-
-                for (ResourcesDesc rescDesc : resources) {
-                    final Locale[] locales = rescDesc.getLocales();
-                    final boolean hasUsableLocale = Stream.of(Match.values()).anyMatch(match -> localeMatches(locale, locales, match));
-                    if (hasUsableLocale
-                            && hasPrefixMatch(os, rescDesc.getOS())
-                            && hasPrefixMatch(arch, rescDesc.getArch())) {
-                        final List<T> ll = rescDesc.getResources(launchType);
-                        result.addAll(ll);
-                    }
-                }
+                final List<T> result = getResourcesDescs(locale, os, arch).stream()
+                        .flatMap(resDesc -> resDesc.getResources(launchType).stream())
+                        .collect(toList());
 
                 result.addAll(sharedResources.getResources(launchType));
 
@@ -726,30 +704,15 @@ public class JNLPFile {
      * read the comment in JNLPFile.getDownloadOptionsForJar(JARDesc).
      */
     public ResourcesDesc[] getResourcesDescs() {
-        return getResourcesDescs(defaultLocale, defaultOS, defaultArch);
+        return getResourcesDescs(defaultLocale, defaultOS, defaultArch).toArray(new ResourcesDesc[0]);
     }
 
-    /**
-     * @param locale preferred locale of resource
-     * @param os     preferred os of resource
-     * @param arch   preferred arch of resource
-     * @return the resources section of the JNLP file for the
-     * specified locale, os, and arch.
-     */
-    public ResourcesDesc[] getResourcesDescs(final Locale locale, final String os, final String arch) {
-        List<ResourcesDesc> matchingResources = new ArrayList<>();
-        for (ResourcesDesc rescDesc : resources) {
-            boolean hasUsableLocale = false;
-            for (Match match : Match.values()) {
-                hasUsableLocale |= localeMatches(locale, rescDesc.getLocales(), match);
-            }
-            if (hasUsableLocale
-                    && hasPrefixMatch(os, rescDesc.getOS())
-                    && hasPrefixMatch(arch, rescDesc.getArch())) {
-                matchingResources.add(rescDesc);
-            }
-        }
-        return matchingResources.toArray(new ResourcesDesc[0]);
+    private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
+        return resources.stream()
+                .filter(rescDesc ->  hasPrefixMatch(os, rescDesc.getOS()))
+                .filter(rescDesc -> hasPrefixMatch(arch, rescDesc.getArch()))
+                .filter(rescDesc -> localeMatches(rescDesc.getLocales(), locale))
+                .collect(toList());
     }
 
     /**

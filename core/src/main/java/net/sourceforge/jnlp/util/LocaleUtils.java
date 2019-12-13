@@ -1,15 +1,17 @@
 package net.sourceforge.jnlp.util;
 
-import java.util.Locale;
-import java.util.Objects;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static net.adoptopenjdk.icedteaweb.StringUtils.EMPTY_STRING;
+
 public class LocaleUtils {
 
-    public static final String EMPTY_STRING = "";
-
-    public enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
+    enum Match { LANG_COUNTRY_VARIANT, LANG_COUNTRY, LANG, GENERALIZED }
 
     /**
      * Returns a {@link Locale} from a locale string. Each locale is specified by a language identifier,
@@ -33,11 +35,9 @@ public class LocaleUtils {
         return new Locale(language, country, variant);
     }
 
-    /**
-     * @deprecated use {@link #localMatches(Locale, Match, Locale[])}
-     */
-    public static boolean localeMatches(final Locale requested, final Locale[] available, final Match matchLevel) {
-        return localMatches(requested, matchLevel, available == null ? new Locale[0] : available);
+    public static boolean localeMatches(final Locale[] availableLocales, final Locale locale) {
+        return Stream.of(Match.values())
+                .anyMatch(match -> localMatches(locale, match, availableLocales == null ? new Locale[0] : availableLocales));
     }
 
     /**
@@ -54,7 +54,7 @@ public class LocaleUtils {
      * @see Locale
      * @see Match
      */
-    public static boolean localMatches(final Locale requested, final Match matchLevel, final Locale... available) {
+    static boolean localMatches(final Locale requested, final Match matchLevel, final Locale... available) {
         Assert.requireNonNull(requested, "requested");
         Assert.requireNonNull(matchLevel, "matchLevel");
         Assert.requireNonNull(available, "available");
