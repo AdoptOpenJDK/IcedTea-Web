@@ -19,7 +19,6 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
@@ -34,7 +33,6 @@ import net.sourceforge.jnlp.runtime.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
-import net.sourceforge.jnlp.util.JarFile;
 import sun.awt.SunToolkit;
 
 import javax.swing.text.html.parser.ParserDelegator;
@@ -372,19 +370,7 @@ public class Launcher {
             final ApplicationInstance app = createApplication(file);
             app.initialize();
 
-            String mainName = file.getApplication().getMainClass();
-
-            // When the application-desc field is empty, we should take a
-            // look at the main jar for the main class.
-            if (mainName == null) {
-                final JARDesc mainJarDesc = file.getResources().getMainJAR();
-                final File f = app.getClassLoader().getTracker().getCacheFile(mainJarDesc.getLocation());
-                if (f != null) {
-                    final JarFile mainJar = new JarFile(f);
-                    mainName = mainJar.getManifest().
-                                getMainAttributes().getValue("Main-Class");
-                }
-            }
+            final String mainName = app.getMainClassName();
 
             if (mainName == null) {
                 throw launchError(new LaunchException(file, null,

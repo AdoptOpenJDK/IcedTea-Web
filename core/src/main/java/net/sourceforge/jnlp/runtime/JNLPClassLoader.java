@@ -2432,4 +2432,13 @@ public class JNLPClassLoader extends URLClassLoader {
     public ResourceTracker getTracker() {
         return tracker;
     }
+
+    public String getMainClassNameFromManifest(JARDesc mainJarDesc) throws IOException {
+        final File f = tracker.getCacheFile(mainJarDesc.getLocation());
+        if (f != null) {
+            final JarFile mainJar = new JarFile(f);
+            return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+        }
+        return null;
+    }
 }

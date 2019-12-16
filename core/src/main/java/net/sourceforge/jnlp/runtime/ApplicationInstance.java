@@ -27,6 +27,7 @@ import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;
 import java.awt.Window;
+import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -243,6 +244,18 @@ public class ApplicationInstance {
             throw new IllegalStateException();
 
         return loader;
+    }
+
+    public String getMainClassName() throws IOException {
+        String mainName = file.getApplication().getMainClass();
+
+        // When the application-desc field is empty, we should take a
+        // look at the main jar for the main class.
+        if (mainName == null) {
+            mainName = getClassLoader().getMainClassNameFromManifest(file.getResources().getMainJAR());
+        }
+
+        return mainName;
     }
 
     /**
