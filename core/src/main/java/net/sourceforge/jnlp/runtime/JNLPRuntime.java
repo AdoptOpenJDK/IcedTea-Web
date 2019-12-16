@@ -900,9 +900,10 @@ public class JNLPRuntime {
         return pluginDebug;
     }
 
-    public static void exit(int i) {
+    public static <T> T exit(int i) {
         closeLoggerAndWaitForExceptionDialogsToBeClosed();
         System.exit(i);
+        return null;
     }
 
     public static void closeLoggerAndWaitForExceptionDialogsToBeClosed() {
