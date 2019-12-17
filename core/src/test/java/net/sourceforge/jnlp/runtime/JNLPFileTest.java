@@ -47,6 +47,7 @@ import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.AfterClass;
 import org.junit.Assert;

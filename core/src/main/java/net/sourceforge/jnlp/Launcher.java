@@ -29,7 +29,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;

@@ -35,12 +35,12 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
 */
 
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.runtime.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader.DownloadAction;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.DownloadAction;
 
 import java.net.URL;
 import java.util.ArrayList;

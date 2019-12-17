@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.runtime.classloader;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
@@ -47,6 +47,9 @@ import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.cache.NativeLibraryStorage;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.CachedJarFileCallback;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
@@ -294,7 +297,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy update policy of loader
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
-    protected JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
+    public JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
         this(file, policy, null, false);
     }
 
@@ -1041,7 +1044,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return the JNLP app for this classloader
      */
-    ApplicationInstance getApplication() {
+    public ApplicationInstance getApplication() {
         return app;
     }
 
@@ -1056,7 +1059,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Returns the permissions for the CodeSource.
      */
     @Override
-    protected PermissionCollection getPermissions(CodeSource cs) {
+    public PermissionCollection getPermissions(CodeSource cs) {
         try {
             Permissions result = new Permissions();
 
@@ -1123,7 +1126,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    void addPermission(Permission p) {
+    public void addPermission(Permission p) {
         runtimePermissions.add(p);
     }
 
@@ -1788,7 +1791,7 @@ public class JNLPClassLoader extends URLClassLoader {
         return new ArrayList<>(result);
     }
 
-    boolean getSigning() {
+    public boolean getSigning() {
         return signing == SigningState.FULL;
     }
 
@@ -1818,7 +1821,7 @@ public class JNLPClassLoader extends URLClassLoader {
         return signing;
     }
 
-    SecurityDesc getSecurity() {
+    public SecurityDesc getSecurity() {
         return security;
     }
 
@@ -2376,7 +2379,7 @@ public class JNLPClassLoader extends URLClassLoader {
          *
          * @return parent JNLPClassLoader
          */
-        JNLPClassLoader getParentJNLPClassLoader() {
+        public JNLPClassLoader getParentJNLPClassLoader() {
             return parentJNLPClassLoader;
         }
 
