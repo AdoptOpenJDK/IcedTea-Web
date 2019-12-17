@@ -108,6 +108,7 @@ public final class Boot implements PrivilegedAction<Integer> {
      * @param args launching arguments
      */
     public static void main(String[] args) {
+        EnvironmentPrinter.logEnvironment(args);
         final int status = mainWithReturnCode(args);
         if (status != 0) {
             System.exit(status);
