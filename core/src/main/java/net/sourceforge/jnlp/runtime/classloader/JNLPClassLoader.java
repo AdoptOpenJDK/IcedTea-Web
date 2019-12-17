@@ -14,8 +14,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime.classloader;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
@@ -26,7 +24,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -52,7 +49,6 @@ import net.sourceforge.jnlp.runtime.CachedJarFileCallback;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -80,7 +76,6 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -93,7 +88,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
@@ -225,7 +219,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the jar cert verifier tool to verify our jars
      */
-    private final JarCertVerifier jcv;
+    final JarCertVerifier jcv;
 
     private SigningState signing = SigningState.NONE;
 
@@ -259,7 +253,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloading threads. See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    private final Map<URL, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
+    final Map<URL, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
 
     /*Set to prevent once tried-to-get resources to be tried again*/
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
@@ -364,7 +358,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 && !JNLPRuntime.isSecurityEnabled();
     }
 
-    private static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
+    static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
         if (isCertUnderestimated()) {
             LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
         } else {
@@ -1805,7 +1799,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * finding that not all of its JARs are actually signed, or because it needs
      * to load something unsigned out of the codebase.
      */
-    private void checkPartialSigningWithUser() {
+    void checkPartialSigningWithUser() {
         if (signing == SigningState.FULL && JNLPRuntime.isVerifying()) {
             signing = SigningState.PARTIAL;
             try {
@@ -2068,7 +2062,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return The appropriate AccessControlContext for loading classes for this
      * instance
      */
-    private AccessControlContext getAccessControlContextForClassLoading() {
+    AccessControlContext getAccessControlContextForClassLoading() {
         AccessControlContext context = AccessController.getContext();
 
         try {
@@ -2113,324 +2107,6 @@ public class JNLPClassLoader extends URLClassLoader {
         return mainClass;
     }
 
-    /**
-     * SecurityDelegate, in real usage, relies on having a "parent"
-     * JNLPClassLoader instance. However, JNLPClassLoaders are very large,
-     * heavyweight, difficult-to-mock objects, which means that unit testing on
-     * anything that uses a SecurityDelegate can become very difficult. For
-     * example, JarCertVerifier is designed separated from the ClassLoader so it
-     * can be tested in isolation. However, JCV needs some sort of access back
-     * to JNLPClassLoader instances to be able to invoke setRunInSandbox(). The
-     * SecurityDelegate handles this, allowing JCV to be tested without
-     * instantiating JNLPClassLoaders, by creating a fake SecurityDelegate that
-     * does not require one.
-     */
-    public interface SecurityDelegate {
-
-        SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost);
-
-        SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException;
-
-        SecurityDesc getJarPermissions(final URL codebaseHost);
-
-        void promptUserOnPartialSigning() throws LaunchException;
-
-        void setRunInSandbox() throws LaunchException;
-
-        boolean getRunInSandbox();
-
-        void addPermissions(final Collection<Permission> perms);
-    }
-
-    /**
-     * Handles security decision logic for the JNLPClassLoader, eg which
-     * permission level to assign to JARs.
-     */
-    public static class SecurityDelegateImpl implements SecurityDelegate {
-
-        private final JNLPClassLoader classLoader;
-        private boolean runInSandbox;
-        private boolean promptedForPartialSigning;
-
-        SecurityDelegateImpl(final JNLPClassLoader classLoader) {
-            this.classLoader = classLoader;
-            runInSandbox = false;
-        }
-
-        boolean isPluginApplet() {
-            return false;
-        }
-
-        @Override
-        public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
-            if (runInSandbox) {
-                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            } else if (isPluginApplet()) {
-                try {
-                    if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.tracker)) {
-                        return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                                SecurityDesc.ALL_PERMISSIONS,
-                                codebaseHost);
-                    } else {
-                        return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                                SecurityDesc.SANDBOX_PERMISSIONS,
-                                codebaseHost);
-                    }
-                } catch (final Exception e) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebaseHost);
-                }
-            } else {
-                return classLoader.file.getSecurity();
-            }
-        }
-
-        @Override
-        public SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException {
-            if (isPluginApplet()) {
-                if (!runInSandbox && classLoader.getSigning()) {
-                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                            SecurityDesc.ALL_PERMISSIONS,
-                            codebaseHost);
-                } else {
-                    return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebaseHost);
-                }
-            } else
-                /*
-                 * Various combinations of the jars being signed and <security> tags being
-                 * present are possible. They are treated as follows
-                 *
-                 * Jars          JNLP File         Result
-                 *
-                 * Signed        <security>        Appropriate Permissions
-                 * Signed        no <security>     Sandbox
-                 * Unsigned      <security>        Error
-                 * Unsigned      no <security>     Sandbox
-                 *
-                 */
-                if (!runInSandbox && !classLoader.getSigning()
-                        && !classLoader.file.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
-                    if (classLoader.jcv.allJarsSigned()) {
-                        LaunchException ex = new LaunchException(classLoader.file, null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
-                        consultCertificateSecurityException(ex);
-                        return consultResult(codebaseHost);
-                    } else {
-                        LaunchException ex = new LaunchException(classLoader.file, null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
-                        consultCertificateSecurityException(ex);
-                        return consultResult(codebaseHost);
-                    }
-                } else return consultResult(codebaseHost);
-        }
-
-        private SecurityDesc consultResult(URL codebaseHost) {
-            if (!runInSandbox && classLoader.getSigning()) {
-                return classLoader.file.getSecurity();
-            } else {
-                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            }
-        }
-
-        @Override
-        public SecurityDesc getJarPermissions(final URL codebaseHost) {
-            if (!runInSandbox && classLoader.jcv.isFullySigned()) {
-                // Already trust application, nested jar should be given
-                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                        SecurityDesc.ALL_PERMISSIONS,
-                        codebaseHost);
-            } else {
-                return new SecurityDesc(classLoader.file, AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            }
-        }
-
-        @Override
-        public void setRunInSandbox() throws LaunchException {
-            if (runInSandbox && classLoader.security != null
-                    && !classLoader.jarLocationSecurityMap.isEmpty()) {
-                throw new LaunchException(classLoader.file, null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
-            }
-
-            JNLPRuntime.reloadPolicy();
-            // ensure that we have the most up-to-date custom policy loaded since the user may have just launched PolicyEditor
-            // to create a custom policy for the applet they are about to run
-            this.runInSandbox = true;
-        }
-
-        @Override
-        public void promptUserOnPartialSigning() throws LaunchException {
-            if (promptedForPartialSigning) {
-                return;
-            }
-            promptedForPartialSigning = true;
-            UnsignedAppletTrustConfirmation.checkPartiallySignedWithUserIfRequired(this, classLoader.file, classLoader.jcv);
-        }
-
-        @Override
-        public boolean getRunInSandbox() {
-            return this.runInSandbox;
-        }
-
-        void addPermission(final Permission perm) {
-            classLoader.addPermission(perm);
-        }
-
-        @Override
-        public void addPermissions(final Collection<Permission> perms) {
-            for (final Permission perm : perms) {
-                addPermission(perm);
-            }
-        }
-
-    }
-
-
-    /*
-     * Helper class to expose protected URLClassLoader methods.
-     * Classes loaded from the codebase are absolutely NOT signed, by definition!
-     * If the CodeBaseClassLoader is used to load any classes in JNLPClassLoader,
-     * then you *MUST* check if the JNLPClassLoader is set to FULL signing. If so,
-     * then it must be set instead to PARTIAL, and the user prompted if it is okay
-     * to proceed. If the JNLPClassLoader is already PARTIAL or NONE signing, then
-     * nothing must be done. This is required so that we can support partial signing
-     * of applets but also ensure that using codebase loading in conjunction with
-     * signed JARs still results in the user having to confirm that this is
-     * acceptable.
-     */
-    public static class CodeBaseClassLoader extends URLClassLoader {
-
-        JNLPClassLoader parentJNLPClassLoader;
-
-        /**
-         * Classes that are not found, so that findClass can skip them next time
-         */
-        ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<>();
-
-        CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
-            super(urls, cl);
-            parentJNLPClassLoader = cl;
-        }
-
-        @Override
-        public void addURL(URL url) {
-            super.addURL(url);
-        }
-
-        /*
-         * Use with care! Check the class-level Javadoc before calling this.
-         */
-        Class<?> findClassNonRecursive(final String name) throws ClassNotFoundException {
-            // If we have searched this path before, don't try again
-            if (Arrays.equals(super.getURLs(), notFoundResources.get(name))) {
-                throw new ClassNotFoundException(name);
-            }
-
-            try {
-                return AccessController.doPrivileged(
-                        (PrivilegedExceptionAction<Class<?>>) () -> {
-                            Class<?> c = CodeBaseClassLoader.super.findClass(name);
-                            parentJNLPClassLoader.checkPartialSigningWithUser();
-                            return c;
-                        }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
-            } catch (PrivilegedActionException pae) {
-                notFoundResources.put(name, super.getURLs());
-                throw new ClassNotFoundException("Could not find class " + name, pae);
-            } catch (NullJnlpFileException njf) {
-                notFoundResources.put(name, super.getURLs());
-                throw new ClassNotFoundException("Could not find class " + name, njf);
-            }
-        }
-
-        /*
-         * Use with care! Check the class-level Javadoc before calling this.
-         */
-        @Override
-        public Class<?> findClass(String name) throws ClassNotFoundException {
-            // Calls JNLPClassLoader#findClass which may call into this.findClassNonRecursive
-            Class<?> c = getParentJNLPClassLoader().findClass(name);
-            parentJNLPClassLoader.checkPartialSigningWithUser();
-            return c;
-        }
-
-        /**
-         * Returns the output of super.findLoadedClass().
-         * <p>
-         * The method is renamed because ClassLoader.findLoadedClass() is final
-         *
-         * @param name The name of the class to find
-         * @return Output of ClassLoader.findLoadedClass() which is the class if
-         * found, null otherwise
-         * @see java.lang.ClassLoader#findLoadedClass(String)
-         */
-        Class<?> findLoadedClassFromParent(String name) {
-            return findLoadedClass(name);
-        }
-
-        /**
-         * Returns JNLPClassLoader that encompasses this loader
-         *
-         * @return parent JNLPClassLoader
-         */
-        public JNLPClassLoader getParentJNLPClassLoader() {
-            return parentJNLPClassLoader;
-        }
-
-        @Override
-        public Enumeration<URL> findResources(String name) throws IOException {
-
-            // If we have searched this path before, don't try again
-            if (Arrays.equals(super.getURLs(), notFoundResources.get(name))) {
-                return (new Vector<URL>(0)).elements();
-            }
-
-            if (!name.startsWith("META-INF")) {
-                Enumeration<URL> urls = super.findResources(name);
-
-                if (!urls.hasMoreElements()) {
-                    notFoundResources.put(name, super.getURLs());
-                }
-
-                return urls;
-            }
-
-            return (new Vector<URL>(0)).elements();
-        }
-
-        @Override
-        public URL findResource(String name) {
-
-            // If we have searched this path before, don't try again
-            if (Arrays.equals(super.getURLs(), notFoundResources.get(name))) {
-                return null;
-            }
-
-            URL url = null;
-            if (!name.startsWith("META-INF")) {
-                try {
-                    final String fName = name;
-                    url = AccessController.doPrivileged(
-                            (PrivilegedExceptionAction<URL>) () -> CodeBaseClassLoader.super.findResource(fName), parentJNLPClassLoader.getAccessControlContextForClassLoading());
-                } catch (PrivilegedActionException ignored) {
-                }
-
-                if (url == null) {
-                    notFoundResources.put(name, super.getURLs());
-                }
-
-                return url;
-            }
-
-            return null;
-        }
-    }
 
     public ResourceTracker getTracker() {
         return tracker;
