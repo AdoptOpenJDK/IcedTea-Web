@@ -30,7 +30,7 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.jnlp.DownloadServiceListener;

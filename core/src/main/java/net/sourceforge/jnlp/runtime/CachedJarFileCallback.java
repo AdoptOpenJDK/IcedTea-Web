@@ -65,7 +65,7 @@ import java.util.jar.Attributes;
  *
  * Large parts of this class are based on JarFileFactory and URLJarFile.
  */
-final class CachedJarFileCallback implements URLJarFileCallBack {
+public final class CachedJarFileCallback implements URLJarFileCallBack {
 
     private final static Logger LOG = LoggerFactory.getLogger(CachedJarFileCallback.class);
 
@@ -82,7 +82,7 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
         mapping = new ConcurrentHashMap<URL, URL>();
     }
 
-    protected void addMapping(URL remoteUrl, URL localUrl) {
+    public void addMapping(URL remoteUrl, URL localUrl) {
         mapping.put(remoteUrl, localUrl);
     }
 

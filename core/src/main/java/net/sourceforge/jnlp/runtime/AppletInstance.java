@@ -20,6 +20,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import java.applet.Applet;
 import java.awt.Container;

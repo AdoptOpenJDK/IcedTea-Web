@@ -38,19 +38,16 @@ package net.adoptopenjdk.icedteaweb.manifest;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.DummySecurityDelegate;
-import net.sourceforge.jnlp.runtime.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
