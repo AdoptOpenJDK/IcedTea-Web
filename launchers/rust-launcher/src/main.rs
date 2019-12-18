@@ -15,6 +15,8 @@ use std::fmt::Write;
 use os_access::Os;
 use std::env;
 
+const NATIVE_DEBUG_ARG: &str = "-nativeDebug";
+
 #[cfg(not(windows))]
 fn get_os(debug: bool, al: bool) -> os_access::Linux {
     os_access::Linux::new(debug, al)
@@ -81,6 +83,24 @@ fn is_splash_forbidden_testable(vars: Vec<(String, String)>, aargs: Vec<String>)
         }
     }
     false
+}
+
+fn is_native_debug_enabled(args: &Vec<String>) -> bool {
+    for s in args {
+        if clean_param(s.to_string()) == NATIVE_DEBUG_ARG.to_string() {
+            return true;
+        }
+    }
+    return false;
+}
+
+fn get_native_debug_parameter(vars: Vec<(String, String)>, parameter: String) -> Option<String> {
+    for (key, value) in vars {
+        if key == parameter{
+            return Some(value);
+        }
+    }
+    return None;
 }
 
 fn main() {
@@ -151,6 +171,35 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
             os.log("itw-rust-debug: splash excluded");
         }
     }
+
+    let native_debug = is_native_debug_enabled(original_args);
+    let (native_debug_toggle, native_debug_config);
+    if native_debug {
+        let (suspend, port);
+        match get_native_debug_parameter(env::vars().collect::<Vec<_>>(), String::from("ITW_NATIVEDEBUG_SUSPEND")){
+            Some(value) => {
+                suspend = value;
+            }
+            None => {
+                suspend = String::from("n");
+            }
+        }
+        match get_native_debug_parameter(env::vars().collect::<Vec<_>>(), String::from("ITW_NATIVEDEBUG_PORT")){
+            Some(value) => {
+                port = value;
+            }
+            None => {
+                port = String::from("9009");
+            }
+        }
+
+        native_debug_toggle = String::from("-Xdebug");
+        native_debug_config = format!("-Xrunjdwp:transport=dt_socket,server=y,suspend={},address={}", suspend, port);
+    } else {
+        native_debug_toggle = String::from("");
+        native_debug_config = String::from("");
+    }
+
     if is_modular_jdk(os, &java_dir) {
         all_args.push(resolve_argsfile(os));
     }
@@ -159,9 +208,13 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     all_args.push(cp);
     all_args.push(bin_name);
     all_args.push(bin_location);
+    if native_debug {
+        all_args.push(native_debug_toggle);
+        all_args.push(native_debug_config);
+    }
     all_args.push(hardcoded_paths::get_main().to_string());
 
-    include_not_dashJs(&original_args, &mut all_args);
+    include_not_dashJs_nor_native_debug(&original_args, &mut all_args);
 
     all_args
 }
@@ -251,9 +304,9 @@ fn clean_param(s: String) -> String {
 }
 
 #[allow(non_snake_case)]
-fn include_not_dashJs(srcs: &Vec<std::string::String>, target: &mut Vec<std::string::String>) {
+fn include_not_dashJs_nor_native_debug(srcs: &Vec<std::string::String>, target: &mut Vec<std::string::String>) {
     for f in srcs.iter() {
-        if !f.to_string().starts_with("-J") {
+        if !f.to_string().starts_with("-J") && !f.to_string().starts_with(NATIVE_DEBUG_ARG) {
             target.push(f.to_string());
         }
     }
@@ -433,14 +486,14 @@ pub mod tests_main {
 
     #[test]
     #[allow(non_snake_case)]
-    fn include_not_dashJs_test() {
+    fn include_not_dashJs_nor_native_debug_test() {
         let switches = vec![
             String::from("-J-a"),
             String::from("-b"),
             String::from("--Jc"),
             String::from("d")];
         let mut result = Vec::new();
-        super::include_not_dashJs(&switches, &mut result);
+        super::include_not_dashJs_nor_native_debug(&switches, &mut result);
         let ex = vec![
             String::from("-b"),
             String::from("--Jc"),
@@ -450,11 +503,11 @@ pub mod tests_main {
 
     #[test]
     #[allow(non_snake_case)]
-    fn include_not_dashJs_test_empty() {
+    fn include_not_dashJs_nor_native_debug_test_empty() {
         let switches: Vec<std::string::String> = vec![];
         let mut result: Vec<std::string::String> = Vec::new();
         let ex: Vec<std::string::String> = Vec::new();
-        super::include_not_dashJs(&switches, &mut result);
+        super::include_not_dashJs_nor_native_debug(&switches, &mut result);
         assert_eq!(ex, result);
     }
 

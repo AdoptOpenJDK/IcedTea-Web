@@ -114,8 +114,8 @@ if isWindows; then
       $WIN_INSTALLER_DIR/installer.json.in > $TARGET_TMP/itw-installer.json
       "$JRE/bin/java" -jar "$WIXGEN_JAR" "$TARGET_IMAGES/`imageName $WIN_SUFFIX`" -c $TARGET_TMP/itw-installer.json -o $TARGET_TMP/itw-installer.wxs
       pushd $TARGET_TMP
-        "$WIX_TOOLSET_DIR/candle.exe" /nologo itw-installer.wxs
-        "$WIX_TOOLSET_DIR/light.exe" /nologo -sval -ext WixUIExtension itw-installer.wixobj
+        "$WIX_TOOLSET_DIR/candle.exe" -nologo itw-installer.wxs
+        "$WIX_TOOLSET_DIR/light.exe" -nologo -sval -ext WixUIExtension itw-installer.wixobj
         mv itw-installer.msi $TARGET_IMAGES/`imageName $WIN_SUFFIX`.msi
       popd
     else
