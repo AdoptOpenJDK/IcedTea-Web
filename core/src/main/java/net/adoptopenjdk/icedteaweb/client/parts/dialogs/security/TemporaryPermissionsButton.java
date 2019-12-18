@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractButton;

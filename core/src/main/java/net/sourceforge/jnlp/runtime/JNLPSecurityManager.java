@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.runtime.classloader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -233,8 +234,8 @@ class JNLPSecurityManager extends SecurityManager {
     private JNLPClassLoader getJnlpClassLoader(ClassLoader cl) {
         // Since we want to deal with JNLPClassLoader, extract it if this
         // is a codebase loader
-        if (cl instanceof JNLPClassLoader.CodeBaseClassLoader) {
-            cl = ((JNLPClassLoader.CodeBaseClassLoader) cl).getParentJNLPClassLoader();
+        if (cl instanceof CodeBaseClassLoader) {
+            cl = ((CodeBaseClassLoader) cl).getParentJNLPClassLoader();
         }
 
         if (cl instanceof JNLPClassLoader) {

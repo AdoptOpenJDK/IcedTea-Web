@@ -38,7 +38,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
