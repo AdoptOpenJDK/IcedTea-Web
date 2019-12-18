@@ -29,12 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CodeBaseClassLoader extends URLClassLoader {
 
-    JNLPClassLoader parentJNLPClassLoader;
+    private final JNLPClassLoader parentJNLPClassLoader;
 
     /**
      * Classes that are not found, so that findClass can skip them next time
      */
-    ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, URL[]> notFoundResources = new ConcurrentHashMap<>();
 
     CodeBaseClassLoader(URL[] urls, JNLPClassLoader cl) {
         super(urls, cl);
@@ -62,12 +62,9 @@ public class CodeBaseClassLoader extends URLClassLoader {
                         parentJNLPClassLoader.checkPartialSigningWithUser();
                         return c;
                     }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
-        } catch (PrivilegedActionException pae) {
+        } catch (PrivilegedActionException | NullJnlpFileException pae) {
             notFoundResources.put(name, super.getURLs());
             throw new ClassNotFoundException("Could not find class " + name, pae);
-        } catch (NullJnlpFileException njf) {
-            notFoundResources.put(name, super.getURLs());
-            throw new ClassNotFoundException("Could not find class " + name, njf);
         }
     }
 
@@ -113,7 +110,7 @@ public class CodeBaseClassLoader extends URLClassLoader {
             return (new Vector<URL>(0)).elements();
         }
 
-        if (!name.startsWith("META-INF")) {
+        if (!name.startsWith(ClassLoaderConstants.META_INF)) {
             Enumeration<URL> urls = super.findResources(name);
 
             if (!urls.hasMoreElements()) {
@@ -135,7 +132,7 @@ public class CodeBaseClassLoader extends URLClassLoader {
         }
 
         URL url = null;
-        if (!name.startsWith("META-INF")) {
+        if (!name.startsWith(ClassLoaderConstants.META_INF)) {
             try {
                 final String fName = name;
                 url = AccessController.doPrivileged(

@@ -1,16 +1,11 @@
 package net.sourceforge.jnlp.runtime.classloader;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
 
 import java.net.URL;
 import java.security.Permission;
@@ -24,8 +19,6 @@ import static net.sourceforge.jnlp.LaunchException.FATAL;
  */
 public class SecurityDelegateImpl implements SecurityDelegate {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityDelegateImpl.class);
-
     private final JNLPClassLoader classLoader;
     private boolean runInSandbox;
     private boolean promptedForPartialSigning;
@@ -35,33 +28,12 @@ public class SecurityDelegateImpl implements SecurityDelegate {
         runInSandbox = false;
     }
 
-    boolean isPluginApplet() {
-        return false;
-    }
-
     @Override
     public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
         if (runInSandbox) {
             return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
-        } else if (isPluginApplet()) {
-            try {
-                if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.getTracker())) {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.ALL_PERMISSIONS,
-                            codebaseHost);
-                } else {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebaseHost);
-                }
-            } catch (final Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            }
         } else {
             return classLoader.getJNLPFile().getSecurity();
         }
@@ -69,41 +41,32 @@ public class SecurityDelegateImpl implements SecurityDelegate {
 
     @Override
     public SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException {
-        if (isPluginApplet()) {
-            if (!runInSandbox && classLoader.getSigning()) {
-                return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                        SecurityDesc.ALL_PERMISSIONS,
-                        codebaseHost);
+        /*
+         * Various combinations of the jars being signed and <security> tags being
+         * present are possible. They are treated as follows
+         *
+         * Jars          JNLP File         Result
+         *
+         * Signed        <security>        Appropriate Permissions
+         * Signed        no <security>     Sandbox
+         * Unsigned      <security>        Error
+         * Unsigned      no <security>     Sandbox
+         *
+         */
+        if (!runInSandbox && !classLoader.getSigning()
+                && !classLoader.getJNLPFile().getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+            if (classLoader.jcv.allJarsSigned()) {
+                LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
+                JNLPClassLoader.consultCertificateSecurityException(ex);
+                return consultResult(codebaseHost);
             } else {
-                return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
+                LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
+                JNLPClassLoader.consultCertificateSecurityException(ex);
+                return consultResult(codebaseHost);
             }
-        } else
-            /*
-             * Various combinations of the jars being signed and <security> tags being
-             * present are possible. They are treated as follows
-             *
-             * Jars          JNLP File         Result
-             *
-             * Signed        <security>        Appropriate Permissions
-             * Signed        no <security>     Sandbox
-             * Unsigned      <security>        Error
-             * Unsigned      no <security>     Sandbox
-             *
-             */
-            if (!runInSandbox && !classLoader.getSigning()
-                    && !classLoader.getJNLPFile().getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
-                if (classLoader.jcv.allJarsSigned()) {
-                    LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
-                    JNLPClassLoader.consultCertificateSecurityException(ex);
-                    return consultResult(codebaseHost);
-                } else {
-                    LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
-                    JNLPClassLoader.consultCertificateSecurityException(ex);
-                    return consultResult(codebaseHost);
-                }
-            } else return consultResult(codebaseHost);
+        } else {
+            return consultResult(codebaseHost);
+        }
     }
 
     private SecurityDesc consultResult(URL codebaseHost) {
@@ -157,14 +120,10 @@ public class SecurityDelegateImpl implements SecurityDelegate {
         return this.runInSandbox;
     }
 
-    void addPermission(final Permission perm) {
-        classLoader.addPermission(perm);
-    }
-
     @Override
     public void addPermissions(final Collection<Permission> perms) {
         for (final Permission perm : perms) {
-            addPermission(perm);
+            classLoader.addPermission(perm);
         }
     }
 

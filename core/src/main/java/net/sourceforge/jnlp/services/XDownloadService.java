@@ -40,8 +40,8 @@ class XDownloadService implements DownloadService {
      * Returns the {@link JNLPClassLoader} of the application
      * @return the {@link JNLPClassLoader} of the application
      */
-    JNLPClassLoader getClassLoader() {
-        return (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+    private ClassLoader getApplicationClassLoader() {
+        return JNLPRuntime.getApplication().getClassLoader();
     }
 
     /**
@@ -62,7 +62,7 @@ class XDownloadService implements DownloadService {
         boolean allCached = true;
         final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
 
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
+        final JARDesc[] jars = ManageJnlpResources.findJars(this.getApplicationClassLoader(), ref, part, resourceVersion);
 
         if (jars.length <= 0)
             return false;
@@ -99,7 +99,7 @@ class XDownloadService implements DownloadService {
     @Override
     public boolean isPartCached(final String part) {
         boolean allCached = true;
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
+        final JARDesc[] jars = ManageJnlpResources.findJars(this.getApplicationClassLoader(), null, part, null);
 
         if (jars.length <= 0)
             return false;
@@ -136,7 +136,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isResourceCached(final URL ref, final String version) {
-        return ManageJnlpResources.isExternalResourceCached(this.getClassLoader(), ref, version);
+        return ManageJnlpResources.isExternalResourceCached(this.getApplicationClassLoader(), ref, version);
     }
 
     /**
@@ -158,7 +158,7 @@ class XDownloadService implements DownloadService {
     @Override
     public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) throws IOException {
         final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        ManageJnlpResources.downloadJars(this.getClassLoader(), ref, part, resourceVersion);
+        ManageJnlpResources.downloadJars(this.getApplicationClassLoader(), ref, part, resourceVersion);
     }
 
     /**
@@ -179,7 +179,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void loadPart(final String part, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.downloadJars(this.getClassLoader(), null, part, null);
+        ManageJnlpResources.downloadJars(this.getApplicationClassLoader(), null, part, null);
     }
 
     /**
@@ -189,7 +189,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.loadExternalResourceToCache(this.getClassLoader(), ref, version);
+        ManageJnlpResources.loadExternalResourceToCache(this.getApplicationClassLoader(), ref, version);
     }
 
     /**
@@ -201,8 +201,8 @@ class XDownloadService implements DownloadService {
     @Override
     public void removeExtensionPart(final URL ref, final String version, final String part) throws IOException {
         final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), ref, jars);
+        final JARDesc[] jars = ManageJnlpResources.findJars(this.getApplicationClassLoader(), ref, part, resourceVersion);
+        ManageJnlpResources.removeCachedJars(this.getApplicationClassLoader(), ref, jars);
     }
 
     /**
@@ -225,8 +225,8 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removePart(final String part) throws IOException {
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), null, jars);
+        final JARDesc[] jars = ManageJnlpResources.findJars(this.getApplicationClassLoader(), null, part, null);
+        ManageJnlpResources.removeCachedJars(this.getApplicationClassLoader(), null, jars);
     }
 
     /**
@@ -249,6 +249,6 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removeResource(final URL ref, final String version) throws IOException {
-        ManageJnlpResources.removeExternalCachedResource(this.getClassLoader(), ref, version);
+        ManageJnlpResources.removeExternalCachedResource(this.getApplicationClassLoader(), ref, version);
     }
 }

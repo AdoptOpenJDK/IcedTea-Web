@@ -44,7 +44,7 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import java.net.URL;
 
-class LocateJnlpClassLoader {
+public class LocateJnlpClassLoader {
 
     /**
      * Locates the JNLPClassLoader of the JNLP file.
@@ -53,7 +53,7 @@ class LocateJnlpClassLoader {
      * be used instead
      * @return the JNLPClassLoader of the JNLP file.
      */
-    static JNLPClassLoader getLoaderByJnlpFile(final JNLPClassLoader rootClassLoader, URL urlToJnlpFile) {
+    public static JNLPClassLoader getLoaderByJnlpFile(final JNLPClassLoader rootClassLoader, URL urlToJnlpFile) {
 
         if (rootClassLoader == null)
             return null;
@@ -85,7 +85,7 @@ class LocateJnlpClassLoader {
      * @param version The version of resource. Is null if no version is specified
      * @return the JNLPClassLoader of the JNLP file's resource.
      */
-    static JNLPClassLoader getLoaderByResourceUrl(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
+    public static JNLPClassLoader getLoaderByResourceUrl(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
         VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
 
         for (JNLPClassLoader loader : rootClassLoader.getLoaders()) {

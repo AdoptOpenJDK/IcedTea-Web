@@ -240,7 +240,7 @@ public class ApplicationInstance {
      * @return the classloader of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
-    public JNLPClassLoader getClassLoader() throws IllegalStateException {
+    public ClassLoader getClassLoader() throws IllegalStateException {
         if (stopped)
             throw new IllegalStateException();
 
@@ -253,7 +253,7 @@ public class ApplicationInstance {
         // When the application-desc field is empty, we should take a
         // look at the main jar for the main class.
         if (mainName == null) {
-            mainName = getClassLoader().getMainClassNameFromManifest(file.getResources().getMainJAR());
+            mainName = loader.getMainClassNameFromManifest(file.getResources().getMainJAR());
         }
 
         return mainName;

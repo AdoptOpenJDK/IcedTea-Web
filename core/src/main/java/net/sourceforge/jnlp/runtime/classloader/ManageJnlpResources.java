@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.runtime.classloader;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
@@ -58,8 +59,10 @@ public class ManageJnlpResources {
      * @param version version of jar
      * @return jars found.
      */
-    public static JARDesc[] findJars(final JNLPClassLoader rootClassLoader, final URL ref, final String part, final VersionString version) {
-        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(rootClassLoader, ref);
+    public static JARDesc[] findJars(final ClassLoader rootClassLoader, final URL ref, final String part, final VersionString version) {
+        final JNLPClassLoader jnlpClassLoader = assertJnlpClassLoader(rootClassLoader);
+
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(jnlpClassLoader, ref);
 
         if (foundLoader != null) {
             final List<JARDesc> foundJars = new ArrayList<>();
@@ -83,8 +86,9 @@ public class ManageJnlpResources {
      * resource. If null, main JNLP's file location will be used instead.
      * @param jars Jars marked for removal.
      */
-    public static void removeCachedJars(final JNLPClassLoader classLoader, final URL ref, final JARDesc[] jars) {
-        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
+    public static void removeCachedJars(final ClassLoader classLoader, final URL ref, final JARDesc[] jars) {
+        final JNLPClassLoader jnlpClassLoader = assertJnlpClassLoader(classLoader);
+        JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(jnlpClassLoader, ref);
 
         if (foundLoader != null)
             foundLoader.removeJars(jars);
@@ -98,11 +102,13 @@ public class ManageJnlpResources {
      * @param part The name of the path.
      * @param version version of jar to be downloaded
      */
-    public static void downloadJars(final JNLPClassLoader classLoader, final URL ref, final String part, final VersionString version) {
-        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(classLoader, ref);
+    public static void downloadJars(final ClassLoader classLoader, final URL ref, final String part, final VersionString version) {
+        final JNLPClassLoader jnlpClassLoader = assertJnlpClassLoader(classLoader);
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(jnlpClassLoader, ref);
 
-        if (foundLoader != null)
+        if (foundLoader != null) {
             foundLoader.initializeNewJarDownload(ref, part, version);
+        }
     }
 
     /**
@@ -113,8 +119,8 @@ public class ManageJnlpResources {
      * @param version The version of resource. If null, no version is specified.
      */
 
-    public static void loadExternalResourceToCache(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
-        rootClassLoader.manageExternalJars(ref, version, DownloadAction.DOWNLOAD_TO_CACHE);
+    public static void loadExternalResourceToCache(final ClassLoader rootClassLoader, final URL ref, final String version) {
+        assertJnlpClassLoader(rootClassLoader).manageExternalJars(ref, version, DownloadAction.DOWNLOAD_TO_CACHE);
     }
 
     /**
@@ -124,8 +130,8 @@ public class ManageJnlpResources {
      * @param ref Path to the resource.
      * @param version The version of resource. If null, no version is specified.
      */
-    public static void removeExternalCachedResource(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
-        rootClassLoader.manageExternalJars(ref, version, DownloadAction.REMOVE_FROM_CACHE);
+    public static void removeExternalCachedResource(final ClassLoader rootClassLoader, final URL ref, final String version) {
+        assertJnlpClassLoader(rootClassLoader).manageExternalJars(ref, version, DownloadAction.REMOVE_FROM_CACHE);
     }
 
     /**
@@ -136,8 +142,15 @@ public class ManageJnlpResources {
      * @param version The version of resource. If {@code null}, no version is specified.
      * @return {@code true} if the external resource is cached, otherwise {@code false}
      */
-    public static boolean isExternalResourceCached(final JNLPClassLoader rootClassLoader, final URL ref, final String version) {
-        return rootClassLoader.manageExternalJars(ref, version, DownloadAction.CHECK_CACHE);
+    public static boolean isExternalResourceCached(final ClassLoader rootClassLoader, final URL ref, final String version) {
+        return assertJnlpClassLoader(rootClassLoader).manageExternalJars(ref, version, DownloadAction.CHECK_CACHE);
     }
 
+    private static JNLPClassLoader assertJnlpClassLoader(final ClassLoader classLoader) {
+        Assert.requireNonNull(classLoader, "classLoader");
+        if(classLoader instanceof JNLPClassLoader) {
+            return (JNLPClassLoader) classLoader;
+        }
+        throw new IllegalArgumentException("The given classloader of type " + classLoader.getClass() + " is not a " + JNLPClassLoader.class);
+    }
 }
