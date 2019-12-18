@@ -1,8 +1,9 @@
-package net.sourceforge.jnlp.runtime.classloader;
+package net.sourceforge.jnlp.runtime.classloader2;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
@@ -15,6 +16,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
@@ -22,10 +24,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ClassLoader2 extends URLClassLoader {
+public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
 
@@ -33,37 +36,46 @@ public class ClassLoader2 extends URLClassLoader {
 
     private final Lock partsLock = new ReentrantLock();
 
-    public ClassLoader2(final JNLPFile jnlpFile) {
-        super(new URL[0], ClassLoader2.class.getClassLoader());
+    private final Function<JARDesc, URL> localJarUrlProvider;
+
+    public JnlpApplicationClassLoader(final JNLPFile jnlpFile, final Function<JARDesc, URL> localJarUrlProvider) {
+        super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
+        this.localJarUrlProvider = localJarUrlProvider;
         addJnlpFile(jnlpFile);
     }
 
     private void addJnlpFile(final JNLPFile jnlpFile) {
+        Arrays.asList(jnlpFile.getResources()).stream()
+                .filter(this::matchCurrentSystem)
+                .flatMap(resourcesDesc -> {
+                    final List<Future<Void>> partFutures = Arrays.asList(resourcesDesc.getPackages())
+                            .stream()
+                            .map(partPackage -> addPartPackage(partPackage))
+                            .collect(Collectors.toList());
 
-        final List<Future<Void>> partFutures = Arrays.asList(jnlpFile.getResources().getPackages())
-                .stream()
-                .map(partPackage -> addPartPackage(partPackage))
-                .collect(Collectors.toList());
+                    final List<Future<Void>> extensionFutures = Arrays.asList(resourcesDesc.getExtensions())
+                            .stream()
+                            .map(extension -> addExtension(jnlpFile, extension))
+                            .collect(Collectors.toList());
 
-        final List<Future<Void>> extensionFutures = Arrays.asList(jnlpFile.getResources().getExtensions())
-                .stream()
-                .map(extension -> addExtension(jnlpFile, extension))
-                .collect(Collectors.toList());
+                    final List<Future<Void>> jarFutures = Arrays.asList(resourcesDesc.getJARs())
+                            .stream()
+                            .map(jar -> addJar(jar))
+                            .collect(Collectors.toList());
 
-        final List<Future<Void>> jarFutures = Arrays.asList(jnlpFile.getResources().getJARs())
-                .stream()
-                .map(jar -> addJar(jar))
-                .collect(Collectors.toList());
+                    return Stream.of(partFutures, extensionFutures, jarFutures).flatMap(list -> list.stream());
+                }).forEach(f -> {
+            try {
+                f.get();
+            } catch (final Exception e) {
+                throw new RuntimeException("Error while creating classloader!", e);
+            }
+        });
+    }
 
-        Stream.of(partFutures, extensionFutures, jarFutures)
-                .flatMap(l -> l.stream())
-                .forEach(f -> {
-                    try {
-                        f.get();
-                    } catch (final Exception e) {
-                        throw new RuntimeException("Error while creating classloader!", e);
-                    }
-                });
+    private boolean matchCurrentSystem(final ResourcesDesc resourcesDesc) {
+        //TODO: check arch / os / JRE ... in desc against current system
+        return true;
     }
 
     private Future<Void> addPartPackage(final PackageDesc packageDesc) {
@@ -108,7 +120,7 @@ public class ClassLoader2 extends URLClassLoader {
                 return CompletableFuture.completedFuture(null);
             }
         } else {
-            //TODO: NATIVE
+            //TODO: NATIVE?
             return CompletableFuture.completedFuture(null);
         }
     }
@@ -131,9 +143,12 @@ public class ClassLoader2 extends URLClassLoader {
     private Future<Void> downloadAndAdd(final JARDesc jarDescription) {
         final CompletableFuture<URL> downloadFuture = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
-            //TODO: check cache and maybe download JAR. Than return local URL from cache
-            final URL localCacheUrl = null;
-            downloadFuture.complete(localCacheUrl);
+            try {
+                final URL localCacheUrl = localJarUrlProvider.apply(jarDescription);
+                downloadFuture.complete(localCacheUrl);
+            } catch (final Exception e) {
+                downloadFuture.completeExceptionally(e);
+            }
         });
         return downloadFuture.thenAccept(url -> addURL(url));
     }
@@ -180,7 +195,7 @@ public class ClassLoader2 extends URLClassLoader {
     @Override
     public URL findResource(final String name) {
         final URL result = super.findResource(name);
-        if(result == null) {
+        if (result == null) {
             checkParts(name);
             return super.findResource(name);
         }
@@ -194,6 +209,7 @@ public class ClassLoader2 extends URLClassLoader {
     }
 
     private class PartPackage {
+
         private final String value;
 
         private final boolean recursive;
@@ -212,7 +228,22 @@ public class ClassLoader2 extends URLClassLoader {
         }
 
         public boolean supports(final String ressourceName) {
-            //TODO
+
+            //Copied from PackageDesc
+
+            // form 1: exact class
+            if (Objects.equals(value, ressourceName)) {
+                return true;
+            }
+            // form 2: package.*
+            Objects.requireNonNull(ressourceName);
+            if (value.endsWith("*")) {
+                final String pkName = value.substring(0, value.length() - 1);
+                if (ressourceName.startsWith(pkName)) {
+                    String postfix = ressourceName.substring(pkName.length() + 1);
+                    return recursive || !postfix.contains(".");
+                }
+            }
             return false;
         }
     }
