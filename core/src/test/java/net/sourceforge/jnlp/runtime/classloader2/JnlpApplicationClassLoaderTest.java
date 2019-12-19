@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -88,6 +89,99 @@ public class JnlpApplicationClassLoaderTest {
         Assert.assertTrue(jarProvider.hasTriedToDownload("lazy.jar"));
     }
 
+    @Test
+    public void findClass6() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //than
+        Assert.assertEquals(0, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void findClass7() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        try {
+            classLoader.findClass("class.in.lazy.A");
+        } catch (final Exception ignore) {}
+
+        //than
+        Assert.assertEquals(1, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void findClass8() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        try {
+            classLoader.findClass("class.in.lazy.sub.A");
+        } catch (final Exception ignore) {}
+
+        //than
+        Assert.assertEquals(0, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void findClass9() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //than
+        Assert.assertEquals(0, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void findClass10() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        try {
+            classLoader.findClass("class.in.lazy.A");
+        } catch (final Exception ignore) {}
+
+        //than
+        Assert.assertEquals(1, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void findClass11() throws Exception {
+
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        try {
+            classLoader.findClass("class.in.lazy.sub.A");
+        } catch (final Exception ignore) {}
+
+        //than
+        Assert.assertEquals(1, jarProvider.getDownloaded().size());
+    }
+
+
 
     private class DummyJarProvider implements Function<JARDesc, URL> {
 
@@ -105,6 +199,9 @@ public class JnlpApplicationClassLoaderTest {
                     .anyMatch(jar -> jar.getLocation().toString().endsWith(name));
         }
 
+        public List<JARDesc> getDownloaded() {
+            return Collections.unmodifiableList(downloaded);
+        }
     }
 
     private class ErrorJarProvider implements Function<JARDesc, URL> {

@@ -204,7 +204,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     @Override
     public Enumeration<URL> findResources(final String name) throws IOException {
-        //This is more tricky than just calling checkParts here...
+        checkParts(name);
         return super.findResources(name);
     }
 
