@@ -53,6 +53,22 @@ public class ClassloaderIntegrationTests {
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
     }
 
+    @Test
+    public void testFullPartDownloaded() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(ClassloaderIntegrationTests.class.getResource("integration-app-3.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        final Class<?> loadedClass = classLoader.loadClass("net.adoptopenjdk.integration.ClassA");
+
+        //than
+        Assertions.assertNotNull(loadedClass);
+        Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
+        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
+    }
+
     private class DummyJarProvider implements Function<JARDesc, URL> {
 
         private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();

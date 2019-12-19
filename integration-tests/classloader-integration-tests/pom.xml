@@ -64,6 +64,12 @@
                                         <include>classloader-integration-tests-module-1.jar</include>
                                     </includes>
                                 </resource>
+                                <resource>
+                                    <directory>../classloader-integration-tests-module-2/target</directory>
+                                    <includes>
+                                        <include>classloader-integration-tests-module-2.jar</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
