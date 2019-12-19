@@ -37,6 +37,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDownloadDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
@@ -94,7 +95,6 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.LAZY;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_DOWNLOAD_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_PART_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.ARCH_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.EXTENSION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.J2SE_ELEMENT;
@@ -568,13 +568,18 @@ public final class Parser {
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        final Node dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
-        for (Node dload1 : dload) {
-            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
-            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, ExtensionDesc.PART_ATTRIBUTE, null), lazy);
+        for (Node downloadNode : getChildNodes(node, EXT_DOWNLOAD_ELEMENT)) {
+            ext.addDownload(getExtensionDownload(downloadNode));
         }
 
         return ext;
+    }
+
+    private ExtensionDownloadDesc getExtensionDownload(Node node) throws ParseException {
+        final boolean lazy = LAZY.getValue().equals(getAttribute(node, ExtensionDownloadDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
+        final String extPart = getRequiredAttribute(node, ExtensionDownloadDesc.EXT_PART_ATTRIBUTE, null, strict);
+        final String part = getAttribute(node, ExtensionDownloadDesc.PART_ATTRIBUTE, null);
+        return new ExtensionDownloadDesc(extPart, part, lazy);
     }
 
     /**
