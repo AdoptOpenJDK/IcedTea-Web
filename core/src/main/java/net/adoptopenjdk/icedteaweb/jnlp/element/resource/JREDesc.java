@@ -71,7 +71,7 @@ public class JREDesc {
     private final List<String> parsedArguments;
 
     /** list of ResourceDesc objects */
-    private final List<ResourcesDesc> resources;
+    private final JNLPResources resources;
 
     /**
      * Create a JRE descriptor.
@@ -94,7 +94,7 @@ public class JREDesc {
         this.parsedArguments = parseArguments(vmArgs);
         this.initialHeapSize = checkHeapSize(initialHeapSize);
         this.maximumHeapSize = checkHeapSize(maximumHeapSize);
-        this.resources = resources;
+        this.resources = new JNLPResources(resources);
     }
 
     /**
@@ -140,6 +140,10 @@ public class JREDesc {
      * @return the resources defined for this JRE.
      */
     public List<ResourcesDesc> getResourcesDesc() {
+        return resources.all();
+    }
+
+    public JNLPResources getJnlpResources() {
         return resources;
     }
 

@@ -26,8 +26,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
@@ -54,8 +54,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
@@ -155,7 +156,7 @@ public class JNLPFile {
     /**
      * resources
      */
-    protected List<ResourcesDesc> resources;
+    protected JNLPResources resources;
 
     /**
      * additional resources not in JNLP file (from command line)
@@ -178,6 +179,11 @@ public class JNLPFile {
     protected SecurityDesc security;
 
     /**
+     * the default Java version
+     */
+    protected String defaultJavaVersion = null;
+
+    /**
      * the default JVM locale
      */
     protected Locale defaultLocale = null;
@@ -198,11 +204,6 @@ public class JNLPFile {
     private boolean missingSignedJNLP = false;
 
     /**
-     * JNLP file contains special properties
-     */
-    private boolean containsSpecialProperties = false;
-
-    /**
      * List of acceptable properties (not-special)
      */
     final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
@@ -219,6 +220,7 @@ public class JNLPFile {
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
+            defaultJavaVersion = JavaSystemProperties.getJavaVersion();
             defaultOS = JavaSystemProperties.getOsName();
             defaultArch = JavaSystemProperties.getOsArch();
         }
@@ -598,7 +600,7 @@ public class JNLPFile {
         final Map<String, List<Object>> mergedItems = new HashMap<>();
 
         infos.stream()
-                .filter(infoDesc -> localeMatches(infoDesc.getLocales(), locale))
+                .filter(infoDesc -> localeMatches(locale, infoDesc.getLocales()))
                 .filter(infoDesc -> hasPrefixMatch(os, infoDesc.getOs()))
                 .filter(infoDesc -> hasPrefixMatch(arch, infoDesc.getArch()))
                 .peek(infoDesc -> {
@@ -620,7 +622,7 @@ public class JNLPFile {
             @Override
             public List<Object> getItems(String key) {
                 final List<Object> result = mergedItems.get(key);
-                return result == null ? Collections.emptyList() : result;
+                return result == null ? emptyList() : result;
             }
 
             @Override
@@ -664,22 +666,11 @@ public class JNLPFile {
      * properties.
      */
     public ResourcesDesc getResources() {
-        return getResources(defaultLocale, defaultOS, defaultArch);
-    }
-
-    /**
-     * @param locale preferred locale of resource
-     * @param os     preferred os of resource
-     * @param arch   preferred arch of resource
-     * @return the resources section of the JNLP file for the
-     * specified locale, os, and arch.
-     */
-    ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
-        return new ResourcesDesc(this, new Locale[]{locale}, new String[]{os}, new String[]{arch}) {
+        return new ResourcesDesc(this, new Locale[]{defaultLocale}, new String[]{defaultOS}, new String[]{defaultArch}) {
 
             @Override
             public <T> List<T> getResources(Class<T> launchType) {
-                final List<T> result = getResourcesDescs(locale, os, arch).stream()
+                final List<T> result = getResourcesDescs().stream()
                         .flatMap(resDesc -> resDesc.getResources(launchType).stream())
                         .collect(toList());
 
@@ -696,6 +687,10 @@ public class JNLPFile {
         };
     }
 
+    public JNLPResources getJnlpResources() {
+        return new JNLPResources(getResourcesDescs());
+    }
+
     /**
      * @return the resources section of the JNLP file as viewed
      * through the default locale and the os.name and os.arch
@@ -704,15 +699,31 @@ public class JNLPFile {
      * read the comment in JNLPFile.getDownloadOptionsForJar(JARDesc).
      */
     public List<ResourcesDesc> getResourcesDescs() {
-        return getResourcesDescs(defaultLocale, defaultOS, defaultArch);
+        final JNLPResources resourcesOutsideOfJreDesc = getResourcesOutsideOfJreDesc();
+        final List<ResourcesDesc> jreResources = getResourcesOfJreDesc(resourcesOutsideOfJreDesc);
+
+        final List<ResourcesDesc> result = new ArrayList<>();
+        result.addAll(resourcesOutsideOfJreDesc.all());
+        result.addAll(jreResources);
+        return result;
     }
 
-    private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
-        return resources.stream()
-                .filter(rescDesc ->  hasPrefixMatch(os, rescDesc.getOS()))
-                .filter(rescDesc -> hasPrefixMatch(arch, rescDesc.getArch()))
-                .filter(rescDesc -> localeMatches(rescDesc.getLocales(), locale))
-                .collect(toList());
+    public JNLPResources getResourcesOutsideOfJreDesc() {
+        return resources.filterResources(defaultLocale, defaultOS, defaultArch);
+    }
+
+    private List<ResourcesDesc> getResourcesOfJreDesc(JNLPResources resourcesOutsideOfJreDesc) {
+        final List<JREDesc> jres = resourcesOutsideOfJreDesc.getJREs();
+        if (jres.isEmpty()) {
+            return emptyList();
+        }
+        return jres.stream()
+                    .filter(jreDesc -> jreDesc.getVersion().contains(defaultJavaVersion))
+                    .findFirst()
+                    .map(JREDesc::getJnlpResources)
+                    .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
+                    .map(jnlpResources -> jnlpResources.all())
+                    .orElseThrow(() -> new RuntimeException("Could not locate a soutable JRE description in the JNLP file"));
     }
 
     /**
@@ -796,22 +807,6 @@ public class JNLPFile {
     }
 
     /**
-     * Sets the default view of the JNLP file returned by
-     * getInformation, getResources, etc.  If unset, the defaults
-     * are the properties os.name, os.arch, and the locale returned
-     * by Locale.getDefault().
-     *
-     * @param os     preferred os of resource
-     * @param arch   preferred arch of resource
-     * @param locale preferred locale of resource
-     */
-    public void setDefaults(String os, String arch, Locale locale) {
-        defaultOS = os;
-        defaultArch = arch;
-        defaultLocale = locale;
-    }
-
-    /**
      * Initialize the JNLPFile fields. Private because it's called
      * from the constructor.
      *
@@ -834,7 +829,7 @@ public class JNLPFile {
             infos = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
-            resources = parser.getResources(root, false); // false == not a j2se/java resources section
+            resources = new JNLPResources(parser.getResources(root, false)); // false == not a j2se/java resources section
             entryPointDesc = parser.getEntryPointDesc(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
@@ -854,26 +849,9 @@ public class JNLPFile {
     /**
      * Inspects the JNLP file to check if it contains any special properties
      */
-    private void checkForSpecialProperties() {
-
-        for (ResourcesDesc res : resources) {
-            for (PropertyDesc propertyDesc : res.getProperties()) {
-
-                for (int i = 0; i < generalProperties.length; i++) {
-                    String property = propertyDesc.getKey();
-
-                    if (property.equals(generalProperties[i])) {
-                        break;
-                    }
-                    else if (!property.equals(generalProperties[i])
-                            && i == generalProperties.length - 1) {
-                        containsSpecialProperties = true;
-                        return;
-                    }
-                }
-
-            }
-        }
+    private boolean checkForSpecialProperties() {
+        final Map<String, String> props = getJnlpResources().getPropertiesMap();
+        return Arrays.stream(generalProperties).anyMatch(gp -> !props.containsKey(gp));
     }
 
     /**
@@ -924,7 +902,7 @@ public class JNLPFile {
      * @return true if a warning should be displayed; otherwise false
      */
     public boolean requiresSignedJNLPWarning() {
-        return (missingSignedJNLP && containsSpecialProperties);
+        return (missingSignedJNLP && checkForSpecialProperties());
     }
 
     /**

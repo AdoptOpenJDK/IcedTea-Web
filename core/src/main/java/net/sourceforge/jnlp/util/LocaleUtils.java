@@ -35,7 +35,7 @@ public class LocaleUtils {
         return new Locale(language, country, variant);
     }
 
-    public static boolean localeMatches(final Locale[] availableLocales, final Locale locale) {
+    public static boolean localeMatches(final Locale locale, final Locale... availableLocales) {
         return Stream.of(Match.values())
                 .anyMatch(match -> localMatches(locale, match, availableLocales == null ? new Locale[0] : availableLocales));
     }
