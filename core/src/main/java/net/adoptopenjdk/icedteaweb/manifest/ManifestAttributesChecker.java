@@ -51,9 +51,9 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SigningState;
+import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -334,7 +334,7 @@ public class ManifestAttributesChecker {
         //cases
         final Map<URL, Set<URL>> usedUrls = new HashMap<>();
         final URL sourceLocation = file.getSourceLocation();
-        final ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
+        final List<ResourcesDesc> resourcesDescs = file.getResourcesDescs();
         if (sourceLocation != null) {
             final URL urlWithoutFileName = UrlUtils.removeFileName(sourceLocation);
             usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(sourceLocation);

@@ -12,6 +12,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,8 +83,8 @@ public class DummyJNLPFileWithJar extends JNLPFile {
     }
 
     @Override
-    public ResourcesDesc[] getResourcesDescs() {
-        return new ResourcesDesc[] { getResources() };
+    public List<ResourcesDesc> getResourcesDescs() {
+        return Collections.singletonList(getResources());
     }
 
     @Override

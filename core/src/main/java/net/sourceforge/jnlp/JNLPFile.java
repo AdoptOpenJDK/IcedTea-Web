@@ -674,7 +674,7 @@ public class JNLPFile {
      * @return the resources section of the JNLP file for the
      * specified locale, os, and arch.
      */
-    public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
+    ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
         return new ResourcesDesc(this, new Locale[]{locale}, new String[]{os}, new String[]{arch}) {
 
             @Override
@@ -703,8 +703,8 @@ public class JNLPFile {
      * XXX: Before overriding this method or changing its implementation,
      * read the comment in JNLPFile.getDownloadOptionsForJar(JARDesc).
      */
-    public ResourcesDesc[] getResourcesDescs() {
-        return getResourcesDescs(defaultLocale, defaultOS, defaultArch).toArray(new ResourcesDesc[0]);
+    public List<ResourcesDesc> getResourcesDescs() {
+        return getResourcesDescs(defaultLocale, defaultOS, defaultArch);
     }
 
     private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
