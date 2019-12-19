@@ -56,10 +56,7 @@
         <module>jnlp-servlet</module>
         <module>launchers</module>
 
-        <module>integration-tests/classloader-integration-tests</module>
-        <module>integration-tests/classloader-integration-tests-module-parent</module>
-        <module>integration-tests/classloader-integration-tests-module-1</module>
-        <module>integration-tests/classloader-integration-tests-module-2</module>
+        <module>integration-tests</module>
     </modules>
 
     <repositories>
