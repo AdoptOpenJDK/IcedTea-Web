@@ -28,6 +28,31 @@ public class ClassloaderIntegrationTests {
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
     }
 
+    @Test
+    public void testClassFromLazyJarNotInitialLoaded() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = new JNLPFile(ClassloaderIntegrationTests.class.getResource("integration-app-2.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //than
+        Assertions.assertEquals(0, jarProvider.getDownloaded().size());
+    }
+
+    @Test
+    public void testLoadClassFromLazyJar() throws Exception {
+        //given
+        final JNLPFile file = new JNLPFile(ClassloaderIntegrationTests.class.getResource("integration-app-2.jnlp"));
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, new DummyJarProvider());
+
+        //when
+        final Class<?> loadedClass = classLoader.loadClass("net.adoptopenjdk.integration.ClassA");
+
+        //than
+        Assertions.assertNotNull(loadedClass);
+        Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
+    }
+
     private class DummyJarProvider implements Function<JARDesc, URL> {
 
         private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();

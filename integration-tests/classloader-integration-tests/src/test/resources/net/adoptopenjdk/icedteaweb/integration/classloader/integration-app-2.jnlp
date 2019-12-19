@@ -6,7 +6,8 @@
     </information>
     <resources>
         <j2se version="1.8+" />
-        <jar href="classloader-integration-tests-module-1.jar" />
+        <jar download="lazy" part="lazy-package" href="classloader-integration-tests-module-1.jar"/>
+        <package name="net.adoptopenjdk.integration.*" part="lazy-package" />
     </resources>
     <application-desc main-class="UnknownMainClass" />
 </jnlp>
