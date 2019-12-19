@@ -16,6 +16,8 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.util.Objects;
 
 /**
@@ -59,21 +61,20 @@ public class PackageDesc {
      * @return whether the specified class is part of this package.
      *
      * @param className the fully qualified class name
-
      */
     public boolean matches(final String className) {
-        // form 1: exact class
-        if (Objects.equals(name, className)) {
-            return true;
-        }
-        // form 2: package.*
-        Objects.requireNonNull(className);
+        Assert.requireNonNull(className, "className");
         if (name.endsWith(ASTERIX_SUFFIX)) {
+            // Form 2: name is a package name
             final String pkName = name.substring(0, name.length() - 1);
             if (className.startsWith(pkName)) {
-                String postfix = className.substring(pkName.length() + 1);
+                final String postfix = className.substring(pkName.length() + 1);
                 return recursive || !postfix.contains(".");
             }
+        }
+        else {
+            // Form 1: name is a class name
+            return Objects.equals(name, className);
         }
         return false;
     }
