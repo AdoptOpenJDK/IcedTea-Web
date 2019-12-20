@@ -19,6 +19,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
 import java.net.URL;
+import java.util.StringJoiner;
 
 /**
  * The JAR element.
@@ -152,4 +153,8 @@ public class JARDesc {
         return cacheable;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(location);
+    }
 }

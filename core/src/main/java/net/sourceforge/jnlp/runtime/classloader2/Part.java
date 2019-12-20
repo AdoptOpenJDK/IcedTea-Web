@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * ...
@@ -42,6 +43,10 @@ public class Part {
         return Collections.unmodifiableList(jars);
     }
 
+    public List<PackageDesc> getPackages() {
+        return Collections.unmodifiableList(packages);
+    }
+
     public boolean supports(final String resourceName) {
         return packages.stream().anyMatch(partPackage -> partPackage.matches(resourceName));
     }
@@ -52,5 +57,15 @@ public class Part {
 
     public boolean isLazy() {
         return lazy;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Part.class.getSimpleName() + "{", "}")
+                .add("name='" + name + "'")
+                .add("lazy=" + lazy)
+                .add("jars=" + jars)
+                .add("packages=" + packages)
+                .toString();
     }
 }

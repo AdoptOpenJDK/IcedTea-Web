@@ -33,10 +33,11 @@ public class JarExtractor {
     private final JNLPFileFactory jnlpFileFactory;
 
     private final Lock partsLock = new ReentrantLock();
-    private final Part defaultEagerPart = createAndAddPart(null);
-    private final Part defaultLazyPart = createAndAddPart(null);
     private final List<Part> parts = new ArrayList<>();
     private final Map<PartKey, Part> partKeyMap = new HashMap<>();
+
+    private final Part defaultEagerPart = createAndAddPart(null);
+    private final Part defaultLazyPart = createAndAddPart(null);
 
     public JarExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
         this.jnlpFileFactory = jnlpFileFactory;

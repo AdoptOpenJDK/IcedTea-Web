@@ -101,4 +101,9 @@ public class PackageDesc {
         return recursive;
     }
 
+
+    @Override
+    public String toString() {
+        return String.valueOf(name);
+    }
 }
