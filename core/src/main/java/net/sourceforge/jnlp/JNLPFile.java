@@ -223,13 +223,14 @@ public class JNLPFile {
             defaultArch = JavaSystemProperties.getOsArch();
         }
         catch (SecurityException ex) {
-            // null values will still work, and app can set defaults later
+            // FIXME: how should we proceed if the default values are not available??
         }
     }
 
     /**
      * Empty stub, allowing child classes to override the constructor
      */
+    // only used for tests
     protected JNLPFile() {
     }
 
@@ -273,6 +274,25 @@ public class JNLPFile {
     }
 
     /**
+     * Create a JNLPFile from a URL, parent URLm a version and checking for
+     * updates using the specified policy.
+     *
+     * @param location  the location of the JNLP file
+     * @param uniqueKey A string that uniquely identifies connected instances
+     * @param version   the version of the JNLP file
+     * @param settings  the parser settings to use while parsing the file
+     * @param policy    the update policy
+     * @throws IOException    if an IO exception occurred
+     * @throws ParseException if the JNLP file was invalid
+     */
+    public JNLPFile(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
+        this(location, version, settings, policy);
+        this.uniqueKey = uniqueKey;
+
+        LOG.warn("UNIQUEKEY (override) =" + this.uniqueKey);
+    }
+
+    /**
      * Create a JNLPFile from a URL and a version, checking for updates
      * using the specified policy.
      *
@@ -284,7 +304,7 @@ public class JNLPFile {
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    protected JNLPFile(final URL location, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
+    JNLPFile(final URL location, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
         this.parserSettings = settings;
         try (InputStream input = openURL(location, version, policy)) {
             parse(input, location, forceCodebase);
@@ -316,31 +336,13 @@ public class JNLPFile {
     }
 
     /**
-     * Create a JNLPFile from a URL, parent URLm a version and checking for
-     * updates using the specified policy.
-     *
-     * @param location  the location of the JNLP file
-     * @param uniqueKey A string that uniquely identifies connected instances
-     * @param version   the version of the JNLP file
-     * @param settings  the parser settings to use while parsing the file
-     * @param policy    the update policy
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
-        this(location, version, settings, policy);
-        this.uniqueKey = uniqueKey;
-
-        LOG.warn("UNIQUEKEY (override) =" + this.uniqueKey);
-    }
-
-    /**
      * Create a JNLPFile from an input stream.
      *
      * @param input    input stream from which create jnlp file
      * @param settings settings of parser
      * @throws ParseException if the JNLP file was invalid
      */
+    // only used for tests
     public JNLPFile(final InputStream input, final ParserSettings settings) throws ParseException {
         this.parserSettings = settings;
         parse(input, null, null);
