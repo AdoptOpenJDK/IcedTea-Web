@@ -122,4 +122,5 @@ public class JNLPFileFactory {
             throw new IOException(ex);
         }
     }
+
 }
