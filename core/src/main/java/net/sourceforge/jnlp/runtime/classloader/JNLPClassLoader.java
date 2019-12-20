@@ -36,6 +36,7 @@ import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.JNLPMatcherException;
 import net.sourceforge.jnlp.LaunchException;
@@ -534,7 +535,7 @@ public class JNLPClassLoader extends URLClassLoader {
             loader = uniqueKeyToLoader.get(uniqueKey);
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
-                final JNLPFile jnlpFile = new JNLPFile(location, uniqueKey, version, settings, policy);
+                final JNLPFile jnlpFile = new JNLPFileFactory().create(location, uniqueKey, version, settings, policy);
 
                 loader = getInstance(jnlpFile, policy, mainName, enableCodeBase);
             }

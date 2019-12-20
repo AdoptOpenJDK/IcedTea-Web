@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Execut
 import net.sourceforge.jnlp.JNLPFile;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.JNLPFileFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -107,7 +108,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     }
     
     public static void main(String[] args) throws Exception {
-        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")));
+        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFileFactory().create(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")));
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.add(w, BorderLayout.CENTER);

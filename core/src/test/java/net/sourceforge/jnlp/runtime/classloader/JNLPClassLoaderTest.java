@@ -49,6 +49,7 @@ import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
 import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -93,6 +94,8 @@ import static org.junit.Assert.fail;
 
 @NotThreadSafe
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
+
+    private final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -407,7 +410,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
             final URL jnlpUrl = new URL("http://localhost:" + port + "/up.jnlp");
-            final JNLPFile jnlpFile1 = new JNLPFile(jnlpUrl);
+            final JNLPFile jnlpFile1 = jnlpFileFactory.create(jnlpUrl);
             final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
             openResourceAsStream(classLoader1, "Hello1.class");
             openResourceAsStream(classLoader1, "META-INF/MANIFEST.MF");
@@ -458,7 +461,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
             final URL jnlpUrl = new URL("http://localhost:" + port + "/upEncoded.jnlp");
-            final JNLPFile jnlpFile1 = new JNLPFile(jnlpUrl);
+            final JNLPFile jnlpFile1 = jnlpFileFactory.create(jnlpUrl);
             final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
             openResourceAsStream(classLoader1, "Hello1.class");
             openResourceAsStream(classLoader1, "META-INF/MANIFEST.MF");
@@ -511,7 +514,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         try {
             //it is invalid jar, so we have to disable checks first
             final URL jnlpUrl = new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp");
-            final JNLPFile jnlpFile = new JNLPFile(jnlpUrl);
+            final JNLPFile jnlpFile = jnlpFileFactory.create(jnlpUrl);
             final JNLPClassLoader classLoader = JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
 
             //ThreadGroup group = Thread.currentThread().getThreadGroup();
@@ -594,7 +597,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
             final URL jnlpUrl = new URL("http://localhost:" + port + "/test.jnlp");
-            final JNLPFile jnlpFile1 = new JNLPFile(jnlpUrl);
+            final JNLPFile jnlpFile1 = jnlpFileFactory.create(jnlpUrl);
             final JNLPClassLoader classLoader1 = JNLPClassLoader.getInstance(jnlpFile1, UpdatePolicy.ALWAYS, false);
             classLoader1.loadClass("Hello1");
         } finally {
@@ -653,7 +656,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final ServerLauncher as = ServerAccess.getIndependentInstance(dir.getAbsolutePath(), port);
         try {
             //it is invalid jar, so we have to disable checks first
-            final JNLPFile jnlpFile = new JNLPFile(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
+            final JNLPFile jnlpFile = jnlpFileFactory.create(new URL("http://localhost:" + port + "/jar_03_dotdot_jarN1.jnlp"));
             JNLPClassLoader.getInstance(jnlpFile, UpdatePolicy.ALWAYS, false);
         } finally {
             JNLPRuntime.setVerify(verifyBackup);

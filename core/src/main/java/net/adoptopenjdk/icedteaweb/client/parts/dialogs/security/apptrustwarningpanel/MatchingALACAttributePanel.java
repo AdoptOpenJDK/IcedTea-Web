@@ -43,6 +43,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.ImageIcon;
@@ -118,7 +119,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
         Set<URL> s = new HashSet<>();
         s.add(new URL("http:/blah.com/blah"));
         s.add(new URL("http:/blah.com/blah/blah"));
-        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFile(new URL("https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
+        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFileFactory().create(new URL("https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
         JFrame f = new JFrame();
         f.setSize(600, 400);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
