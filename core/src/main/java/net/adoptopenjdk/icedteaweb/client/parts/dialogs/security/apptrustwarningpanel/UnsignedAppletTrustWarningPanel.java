@@ -38,16 +38,13 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarnin
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.JNLPFile;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.net.URL;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -105,14 +102,4 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
     protected String getQuestionPanelText() {
         return SecurityDialogPanel.htmlWrap(R(getQuestionPanelTextKey()));
     }
-    
-    public static void main(String[] args) throws Exception {
-        UnsignedAppletTrustWarningPanel w = new UnsignedAppletTrustWarningPanel(null, new JNLPFile(new URL("http://www.geogebra.org/webstart/geogebra.jnlp")));
-        JFrame f = new JFrame();
-        f.setSize(600, 400);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-
 }

@@ -58,6 +58,7 @@ import java.util.Map;
 public class JNLPFileTest extends NoStdOutErrTest{
     Locale jvmLocale = new Locale("en", "CA", "utf8");
     MockJNLPFile file = new MockJNLPFile(jvmLocale);
+    JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
 
     @Test
     public void testCodebaseConstructorWithInputstreamAndCodebase() throws Exception {
@@ -239,7 +240,7 @@ public class JNLPFileTest extends NoStdOutErrTest{
         }
         String jnlpResourceName = "net/sourceforge/jnlp/minimal.jnlp";
         URL jnlpURL = cl.getResource(jnlpResourceName);
-        JNLPFile jnlpFile = new JNLPFile(jnlpURL);
+        JNLPFile jnlpFile = jnlpFileFactory.create(jnlpURL);
         Assert.assertNotNull(jnlpFile.getSourceLocation());
         Assert.assertTrue(jnlpFile.getSourceLocation().getFile().endsWith(jnlpResourceName));
     }
@@ -251,7 +252,7 @@ public class JNLPFileTest extends NoStdOutErrTest{
         }
         String jnlpResourceName = "net/sourceforge/jnlp/minimalWithHref.jnlp";
         URL jnlpURL = cl.getResource(jnlpResourceName);
-        JNLPFile jnlpFile = new JNLPFile(jnlpURL);
+        JNLPFile jnlpFile = jnlpFileFactory.create(jnlpURL);
         Assert.assertNotNull(jnlpFile.getSourceLocation());
         Assert.assertTrue(jnlpFile.getSourceLocation().getFile().endsWith(jnlpResourceName));
     }

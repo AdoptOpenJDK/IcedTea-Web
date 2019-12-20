@@ -293,8 +293,9 @@ public class Launcher {
      * Returns the JNLPFile for the URL, with error handling.
      */
     private JNLPFile fromUrl(URL location) throws LaunchException {
+        final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
         try {
-            JNLPFile file = new JNLPFile(location, parserSettings);
+            JNLPFile file = jnlpFileFactory.create(location, parserSettings);
 
             boolean isLocal = false;
             boolean haveHref = false;
@@ -317,7 +318,7 @@ public class Launcher {
             }
 
             if (isLocal && haveHref) {
-                JNLPFile fileFromHref = new JNLPFile(file.getSourceLocation(), parserSettings);
+                JNLPFile fileFromHref = jnlpFileFactory.create(file.getSourceLocation(), parserSettings);
                 if (fileFromHref.getCodeBase() == null) {
                     fileFromHref.codeBase = file.getCodeBase();
                 }
