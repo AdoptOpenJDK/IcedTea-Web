@@ -7,6 +7,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.util.ArrayList;
@@ -29,13 +30,16 @@ public class JarExtractor {
 
     private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
 
+    private final JNLPFileFactory jnlpFileFactory;
+
     private final Lock partsLock = new ReentrantLock();
     private final Part defaultEagerPart = createAndAddPart(null);
     private final Part defaultLazyPart = createAndAddPart(null);
     private final List<Part> parts = new ArrayList<>();
     private final Map<PartKey, Part> partKeyMap = new HashMap<>();
 
-    public JarExtractor(final JNLPFile jnlpFile) {
+    public JarExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
+        this.jnlpFileFactory = jnlpFileFactory;
         defaultEagerPart.markAsEager();
         addJnlpFile(jnlpFile);
     }
@@ -70,7 +74,7 @@ public class JarExtractor {
         final CompletableFuture<Void> result = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
-                final JNLPFile jnlpFile = new JNLPFile(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
+                final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
                 addExtensionParts(parent, jnlpFile, extension.getDownloads());
                 addJnlpFile(jnlpFile);
                 result.complete(null);

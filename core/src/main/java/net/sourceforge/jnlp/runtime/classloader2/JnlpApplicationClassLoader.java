@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.IOException;
@@ -93,7 +94,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         final CompletableFuture<Void> result = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
-                final JNLPFile jnlpFile = new JNLPFile(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
+                final JNLPFile jnlpFile = new JNLPFileFactory().create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
                 addJnlpFile(jnlpFile);
                 result.complete(null);
             } catch (Exception e) {

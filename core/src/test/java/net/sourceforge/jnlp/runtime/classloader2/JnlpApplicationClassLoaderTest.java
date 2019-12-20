@@ -2,6 +2,7 @@ package net.sourceforge.jnlp.runtime.classloader2;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,6 +16,8 @@ import java.util.function.Function;
 
 public class JnlpApplicationClassLoaderTest {
 
+    private final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -22,7 +25,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass1() throws Exception {
 
         //given
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("empty.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("empty.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, new DummyJarProvider());
         thrown.expect(ClassNotFoundException.class);
         thrown.expectMessage("not.in.Classpath");
@@ -35,7 +38,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass2() throws Exception {
 
         //given
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("unavailable-jar.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("unavailable-jar.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, new DummyJarProvider());
         thrown.expect(ClassNotFoundException.class);
         thrown.expectMessage("not.in.Classpath");
@@ -48,7 +51,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass3() throws Exception {
 
         //given
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("unavailable-jar.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("unavailable-jar.jnlp"));
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Error while creating classloader!");
 
@@ -61,7 +64,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("eager-and-lazy.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("eager-and-lazy.jnlp"));
 
         //when
         new JnlpApplicationClassLoader(file, jarProvider);
@@ -76,7 +79,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("eager-and-lazy.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("eager-and-lazy.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //when
@@ -94,7 +97,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //than
@@ -106,7 +109,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //when
@@ -123,7 +126,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-not-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //when
@@ -140,7 +143,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //than
@@ -152,7 +155,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //when
@@ -169,7 +172,7 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = new JNLPFile(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
+        final JNLPFile file = jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource("lazy-recursive.jnlp"));
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
 
         //when
