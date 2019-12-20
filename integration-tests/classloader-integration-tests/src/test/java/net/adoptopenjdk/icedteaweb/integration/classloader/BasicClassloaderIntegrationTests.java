@@ -60,6 +60,27 @@ public class BasicClassloaderIntegrationTests {
     }
 
     @Test
+    public void testLazyJarOnlyDownloadedOnce() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = createFile("integration-app-2.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
+        final Class<?> loadedClass2 = classLoader.loadClass(CLASS_A);
+
+        //than
+        Assertions.assertNotNull(loadedClass1);
+        Assertions.assertEquals(classLoader, loadedClass1.getClassLoader());
+        Assertions.assertNotNull(loadedClass2);
+        Assertions.assertEquals(classLoader, loadedClass2.getClassLoader());
+        Assertions.assertTrue(loadedClass1 == loadedClass2);
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+    }
+
+    @Test
     public void testFullPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();

@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 
 import java.net.URL;
@@ -14,6 +15,10 @@ class DummyJarProvider implements Function<JARDesc, URL> {
 
     @Override
     public URL apply(final JARDesc jarDesc) {
+        Assert.requireNonNull(jarDesc, "jarDesc");
+        if(downloaded.contains(jarDesc)) {
+            throw new IllegalStateException("Already downloaded " + jarDesc);
+        }
         System.out.println("Should load " + jarDesc.getLocation());
         downloaded.add(jarDesc);
         return jarDesc.getLocation();
