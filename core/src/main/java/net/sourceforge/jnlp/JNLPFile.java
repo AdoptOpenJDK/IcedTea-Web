@@ -38,23 +38,18 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
-import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
-import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -68,7 +63,6 @@ import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
 import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
-import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
  * <p>
@@ -116,17 +110,17 @@ public class JNLPFile {
     /**
      * the network location of this JNLP file
      */
-    protected URL fileLocation;
+    protected final URL fileLocation;
 
     /**
      * the ParserSettings which were used to parse this file
      */
-    protected ParserSettings parserSettings = null;
+    protected final ParserSettings parserSettings;
 
     /**
      * A key that uniquely identifies connected instances (main jnlp+ext)
      */
-    protected String uniqueKey = null;
+    protected final String uniqueKey;
 
     /**
      * the URL used to resolve relative URLs in the file
@@ -223,72 +217,41 @@ public class JNLPFile {
             defaultArch = JavaSystemProperties.getOsArch();
         }
         catch (SecurityException ex) {
-            // null values will still work, and app can set defaults later
+            // FIXME: how should we proceed if the default values are not available??
         }
     }
 
     /**
      * Empty stub, allowing child classes to override the constructor
      */
+    // only used for tests
     protected JNLPFile() {
-    }
-
-    /**
-     * Create a JNLPFile from a URL.
-     *
-     * @param location the location of the JNLP file
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(final URL location) throws IOException, ParseException {
-        this(location, new ParserSettings());
-    }
-
-    /**
-     * Create a JNLPFile from a URL checking for updates using the
-     * default policy.
-     *
-     * @param location the location of the JNLP file
-     * @param settings the parser settings to use while parsing the file
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(final URL location, final ParserSettings settings) throws IOException, ParseException {
-        this(location, (VersionString) null, settings, JNLPRuntime.getDefaultUpdatePolicy());
+        this.parserSettings = null;
+        this.fileLocation = null;
+        this.uniqueKey = null;
     }
 
     /**
      * Create a JNLPFile from a URL and a version, checking for updates
      * using the specified policy.
      *
-     * @param location the location of the JNLP file
-     * @param version  the version of the JNLP file
-     * @param settings the {@link ParserSettings} to use when parsing the {@code location}
-     * @param policy   the update policy
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(final URL location, final VersionString version, final ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
-        this(location, version, settings, policy, null);
-    }
-
-    /**
-     * Create a JNLPFile from a URL and a version, checking for updates
-     * using the specified policy.
-     *
-     * @param location      the location of the JNLP file
      * @param version       the version of the JNLP file
-     * @param settings      the parser settings to use while parsing the file
      * @param policy        the update policy
-     * @param forceCodebase codebase to use if not specified in JNLP file.
+     * @param location      the location of the JNLP file
+     * @param settings      the parser settings to use while parsing the file
      * @throws IOException    if an IO exception occurred
      * @throws ParseException if the JNLP file was invalid
      */
-    protected JNLPFile(final URL location, final VersionString version, final ParserSettings settings, final UpdatePolicy policy, final URL forceCodebase) throws IOException, ParseException {
+    JNLPFile(final InputStream input,
+             final URL location,
+             final ParserSettings settings,
+             final String uniqueKey
+    ) throws IOException, ParseException {
         this.parserSettings = settings;
-        try (InputStream input = openURL(location, version, policy)) {
-            parse(input, location, forceCodebase);
-        }
+        this.fileLocation = location;
+        this.uniqueKey = uniqueKey;
+
+        parse(input, location, null);
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
         if (! StringUtils.isBlank(httpAgent)) {
@@ -297,41 +260,6 @@ public class JNLPFile {
                 LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
             }
         }
-
-        //Downloads the original jnlp file into the cache if possible
-        //(i.e. If the jnlp file being launched exist locally, but it
-        //originated from a website, then download the one from the website
-        //into the cache).
-        if (sourceLocation != null && FILE_PROTOCOL.equals(location.getProtocol())) {
-            openURL(sourceLocation, version, policy);
-        }
-
-        this.fileLocation = location;
-
-        this.uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" +
-                ((int) (Math.random() * Integer.MAX_VALUE)) + "-" +
-                location;
-
-        LOG.debug("UNIQUEKEY=" + this.uniqueKey);
-    }
-
-    /**
-     * Create a JNLPFile from a URL, parent URLm a version and checking for
-     * updates using the specified policy.
-     *
-     * @param location  the location of the JNLP file
-     * @param uniqueKey A string that uniquely identifies connected instances
-     * @param version   the version of the JNLP file
-     * @param settings  the parser settings to use while parsing the file
-     * @param policy    the update policy
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
-        this(location, version, settings, policy);
-        this.uniqueKey = uniqueKey;
-
-        LOG.warn("UNIQUEKEY (override) =" + this.uniqueKey);
     }
 
     /**
@@ -341,9 +269,9 @@ public class JNLPFile {
      * @param settings settings of parser
      * @throws ParseException if the JNLP file was invalid
      */
+    // only used for tests
     public JNLPFile(final InputStream input, final ParserSettings settings) throws ParseException {
-        this.parserSettings = settings;
-        parse(input, null, null);
+        this(input, null, settings);
     }
 
     /**
@@ -354,38 +282,14 @@ public class JNLPFile {
      * @param settings the {@link ParserSettings} to use when parsing
      * @throws ParseException if the JNLP file was invalid
      */
+    // only used for tests
     public JNLPFile(final InputStream input, final URL codebase, final ParserSettings settings) throws ParseException {
         this.parserSettings = settings;
+        this.fileLocation = null;
+        this.uniqueKey = null;
         parse(input, null, codebase);
     }
 
-
-    /**
-     * Open the jnlp file URL from the cache if there, otherwise
-     * download to the cache.
-     * Unless file is find in cache, this method blocks until it is downloaded.
-     * This is the best way in itw how to download and cache file
-     *
-     * @param location of resource to open
-     * @param version  of resource
-     * @param policy   update policy of resource
-     * @return opened stream from given url
-     * @throws java.io.IOException if something goes wrong
-     */
-    public static InputStream openURL(URL location, VersionString version, UpdatePolicy policy) throws IOException {
-        if (location == null || policy == null)
-            throw new IllegalArgumentException("Null parameter");
-
-        try {
-            ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
-            tracker.addResource(location, version);
-            File f = tracker.getCacheFile(location);
-            return new FileInputStream(f);
-        }
-        catch (Exception ex) {
-            throw new IOException(ex);
-        }
-    }
 
     /**
      * @return the JNLP file's best localized title. This method returns the same
