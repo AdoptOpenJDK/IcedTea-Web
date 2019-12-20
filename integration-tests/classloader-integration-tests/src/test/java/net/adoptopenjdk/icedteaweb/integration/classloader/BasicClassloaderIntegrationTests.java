@@ -60,6 +60,34 @@ public class BasicClassloaderIntegrationTests {
     }
 
     @Test
+    public void testLoadClassFromLazyJarWithRecursive() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = createFile("integration-app-7.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
+
+        //than
+        Assertions.assertNotNull(loadedClass);
+        Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+    }
+
+    @Test
+    public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = createFile("integration-app-8.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        Assertions.assertThrows(ClassNotFoundException.class, () -> classLoader.loadClass(CLASS_A));
+    }
+    
+    @Test
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
