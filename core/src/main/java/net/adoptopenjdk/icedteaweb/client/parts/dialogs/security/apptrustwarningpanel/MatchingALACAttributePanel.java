@@ -36,25 +36,15 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
-import net.sourceforge.jnlp.JNLPFile;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
-import net.sourceforge.jnlp.JNLPFileFactory;
-import net.sourceforge.jnlp.util.UrlUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -113,17 +103,5 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
     @Override
     public String getAppletTitle() {
         return "";
-    }
-
-    public static void main(String[] args) throws MalformedURLException, IOException, ParseException {
-        Set<URL> s = new HashSet<>();
-        s.add(new URL("http:/blah.com/blah"));
-        s.add(new URL("http:/blah.com/blah/blah"));
-        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, new JNLPFileFactory().create(new URL("https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp")), "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
-        JFrame f = new JFrame();
-        f.setSize(600, 400);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(w, BorderLayout.CENTER);
-        f.setVisible(true);
     }
 }
