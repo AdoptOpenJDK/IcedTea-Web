@@ -17,7 +17,7 @@ class DummyJarProvider implements Function<JARDesc, URL> {
     public URL apply(final JARDesc jarDesc) {
         Assert.requireNonNull(jarDesc, "jarDesc");
         if(downloaded.contains(jarDesc)) {
-            throw new IllegalStateException("Already downloaded " + jarDesc);
+            throw new IllegalStateException("Already downloaded " + jarDesc.getLocation());
         }
         System.out.println("Should load " + jarDesc.getLocation());
         downloaded.add(jarDesc);

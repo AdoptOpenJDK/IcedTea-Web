@@ -16,7 +16,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
-    public void testWindowsOnlyRessourceOnWindows() throws Exception {
+    public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-4.jnlp");
@@ -31,7 +31,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
-    public void testWindowsOnlyRessourceOnWindowsWithLoadClass() throws Exception {
+    public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-4.jnlp");
@@ -48,7 +48,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @DisabledOnOs(OS.WINDOWS)
-    public void testWindowsOnlyRessourceOnNotWindows() throws Exception {
+    public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-4.jnlp");
@@ -63,7 +63,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.MAC)
-    public void testMacOnlyRessourceOnMac() throws Exception {
+    public void testMacOnlyResourceOnMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-5.jnlp");
@@ -78,7 +78,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.MAC)
-    public void testMacOnlyRessourceOnMacWithLoadClass() throws Exception {
+    public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-5.jnlp");
@@ -95,7 +95,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @DisabledOnOs(OS.MAC)
-    public void testMacOnlyRessourceOnNotMac() throws Exception {
+    public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-5.jnlp");
@@ -110,7 +110,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.LINUX)
-    public void testLinuxOnlyRessourceOnLinux() throws Exception {
+    public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-6.jnlp");
@@ -125,7 +125,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @EnabledOnOs(OS.LINUX)
-    public void testLinuxOnlyRessourceOnLinuxWithLoadClass() throws Exception {
+    public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-6.jnlp");
@@ -142,7 +142,7 @@ public class OsSpecificClassloaderIntegrationTests {
 
     @Test
     @DisabledOnOs(OS.LINUX)
-    public void testLinuxOnlyRessourceOnNotLinux() throws Exception {
+    public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final JNLPFile file = createFile("integration-app-6.jnlp");

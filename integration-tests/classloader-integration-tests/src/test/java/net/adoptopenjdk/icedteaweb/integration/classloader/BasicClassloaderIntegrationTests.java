@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
@@ -86,7 +87,7 @@ public class BasicClassloaderIntegrationTests {
         //when
         Assertions.assertThrows(ClassNotFoundException.class, () -> classLoader.loadClass(CLASS_A));
     }
-    
+
     @Test
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
@@ -121,6 +122,27 @@ public class BasicClassloaderIntegrationTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
+        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+    }
+
+    @Test
+    public void testMultipleResources() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JNLPFile file = createFile("integration-app-11.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+
+        //when
+        final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
+        final Class<?> loadedClass2 = classLoader.loadClass(CLASS_B);
+
+        //than
+        Assertions.assertNotNull(loadedClass1);
+        Assertions.assertEquals(classLoader, loadedClass1.getClassLoader());
+        Assertions.assertNotNull(loadedClass2);
+        Assertions.assertEquals(classLoader, loadedClass2.getClassLoader());
         Assertions.assertEquals(2, jarProvider.getDownloaded().size());
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
