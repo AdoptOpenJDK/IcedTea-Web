@@ -27,6 +27,21 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     }
 
     @Test
+    public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final JarExtractor jarExtractor = createFor("integration-app-14.jnlp");
+
+        //when
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+
+        //than
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
+    }
+
+    @Test
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();

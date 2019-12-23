@@ -38,12 +38,11 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final JarExtractor jarExtractor = createFor("unavailable-jar.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, new DummyJarProvider());
-        thrown.expect(ClassNotFoundException.class);
-        thrown.expectMessage("not.in.Classpath");
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Error while creating classloader!");
 
         //when
-        classLoader.findClass("not.in.Classpath");
+        new JnlpApplicationClassLoader(jarExtractor, new DummyJarProvider());
     }
 
     @Test

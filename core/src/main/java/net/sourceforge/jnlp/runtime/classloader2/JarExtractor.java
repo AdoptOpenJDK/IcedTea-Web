@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.sourceforge.jnlp.runtime.classloader2.ClassLoaderUtils.waitForCompletion;
 
 public class JarExtractor {
 
@@ -148,13 +149,7 @@ public class JarExtractor {
         return newPart;
     }
 
-    private void waitForCompletion(Future<Void> f, String message) {
-        try {
-            f.get();
-        } catch (final Exception e) {
-            throw new RuntimeException(message, e);
-        }
-    }
+
 
     private static class PartKey {
         private final JNLPFile file;

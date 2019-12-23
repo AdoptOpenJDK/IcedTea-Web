@@ -17,6 +17,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static net.sourceforge.jnlp.runtime.classloader2.ClassLoaderUtils.waitForCompletion;
+
 public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
@@ -27,9 +29,12 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private List<Part> parts = new CopyOnWriteArrayList<>();
 
-    public JnlpApplicationClassLoader(final JarExtractor jarExtractor, final Function<JARDesc, URL> localJarUrlProvider) {
+    private final NativeLibrarySupport nativeLibrarySupport;
+
+    public JnlpApplicationClassLoader(final JarExtractor jarExtractor, final Function<JARDesc, URL> localJarUrlProvider) throws Exception {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
         this.localJarUrlProvider = localJarUrlProvider;
+        this.nativeLibrarySupport = new NativeLibrarySupport();
 
         final List<Part> lazyParts = jarExtractor.getParts().stream()
                 .filter(part -> part.isLazy())
@@ -41,14 +46,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                 .flatMap(part -> part.getJars().stream())
                 .map(jar -> downloadAndAdd(jar))
                 .collect(Collectors.toList());
-
-        addJarTasks.forEach(future -> {
-            try {
-                future.get();
-            } catch (final Exception e) {
-                throw new RuntimeException("Error while creating classloader!", e);
-            }
-        });
+        addJarTasks.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
     }
 
     private void checkParts(final String name) {
@@ -71,6 +69,11 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final URL localCacheUrl = localJarUrlProvider.apply(jarDescription);
+                try {
+                    nativeLibrarySupport.addSearchJar(localCacheUrl);
+                } catch (final Exception e) {
+                    throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                }
                 downloadFuture.complete(localCacheUrl);
             } catch (final Exception e) {
                 downloadFuture.completeExceptionally(e);
@@ -83,13 +86,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         final List<Future<Void>> futures = part.getJars().stream()
                 .map(jar -> downloadAndAdd(jar))
                 .collect(Collectors.toList());
-        futures.forEach(f -> {
-            try {
-                f.get();
-            } catch (final Exception e) {
-                throw new RuntimeException("Error while creating classloader!", e);
-            }
-        });
+        futures.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
     }
 
     @Override
@@ -114,8 +111,8 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     @Override
     protected String findLibrary(final String libname) {
-        //TODO: this is overwritten in JNLPClassLoader
-        return super.findLibrary(libname);
+        return nativeLibrarySupport.findLibrary(libname)
+                .orElseGet(() -> super.findLibrary(libname));
     }
 
     @Override
