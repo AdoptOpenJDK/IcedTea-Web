@@ -31,17 +31,17 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private final NativeLibrarySupport nativeLibrarySupport;
 
-    public JnlpApplicationClassLoader(final JarExtractor jarExtractor, final Function<JARDesc, URL> localJarUrlProvider) throws Exception {
+    public JnlpApplicationClassLoader(List<Part> parts, final Function<JARDesc, URL> localJarUrlProvider) throws Exception {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
         this.localJarUrlProvider = localJarUrlProvider;
         this.nativeLibrarySupport = new NativeLibrarySupport();
 
-        final List<Part> lazyParts = jarExtractor.getParts().stream()
+        final List<Part> lazyParts = parts.stream()
                 .filter(part -> part.isLazy())
                 .collect(Collectors.toList());
-        parts.addAll(lazyParts);
+        this.parts.addAll(lazyParts);
 
-        final List<Future<Void>> addJarTasks = jarExtractor.getParts().stream()
+        final List<Future<Void>> addJarTasks = parts.stream()
                 .filter(part -> !part.isLazy())
                 .flatMap(part -> part.getJars().stream())
                 .map(jar -> downloadAndAdd(jar))

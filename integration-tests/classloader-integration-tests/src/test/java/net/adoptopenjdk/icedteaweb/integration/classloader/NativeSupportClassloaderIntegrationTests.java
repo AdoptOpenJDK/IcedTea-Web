@@ -1,12 +1,14 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
+import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+
+import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_WITH_NATIVE;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
@@ -20,10 +22,10 @@ public class NativeSupportClassloaderIntegrationTests {
     public void loadJarWithNativeContent() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-15.jnlp");
+        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
 
         //when
-        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -35,8 +37,8 @@ public class NativeSupportClassloaderIntegrationTests {
     public void loadClassWithNativeMethod() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-15.jnlp");
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
@@ -50,8 +52,8 @@ public class NativeSupportClassloaderIntegrationTests {
     public void callNativeMethod() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-15.jnlp");
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
         
         //when
@@ -74,8 +76,8 @@ public class NativeSupportClassloaderIntegrationTests {
     public void doNotLoadNativeForSimpleJarDesc() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-17.jnlp");
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-17.jnlp").getParts();
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
         Assertions.assertThrows(UnsatisfiedLinkError.class, () -> classLoader.loadClass(NATIVE_CLASS));
@@ -86,10 +88,10 @@ public class NativeSupportClassloaderIntegrationTests {
     public void doNotLoadLazyNativeLibAtStart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-18.jnlp");
+        final List<Part> parts = createFor("integration-app-18.jnlp").getParts();
 
         //when
-        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -100,8 +102,8 @@ public class NativeSupportClassloaderIntegrationTests {
     public void callNativeMethodFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-18.jnlp");
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-18.jnlp").getParts();
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
 
         //when

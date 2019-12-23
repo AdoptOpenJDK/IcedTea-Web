@@ -1,9 +1,11 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
+import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
@@ -17,8 +19,8 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-1.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-1.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -34,10 +36,10 @@ public class BasicClassloaderIntegrationTests {
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-2.jnlp");
+        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
 
         //when
-        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -47,8 +49,8 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-2.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -64,8 +66,8 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJarWithRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-7.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-7.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -81,8 +83,8 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-8.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-8.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         Assertions.assertThrows(ClassNotFoundException.class, () -> classLoader.loadClass(CLASS_A));
@@ -92,8 +94,8 @@ public class BasicClassloaderIntegrationTests {
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-2.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
@@ -113,8 +115,8 @@ public class BasicClassloaderIntegrationTests {
     public void testFullPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-3.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-3.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -131,8 +133,8 @@ public class BasicClassloaderIntegrationTests {
     public void testMultipleResources() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JarExtractor jarExtractor = createFor("integration-app-11.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
+        final List<Part> parts = createFor("integration-app-11.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
