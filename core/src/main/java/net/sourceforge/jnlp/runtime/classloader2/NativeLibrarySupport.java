@@ -23,14 +23,14 @@ public class NativeLibrarySupport {
     private final File nativeSearchDirectory;
 
     public NativeLibrarySupport() throws IOException {
-
         //TODO: Old version uses FileUtils.createRestrictedDirectory(nativeDir); Is this needed??
+        //TODO: Should we place the native files just in the temp folder? Maybe we can place them next to the cache?
         this.nativeSearchDirectory = Files.createTempDirectory("itw-native-" + UUID.randomUUID().toString()).toFile();
         this.nativeSearchDirectory.deleteOnExit();
     }
 
     public Optional<String> findLibrary(final String libname) {
-        final File target = new File(nativeSearchDirectory, libname);
+        final File target = new File(nativeSearchDirectory, System.mapLibraryName(libname));
         if (target.exists()) {
             return Optional.of(target.getPath());
         }
@@ -40,7 +40,7 @@ public class NativeLibrarySupport {
     public void addSearchJar(final URL jarLocation) throws IOException, URISyntaxException {
         final File localFile = Paths.get(jarLocation.toURI()).toFile();
 
-        try (JarFile jarFile = new JarFile(localFile, false)) {
+        try (final JarFile jarFile = new JarFile(localFile, false)) {
             jarFile.stream()
                     .filter(entry -> !entry.isDirectory())
                     .filter(entry -> isSupportedLibrary(entry.getName()))
@@ -54,7 +54,7 @@ public class NativeLibrarySupport {
             if (!outFile.isFile()) {
                 FileUtils.createRestrictedFile(outFile);
             }
-            try (FileOutputStream out = new FileOutputStream(outFile)) {
+            try (final FileOutputStream out = new FileOutputStream(outFile)) {
                 IOUtils.copy(jarFile.getInputStream(entry), out);
             }
         } catch (final Exception e) {

@@ -70,6 +70,12 @@
                                         <include>classloader-integration-tests-module-2.jar</include>
                                     </includes>
                                 </resource>
+                                <resource>
+                                    <directory>../classloader-integration-tests-module-native/target</directory>
+                                    <includes>
+                                        <include>classloader-integration-tests-module-native.jar</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>

@@ -26,5 +26,11 @@
             <version>${version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>classloader-integration-tests-module-native</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

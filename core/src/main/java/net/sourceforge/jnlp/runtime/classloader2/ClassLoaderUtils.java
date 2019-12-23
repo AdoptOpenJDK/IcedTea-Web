@@ -4,9 +4,9 @@ import java.util.concurrent.Future;
 
 public class ClassLoaderUtils {
 
-    public static void waitForCompletion(Future<Void> f, String message) {
+    public static <V> V waitForCompletion(Future<V> f, String message) {
         try {
-            f.get();
+            return f.get();
         } catch (final Exception e) {
             throw new RuntimeException(message, e);
         }

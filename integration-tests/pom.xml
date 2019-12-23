@@ -17,6 +17,7 @@
     <modules>
         <module>classloader-integration-tests-module-1</module>
         <module>classloader-integration-tests-module-2</module>
+        <module>classloader-integration-tests-module-native</module>
         <module>classloader-integration-tests-module-parent</module>
         <module>classloader-integration-tests</module>
     </modules>
