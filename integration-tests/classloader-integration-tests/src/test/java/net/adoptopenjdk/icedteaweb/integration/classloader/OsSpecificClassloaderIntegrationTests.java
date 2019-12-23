@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.condition.OS;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
 
 public class OsSpecificClassloaderIntegrationTests {
 
@@ -19,10 +19,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-4.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-4.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -34,8 +34,8 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-4.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+        final JarExtractor jarExtractor = createFor("integration-app-4.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -51,10 +51,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-4.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-4.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -66,10 +66,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-5.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-5.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -81,8 +81,8 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-5.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+        final JarExtractor jarExtractor = createFor("integration-app-5.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -98,10 +98,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-5.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-5.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -113,10 +113,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-6.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-6.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -128,8 +128,8 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-6.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(file, jarProvider);
+        final JarExtractor jarExtractor = createFor("integration-app-6.jnlp");
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //when
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
@@ -145,10 +145,10 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-6.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-6.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());

@@ -6,7 +6,9 @@
     </information>
     <resources>
         <java version="1.8+" />
-        <jar href="classloader-integration-tests-module-1.jar" os="Windows"/>
+    </resources>
+    <resources os="Windows">
+        <jar href="classloader-integration-tests-module-1.jar"/>
     </resources>
     <application-desc main-class="UnknownMainClass" />
 </jnlp>

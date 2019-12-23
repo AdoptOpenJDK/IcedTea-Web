@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class LocaleSpecificClassloaderIntegrationTests {
@@ -35,10 +35,10 @@ public class LocaleSpecificClassloaderIntegrationTests {
     public void testLoadForConcreteLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-12.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-12.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(2, jarProvider.getDownloaded().size());
@@ -50,10 +50,10 @@ public class LocaleSpecificClassloaderIntegrationTests {
     public void testNotLoadForWrongLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-13.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-13.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());

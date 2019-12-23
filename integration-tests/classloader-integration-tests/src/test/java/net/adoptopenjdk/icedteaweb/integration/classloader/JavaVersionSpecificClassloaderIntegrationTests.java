@@ -1,13 +1,13 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
 
 public class JavaVersionSpecificClassloaderIntegrationTests {
 
@@ -15,10 +15,10 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-9.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-9.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -30,10 +30,10 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final JNLPFile file = createFile("integration-app-10.jnlp");
+        final JarExtractor jarExtractor = createFor("integration-app-10.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(file, jarProvider);
+        new JnlpApplicationClassLoader(jarExtractor, jarProvider);
 
         //than
         Assertions.assertEquals(2, jarProvider.getDownloaded().size());
