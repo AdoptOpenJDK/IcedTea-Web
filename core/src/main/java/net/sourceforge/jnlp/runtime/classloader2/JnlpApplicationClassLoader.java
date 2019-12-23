@@ -27,7 +27,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private final Function<JARDesc, URL> localJarUrlProvider;
 
-    private List<Part> parts = new CopyOnWriteArrayList<>();
+    private final List<Part> lazyParts;
 
     private final NativeLibrarySupport nativeLibrarySupport;
 
@@ -36,28 +36,26 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         this.localJarUrlProvider = localJarUrlProvider;
         this.nativeLibrarySupport = new NativeLibrarySupport();
 
-        final List<Part> lazyParts = parts.stream()
-                .filter(part -> part.isLazy())
-                .collect(Collectors.toList());
-        this.parts.addAll(lazyParts);
+        this.lazyParts = parts.stream()
+                .filter(Part::isLazy)
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
 
-        final List<Future<Void>> addJarTasks = parts.stream()
+        parts.stream()
                 .filter(part -> !part.isLazy())
                 .flatMap(part -> part.getJars().stream())
-                .map(jar -> downloadAndAdd(jar))
-                .collect(Collectors.toList());
-        addJarTasks.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
+                .map(this::downloadAndAdd)
+                .forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
     }
 
     private void checkParts(final String name) {
         partsLock.lock();
         try {
-            parts.stream()
+            lazyParts.stream()
                     .filter(part -> part.supports(name))
                     .findFirst()
                     .ifPresent(part -> {
                         downloadAndAddPart(part);
-                        parts.remove(part);
+                        lazyParts.remove(part);
                     });
         } finally {
             partsLock.unlock();
@@ -79,14 +77,13 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                 downloadFuture.completeExceptionally(e);
             }
         });
-        return downloadFuture.thenAccept(url -> addURL(url));
+        return downloadFuture.thenAccept(this::addURL);
     }
 
     private void downloadAndAddPart(final Part part) {
-        final List<Future<Void>> futures = part.getJars().stream()
-                .map(jar -> downloadAndAdd(jar))
-                .collect(Collectors.toList());
-        futures.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
+        part.getJars().stream()
+                .map(this::downloadAndAdd)
+                .forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
     }
 
     @Override
