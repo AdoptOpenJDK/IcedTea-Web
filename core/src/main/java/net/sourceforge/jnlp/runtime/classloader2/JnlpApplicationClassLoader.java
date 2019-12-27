@@ -62,7 +62,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final URL localCacheUrl = localCacheAccess.apply(jarDescription);
-                if(jarDescription.isNative()) {
+                if (jarDescription.isNative()) {
                     try {
                         nativeLibrarySupport.addSearchJar(localCacheUrl);
                     } catch (final Exception e) {
@@ -78,9 +78,10 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     private void downloadAndAddPart(final Part part) {
-        part.getJars().stream()
+        final List<Future<Void>> tasks = part.getJars().stream()
                 .map(this::downloadAndAdd)
-                .forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
+                .collect(Collectors.toList());
+        tasks.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
         part.setDownloaded(true);
     }
 
@@ -115,8 +116,6 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         checkParts(name);
         return super.findResources(name);
     }
-
-
 
 
     //Methods that are needed for JNLP DownloadService interface
