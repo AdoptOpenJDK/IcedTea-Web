@@ -99,7 +99,7 @@ public class JarExtractor {
                 final String partName = download.getPart();
 
 
-                final Part part = isBlank(partName) ? getOrCreatePart(parentFile, extPartName, true) : getOrCreatePart(parentFile, partName, true);
+                final Part part = isBlank(partName) ? getOrCreatePart(parentFile, extPartName, true) : getOrCreatePart(extensionFile, partName, true);
 
                 if (!download.isLazy()) {
                     part.markAsEager();
@@ -125,7 +125,7 @@ public class JarExtractor {
 
         return parts.stream()
                 .filter(p -> Objects.equals(p.getName(), name))
-                .filter(p -> !isExtension || Objects.equals(p.getExtension(), extension))
+                .filter(p -> Objects.equals(p.getExtension(), extension))
                 .findFirst()
                 .orElseGet(() -> {
                     final Part part = new Part(extension, name);
