@@ -16,6 +16,9 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 
 public class OsSpecificClassloaderIntegrationTests {
 
+    /**
+     * A resource that has defined windows as os will be loaded on windows systems
+     */
     @Test
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindows() throws Exception {
@@ -31,6 +34,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
 
+    /**
+     * A resource that has defined windows as os will be loaded on windows systems and classes can be loaded
+     */
     @Test
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
@@ -48,6 +54,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
     }
 
+    /**
+     * A resource that has defined windows as os won't be loaded on other operation systems
+     */
     @Test
     @DisabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
@@ -63,6 +72,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
     }
 
+    /**
+     * A resource that has defined mac as os will be loaded on mac systems
+     */
     @Test
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMac() throws Exception {
@@ -78,6 +90,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
 
+    /**
+     * A resource that has defined mac as os will be loaded on mac systems and classes can be loaded
+     */
     @Test
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
@@ -95,6 +110,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
     }
 
+    /**
+     * A resource that has defined mac as os won't be loaded on other operation systems
+     */
     @Test
     @DisabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnNotMac() throws Exception {
@@ -110,6 +128,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
     }
 
+    /**
+     * A resource that has defined linux as os will be loaded on linux systems
+     */
     @Test
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinux() throws Exception {
@@ -125,6 +146,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
 
+    /**
+     * A resource that has defined linux as os will be loaded on linux systems and classes can be loaded
+     */
     @Test
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
@@ -142,6 +166,9 @@ public class OsSpecificClassloaderIntegrationTests {
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
     }
 
+    /**
+     * A resource that has defined linux as os won't be loaded on other operation systems
+     */
     @Test
     @DisabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {

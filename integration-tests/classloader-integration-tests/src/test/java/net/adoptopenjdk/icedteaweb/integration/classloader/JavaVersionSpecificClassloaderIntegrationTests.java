@@ -13,6 +13,9 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 
 public class JavaVersionSpecificClassloaderIntegrationTests {
 
+    /**
+     * Resources that are defined as part of a not matching Java version won't be loaded
+     */
     @Test
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
@@ -28,6 +31,9 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
     }
 
+    /**
+     * Resources that are defined as part of a not matching Java version won't be loaded
+     */
     @Test
     public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
         //given
@@ -43,6 +49,9 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
     }
 
+    /**
+     * Resources that are defined as part of a matching Java version will be loaded
+     */
     @Test
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given

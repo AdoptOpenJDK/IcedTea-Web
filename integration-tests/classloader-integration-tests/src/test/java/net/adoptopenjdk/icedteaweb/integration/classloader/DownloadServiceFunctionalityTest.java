@@ -36,7 +36,7 @@ public class DownloadServiceFunctionalityTest {
         classLoader.loadClass(CLASS_A);
 
         //than
-        Assertions.assertFalse(classLoader.isPartDownloaded("lazy-package"));
+        Assertions.assertTrue(classLoader.isPartDownloaded("lazy-package"));
     }
 
     @Test

@@ -51,8 +51,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
             parts.stream()
                     .filter(part -> part.supports(name))
                     .filter(part -> !part.isDownloaded())
-                    .findFirst()
-                    .ifPresent(part -> downloadAndAddPart(part));
+                    .forEach(part -> downloadAndAddPart(part));
         } finally {
             partsLock.unlock();
         }
@@ -90,16 +89,6 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         } catch (final ClassNotFoundException e) {
             checkParts(name);
             return super.findClass(name);
-        }
-    }
-
-    @Override
-    public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        try {
-            return super.loadClass(name);
-        } catch (final ClassNotFoundException e) {
-            checkParts(name);
-            return super.loadClass(name);
         }
     }
 

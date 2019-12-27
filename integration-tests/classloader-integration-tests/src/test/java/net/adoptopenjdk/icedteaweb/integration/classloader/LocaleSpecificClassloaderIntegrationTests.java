@@ -32,6 +32,9 @@ public class LocaleSpecificClassloaderIntegrationTests {
         Locale.setDefault(defaultLocale);
     }
 
+    /**
+     * Resources with a matching local will be loaded
+     */
     @Test
     public void testLoadForConcreteLocale() throws Exception {
         //given
@@ -47,6 +50,9 @@ public class LocaleSpecificClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
     }
 
+    /**
+     * Resources with a not matching local won't be loaded
+     */
     @Test
     public void testNotLoadForWrongLocale() throws Exception {
         //given

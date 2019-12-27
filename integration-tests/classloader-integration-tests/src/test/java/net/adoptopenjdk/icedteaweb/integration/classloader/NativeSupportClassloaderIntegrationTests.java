@@ -17,6 +17,9 @@ public class NativeSupportClassloaderIntegrationTests {
 
     private static final String NATIVE_CLASS = "net.adoptopenjdk.integration.ClassWithNativeCall";
 
+    /**
+     * A jar that is defined by nativelib tag will be downloaded
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadJarWithNativeContent() throws Exception {
@@ -32,6 +35,9 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_WITH_NATIVE));
     }
 
+    /**
+     * A class in a jar that is defined by nativelib tag can be loaded
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadClassWithNativeMethod() throws Exception {
@@ -47,6 +53,9 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertNotNull(loadClass);
     }
 
+    /**
+     * A native method that native lib is part of a jar can be called
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethod() throws Exception {
@@ -65,12 +74,18 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertEquals("Hello from native world!", result);
     }
 
+    /**
+     * If the JNLP does not have a security environment but has nativelib parts the initialization will crash
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeWithoutSecurityEnvironment() throws Exception {
         Assertions.assertThrows(ParseException.class, () -> createFor("integration-app-16.jnlp"));
     }
 
+    /**
+     * If a jar is defined as jar (and not as nativelib) in the JNLP than native libraries that are part of the jar can not be loaded
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeForSimpleJarDesc() throws Exception {
@@ -83,6 +98,10 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertThrows(UnsatisfiedLinkError.class, () -> classLoader.loadClass(NATIVE_CLASS));
     }
 
+    /**
+     * if a nativelib is defined as lazy than the content (with the native content) won't be downloaded automatically
+     * @throws Exception
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadLazyNativeLibAtStart() throws Exception {
@@ -97,6 +116,10 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
     }
 
+    /**
+     * if a nativelib is defined as lazy than the content (with the native content) will be loaded once a class from the
+     * lib will be loaded
+     */
     @Test
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethodFromLazyJar() throws Exception {
