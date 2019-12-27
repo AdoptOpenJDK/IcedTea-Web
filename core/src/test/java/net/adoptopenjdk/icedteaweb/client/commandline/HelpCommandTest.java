@@ -18,6 +18,7 @@ package net.adoptopenjdk.icedteaweb.client.commandline;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class HelpCommandTest extends AbstractCommandTest {
      * Test whether the {@code -help}, command executes and terminates with {@link CommandLine#SUCCESS}.
      */
     @Test
+    @Ignore
     public void testHelpCommand() {
         // GIVEN -----------
         final String[] args = {"-help"}; // use literals for readability
