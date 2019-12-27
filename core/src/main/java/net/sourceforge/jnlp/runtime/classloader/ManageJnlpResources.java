@@ -40,7 +40,6 @@ package net.sourceforge.jnlp.runtime.classloader;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.DownloadAction;
 
 import java.net.URL;
 import java.util.ArrayList;

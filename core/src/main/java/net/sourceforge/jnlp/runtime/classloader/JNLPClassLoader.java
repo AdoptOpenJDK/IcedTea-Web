@@ -124,17 +124,6 @@ public class JNLPClassLoader extends URLClassLoader {
     private static final String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
 
     /**
-     * Actions to specify how cache is to be managed *
-     */
-    enum DownloadAction {
-        DOWNLOAD_TO_CACHE, REMOVE_FROM_CACHE, CHECK_CACHE
-    }
-
-    public enum SigningState {
-        FULL, PARTIAL, NONE
-    }
-
-    /**
      * True if the application has a signed JNLP File
      */
     private boolean isSignedJNLP = false;

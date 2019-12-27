@@ -149,8 +149,6 @@ public class JarExtractor {
         return newPart;
     }
 
-
-
     private static class PartKey {
         private final JNLPFile file;
         private final String name;
