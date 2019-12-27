@@ -34,20 +34,6 @@ public class JnlpApplicationClassLoaderTest {
     }
 
     @Test
-    public void findClass2() throws Exception {
-
-        //given
-        final List<Part> parts = createFor("unavailable-jar.jnlp").getParts();
-
-        // expect
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Error while creating classloader!");
-
-        //when
-        new JnlpApplicationClassLoader(parts, new DummyJarProvider());
-    }
-
-    @Test
     public void findClass3() throws Exception {
 
         //given
