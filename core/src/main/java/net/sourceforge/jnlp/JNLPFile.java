@@ -46,7 +46,6 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -232,26 +231,6 @@ public class JNLPFile {
         this.fileLocation = null;
         this.uniqueKey = null;
     }
-
-    /**
-     * Create a JNLPFile from a URL and a version, checking for updates
-     * using the specified policy.
-     *
-     * @param version       the version of the JNLP file
-     * @param policy        the update policy
-     * @param location      the location of the JNLP file
-     * @param settings      the parser settings to use while parsing the file
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    JNLPFile(final InputStream input,
-             final URL location,
-             final ParserSettings settings,
-             final String uniqueKey
-    ) throws ParseException {
-        this(input, location, null, settings, uniqueKey);
-    }
-
 
     public JNLPFile(final InputStream input, final URL location, final URL codebase, final ParserSettings settings, final String uniqueKey) throws ParseException {
         this.parserSettings = settings;

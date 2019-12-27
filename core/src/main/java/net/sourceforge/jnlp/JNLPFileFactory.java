@@ -92,7 +92,7 @@ public class JNLPFileFactory {
      */
     public JNLPFile create(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
         try (InputStream input = openURL(location, version, policy)) {
-            return new JNLPFile(input, location, settings, uniqueKey);
+            return new JNLPFile(input, location, null, settings, uniqueKey);
         }
     }
 
