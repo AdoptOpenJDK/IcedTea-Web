@@ -62,10 +62,12 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final URL localCacheUrl = localCacheAccess.apply(jarDescription);
-                try {
-                    nativeLibrarySupport.addSearchJar(localCacheUrl);
-                } catch (final Exception e) {
-                    throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                if(jarDescription.isNative()) {
+                    try {
+                        nativeLibrarySupport.addSearchJar(localCacheUrl);
+                    } catch (final Exception e) {
+                        throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                    }
                 }
                 downloadFuture.complete(localCacheUrl);
             } catch (final Exception e) {

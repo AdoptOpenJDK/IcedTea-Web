@@ -95,7 +95,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
-        Assertions.assertThrows(UnsatisfiedLinkError.class, () -> classLoader.loadClass(NATIVE_CLASS));
+        Assertions.assertThrows(UnsatisfiedLinkError.class, () -> classLoader.loadClass(NATIVE_CLASS).newInstance());
     }
 
     /**
