@@ -5,6 +5,7 @@ import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -36,6 +37,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
      * Resources with a matching local will be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadForConcreteLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -54,6 +56,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
      * Resources with a not matching local won't be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testNotLoadForWrongLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();

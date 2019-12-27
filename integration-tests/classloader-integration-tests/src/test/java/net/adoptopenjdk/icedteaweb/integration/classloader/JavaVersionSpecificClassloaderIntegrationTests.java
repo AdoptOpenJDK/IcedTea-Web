@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
      * Resources that are defined as part of a not matching Java version won't be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -35,6 +37,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
      * Resources that are defined as part of a not matching Java version won't be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -53,6 +56,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
      * Resources that are defined as part of a matching Java version will be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();

@@ -4,6 +4,7 @@ import net.sourceforge.jnlp.runtime.classloader2.Extension;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
@@ -15,6 +16,7 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 public class DownloadServiceFunctionalityTest {
 
     @Test
+    @RepeatedTest(10)
     public void testPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -28,6 +30,7 @@ public class DownloadServiceFunctionalityTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void testExtensionPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -44,6 +47,7 @@ public class DownloadServiceFunctionalityTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void testPartDownloaded2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -59,6 +63,7 @@ public class DownloadServiceFunctionalityTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void testDownloadPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -73,6 +78,7 @@ public class DownloadServiceFunctionalityTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void testEagerPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -86,6 +92,7 @@ public class DownloadServiceFunctionalityTest {
     }
 
     @Test
+    @RepeatedTest(10)
     public void testDownloadPartFromExtension() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();

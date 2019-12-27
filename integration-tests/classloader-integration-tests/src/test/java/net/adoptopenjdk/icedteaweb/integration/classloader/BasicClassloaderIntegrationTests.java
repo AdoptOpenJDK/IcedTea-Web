@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class BasicClassloaderIntegrationTests {
      * When loading a JNLP file the eager jars should be directly downloaded and accessible by the classloader
      */
     @Test
+    @RepeatedTest(10)
     public void testEagerJarLoadedAtStart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -36,6 +38,7 @@ public class BasicClassloaderIntegrationTests {
      * When loading a JNLP file classes from eager jar can be loaded
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -56,6 +59,7 @@ public class BasicClassloaderIntegrationTests {
      * When loading a JNLP file a lazy jar should not be directly downloaded
      */
     @Test
+    @RepeatedTest(10)
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -72,6 +76,7 @@ public class BasicClassloaderIntegrationTests {
      * When accessing a class from a lazy jar the classloader will trigger the download of the jar and load the class
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -93,6 +98,7 @@ public class BasicClassloaderIntegrationTests {
      * Here the recursive attribute is checked
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadClassFromLazyJarWithRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -113,6 +119,7 @@ public class BasicClassloaderIntegrationTests {
      * if recursive attribute is not defined only direct classes in the package of a part can be downloaded
      */
     @Test
+    @RepeatedTest(10)
     public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -127,6 +134,7 @@ public class BasicClassloaderIntegrationTests {
      * When accessing a class from a lazy jar multiple times the jar is only downloaded one time
      */
     @Test
+    @RepeatedTest(10)
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -151,6 +159,7 @@ public class BasicClassloaderIntegrationTests {
      * When accessing a class from a lazy jar all jars that are in the same part will be downloaded
      */
     @Test
+    @RepeatedTest(10)
     public void testFullPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -172,6 +181,7 @@ public class BasicClassloaderIntegrationTests {
      * When a JNLP contains multiple resource tags all jars of the resources will be downloaded correctly
      */
     @Test
+    @RepeatedTest(10)
     public void testMultipleResources() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -196,6 +206,7 @@ public class BasicClassloaderIntegrationTests {
      * When a part has lazy and eager parts it will be automatically downloaded
      */
     @Test
+    @RepeatedTest(10)
     public void testEagerPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
@@ -214,6 +225,7 @@ public class BasicClassloaderIntegrationTests {
      * If more than one lazy part matches for the needed class all parts should be downloaded
      */
     @Test
+    @RepeatedTest(10)
     public void testAllLazyPartsLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
