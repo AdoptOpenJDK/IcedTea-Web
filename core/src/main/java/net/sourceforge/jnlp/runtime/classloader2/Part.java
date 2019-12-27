@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
@@ -16,10 +17,19 @@ public class Part {
     private final String name;
     private boolean lazy = true;
 
+    private final Extension extension;
+
+    private boolean downloaded;
+
     private final List<JARDesc> jars = new ArrayList<>();
     private final List<PackageDesc> packages = new ArrayList<>();
 
     Part(final String name) {
+        this(null, name);
+    }
+
+    Part(final Extension extension, final String name) {
+        this.extension = extension;
         this.name = name;
     }
 
@@ -59,6 +69,32 @@ public class Part {
         return lazy;
     }
 
+    public boolean isDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(final boolean downloaded) {
+        this.downloaded = downloaded;
+    }
+
+    public Extension getExtension() {
+        return extension;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final Part part = (Part) o;
+        return Objects.equals(name, part.name) &&
+                Objects.equals(extension, part.extension);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, extension);
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", Part.class.getSimpleName() + "{", "}")
@@ -68,4 +104,5 @@ public class Part {
                 .add("packages=" + packages)
                 .toString();
     }
+
 }

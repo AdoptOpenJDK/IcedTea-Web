@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
@@ -25,38 +26,33 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private final Lock partsLock = new ReentrantLock();
 
-    private final Function<JARDesc, URL> localJarUrlProvider;
+    private final Function<JARDesc, URL> localCacheAccess;
 
-    private final List<Part> lazyParts;
+    private final List<Part> parts;
 
     private final NativeLibrarySupport nativeLibrarySupport;
 
-    public JnlpApplicationClassLoader(List<Part> parts, final Function<JARDesc, URL> localJarUrlProvider) throws Exception {
+    public JnlpApplicationClassLoader(List<Part> parts, final Function<JARDesc, URL> localCacheAccess) throws Exception {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
-        this.localJarUrlProvider = localJarUrlProvider;
+        this.localCacheAccess = localCacheAccess;
         this.nativeLibrarySupport = new NativeLibrarySupport();
 
-        this.lazyParts = parts.stream()
-                .filter(Part::isLazy)
+        this.parts = parts.stream()
                 .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
 
         parts.stream()
                 .filter(part -> !part.isLazy())
-                .flatMap(part -> part.getJars().stream())
-                .map(this::downloadAndAdd)
-                .forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
+                .forEach(this::downloadAndAddPart);
     }
 
     private void checkParts(final String name) {
         partsLock.lock();
         try {
-            lazyParts.stream()
+            parts.stream()
                     .filter(part -> part.supports(name))
+                    .filter(part -> !part.isDownloaded())
                     .findFirst()
-                    .ifPresent(part -> {
-                        downloadAndAddPart(part);
-                        lazyParts.remove(part);
-                    });
+                    .ifPresent(part -> downloadAndAddPart(part));
         } finally {
             partsLock.unlock();
         }
@@ -66,7 +62,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         final CompletableFuture<URL> downloadFuture = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
-                final URL localCacheUrl = localJarUrlProvider.apply(jarDescription);
+                final URL localCacheUrl = localCacheAccess.apply(jarDescription);
                 try {
                     nativeLibrarySupport.addSearchJar(localCacheUrl);
                 } catch (final Exception e) {
@@ -84,6 +80,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         part.getJars().stream()
                 .map(this::downloadAndAdd)
                 .forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
+        part.setDownloaded(true);
     }
 
     @Override
@@ -126,5 +123,57 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     public Enumeration<URL> findResources(final String name) throws IOException {
         checkParts(name);
         return super.findResources(name);
+    }
+
+
+
+
+    //Methods that are needed for JNLP DownloadService interface
+
+    public void downloadPart(final String partName) {
+        downloadPart(partName, null);
+    }
+
+    public void downloadPart(final String partName, final Extension extension) {
+        partsLock.lock();
+        try {
+            parts.stream()
+                    .filter(part -> Objects.equals(extension, part.getExtension()))
+                    .filter(part -> Objects.equals(partName, part.getName()))
+                    .findFirst()
+                    .ifPresent(part -> downloadAndAddPart(part));
+        } finally {
+            partsLock.unlock();
+        }
+    }
+
+    public boolean isPartDownloaded(final String partName) {
+        return isPartDownloaded(partName, null);
+    }
+
+    public boolean isPartDownloaded(final String partName, final Extension extension) {
+        partsLock.lock();
+        try {
+            return parts.stream()
+                    .filter(part -> Objects.equals(extension, part.getExtension()))
+                    .filter(part -> Objects.equals(partName, part.getName()))
+                    .anyMatch(part -> part.isDownloaded());
+        } finally {
+            partsLock.unlock();
+        }
+    }
+
+    @Deprecated
+    public void removePartDownloads(final String partName) {
+        removePartDownloads(partName, null);
+    }
+
+    @Deprecated
+    public void removePartDownloads(final String partName, final Extension extension) {
+        // While DownloadService provides the possibility to remove a part we can not really do that since
+        // the URLClassLoader do not provide functionallity to remove a URL.
+        //Once this ClassLoader is used in ITW the exception should be thrown in the XDownloadService.
+        //This is just a reminder that such functionallity can not be implemented.
+        throw new RuntimeException("Can not remove part!");
     }
 }

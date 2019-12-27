@@ -87,7 +87,7 @@ public class JarExtractor {
         return result;
     }
 
-    private void addExtensionParts(JNLPFile parentFile, JNLPFile extensionFile, List<ExtensionDownloadDesc> downloads) throws ParseException {
+    private void addExtensionParts(final JNLPFile parentFile, final JNLPFile extensionFile, final List<ExtensionDownloadDesc> downloads) throws ParseException {
         partsLock.lock();
         try {
             for (ExtensionDownloadDesc download : downloads) {
@@ -99,7 +99,7 @@ public class JarExtractor {
                     throw new ParseException("found extension part twice: " + extPartName);
                 }
 
-                final Part part = isBlank(partName) ? createAndAddPart(extPartName) : fromMap(parentFile, partName);
+                final Part part = isBlank(partName) ? createAndAddPart(extPartName) : getOrCreatePart(parentFile, partName);
 
                 if (!download.isLazy()) {
                     part.markAsEager();
@@ -114,7 +114,7 @@ public class JarExtractor {
     private Future<Void> addPackage(final JNLPFile jnlpFile, final PackageDesc packageDesc) {
         partsLock.lock();
         try {
-            final Part part = fromMap(jnlpFile, packageDesc.getPart());
+            final Part part = getOrCreatePart(jnlpFile, packageDesc.getPart());
             part.addPackage(packageDesc);
         } finally {
             partsLock.unlock();
@@ -122,12 +122,12 @@ public class JarExtractor {
         return CompletableFuture.completedFuture(null);
     }
 
-    private Future<Void> addJar(JNLPFile jnlpFile, final JARDesc jarDescription) {
+    private Future<Void> addJar(final JNLPFile jnlpFile, final JARDesc jarDescription) {
         final String partName = jarDescription.getPart();
 
         partsLock.lock();
         try {
-            final Part part = isBlank(partName) ? getDefaultPart(jarDescription) : fromMap(jnlpFile, partName);
+            final Part part = isBlank(partName) ? getDefaultPart(jarDescription) : getOrCreatePart(jnlpFile, partName);
             part.addJar(jarDescription);
         } finally {
             partsLock.unlock();
@@ -135,15 +135,15 @@ public class JarExtractor {
         return CompletableFuture.completedFuture(null);
     }
 
-    private Part getDefaultPart(JARDesc jarDescription) {
+    private Part getDefaultPart(final JARDesc jarDescription) {
         return jarDescription.isLazy() && !jarDescription.isMain() ? defaultLazyPart : defaultEagerPart;
     }
 
-    private Part fromMap(JNLPFile jnlpFile, String partName) {
+    private Part getOrCreatePart(final JNLPFile jnlpFile, final String partName) {
         return partKeyMap.computeIfAbsent(new PartKey(jnlpFile, partName), k -> createAndAddPart(partName));
     }
 
-    private Part createAndAddPart(String partName) {
+    private Part createAndAddPart(final String partName) {
         final Part newPart = new Part(partName);
         parts.add(newPart);
         return newPart;
@@ -153,13 +153,13 @@ public class JarExtractor {
         private final JNLPFile file;
         private final String name;
 
-        private PartKey(JNLPFile file, String name) {
+        private PartKey(final JNLPFile file, final String name) {
             this.file = file;
             this.name = name;
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PartKey partKey = (PartKey) o;

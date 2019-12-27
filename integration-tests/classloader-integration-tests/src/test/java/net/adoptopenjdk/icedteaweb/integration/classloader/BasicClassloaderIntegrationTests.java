@@ -150,4 +150,19 @@ public class BasicClassloaderIntegrationTests {
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
     }
 
+    @Test
+    public void testEagerPart() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final List<Part> parts = createFor("integration-app-21.jnlp").getParts();
+
+        //when
+        new JnlpApplicationClassLoader(parts, jarProvider);
+
+        //than
+        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+    }
+
 }
