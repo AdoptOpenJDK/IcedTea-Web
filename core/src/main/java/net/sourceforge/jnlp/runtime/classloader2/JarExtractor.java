@@ -10,11 +10,11 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -35,22 +35,28 @@ public class JarExtractor {
 
     private final Lock partsLock = new ReentrantLock();
     private final List<Part> parts = new ArrayList<>();
-    private final Map<PartKey, Part> partKeyMap = new HashMap<>();
 
-    private final Part defaultEagerPart = createAndAddPart(null);
-    private final Part defaultLazyPart = createAndAddPart(null);
+    private final Part defaultEagerPart;
+    private final Part defaultLazyPart;
 
     public JarExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
         this.jnlpFileFactory = jnlpFileFactory;
+
+        this.defaultEagerPart = new Part(null);
+        parts.add(defaultEagerPart);
         defaultEagerPart.markAsEager();
-        addJnlpFile(jnlpFile);
+
+        this.defaultLazyPart = new Part(null);
+        parts.add(defaultLazyPart);
+
+        addJnlpFile(jnlpFile, false);
     }
 
     public List<Part> getParts() {
         return unmodifiableList(parts);
     }
 
-    private void addJnlpFile(final JNLPFile jnlpFile) {
+    private void addJnlpFile(final JNLPFile jnlpFile, boolean isExtension) {
         final JNLPResources resources = jnlpFile.getJnlpResources();
 
         final List<Future<Void>> extensionTasks = resources.getExtensions().stream()
@@ -58,11 +64,11 @@ public class JarExtractor {
                 .collect(toList());
 
         final List<Future<Void>> packageTasks = resources.getPackages().stream()
-                .map(packageDesc -> addPackage(jnlpFile, packageDesc))
+                .map(packageDesc -> addPackage(jnlpFile, packageDesc, isExtension))
                 .collect(toList());
 
         final List<Future<Void>> jarTasks = resources.getJARs().stream()
-                .map(jarDesc -> addJar(jnlpFile, jarDesc))
+                .map(jarDesc -> addJar(jnlpFile, jarDesc, isExtension))
                 .collect(toList());
 
         extensionTasks.forEach(f -> waitForCompletion(f, "Error while loading extensions!"));
@@ -71,14 +77,12 @@ public class JarExtractor {
     }
 
     private Future<Void> addExtension(final JNLPFile parent, final ExtensionDesc extension) {
-
-
         final CompletableFuture<Void> result = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
                 addExtensionParts(parent, jnlpFile, extension.getDownloads());
-                addJnlpFile(jnlpFile);
+                addJnlpFile(jnlpFile, true);
                 result.complete(null);
             } catch (Exception e) {
                 result.completeExceptionally(e);
@@ -92,29 +96,48 @@ public class JarExtractor {
         try {
             for (ExtensionDownloadDesc download : downloads) {
                 final String extPartName = download.getExtPart();
-                final PartKey extensionKey = new PartKey(extensionFile, extPartName);
                 final String partName = download.getPart();
 
-                if (partKeyMap.containsKey(extensionKey)) {
-                    throw new ParseException("found extension part twice: " + extPartName);
-                }
 
-                final Part part = isBlank(partName) ? createAndAddPart(extPartName) : getOrCreatePart(parentFile, partName);
+                final Part part = isBlank(partName) ? getOrCreatePart(parentFile, extPartName, true) : getOrCreatePart(parentFile, partName, true);
 
                 if (!download.isLazy()) {
                     part.markAsEager();
                 }
-                partKeyMap.put(extensionKey, part);
+
+                if (parts.contains(part)) {
+                    throw new ParseException("found extension part twice: " + extPartName);
+                }
+
+                parts.add(part);
             }
         } finally {
             partsLock.unlock();
         }
     }
 
-    private Future<Void> addPackage(final JNLPFile jnlpFile, final PackageDesc packageDesc) {
+    private Part getOrCreatePart(final JNLPFile jnlpFile, final String name, final boolean isExtension) {
+        final URL location = jnlpFile.getSourceLocation();
+        final String version = Optional.ofNullable(jnlpFile.getFileVersion())
+                .map(v -> v.toString())
+                .orElse(null);
+        final Extension extension = isExtension ? new Extension(location, version) : null;
+
+        return parts.stream()
+                .filter(p -> Objects.equals(p.getName(), name))
+                .filter(p -> !isExtension || Objects.equals(p.getExtension(), extension))
+                .findFirst()
+                .orElseGet(() -> {
+                    final Part part = new Part(extension, name);
+                    parts.add(part);
+                    return part;
+                });
+    }
+
+    private Future<Void> addPackage(final JNLPFile jnlpFile, final PackageDesc packageDesc, final boolean isExtension) {
         partsLock.lock();
         try {
-            final Part part = getOrCreatePart(jnlpFile, packageDesc.getPart());
+            final Part part = getOrCreatePart(jnlpFile, packageDesc.getPart(), isExtension);
             part.addPackage(packageDesc);
         } finally {
             partsLock.unlock();
@@ -122,12 +145,12 @@ public class JarExtractor {
         return CompletableFuture.completedFuture(null);
     }
 
-    private Future<Void> addJar(final JNLPFile jnlpFile, final JARDesc jarDescription) {
+    private Future<Void> addJar(final JNLPFile jnlpFile, final JARDesc jarDescription, final boolean isExtension) {
         final String partName = jarDescription.getPart();
 
         partsLock.lock();
         try {
-            final Part part = isBlank(partName) ? getDefaultPart(jarDescription) : getOrCreatePart(jnlpFile, partName);
+            final Part part = isBlank(partName) ? getDefaultPart(jarDescription) : getOrCreatePart(jnlpFile, partName, isExtension);
             part.addJar(jarDescription);
         } finally {
             partsLock.unlock();
@@ -138,38 +161,4 @@ public class JarExtractor {
     private Part getDefaultPart(final JARDesc jarDescription) {
         return jarDescription.isLazy() && !jarDescription.isMain() ? defaultLazyPart : defaultEagerPart;
     }
-
-    private Part getOrCreatePart(final JNLPFile jnlpFile, final String partName) {
-        return partKeyMap.computeIfAbsent(new PartKey(jnlpFile, partName), k -> createAndAddPart(partName));
-    }
-
-    private Part createAndAddPart(final String partName) {
-        final Part newPart = new Part(partName);
-        parts.add(newPart);
-        return newPart;
-    }
-
-    private static class PartKey {
-        private final JNLPFile file;
-        private final String name;
-
-        private PartKey(final JNLPFile file, final String name) {
-            this.file = file;
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PartKey partKey = (PartKey) o;
-            return file.equals(partKey.file) && name.equals(partKey.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(file, name);
-        }
-    }
-
 }

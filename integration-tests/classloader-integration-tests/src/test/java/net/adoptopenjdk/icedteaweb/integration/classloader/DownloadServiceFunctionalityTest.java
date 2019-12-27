@@ -1,10 +1,12 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
+import net.sourceforge.jnlp.runtime.classloader2.Extension;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.net.URL;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
@@ -36,7 +38,9 @@ public class DownloadServiceFunctionalityTest {
         classLoader.loadClass(CLASS_A);
 
         //than
-        Assertions.assertTrue(classLoader.isPartDownloaded("lazy-package"));
+        final URL extensionURL = DownloadServiceFunctionalityTest.class.getResource("integration-app-19-extension.jnlp");
+        final Extension extension = new Extension(extensionURL, null);
+        Assertions.assertTrue(classLoader.isPartDownloaded("lazy-package", extension));
     }
 
     @Test
@@ -79,5 +83,23 @@ public class DownloadServiceFunctionalityTest {
 
         //than
         Assertions.assertTrue(classLoader.isPartDownloaded("eager-package"));
+    }
+
+    @Test
+    public void testDownloadPartFromExtension() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final List<Part> parts = createFor("integration-app-19.jnlp").getParts();
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final URL extensionURL = DownloadServiceFunctionalityTest.class.getResource("integration-app-19-extension.jnlp");
+        final Extension extension = new Extension(extensionURL, null);
+
+        //when
+        classLoader.downloadPart("lazy-package", extension);
+
+        //than
+        Assertions.assertTrue(classLoader.isPartDownloaded("lazy-package", extension));
+        Assertions.assertFalse(classLoader.isPartDownloaded("lazy-package"));
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
     }
 }
