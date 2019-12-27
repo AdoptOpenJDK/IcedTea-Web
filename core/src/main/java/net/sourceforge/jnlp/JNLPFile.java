@@ -57,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -216,8 +217,7 @@ public class JNLPFile {
             defaultJavaVersion = JavaSystemProperties.getJavaVersion();
             defaultOS = JavaSystemProperties.getOsName();
             defaultArch = JavaSystemProperties.getOsArch();
-        }
-        catch (SecurityException ex) {
+        } catch (SecurityException ex) {
             // FIXME: how should we proceed if the default values are not available??
         }
     }
@@ -239,7 +239,7 @@ public class JNLPFile {
         parse(input, location, codebase);
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
-        if (! StringUtils.isBlank(httpAgent)) {
+        if (!StringUtils.isBlank(httpAgent)) {
             System.setProperty(HTTP_AGENT, httpAgent);
             if (!HttpURLConnection.userAgent.contains(httpAgent)) {
                 LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
@@ -257,8 +257,7 @@ public class JNLPFile {
     public String getTitle() {
         try {
             return getTitle(false);
-        }
-        catch (MissingTitleException cause) {
+        } catch (MissingTitleException cause) {
             throw new RuntimeException(cause);
         }
     }
@@ -320,8 +319,7 @@ public class JNLPFile {
     public String getVendor() {
         try {
             return getVendor(false);
-        }
-        catch (MissingVendorException cause) {
+        } catch (MissingVendorException cause) {
             throw new RuntimeException(cause);
         }
     }
@@ -338,8 +336,7 @@ public class JNLPFile {
             LOG.warn("The vendor section has not been specified for your locale nor does a default value exist in the JNLP file.");
             vendor = "Corrupted or missing vendor. Do not trust this application!";
             LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor" + ": " + vendor);
-        }
-        else {
+        } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
         return vendor;
@@ -416,8 +413,7 @@ public class JNLPFile {
         }
         try {
             return UrlUtils.removeFileName(getSourceLocation());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
         return getSourceLocation();
@@ -575,13 +571,18 @@ public class JNLPFile {
         if (jres.isEmpty()) {
             return emptyList();
         }
-        return jres.stream()
-                    .filter(jreDesc -> jreDesc.getVersion().contains(defaultJavaVersion))
-                    .findFirst()
-                    .map(JREDesc::getJnlpResources)
-                    .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
-                    .map(jnlpResources -> jnlpResources.all())
-                    .orElseThrow(() -> new RuntimeException("Could not locate a soutable JRE description in the JNLP file"));
+        final List<JREDesc> soutableJreDesc = jres.stream()
+                .filter(jreDesc -> jreDesc.getVersion().contains(defaultJavaVersion))
+                .collect(toList());
+        if (soutableJreDesc.isEmpty()) {
+            throw new IllegalStateException("Could not locate a soutable JRE description in the JNLP file");
+        }
+
+        return soutableJreDesc.stream()
+                .map(JREDesc::getJnlpResources)
+                .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
+                .flatMap(jnlpResources -> jnlpResources.all().stream())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -694,11 +695,9 @@ public class JNLPFile {
 
             checkForSpecialProperties();
 
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             throw new RuntimeException(ex.toString());
         }
@@ -779,11 +778,9 @@ public class JNLPFile {
         final String location;
         if (getSourceLocation() != null) {
             location = getSourceLocation().toString();
-        }
-        else if (getCodeBase() != null) {
+        } else if (getCodeBase() != null) {
             location = getCodeBase().toString();
-        }
-        else {
+        } else {
             location = "unknown";
         }
         return location;
@@ -797,11 +794,9 @@ public class JNLPFile {
         final String location;
         if (getSourceLocation() != null) {
             location = new File(getSourceLocation().getFile()).getName();
-        }
-        else if (getCodeBase() != null) {
+        } else if (getCodeBase() != null) {
             location = new File(getCodeBase().getFile()).getName();
-        }
-        else {
+        } else {
             location = "unknown";
         }
         return location;
@@ -824,8 +819,7 @@ public class JNLPFile {
         String basicTitle = getTitle();
         if (basicTitle == null || basicTitle.trim().isEmpty()) {
             return createJnlpTitleValue().replaceAll(".jnlp$", "");
-        }
-        else {
+        } else {
             return basicTitle;
         }
     }
