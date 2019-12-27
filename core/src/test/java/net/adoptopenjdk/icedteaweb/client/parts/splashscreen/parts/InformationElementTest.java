@@ -48,6 +48,7 @@ import net.sourceforge.jnlp.ParserSettings;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.information.HomepageDesc.HOMEPAGE_ELEMENT;
@@ -228,35 +229,35 @@ public class InformationElementTest {
     }
 
     @Test
-    public void createFromJNLP() throws ParseException {
+    public void createFromJNLP() throws ParseException, MalformedURLException {
         final ParserSettings parser = new ParserSettings();
         final InformationElement ie0 = InformationElement.createFromJNLP(null);
         assertNotNull(ie0);
 
         //title, vendor and homepage are obligatory.. not so much to test
         final String exJnlp2 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + testJnlpFooter;
-        final JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes(UTF_8)), parser);
+        final JNLPFile jnlpFile2 = new JNLPFile(new ByteArrayInputStream(exJnlp2.getBytes(UTF_8)), null,null, parser, null);
         final InformationElement ie2 = InformationElement.createFromJNLP(jnlpFile2);
         assertNotNull(ie2);
         assertEquals(3, ie2.getHeader().size());
         assertEquals(0, ie2.getDescriptions().size());
 
         final String exJnlp3 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        final JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes(UTF_8)), parser);
+        final JNLPFile jnlpFile3 = new JNLPFile(new ByteArrayInputStream(exJnlp3.getBytes(UTF_8)), null, null, parser, null);
         final InformationElement ie3 = InformationElement.createFromJNLP(jnlpFile3);
         assertNotNull(ie3);
         assertEquals(3, ie3.getHeader().size());
         assertEquals(1, ie3.getDescriptions().size());
 
         final String exJnlp4 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + testJnlpFooter;
-        final JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes(UTF_8)), parser);
+        final JNLPFile jnlpFile4 = new JNLPFile(new ByteArrayInputStream(exJnlp4.getBytes(UTF_8)), null, null, parser, null);
         final InformationElement ie4 = InformationElement.createFromJNLP(jnlpFile4);
         assertNotNull(ie4);
         assertEquals(3, ie4.getHeader().size());
         assertEquals(1, ie4.getDescriptions().size());
 
         final String exJnlp5 = testJnlpHeader + title.toXml() + "\n" + homepage.toXml() + "\n" + vendor.toXml() + "\n" + noKindD.toXml() + "\n" + toolTipD.toXml() + "\n" + testJnlpFooter;
-        final JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes(UTF_8)), parser);
+        final JNLPFile jnlpFile5 = new JNLPFile(new ByteArrayInputStream(exJnlp5.getBytes(UTF_8)), null, null, parser, null);
         final InformationElement ie5 = InformationElement.createFromJNLP(jnlpFile5);
         assertNotNull(ie5);
         assertEquals(3, ie5.getHeader().size());

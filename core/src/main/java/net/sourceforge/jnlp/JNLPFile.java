@@ -248,12 +248,16 @@ public class JNLPFile {
              final URL location,
              final ParserSettings settings,
              final String uniqueKey
-    ) throws IOException, ParseException {
+    ) throws ParseException {
+        this(input, location, null, settings, uniqueKey);
+    }
+
+
+    public JNLPFile(final InputStream input, final URL location, final URL codebase, final ParserSettings settings, final String uniqueKey) throws ParseException {
         this.parserSettings = settings;
         this.fileLocation = location;
         this.uniqueKey = uniqueKey;
-
-        parse(input, location, null);
+        parse(input, location, codebase);
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
         if (! StringUtils.isBlank(httpAgent)) {
@@ -263,35 +267,6 @@ public class JNLPFile {
             }
         }
     }
-
-    /**
-     * Create a JNLPFile from an input stream.
-     *
-     * @param input    input stream from which create jnlp file
-     * @param settings settings of parser
-     * @throws ParseException if the JNLP file was invalid
-     */
-    // only used for tests
-    public JNLPFile(final InputStream input, final ParserSettings settings) throws ParseException {
-        this(input, null, settings);
-    }
-
-    /**
-     * Create a JNLPFile from an input stream.
-     *
-     * @param input    input stream of JNLP file.
-     * @param codebase codebase to use if not specified in JNLP file..
-     * @param settings the {@link ParserSettings} to use when parsing
-     * @throws ParseException if the JNLP file was invalid
-     */
-    // only used for tests
-    public JNLPFile(final InputStream input, final URL codebase, final ParserSettings settings) throws ParseException {
-        this.parserSettings = settings;
-        this.fileLocation = null;
-        this.uniqueKey = null;
-        parse(input, null, codebase);
-    }
-
 
     /**
      * @return the JNLP file's best localized title. This method returns the same
