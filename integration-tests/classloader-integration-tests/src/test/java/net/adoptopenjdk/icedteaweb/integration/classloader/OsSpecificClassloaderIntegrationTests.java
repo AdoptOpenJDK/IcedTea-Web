@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -20,6 +21,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined windows as os will be loaded on windows systems
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
@@ -38,6 +40,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined windows as os will be loaded on windows systems and classes can be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
@@ -58,6 +61,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined windows as os won't be loaded on other operation systems
      */
     @Test
+    @RepeatedTest(10)
     @DisabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
@@ -76,6 +80,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined mac as os will be loaded on mac systems
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMac() throws Exception {
         //given
@@ -94,6 +99,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined mac as os will be loaded on mac systems and classes can be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
@@ -114,6 +120,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined mac as os won't be loaded on other operation systems
      */
     @Test
+    @RepeatedTest(10)
     @DisabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
@@ -132,6 +139,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined linux as os will be loaded on linux systems
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
@@ -150,6 +158,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined linux as os will be loaded on linux systems and classes can be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
@@ -170,6 +179,7 @@ public class OsSpecificClassloaderIntegrationTests {
      * A resource that has defined linux as os won't be loaded on other operation systems
      */
     @Test
+    @RepeatedTest(10)
     @DisabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given

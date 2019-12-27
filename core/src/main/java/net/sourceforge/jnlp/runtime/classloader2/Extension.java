@@ -35,4 +35,12 @@ public class Extension {
     public String getVersion() {
         return version;
     }
+
+    @Override
+    public String toString() {
+        return "Extension{" +
+                "extensionLocation=" + extensionLocation +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

@@ -242,9 +242,18 @@ public class ResourcesDesc {
      * @return all resources of the specified type.
      */
     public <T> List<T> getResources(final Class<T> type) {
+        return getResources(type, true);
+    }
+
+    /**
+     * @param <T> type of resource to be found
+     * @param type resource to be found
+     * @return all resources of the specified type.
+     */
+    public <T> List<T> getResources(final Class<T> type, final boolean goInJREDesc) {
         final List<T> result = new ArrayList<>();
         for (final Object resource : resources) {
-            if (resource instanceof JREDesc) {
+            if (resource instanceof JREDesc && goInJREDesc) {
                 final JREDesc jre = (JREDesc) resource;
                 final List<ResourcesDesc> descs = jre.getResourcesDesc();
                 for (final ResourcesDesc desc : descs) {

@@ -4,6 +4,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
 import net.sourceforge.jnlp.runtime.classloader2.Part;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -21,6 +22,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * A jar that is defined by nativelib tag will be downloaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadJarWithNativeContent() throws Exception {
         //given
@@ -39,6 +41,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * A class in a jar that is defined by nativelib tag can be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadClassWithNativeMethod() throws Exception {
         //given
@@ -57,6 +60,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * A native method that native lib is part of a jar can be called
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethod() throws Exception {
         //given
@@ -78,6 +82,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * If the JNLP does not have a security environment but has nativelib parts the initialization will crash
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeWithoutSecurityEnvironment() throws Exception {
         Assertions.assertThrows(ParseException.class, () -> createFor("integration-app-16.jnlp"));
@@ -87,6 +92,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * If a jar is defined as jar (and not as nativelib) in the JNLP than native libraries that are part of the jar can not be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeForSimpleJarDesc() throws Exception {
         //given
@@ -103,6 +109,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * @throws Exception
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadLazyNativeLibAtStart() throws Exception {
         //given
@@ -121,6 +128,7 @@ public class NativeSupportClassloaderIntegrationTests {
      * lib will be loaded
      */
     @Test
+    @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethodFromLazyJar() throws Exception {
         //given
