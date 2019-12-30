@@ -12,7 +12,7 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class BasicClassloaderIntegrationTests {
 
@@ -24,7 +24,7 @@ public class BasicClassloaderIntegrationTests {
     public void testEagerJarLoadedAtStart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-1.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-1.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -42,7 +42,7 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-1.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-1.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -63,7 +63,7 @@ public class BasicClassloaderIntegrationTests {
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -80,7 +80,7 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -102,7 +102,7 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJarWithRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-7.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-7.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -123,7 +123,7 @@ public class BasicClassloaderIntegrationTests {
     public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-8.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-8.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -138,7 +138,7 @@ public class BasicClassloaderIntegrationTests {
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -163,7 +163,7 @@ public class BasicClassloaderIntegrationTests {
     public void testFullPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-3.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-3.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -185,7 +185,7 @@ public class BasicClassloaderIntegrationTests {
     public void testMultipleResources() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-11.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-11.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -210,7 +210,7 @@ public class BasicClassloaderIntegrationTests {
     public void testEagerPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-21.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-21.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -229,7 +229,7 @@ public class BasicClassloaderIntegrationTests {
     public void testAllLazyPartsLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-23.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-23.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when

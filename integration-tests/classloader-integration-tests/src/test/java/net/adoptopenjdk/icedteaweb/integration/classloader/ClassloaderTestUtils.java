@@ -4,8 +4,10 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
+import net.sourceforge.jnlp.runtime.classloader2.Part;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ClassloaderTestUtils {
 
@@ -27,5 +29,9 @@ public class ClassloaderTestUtils {
 
     public static JarExtractor createFor(final String name) throws IOException, ParseException {
         return new JarExtractor(JNLP_FILE_FACTORY.create(ClassloaderTestUtils.class.getResource(name)), JNLP_FILE_FACTORY);
+    }
+
+    public static List<Part> createPartsFor(final String name) throws IOException, ParseException {
+        return createFor(name).getParts();
     }
 }
