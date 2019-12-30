@@ -11,7 +11,7 @@ import java.net.URL;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class DownloadServiceFunctionalityTest {
 
@@ -20,7 +20,7 @@ public class DownloadServiceFunctionalityTest {
     public void testPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
 
         //when
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
@@ -34,7 +34,7 @@ public class DownloadServiceFunctionalityTest {
     public void testExtensionPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-19.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -51,7 +51,7 @@ public class DownloadServiceFunctionalityTest {
     public void testPartDownloaded2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
 
@@ -67,7 +67,7 @@ public class DownloadServiceFunctionalityTest {
     public void testDownloadPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-2.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-2.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -82,7 +82,7 @@ public class DownloadServiceFunctionalityTest {
     public void testEagerPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-21.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-21.jnlp");
 
         //when
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
@@ -96,7 +96,7 @@ public class DownloadServiceFunctionalityTest {
     public void testDownloadPartFromExtension() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-19.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
         final URL extensionURL = DownloadServiceFunctionalityTest.class.getResource("integration-app-19-extension.jnlp");
         final Extension extension = new Extension(extensionURL, null);

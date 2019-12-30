@@ -13,7 +13,7 @@ import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class OsSpecificClassloaderIntegrationTests {
 
@@ -26,7 +26,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-4.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -45,7 +45,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-4.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -66,7 +66,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-4.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -85,7 +85,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-5.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -104,7 +104,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-5.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -125,7 +125,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-5.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -144,7 +144,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-6.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -163,7 +163,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-6.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -184,7 +184,7 @@ public class OsSpecificClassloaderIntegrationTests {
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-6.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);

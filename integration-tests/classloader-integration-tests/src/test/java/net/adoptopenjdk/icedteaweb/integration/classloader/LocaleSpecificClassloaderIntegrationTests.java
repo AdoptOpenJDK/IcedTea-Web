@@ -15,7 +15,7 @@ import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class LocaleSpecificClassloaderIntegrationTests {
@@ -41,7 +41,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
     public void testLoadForConcreteLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-12.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-12.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -60,7 +60,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
     public void testNotLoadForWrongLocale() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-13.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-13.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);

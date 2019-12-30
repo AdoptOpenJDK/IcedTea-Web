@@ -12,7 +12,7 @@ import org.junit.jupiter.api.condition.OS;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_WITH_NATIVE;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class NativeSupportClassloaderIntegrationTests {
 
@@ -27,7 +27,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void loadJarWithNativeContent() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-15.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -46,7 +46,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void loadClassWithNativeMethod() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-15.jnlp");
         final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -65,7 +65,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void callNativeMethod() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-15.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-15.jnlp");
         final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
         
@@ -85,7 +85,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @RepeatedTest(10)
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeWithoutSecurityEnvironment() throws Exception {
-        Assertions.assertThrows(ParseException.class, () -> createFor("integration-app-16.jnlp"));
+        Assertions.assertThrows(ParseException.class, () -> createPartsFor("integration-app-16.jnlp"));
     }
 
     /**
@@ -97,7 +97,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void doNotLoadNativeForSimpleJarDesc() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-17.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-17.jnlp");
         final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
@@ -114,7 +114,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void doNotLoadLazyNativeLibAtStart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-18.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-18.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -133,7 +133,7 @@ public class NativeSupportClassloaderIntegrationTests {
     public void callNativeMethodFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-18.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-18.jnlp");
         final ClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
 

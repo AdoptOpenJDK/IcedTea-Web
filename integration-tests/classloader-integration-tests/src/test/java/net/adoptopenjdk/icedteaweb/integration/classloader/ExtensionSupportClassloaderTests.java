@@ -12,7 +12,7 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class ExtensionSupportClassloaderTests {
 
@@ -24,7 +24,7 @@ public class ExtensionSupportClassloaderTests {
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-19.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
 
         //when
         new JnlpApplicationClassLoader(parts, jarProvider);
@@ -41,7 +41,7 @@ public class ExtensionSupportClassloaderTests {
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-19.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -62,7 +62,7 @@ public class ExtensionSupportClassloaderTests {
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-20.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-20.jnlp");
         final JnlpApplicationClassLoader classLoader =
 
                 //when
@@ -81,7 +81,7 @@ public class ExtensionSupportClassloaderTests {
     public void testLoadClassFromEagerJar2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-20.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-20.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -102,7 +102,7 @@ public class ExtensionSupportClassloaderTests {
     public void testPartIsJnlpExclusive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-22.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-22.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
@@ -123,7 +123,7 @@ public class ExtensionSupportClassloaderTests {
     public void testPartIsJnlpExclusive2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createFor("integration-app-22.jnlp").getParts();
+        final List<Part> parts = createPartsFor("integration-app-22.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
 
         //when
