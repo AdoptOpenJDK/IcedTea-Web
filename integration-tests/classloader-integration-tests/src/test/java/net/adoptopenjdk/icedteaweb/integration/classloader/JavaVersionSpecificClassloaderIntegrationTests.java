@@ -66,8 +66,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         new JnlpApplicationClassLoader(parts, jarProvider);
 
         //than
-        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
     }
 }

@@ -533,9 +533,11 @@ public class JNLPFile {
                 return result;
             }
 
+            /**
+             * Only called from Launcher to add propery descriptions from command line.
+             */
             @Override
             public void addResource(Object resource) {
-                // todo: honor the current locale, os, arch values
                 sharedResources.addResource(resource);
             }
         };
@@ -562,7 +564,7 @@ public class JNLPFile {
         return result;
     }
 
-    public JNLPResources getResourcesOutsideOfJreDesc() {
+    private JNLPResources getResourcesOutsideOfJreDesc() {
         return resources.filterResources(defaultLocale, defaultOS, defaultArch);
     }
 
@@ -571,18 +573,13 @@ public class JNLPFile {
         if (jres.isEmpty()) {
             return emptyList();
         }
-        final List<JREDesc> soutableJreDesc = jres.stream()
+        return jres.stream()
                 .filter(jreDesc -> jreDesc.getVersion().contains(defaultJavaVersion))
-                .collect(toList());
-        if (soutableJreDesc.isEmpty()) {
-            throw new IllegalStateException("Could not locate a soutable JRE description in the JNLP file");
-        }
-
-        return soutableJreDesc.stream()
+                .findFirst()
                 .map(JREDesc::getJnlpResources)
                 .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
-                .flatMap(jnlpResources -> jnlpResources.all().stream())
-                .collect(Collectors.toList());
+                .map(jnlpResources -> jnlpResources.all())
+                .orElseThrow(() -> new IllegalStateException("Could not locate a soutable JRE description in the JNLP file"));
     }
 
     /**

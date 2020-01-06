@@ -121,12 +121,8 @@ public class JNLPResources {
      * @return all resources of the specified type.
      */
     private <T> List<T> getResources(final Class<T> type) {
-        return getResources(type, false);
-    }
-
-    private <T> List<T> getResources(final Class<T> type, final boolean goInJREDesc) {
         return resources.stream()
-                .flatMap(resourcesDesc -> resourcesDesc.getResources(type, goInJREDesc).stream())
+                .flatMap(resourcesDesc -> resourcesDesc.getResources(type, false).stream())
                 .collect(toList());
     }
 }
