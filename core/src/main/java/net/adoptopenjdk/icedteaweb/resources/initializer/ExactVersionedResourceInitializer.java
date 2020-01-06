@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
@@ -24,7 +25,7 @@ class ExactVersionedResourceInitializer extends BaseResourceInitializer {
 
     ExactVersionedResourceInitializer(Resource resource) {
         super(resource);
-        versionId = VersionId.fromString(resource.getRequestVersion().toString());
+        versionId = VersionString.fromString(resource.getRequestVersion().toString()).getExactVersion();
     }
 
     @Override

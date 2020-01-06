@@ -60,6 +60,17 @@ class SimpleRange {
         return modifier == NONE;
     }
 
+    /**
+     * @return the exact version if this simple-range is one
+     * @throws IllegalStateException if this simple-range is not one
+     */
+    VersionId getExactVersion() {
+        if (!isExactVersion()) {
+            throw new IllegalStateException(format("'%s' is not an exact version", toString()));
+        }
+        return versionId;
+    }
+
     boolean hasPrefixMatchModifier() {
         return modifier == ASTERISK;
     }
