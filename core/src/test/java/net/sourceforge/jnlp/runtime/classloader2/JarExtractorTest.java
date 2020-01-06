@@ -85,6 +85,30 @@ public class JarExtractorTest {
         ));
     }
 
+    @Test
+    public void jnlpWithExtensionAndEagerExtDownload() throws Exception {
+        // given
+        final JNLPFile jnlpFile = new JNLPFileFactory().create(getUrl("main-1.jnlp"));
+
+        // when
+        final List<Part> parts = new JarExtractor(jnlpFile, jnlpFileFactory).getParts();
+
+        // then
+        assertThat(parts, containsInAnyOrder(
+                part(DEFAULT_NAME, LAZY, NO_JARS, NO_PACKAGES),
+                part(DEFAULT_NAME, EAGER, NO_JARS, NO_PACKAGES),
+                part("lazy-ext-package", EAGER, jars("lazy.jar"), packages("class.in.lazy.Package"))
+        ));
+   }
+
+    //TODO: add the following test cases
+    // - extension with 'ext-part' and no 'part' and no 'download' => should make ext-part eager
+    // - extension with 'ext-part' and no 'part' 'download="lazy"' and package in extension => should make ext-part lazy
+    // - extension with 'ext-part' and no 'part' and 'download="lazy"' and no package in extension => should make ext-part eager
+    // - extension with 'ext-part' and 'part' and no 'download' => should combine the two parts and make it eager
+    // - extension with 'ext-part' and 'part' and no 'download = "lazy"' => should combine the two parts and make it lazy
+    // - extension with 'ext-part' and 'part' and no 'download = "lazy"' and neither part has a package => should combine the two parts and make it eager
+
     //TODO: add the following test cases
     // - lazy and eager jar in same part => part should be eager
     // - resource filtered by locale => jars should not be in result
@@ -93,10 +117,6 @@ public class JarExtractorTest {
     // - resource in <java> tag with wrong version => jars should not be in result
     // - extension without part mapping and different parts => should be 2 parts with different name
     // - extension without part mapping and parts with same name => should be 2 parts with same name
-    // - extension with 'ext-part' but no 'part' and no 'download' => should make ext-part eager
-    // - extension with 'ext-part' and 'download="lazy"' => should make ext-part lazy
-    // - extension with 'ext-part' and 'part' and no 'download' => should combine the two parts and make it eager
-    // - extension with 'ext-part' and 'part' and no 'download = "lazy"' => should combine the two parts and make it lazy
     // - a crazy nested example of all of the above:
     //      - resource with locale filter
     //      - in this a java element

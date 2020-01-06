@@ -104,12 +104,6 @@ public class JarExtractor {
                 if (!download.isLazy()) {
                     part.markAsEager();
                 }
-
-                if (parts.contains(part)) {
-                    throw new ParseException("found extension part twice: " + extPartName);
-                }
-
-                parts.add(part);
             }
         } finally {
             partsLock.unlock();
