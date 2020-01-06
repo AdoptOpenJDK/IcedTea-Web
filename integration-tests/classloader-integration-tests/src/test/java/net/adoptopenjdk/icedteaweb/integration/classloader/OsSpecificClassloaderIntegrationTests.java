@@ -13,6 +13,8 @@ import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_3;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class OsSpecificClassloaderIntegrationTests {
@@ -192,5 +194,59 @@ public class OsSpecificClassloaderIntegrationTests {
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
+    }
+
+
+
+
+
+
+
+    @Test
+    @RepeatedTest(10)
+    @EnabledOnOs(OS.MAC)
+    public void testMacOnlyResourceInJreOnMac() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+
+        //when
+        new JnlpApplicationClassLoader(parts, jarProvider);
+
+        //than
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_3));
+    }
+
+    @Test
+    @RepeatedTest(10)
+    @EnabledOnOs(OS.WINDOWS)
+    public void testWindowsOnlyResourceInJreOnWindows() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+
+        //when
+        new JnlpApplicationClassLoader(parts, jarProvider);
+
+        //than
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+    }
+
+    @Test
+    @RepeatedTest(10)
+    @EnabledOnOs(OS.LINUX)
+    public void testLinuxOnlyResourceInJreOnLinux() throws Exception {
+        //given
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+
+        //when
+        new JnlpApplicationClassLoader(parts, jarProvider);
+
+        //than
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
     }
 }

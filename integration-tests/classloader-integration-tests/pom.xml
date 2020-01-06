@@ -71,6 +71,12 @@
                                     </includes>
                                 </resource>
                                 <resource>
+                                    <directory>../classloader-integration-tests-module-3/target</directory>
+                                    <includes>
+                                        <include>classloader-integration-tests-module-3.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
                                     <directory>../classloader-integration-tests-module-native/target</directory>
                                     <includes>
                                         <include>classloader-integration-tests-module-native.jar</include>
