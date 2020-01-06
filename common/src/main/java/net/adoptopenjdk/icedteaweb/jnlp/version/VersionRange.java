@@ -69,6 +69,17 @@ public class VersionRange {
     }
 
     /**
+     * @return the exact version if this version-range is one
+     * @throws IllegalStateException if this version-range is not one
+     */
+    VersionId getExactVersion() {
+        if (!isExactVersion()) {
+            throw new IllegalStateException(format("'%s' is not an exact version", toString()));
+        }
+        return simpleRanges[0].getExactVersion();
+    }
+
+    /**
      * Checks whether this version-range represents a range with a prefix match modifier.
      *
      * @return {@code true} if this version-range is not a compound range

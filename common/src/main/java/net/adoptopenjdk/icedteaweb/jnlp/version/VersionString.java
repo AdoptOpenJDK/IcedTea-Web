@@ -63,11 +63,12 @@ public class VersionString {
     public static VersionString fromString(final String versionString) {
         Assert.requireNonNull(versionString, "versionString");
 
-        if (!versionString.matches(REGEXP_VERSION_STRING)) {
+        final String trimmed = versionString.trim();
+        if (!trimmed.matches(REGEXP_VERSION_STRING)) {
             throw new IllegalArgumentException(format("'%s' is not a valid version-string according to JSR-56, Appendix A.", versionString));
         }
 
-        final VersionRange[] ranges = Arrays.stream(versionString.split(REGEXP_SPACE))
+        final VersionRange[] ranges = Arrays.stream(trimmed.split(REGEXP_SPACE))
                 .map(VersionRange::fromString)
                 .toArray(VersionRange[]::new);
 
@@ -86,6 +87,17 @@ public class VersionString {
      */
     public boolean isExactVersion() {
         return versionRanges.length == 1 && versionRanges[0].isExactVersion();
+    }
+
+    /**
+     * @return the exact version if this version-string is one
+     * @throws IllegalStateException if this version-string is not none
+     */
+    public VersionId getExactVersion() {
+        if (!isExactVersion()) {
+            throw new IllegalStateException(format("'%s' is not an exact version", toString()));
+        }
+        return versionRanges[0].getExactVersion();
     }
 
     /**

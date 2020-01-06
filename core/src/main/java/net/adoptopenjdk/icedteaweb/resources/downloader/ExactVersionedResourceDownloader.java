@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 
@@ -16,7 +17,7 @@ class ExactVersionedResourceDownloader extends BaseResourceDownloader {
 
     ExactVersionedResourceDownloader(Resource resource, List<URL> downloadUrls) {
         super(resource, downloadUrls);
-        versionId = VersionId.fromString(resource.getRequestVersion().toString());
+        versionId = VersionString.fromString(resource.getRequestVersion().toString()).getExactVersion();
     }
 
     @Override
