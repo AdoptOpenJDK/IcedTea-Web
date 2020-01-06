@@ -13,4 +13,4 @@ Based on the Java `System.mapLibraryName(libname)` call the native file must be 
 
 # How to add the native lib
 
-The Maven build of this project adds all native libraries to the JAR. By calling the `ClassWithNativeCall` you can check if the native lib is called.
+The Maven build of this project adds all native libraries to the JAR. By calling `new ClassWithNativeCall().callNative()` you can check if the native lib is called.
