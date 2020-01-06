@@ -122,7 +122,7 @@ public class JNLPResources {
      */
     private <T> List<T> getResources(final Class<T> type) {
         return resources.stream()
-                .flatMap(resourcesDesc -> resourcesDesc.getResources(type, false).stream())
+                .flatMap(resourcesDesc -> resourcesDesc.getResources(type).stream())
                 .collect(toList());
     }
 }

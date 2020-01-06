@@ -238,23 +238,6 @@ public class ParserBasicTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void testResourcesInsideJava() throws ParseException {
-        ClassLoader cl = ParserBasicTest.class.getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-        ParserSettings defaultParserSettings = new ParserSettings();
-        InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
-        Node omega = xmlParser.getRootNode(jnlpStream);
-        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParserSettings);
-        ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
-        JARDesc[] r = resources.getJARs();
-        // we ensures that also in j2se hars ar eloaded.it is 7 withutt them.
-        Assert.assertTrue(r.length>30);
-    }
-
-    @Test
     public void testResourcesJar() throws ParseException {
         ResourcesDesc resources = parser.getResources(root, false).get(0);
 
