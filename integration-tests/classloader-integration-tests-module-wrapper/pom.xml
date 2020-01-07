@@ -11,7 +11,7 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>classloader-integration-tests-module-parent</artifactId>
+    <artifactId>classloader-integration-tests-module-wrapper</artifactId>
 
     <dependencies>
         <dependency>

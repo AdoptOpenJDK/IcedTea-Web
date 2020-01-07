@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>classloader-integration-tests-module-parent</artifactId>
+            <artifactId>classloader-integration-tests-module-wrapper</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
