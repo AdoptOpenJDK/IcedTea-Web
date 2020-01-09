@@ -15,7 +15,7 @@ public class RegistryQueryTest {
         //Given
         final String key = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
         final String content = IOUtils.readContentAsUtf8String(RegistryQueryTest.class.getResourceAsStream("reg_query.out"));
-        final List<String> lines = Arrays.asList(content.split(System.lineSeparator()));
+        final List<String> lines = Arrays.asList(content.split("\\R"));
 
         //When
         final Map<String, RegistryValue> values = RegistryQuery.getRegistryValuesFromLines(key, lines);
