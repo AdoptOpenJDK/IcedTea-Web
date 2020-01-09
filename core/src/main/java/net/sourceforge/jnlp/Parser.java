@@ -292,7 +292,7 @@ public final class Parser {
      */
     public VersionId getFileVersion() {
         final String version = getAttribute(root, JNLPFile.VERSION_ATTRIBUTE, null);
-        return (version == null) ? null : VersionId.fromString(version);
+        return (version == null) ? null : VersionId.fromString(version.trim());
     }
 
     /**

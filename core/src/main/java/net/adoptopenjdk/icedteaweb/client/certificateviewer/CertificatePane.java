@@ -138,7 +138,9 @@ public class CertificatePane extends JPanel {
         this.parent = parent;
 
         userTable = new JTable(null);
+        userTable.setAutoCreateRowSorter(true);
         systemTable = new JTable(null);
+        systemTable.setAutoCreateRowSorter(true);
         disableForSystem = new ArrayList<>();
 
         addComponents();
@@ -559,7 +561,8 @@ public class CertificatePane extends JPanel {
 
             int selectedRow = table.getSelectedRow();
             if (selectedRow != -1 && selectedRow >= 0) {
-                X509Certificate c = certs.get(selectedRow);
+                int modelIndex = table.getRowSorter().convertRowIndexToModel(selectedRow);
+                X509Certificate c = certs.get(modelIndex);
                 SecurityDialog.showSingleCertInfoDialog(c, parent);
             }
         }

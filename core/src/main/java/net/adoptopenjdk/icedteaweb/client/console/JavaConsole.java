@@ -36,6 +36,7 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.console;
 
+import net.adoptopenjdk.icedteaweb.client.certificateviewer.CertificatePane;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
@@ -401,6 +402,21 @@ public class JavaConsole implements ObservableMessagesProvider {
                     rawData.clear();
                     updateModel(true);
                 }
+            }
+        });
+
+        final JButton certificateButton = new JButton("Show Certificates");
+        buttonPanel.add(certificateButton);
+        certificateButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final JDialog certificatesViewer = new JDialog(consoleWindow, "Cerificates Viewer");
+                certificatesViewer.setLocationRelativeTo(consoleWindow);
+                certificatesViewer.getContentPane().add(new CertificatePane(certificatesViewer));
+                certificatesViewer.pack();
+                certificatesViewer.setVisible(true);
+                certificatesViewer.pack();
             }
         });
 
