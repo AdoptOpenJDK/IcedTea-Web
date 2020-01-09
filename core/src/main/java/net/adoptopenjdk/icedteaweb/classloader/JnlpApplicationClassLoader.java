@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime.classloader2;
+package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static net.sourceforge.jnlp.runtime.classloader2.ClassLoaderUtils.waitForCompletion;
+import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
 

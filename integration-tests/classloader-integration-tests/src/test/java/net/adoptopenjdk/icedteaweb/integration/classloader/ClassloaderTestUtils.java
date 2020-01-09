@@ -2,8 +2,8 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFileFactory;
-import net.sourceforge.jnlp.runtime.classloader2.JarExtractor;
-import net.sourceforge.jnlp.runtime.classloader2.Part;
+import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
+import net.adoptopenjdk.icedteaweb.classloader.Part;
 
 import java.io.IOException;
 import java.util.List;

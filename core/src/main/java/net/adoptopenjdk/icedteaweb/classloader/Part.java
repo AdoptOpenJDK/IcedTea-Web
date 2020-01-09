@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime.classloader2;
+package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;

@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.sourceforge.jnlp.runtime.classloader2.JnlpApplicationClassLoader;
-import net.sourceforge.jnlp.runtime.classloader2.Part;
+import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.Part;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;

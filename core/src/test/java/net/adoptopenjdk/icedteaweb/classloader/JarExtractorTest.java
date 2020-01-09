@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime.classloader2;
+package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
@@ -85,21 +85,6 @@ public class JarExtractorTest {
         ));
     }
 
-    @Test
-    public void jnlpWithExtensionAndEagerExtDownload() throws Exception {
-        // given
-        final JNLPFile jnlpFile = new JNLPFileFactory().create(getUrl("main-1.jnlp"));
-
-        // when
-        final List<Part> parts = new JarExtractor(jnlpFile, jnlpFileFactory).getParts();
-
-        // then
-        assertThat(parts, containsInAnyOrder(
-                part(DEFAULT_NAME, LAZY, NO_JARS, NO_PACKAGES),
-                part(DEFAULT_NAME, EAGER, NO_JARS, NO_PACKAGES),
-                part("lazy-ext-package", EAGER, jars("lazy.jar"), packages("class.in.lazy.Package"))
-        ));
-   }
 
     //TODO: add the following test cases
     // - extension with 'ext-part' and no 'part' and no 'download' => should make ext-part eager

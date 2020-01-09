@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime.classloader2;
+package net.adoptopenjdk.icedteaweb.classloader;
 
 import java.net.URL;
 import java.util.Objects;

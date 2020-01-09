@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime.classloader2;
+package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDownloadDesc;
@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
-import static net.sourceforge.jnlp.runtime.classloader2.ClassLoaderUtils.waitForCompletion;
+import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class JarExtractor {
 
