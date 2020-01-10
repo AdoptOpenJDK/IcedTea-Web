@@ -14,7 +14,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime.classloader;
 
-import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
@@ -341,19 +340,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
         installShutdownHooks();
 
-    }
-
-    private static boolean isCertUnderestimated() {
-        return Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
-                && !JNLPRuntime.isSecurityEnabled();
-    }
-
-    static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
-        if (isCertUnderestimated()) {
-            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
-        } else {
-            throw ex;
-        }
     }
 
     /**
@@ -697,7 +683,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 LOG.error("Exception while verifying jars", e);
                 LaunchException ex = new LaunchException(null, null, FATAL,
                         "Initialization Error", "A fatal error occurred while trying to verify jars.", "An exception has been thrown in class JarCertVerifier. Being unable to read the cacerts or trusted.certs files could be a possible cause for this exception.: " + e.getMessage());
-                consultCertificateSecurityException(ex);
+                SecurityDelegateImpl.consultCertificateSecurityException(ex);
             }
 
             //Case when at least one jar has some signing
@@ -967,7 +953,7 @@ public class JNLPClassLoader extends URLClassLoader {
              */
             LaunchException ex = new LaunchException(file, null, FATAL, "Application Error",
                     "The signed JNLP file did not match the launching JNLP file.", R(e.getMessage()));
-            consultCertificateSecurityException(ex);
+            SecurityDelegateImpl.consultCertificateSecurityException(ex);
             /*
              * Throwing this exception will fail to initialize the application
              * resulting in the termination of the application
