@@ -29,7 +29,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
@@ -520,21 +519,12 @@ public class Launcher {
     //See also PluginAppletViewer.framePanel
     private AppletInstance createApplet(final JNLPFile file, final Container cont) throws LaunchException {
          try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, true);
 
-             loader.enableCodeBase();
-
-             ThreadGroup group = Thread.currentThread().getThreadGroup();
 
             // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
-            final AppletInstance appletInstance;
-            if (cont == null) {
-                 appletInstance = new AppletInstance(file, group, loader, null);
-             } else {
-                 appletInstance = new AppletInstance(file, group, loader, null, cont);
-             }
+            final AppletInstance appletInstance = new AppletInstance(file, cont);
 
              /*
               * Due to PR2968, moved to earlier phase, so early stages of applet
@@ -545,12 +535,10 @@ public class Launcher {
               */
              setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
 
-            loader.setApplication(appletInstance);
-
             // Initialize applet now that ServiceManager has access to its
             // appletInstance.
             String appletName = file.getApplet().getMainClass();
-            Class<?> appletClass = loader.loadClass(appletName);
+            Class<?> appletClass = appletInstance.getClassLoader().loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
             applet.setStub((AppletStub)cont);
             // Finish setting up appletInstance.
@@ -571,13 +559,7 @@ public class Launcher {
      */
     private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
         try {
-            JNLPClassLoader loader = JNLPClassLoader.getInstance(file, updatePolicy, false);
-            ThreadGroup group = Thread.currentThread().getThreadGroup();
-
-            ApplicationInstance app = new ApplicationInstance(file, group, loader);
-            loader.setApplication(app);
-
-            return app;
+            return new ApplicationInstance(file, false);
         } catch (Exception ex) {
             throw new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
         }

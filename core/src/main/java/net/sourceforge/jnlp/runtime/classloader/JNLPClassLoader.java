@@ -93,7 +93,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1019,7 +1018,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return the JNLP app for this classloader
      */
-    public ApplicationInstance getApplication() {
+    ApplicationInstance getApplication() {
         return app;
     }
 

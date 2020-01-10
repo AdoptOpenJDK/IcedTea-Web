@@ -19,8 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.runtime.classloader.CodeBaseClassLoader;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoaderUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
@@ -167,7 +166,7 @@ class JNLPSecurityManager extends SecurityManager {
      * determined.
      */
     protected ApplicationInstance getApplication() {
-        return getApplication(Thread.currentThread(), getClassContext(), 0);
+        return JNLPClassLoaderUtil.getApplication(Thread.currentThread(), getClassContext(), 0);
     }
 
     /**
@@ -185,62 +184,6 @@ class JNLPSecurityManager extends SecurityManager {
             if (w == window) {
                 return weakApplications.get(i);
             }
-        }
-
-        return null;
-    }
-
-    /**
-     * Return the current Application, or null.
-     */
-    protected ApplicationInstance getApplication(Thread thread, Class<?>[] stack, int maxDepth) {
-        ClassLoader cl;
-        JNLPClassLoader jnlpCl;
-
-        cl = thread.getContextClassLoader();
-        while (cl != null) {
-            jnlpCl = getJnlpClassLoader(cl);
-            if (jnlpCl != null && jnlpCl.getApplication() != null) {
-                return jnlpCl.getApplication();
-            }
-            cl = cl.getParent();
-        }
-
-        if (maxDepth <= 0) {
-            maxDepth = stack.length;
-        }
-
-        // this needs to be tightened up
-        for (int i = 0; i < stack.length && i < maxDepth; i++) {
-            cl = stack[i].getClassLoader();
-            while (cl != null) {
-                jnlpCl = getJnlpClassLoader(cl);
-                if (jnlpCl != null && jnlpCl.getApplication() != null) {
-                    return jnlpCl.getApplication();
-                }
-                cl = cl.getParent();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the JNLPClassLoader associated with the given ClassLoader, or
-     * null.
-     *
-     * @param cl a ClassLoader
-     * @return JNLPClassLoader or null
-     */
-    private JNLPClassLoader getJnlpClassLoader(ClassLoader cl) {
-        // Since we want to deal with JNLPClassLoader, extract it if this
-        // is a codebase loader
-        if (cl instanceof CodeBaseClassLoader) {
-            cl = ((CodeBaseClassLoader) cl).getParentJNLPClassLoader();
-        }
-
-        if (cl instanceof JNLPClassLoader) {
-            JNLPClassLoader loader = (JNLPClassLoader) cl;
-            return loader;
         }
 
         return null;
@@ -367,7 +310,7 @@ class JNLPSecurityManager extends SecurityManager {
         }
 
         // but when they really call, stop only the app instead of the JVM
-        ApplicationInstance app = getApplication(Thread.currentThread(), stack, 0);
+        ApplicationInstance app = JNLPClassLoaderUtil.getApplication(Thread.currentThread(), stack, 0);
         if (app == null) {
             throw new SecurityException("Cannot exit the JVM because the current application cannot be determined.");
         }
