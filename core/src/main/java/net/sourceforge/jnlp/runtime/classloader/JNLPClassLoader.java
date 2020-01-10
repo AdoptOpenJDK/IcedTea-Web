@@ -1117,7 +1117,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param jars the list of jars to load
      */
-    void activateJars(final List<JARDesc> jars) {
+    private void activateJars(final List<JARDesc> jars) {
         PrivilegedAction<Void> activate = () -> doActivateJars(jars);
         AccessController.doPrivileged(activate, acc);
     }

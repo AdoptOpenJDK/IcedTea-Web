@@ -286,41 +286,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
-    @Bug(id = "PR3417")
-    /**
-     * The nested jar must be more 1024 bytes long. Better, longer
-     * then  byte[] bytes = new byte[1024] on line 1273 in
-     * net.sourceforge.jnlp.runtime.JNLPClassLoader otherwise the file
-     * will not get rewritten while read  Also there must be more then
-     * one item of this size, for same reason
-     */
-    public void testNameClashInNestedJars() throws Exception {
-        //for this test is enough to not crash jvm
-        final boolean verifyBackup = JNLPRuntime.isVerifying();
-        final File dir = temporaryFolder.newFolder();
-        final File dirHolder = File.createTempFile("pf-", ".jar", dir);
-        final File jarLocation = new File(dirHolder.getParentFile(), "pf.jar");
-        try {
-            //it is invalid jar, so we have to disable checks first
-            JNLPRuntime.setVerify(false);
-            InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/runtime/pf.jar-orig");
-            assertNotNull(is);
-            Files.copy(is, jarLocation.toPath());
-            final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-
-            new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS) {
-                @Override
-                protected void activateJars(List<JARDesc> jars) {
-                    super.activateJars(jars);
-                }
-
-            };
-        } finally {
-            JNLPRuntime.setVerify(verifyBackup);
-        }
-    }
-
-    @Test
     public void testFindLibrary() throws Exception {
         final File tempDirectory = temporaryFolder.newFolder();
         final String nativeLibName = "native";
