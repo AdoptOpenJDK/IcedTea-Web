@@ -33,14 +33,6 @@ import java.net.URL;
 class XDownloadService implements DownloadService {
 
     /**
-     * Returns the {@link JNLPClassLoader} of the application
-     * @return the {@link JNLPClassLoader} of the application
-     */
-    private JNLPClassLoader getClassLoader() {
-        return (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
-    }
-
-    /**
      * Returns a listener that will automatically display download
      * progress to the user.
      * @return always {@code null}
