@@ -529,7 +529,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         final ExtensionDesc[] extDescs = resources.getExtensions();
         if (extDescs != null) {
-            final String uniqueKey = this.getJNLPFile().getUniqueKey();
+            final String uniqueKey = file.getUniqueKey();
             for (ExtensionDesc ext : extDescs) {
                 try {
                     final JNLPClassLoader loader = getInstance(ext.getLocation(), uniqueKey, ext.getVersion(), file.getParserSettings(), updatePolicy, mainClass, enableCodeBase);
@@ -853,7 +853,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return true if this loader has the main jar
      */
-    boolean hasMainJar() {
+    private boolean hasMainJar() {
         return this.foundMainJar;
     }
 
@@ -891,23 +891,22 @@ public class JNLPClassLoader extends URLClassLoader {
                         LOG.debug("Creating Jar InputStream from JarEntry");
                         InputStream inStream = jarFile.getInputStream(je);
                         LOG.debug("Creating File InputStream from launching JNLP file");
-                        JNLPFile jnlp = this.getJNLPFile();
                         File jn;
                         // If the file is on the local file system, use original path, otherwise find cached file
-                        if (jnlp.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
-                            jn = new File(jnlp.getFileLocation().getPath());
+                        if (file.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
+                            jn = new File(file.getFileLocation().getPath());
                         } else {
-                            jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
+                            jn = Cache.getCacheFile(file.getFileLocation(), file.getFileVersion());
                         }
 
                         InputStream jnlpStream = new FileInputStream(jn);
                         JNLPMatcher matcher;
                         if (jeName.equals(APPLICATION)) { // If signed application was found
                             LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verification...");
-                            matcher = new JNLPMatcher(inStream, jnlpStream, false, jnlp.getParserSettings());
+                            matcher = new JNLPMatcher(inStream, jnlpStream, false, file.getParserSettings());
                         } else { // Otherwise template was found
                             LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
-                            matcher = new JNLPMatcher(inStream, jnlpStream, true, jnlp.getParserSettings());
+                            matcher = new JNLPMatcher(inStream, jnlpStream, true, file.getParserSettings());
                         }
                         // If signed JNLP file does not matches launching JNLP file, throw JNLPMatcherException
                         if (!matcher.isMatch()) {
