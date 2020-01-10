@@ -141,17 +141,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         });
     }
 
-    /* Note: We should create a JNLPClassLoader with an invalid jar to test isInvalidJar with.
-     * However, it is tricky without it erroring-out. */
-    @Test
-    public void isInvalidJarTest() throws Exception {
-        final File jarLocation = createJarWithoutContent();
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-
-        assertNoFileLeak(() -> assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc())));
-    }
-
     @Test
     public void getMainClassNameTest() throws Exception {
         File tempDirectory = temporaryFolder.newFolder();

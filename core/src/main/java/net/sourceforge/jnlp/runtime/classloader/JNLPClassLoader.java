@@ -591,28 +591,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Check if a described jar file is invalid
-     *
-     * @param jar the jar to check
-     * @return true if file exists AND is an invalid jar, false otherwise
-     */
-    boolean isInvalidJar(JARDesc jar) {
-        File cacheFile = tracker.getCacheFile(jar.getLocation());
-        if (cacheFile == null) {
-            return false;//File cannot be retrieved, do not claim it is an invalid jar
-        }
-        boolean isInvalid = false;
-        try {
-            JarFile jarFile = new JarFile(cacheFile.getAbsolutePath());
-            jarFile.close();
-        } catch (IOException ioe) {
-            //Catch a ZipException or any other read failure
-            isInvalid = true;
-        }
-        return isInvalid;
-    }
-
-    /**
      * Load all of the JARs used in this JNLP file into the ResourceTracker for
      * downloading.
      */
