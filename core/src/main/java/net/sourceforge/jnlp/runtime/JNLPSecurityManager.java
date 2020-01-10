@@ -21,13 +21,10 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.runtime.classloader.CodeBaseClassLoader;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
-import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.services.ServiceUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
 import java.awt.Window;
-import java.net.SocketPermission;
 import java.security.AccessControlException;
 import java.security.Permission;
 
@@ -48,7 +45,7 @@ import java.security.Permission;
  */
 class JNLPSecurityManager extends SecurityManager {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPSecurityManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPSecurityManager.class);
 
     // todo: some apps like JDiskReport can close the VM even when
     // an exit class is set - fix!
@@ -81,29 +78,31 @@ class JNLPSecurityManager extends SecurityManager {
     // another way for different apps to have different properties
     // in java.lang.System with the same names.
 
-    /** only class that can exit the JVM, if set */
+    /**
+     * only class that can exit the JVM, if set
+     */
     private Object exitClass = null;
 
-    /** this exception prevents exiting the JVM */
+    /**
+     * this exception prevents exiting the JVM
+     */
     private SecurityException closeAppEx = // making here prevents huge stack traces
             new SecurityException("This exception to prevent shutdown of JVM, but the process has been terminated.");
 
-    /** weak list of windows created */
-    private WeakList<Window> weakWindows = new WeakList<Window>();
-
-    /** weak list of applications corresponding to window list */
-    private WeakList<ApplicationInstance> weakApplications =
-            new WeakList<ApplicationInstance>();
-
-    /** Sets whether or not exit is allowed (in the context of the plugin, this is always false) */
-    private boolean exitAllowed = true;
+    /**
+     * weak list of windows created
+     */
+    private WeakList<Window> weakWindows = new WeakList<>();
 
     /**
-     * The AppContext of the main application (netx). We need to store this here
-     * so we can return this when no code from an external application is
-     * running on the thread
+     * weak list of applications corresponding to window list
      */
-    private AppContext mainAppContext;
+    private WeakList<ApplicationInstance> weakApplications = new WeakList<>();
+
+    /**
+     * Sets whether or not exit is allowed (in the context of the plugin, this is always false)
+     */
+    private boolean exitAllowed = true;
 
     /**
      * Creates a JNLP SecurityManager.
@@ -119,7 +118,7 @@ class JNLPSecurityManager extends SecurityManager {
             SwingUtils.getOrCreateWindowOwner();
         }
 
-        mainAppContext = AppContext.getAppContext();
+        AppContext.getAppContext();
     }
 
     /**
@@ -134,13 +133,13 @@ class JNLPSecurityManager extends SecurityManager {
      * Returns whether the exit class is present on the stack, or
      * true if no exit class is set.
      */
-    private boolean isExitClass(Class stack[]) {
+    private boolean isExitClass(Class<?>[] stack) {
         if (exitClass == null) {
             return true;
         }
 
-        for (int i = 0; i < stack.length; i++) {
-            if (stack[i] == exitClass) {
+        for (Class<?> aClass : stack) {
+            if (aClass == exitClass) {
                 return true;
             }
         }
@@ -176,7 +175,7 @@ class JNLPSecurityManager extends SecurityManager {
      * call from event dispatch thread).
      */
     protected ApplicationInstance getApplication(Window window) {
-        for (int i = weakWindows.size(); i-- > 0;) {
+        for (int i = weakWindows.size(); i-- > 0; ) {
             Window w = weakWindows.get(i);
             if (w == null) {
                 weakWindows.remove(i);
@@ -194,7 +193,7 @@ class JNLPSecurityManager extends SecurityManager {
     /**
      * Return the current Application, or null.
      */
-    protected ApplicationInstance getApplication(Thread thread, Class<?> stack[], int maxDepth) {
+    protected ApplicationInstance getApplication(Thread thread, Class<?>[] stack, int maxDepth) {
         ClassLoader cl;
         JNLPClassLoader jnlpCl;
 
@@ -228,6 +227,7 @@ class JNLPSecurityManager extends SecurityManager {
     /**
      * Returns the JNLPClassLoader associated with the given ClassLoader, or
      * null.
+     *
      * @param cl a ClassLoader
      * @return JNLPClassLoader or null
      */
@@ -298,49 +298,6 @@ class JNLPSecurityManager extends SecurityManager {
     }
 
     /**
-     * Asks the user whether or not to grant permission.
-     * @param perm the permission to be granted
-     * @return true if the permission was granted, false otherwise.
-     */
-    private boolean askPermission(Permission perm) {
-
-        ApplicationInstance app = getApplication();
-        if (app != null && !app.isSigned()) {
-            if (perm instanceof SocketPermission
-                                && ServiceUtil.checkAccess(AccessType.NETWORK, perm.getName())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Adds a permission to the JNLPClassLoader.
-     * @param perm the permission to add to the JNLPClassLoader
-     */
-    private void addPermission(Permission perm) {
-        if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
-
-            JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
-            cl.addPermission(perm);
-            if (JNLPRuntime.isDebug()) {
-                if (cl.getSecurity() == null) {
-                    if (cl.getPermissions(null).implies(perm)){
-                        LOG.warn("Added permission: {}", perm);
-                    } else {
-                        LOG.warn("Unable to add permission: {}", perm);
-                    }
-                } else {
-                    LOG.warn("Cannot get permissions for null codesource when classloader security is not null");
-                }
-            }
-        } else {
-            LOG.debug("Unable to add permission: {}, classloader not JNLP.", perm);
-        }
-    }
-
-    /**
      * Checks whether the window can be displayed without an applet
      * warning banner, and adds the window to the list of windows to
      * be disposed when the calling application exits.
@@ -385,10 +342,10 @@ class JNLPSecurityManager extends SecurityManager {
     public void checkExit(int status) {
 
         // applets are not allowed to exit, but the plugin main class (primordial loader) is
-        Class stack[] = getClassContext();
+        Class<?>[] stack = getClassContext();
         if (!exitAllowed) {
-            for (int i = 0; i < stack.length; i++) {
-                if (stack[i].getClassLoader() != null) {
+            for (Class<?> aClass : stack) {
+                if (aClass.getClassLoader() != null) {
                     throw new AccessControlException("Applets may not call System.exit()");
                 }
             }
@@ -423,33 +380,4 @@ class JNLPSecurityManager extends SecurityManager {
     protected void disableExit() {
         exitAllowed = false;
     }
-
-    /**
-     * Tests if a client can get access to the AWT event queue. This version allows
-     * complete access to the EventQueue for its own AppContext-specific EventQueue.
-     *
-     * FIXME there are probably huge security implications for this. Eg:
-     * http://hg.openjdk.java.net/jdk7/awt/jdk/rev/8022709a306d
-     *
-     * @exception  SecurityException  if the caller does not have
-     *             permission to access the AWT event queue.
-     */
-    @Override
-    public void checkAwtEventQueueAccess() {
-        /*
-         * this is the template of the code that should allow applets access to
-         * eventqueues
-         */
-
-        // AppContext appContext = AppContext.getAppContext();
-        // ApplicationInstance instance = getApplication();
-
-        // if ((appContext == mainAppContext) && (instance != null)) {
-        // If we're about to allow access to the main EventQueue,
-        // and anything untrusted is on the class context stack,
-        // disallow access.
-        super.checkAwtEventQueueAccess();
-        // }
-    }
-
 }
