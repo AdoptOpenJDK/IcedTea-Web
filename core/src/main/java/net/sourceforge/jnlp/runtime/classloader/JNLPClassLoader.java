@@ -314,8 +314,9 @@ public class JNLPClassLoader extends URLClassLoader {
         if (this.enableCodeBase) {
             enableCodeBase();
         }
+        classloaderPermissions = new ClassloaderPermissions();
 
-        this.securityDelegate = new SecurityDelegateImpl(this);
+        this.securityDelegate = new SecurityDelegateImpl(this, classloaderPermissions);
 
         this.mainClass = getMainClass(mainName);
         // initialize extensions
@@ -323,7 +324,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
         initializeResources();
 
-        classloaderPermissions = new ClassloaderPermissions();
 
         // initialize permissions
         classloaderPermissions.initializeReadJarPermissions(resources, tracker);
@@ -1057,10 +1057,6 @@ public class JNLPClassLoader extends URLClassLoader {
             LOG.error("Failed to get permissions", ex);
             throw ex;
         }
-    }
-
-    public void addPermission(Permission p) {
-        classloaderPermissions.addRuntimePermission(p);
     }
 
     /**

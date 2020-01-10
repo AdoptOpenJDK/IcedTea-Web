@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.runtime.classloader;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -11,8 +10,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
 
 import java.net.URL;
 import java.security.Permission;
@@ -32,8 +29,11 @@ public class SecurityDelegateImpl implements SecurityDelegate {
     private boolean runInSandbox;
     private boolean promptedForPartialSigning;
 
-    SecurityDelegateImpl(final JNLPClassLoader classLoader) {
+    private final ClassloaderPermissions classloaderPermissions;
+
+    SecurityDelegateImpl(final JNLPClassLoader classLoader, final ClassloaderPermissions classloaderPermissions) {
         this.classLoader = classLoader;
+        this.classloaderPermissions = classloaderPermissions;
         runInSandbox = false;
     }
 
@@ -155,14 +155,10 @@ public class SecurityDelegateImpl implements SecurityDelegate {
         return this.runInSandbox;
     }
 
-    void addPermission(final Permission perm) {
-        classLoader.addPermission(perm);
-    }
-
     @Override
     public void addPermissions(final Collection<Permission> perms) {
         for (final Permission perm : perms) {
-            addPermission(perm);
+            classloaderPermissions.addRuntimePermission(perm);
         }
     }
 
