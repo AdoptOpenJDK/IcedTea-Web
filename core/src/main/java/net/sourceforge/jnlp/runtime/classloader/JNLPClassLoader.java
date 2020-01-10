@@ -317,7 +317,7 @@ public class JNLPClassLoader extends URLClassLoader {
         jcv = new JarCertVerifier(verifier);
 
         if (this.enableCodeBase) {
-            addToCodeBaseLoader(this.file.getCodeBase());
+            enableCodeBase();
         }
 
         this.securityDelegate = new SecurityDelegateImpl(this);
@@ -1878,13 +1878,6 @@ public class JNLPClassLoader extends URLClassLoader {
         synchronized (getUniqueKeyLock(file.getUniqueKey())) {
             useCount++;
         }
-    }
-
-    /**
-     * Returns all loaders that this loader uses, including itself
-     */
-    JNLPClassLoader[] getLoaders() {
-        return loaders;
     }
 
     /**
