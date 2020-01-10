@@ -156,7 +156,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * the permissions for the cached jar files
      */
-    private final List<Permission> resourcePermissions;
+    private final List<Permission> resourcePermissions = new ArrayList<>();
 
     /**
      * the app
@@ -333,7 +333,6 @@ public class JNLPClassLoader extends URLClassLoader {
                 mainClass = entryPoint.getMainClass();
             }
         }
-        resourcePermissions = new ArrayList<>();
 
         // initialize extensions
         initializeExtensions();
