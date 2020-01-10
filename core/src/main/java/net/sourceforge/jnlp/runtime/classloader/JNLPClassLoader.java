@@ -95,10 +95,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.jar.Attributes.Name.MAIN_CLASS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
@@ -313,8 +315,6 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.nativeLibraryStorage = new NativeLibraryStorage(tracker);
 
-        this.mainClass = mainName;
-
         this.enableCodeBase = enableCodeBase;
 
         final AppVerifier verifier = new JNLPAppVerifier();
@@ -327,13 +327,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.securityDelegate = new SecurityDelegateImpl(this);
 
-        if (mainClass == null) {
-            final EntryPoint entryPoint = file.getEntryPointDesc();
-            if (entryPoint instanceof ApplicationDesc || entryPoint instanceof AppletDesc) {
-                mainClass = entryPoint.getMainClass();
-            }
-        }
-
+        this.mainClass = getMainClass(mainName);
         // initialize extensions
         initializeExtensions();
 
@@ -344,6 +338,19 @@ public class JNLPClassLoader extends URLClassLoader {
 
         installShutdownHooks();
 
+    }
+
+    private String getMainClass(String mainName) throws LaunchException {
+        if (mainName != null) {
+            return mainName;
+        }
+
+        final String fromEntryPoint = getMainClassFromEntryPoint();
+        if (fromEntryPoint != null) {
+            return fromEntryPoint;
+        }
+
+        return null;
     }
 
     /**
@@ -644,6 +651,27 @@ public class JNLPClassLoader extends URLClassLoader {
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }
 
+        if (mainClass == null) {
+            final List<JARDesc> mainJars = file.getJnlpResources().getJARs().stream()
+                    .filter(JARDesc::isMain)
+                    .collect(Collectors.toList());
+            if (mainJars.size() == 1) {
+                final JARDesc jarDesc = mainJars.get(0);
+                final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
+                if (fromManifest != null) {
+                    mainClass = fromManifest;
+                }
+            } else if (mainJars.size() == 0) {
+                final JARDesc jarDesc = file.getJnlpResources().getJARs().get(0);
+                final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
+                if (fromManifest != null) {
+                    mainClass = fromManifest;
+                }
+            }
+
+            throw new LaunchException("could not find main class");
+        }
+
         //If there are no eager jars, initialize the first jar
         if (initialJars.isEmpty()) {
             initialJars.add(jars[0]);
@@ -797,6 +825,14 @@ public class JNLPClassLoader extends URLClassLoader {
         return codebase;
     }
 
+    private String getMainClassFromEntryPoint() {
+        final EntryPoint entryPoint = file.getEntryPointDesc();
+        if (entryPoint instanceof ApplicationDesc || entryPoint instanceof AppletDesc) {
+            return entryPoint.getMainClass();
+        }
+        return null;
+    }
+
     /**
      * *
      * Checks for the jar that contains the main class. If the main class was
@@ -808,18 +844,8 @@ public class JNLPClassLoader extends URLClassLoader {
      *                         jar, fails to be verified or does not match
      */
     private void checkForMain(List<JARDesc> jars) throws LaunchException {
-
-        // Check launch info
         if (mainClass == null) {
-            final EntryPoint entryPoint = file.getEntryPointDesc();
-            if (entryPoint != null) {
-                mainClass = entryPoint.getMainClass();
-            }
-        }
-
-        // The main class may be specified in the manifest
-        if (mainClass == null) {
-            mainClass = ManifestAttributesReader.getAttributeFromJars(Attributes.Name.MAIN_CLASS, jars, tracker);
+            throw new LaunchException("no main class found");
         }
 
         final String desiredJarEntryName = mainClass + ".class";
