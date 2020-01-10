@@ -669,7 +669,10 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             throw new LaunchException("could not find main class");
+
         }
+
+        file.getManifestAttributesReader().setMainClass(mainClass);
 
         //If there are no eager jars, initialize the first jar
         if (initialJars.isEmpty()) {
@@ -807,7 +810,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void initializeManifestAttributesChecker() {
         if (mac == null) {
-            file.getManifestAttributesReader().setLoader(this);
+            file.getManifestAttributesReader().setTracker(tracker);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
         }
     }
