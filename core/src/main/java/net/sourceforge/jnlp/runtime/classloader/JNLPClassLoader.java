@@ -402,7 +402,7 @@ public class JNLPClassLoader extends URLClassLoader {
         // the user was already shown a CertWarning dialog and has chosen to run the applet sandboxed.
         // This means they've already agreed to running the applet and have specified with which
         // permission level to do it!
-        if (loader.getSigningState() == SigningState.PARTIAL) {
+        if (loader.signing == SigningState.PARTIAL) {
             loader.securityDelegate.promptUserOnPartialSigning();
         }
 
@@ -958,7 +958,7 @@ public class JNLPClassLoader extends URLClassLoader {
             return;
         }
 
-        if (getSigningState() == SigningState.FULL && jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
+        if (signing == SigningState.FULL && jcv.isFullySigned() && !jcv.getAlreadyTrustPublisher()) {
             jcv.checkTrustWithUser(securityDelegate, file);
         }
     }
@@ -1761,10 +1761,6 @@ public class JNLPClassLoader extends URLClassLoader {
                         + "which the user refused", e);
             }
         }
-    }
-
-    private SigningState getSigningState() {
-        return signing;
     }
 
     public SecurityDesc getSecurity() {
