@@ -1917,7 +1917,22 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param version of jar to be downloaded
      */
     void initializeNewJarDownload(final URL ref, final String part, final VersionString version) {
-        final JARDesc[] jars = ManageJnlpResources.findJars(this, ref, part, version);
+        JARDesc[] jars;
+        final JNLPClassLoader foundLoader = LocateJnlpClassLoader.getLoaderByJnlpFile(this, ref);
+
+        if (foundLoader != null) {
+            final List<JARDesc> foundJars = new ArrayList<>();
+            final ResourcesDesc resources1 = foundLoader.getJNLPFile().getResources();
+
+            for (final JARDesc aJar : resources1.getJARs(part)) {
+                if (Objects.equals(version, aJar.getVersion()))
+                    foundJars.add(aJar);
+            }
+
+            jars = foundJars.toArray(new JARDesc[foundJars.size()]);
+        } else {
+            jars = new JARDesc[]{};
+        }
 
         for (JARDesc eachJar : jars) {
             LOG.info("Downloading and initializing jar: {}", eachJar.getLocation().toString());
