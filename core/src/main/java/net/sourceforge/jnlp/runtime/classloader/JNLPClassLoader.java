@@ -2066,7 +2066,6 @@ public class JNLPClassLoader extends URLClassLoader {
         return mainClass;
     }
 
-
     public ResourceTracker getTracker() {
         return tracker;
     }

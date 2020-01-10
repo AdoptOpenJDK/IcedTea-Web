@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -78,19 +77,19 @@ public class JNLPPolicy extends Policy {
     /**
      * the system level policy for jnlps
      */
-    private Policy systemJnlpPolicy = null;
+    private Policy systemJnlpPolicy;
 
     /**
      * the user-level policy for jnlps
      */
-    private Policy userJnlpPolicy = null;
+    private Policy userJnlpPolicy;
 
     protected JNLPPolicy() {
         shellSource = JNLPPolicy.class.getProtectionDomain().getCodeSource();
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
         systemPolicy = Policy.getPolicy();
 
-        systemJnlpPolicy = getPolicyFromConfig(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
+        systemJnlpPolicy = getSystemSecurityPolicyFromConfig();
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
         String jre = JavaSystemProperties.getJavaHome();
@@ -112,8 +111,8 @@ public class JNLPPolicy extends Policy {
         // if we check the SecurityDesc here then keep in mind that
         // code can add properties at runtime to the ResourcesDesc!
         if (JNLPRuntime.getApplication() != null) {
-            if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
-                JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+            if (JNLPRuntime.getApplication().getClassLoader() != null) {
+                JNLPClassLoader cl = JNLPRuntime.getApplication().getClassLoader();
 
                 PermissionCollection clPermissions = cl.getPermissions(source);
 
@@ -213,12 +212,11 @@ public class JNLPPolicy extends Policy {
     /**
      * Constructs a delegate policy based on a config setting
      *
-     * @param key a KEY_* in DeploymentConfiguration
      * @return a policy based on the configuration set by the user
      */
-    private Policy getPolicyFromConfig(String key) {
+    private Policy getSystemSecurityPolicyFromConfig() {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-        String policyLocation = config.getProperty(key);
+        String policyLocation = config.getProperty(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
         return getPolicyFromUrl(policyLocation);
     }
 
@@ -240,7 +238,7 @@ public class JNLPPolicy extends Policy {
                 }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Failed to get policy from url " + policyLocation, e);
             }
         }
         return policy;
