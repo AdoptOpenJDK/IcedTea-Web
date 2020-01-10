@@ -803,7 +803,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws LaunchException Thrown if the signed JNLP file, within the main
      *                         jar, fails to be verified or does not match
      */
-    void checkForMain(List<JARDesc> jars) throws LaunchException {
+    private void checkForMain(List<JARDesc> jars) throws LaunchException {
 
         // Check launch info
         if (mainClass == null) {

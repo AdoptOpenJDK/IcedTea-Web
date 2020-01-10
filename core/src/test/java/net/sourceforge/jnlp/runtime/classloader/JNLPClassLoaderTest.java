@@ -169,23 +169,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         assertNoFileLeak(() -> assertNull(jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
     }
 
-    /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
-    @Test
-    public void checkForMainFileLeakTest() throws Exception {
-        File jarLocation = createJarWithoutContent();
-
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-        assertNoFileLeak(() -> {
-            try {
-                classLoader.checkForMain(asList(jnlpFile.getJarDesc()));
-            } catch (LaunchException e) {
-                fail(e.toString());
-            }
-        });
-        assertFalse(classLoader.hasMainJar());
-    }
-
     @Test
     public void getCustomAttributes() throws Exception {
         File tempDirectory = temporaryFolder.newFolder();
