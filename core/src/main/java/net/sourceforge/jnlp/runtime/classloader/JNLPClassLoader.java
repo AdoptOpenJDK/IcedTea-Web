@@ -366,7 +366,7 @@ public class JNLPClassLoader extends URLClassLoader {
          * there is one). Other classloaders (parent, peers) will all
          * cleanup things they created
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> nativeLibraryStorage.cleanupTemporaryFolder()));
+        Runtime.getRuntime().addShutdownHook(new Thread(nativeLibraryStorage::cleanupTemporaryFolder));
     }
 
     private void setSecurity() throws LaunchException {
@@ -1042,6 +1042,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * Returns the permissions for the CodeSource.
      */
+    @SuppressWarnings("ConstantConditions")
     @Override
     public PermissionCollection getPermissions(CodeSource cs) {
         try {
