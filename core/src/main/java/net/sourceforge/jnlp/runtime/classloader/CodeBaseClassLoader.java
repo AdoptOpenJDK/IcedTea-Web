@@ -14,8 +14,6 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * ...
- */ /*
  * Helper class to expose protected URLClassLoader methods.
  * Classes loaded from the codebase are absolutely NOT signed, by definition!
  * If the CodeBaseClassLoader is used to load any classes in JNLPClassLoader,
@@ -58,7 +56,7 @@ public class CodeBaseClassLoader extends URLClassLoader {
         try {
             return AccessController.doPrivileged(
                     (PrivilegedExceptionAction<Class<?>>) () -> {
-                        Class<?> c = CodeBaseClassLoader.super.findClass(name);
+                        Class<?> c = super.findClass(name);
                         parentJNLPClassLoader.checkPartialSigningWithUser();
                         return c;
                     }, parentJNLPClassLoader.getAccessControlContextForClassLoading());
@@ -139,7 +137,7 @@ public class CodeBaseClassLoader extends URLClassLoader {
             try {
                 final String fName = name;
                 url = AccessController.doPrivileged(
-                        (PrivilegedExceptionAction<URL>) () -> CodeBaseClassLoader.super.findResource(fName), parentJNLPClassLoader.getAccessControlContextForClassLoading());
+                        (PrivilegedExceptionAction<URL>) () -> super.findResource(fName), parentJNLPClassLoader.getAccessControlContextForClassLoading());
             } catch (PrivilegedActionException ignored) {
             }
 

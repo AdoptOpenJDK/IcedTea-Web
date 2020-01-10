@@ -16,12 +16,8 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.classloader.ManageJnlpResources;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
@@ -35,14 +31,6 @@ import java.net.URL;
  * @version $Revision: 1.7 $
  */
 class XDownloadService implements DownloadService {
-
-    /**
-     * Returns the {@link JNLPClassLoader} of the application
-     * @return the {@link JNLPClassLoader} of the application
-     */
-    JNLPClassLoader getClassLoader() {
-        return (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
-    }
 
     /**
      * Returns a listener that will automatically display download
@@ -59,19 +47,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String part) {
-        boolean allCached = true;
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
-
-        if (jars.length <= 0)
-            return false;
-
-        for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = Cache.isAnyCached(jars[i].getLocation(), resourceVersion);
-        }
-
-        return allCached;
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -98,17 +74,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isPartCached(final String part) {
-        boolean allCached = true;
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
-
-        if (jars.length <= 0)
-            return false;
-
-        for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = Cache.isAnyCached(jars[i].getLocation(), jars[i].getVersion());
-        }
-
-        return allCached;
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -136,7 +102,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isResourceCached(final URL ref, final String version) {
-        return ManageJnlpResources.isExternalResourceCached(this.getClassLoader(), ref, version);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -157,8 +123,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) throws IOException {
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        ManageJnlpResources.downloadJars(this.getClassLoader(), ref, part, resourceVersion);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -179,7 +144,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void loadPart(final String part, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.downloadJars(this.getClassLoader(), null, part, null);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -189,7 +154,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.loadExternalResourceToCache(this.getClassLoader(), ref, version);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -200,9 +165,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removeExtensionPart(final URL ref, final String version, final String part) throws IOException {
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), ref, jars);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -225,8 +188,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removePart(final String part) throws IOException {
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), null, jars);
+        throw new RuntimeException("Not implemented yet!");
     }
 
     /**
@@ -249,6 +211,6 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removeResource(final URL ref, final String version) throws IOException {
-        ManageJnlpResources.removeExternalCachedResource(this.getClassLoader(), ref, version);
+        throw new RuntimeException("Not implemented yet!");
     }
 }

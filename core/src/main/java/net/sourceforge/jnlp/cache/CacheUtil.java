@@ -17,12 +17,7 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -30,24 +25,19 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
 
@@ -226,100 +216,5 @@ public class CacheUtil {
         return hexString.toString();
     }
 
-    /**
-     * Waits until the resources are downloaded, while showing a
-     * progress indicator.
-     * @param jnlpClassLoader the classloader
-     * @param tracker   the resource tracker
-     * @param resources the resources to wait for
-     * @param title     name of the download
-     */
-    public static void waitForResources(final JNLPClassLoader jnlpClassLoader, final ResourceTracker tracker, final URL[] resources, final String title) {
-        final DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
-        DownloadServiceListener listener = null;
 
-        try {
-            if (indicator == null) {
-                tracker.waitForResources(resources);
-                return;
-            }
-
-            // see if resources can be downloaded very quickly; avoids
-            // overhead of creating display components for the resources
-            if (tracker.waitForResources(resources, indicator.getInitialDelay(), MILLISECONDS)) {
-                return;
-            }
-
-            // only resources not starting out downloaded are displayed
-            final List<URL> urlList = new ArrayList<>();
-            for (URL url : resources) {
-                if (!tracker.checkResource(url))
-                    urlList.add(url);
-            }
-            final URL[] undownloaded = urlList.toArray(new URL[0]);
-
-            listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
-
-            do {
-                long read = 0;
-                long total = 0;
-
-                for (URL url : undownloaded) {
-                    // add in any -1's; they're insignificant
-                    total += tracker.getTotalSize(url);
-                    read += tracker.getAmountRead(url);
-                }
-
-                int percent = (int) ((100 * read) / Math.max(1, total));
-
-                for (URL url : undownloaded) {
-                    listener.progress(url, "version",
-                            tracker.getAmountRead(url),
-                            tracker.getTotalSize(url),
-                            percent);
-                }
-            } while (!tracker.waitForResources(resources, indicator.getUpdateRate(), MILLISECONDS));
-
-            // make sure they read 100% until indicator closes
-            for (URL url : undownloaded) {
-                listener.progress(url, "version",
-                        tracker.getTotalSize(url),
-                        tracker.getTotalSize(url),
-                        100);
-            }
-        } catch (InterruptedException ex) {
-            LOG.error("Downloading of resources was interrupted", ex);
-        } finally {
-            if (indicator != null && listener != null)
-                indicator.disposeListener(listener);
-        }
-    }
-
-    private static DownloadServiceListener getDownloadServiceListener(final JNLPClassLoader jnlpClassLoader, final String title, final URL[] undownloaded, final DownloadIndicator indicator) {
-        final EntryPoint entryPoint = jnlpClassLoader.getJNLPFile().getEntryPointDesc();
-        String progressClass = null;
-
-        if (entryPoint instanceof ApplicationDesc) {
-            final ApplicationDesc applicationDesc = (ApplicationDesc) entryPoint;
-            progressClass = applicationDesc.getProgressClass();
-        } else if (entryPoint instanceof AppletDesc) {
-            final AppletDesc appletDesc = (AppletDesc) entryPoint;
-            progressClass = appletDesc.getProgressClass();
-        } else if (entryPoint instanceof InstallerDesc) {
-            final InstallerDesc installerDesc = (InstallerDesc) entryPoint;
-            progressClass = installerDesc.getProgressClass();
-        }
-
-        if (progressClass != null) {
-            try {
-                final Class<?> downloadProgressIndicatorClass = jnlpClassLoader.loadClass(progressClass);
-                return (DownloadServiceListener) downloadProgressIndicatorClass.newInstance();
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-                LOG.warn(format("Could not load progress class '%s' specified in JNLP file, " +
-                        "use default download progress indicator instead.", progressClass), ex);
-            }
-        }
-
-        return indicator.getListener(title, undownloaded);
-    }
 }

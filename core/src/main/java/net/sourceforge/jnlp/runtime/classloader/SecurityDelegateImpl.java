@@ -2,12 +2,14 @@ package net.sourceforge.jnlp.runtime.classloader;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.PluginAppVerifier;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
@@ -35,6 +37,19 @@ public class SecurityDelegateImpl implements SecurityDelegate {
         runInSandbox = false;
     }
 
+    static void consultCertificateSecurityException(LaunchException ex) throws LaunchException {
+        if (isCertUnderestimated()) {
+            LOG.error("{} and {} are declared. Ignoring certificate issue", CommandLineOptions.NOSEC.getOption(), ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES);
+        } else {
+            throw ex;
+        }
+    }
+
+    private static boolean isCertUnderestimated() {
+        return Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ITW_IGNORECERTISSUES))
+                && !JNLPRuntime.isSecurityEnabled();
+    }
+
     boolean isPluginApplet() {
         return false;
     }
@@ -45,23 +60,6 @@ public class SecurityDelegateImpl implements SecurityDelegate {
             return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
-        } else if (isPluginApplet()) {
-            try {
-                if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.getTracker())) {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.ALL_PERMISSIONS,
-                            codebaseHost);
-                } else {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebaseHost);
-                }
-            } catch (final Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            }
         } else {
             return classLoader.getJNLPFile().getSecurity();
         }
@@ -96,11 +94,11 @@ public class SecurityDelegateImpl implements SecurityDelegate {
                     && !classLoader.getJNLPFile().getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
                 if (classLoader.jcv.allJarsSigned()) {
                     LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
-                    JNLPClassLoader.consultCertificateSecurityException(ex);
+                    consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 } else {
                     LaunchException ex = new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
-                    JNLPClassLoader.consultCertificateSecurityException(ex);
+                    consultCertificateSecurityException(ex);
                     return consultResult(codebaseHost);
                 }
             } else return consultResult(codebaseHost);

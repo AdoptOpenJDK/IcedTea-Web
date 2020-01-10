@@ -23,17 +23,20 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;
 import java.awt.Window;
+import java.io.File;
 import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.jar.Attributes;
 
 /**
  * Represents a running instance of an application described in a
@@ -135,7 +138,6 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final JNLPClassLoader loader = this.loader;
             final SecurityDesc s = loader.getSecurity();
             final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
@@ -248,15 +250,22 @@ public class ApplicationInstance {
     }
 
     public String getMainClassName() throws IOException {
-        String mainName = file.getApplication().getMainClass();
+        final String mainName = file.getApplication().getMainClass();
 
         // When the application-desc field is empty, we should take a
         // look at the main jar for the main class.
-        if (mainName == null) {
-            mainName = getClassLoader().getMainClassNameFromManifest(file.getResources().getMainJAR());
+        if (mainName != null) {
+            return mainName;
         }
 
-        return mainName;
+        final File f = loader.getTracker().getCacheFile(file.getResources().getMainJAR().getLocation());
+        if (f != null) {
+            try (final JarFile mainJar = new JarFile(f)) {
+                return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            }
+        }
+
+        return null;
     }
 
     /**
