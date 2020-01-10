@@ -60,23 +60,6 @@ public class SecurityDelegateImpl implements SecurityDelegate {
             return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
-        } else if (isPluginApplet()) {
-            try {
-                if (JarCertVerifier.isJarSigned(jarDesc, new PluginAppVerifier(), classLoader.getTracker())) {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.ALL_PERMISSIONS,
-                            codebaseHost);
-                } else {
-                    return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                            SecurityDesc.SANDBOX_PERMISSIONS,
-                            codebaseHost);
-                }
-            } catch (final Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                return new SecurityDesc(classLoader.getJNLPFile(), AppletPermissionLevel.NONE,
-                        SecurityDesc.SANDBOX_PERMISSIONS,
-                        codebaseHost);
-            }
         } else {
             return classLoader.getJNLPFile().getSecurity();
         }
