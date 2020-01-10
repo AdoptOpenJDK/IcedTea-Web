@@ -830,18 +830,16 @@ public class JNLPClassLoader extends URLClassLoader {
                     continue; // JAR not found. Keep going.
                 }
 
-                final JarFile jarFile = new JarFile(localFile);
-
-                for (JarEntry entry : Collections.list(jarFile.entries())) {
-                    String jeName = entry.getName().replaceAll("/", ".");
-                    if (jeName.equals(desiredJarEntryName)) {
-                        foundMainJar = true;
-                        verifySignedJNLP(jarFile);
-                        break;
+                try (final JarFile jarFile = new JarFile(localFile)) {
+                    for (JarEntry entry : Collections.list(jarFile.entries())) {
+                        String jeName = entry.getName().replaceAll("/", ".");
+                        if (jeName.equals(desiredJarEntryName)) {
+                            foundMainJar = true;
+                            verifySignedJNLP(jarFile);
+                            break;
+                        }
                     }
                 }
-
-                jarFile.close();
             } catch (IOException e) {
                 /*
                  * After this exception is caught, it is escaped. This will skip
@@ -2070,8 +2068,9 @@ public class JNLPClassLoader extends URLClassLoader {
     public String getMainClassNameFromManifest(JARDesc mainJarDesc) throws IOException {
         final File f = tracker.getCacheFile(mainJarDesc.getLocation());
         if (f != null) {
-            final JarFile mainJar = new JarFile(f);
-            return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            try (final JarFile mainJar = new JarFile(f)) {
+                return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            }
         }
         return null;
     }
