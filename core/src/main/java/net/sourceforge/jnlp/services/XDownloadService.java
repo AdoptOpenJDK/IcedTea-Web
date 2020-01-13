@@ -16,9 +16,6 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
-
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
 import java.io.IOException;
@@ -35,6 +32,7 @@ class XDownloadService implements DownloadService {
     /**
      * Returns a listener that will automatically display download
      * progress to the user.
+     *
      * @return always {@code null}
      */
     public DownloadServiceListener getDefaultProgressWindow() {

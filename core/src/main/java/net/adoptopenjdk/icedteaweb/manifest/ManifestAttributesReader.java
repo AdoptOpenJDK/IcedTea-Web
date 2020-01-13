@@ -23,7 +23,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.util.ClasspathMatcher;
 import net.sourceforge.jnlp.util.JarFile;
 
@@ -47,18 +46,21 @@ public class ManifestAttributesReader {
     private final static Logger LOG = LoggerFactory.getLogger(ManifestAttributesReader.class);
 
     private final JNLPFile jnlpFile;
-    private JNLPClassLoader loader;
+
+    private ResourceTracker tracker;
+
+    private String mainClass;
 
     public ManifestAttributesReader(final JNLPFile jnlpFile) {
         this.jnlpFile = jnlpFile;
     }
 
-    public void setLoader(JNLPClassLoader loader) {
-        this.loader = loader;
+    public void setTracker(final ResourceTracker tracker) {
+        this.tracker = tracker;
     }
 
-    public boolean isLoader() {
-        return loader != null;
+    public void setMainClass(final String mainClass) {
+        this.mainClass = mainClass;
     }
 
     /**
@@ -67,11 +69,7 @@ public class ManifestAttributesReader {
      * @return main-class as it is specified in application
      */
     public String getMainClass(){
-        if (loader == null) {
-            LOG.debug("Jars not ready to provide main class");
-            return null;
-        }
-        return loader.getMainClass();
+        return mainClass;
     }
 
     /**
@@ -201,11 +199,11 @@ public class ManifestAttributesReader {
      * @return  plain attribute value
      */
     public String getAttribute(final Name name) {
-        if (loader == null) {
+        if (tracker == null) {
             LOG.debug("Jars not ready to provide attribute {}", name);
             return null;
         }
-        return getAttributeFromJars(name, Arrays.asList(jnlpFile.getResources().getJARs()), loader.getTracker());
+        return getAttributeFromJars(name, Arrays.asList(jnlpFile.getResources().getJARs()), tracker);
     }
 
     private ManifestBoolean getBooleanAttribute(final String name) throws IllegalArgumentException {

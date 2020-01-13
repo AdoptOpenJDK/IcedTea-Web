@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.util.JarFile;
@@ -81,13 +82,15 @@ public class ApplicationInstance {
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
      * @param file jnlpfile for which the instance do exists
-     * @param group thread group to which it belongs
-     * @param loader loader for this application
      */
-    public ApplicationInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader) {
+    public ApplicationInstance(JNLPFile file, boolean enableCodeBase) throws LaunchException {
         this.file = file;
-        this.group = group;
-        this.loader = loader;
+        this.group = Thread.currentThread().getThreadGroup();
+        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase);
+        if(enableCodeBase) {
+            this.loader.enableCodeBase();
+        }
+        loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
     }

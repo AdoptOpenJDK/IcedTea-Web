@@ -15,8 +15,6 @@
 package net.sourceforge.jnlp.runtime.classloader;
 
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
-import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -59,7 +57,6 @@ import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -93,7 +90,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,7 +100,6 @@ import static java.util.jar.Attributes.Name.MAIN_CLASS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
-import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 /**
  * Classloader that takes it's resources from a JNLP file. If the JNLP file
@@ -117,6 +112,7 @@ import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
  * @version $Revision: 1.20 $
  */
 public class JNLPClassLoader extends URLClassLoader {
+
 
     private static final Logger LOG = LoggerFactory.getLogger(JNLPClassLoader.class);
 
@@ -155,10 +151,6 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     private final AccessControlContext acc = AccessController.getContext();
 
-    /**
-     * the permissions for the cached jar files
-     */
-    private final List<Permission> resourcePermissions = new ArrayList<>();
 
     /**
      * the app
@@ -199,11 +191,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * the security section
      */
     private SecurityDesc security;
-
-    /**
-     * Permissions granted by the user during runtime.
-     */
-    private final ArrayList<Permission> runtimePermissions = new ArrayList<>();
 
     /**
      * all jars not yet part of classloader or active Synchronized since this
@@ -280,7 +267,10 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private ManifestAttributesChecker mac;
 
+    private final ClassloaderPermissions classloaderPermissions;
+
     /**
+     *
      * Create a new JNLPClassLoader from the specified file.
      *
      * @param file   the JNLP file
@@ -324,8 +314,9 @@ public class JNLPClassLoader extends URLClassLoader {
         if (this.enableCodeBase) {
             enableCodeBase();
         }
+        classloaderPermissions = new ClassloaderPermissions();
 
-        this.securityDelegate = new SecurityDelegateImpl(this);
+        this.securityDelegate = new SecurityDelegateImpl(this, classloaderPermissions);
 
         this.mainClass = getMainClass(mainName);
         // initialize extensions
@@ -333,8 +324,9 @@ public class JNLPClassLoader extends URLClassLoader {
 
         initializeResources();
 
+
         // initialize permissions
-        initializeReadJarPermissions();
+        classloaderPermissions.initializeReadJarPermissions(resources, tracker);
 
         installShutdownHooks();
 
@@ -560,48 +552,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Make permission objects for the classpath.
-     */
-    private void initializeReadJarPermissions() {
-
-        JARDesc[] jars = resources.getJARs();
-        for (JARDesc jar : jars) {
-            Permission p = getReadPermission(jar);
-
-            if (p == null) {
-                LOG.info("Unable to add permission for {}", jar.getLocation());
-            } else {
-                resourcePermissions.add(p);
-                LOG.info("Permission added: {}", p.toString());
-            }
-        }
-    }
-
-    private Permission getReadPermission(JARDesc jar) {
-        final URL location = jar.getLocation();
-
-        if (CacheUtil.isCacheable(location)) {
-            final File cacheFile = tracker.getCacheFile(location);
-            if (cacheFile != null) {
-                return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
-            } else {
-                LOG.debug("No cache file for cacheable resource '{}' found.", location);
-                return null;
-            }
-        } else {
-            // this is what URLClassLoader does
-            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
-                return conn.getPermission();
-            } catch (IOException ioe) {
-                LOG.error("Exception while retrieving permissions from connection to " + location, ioe);
-            }
-        }
-
-        // should try to figure out the permission
-        return null;
-    }
-
-    /**
      * Load all of the JARs used in this JNLP file into the ResourceTracker for
      * downloading.
      */
@@ -669,6 +619,8 @@ public class JNLPClassLoader extends URLClassLoader {
                 }
             }
         }
+
+        file.getManifestAttributesReader().setMainClass(mainClass);
 
         //If there are no eager jars, initialize the first jar
         if (initialJars.isEmpty()) {
@@ -806,7 +758,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private void initializeManifestAttributesChecker() {
         if (mac == null) {
-            file.getManifestAttributesReader().setLoader(this);
+            file.getManifestAttributesReader().setTracker(tracker);
             mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
         }
     }
@@ -1017,7 +969,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * @return the JNLP app for this classloader
      */
-    public ApplicationInstance getApplication() {
+    ApplicationInstance getApplication() {
         return app;
     }
 
@@ -1078,12 +1030,12 @@ public class JNLPClassLoader extends URLClassLoader {
             }
 
             // add in permission to read the cached JAR files
-            for (Permission perm : resourcePermissions) {
+            for (Permission perm : classloaderPermissions.getResourcePermissions()) {
                 result.add(perm);
             }
 
             // add in the permissions that the user granted.
-            for (Permission perm : runtimePermissions) {
+            for (Permission perm : classloaderPermissions.getRuntimePermissions()) {
                 result.add(perm);
             }
 
@@ -1098,10 +1050,6 @@ public class JNLPClassLoader extends URLClassLoader {
             LOG.error("Failed to get permissions", ex);
             throw ex;
         }
-    }
-
-    public void addPermission(Permission p) {
-        runtimePermissions.add(p);
     }
 
     /**
@@ -1595,14 +1543,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 updatePolicy
         );
 
-        // Give read permissions to the cached jar file
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            Permission p = getReadPermission(desc);
-
-            resourcePermissions.add(p);
-
-            return null;
-        });
+        classloaderPermissions.addForJar(desc, tracker);
 
         final URL remoteURL = desc.getLocation();
         final URL cachedUrl = tracker.getCacheURL(remoteURL); // blocks till download
@@ -2060,7 +2001,7 @@ public class JNLPClassLoader extends URLClassLoader {
         PermissionCollection permissions = this.security.getSandBoxPermissions();
 
         // Local cache access permissions
-        for (Permission resourcePermission : resourcePermissions) {
+        for (Permission resourcePermission : classloaderPermissions.getResourcePermissions()) {
             permissions.add(resourcePermission);
         }
 

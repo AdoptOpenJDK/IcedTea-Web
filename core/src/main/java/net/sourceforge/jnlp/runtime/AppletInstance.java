@@ -20,7 +20,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.LaunchException;
 
 import java.applet.Applet;
 import java.awt.Container;
@@ -50,16 +50,23 @@ public class AppletInstance extends ApplicationInstance {
     /**
      * Create a New Task based on the Specified URL
      * @param file pluginbridge to build instance on
-     * @param group thread group of this instance
-     * @param loader classloader for this instance
-     * @param applet applet of this instance
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet) {
-        super(file, group, loader);
+    public AppletInstance(JNLPFile file) throws LaunchException {
+        this(file, null);
+    }
 
-        this.applet = applet;
-
-        this.environment = new AppletEnvironment(file, this);
+    /**
+     * Create a New Task based on the Specified URL
+     * @param file pluginbridge to build instance on
+     * @param cont Container where to place applet
+     */
+    public AppletInstance(JNLPFile file, Container cont) throws LaunchException {
+        super(file, true);
+        if(cont != null) {
+            this.environment = new AppletEnvironment(file, this, cont);
+        } else {
+            this.environment = new AppletEnvironment(file, this);
+        }
     }
 
     /**
@@ -74,19 +81,7 @@ public class AppletInstance extends ApplicationInstance {
         this.applet = applet;
     }
 
-    /**
-     * Create a New Task based on the Specified URL
-     * @param file pluginbridge to build instance on
-     * @param group thread group of this instance
-     * @param loader classloader for this instance
-     * @param applet applet of this instance
-     * @param cont Container where to place applet
-     */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, Container cont) {
-        super(file, group, loader);
-        this.applet = applet;
-        this.environment = new AppletEnvironment(file, this, cont);
-    }
+
 
     /**
      * Sets whether the applet is resizable or not.  Applets default
