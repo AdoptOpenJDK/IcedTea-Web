@@ -35,6 +35,7 @@ import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoaderUtil;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -595,27 +596,6 @@ public class JNLPRuntime {
     }
 
     /**
-     * Set a class that can exit the JVM; if not set then any class
-     * can exit the JVM.
-     *
-     * @param exitClass a class that can exit the JVM
-     * @throws IllegalStateException if caller is not the exit class
-     */
-    public static void setExitClass(Class<?> exitClass) {
-        checkExitClass();
-        security.setExitClass(exitClass);
-    }
-
-    /**
-     * Disables applets from calling exit.
-     *
-     * Once disabled, exit cannot be re-enabled for the duration of the JVM instance
-     */
-    public static void disableExit() {
-        security.disableExit();
-    }
-
-    /**
      * @return the current Application, or null if none can be
      * determined.
      */
@@ -643,7 +623,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDebug(boolean enabled) {
-        checkExitClass();
         debug = enabled;
     }
 
@@ -655,7 +634,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultUpdatePolicy(UpdatePolicy policy) {
-        checkExitClass();
         updatePolicy = policy;
     }
 
@@ -671,7 +649,6 @@ public class JNLPRuntime {
      * @param handler default handler
      */
     public static void setDefaultLaunchHandler(LaunchHandler handler) {
-        checkExitClass();
         JNLPRuntime.handler = handler;
     }
 
@@ -690,7 +667,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultDownloadIndicator(DownloadIndicator indicator) {
-        checkExitClass();
         JNLPRuntime.indicator = indicator;
     }
 
@@ -723,16 +699,6 @@ public class JNLPRuntime {
     private static void checkInitialized() {
         if (initialized)
             throw new IllegalStateException("JNLPRuntime already initialized.");
-    }
-
-    /**
-     * Throws an exception if called with security enabled but a caller is not
-     * the exit class and the runtime has been initialized.
-     */
-    private static void checkExitClass() {
-        if (securityEnabled && initialized)
-            if (!security.isExitClass())
-                throw new IllegalStateException("Caller is not the exit class");
     }
 
     /**

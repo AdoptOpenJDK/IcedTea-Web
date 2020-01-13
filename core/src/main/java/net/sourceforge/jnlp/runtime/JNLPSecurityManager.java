@@ -24,7 +24,6 @@ import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
 import java.awt.Window;
-import java.security.AccessControlException;
 import java.security.Permission;
 
 /**
@@ -78,17 +77,6 @@ class JNLPSecurityManager extends SecurityManager {
     // in java.lang.System with the same names.
 
     /**
-     * only class that can exit the JVM, if set
-     */
-    private Object exitClass = null;
-
-    /**
-     * this exception prevents exiting the JVM
-     */
-    private SecurityException closeAppEx = // making here prevents huge stack traces
-            new SecurityException("This exception to prevent shutdown of JVM, but the process has been terminated.");
-
-    /**
      * weak list of windows created
      */
     private WeakList<Window> weakWindows = new WeakList<>();
@@ -97,11 +85,6 @@ class JNLPSecurityManager extends SecurityManager {
      * weak list of applications corresponding to window list
      */
     private WeakList<ApplicationInstance> weakApplications = new WeakList<>();
-
-    /**
-     * Sets whether or not exit is allowed (in the context of the plugin, this is always false)
-     */
-    private boolean exitAllowed = true;
 
     /**
      * Creates a JNLP SecurityManager.
@@ -118,47 +101,6 @@ class JNLPSecurityManager extends SecurityManager {
         }
 
         AppContext.getAppContext();
-    }
-
-    /**
-     * Returns whether the exit class is present on the stack, or
-     * true if no exit class is set.
-     */
-    public boolean isExitClass() {
-        return isExitClass(getClassContext());
-    }
-
-    /**
-     * Returns whether the exit class is present on the stack, or
-     * true if no exit class is set.
-     */
-    private boolean isExitClass(Class<?>[] stack) {
-        if (exitClass == null) {
-            return true;
-        }
-
-        for (Class<?> aClass : stack) {
-            if (aClass == exitClass) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Set the exit class, which is the only class that can exit the
-     * JVM; if not set then any class can exit the JVM.
-     *
-     * @param exitClass the exit class
-     * @throws IllegalStateException if the exit class is already set
-     */
-    public void setExitClass(Class<?> exitClass) throws IllegalStateException {
-        if (this.exitClass != null) {
-            throw new IllegalStateException("Exit class already set and caller is not exit class.");
-        }
-
-        this.exitClass = exitClass;
     }
 
     /**
@@ -238,89 +180,5 @@ class JNLPSecurityManager extends SecurityManager {
             LOG.debug("Denying permission: {}", perm);
             throw ex;
         }
-    }
-
-    /**
-     * Checks whether the window can be displayed without an applet
-     * warning banner, and adds the window to the list of windows to
-     * be disposed when the calling application exits.
-     */
-    @Override
-    public boolean checkTopLevelWindow(Object window) {
-        ApplicationInstance app = getApplication();
-
-        // remember window -> application mapping for focus, close on exit
-        if (app != null && window instanceof Window) {
-            Window w = (Window) window;
-
-            LOG.debug("SM: app: {} is adding a window: {} with appContext {}", app.getTitle(), window, AppContext.getAppContext());
-
-            weakWindows.add(w); // for mapping window -> app
-            weakApplications.add(app);
-
-            app.addWindow(w);
-        }
-
-        // todo: set awt.appletWarning to custom message
-        // todo: logo on with glass pane on JFrame/JWindow?
-
-        return super.checkTopLevelWindow(window);
-    }
-
-    /**
-     * Checks whether the caller can exit the system. This method
-     * identifies whether the caller is a real call to Runtime.exec
-     * and has special behavior when returning from this method
-     * would exit the JVM and an exit class is set: if the caller is
-     * not the exit class then the calling application will be
-     * stopped and its resources destroyed (when possible), and an
-     * exception will be thrown to prevent the JVM from shutting
-     * down.
-     * <p>
-     * Calls not from Runtime.exit or with no exit class set will
-     * behave normally, and the exit class can always exit the JVM.
-     * </p>
-     */
-    @Override
-    public void checkExit(int status) {
-
-        // applets are not allowed to exit, but the plugin main class (primordial loader) is
-        Class<?>[] stack = getClassContext();
-        if (!exitAllowed) {
-            for (Class<?> aClass : stack) {
-                if (aClass.getClassLoader() != null) {
-                    throw new AccessControlException("Applets may not call System.exit()");
-                }
-            }
-        }
-
-        super.checkExit(status);
-
-        boolean realCall = (stack[1] == Runtime.class);
-
-        if (isExitClass(stack)) {
-            return;
-        } // to Runtime.exit or fake call to see if app has permission
-
-        // not called from Runtime.exit()
-        if (!realCall) {
-            // apps that can't exit should think they can exit normally
-            super.checkExit(status);
-            return;
-        }
-
-        // but when they really call, stop only the app instead of the JVM
-        ApplicationInstance app = JNLPClassLoaderUtil.getApplication(Thread.currentThread(), stack, 0);
-        if (app == null) {
-            throw new SecurityException("Cannot exit the JVM because the current application cannot be determined.");
-        }
-
-        app.destroy();
-
-        throw closeAppEx;
-    }
-
-    protected void disableExit() {
-        exitAllowed = false;
     }
 }
