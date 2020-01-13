@@ -206,7 +206,6 @@ public class JNLPFile {
      */
     private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
 
-    private static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
 
