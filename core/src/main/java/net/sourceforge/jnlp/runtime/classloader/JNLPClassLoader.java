@@ -14,6 +14,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime.classloader;
 
+import net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.jdk89access.JarIndexAccess;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
@@ -28,7 +29,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.resources.IllegalResourceDescriptorException;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
@@ -91,12 +91,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarEntry;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.jar.Attributes.Name.MAIN_CLASS;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
@@ -336,13 +334,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (mainName != null) {
             return mainName;
         }
-
-        final String fromEntryPoint = getMainClassFromEntryPoint();
-        if (fromEntryPoint != null) {
-            return fromEntryPoint;
-        }
-
-        return null;
+        return ClassLoaderUtils.getMainClassFromEntryPoint(file);
     }
 
     /**
@@ -602,22 +594,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         if (mainClass == null) {
-            final List<JARDesc> mainJars = file.getJnlpResources().getJARs().stream()
-                    .filter(JARDesc::isMain)
-                    .collect(Collectors.toList());
-            if (mainJars.size() == 1) {
-                final JARDesc jarDesc = mainJars.get(0);
-                final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-                if (fromManifest != null) {
-                    mainClass = fromManifest;
-                }
-            } else if (mainJars.size() == 0) {
-                final JARDesc jarDesc = file.getJnlpResources().getJARs().get(0);
-                final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-                if (fromManifest != null) {
-                    mainClass = fromManifest;
-                }
-            }
+            mainClass = ClassLoaderUtils.getMainClass(file, this);
         }
 
         //If there are no eager jars, initialize the first jar
