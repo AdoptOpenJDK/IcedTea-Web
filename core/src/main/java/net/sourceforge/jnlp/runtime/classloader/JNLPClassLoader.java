@@ -51,7 +51,6 @@ import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
@@ -60,21 +59,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.SocketPermission;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessControlContext;
-import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.CodeSource;
-import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -85,6 +81,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -934,7 +931,7 @@ public class JNLPClassLoader extends URLClassLoader {
     @SuppressWarnings("ConstantConditions")
     @Override
     public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(this, cs);
+        return applicationPermissions.getPermissions(cs, jar -> addNewJar(jar));
     }
 
     /**
@@ -1408,7 +1405,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param desc the JARDesc for the new jar
      */
-    public void addNewJar(final JARDesc desc) {
+    private void addNewJar(final JARDesc desc) {
         this.addNewJar(desc, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
@@ -1841,42 +1838,14 @@ public class JNLPClassLoader extends URLClassLoader {
      * instance
      */
     AccessControlContext getAccessControlContextForClassLoading() {
-        AccessControlContext context = AccessController.getContext();
+        final List<URL> urls = Optional.ofNullable(codeBaseLoader)
+                .map(loader -> Arrays.asList(loader.getURLs()))
+                .orElse(Collections.emptyList());
 
-        try {
-            context.checkPermission(new AllPermission());
-            return context; // If context already has all permissions, don't bother
-        } catch (AccessControlException ace) {
-            // continue below
-        }
-
-        // Since this is for class-loading, technically any class from one jar
-        // should be able to access a class from another, therefore making the
-        // original context code source irrelevant
-        PermissionCollection permissions = applicationPermissions.getSecurity().getSandBoxPermissions();
-
-        // Local cache access permissions
-        for (Permission resourcePermission : applicationPermissions.getResourcePermissions()) {
-            permissions.add(resourcePermission);
-        }
-
-        synchronized (applicationPermissions) {
-            applicationPermissions.createSocketPermissionsForAllSecurityDescLocations().stream()
-                    .forEach(p -> permissions.add(p));
-        }
-
-        // Permissions for codebase urls (if there is a loader)
-        if (codeBaseLoader != null) {
-            for (URL u : codeBaseLoader.getURLs()) {
-                permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),
-                        "connect, accept"));
-            }
-        }
-
-        ProtectionDomain pd = new ProtectionDomain(null, permissions);
-
-        return new AccessControlContext(new ProtectionDomain[]{pd});
+        return applicationPermissions.getAccessControlContextForClassLoading(urls);
     }
+
+
 
     public String getMainClass() {
         return mainClass;
