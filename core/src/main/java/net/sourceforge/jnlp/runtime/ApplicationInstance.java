@@ -88,9 +88,6 @@ public class ApplicationInstance {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
         this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase);
-        if(enableCodeBase) {
-            this.loader.enableCodeBase();
-        }
         loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();

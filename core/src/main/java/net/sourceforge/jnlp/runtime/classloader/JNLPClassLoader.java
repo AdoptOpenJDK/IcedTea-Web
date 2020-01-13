@@ -411,7 +411,11 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
     public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase) throws LaunchException {
-        return getInstance(file, policy, null, enableCodeBase);
+        final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase);
+        if(enableCodeBase) {
+            loader.enableCodeBase();
+        }
+        return loader;
     }
 
     /**
@@ -893,7 +897,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * load resources from their codebase instead of through JARs, but can slow
      * down resource loading. Resources loaded from the codebase are not cached.
      */
-    public void enableCodeBase() {
+    private void enableCodeBase() {
         addToCodeBaseLoader(file.getCodeBase());
     }
 
