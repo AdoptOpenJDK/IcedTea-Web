@@ -12,7 +12,7 @@ public class JNLPPolicyTest {
         final String fileURI = "file://C:/Users/philippe doussot/.config/icedtea-web/security/java.policy";
         System.setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
         JNLPRuntime.getConfiguration().setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
-        new JNLPPolicy();
+        new JNLPPolicy(new JNLPSecurityManager());
     }
 
     @Test
@@ -20,7 +20,7 @@ public class JNLPPolicyTest {
         final String fileURI = "file://a/b/c/java.policy";
         System.setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
         JNLPRuntime.getConfiguration().setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
-        new JNLPPolicy();
+        new JNLPPolicy(new JNLPSecurityManager());
     }
 
     @Test
@@ -28,7 +28,7 @@ public class JNLPPolicyTest {
         final String fileURI = "http://my:8080/policy/locationjava.policy";
         System.setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
         JNLPRuntime.getConfiguration().setProperty(KEY_SYSTEM_SECURITY_POLICY, fileURI);
-        new JNLPPolicy();
+        new JNLPPolicy(new JNLPSecurityManager());
     }
 
 }

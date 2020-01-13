@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
+import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.jar.Attributes;
@@ -93,6 +94,14 @@ public class ApplicationInstance {
         loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
+
+        if (JNLPRuntime.isSecurityEnabled() && JNLPRuntime.getForksStrategy().mayRunManagedApplication()) {
+            final JNLPSecurityManager security = new JNLPSecurityManager();
+            final JNLPPolicy policy = new JNLPPolicy(security);
+
+            Policy.setPolicy(policy);
+            System.setSecurityManager(security);
+        }
     }
 
     /**

@@ -135,9 +135,7 @@ public class SecurityDelegateImpl implements SecurityDelegate {
             throw new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
         }
 
-        JNLPRuntime.reloadPolicy();
-        // ensure that we have the most up-to-date custom policy loaded since the user may have just launched PolicyEditor
-        // to create a custom policy for the applet they are about to run
+        // TODO: refresh policy to make sure we have the latest and greatest from the file system
         this.runInSandbox = true;
     }
 

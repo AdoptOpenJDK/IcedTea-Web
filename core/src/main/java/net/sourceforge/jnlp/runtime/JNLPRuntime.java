@@ -117,12 +117,6 @@ public class JNLPRuntime {
      */
     private static String history = "";
 
-    /** the security manager */
-    private static JNLPSecurityManager security;
-
-    /** the security policy */
-    private static JNLPPolicy policy;
-
     /** handles all security message to show appropriate security dialogs */
     private static SecurityDialogMessageHandler securityDialogMessageHandler;
 
@@ -270,15 +264,7 @@ public class JNLPRuntime {
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
-        policy = new JNLPPolicy();
-        security = new JNLPSecurityManager(); // side effect: create JWindow
-
         doMainAppContextHacks();
-
-        if (securityEnabled && forkingStrategy.mayRunManagedApplication()) {
-            Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
-            System.setSecurityManager(security);
-        }
 
         securityDialogMessageHandler = startSecurityThreads();
 
@@ -311,10 +297,6 @@ public class JNLPRuntime {
 
         initialized = true;
 
-    }
-
-    public static void reloadPolicy() {
-        policy.refresh();
     }
 
     /**
