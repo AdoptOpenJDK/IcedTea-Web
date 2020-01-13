@@ -330,7 +330,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     }
 
-    private String getMainClass(String mainName) throws LaunchException {
+    private String getMainClass(String mainName) {
         if (mainName != null) {
             return mainName;
         }
@@ -748,14 +748,6 @@ public class JNLPClassLoader extends URLClassLoader {
             codebase = file.getResources().getMainJAR().getLocation();
         }
         return codebase;
-    }
-
-    private String getMainClassFromEntryPoint() {
-        final EntryPoint entryPoint = file.getEntryPointDesc();
-        if (entryPoint instanceof ApplicationDesc || entryPoint instanceof AppletDesc) {
-            return entryPoint.getMainClass();
-        }
-        return null;
     }
 
     /**

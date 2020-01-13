@@ -24,7 +24,6 @@ public class ClassLoaderUtils {
         }
     }
 
-
     public static String getMainClass(final JNLPFile file, final JNLPClassLoader classLoader) {
         final String fromEntryPoint = getMainClassFromEntryPoint(file);
         if (fromEntryPoint != null) {
