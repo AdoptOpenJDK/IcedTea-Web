@@ -29,11 +29,11 @@ public class SecurityDelegateImpl implements SecurityDelegate {
     private boolean runInSandbox;
     private boolean promptedForPartialSigning;
 
-    private final ClassloaderPermissions classloaderPermissions;
+    private final ApplicationPermissions applicationPermissions;
 
-    SecurityDelegateImpl(final JNLPClassLoader classLoader, final ClassloaderPermissions classloaderPermissions) {
+    SecurityDelegateImpl(final JNLPClassLoader classLoader, final ApplicationPermissions applicationPermissions) {
         this.classLoader = classLoader;
-        this.classloaderPermissions = classloaderPermissions;
+        this.applicationPermissions = applicationPermissions;
         runInSandbox = false;
     }
 
@@ -130,8 +130,8 @@ public class SecurityDelegateImpl implements SecurityDelegate {
 
     @Override
     public void setRunInSandbox() throws LaunchException {
-        if (runInSandbox && classLoader.getClassloaderPermissions().getSecurity() != null
-                && !classLoader.getClassloaderPermissions().getAllSecurityDescLocations().isEmpty()) {
+        if (runInSandbox && classLoader.getApplicationPermissions().getSecurity() != null
+                && !classLoader.getApplicationPermissions().getAllSecurityDescLocations().isEmpty()) {
             throw new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
         }
 
@@ -156,7 +156,7 @@ public class SecurityDelegateImpl implements SecurityDelegate {
     @Override
     public void addPermissions(final Collection<Permission> perms) {
         for (final Permission perm : perms) {
-            classloaderPermissions.addRuntimePermission(perm);
+            applicationPermissions.addRuntimePermission(perm);
         }
     }
 

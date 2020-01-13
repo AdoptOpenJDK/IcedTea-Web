@@ -37,9 +37,9 @@ import java.util.stream.Collectors;
 
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
-public class ClassloaderPermissions {
+public class ApplicationPermissions {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ClassloaderPermissions.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ApplicationPermissions.class);
 
     /**
      * the security section

@@ -251,7 +251,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
     private ManifestAttributesChecker mac;
 
-    private final ClassloaderPermissions classloaderPermissions;
+    private final ApplicationPermissions applicationPermissions;
 
     /**
      *
@@ -298,9 +298,9 @@ public class JNLPClassLoader extends URLClassLoader {
         if (this.enableCodeBase) {
             enableCodeBase();
         }
-        classloaderPermissions = new ClassloaderPermissions();
+        applicationPermissions = new ApplicationPermissions();
 
-        this.securityDelegate = new SecurityDelegateImpl(this, classloaderPermissions);
+        this.securityDelegate = new SecurityDelegateImpl(this, applicationPermissions);
 
         this.mainClass = getMainClass(mainName);
         // initialize extensions
@@ -310,7 +310,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
 
         // initialize permissions
-        classloaderPermissions.initializeReadJarPermissions(resources, tracker);
+        applicationPermissions.initializeReadJarPermissions(resources, tracker);
 
         installShutdownHooks();
 
@@ -554,7 +554,7 @@ public class JNLPClassLoader extends URLClassLoader {
             //Check if main jar is found within extensions
             foundMainJar = foundMainJar || hasMainInExtensions();
 
-            classloaderPermissions.setSecurity(file, securityDelegate);
+            applicationPermissions.setSecurity(file, securityDelegate);
             initializeManifestAttributesChecker();
             mac.checkAll();
             return;
@@ -658,7 +658,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 signing = SigningState.NONE;
             }
         }
-        classloaderPermissions.setSecurity(file, securityDelegate);
+        applicationPermissions.setSecurity(file, securityDelegate);
 
         final Set<JARDesc> validJars = new HashSet<>();
         boolean containsSignedJar = false, containsUnsignedJar = false;
@@ -698,7 +698,7 @@ public class JNLPClassLoader extends URLClassLoader {
             checkPartialSigningWithUser();
         }
 
-        classloaderPermissions.setSecurity(file, securityDelegate);
+        applicationPermissions.setSecurity(file, securityDelegate);
 
         initializeManifestAttributesChecker();
         mac.checkAll();
@@ -706,7 +706,7 @@ public class JNLPClassLoader extends URLClassLoader {
         for (JARDesc jarDesc : validJars) {
             final URL codebase = getJnlpFileCodebase();
             final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase);
-            classloaderPermissions.addSecurityDesc(jarDesc.getLocation(), jarSecurity);
+            applicationPermissions.addSecurityDesc(jarDesc.getLocation(), jarSecurity);
         }
 
         activateJars(initialJars);
@@ -715,7 +715,7 @@ public class JNLPClassLoader extends URLClassLoader {
     private void initializeManifestAttributesChecker() {
         if (mac == null) {
             file.getManifestAttributesReader().setTracker(tracker);
-            mac = new ManifestAttributesChecker(classloaderPermissions.getSecurity(), file, signing, securityDelegate);
+            mac = new ManifestAttributesChecker(applicationPermissions.getSecurity(), file, signing, securityDelegate);
         }
     }
 
@@ -934,7 +934,7 @@ public class JNLPClassLoader extends URLClassLoader {
     @SuppressWarnings("ConstantConditions")
     @Override
     public PermissionCollection getPermissions(CodeSource cs) {
-        return classloaderPermissions.getPermissions(this, cs);
+        return applicationPermissions.getPermissions(this, cs);
     }
 
     /**
@@ -1059,7 +1059,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                     addURL(fakeRemote);
 
-                                    classloaderPermissions.addSecurityDesc(fakeRemote, jarSecurity);
+                                    applicationPermissions.addSecurityDesc(fakeRemote, jarSecurity);
 
                                 } catch (MalformedURLException mfue) {
                                     LOG.error("Unable to add extracted nested jar to classpath", mfue);
@@ -1427,7 +1427,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 updatePolicy
         );
 
-        classloaderPermissions.addForJar(desc, tracker);
+        applicationPermissions.addForJar(desc, tracker);
 
         final URL remoteURL = desc.getLocation();
         final URL cachedUrl = tracker.getCacheURL(remoteURL); // blocks till download
@@ -1447,7 +1447,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
 
-                classloaderPermissions.addSecurityDesc(remoteURL, security);
+                applicationPermissions.addSecurityDesc(remoteURL, security);
 
                 return null;
             });
@@ -1745,15 +1745,15 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // security descriptors
-        synchronized (classloaderPermissions) {
-            for (URL key : extLoader.getClassloaderPermissions().getAllSecurityDescLocations()) {
-                classloaderPermissions.addSecurityDesc(key, extLoader.getClassloaderPermissions().getSecurityDesc(key));
+        synchronized (applicationPermissions) {
+            for (URL key : extLoader.getApplicationPermissions().getAllSecurityDescLocations()) {
+                applicationPermissions.addSecurityDesc(key, extLoader.getApplicationPermissions().getSecurityDesc(key));
             }
         }
     }
 
-    public ClassloaderPermissions getClassloaderPermissions() {
-        return classloaderPermissions;
+    public ApplicationPermissions getApplicationPermissions() {
+        return applicationPermissions;
     }
 
     /**
@@ -1853,15 +1853,15 @@ public class JNLPClassLoader extends URLClassLoader {
         // Since this is for class-loading, technically any class from one jar
         // should be able to access a class from another, therefore making the
         // original context code source irrelevant
-        PermissionCollection permissions = classloaderPermissions.getSecurity().getSandBoxPermissions();
+        PermissionCollection permissions = applicationPermissions.getSecurity().getSandBoxPermissions();
 
         // Local cache access permissions
-        for (Permission resourcePermission : classloaderPermissions.getResourcePermissions()) {
+        for (Permission resourcePermission : applicationPermissions.getResourcePermissions()) {
             permissions.add(resourcePermission);
         }
 
-        synchronized (classloaderPermissions) {
-            classloaderPermissions.createSocketPermissionsForAllSecurityDescLocations().stream()
+        synchronized (applicationPermissions) {
+            applicationPermissions.createSocketPermissionsForAllSecurityDescLocations().stream()
                     .forEach(p -> permissions.add(p));
         }
 
