@@ -668,8 +668,6 @@ public class JNLPClassLoader extends URLClassLoader {
                     mainClass = fromManifest;
                 }
             }
-
-            throw new LaunchException("could not find main class");
         }
 
         //If there are no eager jars, initialize the first jar

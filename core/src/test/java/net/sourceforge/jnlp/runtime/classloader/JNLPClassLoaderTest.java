@@ -192,20 +192,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void getCustomAttributesEmpty() throws Exception {
-        File jarLocation = createJarWithoutContent();
-
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-
-        assertNoFileLeak(() -> {
-            assertNull(getAttributeFromJar(IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertNull(getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertNull(getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
-        });
-    }
-
-    @Test
     public void checkOrderWhenReadingAttributes() throws Exception {
         File tempDirectory = temporaryFolder.newFolder();
         File jarLocation1 = new File(tempDirectory, "test1.jar");

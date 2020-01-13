@@ -38,6 +38,8 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
+import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
+import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributes;
@@ -89,14 +91,21 @@ public class JNLPFileTest extends NoStdOutErrTest {
         //here we go with pure loading and parsing of them
         File tempDirectory = FileTestUtils.createTempDirectory();
         tempDirectory.deleteOnExit();
+        final File fooClassFile = new File(tempDirectory, "Foo.class");
         File jarLocation66 = new File(tempDirectory, "test66.jar");
         File jarLocation77 = new File(tempDirectory, "test77.jar");
         Manifest manifest77 = new Manifest();
 
+        Assert.assertTrue(fooClassFile.createNewFile());
         FileTestUtils.createJarWithContents(jarLocation66); //no manifest
-        FileTestUtils.createJarWithContents(jarLocation77, manifest77);
+        FileTestUtils.createJarWithContents(jarLocation77, manifest77, fooClassFile);
 
-        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(0, jarLocation66, jarLocation77); //jar 6 should be main
+        final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(0, jarLocation66, jarLocation77) {
+            @Override
+            public EntryPoint getEntryPointDesc() {
+                return new ApplicationDesc("Foo", new String[0]);
+            }
+        }; //jar 6 should be main
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader); //classloader set, but no att specified
 
@@ -109,7 +118,6 @@ public class JNLPFileTest extends NoStdOutErrTest {
         Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.TRUSTED_ONLY.toString())));
         Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getAttribute(new Attributes.Name(ManifestAttributes.ENTRY_POINT.toString())));
 
-        Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getMainClass());
         Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationName());
         Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getApplicationLibraryAllowableCodebase());
         Assert.assertNull("classloader attached, but should be null", jnlpFile.getManifestAttributesReader().getCallerAllowableCodebase());
