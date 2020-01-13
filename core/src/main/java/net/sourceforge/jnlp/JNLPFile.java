@@ -291,8 +291,7 @@ public class JNLPFile {
         if (jnlpTitle == null && manifestTitle != null) {
             return manifestTitle;
         }
-        String mainClass = getManifestAttributesReader().getMainClass();
-        return mainClass;
+        return null;
     }
 
     /**

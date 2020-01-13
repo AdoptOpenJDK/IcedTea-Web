@@ -292,7 +292,6 @@ public class JNLPFileTest extends NoStdOutErrTest {
         FileTestUtils.createJarWithContents(jarLocation5, manifest5);
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(3, jarLocation5, jarLocation3, jarLocation4, jarLocation1, jarLocation2); //jar 1 should be main
-        Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getMainClass());
         Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
         Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
         Assert.assertNull("no classloader attached, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.MAIN_CLASS));
@@ -318,7 +317,6 @@ public class JNLPFileTest extends NoStdOutErrTest {
 
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);//jnlp file got its instance in classloaders constructor
         //jnlpFile.getManifestsAttributes().setLoader(classLoader);
-        Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getMainClass());
         Assert.assertNull("defined twice, should be null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_VENDOR));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.IMPLEMENTATION_TITLE));
         Assert.assertNotNull("classloader attached, should be not null", jnlpFile.getManifestAttributesReader().getAttribute(Attributes.Name.MAIN_CLASS));

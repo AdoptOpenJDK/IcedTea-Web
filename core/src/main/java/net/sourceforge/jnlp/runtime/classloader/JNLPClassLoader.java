@@ -620,8 +620,6 @@ public class JNLPClassLoader extends URLClassLoader {
             }
         }
 
-        file.getManifestAttributesReader().setMainClass(mainClass);
-
         //If there are no eager jars, initialize the first jar
         if (initialJars.isEmpty()) {
             initialJars.add(jars[0]);

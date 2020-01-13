@@ -49,27 +49,12 @@ public class ManifestAttributesReader {
 
     private ResourceTracker tracker;
 
-    private String mainClass;
-
     public ManifestAttributesReader(final JNLPFile jnlpFile) {
         this.jnlpFile = jnlpFile;
     }
 
     public void setTracker(final ResourceTracker tracker) {
         this.tracker = tracker;
-    }
-
-    public void setMainClass(final String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    /**
-     * main class can be defined outside of manifest.
-     * This method is mostly for completeness
-     * @return main-class as it is specified in application
-     */
-    public String getMainClass(){
-        return mainClass;
     }
 
     /**
