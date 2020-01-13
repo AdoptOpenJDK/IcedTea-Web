@@ -105,7 +105,9 @@ import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
  */
 public class JNLPRuntime {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
+
+    private static final ClassContextProvider contextProvider = new ClassContextProvider();
 
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
@@ -600,7 +602,8 @@ public class JNLPRuntime {
      * determined.
      */
     public static ApplicationInstance getApplication() {
-        return security.getApplication();
+        final Class<?>[] classContext = contextProvider.getClassContext();
+        return JNLPClassLoaderUtil.getApplication(Thread.currentThread(), classContext, 0);
     }
 
     /**
@@ -934,6 +937,13 @@ public class JNLPRuntime {
                 LOG.error(msg);
                 throw new IllegalStateException(msg);
             }
+        }
+    }
+
+    private static class ClassContextProvider extends SecurityManager {
+        @Override
+        public Class<?>[] getClassContext() {
+            return super.getClassContext();
         }
     }
 }
