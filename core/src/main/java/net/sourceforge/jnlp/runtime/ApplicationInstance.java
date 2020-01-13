@@ -254,7 +254,7 @@ public class ApplicationInstance {
      * @return the classloader of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
-    public JNLPClassLoader getClassLoader() throws IllegalStateException {
+    public ClassLoader getClassLoader() throws IllegalStateException {
         if (stopped)
             throw new IllegalStateException();
 
