@@ -150,7 +150,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final SecurityDesc s = loader.getSecurity();
+            final SecurityDesc s = loader.getClassloaderPermissions().getSecurity();
             final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 

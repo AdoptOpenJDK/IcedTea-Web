@@ -70,7 +70,6 @@ import java.security.AllPermission;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.Permissions;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -186,11 +185,6 @@ public class JNLPClassLoader extends URLClassLoader {
     private final ResourcesDesc resources;
 
     /**
-     * the security section
-     */
-    private SecurityDesc security;
-
-    /**
      * all jars not yet part of classloader or active Synchronized since this
      * field may become shared data between multiple classloading threads. See
      * loadClass(String) and CodebaseClassLoader.findClassNonRecursive(String).
@@ -227,14 +221,6 @@ public class JNLPClassLoader extends URLClassLoader {
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
     private final Set<String> jarEntries = Collections.synchronizedSet(new TreeSet<>());
-
-    /**
-     * Map of specific original (remote) CodeSource Urls to securitydesc
-     * Synchronized since this field may become shared data between multiple
-     * classloading threads. See loadClass(String) and
-     * CodebaseClassLoader.findClassNonRecursive(String).
-     */
-    final Map<URL, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
 
     /*Set to prevent once tried-to-get resources to be tried again*/
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
@@ -348,11 +334,6 @@ public class JNLPClassLoader extends URLClassLoader {
          * cleanup things they created
          */
         Runtime.getRuntime().addShutdownHook(new Thread(nativeLibraryStorage::cleanupTemporaryFolder));
-    }
-
-    private void setSecurity() throws LaunchException {
-        URL codebase = UrlUtils.guessCodeBase(file);
-        this.security = securityDelegate.getClassLoaderSecurity(codebase);
     }
 
     /**
@@ -573,7 +554,7 @@ public class JNLPClassLoader extends URLClassLoader {
             //Check if main jar is found within extensions
             foundMainJar = foundMainJar || hasMainInExtensions();
 
-            setSecurity();
+            classloaderPermissions.setSecurity(file, securityDelegate);
             initializeManifestAttributesChecker();
             mac.checkAll();
             return;
@@ -677,7 +658,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 signing = SigningState.NONE;
             }
         }
-        setSecurity();
+        classloaderPermissions.setSecurity(file, securityDelegate);
 
         final Set<JARDesc> validJars = new HashSet<>();
         boolean containsSignedJar = false, containsUnsignedJar = false;
@@ -717,7 +698,7 @@ public class JNLPClassLoader extends URLClassLoader {
             checkPartialSigningWithUser();
         }
 
-        setSecurity();
+        classloaderPermissions.setSecurity(file, securityDelegate);
 
         initializeManifestAttributesChecker();
         mac.checkAll();
@@ -725,7 +706,7 @@ public class JNLPClassLoader extends URLClassLoader {
         for (JARDesc jarDesc : validJars) {
             final URL codebase = getJnlpFileCodebase();
             final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase);
-            jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
+            classloaderPermissions.addSecurityDesc(jarDesc.getLocation(), jarSecurity);
         }
 
         activateJars(initialJars);
@@ -734,7 +715,7 @@ public class JNLPClassLoader extends URLClassLoader {
     private void initializeManifestAttributesChecker() {
         if (mac == null) {
             file.getManifestAttributesReader().setTracker(tracker);
-            mac = new ManifestAttributesChecker(security, file, signing, securityDelegate);
+            mac = new ManifestAttributesChecker(classloaderPermissions.getSecurity(), file, signing, securityDelegate);
         }
     }
 
@@ -953,70 +934,7 @@ public class JNLPClassLoader extends URLClassLoader {
     @SuppressWarnings("ConstantConditions")
     @Override
     public PermissionCollection getPermissions(CodeSource cs) {
-        try {
-            Permissions result = new Permissions();
-
-            // should check for extensions or boot, automatically give all
-            // access w/o security dialog once we actually check certificates.
-            // copy security permissions from SecurityDesc element
-            if (security != null) {
-                // Security desc. is used only to track security settings for the
-                // application. However, an application may comprise of multiple
-                // jars, and as such, security must be evaluated on a per jar basis.
-
-                // set default perms
-                PermissionCollection permissions = security.getSandBoxPermissions();
-
-                // If more than default is needed:
-                // 1. Code must be signed
-                // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
-                if (cs == null) {
-                    throw new NullPointerException("Code source was null");
-                }
-                if (cs.getCodeSigners() != null) {
-                    if (cs.getLocation() == null) {
-                        throw new NullPointerException("Code source location was null");
-                    }
-                    if (getCodeSourceSecurity(cs.getLocation()) == null) {
-                        throw new NullPointerException("Code source security was null");
-                    }
-                    if (getCodeSourceSecurity(cs.getLocation()).getSecurityType() == null) {
-                        LOG.error("Warning! Code source security type was null");
-                    }
-                    Object securityType = getCodeSourceSecurity(cs.getLocation()).getSecurityType();
-                    if (SecurityDesc.ALL_PERMISSIONS.equals(securityType)
-                            || SecurityDesc.J2EE_PERMISSIONS.equals(securityType)) {
-
-                        permissions = getCodeSourceSecurity(cs.getLocation()).getPermissions(cs);
-                    }
-                }
-
-                for (Permission perm : Collections.list(permissions.elements())) {
-                    result.add(perm);
-                }
-            }
-
-            // add in permission to read the cached JAR files
-            for (Permission perm : classloaderPermissions.getResourcePermissions()) {
-                result.add(perm);
-            }
-
-            // add in the permissions that the user granted.
-            for (Permission perm : classloaderPermissions.getRuntimePermissions()) {
-                result.add(perm);
-            }
-
-            // Class from host X should be allowed to connect to host X
-            if (cs.getLocation() != null && cs.getLocation().getHost().length() > 0) {
-                result.add(new SocketPermission(UrlUtils.getHostAndPort(cs.getLocation()),
-                        "connect, accept"));
-            }
-
-            return result;
-        } catch (RuntimeException ex) {
-            LOG.error("Failed to get permissions", ex);
-            throw ex;
-        }
+        return classloaderPermissions.getPermissions(this, cs);
     }
 
     /**
@@ -1141,7 +1059,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                     addURL(fakeRemote);
 
-                                    jarLocationSecurityMap.put(fakeRemote, jarSecurity);
+                                    classloaderPermissions.addSecurityDesc(fakeRemote, jarSecurity);
 
                                 } catch (MalformedURLException mfue) {
                                     LOG.error("Unable to add extracted nested jar to classpath", mfue);
@@ -1403,8 +1321,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * process to hang. More information in the mailing list archives:
      * http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2013-September/024536.html
      * <p>
-     * Affected fields: available, classpaths, jarIndexes, jarEntries,
-     * jarLocationSecurityMap
+     * Affected fields: available, classpaths, jarIndexes, jarEntries
      */
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
@@ -1491,7 +1408,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param desc the JARDesc for the new jar
      */
-    private void addNewJar(final JARDesc desc) {
+    public void addNewJar(final JARDesc desc) {
         this.addNewJar(desc, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
@@ -1530,7 +1447,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
 
-                jarLocationSecurityMap.put(remoteURL, security);
+                classloaderPermissions.addSecurityDesc(remoteURL, security);
 
                 return null;
             });
@@ -1795,39 +1712,6 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    public SecurityDesc getSecurity() {
-        return security;
-    }
-
-    /**
-     * Returns the security descriptor for given code source URL
-     *
-     * @param source the origin (remote) url of the code
-     * @return The SecurityDescriptor for that source
-     */
-    private SecurityDesc getCodeSourceSecurity(URL source) {
-        SecurityDesc sec = jarLocationSecurityMap.get(source);
-        synchronized (alreadyTried) {
-            if (sec == null && !alreadyTried.contains(source)) {
-                alreadyTried.add(source);
-                //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
-                LOG.info("Application is trying to get permissions for {}, which was not added by standard way. Trying to download and verify!", source.toString());
-                try {
-                    JARDesc des = new JARDesc(source, null, null, false, false, false, false);
-                    addNewJar(des);
-                    sec = jarLocationSecurityMap.get(source);
-                } catch (Throwable t) {
-                    LOG.error("Error while getting security", t);
-                    sec = null;
-                }
-            }
-        }
-        if (sec == null) {
-            LOG.info("Error: No security instance for {}. The application may have trouble continuing", source.toString());
-        }
-        return sec;
-    }
-
     /**
      * Merges the code source/security descriptor mapping from another loader
      *
@@ -1861,11 +1745,15 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // security descriptors
-        synchronized (jarLocationSecurityMap) {
-            for (URL key : extLoader.jarLocationSecurityMap.keySet()) {
-                jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
+        synchronized (classloaderPermissions) {
+            for (URL key : extLoader.getClassloaderPermissions().getAllSecurityDescLocations()) {
+                classloaderPermissions.addSecurityDesc(key, extLoader.getClassloaderPermissions().getSecurityDesc(key));
             }
         }
+    }
+
+    public ClassloaderPermissions getClassloaderPermissions() {
+        return classloaderPermissions;
     }
 
     /**
@@ -1965,19 +1853,16 @@ public class JNLPClassLoader extends URLClassLoader {
         // Since this is for class-loading, technically any class from one jar
         // should be able to access a class from another, therefore making the
         // original context code source irrelevant
-        PermissionCollection permissions = this.security.getSandBoxPermissions();
+        PermissionCollection permissions = classloaderPermissions.getSecurity().getSandBoxPermissions();
 
         // Local cache access permissions
         for (Permission resourcePermission : classloaderPermissions.getResourcePermissions()) {
             permissions.add(resourcePermission);
         }
 
-        // Permissions for all remote hosting urls
-        synchronized (jarLocationSecurityMap) {
-            for (URL u : jarLocationSecurityMap.keySet()) {
-                permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),
-                        "connect, accept"));
-            }
+        synchronized (classloaderPermissions) {
+            classloaderPermissions.createSocketPermissionsForAllSecurityDescLocations().stream()
+                    .forEach(p -> permissions.add(p));
         }
 
         // Permissions for codebase urls (if there is a loader)
