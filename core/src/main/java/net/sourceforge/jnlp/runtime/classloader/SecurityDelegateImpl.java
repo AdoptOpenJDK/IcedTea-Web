@@ -131,7 +131,7 @@ public class SecurityDelegateImpl implements SecurityDelegate {
     @Override
     public void setRunInSandbox() throws LaunchException {
         if (runInSandbox && classLoader.getApplicationPermissions().getSecurity() != null
-                && !classLoader.getApplicationPermissions().getAllSecurityDescLocations().isEmpty()) {
+                && !classLoader.getApplicationPermissions().getAllJarLocations().isEmpty()) {
             throw new LaunchException(classLoader.getJNLPFile(), null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
         }
 

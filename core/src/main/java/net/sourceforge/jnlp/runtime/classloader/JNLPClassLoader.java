@@ -295,7 +295,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (this.enableCodeBase) {
             enableCodeBase();
         }
-        applicationPermissions = new ApplicationPermissions();
+        applicationPermissions = new ApplicationPermissions(tracker);
 
         this.securityDelegate = new SecurityDelegateImpl(this, applicationPermissions);
 
@@ -307,7 +307,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
 
         // initialize permissions
-        applicationPermissions.initializeReadJarPermissions(resources, tracker);
+        applicationPermissions.addReadPermissionsForAllJars(resources);
 
         installShutdownHooks();
 
@@ -707,7 +707,7 @@ public class JNLPClassLoader extends URLClassLoader {
         for (JARDesc jarDesc : validJars) {
             final URL codebase = getJnlpFileCodebase();
             final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase);
-            applicationPermissions.addSecurityDesc(jarDesc.getLocation(), jarSecurity);
+            applicationPermissions.addSecurityForJarLocation(jarDesc.getLocation(), jarSecurity);
         }
 
         activateJars(initialJars);
@@ -1060,7 +1060,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                     addURL(fakeRemote);
 
-                                    applicationPermissions.addSecurityDesc(fakeRemote, jarSecurity);
+                                    applicationPermissions.addSecurityForJarLocation(fakeRemote, jarSecurity);
 
                                 } catch (MalformedURLException mfue) {
                                     LOG.error("Unable to add extracted nested jar to classpath", mfue);
@@ -1428,7 +1428,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 updatePolicy
         );
 
-        applicationPermissions.addForJar(desc, tracker);
+        applicationPermissions.addReadPermissionForJar(desc.getLocation());
 
         final URL remoteURL = desc.getLocation();
         final URL cachedUrl = tracker.getCacheURL(remoteURL); // blocks till download
@@ -1448,7 +1448,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
 
-                applicationPermissions.addSecurityDesc(remoteURL, security);
+                applicationPermissions.addSecurityForJarLocation(remoteURL, security);
 
                 return null;
             });
@@ -1747,8 +1747,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // security descriptors
         synchronized (applicationPermissions) {
-            for (URL key : extLoader.getApplicationPermissions().getAllSecurityDescLocations()) {
-                applicationPermissions.addSecurityDesc(key, extLoader.getApplicationPermissions().getSecurityDesc(key));
+            for (URL key : extLoader.getApplicationPermissions().getAllJarLocations()) {
+                applicationPermissions.addSecurityForJarLocation(key, extLoader.getApplicationPermissions().getSecurityForJarLocation(key));
             }
         }
     }

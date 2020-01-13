@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
@@ -49,6 +48,8 @@ public class ApplicationPermissions {
      * the security section
      */
     private SecurityDesc security;
+
+    private final ResourceTracker tracker;
 
     /**
      * Map of specific original (remote) CodeSource Urls to securitydesc
@@ -70,6 +71,10 @@ public class ApplicationPermissions {
 
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
 
+    public ApplicationPermissions(final ResourceTracker tracker) {
+        this.tracker = tracker;
+    }
+
     public void setSecurity(final JNLPFile file, final SecurityDelegate securityDelegate) throws LaunchException {
         URL codebase = UrlUtils.guessCodeBase(file);
         this.security = securityDelegate.getClassLoaderSecurity(codebase);
@@ -86,11 +91,11 @@ public class ApplicationPermissions {
     /**
      * Make permission objects for the classpath.
      */
-    public void initializeReadJarPermissions(ResourcesDesc resources, ResourceTracker tracker) {
+    public void addReadPermissionsForAllJars(final ResourcesDesc resources) {
 
         JARDesc[] jars = resources.getJARs();
         for (JARDesc jar : jars) {
-            Permission p = getReadPermission(jar, tracker);
+            Permission p = getReadPermission(jar.getLocation());
 
             if (p == null) {
                 LOG.info("Unable to add permission for {}", jar.getLocation());
@@ -101,39 +106,13 @@ public class ApplicationPermissions {
         }
     }
 
-    public void addForJar(final JARDesc desc, ResourceTracker tracker) {
+    public void addReadPermissionForJar(final URL location) {
         // Give read permissions to the cached jar file
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            Permission p = getReadPermission(desc, tracker);
-
+            Permission p = getReadPermission(location);
             resourcePermissions.add(p);
-
             return null;
         });
-    }
-
-    private Permission getReadPermission(JARDesc jar, ResourceTracker tracker) {
-        final URL location = jar.getLocation();
-
-        if (CacheUtil.isCacheable(location)) {
-            final File cacheFile = tracker.getCacheFile(location);
-            if (cacheFile != null) {
-                return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
-            } else {
-                LOG.debug("No cache file for cacheable resource '{}' found.", location);
-                return null;
-            }
-        } else {
-            // this is what URLClassLoader does
-            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
-                return conn.getPermission();
-            } catch (IOException ioe) {
-                LOG.error("Exception while retrieving permissions from connection to " + location, ioe);
-            }
-        }
-
-        // should try to figure out the permission
-        return null;
     }
 
     public PermissionCollection getPermissions(CodeSource codeSource, final Consumer<JARDesc> addJarConsumer) {
@@ -199,6 +178,52 @@ public class ApplicationPermissions {
         }
     }
 
+    public void addSecurityForJarLocation(final URL location, SecurityDesc securityDesc) {
+        jarLocationSecurityMap.put(location, securityDesc);
+    }
+
+    public SecurityDesc getSecurityForJarLocation(final URL location) {
+        return jarLocationSecurityMap.get(location);
+    }
+
+    public Set<URL> getAllJarLocations() {
+        return jarLocationSecurityMap.keySet();
+    }
+
+    public AccessControlContext getAccessControlContextForClassLoading(final List<URL> codeBaseLoaderUrls) {
+        AccessControlContext context = AccessController.getContext();
+
+        try {
+            context.checkPermission(new AllPermission());
+            return context; // If context already has all permissions, don't bother
+        } catch (AccessControlException ace) {
+            // continue below
+        }
+
+        // Since this is for class-loading, technically any class from one jar
+        // should be able to access a class from another, therefore making the
+        // original context code source irrelevant
+        PermissionCollection permissions = getSecurity().getSandBoxPermissions();
+
+        // Local cache access permissions
+        for (Permission resourcePermission : resourcePermissions) {
+            permissions.add(resourcePermission);
+        }
+
+        synchronized (this) {
+            getAllJarLocations().stream()
+                    .map(l -> new SocketPermission(UrlUtils.getHostAndPort(l),"connect, accept"))
+                    .forEach(p -> permissions.add(p));
+        }
+
+        // Permissions for codebase urls (if there is a loader)
+        codeBaseLoaderUrls.forEach(u -> permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),"connect, accept")));
+
+        ProtectionDomain pd = new ProtectionDomain(null, permissions);
+
+        return new AccessControlContext(new ProtectionDomain[]{pd});
+    }
+
     private SecurityDesc getCodeSourceSecurity(final URL source, final Consumer<JARDesc> addJarConsumer) {
         final SecurityDesc storedValue = jarLocationSecurityMap.get(source);
         if (storedValue == null) {
@@ -226,54 +251,25 @@ public class ApplicationPermissions {
         }
     }
 
-    public void addSecurityDesc(final URL location, SecurityDesc securityDesc) {
-        jarLocationSecurityMap.put(location, securityDesc);
-    }
-
-    public SecurityDesc getSecurityDesc(final URL location) {
-        return jarLocationSecurityMap.get(location);
-    }
-
-    public Set<URL> getAllSecurityDescLocations() {
-        return jarLocationSecurityMap.keySet();
-    }
-
-    private List<SocketPermission> createSocketPermissionsForAllSecurityDescLocations() {
-        return getAllSecurityDescLocations().stream()
-                .map(l -> new SocketPermission(UrlUtils.getHostAndPort(l),"connect, accept"))
-                .collect(Collectors.toList());
-    }
-
-    public AccessControlContext getAccessControlContextForClassLoading(final List<URL> codeBaseLoaderUrls) {
-        AccessControlContext context = AccessController.getContext();
-
-        try {
-            context.checkPermission(new AllPermission());
-            return context; // If context already has all permissions, don't bother
-        } catch (AccessControlException ace) {
-            // continue below
+    private Permission getReadPermission(final URL location) {
+        if (CacheUtil.isCacheable(location)) {
+            final File cacheFile = tracker.getCacheFile(location);
+            if (cacheFile != null) {
+                return new FilePermission(cacheFile.getPath(), FILE_READ_ACTION);
+            } else {
+                LOG.debug("No cache file for cacheable resource '{}' found.", location);
+                return null;
+            }
+        } else {
+            // this is what URLClassLoader does
+            try (final CloseableConnection conn = ConnectionFactory.openConnection(location)) {
+                return conn.getPermission();
+            } catch (IOException ioe) {
+                LOG.error("Exception while retrieving permissions from connection to " + location, ioe);
+            }
         }
-
-        // Since this is for class-loading, technically any class from one jar
-        // should be able to access a class from another, therefore making the
-        // original context code source irrelevant
-        PermissionCollection permissions = getSecurity().getSandBoxPermissions();
-
-        // Local cache access permissions
-        for (Permission resourcePermission : resourcePermissions) {
-            permissions.add(resourcePermission);
-        }
-
-        synchronized (this) {
-            createSocketPermissionsForAllSecurityDescLocations().stream()
-                    .forEach(p -> permissions.add(p));
-        }
-
-        // Permissions for codebase urls (if there is a loader)
-        codeBaseLoaderUrls.forEach(u -> permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),"connect, accept")));
-
-        ProtectionDomain pd = new ProtectionDomain(null, permissions);
-
-        return new AccessControlContext(new ProtectionDomain[]{pd});
+        // should try to figure out the permission
+        return null;
     }
+
 }
