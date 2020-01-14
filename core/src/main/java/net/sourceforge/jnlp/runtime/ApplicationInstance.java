@@ -24,6 +24,7 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.classloader.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.WeakList;
@@ -82,6 +83,8 @@ public class ApplicationInstance {
 
     private final ResourceTracker tracker;
 
+    private final ApplicationPermissions applicationPermissions;
+
     /**
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
@@ -90,8 +93,9 @@ public class ApplicationInstance {
     public ApplicationInstance(JNLPFile file, boolean enableCodeBase) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
-        tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
-        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker);
+        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        this.applicationPermissions = new ApplicationPermissions(tracker);
+        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker, applicationPermissions);
         loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
@@ -151,7 +155,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final SecurityDesc s = loader.getApplicationPermissions().getSecurity();
+            final SecurityDesc s = applicationPermissions.getSecurity();
             final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 

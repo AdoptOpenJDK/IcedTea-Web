@@ -259,7 +259,19 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
     public JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
-        this(file, policy, null, false, new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
+        this(file, policy, new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
+    }
+
+    /**
+     *
+     * Create a new JNLPClassLoader from the specified file.
+     *
+     * @param file   the JNLP file
+     * @param policy update policy of loader
+     * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
+     */
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, final ResourceTracker tracker) throws LaunchException {
+        this(file, policy, null, false, tracker, new ApplicationPermissions(tracker));
     }
 
     /**
@@ -273,7 +285,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException when need to kill an app
      *                                              comes.
      */
-    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker tracker) throws LaunchException {
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
@@ -281,6 +293,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         this.file = file;
         this.tracker = tracker;
+        this.applicationPermissions = applicationPermissions;
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
@@ -295,7 +308,7 @@ public class JNLPClassLoader extends URLClassLoader {
         if (this.enableCodeBase) {
             enableCodeBase();
         }
-        applicationPermissions = new ApplicationPermissions(tracker);
+
 
         this.securityDelegate = new SecurityDelegateImpl(this, applicationPermissions);
 
@@ -363,10 +376,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy   the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
-    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
+    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         String uniqueKey = file.getUniqueKey();
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
-        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker);
+        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker, applicationPermissions);
 
         // If security level is 'high' or greater, we must check if the user allows unsigned applets
         // when the JNLPClassLoader is created. We do so here, because doing so in the constructor
@@ -410,8 +423,22 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
-        final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase, resourceTracker);
+    static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
+        return getInstance(file, policy, enableCodeBase, resourceTracker, new ApplicationPermissions(resourceTracker));
+    }
+
+    /**
+     * Returns a JNLP classloader for the specified JNLP file.
+     *
+     * @param file           the file to load classes for
+     * @param policy         the update policy to use when downloading resources
+     * @param enableCodeBase true if codebase can be searched (ok for
+     *                       applets,false for apps)
+     * @return existing classloader. creates new if none reliable exists
+     * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
+     */
+    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker, ApplicationPermissions applicationPermissions) throws LaunchException {
+        final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase, resourceTracker, applicationPermissions);
         if(enableCodeBase) {
             loader.enableCodeBase();
         }
@@ -429,7 +456,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
+    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         JNLPClassLoader loader;
         String uniqueKey = file.getUniqueKey();
 
@@ -442,12 +469,12 @@ public class JNLPClassLoader extends URLClassLoader {
                     || (file.isApplication()
                     && !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
-                loader = createInstance(file, policy, mainName, enableCodeBase, resourceTracker);
+                loader = createInstance(file, policy, mainName, enableCodeBase, resourceTracker, applicationPermissions);
             } else {
                 // if key is same and locations match, this is the loader we want
                 if (!file.isApplication()) {
                     // If this is an applet, we do need to consider its loader
-                    loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker);
+                    loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker, applicationPermissions);
                     baseLoader.merge(loader);
                 }
                 loader = baseLoader;
@@ -489,7 +516,8 @@ public class JNLPClassLoader extends URLClassLoader {
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
                 final JNLPFile jnlpFile = new JNLPFileFactory().create(location, uniqueKey, version, settings, policy);
                 final ResourceTracker extensionTracker = new ResourceTracker(true, jnlpFile.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
-                loader = getInstance(jnlpFile, policy, mainName, enableCodeBase, extensionTracker);
+                final ApplicationPermissions extensionApplicationPermissions = new ApplicationPermissions(extensionTracker);
+                loader = getInstance(jnlpFile, policy, mainName, enableCodeBase, extensionTracker, extensionApplicationPermissions);
             }
         }
 
@@ -1267,7 +1295,7 @@ public class JNLPClassLoader extends URLClassLoader {
         return tracker;
     }
 
-    public ApplicationPermissions getApplicationPermissions() {
+    ApplicationPermissions getApplicationPermissions() {
         return applicationPermissions;
     }
 
