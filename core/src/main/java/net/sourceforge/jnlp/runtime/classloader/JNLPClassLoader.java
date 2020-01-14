@@ -259,7 +259,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
     public JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
-        this(file, policy, null, false);
+        this(file, policy, null, false, new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
     }
 
     /**
@@ -273,14 +273,14 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException when need to kill an app
      *                                              comes.
      */
-    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker tracker) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
         strict = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
-        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        this.tracker = tracker;
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
@@ -363,10 +363,10 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy   the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
-    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
         String uniqueKey = file.getUniqueKey();
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
-        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
+        JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker);
 
         // If security level is 'high' or greater, we must check if the user allows unsigned applets
         // when the JNLPClassLoader is created. We do so here, because doing so in the constructor
@@ -410,8 +410,8 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase) throws LaunchException {
-        final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase);
+    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
+        final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase, resourceTracker);
         if(enableCodeBase) {
             loader.enableCodeBase();
         }
@@ -429,7 +429,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase) throws LaunchException {
+    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
         JNLPClassLoader loader;
         String uniqueKey = file.getUniqueKey();
 
@@ -442,12 +442,12 @@ public class JNLPClassLoader extends URLClassLoader {
                     || (file.isApplication()
                     && !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
 
-                loader = createInstance(file, policy, mainName, enableCodeBase);
+                loader = createInstance(file, policy, mainName, enableCodeBase, resourceTracker);
             } else {
                 // if key is same and locations match, this is the loader we want
                 if (!file.isApplication()) {
                     // If this is an applet, we do need to consider its loader
-                    loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase);
+                    loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker);
                     baseLoader.merge(loader);
                 }
                 loader = baseLoader;
@@ -488,8 +488,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
                 final JNLPFile jnlpFile = new JNLPFileFactory().create(location, uniqueKey, version, settings, policy);
-
-                loader = getInstance(jnlpFile, policy, mainName, enableCodeBase);
+                final ResourceTracker extensionTracker = new ResourceTracker(true, jnlpFile.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+                loader = getInstance(jnlpFile, policy, mainName, enableCodeBase, extensionTracker);
             }
         }
 
@@ -576,7 +576,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         if (mainClass == null) {
-            mainClass = ClassLoaderUtils.getMainClass(file, this);
+            mainClass = ClassLoaderUtils.getMainClass(file, tracker);
         }
 
         //If there are no eager jars, initialize the first jar
@@ -902,43 +902,6 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Sets the JNLP app this group is for; can only be called once.
-     *
-     * @param app application to be ser to this group
-     */
-    public void setApplication(ApplicationInstance app) {
-        if (this.app != null) {
-            LOG.error("Application can only be set once");
-            return;
-        }
-
-        this.app = app;
-    }
-
-    /**
-     * @return the JNLP app for this classloader
-     */
-    ApplicationInstance getApplication() {
-        return app;
-    }
-
-    /**
-     * @return the JNLP file the classloader was created from.
-     */
-    public JNLPFile getJNLPFile() {
-        return file;
-    }
-
-    /**
-     * Returns the permissions for the CodeSource.
-     */
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(cs, jar -> addNewJar(jar));
-    }
-
-    /**
      * Adds to the specified list of JARS any other JARs that need to be loaded
      * at the same time as the JARs specified (ie, are in the same part).
      *
@@ -1099,26 +1062,6 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         return null;
-    }
-
-    /**
-     * Return the absolute path to the native library.
-     */
-    @Override
-    protected String findLibrary(String lib) {
-        String syslib = System.mapLibraryName(lib);
-        File libFile = nativeLibraryStorage.findLibrary(syslib);
-
-        if (libFile != null) {
-            return libFile.toString();
-        }
-
-        String result = super.findLibrary(lib);
-        if (result != null) {
-            return result;
-        }
-
-        return findLibraryExt(lib);
     }
 
     /**
@@ -1288,7 +1231,7 @@ public class JNLPClassLoader extends URLClassLoader {
     }
 
     @FunctionalInterface
-    public interface ExceptionalSupplier<T, E extends Exception> {
+    private interface ExceptionalSupplier<T, E extends Exception> {
 
         T call() throws E;
 
@@ -1299,6 +1242,131 @@ public class JNLPClassLoader extends URLClassLoader {
                 return null;
             }
         }
+    }
+
+
+
+
+
+
+    /**
+     * Sets the JNLP app this group is for; can only be called once.
+     *
+     * @param app application to be ser to this group
+     */
+    public void setApplication(ApplicationInstance app) {
+        if (this.app != null) {
+            LOG.error("Application can only be set once");
+            return;
+        }
+
+        this.app = app;
+    }
+
+    ResourceTracker getTracker() {
+        return tracker;
+    }
+
+    public ApplicationPermissions getApplicationPermissions() {
+        return applicationPermissions;
+    }
+
+    public boolean getSigning() {
+        return signing == SigningState.FULL;
+    }
+
+    /**
+     * @return the JNLP app for this classloader
+     */
+    ApplicationInstance getApplication() {
+        return app;
+    }
+
+    /**
+     * @return the JNLP file the classloader was created from.
+     */
+    JNLPFile getJNLPFile() {
+        return file;
+    }
+
+    /**
+     * Returns the permissions for the CodeSource.
+     */
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public PermissionCollection getPermissions(CodeSource cs) {
+        return applicationPermissions.getPermissions(cs, jar -> addNewJar(jar));
+    }
+
+    /**
+     * Call this when it's suspected that an applet's permission level may have
+     * just changed from Full Signing to Partial Signing. This will display a
+     * one-time prompt asking the user to confirm running the partially signed
+     * applet. Partially Signed applets always start off as appearing to be
+     * Fully Signed, and then during the initialization or loading process, we
+     * find that we actually need to demote the applet to Partial, either due to
+     * finding that not all of its JARs are actually signed, or because it needs
+     * to load something unsigned out of the codebase.
+     */
+    void checkPartialSigningWithUser() {
+        if (signing == SigningState.FULL && JNLPRuntime.isVerifying()) {
+            signing = SigningState.PARTIAL;
+            try {
+                securityDelegate.promptUserOnPartialSigning();
+            } catch (LaunchException e) {
+                throw new RuntimeException("The signed applet required loading of unsigned code from the codebase, "
+                        + "which the user refused", e);
+            }
+        }
+    }
+
+    /**
+     * Returns an appropriate AccessControlContext for loading classes in the
+     * running instance.
+     * <p>
+     * The default context during class-loading only allows connection to
+     * codebase. However applets are allowed to load jars from arbitrary
+     * locations and the codebase only access falls short if a class from one
+     * location needs a class from another.
+     * <p>
+     * Given protected access since CodeBaseClassloader uses this function too.
+     *
+     * @return The appropriate AccessControlContext for loading classes for this
+     * instance
+     */
+    AccessControlContext getAccessControlContextForClassLoading() {
+        final List<URL> urls = Optional.ofNullable(codeBaseLoader)
+                .map(loader -> Arrays.asList(loader.getURLs()))
+                .orElse(Collections.emptyList());
+
+        return applicationPermissions.getAccessControlContextForClassLoading(urls);
+    }
+
+
+
+
+
+
+
+
+    /**
+     * Return the absolute path to the native library.
+     */
+    @Override
+    protected String findLibrary(String lib) {
+        String syslib = System.mapLibraryName(lib);
+        File libFile = nativeLibraryStorage.findLibrary(syslib);
+
+        if (libFile != null) {
+            return libFile.toString();
+        }
+
+        String result = super.findLibrary(lib);
+        if (result != null) {
+            return result;
+        }
+
+        return findLibraryExt(lib);
     }
 
     /**
@@ -1687,32 +1755,6 @@ public class JNLPClassLoader extends URLClassLoader {
         return new ArrayList<>(result);
     }
 
-    public boolean getSigning() {
-        return signing == SigningState.FULL;
-    }
-
-    /**
-     * Call this when it's suspected that an applet's permission level may have
-     * just changed from Full Signing to Partial Signing. This will display a
-     * one-time prompt asking the user to confirm running the partially signed
-     * applet. Partially Signed applets always start off as appearing to be
-     * Fully Signed, and then during the initialization or loading process, we
-     * find that we actually need to demote the applet to Partial, either due to
-     * finding that not all of its JARs are actually signed, or because it needs
-     * to load something unsigned out of the codebase.
-     */
-    void checkPartialSigningWithUser() {
-        if (signing == SigningState.FULL && JNLPRuntime.isVerifying()) {
-            signing = SigningState.PARTIAL;
-            try {
-                securityDelegate.promptUserOnPartialSigning();
-            } catch (LaunchException e) {
-                throw new RuntimeException("The signed applet required loading of unsigned code from the codebase, "
-                        + "which the user refused", e);
-            }
-        }
-    }
-
     /**
      * Merges the code source/security descriptor mapping from another loader
      *
@@ -1753,10 +1795,6 @@ public class JNLPClassLoader extends URLClassLoader {
         }
     }
 
-    public ApplicationPermissions getApplicationPermissions() {
-        return applicationPermissions;
-    }
-
     /**
      * Adds the given path to the path loader
      *
@@ -1781,7 +1819,6 @@ public class JNLPClassLoader extends URLClassLoader {
             codeBaseLoader.addURL(u);
         }
     }
-
 
     /**
      * Increments loader use count by 1
@@ -1825,37 +1862,5 @@ public class JNLPClassLoader extends URLClassLoader {
                 uniqueKeyToLoader.remove(uniqueKey);
             }
         }
-    }
-
-    /**
-     * Returns an appropriate AccessControlContext for loading classes in the
-     * running instance.
-     * <p>
-     * The default context during class-loading only allows connection to
-     * codebase. However applets are allowed to load jars from arbitrary
-     * locations and the codebase only access falls short if a class from one
-     * location needs a class from another.
-     * <p>
-     * Given protected access since CodeBaseClassloader uses this function too.
-     *
-     * @return The appropriate AccessControlContext for loading classes for this
-     * instance
-     */
-    AccessControlContext getAccessControlContextForClassLoading() {
-        final List<URL> urls = Optional.ofNullable(codeBaseLoader)
-                .map(loader -> Arrays.asList(loader.getURLs()))
-                .orElse(Collections.emptyList());
-
-        return applicationPermissions.getAccessControlContextForClassLoading(urls);
-    }
-
-
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public ResourceTracker getTracker() {
-        return tracker;
     }
 }

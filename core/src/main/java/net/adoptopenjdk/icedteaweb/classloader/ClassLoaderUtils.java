@@ -5,8 +5,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -24,27 +24,27 @@ public class ClassLoaderUtils {
         }
     }
 
-    public static String getMainClass(final JNLPFile file, final JNLPClassLoader classLoader) {
+    public static String getMainClass(final JNLPFile file, final ResourceTracker tracker) {
         final String fromEntryPoint = getMainClassFromEntryPoint(file);
         if (fromEntryPoint != null) {
             return fromEntryPoint;
         }
-        return getMainClassFromManifest(file, classLoader);
+        return getMainClassFromManifest(file, tracker);
     }
 
-    private static String getMainClassFromManifest(final JNLPFile file, final JNLPClassLoader classLoader) {
+    private static String getMainClassFromManifest(final JNLPFile file, final ResourceTracker tracker) {
         final List<JARDesc> mainJars = file.getJnlpResources().getJARs().stream()
                 .filter(JARDesc::isMain)
                 .collect(Collectors.toList());
         if (mainJars.size() == 1) {
             final JARDesc jarDesc = mainJars.get(0);
-            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), classLoader.getTracker());
+            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
             if (fromManifest != null) {
                 return fromManifest;
             }
         } else if (mainJars.size() == 0) {
             final JARDesc jarDesc = file.getJnlpResources().getJARs().get(0);
-            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), classLoader.getTracker());
+            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
             if (fromManifest != null) {
                 return fromManifest;
             }

@@ -20,6 +20,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -79,6 +80,8 @@ public class ApplicationInstance {
     /** whether or not this application is signed */
     private boolean isSigned;
 
+    private final ResourceTracker tracker;
+
     /**
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
@@ -87,7 +90,8 @@ public class ApplicationInstance {
     public ApplicationInstance(JNLPFile file, boolean enableCodeBase) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
-        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase);
+        tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker);
         loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
@@ -267,7 +271,7 @@ public class ApplicationInstance {
             return mainName;
         }
 
-        final File f = loader.getTracker().getCacheFile(file.getResources().getMainJAR().getLocation());
+        final File f = tracker.getCacheFile(file.getResources().getMainJAR().getLocation());
         if (f != null) {
             try (final JarFile mainJar = new JarFile(f)) {
                 return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
