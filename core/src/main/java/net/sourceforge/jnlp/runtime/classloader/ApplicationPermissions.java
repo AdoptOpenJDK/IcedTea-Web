@@ -42,7 +42,7 @@ import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 public class ApplicationPermissions {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ApplicationPermissions.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationPermissions.class);
 
     /**
      * the security section
@@ -139,15 +139,16 @@ public class ApplicationPermissions {
                     if (codeSource.getLocation() == null) {
                         throw new IllegalStateException("Code source location was null");
                     }
-                    if (getCodeSourceSecurity(codeSource.getLocation(), jar -> addJarConsumer.accept(jar)) == null) {
+                    final SecurityDesc codeSourceSecurity = getCodeSourceSecurity(codeSource.getLocation(), addJarConsumer);
+                    if (codeSourceSecurity == null) {
                         throw new IllegalStateException("Code source security was null");
                     }
-                    if (getCodeSourceSecurity(codeSource.getLocation(), jar -> addJarConsumer.accept(jar)).getSecurityType() == null) {
+                    if (codeSourceSecurity.getSecurityType() == null) {
                         LOG.error("Warning! Code source security type was null");
                     }
-                    Object securityType = getCodeSourceSecurity(codeSource.getLocation(), jar -> addJarConsumer.accept(jar)).getSecurityType();
+                    Object securityType = codeSourceSecurity.getSecurityType();
                     if (SecurityDesc.ALL_PERMISSIONS.equals(securityType) || SecurityDesc.J2EE_PERMISSIONS.equals(securityType)) {
-                        permissions = getCodeSourceSecurity(codeSource.getLocation(), jar -> addJarConsumer.accept(jar)).getPermissions(codeSource);
+                        permissions = codeSourceSecurity.getPermissions(codeSource);
                     }
                 }
                 for (Permission perm : Collections.list(permissions.elements())) {
@@ -213,7 +214,7 @@ public class ApplicationPermissions {
         synchronized (this) {
             getAllJarLocations().stream()
                     .map(l -> new SocketPermission(UrlUtils.getHostAndPort(l),"connect, accept"))
-                    .forEach(p -> permissions.add(p));
+                    .forEach(permissions::add);
         }
 
         // Permissions for codebase urls (if there is a loader)
