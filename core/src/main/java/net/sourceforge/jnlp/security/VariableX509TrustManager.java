@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.CollectionUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -64,19 +64,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
+
 /**
  * This class implements an X509 Trust Manager. The certificates it trusts are
  * "variable", in the sense that it can dynamically, and temporarily support
  * different certificates that are not in the keystore.
  */
 
-final public class VariableX509TrustManager {
+public final class VariableX509TrustManager {
 
-    private final static Logger LOG = LoggerFactory.getLogger(VariableX509TrustManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VariableX509TrustManager.class);
 
-    public final static String SUN_X_509 = "SunX509";
+    public static final String PKIX = "PKIX";
 
-    public final static String SUN_JSSE = "SunJSSE";
+    public static final String SUN_JSSE = "SunJSSE";
 
 
     private static VariableX509TrustManager instance = null;
@@ -104,19 +106,19 @@ final public class VariableX509TrustManager {
         try {
             loadManagers(Arrays.asList(KeyStores.getCertKeyStores()), certTrustManagers);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Exception while loading CertKeyStores", e);
         }
 
         try {
             loadManagers(Arrays.asList(KeyStores.getCAKeyStores()), caTrustManagers);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Exception while loading CaKeyStores", e);
         }
 
         try {
             loadManagers(Arrays.asList(KeyStores.getClientKeyStores()), clientTrustManagers);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Exception while loading ClientKeyStores", e);
         }
     }
 
@@ -125,15 +127,15 @@ final public class VariableX509TrustManager {
         Objects.requireNonNull(managers);
 
         keyStores.stream()
-                .map(keyStore -> getTrustManagerFactory(keyStore))
-                .flatMap(trustManagerFactory -> Arrays.asList(trustManagerFactory.getTrustManagers()).stream())
+                .map(this::getTrustManagerFactory)
+                .flatMap(trustManagerFactory -> Arrays.stream(trustManagerFactory.getTrustManagers()))
                 .filter(trustManager -> trustManager instanceof X509TrustManager)
                 .forEach(trustManager -> managers.add((X509TrustManager) trustManager));
     }
 
     private TrustManagerFactory getTrustManagerFactory(final KeyStore keyStore) {
         try {
-            final TrustManagerFactory tmFactory = TrustManagerFactory.getInstance(SUN_X_509, SUN_JSSE);
+            final TrustManagerFactory tmFactory = TrustManagerFactory.getInstance(PKIX, SUN_JSSE);
             tmFactory.init(keyStore);
             return tmFactory;
         } catch (final Exception e) {
@@ -153,22 +155,24 @@ final public class VariableX509TrustManager {
                                  final String hostName)
             throws CertificateException {
 
-        boolean trusted = false;
-        ValidatorException savedException = null;
+        final List<ValidatorException> savedException = new ArrayList<>();
         for (X509TrustManager clientTrustManager : clientTrustManagers) {
+            if (isNullOrEmpty(clientTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             try {
                 clientTrustManager.checkClientTrusted(chain, authType);
-                trusted = true;
-                break;
+                return;
             } catch (ValidatorException caex) {
-                savedException = caex;
+                savedException.add(caex);
             }
         }
-        if (trusted) {
-            return;
+        if (savedException.isEmpty()) {
+            throw new ValidatorException("could not verify certificate chain because there exist no accepted issuers");
+        } else {
+            savedException.forEach(e -> LOG.warn("failed to check trust client for " + hostName, e));
+            throw savedException.get(0);
         }
-
-        throw savedException;
     }
 
     /**
@@ -234,7 +238,11 @@ final public class VariableX509TrustManager {
                 }
             }
 
-            throw ce;
+            if (ce != null) {
+                throw ce;
+            } else {
+                throw new CertificateException("hostName is null");
+            }
         }
     }
 
@@ -256,9 +264,11 @@ final public class VariableX509TrustManager {
     private void checkAllManagers(X509Certificate[] chain, String authType, Socket socket, SSLEngine engine) throws CertificateException {
 
         // first try CA TrustManagers
-        boolean trusted = false;
-        ValidatorException savedException = null;
+        final List<ValidatorException> savedException = new ArrayList<>();
         for (X509TrustManager caTrustManager : caTrustManagers) {
+            if (isNullOrEmpty(caTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             try {
                 if (socket == null && engine == null) {
                     caTrustManager.checkServerTrusted(chain, authType);
@@ -276,37 +286,29 @@ final public class VariableX509TrustManager {
                         throw new ValidatorException(nsme.getMessage());
                     }
                 }
-                trusted = true;
-                break;
+                return;
             } catch (ValidatorException caex) {
-                savedException = caex;
+                savedException.add(caex);
             }
-        }
-
-        if (trusted) {
-            return;
         }
 
         for (X509TrustManager certTrustManager : certTrustManagers) {
             try {
                 certTrustManager.checkServerTrusted(chain, authType);
-                trusted = true;
-                break;
+                return;
             } catch (ValidatorException caex) {
-                savedException = caex;
+                savedException.add(caex);
             }
-        }
-        if (trusted) {
-            return;
         }
 
         // finally check temp trusted certs
         if (!temporarilyTrusted.contains(chain[0])) {
-            if (savedException == null) {
-                // OutputController.getLogger().log(OutputController.Level.MESSAGE_ALL, "IMPOSSIBLE!");
+            if (savedException.isEmpty()) {
                 throw new ValidatorException(ValidatorException.T_SIGNATURE_ERROR, chain[0]);
+            } else {
+                savedException.forEach(e -> LOG.warn("failed to check chain", e));
+                throw savedException.get(0);
             }
-            throw savedException;
         }
 
     }
@@ -318,6 +320,9 @@ final public class VariableX509TrustManager {
         boolean explicitlyTrusted = false;
 
         for (X509TrustManager certTrustManager : certTrustManagers) {
+            if (isNullOrEmpty(certTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             try {
                 certTrustManager.checkServerTrusted(chain, authType);
                 explicitlyTrusted = true;
@@ -342,7 +347,7 @@ final public class VariableX509TrustManager {
             issuers.addAll(Arrays.asList(caTrustManager.getAcceptedIssuers()));
         }
 
-        return issuers.toArray(new X509Certificate[issuers.size()]);
+        return issuers.toArray(new X509Certificate[0]);
     }
 
     /**
