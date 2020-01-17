@@ -36,6 +36,7 @@ import sun.awt.AppContext;
 import javax.swing.event.EventListenerList;
 import java.awt.Window;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.AccessControlContext;
@@ -107,9 +108,21 @@ public class ApplicationInstance {
     private final ApplicationPermissions applicationPermissions;
 
 
-    final Consumer<JARDesc> addJarConsumer = jarDesc -> System.out.println("addJarConsumer called for " + jarDesc);
+    final Consumer<JARDesc> addJarConsumer = jarDesc -> {
+        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/ITW-1.txt"), true)) {
+            out.write(("addJarConsumer called for " + jarDesc + System.lineSeparator()).getBytes());
+        } catch (final Exception e) {
+            throw new RuntimeException("ARH!", e);
+        }
+        System.out.println("addJarConsumer called for " + jarDesc);
+    };
 
     final Function<JARDesc, URL> localCacheAccess = jarDesc -> {
+        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/ITW-2.txt"), true)) {
+            out.write(("localCacheAccess called for " + jarDesc + System.lineSeparator()).getBytes());
+        } catch (final Exception e) {
+            throw new RuntimeException("ARH!", e);
+        }
         System.out.println("localCacheAccess called for " + jarDesc);
         return null;
     };
