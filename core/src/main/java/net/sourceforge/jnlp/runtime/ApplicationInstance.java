@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
+import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
@@ -302,4 +303,11 @@ public class ApplicationInstance {
         return isSigned;
     }
 
+    public ApplicationPermissions getApplicationPermissions() {
+        return applicationPermissions;
+    }
+
+    public PermissionCollection getPermissions(CodeSource cs) {
+        return applicationPermissions.getPermissions(cs, jar -> loader.addNewJar(jar));
+    }
 }

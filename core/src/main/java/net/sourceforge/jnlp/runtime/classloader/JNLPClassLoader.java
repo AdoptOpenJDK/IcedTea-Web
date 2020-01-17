@@ -1508,7 +1508,7 @@ public class JNLPClassLoader extends URLClassLoader {
      *
      * @param desc the JARDesc for the new jar
      */
-    private void addNewJar(final JARDesc desc) {
+    public void addNewJar(final JARDesc desc) {
         this.addNewJar(desc, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
