@@ -107,25 +107,20 @@ public class ApplicationInstance {
 
     private final ApplicationPermissions applicationPermissions;
 
-
-    final Consumer<JARDesc> addJarConsumer = jarDesc -> {
-        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/ITW-1.txt"), true)) {
-            out.write(("addJarConsumer called for " + jarDesc + System.lineSeparator()).getBytes());
+    private void print(final String message) {
+        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/itw-log.txt"), true)) {
+            out.write((message + System.lineSeparator()).getBytes());
         } catch (final Exception e) {
-            throw new RuntimeException("ARH!", e);
+            throw new RuntimeException("Can not write message to file!", e);
+        } finally {
+            System.out.println(message);
         }
-        System.out.println("addJarConsumer called for " + jarDesc);
-    };
+    }
 
-    final Function<JARDesc, URL> localCacheAccess = jarDesc -> {
-        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/ITW-2.txt"), true)) {
-            out.write(("localCacheAccess called for " + jarDesc + System.lineSeparator()).getBytes());
-        } catch (final Exception e) {
-            throw new RuntimeException("ARH!", e);
-        }
-        System.out.println("localCacheAccess called for " + jarDesc);
-        return null;
-    };
+
+    final Consumer<JARDesc> addJarConsumer = jarDesc -> print("addJarConsumer called for " + jarDesc);
+
+    final Function<JARDesc, URL> localCacheAccess;
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -138,6 +133,19 @@ public class ApplicationInstance {
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
+
+        localCacheAccess = jarDesc -> {
+            print("Try to load JAR at " + jarDesc.getLocation());
+            try {
+                tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
+                final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
+                print("Local URL: " + url);
+                return url;
+            } catch (final Exception e) {
+                print("ERROR: " + e);
+                throw new RuntimeException("ARGH", e);
+            }
+        };
 
         JNLPFileFactory fileFactory = new JNLPFileFactory();
         JarExtractor extractor = new JarExtractor(file, fileFactory);
