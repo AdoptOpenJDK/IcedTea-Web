@@ -35,7 +35,6 @@ import net.sourceforge.jnlp.LaunchHandler;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoaderUtil;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -72,7 +71,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.security.AllPermission;
 import java.security.KeyStore;
-import java.security.Policy;
 import java.security.Security;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -584,8 +582,7 @@ public class JNLPRuntime {
      * determined.
      */
     public static ApplicationInstance getApplication() {
-        final Class<?>[] classContext = contextProvider.getClassContext();
-        return JNLPClassLoaderUtil.getApplication(Thread.currentThread(), classContext, 0);
+        return ApplicationManager.getApplication();
     }
 
     /**

@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoaderUtil;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
@@ -108,7 +107,7 @@ class JNLPSecurityManager extends SecurityManager {
      * determined.
      */
     protected ApplicationInstance getApplication() {
-        return JNLPClassLoaderUtil.getApplication(Thread.currentThread(), getClassContext(), 0);
+        return ApplicationManager.getApplication();
     }
 
     /**

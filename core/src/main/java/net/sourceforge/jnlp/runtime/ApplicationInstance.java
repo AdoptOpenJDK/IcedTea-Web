@@ -95,6 +95,7 @@ public class ApplicationInstance {
         this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
         this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker, applicationPermissions);
+        ApplicationManager.addApplication(this);
         loader.setApplication(this);
         this.isSigned = loader.getSigning();
         AppContext.getAppContext();
