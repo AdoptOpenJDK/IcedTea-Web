@@ -3,7 +3,6 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 
 import java.net.URL;
 import java.security.Permission;

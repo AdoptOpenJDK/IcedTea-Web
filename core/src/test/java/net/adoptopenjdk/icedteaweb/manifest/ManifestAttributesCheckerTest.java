@@ -44,8 +44,8 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.DummySecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.classloader.SigningState;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.SigningState;
 import org.junit.Assert;
 import org.junit.Test;
 
