@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -108,7 +109,19 @@ public class ApplicationInstance {
     private final ApplicationPermissions applicationPermissions;
 
     private void print(final String message) {
-        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/itw-log.txt"), true)) {
+        final File tmpDir = new File(JavaSystemProperties.getJavaTempDir());
+        final File logFile = new File(tmpDir, "itw-log.txt");
+        if (!tmpDir.exists()) {
+            tmpDir.mkdirs();
+        }
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try(FileOutputStream out = new FileOutputStream(logFile, true)) {
             out.write((message + System.lineSeparator()).getBytes());
         } catch (final Exception e) {
             throw new RuntimeException("Can not write message to file!", e);
