@@ -16,12 +16,16 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
+import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
@@ -33,6 +37,7 @@ import javax.swing.event.EventListenerList;
 import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -40,6 +45,8 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.jar.Attributes;
 
 /**
@@ -60,34 +67,57 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-    /** the file */
+    /**
+     * the file
+     */
     private final JNLPFile file;
 
-    /** the thread group */
+    /**
+     * the thread group
+     */
     private final ThreadGroup group;
 
-    /** the classloader */
-    private final JNLPClassLoader loader;
+    /**
+     * the classloader
+     */
+    private final JnlpApplicationClassLoader loader;
 
-    /** whether the application has stopped running */
+    /**
+     * whether the application has stopped running
+     */
     private boolean stopped = false;
 
-    /** weak list of windows opened by the application */
+    /**
+     * weak list of windows opened by the application
+     */
     private final WeakList<Window> weakWindows = new WeakList<>();
 
-    /** list of application listeners  */
+    /**
+     * list of application listeners
+     */
     private final EventListenerList listeners = new EventListenerList();
 
-    /** whether or not this application is signed */
+    /**
+     * whether or not this application is signed
+     */
     private boolean isSigned;
 
     private final ResourceTracker tracker;
 
     private final ApplicationPermissions applicationPermissions;
 
+
+    final Consumer<JARDesc> addJarConsumer = jarDesc -> System.out.println("addJarConsumer called for " + jarDesc);
+
+    final Function<JARDesc, URL> localCacheAccess = jarDesc -> {
+        System.out.println("localCacheAccess called for " + jarDesc);
+        return null;
+    };
+
     /**
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
+     *
      * @param file jnlpfile for which the instance do exists
      */
     public ApplicationInstance(JNLPFile file, boolean enableCodeBase) throws LaunchException {
@@ -95,10 +125,21 @@ public class ApplicationInstance {
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
-        this.loader = JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker, applicationPermissions);
+
+        JNLPFileFactory fileFactory = new JNLPFileFactory();
+        JarExtractor extractor = new JarExtractor(file, fileFactory);
+
+        try {
+            this.loader = new JnlpApplicationClassLoader(extractor.getParts(), localCacheAccess);
+        } catch (final Exception e) {
+            throw new RuntimeException("ARGH!!!", e);
+        }
+
+        JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker, applicationPermissions);
         ApplicationManager.addApplication(this);
-        loader.setApplication(this);
-        this.isSigned = loader.getSigning();
+
+        this.isSigned = true; // TODO: REFACTOR!!!!!!!!
+
         AppContext.getAppContext();
 
         if (JNLPRuntime.isSecurityEnabled() && JNLPRuntime.getForksStrategy().mayRunManagedApplication()) {
@@ -158,7 +199,7 @@ public class ApplicationInstance {
 
             final SecurityDesc s = applicationPermissions.getSecurity();
             final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
-            final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
+            final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
@@ -178,6 +219,7 @@ public class ApplicationInstance {
 
     /**
      * Returns the jnlpfile on which is this application based
+     *
      * @return JNLP file for this task.
      */
     public JNLPFile getJNLPFile() {
@@ -186,6 +228,7 @@ public class ApplicationInstance {
 
     /**
      * Returns the application title.
+     *
      * @return the title of this application
      */
     public String getTitle() {
@@ -194,6 +237,7 @@ public class ApplicationInstance {
 
     /**
      * Returns whether the application is running.
+     *
      * @return state of application
      */
     public boolean isRunning() {
@@ -289,6 +333,7 @@ public class ApplicationInstance {
     /**
      * Adds a window that this application opened.  When the
      * application is disposed, these windows will also be disposed.
+     *
      * @param window to be added
      */
     void addWindow(Window window) {
@@ -308,6 +353,6 @@ public class ApplicationInstance {
     }
 
     public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(cs, jar -> loader.addNewJar(jar));
+        return applicationPermissions.getPermissions(cs, addJarConsumer);
     }
 }
