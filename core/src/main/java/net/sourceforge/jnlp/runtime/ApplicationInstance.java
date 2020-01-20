@@ -29,6 +29,9 @@ import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
@@ -110,10 +113,15 @@ public class ApplicationInstance {
 
     private final ApplicationPermissions applicationPermissions;
 
+    private final JarCertVerifier certVerifier;
+
+    private final SecurityDelegate securityDelegate;
+
+
     //JUST FOR CURRENT TESTS!
     @Deprecated
     private void print(final String message) {
-        try (FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/itw-log.txt"), true)) {
+        try (FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.home") + "/Desktop/itw-log.txt"), true)) {
             out.write((message + System.lineSeparator()).getBytes());
         } catch (final Exception e) {
             throw new RuntimeException("Can not write message to file!", e);
@@ -132,11 +140,17 @@ public class ApplicationInstance {
      *
      * @param file jnlpfile for which the instance do exists
      */
-    public ApplicationInstance(JNLPFile file, boolean enableCodeBase) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, boolean enableCodeBase) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
+        final AppVerifier verifier = new JNLPAppVerifier();
+        certVerifier = new JarCertVerifier(verifier);
+        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
+
+
+
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final JarExtractor extractor = new JarExtractor(file, fileFactory);
@@ -175,6 +189,12 @@ public class ApplicationInstance {
         try {
             if (!tracker.isResourceAdded(jarDesc.getLocation())) {
                 tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
+            }
+            certVerifier.add(jarDesc, tracker);
+            if (!securityDelegate.getRunInSandbox()) {
+                if (certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
+                    certVerifier.checkTrustWithUser(securityDelegate, file);
+                }
             }
             final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
             LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);

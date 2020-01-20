@@ -51,6 +51,7 @@ public class ApplicationPermissions {
 
     private final ResourceTracker tracker;
 
+
     /**
      * Map of specific original (remote) CodeSource Urls to securitydesc
      * Synchronized since this field may become shared data between multiple
