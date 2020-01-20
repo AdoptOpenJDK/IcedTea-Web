@@ -57,17 +57,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * It is accepting commons setters for jdialog, but actually applying them right before it is created.
  * Obviously it do not have getters, but jdialog itself  should not be keeper of any information. SecurityPanel is.
  */
-public class ViwableDialog {
+public class ViewableDialog {
 
     private JDialog jd = null;
     List<Runnable> operations = new ArrayList<Runnable>();
 
-    public ViwableDialog() {
+    public ViewableDialog() {
     }
 
     private JDialog createJDialog() {
         jd = new JDialog();
-        jd.setName("ViwableDialog");
+        jd.setName("ViewableDialog");
         SwingUtils.info(jd);
         jd.setIconImages(ImageResources.INSTANCE.getApplicationImages());
         

@@ -80,7 +80,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         buttons.add(2, advancedOptionsButton);
 
         addComponents();
-        securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+        securityDialog.getViewableDialog().setMinimumSize(new Dimension(600, 400));
     }
 
     private String getAppletInfo() {

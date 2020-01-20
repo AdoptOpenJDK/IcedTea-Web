@@ -90,7 +90,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
             public void actionPerformed(ActionEvent e) {
                 if (sd != null) {
                     sd.setValue(YesCancelSkip.yes());
-                    parent.getViwableDialog().dispose();
+                    parent.getViewableDialog().dispose();
                 }
             }
         });
@@ -101,7 +101,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
             public void actionPerformed(ActionEvent e) {
                 if (sd != null) {
                     sd.setValue(YesCancelSkip.cancel());
-                    parent.getViwableDialog().dispose();
+                    parent.getViewableDialog().dispose();
                 }
             }
         });
@@ -141,7 +141,7 @@ public class InetSecurity511Panel extends SecurityDialogPanel {
         this.add(title, BorderLayout.NORTH);
         if (sd != null) {
             //for testing purposes
-            sd.getViwableDialog().pack();
+            sd.getViewableDialog().pack();
         }
     }
 

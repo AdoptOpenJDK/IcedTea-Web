@@ -302,7 +302,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     private class MoreInfoButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            SecurityDialog.showMoreInfoDialog(parent.getCertVerifier(),
+            SecurityDialogFactory.showMoreInfoDialog(parent.getCertVerifier(),
                                 parent);
         }
     }

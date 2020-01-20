@@ -65,7 +65,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
         TOP_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
-            securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+            securityDialog.getViewableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 

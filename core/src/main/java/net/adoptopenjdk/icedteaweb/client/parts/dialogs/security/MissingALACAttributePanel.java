@@ -91,7 +91,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
             throw new RuntimeException(ex);
         }
         if (x != null) {
-            x.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+            x.getViewableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 

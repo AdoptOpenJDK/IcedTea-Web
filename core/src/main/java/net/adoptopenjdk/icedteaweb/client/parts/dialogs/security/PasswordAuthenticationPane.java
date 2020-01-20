@@ -158,7 +158,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
 
         setSize(400, 150);
         if (parent!=null){
-            parent.getViwableDialog().setLocationRelativeTo(null);
+            parent.getViewableDialog().setLocationRelativeTo(null);
         }
         initialFocusComponent = jtfUserName;
 
@@ -166,7 +166,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(new NamePassword(jtfUserName.getText(), jpfPassword.getPassword()));
-                parent.getViwableDialog().dispose();
+                parent.getViewableDialog().dispose();
             }
         };
 
@@ -174,7 +174,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(null);
-                parent.getViwableDialog().dispose();
+                parent.getViewableDialog().dispose();
             }
         };
 
