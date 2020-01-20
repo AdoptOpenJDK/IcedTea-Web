@@ -146,8 +146,7 @@ public class ApplicationInstance {
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
-        final AppVerifier verifier = new JNLPAppVerifier();
-        certVerifier = new JarCertVerifier(verifier);
+        this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
         this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
 
