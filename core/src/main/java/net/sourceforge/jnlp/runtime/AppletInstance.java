@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 
@@ -51,8 +52,8 @@ public class AppletInstance extends ApplicationInstance {
      * Create a New Task based on the Specified URL
      * @param file pluginbridge to build instance on
      */
-    public AppletInstance(JNLPFile file) throws LaunchException {
-        this(file, null);
+    public AppletInstance(JNLPFile file, ResourceTrackerFactory trackerFactory) throws LaunchException {
+        this(file, trackerFactory, null);
     }
 
     /**
@@ -60,8 +61,8 @@ public class AppletInstance extends ApplicationInstance {
      * @param file pluginbridge to build instance on
      * @param cont Container where to place applet
      */
-    public AppletInstance(JNLPFile file, Container cont) throws LaunchException {
-        super(file, true);
+    public AppletInstance(JNLPFile file, ResourceTrackerFactory trackerFactory, Container cont) throws LaunchException {
+        super(file, trackerFactory, true);
         if(cont != null) {
             this.environment = new AppletEnvironment(file, this, cont);
         } else {

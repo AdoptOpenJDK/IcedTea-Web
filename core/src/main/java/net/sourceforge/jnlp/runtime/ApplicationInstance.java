@@ -23,6 +23,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
@@ -140,10 +141,10 @@ public class ApplicationInstance {
      *
      * @param file jnlpfile for which the instance do exists
      */
-    public ApplicationInstance(final JNLPFile file, boolean enableCodeBase) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, boolean enableCodeBase) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
-        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
         final AppVerifier verifier = new JNLPAppVerifier();
         certVerifier = new JarCertVerifier(verifier);

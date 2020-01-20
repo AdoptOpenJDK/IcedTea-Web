@@ -24,6 +24,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -524,7 +525,7 @@ public class Launcher {
             // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
-            final AppletInstance appletInstance = new AppletInstance(file, cont);
+            final AppletInstance appletInstance = new AppletInstance(file, new DefaultResourceTrackerFactory(), cont);
 
              /*
               * Due to PR2968, moved to earlier phase, so early stages of applet
@@ -559,7 +560,7 @@ public class Launcher {
      */
     private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
         try {
-            return new ApplicationInstance(file, false);
+            return new ApplicationInstance(file, new DefaultResourceTrackerFactory(), false);
         } catch (Exception ex) {
             throw new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
         }
