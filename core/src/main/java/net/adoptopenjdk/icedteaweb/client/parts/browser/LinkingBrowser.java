@@ -85,7 +85,7 @@ public class LinkingBrowser extends JTabbedPane {
     }
 
     public static void showStandAloneWindow(String url, boolean socket) {
-        if (JavaConsole.canShowOnStartup(true)) {
+        if (JavaConsole.canShowOnStartup()) {
             JavaConsole.getConsole().showConsoleLater();
         }
         // plug in a custom authenticator and proxy selector

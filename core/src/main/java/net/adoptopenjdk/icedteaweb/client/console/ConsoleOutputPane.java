@@ -5,7 +5,6 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
 
@@ -148,7 +147,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         setHeadersCheckBoxesEnabled(showHeaders.isSelected());
         setMessagesCheckBoxesEnabled(showMessage.isSelected());
         refresh.setEnabled(!autorefresh.isSelected());
-        if (JNLPRuntime.isWebstartApplication()) {
+        if (true) {
             showPlugin.setSelected(false);
             showPreInit.setSelected(false);
             showPostInit.setSelected(false);

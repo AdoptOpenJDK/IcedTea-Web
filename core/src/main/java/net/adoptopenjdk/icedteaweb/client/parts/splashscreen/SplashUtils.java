@@ -73,7 +73,7 @@ public class SplashUtils {
     }
 
     private static SplashReason getReason() {
-        if (JNLPRuntime.isWebstartApplication()) {
+        if (true) {
             return SplashReason.JAVAWS;
         } else {
             return SplashReason.APPLET;

@@ -29,7 +29,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 
@@ -156,7 +155,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         String exec;
         String title = "xdesktop writing";
-        if (JNLPRuntime.isWebstartApplication()) {
+        if (true) {
             exec = "Exec=" + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
             fileContents += exec;
         } else {

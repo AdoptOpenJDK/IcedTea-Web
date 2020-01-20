@@ -91,7 +91,7 @@ public class XDesktopEntryTest {
 
     @BeforeClass
     public static void saveJnlpRuntimeHtml() {
-        wasJavaws = JNLPRuntime.isWebstartApplication();
+        wasJavaws = true;
     }
 
     private static void setIsWebstart(boolean value) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {

@@ -98,7 +98,7 @@ public class CertificateViewer extends JFrame {
     }
 
     private static void showCertificateViewer() {
-        JNLPRuntime.initialize(true);
+        JNLPRuntime.initialize();
 
         CertificateViewer cv = new CertificateViewer();
         cv.setResizable(true);

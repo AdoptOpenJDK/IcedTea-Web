@@ -239,7 +239,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             c.gridy++;
             infoPanel.add(desktopCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
+            if (!true) {
                 htmlPanelDesktop = new HtmlShortcutPanel();
                 infoPanel.add(htmlPanelDesktop, c);
                 htmlPanelDesktop.setVisible(false);
@@ -247,7 +247,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             }
             infoPanel.add(menuCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
+            if (!true) {
                 htmlPanelMenu = new HtmlShortcutPanel();
                 infoPanel.add(htmlPanelMenu, c);
                 htmlPanelMenu.setVisible(false);
