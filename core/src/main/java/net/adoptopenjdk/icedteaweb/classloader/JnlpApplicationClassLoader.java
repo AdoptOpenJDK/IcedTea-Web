@@ -33,13 +33,14 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     private final NativeLibrarySupport nativeLibrarySupport;
 
+    private final ReentrantLock loadJarLock = new ReentrantLock();
+
     public JnlpApplicationClassLoader(List<Part> parts, final Function<JARDesc, URL> localCacheAccess) throws Exception {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
         this.localCacheAccess = localCacheAccess;
         this.nativeLibrarySupport = new NativeLibrarySupport();
 
-        this.parts = parts.stream()
-                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+        this.parts = new CopyOnWriteArrayList<>(parts);
 
         parts.stream()
                 .filter(part -> !part.isLazy())
@@ -63,22 +64,32 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final URL localCacheUrl = localCacheAccess.apply(jarDescription);
-                if (!Arrays.asList(getURLs()).contains(localCacheUrl)) {
-                    if (jarDescription.isNative()) {
-                        try {
-                            nativeLibrarySupport.addSearchJar(localCacheUrl);
-                        } catch (final Exception e) {
-                            throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
-                        }
-                    }
-                    addURL(localCacheUrl);
-                }
+                addJar(jarDescription, localCacheUrl);
                 downloadFuture.complete(null);
             } catch (final Exception e) {
                 downloadFuture.completeExceptionally(e);
             }
         });
         return downloadFuture;
+    }
+
+    private void addJar(JARDesc jarDescription, URL localCacheUrl) {
+        loadJarLock.lock();
+        try {
+            if (!Arrays.asList(getURLs()).contains(localCacheUrl)) {
+                if (jarDescription.isNative()) {
+                    try {
+                        nativeLibrarySupport.addSearchJar(localCacheUrl);
+                    } catch (final Exception e) {
+                        throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                    }
+                }
+                addURL(localCacheUrl);
+            }
+        }
+        finally {
+            loadJarLock.unlock();
+        }
     }
 
     private void downloadAndAddPart(final Part part) {
