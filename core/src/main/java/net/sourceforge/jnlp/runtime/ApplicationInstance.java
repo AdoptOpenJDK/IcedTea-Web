@@ -46,8 +46,11 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.jar.Attributes;
 
 /**
@@ -107,8 +110,10 @@ public class ApplicationInstance {
 
     private final ApplicationPermissions applicationPermissions;
 
+    //JUST FOR CURRENT TESTS!
+    @Deprecated
     private void print(final String message) {
-        try(FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/itw-log.txt"), true)) {
+        try (FileOutputStream out = new FileOutputStream(new File("/Users/hendrikebbers/Desktop/itw-log.txt"), true)) {
             out.write((message + System.lineSeparator()).getBytes());
         } catch (final Exception e) {
             throw new RuntimeException("Can not write message to file!", e);
@@ -117,10 +122,9 @@ public class ApplicationInstance {
         }
     }
 
-
     final Consumer<JARDesc> addJarConsumer = jarDesc -> print("addJarConsumer called for " + jarDesc);
 
-    final Function<JARDesc, URL> localCacheAccess;
+    private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -134,24 +138,11 @@ public class ApplicationInstance {
         this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
 
-        localCacheAccess = jarDesc -> {
-            print("Try to load JAR at " + jarDesc.getLocation());
-            try {
-                tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
-                final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
-                print("Local URL: " + url);
-                return url;
-            } catch (final Exception e) {
-                print("ERROR: " + e);
-                throw new RuntimeException("ARGH", e);
-            }
-        };
-
-        JNLPFileFactory fileFactory = new JNLPFileFactory();
-        JarExtractor extractor = new JarExtractor(file, fileFactory);
+        final JNLPFileFactory fileFactory = new JNLPFileFactory();
+        final JarExtractor extractor = new JarExtractor(file, fileFactory);
 
         try {
-            this.loader = new JnlpApplicationClassLoader(extractor.getParts(), localCacheAccess);
+            this.loader = new JnlpApplicationClassLoader(extractor.getParts(), jarDesc -> getLocalUrlForJar(jarDesc));
         } catch (final Exception e) {
             throw new RuntimeException("ARGH!!!", e);
         }
@@ -169,6 +160,31 @@ public class ApplicationInstance {
 
             Policy.setPolicy(policy);
             System.setSecurityManager(security);
+        }
+    }
+
+    private synchronized Lock getOrCreateLock(final URL resourceUrl) {
+        return resourceDownloadLocks.computeIfAbsent(resourceUrl, url -> new ReentrantLock());
+    }
+
+    private URL getLocalUrlForJar(final JARDesc jarDesc) {
+        LOG.debug("Trying to get local URL of JAR '{}'", jarDesc.getLocation());
+        print("Trying to get local URL of JAR '" + jarDesc.getLocation() + "'");
+        final Lock jarLock = getOrCreateLock(jarDesc.getLocation());
+        jarLock.lock();
+        try {
+            if (!tracker.isResourceAdded(jarDesc.getLocation())) {
+                tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
+            }
+            final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
+            LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);
+            print("Local URL of JAR '" + jarDesc.getLocation() + "' is '" + url + "'");
+            return url;
+        } catch (final Exception e) {
+            print("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'. Error: " + e.getMessage());
+            throw new RuntimeException("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'", e);
+        } finally {
+            jarLock.unlock();
         }
     }
 

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -292,8 +293,8 @@ public class ResourceTracker {
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
-     * @param urls    the resources to wait for
-     * @throws InterruptedException     if thread is interrupted
+     * @param urls the resources to wait for
+     * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void waitForResources(URL... urls) throws InterruptedException {
@@ -310,7 +311,7 @@ public class ResourceTracker {
      * @param timeout  the time in ms to wait before returning, 0 for no timeout
      * @param timeUnit the unit for timeout
      * @return whether the resources downloaded before the timeout
-     * @throws InterruptedException     if thread is interrupted
+     * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
@@ -346,6 +347,10 @@ public class ResourceTracker {
         return resource.isComplete();
     }
 
+    public boolean isResourceAdded(URL location) {
+        return getOptionalResource(location).isPresent();
+    }
+
     /**
      * Returns the number of total size in bytes of a resource, or
      * -1 it the size is not known.
@@ -370,19 +375,21 @@ public class ResourceTracker {
         return lresources;
     }
 
+
     /**
      * Return the resource matching the specified URL.
      *
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     private Resource getResource(URL location) {
+        return getOptionalResource(location)
+                .orElseThrow(() -> new IllegalResourceDescriptorException("Location " + location + " does not specify a resource being tracked."));
+    }
+
+    private Optional<Resource> getOptionalResource(URL location) {
         final URL normalizedLocation = normalizeUrlQuietly(location);
         synchronized (resources) {
-            final Resource result = resources.get(normalizedLocation);
-            if (result == null) {
-                throw new IllegalResourceDescriptorException("Location " + location + " does not specify a resource being tracked.");
-            }
-            return result;
+            return Optional.ofNullable(resources.get(normalizedLocation));
         }
     }
 

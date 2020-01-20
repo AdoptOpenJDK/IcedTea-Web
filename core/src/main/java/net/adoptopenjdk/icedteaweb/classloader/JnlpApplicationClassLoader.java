@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -58,23 +59,26 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     private Future<Void> downloadAndAdd(final JARDesc jarDescription) {
-        final CompletableFuture<URL> downloadFuture = new CompletableFuture<>();
+        final CompletableFuture<Void> downloadFuture = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
                 final URL localCacheUrl = localCacheAccess.apply(jarDescription);
-                if (jarDescription.isNative()) {
-                    try {
-                        nativeLibrarySupport.addSearchJar(localCacheUrl);
-                    } catch (final Exception e) {
-                        throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                if (!Arrays.asList(getURLs()).contains(localCacheUrl)) {
+                    if (jarDescription.isNative()) {
+                        try {
+                            nativeLibrarySupport.addSearchJar(localCacheUrl);
+                        } catch (final Exception e) {
+                            throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
+                        }
                     }
+                    addURL(localCacheUrl);
                 }
-                downloadFuture.complete(localCacheUrl);
+                downloadFuture.complete(null);
             } catch (final Exception e) {
                 downloadFuture.completeExceptionally(e);
             }
         });
-        return downloadFuture.thenAccept(this::addURL);
+        return downloadFuture;
     }
 
     private void downloadAndAddPart(final Part part) {
