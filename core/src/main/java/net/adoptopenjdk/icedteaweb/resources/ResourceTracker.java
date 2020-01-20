@@ -189,22 +189,6 @@ public class ResourceTracker {
     }
 
     /**
-     * Removes a resource from the tracker.  This method is useful
-     * to allow memory to be reclaimed, but calling this method is
-     * not required as resources are reclaimed when the tracker is
-     * collected.
-     *
-     * @param location location of resource to be removed
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    public void removeResource(URL location) {
-        synchronized (resources) {
-            Resource resource = getResource(location);
-            resources.remove(resource.getLocation());
-        }
-    }
-
-    /**
      * Returns a URL pointing to the cached location of the
      * resource, or the resource itself if it is a non-cacheable
      * resource.
@@ -217,7 +201,9 @@ public class ResourceTracker {
      * @return the resource, or null if it could not be downloaded
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      * @see CacheUtil#isCacheable
+     * @deprecated
      */
+    @Deprecated
     public URL getCacheURL(URL location) {
         final File f = getCacheFile(location);
         if (f != null) {
@@ -296,7 +282,9 @@ public class ResourceTracker {
      * @param urls the resources to wait for
      * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     * @deprecated
      */
+    @Deprecated
     public void waitForResources(URL... urls) throws InterruptedException {
         if (urls.length > 0) {
             wait(getResources(urls));
@@ -313,7 +301,9 @@ public class ResourceTracker {
      * @return whether the resources downloaded before the timeout
      * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     * @deprecated
      */
+    @Deprecated
     public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
         if (urls.length > 0) {
             return wait(getResources(urls), timeout, timeUnit);
@@ -327,7 +317,9 @@ public class ResourceTracker {
      * @param location the resource location
      * @return the number of bytes transferred
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     * @deprecated
      */
+    @Deprecated
     public long getAmountRead(URL location) {
         // not atomic b/c transferred is a long, but so what (each
         // byte atomic? so probably won't affect anything...)
@@ -341,7 +333,9 @@ public class ResourceTracker {
      * @param location the resource location
      * @return resource availability
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     * @deprecated
      */
+    @Deprecated
     public boolean checkResource(URL location) {
         Resource resource = getResource(location);
         return resource.isComplete();
@@ -358,7 +352,9 @@ public class ResourceTracker {
      * @param location the resource location
      * @return the number of bytes, or -1
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
+     * @deprecated
      */
+    @Deprecated
     public long getTotalSize(URL location) {
         return getResource(location).getSize(); // atomic
     }
