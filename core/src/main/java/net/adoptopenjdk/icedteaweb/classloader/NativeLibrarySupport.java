@@ -48,9 +48,12 @@ public class NativeLibrarySupport {
         }
     }
 
-    private void storeLibrary(final JarFile jarFile, final JarEntry entry) {
+    private synchronized void storeLibrary(final JarFile jarFile, final JarEntry entry) {
         try {
             final File outFile = new File(nativeSearchDirectory, entry.getName());
+            if(outFile.exists()) {
+                throw new RuntimeException("Native file with given name " + entry.getName() + " already exists.");
+            }
             if (!outFile.isFile()) {
                 FileUtils.createRestrictedFile(outFile);
             }
@@ -58,7 +61,7 @@ public class NativeLibrarySupport {
                 IOUtils.copy(jarFile.getInputStream(entry), out);
             }
         } catch (final Exception e) {
-            throw new RuntimeException("Error while storing native library", e);
+            throw new RuntimeException("Error while storing native library " + entry + " that is part of jar " + jarFile.getName(), e);
         }
     }
 
