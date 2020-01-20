@@ -62,7 +62,7 @@ public class AppletInstance extends ApplicationInstance {
      * @param cont Container where to place applet
      */
     public AppletInstance(JNLPFile file, ResourceTrackerFactory trackerFactory, Container cont) throws LaunchException {
-        super(file, trackerFactory, true);
+        super(file, trackerFactory);
         if(cont != null) {
             this.environment = new AppletEnvironment(file, this, cont);
         } else {

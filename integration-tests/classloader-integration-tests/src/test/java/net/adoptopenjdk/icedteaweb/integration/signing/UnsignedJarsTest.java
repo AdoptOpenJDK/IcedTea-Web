@@ -17,6 +17,6 @@ class UnsignedJarsTest {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(IntegrationTestResources.load("integration-app-25.jnlp"));
         final ResourceTrackerFactory resourceTrackerFactory = new DummyResourceTracker.Factory();
 
-        new ApplicationInstance(jnlpFile, resourceTrackerFactory, false);
+        new ApplicationInstance(jnlpFile, resourceTrackerFactory);
     }
 }

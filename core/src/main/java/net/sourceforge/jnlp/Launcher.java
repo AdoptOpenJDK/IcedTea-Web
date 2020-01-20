@@ -560,7 +560,7 @@ public class Launcher {
      */
     private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
         try {
-            return new ApplicationInstance(file, new DefaultResourceTrackerFactory(), false);
+            return new ApplicationInstance(file, new DefaultResourceTrackerFactory());
         } catch (Exception ex) {
             throw new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
         }

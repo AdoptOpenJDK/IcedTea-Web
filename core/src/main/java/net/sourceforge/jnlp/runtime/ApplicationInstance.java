@@ -139,7 +139,7 @@ public class ApplicationInstance {
      *
      * @param file jnlpfile for which the instance do exists
      */
-    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, boolean enableCodeBase) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
