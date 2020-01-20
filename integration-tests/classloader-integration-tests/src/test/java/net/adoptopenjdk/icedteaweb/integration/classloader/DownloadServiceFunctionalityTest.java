@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 import net.adoptopenjdk.icedteaweb.classloader.Extension;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class DownloadServiceFunctionalityTest {
         classLoader.loadClass(CLASS_A);
 
         //than
-        final URL extensionURL = DownloadServiceFunctionalityTest.class.getResource("integration-app-19-extension.jnlp");
+        final URL extensionURL = IntegrationTestResources.load("integration-app-19-extension.jnlp");
         final Extension extension = new Extension(extensionURL, null);
         Assertions.assertTrue(classLoader.isPartDownloaded("lazy-package", extension));
     }
@@ -98,7 +99,7 @@ public class DownloadServiceFunctionalityTest {
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-19.jnlp");
         final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
-        final URL extensionURL = DownloadServiceFunctionalityTest.class.getResource("integration-app-19-extension.jnlp");
+        final URL extensionURL = IntegrationTestResources.load("integration-app-19-extension.jnlp");
         final Extension extension = new Extension(extensionURL, null);
 
         //when

@@ -56,7 +56,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>src/test/resources/net/adoptopenjdk/icedteaweb/integration/classloader</outputDirectory>
+                            <outputDirectory>src/test/resources/net/adoptopenjdk/icedteaweb/integration</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>../classloader-integration-tests-module-1/target</directory>

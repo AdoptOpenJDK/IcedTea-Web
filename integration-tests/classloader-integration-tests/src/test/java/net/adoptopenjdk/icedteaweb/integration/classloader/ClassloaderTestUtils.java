@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
+import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
@@ -25,6 +26,6 @@ public class ClassloaderTestUtils {
     private static final JNLPFileFactory JNLP_FILE_FACTORY = new JNLPFileFactory();
 
     public static List<Part> createPartsFor(final String name) throws IOException, ParseException {
-        return new JarExtractor(JNLP_FILE_FACTORY.create(ClassloaderTestUtils.class.getResource(name)), JNLP_FILE_FACTORY).getParts();
+        return new JarExtractor(JNLP_FILE_FACTORY.create(IntegrationTestResources.class.getResource(name)), JNLP_FILE_FACTORY).getParts();
     }
 }
