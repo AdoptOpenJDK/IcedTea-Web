@@ -29,6 +29,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.IllegalResourceDescriptorException;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
@@ -167,7 +168,7 @@ public class JNLPClassLoader extends URLClassLoader {
     /**
      * loads the resources
      */
-    private final ResourceTracker tracker;
+    private final DefaultResourceTracker tracker;
 
     /**
      * the update policy for resources
@@ -262,7 +263,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
     public JNLPClassLoader(JNLPFile file, UpdatePolicy policy) throws LaunchException {
-        this(file, policy, new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
+        this(file, policy, new DefaultResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
     }
 
     /**
@@ -273,7 +274,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy update policy of loader
      * @throws net.sourceforge.jnlp.LaunchException if app can not be loaded
      */
-    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, final ResourceTracker tracker) throws LaunchException {
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, final DefaultResourceTracker tracker) throws LaunchException {
         this(file, policy, null, false, tracker, new ApplicationPermissions(tracker));
     }
 
@@ -288,7 +289,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @throws net.sourceforge.jnlp.LaunchException when need to kill an app
      *                                              comes.
      */
-    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
+    private JNLPClassLoader(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final DefaultResourceTracker tracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         super(new URL[0], JNLPClassLoader.class.getClassLoader());
 
         LOG.info("New classloader: {}", file.getFileLocation());
@@ -379,7 +380,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param policy   the update policy to use when downloading resources
      * @param mainName Overrides the main class name of the application
      */
-    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
+    private static JNLPClassLoader createInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final DefaultResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         String uniqueKey = file.getUniqueKey();
         JNLPClassLoader baseLoader = uniqueKeyToLoader.get(uniqueKey);
         JNLPClassLoader loader = new JNLPClassLoader(file, policy, mainName, enableCodeBase, resourceTracker, applicationPermissions);
@@ -426,7 +427,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker) throws LaunchException {
+    static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final DefaultResourceTracker resourceTracker) throws LaunchException {
         return getInstance(file, policy, enableCodeBase, resourceTracker, new ApplicationPermissions(resourceTracker));
     }
 
@@ -440,7 +441,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final ResourceTracker resourceTracker, ApplicationPermissions applicationPermissions) throws LaunchException {
+    public static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, boolean enableCodeBase, final DefaultResourceTracker resourceTracker, ApplicationPermissions applicationPermissions) throws LaunchException {
         final JNLPClassLoader loader = getInstance(file, policy, null, enableCodeBase, resourceTracker, applicationPermissions);
         if(enableCodeBase) {
             loader.enableCodeBase();
@@ -459,7 +460,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return existing classloader. creates new if none reliable exists
      * @throws net.sourceforge.jnlp.LaunchException when launch is doomed
      */
-    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final ResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
+    private static JNLPClassLoader getInstance(JNLPFile file, UpdatePolicy policy, String mainName, boolean enableCodeBase, final DefaultResourceTracker resourceTracker, final ApplicationPermissions applicationPermissions) throws LaunchException {
         JNLPClassLoader loader;
         String uniqueKey = file.getUniqueKey();
 
@@ -518,7 +519,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
                 final JNLPFile jnlpFile = new JNLPFileFactory().create(location, uniqueKey, version, settings, policy);
-                final ResourceTracker extensionTracker = new ResourceTracker(true, jnlpFile.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+                final DefaultResourceTracker extensionTracker = new DefaultResourceTracker(true, jnlpFile.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
                 final ApplicationPermissions extensionApplicationPermissions = new ApplicationPermissions(extensionTracker);
                 loader = getInstance(jnlpFile, policy, mainName, enableCodeBase, extensionTracker, extensionApplicationPermissions);
             }
@@ -1142,7 +1143,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @param resources the resources to wait for
      * @param title     name of the download
      */
-    private void waitForResources(final ResourceTracker tracker, final URL[] resources, final String title) {
+    private void waitForResources(final DefaultResourceTracker tracker, final URL[] resources, final String title) {
         final DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
         DownloadServiceListener listener = null;
 

@@ -24,6 +24,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -112,7 +113,7 @@ public class JNLPFileFactory {
         Assert.requireNonNull(policy, "policy");
 
         try {
-            final ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
+            final ResourceTracker tracker = new DefaultResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
             tracker.addResource(location, version);
             final File f = tracker.getCacheFile(location);
             return new FileInputStream(f);

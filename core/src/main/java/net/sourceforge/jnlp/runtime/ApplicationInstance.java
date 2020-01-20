@@ -23,14 +23,12 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
-import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
@@ -149,9 +147,6 @@ public class ApplicationInstance {
         this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
         this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
-
-
-
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final JarExtractor extractor = new JarExtractor(file, fileFactory);
 
@@ -161,7 +156,6 @@ public class ApplicationInstance {
             throw new RuntimeException("ARGH!!!", e);
         }
 
-        JNLPClassLoader.getInstance(file, JNLPRuntime.getDefaultUpdatePolicy(), enableCodeBase, tracker, applicationPermissions);
         ApplicationManager.addApplication(this);
 
         this.isSigned = true; // TODO: REFACTOR!!!!!!!!
@@ -192,7 +186,11 @@ public class ApplicationInstance {
             }
             certVerifier.add(jarDesc, tracker);
             if (!securityDelegate.getRunInSandbox()) {
-                if (certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
+                // TODO: work in progress
+                if (!certVerifier.isFullySigned()) {
+                    securityDelegate.promptUserOnPartialSigning();
+                }
+                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
                     certVerifier.checkTrustWithUser(securityDelegate, file);
                 }
             }

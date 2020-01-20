@@ -66,7 +66,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ResourceTrackerTest extends NoStdOutErrTest{
+public class DefaultResourceTrackerTest extends NoStdOutErrTest{
 
     public static ServerLauncher downloadServer;
     private static final PrintStream[] backedUpStream = new PrintStream[4];
@@ -211,7 +211,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
 
         URL url = downloadServer.getUrl("resource");
 
-        ResourceTracker rt = new ResourceTracker();
+        ResourceTracker rt = new DefaultResourceTracker();
         rt.addResource(url, (VersionString) null, UpdatePolicy.FORCE);
         File downloadFile = rt.getCacheFile(url);
 

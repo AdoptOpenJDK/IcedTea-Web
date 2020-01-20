@@ -39,6 +39,7 @@ package net.adoptopenjdk.icedteaweb.client;
 
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.AbstractLaunchHandler;
@@ -111,7 +112,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
         final URL splashImageURL = file.getInformation().getIconLocation(
                 IconKind.SPLASH, preferredWidth, preferredHeight);
 
-        final ResourceTracker resourceTracker = new ResourceTracker(true);
+        final ResourceTracker resourceTracker = new DefaultResourceTracker(true);
         if (splashImageURL != null) {
             resourceTracker.addResource(splashImageURL, file.getFileVersion());
         }
