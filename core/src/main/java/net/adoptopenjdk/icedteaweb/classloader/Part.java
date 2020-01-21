@@ -19,8 +19,6 @@ public class Part {
 
     private final Extension extension;
 
-    private boolean downloaded;
-
     private final List<JARDesc> jars = new ArrayList<>();
     private final List<PackageDesc> packages = new ArrayList<>();
 
@@ -67,14 +65,6 @@ public class Part {
 
     public boolean isLazy() {
         return lazy;
-    }
-
-    public boolean isDownloaded() {
-        return downloaded;
-    }
-
-    public void setDownloaded(final boolean downloaded) {
-        this.downloaded = downloaded;
     }
 
     public Extension getExtension() {

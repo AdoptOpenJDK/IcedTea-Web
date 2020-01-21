@@ -35,21 +35,25 @@ class NativeLibrarySupport {
         return Optional.empty();
     }
 
-    public void addSearchJar(final URL jarLocation) throws IOException, URISyntaxException {
-        final File localFile = Paths.get(jarLocation.toURI()).toFile();
+    public void addSearchJar(final URL jarLocation) {
+        try {
+            final File localFile = Paths.get(jarLocation.toURI()).toFile();
 
-        try (final JarFile jarFile = new JarFile(localFile, false)) {
-            jarFile.stream()
-                    .filter(entry -> !entry.isDirectory())
-                    .filter(entry -> isSupportedLibrary(entry.getName()))
-                    .forEach(entry -> storeLibrary(jarFile, entry));
+            try (final JarFile jarFile = new JarFile(localFile, false)) {
+                jarFile.stream()
+                        .filter(entry -> !entry.isDirectory())
+                        .filter(entry -> isSupportedLibrary(entry.getName()))
+                        .forEach(entry -> storeLibrary(jarFile, entry));
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("Unable to inspect jar for native libraries: " + jarLocation, e);
         }
     }
 
     private synchronized void storeLibrary(final JarFile jarFile, final JarEntry entry) {
         try {
             final File outFile = new File(nativeSearchDirectory, entry.getName());
-            if(outFile.exists()) {
+            if (outFile.exists()) {
                 throw new RuntimeException("Native file with given name " + entry.getName() + " already exists.");
             }
             if (!outFile.isFile()) {

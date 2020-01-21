@@ -25,11 +25,15 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final List<Part> parts = createFor("empty.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, new DummyJarProvider());
+        final DummyJarProvider jarProvider = new DummyJarProvider();
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+
+        //expect
         thrown.expect(ClassNotFoundException.class);
         thrown.expectMessage("not.in.Classpath");
 
         //when
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         classLoader.findClass("not.in.Classpath");
     }
 
@@ -38,13 +42,15 @@ public class JnlpApplicationClassLoaderTest {
 
         //given
         final List<Part> parts = createFor("unavailable-jar.jnlp").getParts();
+        final ErrorJarProvider jarProvider = new ErrorJarProvider();
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         // expect
         thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Error while creating classloader!");
+        thrown.expectMessage("Error while downloading jar!");
 
         //when
-        new JnlpApplicationClassLoader(parts, new ErrorJarProvider());
+        new JnlpApplicationClassLoader(partsHandler);
     }
 
     @Test
@@ -53,9 +59,10 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("eager-and-lazy.jnlp").getParts();
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assert.assertTrue(jarProvider.hasTriedToDownload("eager.jar"));
@@ -68,10 +75,11 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("eager-and-lazy.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
         try {
+            final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
             classLoader.findClass("class.in.lazy.Package");
         } catch (final Exception ignore) {}
 
@@ -86,7 +94,10 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-not-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+
+        //when
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assert.assertEquals(0, jarProvider.getDownloaded().size());
@@ -98,10 +109,11 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-not-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
         try {
+            final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
             classLoader.findClass("class.in.lazy.A");
         } catch (final Exception ignore) {}
 
@@ -115,15 +127,16 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-not-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
         try {
+            final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
             classLoader.findClass("class.in.lazy.sub.A");
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertEquals(0, jarProvider.getDownloaded().size());
+        Assert.assertEquals(1, jarProvider.getDownloaded().size());
     }
 
     @Test
@@ -132,7 +145,10 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+
+        //when
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assert.assertEquals(0, jarProvider.getDownloaded().size());
@@ -144,10 +160,11 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
         try {
+            final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
             classLoader.findClass("class.in.lazy.A");
         } catch (final Exception ignore) {}
 
@@ -161,10 +178,11 @@ public class JnlpApplicationClassLoaderTest {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createFor("lazy-recursive.jnlp").getParts();
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
         try {
+            final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
             classLoader.findClass("class.in.lazy.sub.A");
         } catch (final Exception ignore) {}
 
@@ -173,8 +191,7 @@ public class JnlpApplicationClassLoaderTest {
     }
 
 
-
-    private class DummyJarProvider implements Function<JARDesc, URL> {
+    private static class DummyJarProvider implements Function<JARDesc, URL> {
 
         private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();
 
@@ -195,7 +212,7 @@ public class JnlpApplicationClassLoaderTest {
         }
     }
 
-    private class ErrorJarProvider implements Function<JARDesc, URL> {
+    private static class ErrorJarProvider implements Function<JARDesc, URL> {
 
         @Override
         public URL apply(final JARDesc jarDesc) {

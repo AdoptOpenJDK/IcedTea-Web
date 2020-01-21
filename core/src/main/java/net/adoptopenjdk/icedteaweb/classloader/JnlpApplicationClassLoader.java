@@ -1,113 +1,62 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
 
-    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
-
-    private final Lock partsLock = new ReentrantLock();
-
-    private final Function<JARDesc, URL> localCacheAccess;
-
-    private final List<Part> parts;
-
+    private final JarProvider jarProvider;
     private final NativeLibrarySupport nativeLibrarySupport;
 
-    private final ReentrantLock loadJarLock = new ReentrantLock();
+    private final ReentrantLock addJarLock = new ReentrantLock();
 
-    public JnlpApplicationClassLoader(List<Part> parts, final Function<JARDesc, URL> localCacheAccess) throws Exception {
+    public JnlpApplicationClassLoader(JarProvider jarProvider) {
+        this(jarProvider, new NativeLibrarySupport());
+    }
+
+    public JnlpApplicationClassLoader(JarProvider jarProvider, NativeLibrarySupport nativeLibrarySupport) {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
-        this.localCacheAccess = localCacheAccess;
-        this.nativeLibrarySupport = new NativeLibrarySupport();
+        this.jarProvider = jarProvider;
+        this.nativeLibrarySupport = nativeLibrarySupport;
 
-        this.parts = new CopyOnWriteArrayList<>(parts);
-
-        parts.stream()
-                .filter(part -> !part.isLazy())
-                .forEach(this::downloadAndAddPart);
+        jarProvider.loadEagerJars().forEach(this::addJar);
     }
 
-    private void checkParts(final String name) {
-        partsLock.lock();
+    private boolean loadMoreJars(final String name) {
+        return jarProvider.loadMoreJars(name).stream()
+                .peek(this::addJar)
+                .count() > 0;
+    }
+
+    private void addJar(LoadableJar jar) {
+        addJarLock.lock();
         try {
-            parts.stream()
-                    .filter(part -> part.supports(name))
-                    .filter(part -> !part.isDownloaded())
-                    .forEach(part -> downloadAndAddPart(part));
-        } finally {
-            partsLock.unlock();
-        }
-    }
-
-    private Future<Void> downloadAndAdd(final JARDesc jarDescription) {
-        final CompletableFuture<Void> downloadFuture = new CompletableFuture<>();
-        BACKGROUND_EXECUTOR.execute(() -> {
-            try {
-                final URL localCacheUrl = localCacheAccess.apply(jarDescription);
-                addJar(jarDescription, localCacheUrl);
-                downloadFuture.complete(null);
-            } catch (final Exception e) {
-                downloadFuture.completeExceptionally(e);
-            }
-        });
-        return downloadFuture;
-    }
-
-    private void addJar(JARDesc jarDescription, URL localCacheUrl) {
-        loadJarLock.lock();
-        try {
-            if (!Arrays.asList(getURLs()).contains(localCacheUrl)) {
-                if (jarDescription.isNative()) {
-                    try {
-                        nativeLibrarySupport.addSearchJar(localCacheUrl);
-                    } catch (final Exception e) {
-                        throw new RuntimeException("Unable to inspect jar for native libraries: " + localCacheUrl, e);
-                    }
+            if (!Arrays.asList(getURLs()).contains(jar.getLocation())) {
+                if (jar.containsNativeLib()) {
+                    nativeLibrarySupport.addSearchJar(jar.getLocation());
                 }
-                addURL(localCacheUrl);
+                addURL(jar.getLocation());
             }
+        } finally {
+            addJarLock.unlock();
         }
-        finally {
-            loadJarLock.unlock();
-        }
-    }
-
-    private void downloadAndAddPart(final Part part) {
-        final List<Future<Void>> tasks = part.getJars().stream()
-                .map(this::downloadAndAdd)
-                .collect(Collectors.toList());
-        tasks.forEach(future -> waitForCompletion(future, "Error while creating classloader!"));
-        part.setDownloaded(true);
     }
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        try {
-            return super.findClass(name);
-        } catch (final ClassNotFoundException e) {
-            checkParts(name);
-            return super.findClass(name);
+        do {
+            try {
+                return super.findClass(name);
+            } catch (ClassNotFoundException ignored) {
+            }
         }
+        while (loadMoreJars(name));
+        throw new ClassNotFoundException(name);
     }
 
     @Override
@@ -118,67 +67,45 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     @Override
     public URL findResource(final String name) {
-        final URL result = super.findResource(name);
-        if (result == null) {
-            checkParts(name);
-            return super.findResource(name);
+        do {
+            final URL result = super.findResource(name);
+            if (result != null) {
+                return result;
+            }
         }
-        return result;
+        while (loadMoreJars(name));
+        return null;
     }
 
     @Override
     public Enumeration<URL> findResources(final String name) throws IOException {
-        checkParts(name);
+        //noinspection StatementWithEmptyBody
+        while (loadMoreJars(name)) {
+            // continue until finished
+        }
         return super.findResources(name);
     }
 
-
-    //Methods that are needed for JNLP DownloadService interface
-
-    public void downloadPart(final String partName) {
-        downloadPart(partName, null);
+    public interface JarProvider {
+        List<LoadableJar> loadEagerJars();
+        List<LoadableJar> loadMoreJars(String name);
     }
 
-    public void downloadPart(final String partName, final Extension extension) {
-        partsLock.lock();
-        try {
-            parts.stream()
-                    .filter(part -> Objects.equals(extension, part.getExtension()))
-                    .filter(part -> Objects.equals(partName, part.getName()))
-                    .findFirst()
-                    .ifPresent(part -> downloadAndAddPart(part));
-        } finally {
-            partsLock.unlock();
+    public static class LoadableJar {
+        private final URL location;
+        private final boolean containsNativeLib;
+
+        LoadableJar(URL location, boolean containsNativeLib) {
+            this.location = location;
+            this.containsNativeLib = containsNativeLib;
         }
-    }
 
-    public boolean isPartDownloaded(final String partName) {
-        return isPartDownloaded(partName, null);
-    }
-
-    public boolean isPartDownloaded(final String partName, final Extension extension) {
-        partsLock.lock();
-        try {
-            return parts.stream()
-                    .filter(part -> Objects.equals(extension, part.getExtension()))
-                    .filter(part -> Objects.equals(partName, part.getName()))
-                    .anyMatch(part -> part.isDownloaded());
-        } finally {
-            partsLock.unlock();
+        public URL getLocation() {
+            return location;
         }
-    }
 
-    @Deprecated
-    public void removePartDownloads(final String partName) {
-        removePartDownloads(partName, null);
-    }
-
-    @Deprecated
-    public void removePartDownloads(final String partName, final Extension extension) {
-        // While DownloadService provides the possibility to remove a part we can not really do that since
-        // the URLClassLoader do not provide functionallity to remove a URL.
-        //Once this ClassLoader is used in ITW the exception should be thrown in the XDownloadService.
-        //This is just a reminder that such functionallity can not be implemented.
-        throw new RuntimeException("Can not remove part!");
+        public boolean containsNativeLib() {
+            return containsNativeLib;
+        }
     }
 }

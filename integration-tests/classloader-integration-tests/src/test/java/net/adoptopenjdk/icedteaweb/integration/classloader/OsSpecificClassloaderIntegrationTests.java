@@ -2,9 +2,9 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -22,16 +22,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined windows as os will be loaded on windows systems
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-4.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -41,16 +41,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined windows as os will be loaded on windows systems and classes can be loaded
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-4.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -62,16 +62,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined windows as os won't be loaded on other operation systems
      */
-    @Test
     @RepeatedTest(10)
     @DisabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-4.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -81,16 +81,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined mac as os will be loaded on mac systems
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-5.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -100,16 +100,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined mac as os will be loaded on mac systems and classes can be loaded
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-5.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -121,16 +121,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined mac as os won't be loaded on other operation systems
      */
-    @Test
     @RepeatedTest(10)
     @DisabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-5.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -140,16 +140,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined linux as os will be loaded on linux systems
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-6.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -159,16 +159,16 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined linux as os will be loaded on linux systems and classes can be loaded
      */
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-6.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -180,70 +180,64 @@ public class OsSpecificClassloaderIntegrationTests {
     /**
      * A resource that has defined linux as os won't be loaded on other operation systems
      */
-    @Test
     @RepeatedTest(10)
     @DisabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-6.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
         Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
     }
 
-
-
-
-
-
-
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceInJreOnMac() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_3));
     }
 
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceInJreOnWindows() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
 
-    @Test
     @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceInJreOnLinux() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-24.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());

@@ -2,9 +2,9 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -19,15 +19,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When loading a JNLP file the eager jars should be directly downloaded and accessible by the classloader
      */
-    @Test
     @RepeatedTest(10)
     public void testEagerJarLoadedAtStart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-1.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -37,15 +37,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When loading a JNLP file classes from eager jar can be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-1.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -58,15 +58,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When loading a JNLP file a lazy jar should not be directly downloaded
      */
-    @Test
     @RepeatedTest(10)
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-2.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -75,15 +75,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When accessing a class from a lazy jar the classloader will trigger the download of the jar and load the class
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-2.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -97,15 +97,15 @@ public class BasicClassloaderIntegrationTests {
      * When accessing a class from a lazy jar the classloader will trigger the download of the jar and load the class
      * Here the recursive attribute is checked
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromLazyJarWithRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-7.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -116,32 +116,39 @@ public class BasicClassloaderIntegrationTests {
     }
 
     /**
-     * if recursive attribute is not defined only direct classes in the package of a part can be downloaded
+     * if recursive attribute is not defined only direct classes in the package of a part can be downloaded.
+     * Never the less the remaining parts are downloaded one by one in a trial and error approach to find the class.
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-8.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        Assertions.assertThrows(ClassNotFoundException.class, () -> classLoader.loadClass(CLASS_A));
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
+
+        //than
+        Assertions.assertNotNull(loadedClass);
+        Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
+        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
 
     /**
      * When accessing a class from a lazy jar multiple times the jar is only downloaded one time
      */
-    @Test
     @RepeatedTest(10)
     public void testLazyJarOnlyDownloadedOnce() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-2.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
         final Class<?> loadedClass2 = classLoader.loadClass(CLASS_A);
 
@@ -150,7 +157,7 @@ public class BasicClassloaderIntegrationTests {
         Assertions.assertEquals(classLoader, loadedClass1.getClassLoader());
         Assertions.assertNotNull(loadedClass2);
         Assertions.assertEquals(classLoader, loadedClass2.getClassLoader());
-        Assertions.assertTrue(loadedClass1 == loadedClass2);
+        Assertions.assertSame(loadedClass1, loadedClass2);
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
         Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
     }
@@ -158,15 +165,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When accessing a class from a lazy jar all jars that are in the same part will be downloaded
      */
-    @Test
     @RepeatedTest(10)
     public void testFullPartDownloaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-3.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -180,15 +187,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When a JNLP contains multiple resource tags all jars of the resources will be downloaded correctly
      */
-    @Test
     @RepeatedTest(10)
     public void testMultipleResources() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-11.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
         final Class<?> loadedClass2 = classLoader.loadClass(CLASS_B);
 
@@ -205,15 +212,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * When a part has lazy and eager parts it will be automatically downloaded
      */
-    @Test
     @RepeatedTest(10)
     public void testEagerPart() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-21.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(2, jarProvider.getDownloaded().size());
@@ -224,15 +231,15 @@ public class BasicClassloaderIntegrationTests {
     /**
      * If more than one lazy part matches for the needed class all parts should be downloaded
      */
-    @Test
     @RepeatedTest(10)
     public void testAllLazyPartsLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-23.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_B);
 
         //than

@@ -2,9 +2,9 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -19,15 +19,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * A part of an extension JNLP will not be automatically downloaded if all jars of the part are lazy
      */
-    @Test
     @RepeatedTest(10)
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-19.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(0, jarProvider.getDownloaded().size());
@@ -36,15 +36,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * A lazy part of an extension JNLP will be downloaded if a class of the part is loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-19.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -57,16 +57,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * An eager jar of an extension JNLP will automatically be downloaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-20.jnlp");
-        final JnlpApplicationClassLoader classLoader =
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
-                //when
-                new JnlpApplicationClassLoader(parts, jarProvider);
+        //when
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -76,15 +75,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * A class from an eager jar of an extension JNLP can be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-20.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -97,15 +96,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * Parts with the same name in the main JNLP and an extension JNLP do not belong together
      */
-    @Test
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-22.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -118,15 +117,15 @@ public class ExtensionSupportClassloaderTests {
     /**
      * Parts with the same name in the main JNLP and an extension JNLP do not belong together
      */
-    @Test
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-22.jnlp");
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(parts, jarProvider);
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
+        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_B);
 
         //than

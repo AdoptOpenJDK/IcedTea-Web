@@ -2,9 +2,9 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -17,15 +17,15 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     /**
      * Resources that are defined as part of a not matching Java version won't be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-9.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -36,15 +36,15 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     /**
      * Resources that are defined as part of a not matching Java version won't be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-14.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());
@@ -55,15 +55,15 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     /**
      * Resources that are defined as part of a matching Java version will be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
         final DummyJarProvider jarProvider = new DummyJarProvider();
         final List<Part> parts = createPartsFor("integration-app-10.jnlp");
+        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        new JnlpApplicationClassLoader(partsHandler);
 
         //than
         Assertions.assertEquals(1, jarProvider.getDownloaded().size());

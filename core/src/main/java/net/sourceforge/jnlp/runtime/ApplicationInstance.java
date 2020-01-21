@@ -18,6 +18,7 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
@@ -159,7 +160,8 @@ public class ApplicationInstance {
         final JarExtractor extractor = new JarExtractor(file, fileFactory);
 
         try {
-            this.loader = new JnlpApplicationClassLoader(extractor.getParts(), jarDesc -> getLocalUrlForJar(jarDesc));
+            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), this::getLocalUrlForJar);
+            this.loader = new JnlpApplicationClassLoader(partsHandler);
         } catch (final Exception e) {
             throw new RuntimeException("ARGH!!!", e);
         }
