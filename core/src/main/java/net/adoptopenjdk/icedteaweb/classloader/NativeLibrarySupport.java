@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 
@@ -8,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,16 +16,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
-public class NativeLibrarySupport {
+class NativeLibrarySupport {
 
     private static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", ".dylib", ".jnilib", ".framework", ".dll"};
 
     private final File nativeSearchDirectory;
 
-    public NativeLibrarySupport() throws IOException {
-        //TODO: Old version uses FileUtils.createRestrictedDirectory(nativeDir); Is this needed??
-        //TODO: Should we place the native files just in the temp folder? Maybe we can place them next to the cache?
-        this.nativeSearchDirectory = Files.createTempDirectory("itw-native-" + UUID.randomUUID().toString()).toFile();
+    public NativeLibrarySupport() {
+        this.nativeSearchDirectory = createNativeStoreDirectory();
         this.nativeSearchDirectory.deleteOnExit();
     }
 
@@ -67,5 +65,26 @@ public class NativeLibrarySupport {
 
     private boolean isSupportedLibrary(final String filename) {
         return Stream.of(NATIVE_LIBRARY_EXTENSIONS).anyMatch(filename::endsWith);
+    }
+
+    /**
+     * Create a random base directory to cache native code files in.
+     * The directory has restricted access such that only the current user can access it.
+     * This is to reduce the chance some other user can manipulate the native libs in the cache.
+     */
+    private static File createNativeStoreDirectory() {
+        final String javaTempDir = JavaSystemProperties.getJavaTempDir();
+        final File parent = new File(javaTempDir);
+        if (!parent.isDirectory() && !parent.mkdirs()) {
+            throw new IllegalStateException("Java temp dir '" + javaTempDir + "' is not a directory and cannot be created");
+        }
+
+        final File nativeDir = new File(parent, "itw-native-" + UUID.randomUUID().toString());
+        try {
+            FileUtils.createRestrictedDirectory(nativeDir);
+            return nativeDir;
+        } catch (IOException e) {
+            throw new RuntimeException("Exception while creating native storage directory '" + nativeDir + "'", e);
+        }
     }
 }
