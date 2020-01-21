@@ -23,6 +23,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -138,6 +139,13 @@ public class ApplicationInstance {
      * appropriate {@link ThreadGroup} only.
      *
      * @param file jnlpfile for which the instance do exists
+     */
+    public ApplicationInstance(final JNLPFile file) throws LaunchException {
+        this(file, new DefaultResourceTrackerFactory());
+    }
+
+    /**
+     * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile)} (JNLPFile)}.
      */
     public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) throws LaunchException {
         this.file = file;
