@@ -141,19 +141,19 @@ public class ApplicationInstance {
      * @param file jnlpfile for which the instance do exists
      */
     public ApplicationInstance(final JNLPFile file) throws LaunchException {
-        this(file, new DefaultResourceTrackerFactory(), new DefaultSecurityDelegateFactory());
+        this(file, new DefaultResourceTrackerFactory());
     }
 
     /**
      * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile)} (JNLPFile)}.
      */
-    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, SecurityDelegateFactory securityDelegateFactory) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) throws LaunchException {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
         this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
-        this.securityDelegate = securityDelegateFactory.create(applicationPermissions, file, certVerifier);
+        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final JarExtractor extractor = new JarExtractor(file, fileFactory);
