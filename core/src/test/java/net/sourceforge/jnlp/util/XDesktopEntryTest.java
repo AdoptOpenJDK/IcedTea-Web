@@ -90,27 +90,6 @@ public class XDesktopEntryTest {
     private static boolean wasJavaws;
 
     @BeforeClass
-    public static void saveJnlpRuntimeHtml() {
-        wasJavaws = true;
-    }
-
-    private static void setIsWebstart(boolean value) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
-        field.setAccessible(true);
-        field.set(null, value);
-    }
-
-    @After
-    public void restoreJnlpRuntimeHtml() throws Exception {
-        setIsWebstart(wasJavaws);
-    }
-
-    @AfterClass
-    public static void restoreJnlpRuntimeHtmlFinally() throws Exception {
-        setIsWebstart(wasJavaws);
-    }
-
-    @BeforeClass
     public static void ensureHomeVariable() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
         ServerAccess.logOutputReprint("Environment");
         envToString();

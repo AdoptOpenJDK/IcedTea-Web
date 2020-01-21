@@ -82,26 +82,19 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, macStatus);
     }
 
-    private static final String isWSA = "isWebstartApplication";
-
     static void setStaticField(Field field, Object newValue) throws Exception {
         field.setAccessible(true);
         field.set(null, newValue);
     }
 
     private void setWSA() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), true);
     }
 
     private void setApplet() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
-
-
     }
 
     @Bug(id = {"PR895",
