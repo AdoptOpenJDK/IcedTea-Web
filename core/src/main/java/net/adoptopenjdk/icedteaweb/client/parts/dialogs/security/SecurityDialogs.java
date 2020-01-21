@@ -47,20 +47,23 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancel;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
+import java.awt.Component;
 import java.awt.Dialog.ModalityType;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.NetPermission;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.cert.X509Certificate;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -79,13 +82,12 @@ import java.util.concurrent.Semaphore;
  */
 public class SecurityDialogs {
 
-    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
 
     /**
      * Types of dialogs we can create
      */
-    public static enum DialogType {
-
+    public enum DialogType {
         CERT_WARNING,
         MORE_INFO,
         CERT_INFO,
@@ -372,6 +374,55 @@ public class SecurityDialogs {
             return false; //kill command
         }
         return true;
+    }
+
+    /**
+     * Shows more information regarding jar code signing
+     *
+     * @param certVerifier the JarCertVerifier used to verify this application
+     * @param parent       the parent NumberOfArguments pane
+     */
+    public static void showMoreInfoDialog(
+            CertVerifier certVerifier, SecurityDialog parent) {
+
+        JNLPFile file = parent.getFile();
+        SecurityDialog dialog =
+                new SecurityDialog(DialogType.MORE_INFO, null, file,
+                        certVerifier);
+        dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViewableDialog().show();
+        dialog.getViewableDialog().dispose();
+    }
+
+    /**
+     * Displays CertPath information in a readable table format.
+     *
+     * @param certVerifier the JarCertVerifier used to verify this application
+     * @param parent       the parent NumberOfArguments pane
+     */
+    public static void showCertInfoDialog(CertVerifier certVerifier,
+                                          Component parent) {
+        SecurityDialog dialog = new SecurityDialog(DialogType.CERT_INFO,
+                null, null, certVerifier);
+        dialog.getViewableDialog().setLocationRelativeTo(parent);
+        dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViewableDialog().show();
+        dialog.getViewableDialog().dispose();
+    }
+
+    /**
+     * Displays a single certificate's information.
+     *
+     * @param c      the X509 certificate.
+     * @param parent the parent pane.
+     */
+    public static void showSingleCertInfoDialog(X509Certificate c,
+                                                Window parent) {
+        SecurityDialog dialog = new SecurityDialog(DialogType.SINGLE_CERT_INFO, c);
+        dialog.getViewableDialog().setLocationRelativeTo(parent);
+        dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.getViewableDialog().show();
+        dialog.getViewableDialog().dispose();
     }
 
 }

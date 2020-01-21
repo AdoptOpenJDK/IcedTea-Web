@@ -38,6 +38,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -53,7 +54,6 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -302,7 +302,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     private class MoreInfoButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            SecurityDialogFactory.showMoreInfoDialog(parent.getCertVerifier(),
+            SecurityDialogs.showMoreInfoDialog(parent.getCertVerifier(),
                                 parent);
         }
     }
