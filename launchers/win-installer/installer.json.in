@@ -86,7 +86,7 @@
         {
           "type": "string",
           "name": "",
-          "value": "[INSTALLDIR]share\\pixmaps\\javaws.ico"
+          "value": "[INSTALLDIR]libs\\javaws.ico"
         }
       ]
     },
