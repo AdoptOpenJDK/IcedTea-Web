@@ -87,7 +87,16 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     public interface JarProvider {
+        /**
+         * @return a list with all eager jars which have not yet been loaded.
+         */
         List<LoadableJar> loadEagerJars();
+
+        /**
+         * Loads more jars. If no more jars can be loaded then an empty list is returned.
+         * @param name the name of the class/resource which is needed by the classloader.
+         * @return the list of additional jars or an empty list if all jars have been loaded.
+         */
         List<LoadableJar> loadMoreJars(String name);
     }
 
