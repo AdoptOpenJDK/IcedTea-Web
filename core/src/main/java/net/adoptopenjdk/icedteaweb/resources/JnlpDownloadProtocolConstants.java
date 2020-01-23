@@ -19,4 +19,6 @@ public interface JnlpDownloadProtocolConstants {
 
     String VERSION_ID_QUERY_PARAM = "version-id";
     String CURRENT_VERSION_ID_QUERY_PARAM = "current-version-id";
+
+    String VERSION_PREFIX = "__V";
 }
