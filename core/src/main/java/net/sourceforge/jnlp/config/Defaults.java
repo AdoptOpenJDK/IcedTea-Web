@@ -270,48 +270,48 @@ public class Defaults {
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
-                    null,
-                    null
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTP_HOST,
                     null,
-                    null
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTP_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
                     null,
-                    null
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_HOST,
                     null,
-                    null
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
                     null,
-                    null
+                    ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS,
