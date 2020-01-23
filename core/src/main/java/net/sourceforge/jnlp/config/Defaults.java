@@ -281,7 +281,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTP_PORT,
                     null,
-                    ValidatorFactory.createRangedIntegerValidator(0, 65535)
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
@@ -291,7 +291,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
                     null,
-                    ValidatorFactory.createRangedIntegerValidator(0, 65535)
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_HOST,
@@ -301,7 +301,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_PORT,
                     null,
-                    ValidatorFactory.createRangedIntegerValidator(0, 65535)
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
@@ -311,7 +311,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
                     null,
-                    ValidatorFactory.createRangedIntegerValidator(0, 65535)
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS,
