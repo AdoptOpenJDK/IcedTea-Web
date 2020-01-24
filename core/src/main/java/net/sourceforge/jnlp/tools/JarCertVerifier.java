@@ -183,7 +183,6 @@ public class JarCertVerifier implements CertVerifier {
      *
      * @return Whether or not the app is considered signed.
      */
-    // FIXME: Change javadoc once applets do not need entire jars signed.
     public boolean isFullySigned() {
         return isTriviallySigned() || isSigned();
     }
@@ -192,12 +191,6 @@ public class JarCertVerifier implements CertVerifier {
         final boolean fullySigned = appVerifier.isFullySigned(certs, jarSignableEntries);
         LOG.debug("App already has trusted publisher: {}", fullySigned);
         return fullySigned;
-    }
-
-    public static boolean isJarSigned(final JARDesc jar, final AppVerifier verifier, final ResourceTracker tracker) throws Exception {
-        final JarCertVerifier certVerifier = new JarCertVerifier(verifier);
-        certVerifier.add(jar, tracker);
-        return certVerifier.allJarsSigned();
     }
 
     /**
@@ -414,9 +407,6 @@ public class JarCertVerifier implements CertVerifier {
                 }
             }
         } catch (Exception e) {
-            // TODO: Warn user about not being able to
-            // look through their cacerts/trusted.certs
-            // file depending on exception.
             LOG.warn("Unable to read through cert store files.");
             throw e;
         }
