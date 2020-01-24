@@ -3,11 +3,26 @@ package net.adoptopenjdk.icedteaweb.classloader;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.JarProvider;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.LoadableJar;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.runtime.ApplicationPermissions;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -17,25 +32,47 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class PartsHandler implements JarProvider {
 
-    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
+    private static final Logger LOG = LoggerFactory.getLogger(PartsHandler.class);
 
-    private final Function<JARDesc, URL> localCacheAccess;
+    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
 
     private final List<Part> parts;
     private final Lock partsLock = new ReentrantLock();
     private final Set<Part> downloadedParts = new HashSet<>();
     private final Set<Part> loadedParts = new HashSet<>();
 
-    public PartsHandler(List<Part> parts, final Function<JARDesc, URL> localCacheAccess) {
-        this.localCacheAccess = localCacheAccess;
+    private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
+
+    private final ResourceTracker tracker;
+
+    private final SecurityDelegate securityDelegate;
+
+    private final JarCertVerifier certVerifier;
+
+    private final JNLPFile file;
+
+    public PartsHandler(final List<Part> parts, final JNLPFile file) {
+        this(parts, file, new DefaultResourceTrackerFactory().create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
+    }
+
+    private PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker) {
+        this(parts, file, tracker, new ApplicationPermissions(tracker));
+    }
+
+    public PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) {
+        this.tracker = tracker;
         this.parts = new CopyOnWriteArrayList<>(parts);
+        this.file = file;
+
+        this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
+        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
+
     }
 
     @Override
@@ -50,6 +87,53 @@ public class PartsHandler implements JarProvider {
                     .collect(Collectors.toList());
         } finally {
             partsLock.unlock();
+        }
+    }
+
+    //JUST FOR CURRENT TESTS!
+    @Deprecated
+    private void print(final String message) {
+        try (FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.home") + "/Desktop/itw-log.txt"), true)) {
+            out.write((message + System.lineSeparator()).getBytes());
+        } catch (final Exception e) {
+            throw new RuntimeException("Can not write message to file!", e);
+        } finally {
+            System.out.println(message);
+        }
+    }
+
+    private synchronized Lock getOrCreateLock(final URL resourceUrl) {
+        return resourceDownloadLocks.computeIfAbsent(resourceUrl, url -> new ReentrantLock());
+    }
+
+    protected URL getLocalUrlForJar(final JARDesc jarDesc) {
+        LOG.debug("Trying to get local URL of JAR '{}'", jarDesc.getLocation());
+        print("Trying to get local URL of JAR '" + jarDesc.getLocation() + "'");
+        final Lock jarLock = getOrCreateLock(jarDesc.getLocation());
+        jarLock.lock();
+        try {
+            if (!tracker.isResourceAdded(jarDesc.getLocation())) {
+                tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
+            }
+            certVerifier.add(jarDesc, tracker);
+            if (!securityDelegate.getRunInSandbox()) {
+                // TODO: work in progress
+                if (!certVerifier.isFullySigned()) {
+                    securityDelegate.promptUserOnPartialSigning();
+                }
+                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
+                    certVerifier.checkTrustWithUser(securityDelegate, file);
+                }
+            }
+            final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
+            LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);
+            print("Local URL of JAR '" + jarDesc.getLocation() + "' is '" + url + "'");
+            return url;
+        } catch (final Exception e) {
+            print("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'. Error: " + e.getMessage());
+            throw new RuntimeException("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'", e);
+        } finally {
+            jarLock.unlock();
         }
     }
 
@@ -99,7 +183,7 @@ public class PartsHandler implements JarProvider {
         final CompletableFuture<LoadableJar> downloadFuture = new CompletableFuture<>();
         BACKGROUND_EXECUTOR.execute(() -> {
             try {
-                final URL localCacheUrl = localCacheAccess.apply(jarDescription);
+                final URL localCacheUrl = getLocalUrlForJar(jarDescription);
                 downloadFuture.complete(new LoadableJar(localCacheUrl, jarDescription.isNative()));
             } catch (final Exception e) {
                 downloadFuture.completeExceptionally(e);
@@ -141,19 +225,5 @@ public class PartsHandler implements JarProvider {
         } finally {
             partsLock.unlock();
         }
-    }
-
-    @Deprecated
-    public void removePartDownloads(final String partName) {
-        removePartDownloads(partName, null);
-    }
-
-    @Deprecated
-    public void removePartDownloads(final String partName, final Extension extension) {
-        // While DownloadService provides the possibility to remove a part we can not really do that since
-        // the URLClassLoader do not provide functionality to remove a URL.
-        // Once this ClassLoader is used in ITW the exception should be thrown in the XDownloadService.
-        // This is just a reminder that such functionality can not be implemented.
-        throw new RuntimeException("Can not remove part!");
     }
 }

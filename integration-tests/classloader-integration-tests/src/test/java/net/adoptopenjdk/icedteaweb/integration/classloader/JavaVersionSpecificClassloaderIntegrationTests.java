@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
+import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class JavaVersionSpecificClassloaderIntegrationTests {
@@ -20,17 +22,17 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-9.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-9.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_2));
     }
 
     /**
@@ -39,17 +41,17 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-14.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-14.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_2));
     }
 
     /**
@@ -58,15 +60,15 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-10.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-10.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 }

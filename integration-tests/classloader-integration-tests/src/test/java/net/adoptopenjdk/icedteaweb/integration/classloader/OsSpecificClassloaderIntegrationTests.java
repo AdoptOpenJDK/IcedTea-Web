@@ -2,7 +2,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
+import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -15,6 +15,7 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_3;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class OsSpecificClassloaderIntegrationTests {
@@ -26,16 +27,16 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindows() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-4.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -45,9 +46,9 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnWindowsWithLoadClass() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-4.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -56,7 +57,7 @@ public class OsSpecificClassloaderIntegrationTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     /**
@@ -66,16 +67,16 @@ public class OsSpecificClassloaderIntegrationTests {
     @DisabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceOnNotWindows() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-4.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-4.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(0, jarProvider.getDownloaded().size());
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(0, partsHandler.getDownloaded().size());
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -85,16 +86,16 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMac() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-5.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -104,9 +105,9 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnMacWithLoadClass() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-5.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -115,7 +116,7 @@ public class OsSpecificClassloaderIntegrationTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     /**
@@ -125,16 +126,16 @@ public class OsSpecificClassloaderIntegrationTests {
     @DisabledOnOs(OS.MAC)
     public void testMacOnlyResourceOnNotMac() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-5.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-5.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(0, jarProvider.getDownloaded().size());
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(0, partsHandler.getDownloaded().size());
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -144,16 +145,16 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinux() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-6.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -163,9 +164,9 @@ public class OsSpecificClassloaderIntegrationTests {
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnLinuxWithLoadClass() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-6.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -174,7 +175,7 @@ public class OsSpecificClassloaderIntegrationTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     /**
@@ -184,63 +185,63 @@ public class OsSpecificClassloaderIntegrationTests {
     @DisabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceOnNotLinux() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-6.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-6.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(0, jarProvider.getDownloaded().size());
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(0, partsHandler.getDownloaded().size());
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     @RepeatedTest(10)
     @EnabledOnOs(OS.MAC)
     public void testMacOnlyResourceInJreOnMac() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-24.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_3));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_3));
     }
 
     @RepeatedTest(10)
     @EnabledOnOs(OS.WINDOWS)
     public void testWindowsOnlyResourceInJreOnWindows() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-24.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     @RepeatedTest(10)
     @EnabledOnOs(OS.LINUX)
     public void testLinuxOnlyResourceInJreOnLinux() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-24.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-24.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 }

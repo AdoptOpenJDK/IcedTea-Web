@@ -31,8 +31,6 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
@@ -40,9 +38,7 @@ import sun.awt.AppContext;
 import javax.swing.event.EventListenerList;
 import java.awt.Window;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -50,10 +46,6 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.jar.Attributes;
 
@@ -114,26 +106,7 @@ public class ApplicationInstance {
 
     private final ApplicationPermissions applicationPermissions;
 
-    private final JarCertVerifier certVerifier;
-
-    private final SecurityDelegate securityDelegate;
-
-
-    //JUST FOR CURRENT TESTS!
-    @Deprecated
-    private void print(final String message) {
-        try (FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.home") + "/Desktop/itw-log.txt"), true)) {
-            out.write((message + System.lineSeparator()).getBytes());
-        } catch (final Exception e) {
-            throw new RuntimeException("Can not write message to file!", e);
-        } finally {
-            System.out.println(message);
-        }
-    }
-
-    final Consumer<JARDesc> addJarConsumer = jarDesc -> print("addJarConsumer called for " + jarDesc);
-
-    private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
+    final Consumer<JARDesc> addJarConsumer = jarDesc -> System.out.println("addJarConsumer called for " + jarDesc);
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -148,19 +121,17 @@ public class ApplicationInstance {
     /**
      * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile)} (JNLPFile)}.
      */
-    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) {
         this.file = file;
         this.group = Thread.currentThread().getThreadGroup();
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
-        this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
-        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final JarExtractor extractor = new JarExtractor(file, fileFactory);
 
         try {
-            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), this::getLocalUrlForJar);
+            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker, applicationPermissions);
             this.loader = new JnlpApplicationClassLoader(partsHandler);
         } catch (final Exception e) {
             throw new RuntimeException("ARGH!!!", e);
@@ -178,41 +149,6 @@ public class ApplicationInstance {
 
             Policy.setPolicy(policy);
             System.setSecurityManager(security);
-        }
-    }
-
-    private synchronized Lock getOrCreateLock(final URL resourceUrl) {
-        return resourceDownloadLocks.computeIfAbsent(resourceUrl, url -> new ReentrantLock());
-    }
-
-    private URL getLocalUrlForJar(final JARDesc jarDesc) {
-        LOG.debug("Trying to get local URL of JAR '{}'", jarDesc.getLocation());
-        print("Trying to get local URL of JAR '" + jarDesc.getLocation() + "'");
-        final Lock jarLock = getOrCreateLock(jarDesc.getLocation());
-        jarLock.lock();
-        try {
-            if (!tracker.isResourceAdded(jarDesc.getLocation())) {
-                tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
-            }
-            certVerifier.add(jarDesc, tracker);
-            if (!securityDelegate.getRunInSandbox()) {
-                // TODO: work in progress
-                if (!certVerifier.isFullySigned()) {
-                    securityDelegate.promptUserOnPartialSigning();
-                }
-                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
-                    certVerifier.checkTrustWithUser(securityDelegate, file);
-                }
-            }
-            final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
-            LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);
-            print("Local URL of JAR '" + jarDesc.getLocation() + "' is '" + url + "'");
-            return url;
-        } catch (final Exception e) {
-            print("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'. Error: " + e.getMessage());
-            throw new RuntimeException("Unable to provide local URL for JAR '" + jarDesc.getLocation() + "'", e);
-        } finally {
-            jarLock.unlock();
         }
     }
 
@@ -411,10 +347,6 @@ public class ApplicationInstance {
      */
     public boolean isSigned() {
         return isSigned;
-    }
-
-    public ApplicationPermissions getApplicationPermissions() {
-        return applicationPermissions;
     }
 
     public PermissionCollection getPermissions(CodeSource cs) {

@@ -2,7 +2,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
+import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -39,17 +40,17 @@ public class LocaleSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testLoadForConcreteLocale() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-12.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-12.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(2, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 
     /**
@@ -58,17 +59,17 @@ public class LocaleSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadForWrongLocale() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-13.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-13.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_2));
     }
 
 

@@ -2,7 +2,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
+import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -12,6 +12,7 @@ import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTes
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
 public class ExtensionSupportClassloaderTests {
@@ -22,15 +23,15 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(0, jarProvider.getDownloaded().size());
+        Assertions.assertEquals(0, partsHandler.getDownloaded().size());
     }
 
     /**
@@ -39,9 +40,9 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-19.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -50,8 +51,8 @@ public class ExtensionSupportClassloaderTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -60,16 +61,16 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-20.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-20.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -78,9 +79,9 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar2() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-20.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-20.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -89,8 +90,8 @@ public class ExtensionSupportClassloaderTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -99,9 +100,9 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-22.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-22.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -110,8 +111,8 @@ public class ExtensionSupportClassloaderTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
@@ -120,9 +121,9 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive2() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-22.jnlp");
-        final PartsHandler partsHandler = new PartsHandler(parts, jarProvider);
+        final JNLPFile jnlpFile = createFile("integration-app-22.jnlp");
+        final List<Part> parts = createPartsFor(jnlpFile);
+        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -131,8 +132,8 @@ public class ExtensionSupportClassloaderTests {
         //than
         Assertions.assertNotNull(loadedClass);
         Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 
 }
