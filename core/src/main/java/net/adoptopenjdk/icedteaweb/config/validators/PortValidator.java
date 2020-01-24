@@ -8,7 +8,7 @@ public class PortValidator extends RangedIntegerValidator {
     private static final int HIGHEST_PORT = 65535;
     private static final int LOWEST_PORT = 0;
 
-    PortValidator() {
+    public PortValidator() {
         super(LOWEST_PORT, HIGHEST_PORT);
     }
 
