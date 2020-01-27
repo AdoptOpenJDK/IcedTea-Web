@@ -1,8 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,13 +8,11 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.util.List;
 import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class LocaleSpecificClassloaderIntegrationTests {
@@ -40,9 +36,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testLoadForConcreteLocale() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-12.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-12.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -59,9 +53,7 @@ public class LocaleSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadForWrongLocale() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-13.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-13.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);

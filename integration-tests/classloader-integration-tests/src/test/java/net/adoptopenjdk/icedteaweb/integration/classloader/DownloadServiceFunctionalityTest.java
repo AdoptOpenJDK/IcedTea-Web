@@ -2,27 +2,22 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.Extension;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
-import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.net.URL;
-import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 
 public class DownloadServiceFunctionalityTest {
 
     @RepeatedTest(10)
     public void testPartDownloaded() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-2.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -35,9 +30,7 @@ public class DownloadServiceFunctionalityTest {
     @RepeatedTest(10)
     public void testExtensionPartDownloaded() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -52,9 +45,7 @@ public class DownloadServiceFunctionalityTest {
     @RepeatedTest(10)
     public void testPartDownloaded2() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-2.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -67,9 +58,7 @@ public class DownloadServiceFunctionalityTest {
     @RepeatedTest(10)
     public void testDownloadPart() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-2.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
         partsHandler.downloadPart("lazy-package");
@@ -81,9 +70,7 @@ public class DownloadServiceFunctionalityTest {
     @RepeatedTest(10)
     public void testEagerPart() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-21.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-21.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -95,9 +82,7 @@ public class DownloadServiceFunctionalityTest {
     @RepeatedTest(10)
     public void testDownloadPartFromExtension() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
         final URL extensionURL = IntegrationTestResources.load("integration-app-19-extension.jnlp");
         final Extension extension = new Extension(extensionURL, null);
 
@@ -108,5 +93,7 @@ public class DownloadServiceFunctionalityTest {
         Assertions.assertTrue(partsHandler.isPartDownloaded("lazy-package", extension));
         Assertions.assertFalse(partsHandler.isPartDownloaded("lazy-package"));
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+
     }
 }

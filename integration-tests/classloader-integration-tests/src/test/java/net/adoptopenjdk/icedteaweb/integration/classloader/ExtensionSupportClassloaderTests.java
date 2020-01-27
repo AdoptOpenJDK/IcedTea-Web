@@ -1,19 +1,14 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
-
-import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_A;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.CLASS_B;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 
 public class ExtensionSupportClassloaderTests {
 
@@ -23,9 +18,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testClassFromLazyJarNotInitialLoaded() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -40,9 +33,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-19.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -61,9 +52,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-20.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-20.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -79,9 +68,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testLoadClassFromEagerJar2() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-20.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-20.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -100,9 +87,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-22.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-22.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -121,9 +106,7 @@ public class ExtensionSupportClassloaderTests {
     @RepeatedTest(10)
     public void testPartIsJnlpExclusive2() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-22.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-22.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);

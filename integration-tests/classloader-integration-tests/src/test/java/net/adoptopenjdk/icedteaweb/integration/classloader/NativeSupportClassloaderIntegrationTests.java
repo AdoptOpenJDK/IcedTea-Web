@@ -1,17 +1,14 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
-import java.util.List;
-
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_WITH_NATIVE;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
 
@@ -26,9 +23,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadJarWithNativeContent() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-15.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -45,9 +40,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void loadClassWithNativeMethod() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-15.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -64,9 +57,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethod() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-15.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
@@ -95,9 +86,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadNativeForSimpleJarDesc() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-17.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-17.jnlp");
 
         //than
         Assertions.assertThrows(UnsatisfiedLinkError.class, () -> {
@@ -113,9 +102,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void doNotLoadLazyNativeLibAtStart() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-18.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-18.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -132,9 +119,7 @@ public class NativeSupportClassloaderIntegrationTests {
     @EnabledOnOs(OS.MAC) // We only have native lib for MAC so far...
     public void callNativeMethodFromLazyJar() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-18.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-18.jnlp");
 
         //when
         final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);

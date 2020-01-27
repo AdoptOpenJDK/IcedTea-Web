@@ -26,6 +26,12 @@ public class ClassloaderTestUtils {
 
     private static final JNLPFileFactory JNLP_FILE_FACTORY = new JNLPFileFactory();
 
+    public static DummyPartsHandler createDummyPartsHandlerFor(final String name) throws IOException, ParseException {
+        final JNLPFile jnlpFile = createFile(name);
+        final List<Part> parts = createPartsFor(jnlpFile);
+        return new DummyPartsHandler(parts, jnlpFile);
+    }
+
     public static List<Part> createPartsFor(final JNLPFile file) {
         return createFor(file).getParts();
     }

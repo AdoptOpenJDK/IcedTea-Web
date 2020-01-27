@@ -1,18 +1,12 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
-import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
-import net.sourceforge.jnlp.JNLPFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.List;
-
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createFile;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 
 public class JavaVersionSpecificClassloaderIntegrationTests {
 
@@ -22,9 +16,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-9.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-9.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -41,9 +33,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testNotLoadJarFromNotMatchingJavaVersion2() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-14.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-14.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -60,9 +50,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testLoadJarFromMatchingJavaVersion() throws Exception {
         //given
-        final JNLPFile jnlpFile = createFile("integration-app-10.jnlp");
-        final List<Part> parts = createPartsFor(jnlpFile);
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-10.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
