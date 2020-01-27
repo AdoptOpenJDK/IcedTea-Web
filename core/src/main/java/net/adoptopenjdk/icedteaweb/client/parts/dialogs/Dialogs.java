@@ -75,8 +75,13 @@ public class Dialogs {
     private static DialogFactory dialogFactory = DEFAULT_DIALOG_FACTORY;
 
     @FunctionalInterface
-    public interface Uninstaller {
+    public interface Uninstaller extends AutoCloseable {
         void uninstall();
+
+        @Override
+        default void close() throws Exception {
+            uninstall();
+        }
     }
 
     public static synchronized Uninstaller setDialogFactory(final DialogFactory dialogs) {

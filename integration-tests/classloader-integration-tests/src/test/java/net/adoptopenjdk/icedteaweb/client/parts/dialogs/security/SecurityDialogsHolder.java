@@ -11,12 +11,7 @@ public class SecurityDialogsHolder {
     /**
      * The returned {@link AutoCloseable} must be called at the end of the test to allow other tests to set their own dialogs.
      */
-    public static RevertDialogsToDefault setSecurityDialogForTests(DialogFactory dialogs) {
-        return Dialogs.setDialogFactory(dialogs)::uninstall;
-    }
-
-    public interface RevertDialogsToDefault extends AutoCloseable {
-        @Override
-        void close();
+    public static Dialogs.Uninstaller setSecurityDialogForTests(DialogFactory dialogs) {
+        return Dialogs.setDialogFactory(dialogs);
     }
 }

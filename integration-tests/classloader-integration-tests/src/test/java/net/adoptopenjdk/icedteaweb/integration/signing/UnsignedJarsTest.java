@@ -1,8 +1,8 @@
 package net.adoptopenjdk.icedteaweb.integration.signing;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs.Dialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogsHolder;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogsHolder.RevertDialogsToDefault;
 import net.adoptopenjdk.icedteaweb.integration.DummyResourceTracker;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
@@ -24,20 +24,18 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UnsignedJarsTest {
     @Test
-    void launchUnsignedApp(@Mock Dialogs dialogs) throws Exception {
+    void launchUnsignedApp(@Mock DialogFactory dialogFactory) throws Exception {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(IntegrationTestResources.load("integration-app-25.jnlp"));
         final ResourceTrackerFactory resourceTrackerFactory = new DummyResourceTracker.Factory();
 
-        when(dialogs.showUnsignedWarningDialog(jnlpFile)).thenReturn(YesNoSandboxLimited.yes());
+        when(dialogFactory.showUnsignedWarningDialog(jnlpFile)).thenReturn(YesNoSandboxLimited.yes());
 
-        try (final RevertDialogsToDefault r = SecurityDialogsHolder.setSecurityDialogForTests(dialogs)) {
-
+        try (Dialogs.Uninstaller uninstaller = SecurityDialogsHolder.setSecurityDialogForTests(dialogFactory)){
             // when
             new ApplicationInstance(jnlpFile, resourceTrackerFactory);
         } finally {
-
             // then
-            verify(dialogs).showUnsignedWarningDialog(jnlpFile);
+            verify(dialogFactory).showUnsignedWarningDialog(jnlpFile);
         }
     }
 }
