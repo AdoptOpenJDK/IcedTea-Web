@@ -293,6 +293,9 @@ public final class VariableX509TrustManager {
         }
 
         for (X509TrustManager certTrustManager : certTrustManagers) {
+            if (isNullOrEmpty(certTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             try {
                 certTrustManager.checkServerTrusted(chain, authType);
                 return;
@@ -344,6 +347,9 @@ public final class VariableX509TrustManager {
         List<X509Certificate> issuers = new ArrayList<>();
 
         for (X509TrustManager caTrustManager : caTrustManagers) {
+            if (isNullOrEmpty(caTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             issuers.addAll(Arrays.asList(caTrustManager.getAcceptedIssuers()));
         }
 
