@@ -234,7 +234,7 @@ public class UnsignedAppletTrustConfirmation {
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || warningResponse.compareValue(Primitive.NO)) {
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was partially signed.", "The applet was partially signed.UserDenied");
+            throw new LaunchException(file, null, FATAL, "Application Error", "The application was partially signed.", "The application was partially signed.UserDenied");
         }
 
         //this is due to possible YesNoSandboxLimited

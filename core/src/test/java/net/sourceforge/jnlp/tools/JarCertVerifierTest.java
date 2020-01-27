@@ -37,17 +37,18 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.tools;
 
-import java.security.CodeSigner;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-import java.util.jar.JarEntry;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
 import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.security.CodeSigner;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
+import java.util.jar.JarEntry;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static org.junit.Assert.assertFalse;
@@ -116,7 +117,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testNoManifest() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         VerifyResult result = jcv.verifyJarEntryCerts("", false, null);
 
         Assert.assertEquals("No manifest should be considered unsigned.",
@@ -127,7 +128,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testNoSignableEntries() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("OneDirEntry/"));
         entries.add(new JarCertVerifierEntry("META-INF/MANIFEST.MF"));
@@ -141,7 +142,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryNoSigners() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstEntryWithoutSigner"));
         VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
@@ -154,7 +155,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesNoSigners() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstEntryWithoutSigner"));
         entries.add(new JarCertVerifierEntry("secondEntryWithoutSigner"));
@@ -169,7 +170,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntrySingleValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] signers = { alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByOne", signers));
@@ -185,7 +186,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesSingleValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] signers = { alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByOne", signers));
@@ -203,7 +204,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryMultipleValidSigners() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] signers = { alphaSigner, betaSigner, charlieSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByThree", signers));
@@ -221,7 +222,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesMultipleValidSigners() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] signers = { alphaSigner, betaSigner, charlieSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByThree", signers));
@@ -241,7 +242,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testOneCommonSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] alphaSigners = { alphaSigner };
         CodeSigner[] betaSigners = { alphaSigner, betaSigner };
         CodeSigner[] charlieSigners = { alphaSigner, charlieSigner };
@@ -261,7 +262,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testNoCommonSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] alphaSigners = { alphaSigner };
         CodeSigner[] betaSigners = { betaSigner };
         CodeSigner[] charlieSigners = { charlieSigner };
@@ -279,7 +280,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testFewButNotAllCommonSigners() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] alphaSigners = { alphaSigner };
         CodeSigner[] betaSigners = { betaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
@@ -296,7 +297,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testNotAllEntriesSigned() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] alphaSigners = { alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByAlpha", alphaSigners));
@@ -312,7 +313,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryExpiredSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] expiredSigners = { expiredSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpired", expiredSigners));
@@ -328,7 +329,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesExpiredSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] expiredSigners = { expiredSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpired", expiredSigners));
@@ -346,7 +347,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryExpiringSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] expiringSigners = { expiringSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpiring", expiringSigners));
@@ -362,7 +363,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesExpiringSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] expiringSigners = { expiringSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpiring", expiringSigners));
@@ -380,7 +381,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryNotYetValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] notYetValidSigners = { notYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByNotYetValid", notYetValidSigners));
@@ -396,7 +397,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesNotYetValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] notYetValidSigners = { notYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByNotYetValid", notYetValidSigners));
@@ -414,7 +415,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryExpiringAndNotYetValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] expiringAndNotYetValidSigners = { expiringAndNotYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpiringNotYetValid", expiringAndNotYetValidSigners));
@@ -430,7 +431,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntryExpiringAndNotYetValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
 
         CodeSigner[] expiringAndNotYetValidSigners = { expiringAndNotYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
@@ -451,7 +452,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSingleEntryOneExpiredOneValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] oneExpiredOneValidSigner = { expiredSigner, alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByTwo", oneExpiredOneValidSigner));
@@ -468,7 +469,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyEntriesOneExpiredOneValidSigner() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] oneExpiredOneValidSigner = { expiredSigner, alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByTwo", oneExpiredOneValidSigner));
@@ -487,7 +488,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testSomeExpiredEntries() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] oneExpiredOneValidSigners = { expiredSigner, alphaSigner };
         CodeSigner[] expiredSigners = { expiredSigner };
 
@@ -507,7 +508,7 @@ public class JarCertVerifierTest {
 
     @Test
     public void testManyInvalidOneValidStillSignedOkay() throws Exception {
-        JarCertVerifier jcv = new JarCertVerifier(null);
+        JarCertVerifier jcv = new JarCertVerifier();
         CodeSigner[] oneExpiredOneValidSigners = { alphaSigner, expiredSigner };
         CodeSigner[] oneNotYetValidOneValidSigners = { alphaSigner, notYetValidSigner };
         CodeSigner[] oneExpiringSigners = { alphaSigner, expiringSigner };

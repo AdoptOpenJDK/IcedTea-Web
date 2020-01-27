@@ -12,7 +12,6 @@ import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
 
 import java.io.File;
@@ -67,7 +66,7 @@ public class PartsHandler implements JarProvider {
         this.parts = new CopyOnWriteArrayList<>(parts);
         this.file = file;
 
-        this.certVerifier = new JarCertVerifier(new JNLPAppVerifier());
+        this.certVerifier = new JarCertVerifier();
         this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
     }

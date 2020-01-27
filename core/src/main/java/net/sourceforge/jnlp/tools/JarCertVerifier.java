@@ -25,14 +25,17 @@
 
 package net.sourceforge.jnlp.tools;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
@@ -62,6 +65,7 @@ import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 
 import static java.time.temporal.ChronoUnit.MONTHS;
+import static net.sourceforge.jnlp.LaunchException.FATAL;
 
 /**
  * The jar certificate verifier utility.
@@ -102,42 +106,35 @@ public class JarCertVerifier implements CertVerifier {
     private final Map<String, Integer> jarSignableEntries = new HashMap<>();
 
     /**
-     * The application verifier to use by this instance
-     */
-    private final AppVerifier appVerifier;
-
-    /**
      * Temporary cert path hack to be used to keep track of which one a UI dialog is using
      */
     private CertPath currentlyUsed;
 
-    /**
-     * Create a new jar certificate verifier utility that uses the provided verifier for its strategy pattern.
-     *
-     * @param verifier The application verifier to be used by the new instance.
-     */
-    public JarCertVerifier(AppVerifier verifier) {
-        appVerifier = verifier;
-    }
+
 
     /**
-     * @return true if there are no signable entries in the jar.
-     * This will return false if any of verified jars have content more than just META-INF/.
+     * Returns if all jars are signed.
+     *
+     * @return True if all jars are signed, false if there are one or more unsigned jars
      */
-    public boolean isTriviallySigned() {
-        return getTotalJarEntries(jarSignableEntries) <= 0 && certs.size() <= 0;
+    public boolean allJarsSigned() {
+        return unverifiedJars.isEmpty();
+    }
+
+    public void checkTrustWithUser(final SecurityDelegate securityDelegate, final JNLPFile file) throws LaunchException {
+        checkTrustWithUser(securityDelegate, this, file);
     }
 
     @Override
     public boolean getAlreadyTrustPublisher() {
-        final boolean allPublishersTrusted = appVerifier.hasAlreadyTrustedPublisher(certs, jarSignableEntries);
+        final boolean allPublishersTrusted = hasAlreadyTrustedPublisher(certs, jarSignableEntries);
         LOG.debug("App already has trusted publisher: {}", allPublishersTrusted);
         return allPublishersTrusted;
     }
 
     @Override
     public boolean getRootInCaCerts() {
-        final boolean allRootCAsTrusted = appVerifier.hasRootInCacerts(certs, jarSignableEntries);
+        final boolean allRootCAsTrusted = hasRootInCacerts(certs, jarSignableEntries);
         LOG.debug("App has trusted root CA: {}", allRootCAsTrusted);
         return allRootCAsTrusted;
     }
@@ -155,13 +152,38 @@ public class JarCertVerifier implements CertVerifier {
         return certs.get(currentlyUsed).getDetailsAsStrings();
     }
 
-    /**
-     * Get a list of the cert paths of all signers across the app.
-     *
-     * @return List of CertPath vars representing each of the signers present on any jar.
-     */
-    public List<CertPath> getCertsList() {
-        return new ArrayList<>(certs.keySet());
+    @Override
+    public Certificate getPublisher(final CertPath certPath) {
+        if (certPath != null) {
+            currentlyUsed = certPath;
+        }
+        if (currentlyUsed != null) {
+            final List<? extends Certificate> certList = currentlyUsed.getCertificates();
+            if (certList.size() > 0) {
+                return certList.get(0);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Certificate getRoot(final CertPath certPath) {
+        if (certPath != null) {
+            currentlyUsed = certPath;
+        }
+        if (currentlyUsed != null) {
+            final List<? extends Certificate> certList = currentlyUsed.getCertificates();
+            if (certList.size() > 0) {
+                return certList.get(certList.size() - 1);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -187,12 +209,6 @@ public class JarCertVerifier implements CertVerifier {
         return isTriviallySigned() || isSigned();
     }
 
-    private boolean isSigned() {
-        final boolean fullySigned = appVerifier.isFullySigned(certs, jarSignableEntries);
-        LOG.debug("App already has trusted publisher: {}", fullySigned);
-        return fullySigned;
-    }
-
     /**
      * Update the verifier to consider a new jar when verifying.
      *
@@ -204,84 +220,14 @@ public class JarCertVerifier implements CertVerifier {
         verifyJars(Collections.singletonList(jar), tracker);
     }
 
-    /**
-     * Update the verifier to consider new jars when verifying.
-     *
-     * @param jars    List of new jars to be verified.
-     * @param tracker Resource tracker used to obtain the the jars from cache
-     * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
-     */
-    public void add(final List<JARDesc> jars, final ResourceTracker tracker) throws Exception {
-        verifyJars(jars, tracker);
-    }
 
     /**
-     * Verify the jars provided and update the state of this instance to match the new information.
+     * Get a list of the cert paths of all signers across the app.
      *
-     * @param jars    List of new jars to be verified.
-     * @param tracker Resource tracker used to obtain the the jars from cache
-     * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
+     * @return List of CertPath vars representing each of the signers present on any jar.
      */
-    private void verifyJars(final List<JARDesc> jars, final ResourceTracker tracker) throws Exception {
-
-        for (JARDesc jar : jars) {
-            final File jarFile = tracker.getCacheFile(jar.getLocation());
-
-            // some sort of resource download/cache error. Nothing to add
-            // in that case ... but don't fail here
-            if (jarFile == null || !jarFile.isFile()) {
-                continue;
-            }
-
-            final String jarPath = jarFile.getCanonicalFile().getAbsolutePath();
-            if (verifiedJars.contains(jarPath) || unverifiedJars.contains(jarPath)) {
-                continue;
-            }
-
-            final VerifyResult result = verifyJar(jarPath);
-            if (result == VerifyResult.UNSIGNED) {
-                unverifiedJars.add(jarPath);
-            } else if (result == VerifyResult.SIGNED_NOT_OK) {
-                verifiedJars.add(jarPath);
-            } else if (result == VerifyResult.SIGNED_OK) {
-                verifiedJars.add(jarPath);
-            }
-        }
-
-        for (CertPath certPath : certs.keySet()) {
-            checkTrustedCerts(certPath);
-        }
-    }
-
-    /**
-     * Checks through all the jar entries of jarName for signers, storing all the common ones in the certs hash map.
-     *
-     * @param jarPath The absolute path to the jar file.
-     * @return The return of {@link JarCertVerifier#verifyJarEntryCerts} using the entries found in the jar located at jarName.
-     */
-    private VerifyResult verifyJar(final String jarPath) {
-        try (final JarFile jarFile = new JarFile(jarPath, true)) {
-            final List<JarEntry> entries = new ArrayList<>();
-            final byte[] buffer = new byte[8192];
-
-            final Enumeration<JarEntry> entriesEnum = jarFile.entries();
-            while (entriesEnum.hasMoreElements()) {
-                final JarEntry entry = entriesEnum.nextElement();
-                entries.add(entry);
-
-                try (InputStream is = jarFile.getInputStream(entry)) {
-                    //noinspection StatementWithEmptyBody
-                    while (is.read(buffer, 0, buffer.length) != -1) {
-                        // we just read. this will throw a SecurityException
-                        // if a signature/digest check fails.
-                    }
-                }
-            }
-            return verifyJarEntryCerts(jarPath, jarFile.getManifest() != null, entries);
-        } catch (Exception e) {
-            LOG.error("Error in verify jar " + jarPath, e);
-            throw new RuntimeException("Error in verify jar " + jarPath, e);
-        }
+    List<CertPath> getCertsList() {
+        return new ArrayList<>(certs.keySet());
     }
 
     /**
@@ -367,6 +313,108 @@ public class JarCertVerifier implements CertVerifier {
         return result;
     }
 
+    /**
+     * Returns whether a file is in META-INF, and thus does not require signing.
+     * <p>
+     * Signature-related files under META-INF include: . META-INF/MANIFEST.MF . META-INF/SIG-* . META-INF/*.SF . META-INF/*.DSA . META-INF/*.RSA
+     */
+    static boolean isMetaInfFile(final String name) {
+        if (name.endsWith("class")) {
+            return false;
+        }
+        return name.startsWith(META_INF) && (
+                name.endsWith(".MF") ||
+                        name.endsWith(".SF") ||
+                        name.endsWith(".DSA") ||
+                        name.endsWith(".RSA") ||
+                        SIG.matcher(name).matches()
+        );
+    }
+
+
+    /**
+     * @return true if there are no signable entries in the jar.
+     * This will return false if any of verified jars have content more than just META-INF/.
+     */
+    private boolean isTriviallySigned() {
+        return getTotalJarEntries(jarSignableEntries) <= 0 && certs.size() <= 0;
+    }
+
+    private boolean isSigned() {
+        final boolean fullySigned = isFullySigned(certs, jarSignableEntries);
+        LOG.debug("App already has trusted publisher: {}", fullySigned);
+        return fullySigned;
+    }
+
+    /**
+     * Verify the jars provided and update the state of this instance to match the new information.
+     *
+     * @param jars    List of new jars to be verified.
+     * @param tracker Resource tracker used to obtain the the jars from cache
+     * @throws Exception Caused by issues with obtaining the jars' entries or interacting with the tracker.
+     */
+    private void verifyJars(final List<JARDesc> jars, final ResourceTracker tracker) throws Exception {
+
+        for (JARDesc jar : jars) {
+            final File jarFile = tracker.getCacheFile(jar.getLocation());
+
+            // some sort of resource download/cache error. Nothing to add
+            // in that case ... but don't fail here
+            if (jarFile == null || !jarFile.isFile()) {
+                continue;
+            }
+
+            final String jarPath = jarFile.getCanonicalFile().getAbsolutePath();
+            if (verifiedJars.contains(jarPath) || unverifiedJars.contains(jarPath)) {
+                continue;
+            }
+
+            final VerifyResult result = verifyJar(jarPath);
+            if (result == VerifyResult.UNSIGNED) {
+                unverifiedJars.add(jarPath);
+            } else if (result == VerifyResult.SIGNED_NOT_OK) {
+                verifiedJars.add(jarPath);
+            } else if (result == VerifyResult.SIGNED_OK) {
+                verifiedJars.add(jarPath);
+            }
+        }
+
+        for (CertPath certPath : certs.keySet()) {
+            checkTrustedCerts(certPath);
+        }
+    }
+
+    /**
+     * Checks through all the jar entries of jarName for signers, storing all the common ones in the certs hash map.
+     *
+     * @param jarPath The absolute path to the jar file.
+     * @return The return of {@link JarCertVerifier#verifyJarEntryCerts} using the entries found in the jar located at jarName.
+     */
+    private VerifyResult verifyJar(final String jarPath) {
+        try (final JarFile jarFile = new JarFile(jarPath, true)) {
+            final List<JarEntry> entries = new ArrayList<>();
+            final byte[] buffer = new byte[8192];
+
+            final Enumeration<JarEntry> entriesEnum = jarFile.entries();
+            while (entriesEnum.hasMoreElements()) {
+                final JarEntry entry = entriesEnum.nextElement();
+                entries.add(entry);
+
+                try (InputStream is = jarFile.getInputStream(entry)) {
+                    //noinspection StatementWithEmptyBody
+                    while (is.read(buffer, 0, buffer.length) != -1) {
+                        // we just read. this will throw a SecurityException
+                        // if a signature/digest check fails.
+                    }
+                }
+            }
+            return verifyJarEntryCerts(jarPath, jarFile.getManifest() != null, entries);
+        } catch (Exception e) {
+            LOG.error("Error in verify jar " + jarPath, e);
+            throw new RuntimeException("Error in verify jar " + jarPath, e);
+        }
+    }
+
     private VerifyResult verifySigners(final Map<CertPath, Integer> jarSignCount) {
         for (CertPath entryCertPath : jarSignCount.keySet()) {
             if (certs.containsKey(entryCertPath) && !certs.get(entryCertPath).hasSigningIssues()) {
@@ -415,60 +463,8 @@ public class JarCertVerifier implements CertVerifier {
         info.setUntrusted();
     }
 
-    public void setCurrentlyUsedCertPath(final CertPath certPath) {
+    private void setCurrentlyUsedCertPath(final CertPath certPath) {
         currentlyUsed = certPath;
-    }
-
-    @Override
-    public Certificate getPublisher(final CertPath certPath) {
-        if (certPath != null) {
-            currentlyUsed = certPath;
-        }
-        if (currentlyUsed != null) {
-            final List<? extends Certificate> certList = currentlyUsed.getCertificates();
-            if (certList.size() > 0) {
-                return certList.get(0);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public Certificate getRoot(final CertPath certPath) {
-        if (certPath != null) {
-            currentlyUsed = certPath;
-        }
-        if (currentlyUsed != null) {
-            final List<? extends Certificate> certList = currentlyUsed.getCertificates();
-            if (certList.size() > 0) {
-                return certList.get(certList.size() - 1);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns whether a file is in META-INF, and thus does not require signing.
-     * <p>
-     * Signature-related files under META-INF include: . META-INF/MANIFEST.MF . META-INF/SIG-* . META-INF/*.SF . META-INF/*.DSA . META-INF/*.RSA
-     */
-    static boolean isMetaInfFile(final String name) {
-        if (name.endsWith("class")) {
-            return false;
-        }
-        return name.startsWith(META_INF) && (
-                name.endsWith(".MF") ||
-                name.endsWith(".SF") ||
-                name.endsWith(".DSA") ||
-                name.endsWith(".RSA") ||
-                SIG.matcher(name).matches()
-        );
     }
 
     /**
@@ -522,20 +518,7 @@ public class JarCertVerifier implements CertVerifier {
         }
     }
 
-    /**
-     * Returns if all jars are signed.
-     *
-     * @return True if all jars are signed, false if there are one or more unsigned jars
-     */
-    public boolean allJarsSigned() {
-        return unverifiedJars.isEmpty();
-    }
-
-    public void checkTrustWithUser(final SecurityDelegate securityDelegate, final JNLPFile file) throws LaunchException {
-        appVerifier.checkTrustWithUser(securityDelegate, this, file);
-    }
-
-    public Map<String, Integer> getJarSignableEntries() {
+    private Map<String, Integer> getJarSignableEntries() {
         return Collections.unmodifiableMap(jarSignableEntries);
     }
 
@@ -545,9 +528,131 @@ public class JarCertVerifier implements CertVerifier {
      * @param map map of all jars
      * @return The number of entries.
      */
-    public static int getTotalJarEntries(final Map<String, Integer> map) {
+    private static int getTotalJarEntries(final Map<String, Integer> map) {
         return map.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
+    }
+
+    /**
+     * Checks if the app has already found trust in its publisher(s).
+     *
+     * @param certs      The certs to search through and their cert information
+     * @param signedJars A map of all the jars of this app and the number of
+     *                   signed entries each one has.
+     * @return True if the app trusts its publishers.
+     */
+    private boolean hasAlreadyTrustedPublisher(
+            Map<CertPath, CertInformation> certs,
+            Map<String, Integer> signedJars) {
+        int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
+        for (CertInformation certInfo : certs.values()) {
+            Map<String, Integer> certSignedJars = certInfo.getSignedJars();
+
+            if (JarCertVerifier.getTotalJarEntries(certSignedJars) == sumOfSignableEntries
+                    && certInfo.isPublisherAlreadyTrusted()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the app has signer(s) whose certs along their chains are in CA certs.
+     *
+     * @param certs      The certs to search through and their cert information
+     * @param signedJars A map of all the jars of this app and the number of
+     *                   signed entries each one has.
+     * @return True if the app has a root in the CA certs store.
+     */
+    private boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
+                                    Map<String, Integer> signedJars) {
+        int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
+        for (CertInformation certInfo : certs.values()) {
+            Map<String, Integer> certSignedJars = certInfo.getSignedJars();
+
+            if (JarCertVerifier.getTotalJarEntries(certSignedJars) == sumOfSignableEntries
+                    && certInfo.isRootInCacerts()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the app's jars are covered by the provided certificates, enough
+     * to consider the app fully signed.
+     *
+     * @param certs      Any possible signer and their respective information regarding this app.
+     * @param signedJars A map of all the jars of this app and the number of
+     *                   signed entries each one has.
+     * @return true if jar is fully signed
+     */
+    private boolean isFullySigned(Map<CertPath, CertInformation> certs,
+                                 Map<String, Integer> signedJars) {
+        int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(signedJars);
+        for (CertPath cPath : certs.keySet()) {
+            // If this cert has signed everything, return true
+            if (hasCompletelySignedApp(certs.get(cPath), sumOfSignableEntries)) {
+                return true;
+            }
+        }
+
+        // No cert found that signed all entries. Return false.
+        return false;
+    }
+
+    /**
+     * Prompt the user with requests for trusting the certificates used by this app
+     *
+     * @param securityDelegate parental security
+     * @param jcv              jar verifier
+     * @param file             jnlp file to provide information
+     * @throws LaunchException if it fails to verify
+     */
+    private void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)
+            throws LaunchException {
+
+        int sumOfSignableEntries = JarCertVerifier.getTotalJarEntries(jcv.getJarSignableEntries());
+        for (CertPath cPath : jcv.getCertsList()) {
+            jcv.setCurrentlyUsedCertPath(cPath);
+            CertInformation info = jcv.getCertInformation(cPath);
+            if (hasCompletelySignedApp(info, sumOfSignableEntries)) {
+                if (info.isPublisherAlreadyTrusted()) {
+                    return;
+                }
+
+                AccessType dialogType;
+                if (info.isRootInCacerts() && !info.hasSigningIssues()) {
+                    dialogType = AccessType.VERIFIED;
+                } else if (info.isRootInCacerts()) {
+                    dialogType = AccessType.SIGNING_ERROR;
+                } else {
+                    dialogType = AccessType.UNVERIFIED;
+                }
+
+                YesNoSandbox action = Dialogs.showCertWarningDialog(
+                        dialogType, file, jcv, securityDelegate);
+                if (action != null && action.toBoolean()) {
+                    if (action.compareValue(Primitive.SANDBOX)) {
+                        securityDelegate.setRunInSandbox();
+                    }
+                    return;
+                }
+            }
+        }
+
+        throw new LaunchException(null, null, FATAL, "Launch Error",
+                "Cancelled on user request.", "");
+    }
+
+    /**
+     * Find out if the CertPath with the given info has fully signed the app.
+     * @param info The information regarding the CertPath in question
+     * @param sumOfSignableEntries The total number of signable entries in the app.
+     * @return True if the signer has fully signed this app.
+     */
+    private boolean hasCompletelySignedApp(CertInformation info, int sumOfSignableEntries) {
+        return JarCertVerifier.getTotalJarEntries(info.getSignedJars()) == sumOfSignableEntries;
     }
 }
