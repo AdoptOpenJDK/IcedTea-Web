@@ -52,8 +52,8 @@ public class AppletInstance extends ApplicationInstance {
      * @param file pluginbridge to build instance on
      * @param cont Container where to place applet
      */
-    public AppletInstance(JNLPFile file, Container cont) throws LaunchException {
-        super(file);
+    public AppletInstance(JNLPFile file, Container cont, final ThreadGroup threadGroup) throws LaunchException {
+        super(file, threadGroup);
         if(cont != null) {
             this.environment = new AppletEnvironment(file, this, cont);
         } else {

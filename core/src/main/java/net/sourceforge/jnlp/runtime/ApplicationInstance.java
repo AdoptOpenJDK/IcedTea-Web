@@ -46,8 +46,10 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.jar.Attributes;
+import java.util.stream.Stream;
 
 /**
  * Represents a running instance of an application described in a
@@ -114,16 +116,16 @@ public class ApplicationInstance {
      *
      * @param file jnlpfile for which the instance do exists
      */
-    public ApplicationInstance(final JNLPFile file) throws LaunchException {
-        this(file, new DefaultResourceTrackerFactory());
+    public ApplicationInstance(final JNLPFile file, final ThreadGroup applicationThreadGroup) throws LaunchException {
+        this(file, new DefaultResourceTrackerFactory(), applicationThreadGroup);
     }
 
     /**
-     * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile)} (JNLPFile)}.
+     * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile, ThreadGroup)} (JNLPFile)}.
      */
-    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory) {
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, final ThreadGroup applicationThreadGroup) {
         this.file = file;
-        this.group = Thread.currentThread().getThreadGroup();
+        this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
 
@@ -254,32 +256,21 @@ public class ApplicationInstance {
             return;
 
         try {
-            // destroy resources
-            for (Window w : weakWindows) {
-                if (w != null)
-                    w.dispose();
-            }
-
+            weakWindows.forEach(w -> Optional.ofNullable(w).ifPresent(win -> win.dispose()));
             weakWindows.clear();
 
-            // interrupt threads
             Thread[] threads = new Thread[group.activeCount() * 2];
-            int nthreads = group.enumerate(threads);
-            for (int i = 0; i < nthreads; i++) {
-                LOG.info("Interrupt thread: {}", threads[i]);
-                threads[i].interrupt();
-            }
+            group.enumerate(threads);
+            Stream.of(threads).forEach(t -> {
+                try {
+                    t.interrupt();
+                } catch (final Exception e) {
+                    LOG.error("Unable to interrupt application Thread '" + t.getName() + "'", e);
+                }
+            });
 
-            // then stop
-            Thread.yield();
-            nthreads = group.enumerate(threads);
-            for (int i = 0; i < nthreads; i++) {
-                LOG.info("Stop thread: {}", threads[i]);
-                threads[i].stop();
-            }
-
-            // then destroy - except Thread.destroy() not implemented in jdk
-
+        } catch (final Exception e) {
+            LOG.error("ERROR IN DESTROYING APP!", e);
         } finally {
             stopped = true;
             fireDestroyed();

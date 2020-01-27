@@ -11,6 +11,8 @@ import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -22,19 +24,20 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class UnsignedJarsTest {
+
     @Test
+    @Execution(ExecutionMode.SAME_THREAD)
     void launchUnsignedApp(@Mock DialogFactory dialogFactory) throws Exception {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(IntegrationTestResources.load("integration-app-25.jnlp"));
         final ResourceTrackerFactory resourceTrackerFactory = new DummyResourceTracker.Factory();
 
         when(dialogFactory.showUnsignedWarningDialog(jnlpFile)).thenReturn(YesNoSandboxLimited.yes());
 
-        try (Dialogs.Uninstaller uninstaller = Dialogs.setDialogFactory(dialogFactory)){
+        try (Dialogs.Uninstaller uninstaller = Dialogs.setDialogFactory(dialogFactory)) {
             // when
-            new ApplicationInstance(jnlpFile, resourceTrackerFactory);
-        } finally {
-            // then
-            verify(dialogFactory).showUnsignedWarningDialog(jnlpFile);
+            final ThreadGroup threadGroup = new ThreadGroup("Test-Group");
+            new ApplicationInstance(jnlpFile, resourceTrackerFactory, threadGroup);
         }
+        verify(dialogFactory).showUnsignedWarningDialog(jnlpFile);
     }
 }
