@@ -300,10 +300,10 @@ public class OutputController extends BasicOutputController {
         private static final SingleStreamLogger INSTANCE = initSystemLogger();
 
         private static SingleStreamLogger initSystemLogger() {
-            if (OsUtil.isWindows()) {
-                return new WinSystemLog();
-            } else {
+            if (OsUtil.isLinux()) {
                 return new UnixSystemLog();
+            } else {
+                return new NoopSystemLog();
             }
         }
     }
