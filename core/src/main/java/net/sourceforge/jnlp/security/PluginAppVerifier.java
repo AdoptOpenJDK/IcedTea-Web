@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
@@ -168,7 +168,7 @@ public class PluginAppVerifier implements AppVerifier {
                         dialogType = AccessType.UNVERIFIED;
                     }
 
-                    YesNoSandbox action = SecurityDialogs.showCertWarningDialog(
+                    YesNoSandbox action = Dialogs.showCertWarningDialog(
                             dialogType, file, jcv, securityDelegate);
                     if (action != null && action.toBoolean()) {
                         if (action.compareValue(Primitive.SANDBOX)) {

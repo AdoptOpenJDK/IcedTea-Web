@@ -39,7 +39,7 @@ package net.sourceforge.jnlp.security;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 
 public class JNLPAuthenticator extends Authenticator {
@@ -57,7 +57,7 @@ public class JNLPAuthenticator extends Authenticator {
         int port = getRequestingPort();
         String prompt = getRequestingPrompt();
 
-        NamePassword response = SecurityDialogs.showAuthenticationPrompt(host, port, prompt, type);
+        NamePassword response = Dialogs.showAuthenticationPrompt(host, port, prompt, type);
         if (response == null) {
             return null;
         } else {

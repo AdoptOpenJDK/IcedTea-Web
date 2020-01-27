@@ -37,6 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
@@ -122,7 +123,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
     private class CertInfoButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            SecurityDialogs.showCertInfoDialog(parent.getCertVerifier(),
+            Dialogs.showCertInfoDialog(parent.getCertVerifier(),
                                 parent.getSecurityDialogPanel());
         }
     }

@@ -1,7 +1,7 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -156,10 +156,10 @@ public class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
             case ShortcutDesc.CREATE_ALWAYS:
                 return new AccessWarningPaneComplexReturn(true);
             case ShortcutDesc.CREATE_ASK_USER:
-                return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
+                return Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
             case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
-                    return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
+                    return Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
                 }
             case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
