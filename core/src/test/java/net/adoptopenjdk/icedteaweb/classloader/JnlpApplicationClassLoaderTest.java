@@ -24,9 +24,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass1() throws Exception {
 
         //given
-        final JNLPFile jnlpFile = createFile("empty.jnlp");
-        final List<Part> parts = createFor(jnlpFile).getParts();
-        final PartsHandler partsHandler = new DummyPartsHandler(parts, jnlpFile);
+        final PartsHandler partsHandler = createDummyPartsHandlerFor("empty.jnlp");
 
         //expect
         thrown.expect(ClassNotFoundException.class);
@@ -41,9 +39,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass3() throws Exception {
 
         //given
-        final JNLPFile jnlpFile = createFile("unavailable-jar.jnlp");
-        final List<Part> parts = createFor(jnlpFile).getParts();
-        final PartsHandler partsHandler = new ErrorPartsHandler(parts, jnlpFile);
+        final PartsHandler partsHandler = createErrorPartsHandler("unavailable-jar.jnlp");
 
         // expect
         thrown.expect(RuntimeException.class);
@@ -57,9 +53,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass4() throws Exception {
 
         //given
-        final JNLPFile file = createFile("eager-and-lazy.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("eager-and-lazy.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -73,9 +67,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass5() throws Exception {
 
         //given
-        final JNLPFile file = createFile("eager-and-lazy.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("eager-and-lazy.jnlp");
 
         //when
         try {
@@ -92,9 +84,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass6() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-not-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-not-recursive.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -107,9 +97,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass7() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-not-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-not-recursive.jnlp");
 
         //when
         try {
@@ -125,9 +113,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass8() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-not-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-not-recursive.jnlp");
 
         //when
         try {
@@ -143,9 +129,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass9() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-recursive.jnlp");
 
         //when
         new JnlpApplicationClassLoader(partsHandler);
@@ -158,9 +142,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass10() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-recursive.jnlp");
 
         //when
         try {
@@ -176,9 +158,7 @@ public class JnlpApplicationClassLoaderTest {
     public void findClass11() throws Exception {
 
         //given
-        final JNLPFile file = createFile("lazy-recursive.jnlp");
-        final List<Part> parts = createFor(file).getParts();
-        final DummyPartsHandler partsHandler = new DummyPartsHandler(parts, file);
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("lazy-recursive.jnlp");
 
         //when
         try {
@@ -227,6 +207,18 @@ public class JnlpApplicationClassLoaderTest {
             throw new RuntimeException("Can not download " + jarDesc.getLocation());
         }
 
+    }
+
+    public static ErrorPartsHandler createErrorPartsHandler(final String name) throws IOException, ParseException {
+        final JNLPFile file = createFile(name);
+        final List<Part> parts = createFor(file).getParts();
+        return new ErrorPartsHandler(parts, file);
+    }
+
+    public static DummyPartsHandler createDummyPartsHandlerFor(final String name) throws IOException, ParseException {
+        final JNLPFile file = createFile(name);
+        final List<Part> parts = createFor(file).getParts();
+        return new DummyPartsHandler(parts, file);
     }
 
     public static JNLPFile createFile(final String name) throws IOException, ParseException {
