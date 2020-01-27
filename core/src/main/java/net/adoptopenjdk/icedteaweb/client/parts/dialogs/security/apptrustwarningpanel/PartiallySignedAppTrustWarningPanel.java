@@ -49,7 +49,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SetValueHandler;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.tools.CertInformation;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.signing.JarCertVerifier;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;

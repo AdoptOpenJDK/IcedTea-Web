@@ -10,7 +10,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.signing.JarCertVerifier;
 
 import java.net.URL;
 import java.security.Permission;

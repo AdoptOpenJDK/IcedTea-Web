@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.runtime;
+package net.sourceforge.jnlp.signing;
 
 public enum SigningState {
     FULL, PARTIAL, NONE

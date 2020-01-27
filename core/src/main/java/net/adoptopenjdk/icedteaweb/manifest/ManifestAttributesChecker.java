@@ -52,7 +52,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.SigningState;
+import net.sourceforge.jnlp.signing.SigningState;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;

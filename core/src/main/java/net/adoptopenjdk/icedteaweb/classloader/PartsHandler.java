@@ -12,7 +12,7 @@ import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.signing.JarCertVerifier;
 
 import java.io.File;
 import java.io.FileOutputStream;

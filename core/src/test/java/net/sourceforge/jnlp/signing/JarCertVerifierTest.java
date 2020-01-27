@@ -35,11 +35,10 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version.
  */
 
-package net.sourceforge.jnlp.tools;
+package net.sourceforge.jnlp.signing;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
-import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,22 +58,22 @@ public class JarCertVerifierTest {
     @Test
     public void testIsMetaInfFile() {
         final String METAINF = "META-INF";
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.MF"));
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.SF"));
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.DSA"));
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/file.RSA"));
-        assertTrue(JarCertVerifier.isMetaInfFile(METAINF + "/SIG-blah.blah"));
+        assertTrue(SignVerifyUtils.isMetaInfFile(METAINF + "/file.MF"));
+        assertTrue(SignVerifyUtils.isMetaInfFile(METAINF + "/file.SF"));
+        assertTrue(SignVerifyUtils.isMetaInfFile(METAINF + "/file.DSA"));
+        assertTrue(SignVerifyUtils.isMetaInfFile(METAINF + "/file.RSA"));
+        assertTrue(SignVerifyUtils.isMetaInfFile(METAINF + "/SIG-blah.blah"));
 
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.MF.class"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.SF.class"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.DSA.class"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/file.RSA.class"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/SIG-blah.blah.class"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/file.MF.class"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/file.SF.class"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/file.DSA.class"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/file.RSA.class"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/SIG-blah.blah.class"));
 
-        assertFalse(JarCertVerifier.isMetaInfFile("some_dir/" + METAINF + "/filename"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "filename"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/filename"));
-        assertFalse(JarCertVerifier.isMetaInfFile(METAINF + "/filename"));
+        assertFalse(SignVerifyUtils.isMetaInfFile("some_dir/" + METAINF + "/filename"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "filename"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/filename"));
+        assertFalse(SignVerifyUtils.isMetaInfFile(METAINF + "/filename"));
     }
 
     class JarCertVerifierEntry extends JarEntry {
@@ -118,10 +117,10 @@ public class JarCertVerifierTest {
     @Test
     public void testNoManifest() throws Exception {
         JarCertVerifier jcv = new JarCertVerifier();
-        VerifyResult result = jcv.verifyJarEntryCerts("", false, null);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", false, null);
 
         Assert.assertEquals("No manifest should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("No manifest means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -132,10 +131,10 @@ public class JarCertVerifierTest {
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("OneDirEntry/"));
         entries.add(new JarCertVerifierEntry("META-INF/MANIFEST.MF"));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("No signable entry (only dirs/manifests) should be considered trivially signed.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("No signable entry (only dirs/manifests) means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -145,10 +144,10 @@ public class JarCertVerifierTest {
         JarCertVerifier jcv = new JarCertVerifier();
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstEntryWithoutSigner"));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One unsigned entry should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("One unsigned entry means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -160,10 +159,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstEntryWithoutSigner"));
         entries.add(new JarCertVerifierEntry("secondEntryWithoutSigner"));
         entries.add(new JarCertVerifierEntry("thirdEntryWithoutSigner"));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Many unsigned entries should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("Many unsigned entries means no signers in the verifier.", 0,
                 jcv.getCertsList().size());
     }
@@ -174,10 +173,10 @@ public class JarCertVerifierTest {
         CodeSigner[] signers = { alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByOne", signers));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One signed entry should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("One signed entry means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("One signed entry means one signer in the verifier.",
@@ -192,10 +191,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByOne", signers));
         entries.add(new JarCertVerifierEntry("secondSignedByOne", signers));
         entries.add(new JarCertVerifierEntry("thirdSignedByOne", signers));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by one signer should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries signed by one signer means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by one signer means one signer in the verifier.",
@@ -208,10 +207,10 @@ public class JarCertVerifierTest {
         CodeSigner[] signers = { alphaSigner, betaSigner, charlieSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByThree", signers));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by three signers should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("One entry signed by three means three signers in the verifier.",
                 3, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by three means three signers in the verifier.",
@@ -228,10 +227,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByThree", signers));
         entries.add(new JarCertVerifierEntry("secondSignedByThree", signers));
         entries.add(new JarCertVerifierEntry("thirdSignedByThree", signers));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by three signers should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries signed by three means three signers in the verifier.",
                 3, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by three means three signers in the verifier.",
@@ -250,10 +249,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByOne", alphaSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByTwo", betaSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByTwo", charlieSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by at least one common signer should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries signed completely by only one signer means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed completely by only one signer means one signer in the verifier.",
@@ -270,10 +269,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByAlpha", alphaSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByBeta", betaSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByCharlie", charlieSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by no common signers should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("Three entries signed by no common signers means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -287,10 +286,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByAlpha", alphaSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByAlpha", alphaSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByBeta", betaSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("First two entries signed by alpha signer, third entry signed by beta signer should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("Three entries signed by some common signers but not all means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -303,10 +302,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByAlpha", alphaSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByAlpha", alphaSigners));
         entries.add(new JarCertVerifierEntry("thirdUnsigned"));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("First two entries signed by alpha signer, third entry not signed, should be considered unsigned.",
-                VerifyResult.UNSIGNED, result);
+                SignVerifyResult.UNSIGNED, result);
         Assert.assertEquals("First two entries signed by alpha signer, third entry not signed, means no signers in the verifier.",
                 0, jcv.getCertsList().size());
     }
@@ -317,10 +316,10 @@ public class JarCertVerifierTest {
         CodeSigner[] expiredSigners = { expiredSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpired", expiredSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by expired cert, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("One entry signed by expired cert means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by expired cert means one signer in the verifier.",
@@ -335,10 +334,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByExpired", expiredSigners));
         entries.add(new JarCertVerifierEntry("secondSignedBExpired", expiredSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByExpired", expiredSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by expired cert, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("Three entries signed by expired cert means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by expired cert means one signer in the verifier.",
@@ -351,10 +350,10 @@ public class JarCertVerifierTest {
         CodeSigner[] expiringSigners = { expiringSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpiring", expiringSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by expiring cert, should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("One entry signed by expiring cert means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by expiring cert means one signer in the verifier.",
@@ -369,10 +368,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByExpiring", expiringSigners));
         entries.add(new JarCertVerifierEntry("secondSignedBExpiring", expiringSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByExpiring", expiringSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by expiring cert, should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries signed by expiring cert means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by expiring cert means one signer in the verifier.",
@@ -385,10 +384,10 @@ public class JarCertVerifierTest {
         CodeSigner[] notYetValidSigners = { notYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByNotYetValid", notYetValidSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by cert that is not yet valid, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("One entry signed by cert that is not yet valid means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by cert that is not yet valid means one signer in the verifier.",
@@ -403,10 +402,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByNotYetValid", notYetValidSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByNotYetValid", notYetValidSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByNotYetValid", notYetValidSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by cert that is not yet valid, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("Three entries signed by cert that is not yet valid means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by cert that is not yet valid means one signer in the verifier.",
@@ -419,10 +418,10 @@ public class JarCertVerifierTest {
         CodeSigner[] expiringAndNotYetValidSigners = { expiringAndNotYetValidSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByExpiringNotYetValid", expiringAndNotYetValidSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by cert that is not yet valid but also expiring, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("One entry signed by cert that is not yet valid but also expiring means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by cert that is not yet valid but also expiring means one signer in the verifier.",
@@ -438,10 +437,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByExpiringNotYetValid", expiringAndNotYetValidSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByExpiringNotYetValid", expiringAndNotYetValidSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByExpiringNotYetValid", expiringAndNotYetValidSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by cert that is not yet valid but also expiring, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("Three entries signed by cert that is not yet valid but also expiring means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by cert that is not yet valid but also expiring means one signer in the verifier.",
@@ -456,10 +455,10 @@ public class JarCertVerifierTest {
         CodeSigner[] oneExpiredOneValidSigner = { expiredSigner, alphaSigner };
         Vector<JarEntry> entries = new Vector<JarEntry>();
         entries.add(new JarCertVerifierEntry("firstSignedByTwo", oneExpiredOneValidSigner));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("One entry signed by one expired cert and another valid cert, should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("One entry signed by one expired cert and another valid cert means two signers in the verifier.",
                 2, jcv.getCertsList().size());
         Assert.assertTrue("One entry signed by one expired cert and another valid cert means two signers in the verifier.",
@@ -475,10 +474,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByTwo", oneExpiredOneValidSigner));
         entries.add(new JarCertVerifierEntry("secondSignedByTwo", oneExpiredOneValidSigner));
         entries.add(new JarCertVerifierEntry("thirdSignedByTwo", oneExpiredOneValidSigner));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries signed by one expired cert and another valid cert, should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries signed by one expired cert and another valid cert means two signers in the verifier.",
                 2, jcv.getCertsList().size());
         Assert.assertTrue("Three entries signed by one expired cert and another valid cert means two signers in the verifier.",
@@ -496,10 +495,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("firstSignedByTwo", oneExpiredOneValidSigners));
         entries.add(new JarCertVerifierEntry("secondSignedByTwo", oneExpiredOneValidSigners));
         entries.add(new JarCertVerifierEntry("thirdSignedByExpired", expiredSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Two entries signed by one expired and one valid cert, third signed by just expired cert, should be considered signed but not okay.",
-                VerifyResult.SIGNED_NOT_OK, result);
+                SignVerifyResult.SIGNED_NOT_OK, result);
         Assert.assertEquals("Two entries signed by one expired and one valid cert, third signed by just expired cert means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Two entries signed by one expired and one valid cert, third signed by just expired cert means one signer in the verifier.",
@@ -520,10 +519,10 @@ public class JarCertVerifierTest {
         entries.add(new JarCertVerifierEntry("thirdSigned", oneExpiringSigners));
         entries.add(new JarCertVerifierEntry("oneDir/"));
         entries.add(new JarCertVerifierEntry("oneDir/fourthSigned", oneExpiredOneValidSigners));
-        VerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
+        SignVerifyResult result = jcv.verifyJarEntryCerts("", true, entries);
 
         Assert.assertEquals("Three entries sharing valid cert and others with issues, should be considered signed and okay.",
-                VerifyResult.SIGNED_OK, result);
+                SignVerifyResult.SIGNED_OK, result);
         Assert.assertEquals("Three entries sharing valid cert and others with issues means one signer in the verifier.",
                 1, jcv.getCertsList().size());
         Assert.assertTrue("Three entries sharing valid cert and others with issues means one signer in the verifier.",
