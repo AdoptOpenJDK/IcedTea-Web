@@ -9,12 +9,20 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static java.util.jar.Attributes.Name.MAIN_CLASS;
 
 public class ClassLoaderUtils {
+
+    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
+
+    public static Executor getClassloaderBackgroundExecutor() {
+        return BACKGROUND_EXECUTOR;
+    }
 
     public static <V> V waitForCompletion(Future<V> f, String message) {
         try {
@@ -39,15 +47,11 @@ public class ClassLoaderUtils {
         if (mainJars.size() == 1) {
             final JARDesc jarDesc = mainJars.get(0);
             final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-            if (fromManifest != null) {
-                return fromManifest;
-            }
+            return fromManifest;
         } else if (mainJars.size() == 0) {
             final JARDesc jarDesc = file.getJnlpResources().getJARs().get(0);
             final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-            if (fromManifest != null) {
-                return fromManifest;
-            }
+            return fromManifest;
         }
         return null;
     }

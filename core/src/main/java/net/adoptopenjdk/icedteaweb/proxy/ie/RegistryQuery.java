@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,21 +57,14 @@ class RegistryQuery {
     }
 
     private static Future<List<String>> getLines(final InputStream src) {
-        final CompletableFuture<List<String>> result = new CompletableFuture<>();
-
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                final List<String> lines = new ArrayList<>();
-                final Scanner sc = new Scanner(src);
-                while (sc.hasNextLine()) {
-                    lines.add(sc.nextLine());
-                }
-                result.complete(lines);
-            } catch (final Exception e) {
-                result.completeExceptionally(e);
+        return CompletableFuture.supplyAsync(() -> {
+            final List<String> lines = new ArrayList<>();
+            final Scanner sc = new Scanner(src);
+            while (sc.hasNextLine()) {
+                lines.add(sc.nextLine());
             }
+            return lines;
         });
-        return result;
     }
 
 }

@@ -19,7 +19,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         this(jarProvider, new NativeLibrarySupport());
     }
 
-    public JnlpApplicationClassLoader(JarProvider jarProvider, NativeLibrarySupport nativeLibrarySupport) {
+    private JnlpApplicationClassLoader(JarProvider jarProvider, NativeLibrarySupport nativeLibrarySupport) {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
         this.jarProvider = jarProvider;
         this.nativeLibrarySupport = nativeLibrarySupport;
