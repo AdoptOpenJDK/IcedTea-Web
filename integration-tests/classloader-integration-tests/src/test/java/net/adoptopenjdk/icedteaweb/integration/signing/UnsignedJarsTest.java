@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.integration.signing;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogsHolder;
 import net.adoptopenjdk.icedteaweb.integration.DummyResourceTracker;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
@@ -30,7 +29,7 @@ class UnsignedJarsTest {
 
         when(dialogFactory.showUnsignedWarningDialog(jnlpFile)).thenReturn(YesNoSandboxLimited.yes());
 
-        try (Dialogs.Uninstaller uninstaller = SecurityDialogsHolder.setSecurityDialogForTests(dialogFactory)){
+        try (Dialogs.Uninstaller uninstaller = Dialogs.setDialogFactory(dialogFactory)){
             // when
             new ApplicationInstance(jnlpFile, resourceTrackerFactory);
         } finally {
