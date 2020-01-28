@@ -46,12 +46,10 @@ public class ClassLoaderUtils {
                 .collect(Collectors.toList());
         if (mainJars.size() == 1) {
             final JARDesc jarDesc = mainJars.get(0);
-            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-            return fromManifest;
+            return ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
         } else if (mainJars.size() == 0) {
             final JARDesc jarDesc = file.getJnlpResources().getJARs().get(0);
-            final String fromManifest = ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
-            return fromManifest;
+            return ManifestAttributesReader.getAttributeFromJar(MAIN_CLASS, jarDesc.getLocation(), tracker);
         }
         return null;
     }
