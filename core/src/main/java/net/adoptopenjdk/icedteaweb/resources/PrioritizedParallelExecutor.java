@@ -46,18 +46,16 @@ public class PrioritizedParallelExecutor {
             throw new IllegalArgumentException("No callables");
         }
 
-        final CompletableFuture<V> futureResult = new CompletableFuture<>();
         final List<Exception> exceptions = new ArrayList<>();
         for (Callable<V> next : callables) {
             try {
-                futureResult.complete(executor.submit(next).get());
-                return futureResult;
+                return CompletableFuture.completedFuture(executor.submit(next).get());
             } catch (Exception e) {
                 exceptions.add(e);
                 // continue with next callable
             }
         }
-
+        final CompletableFuture<V> futureResult = new CompletableFuture<>();
         futureResult.completeExceptionally(getFailureReason(exceptions));
         return futureResult;
     }

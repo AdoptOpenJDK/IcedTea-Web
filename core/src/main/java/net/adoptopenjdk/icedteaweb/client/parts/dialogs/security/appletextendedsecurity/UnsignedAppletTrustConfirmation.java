@@ -36,7 +36,7 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
@@ -211,7 +211,7 @@ public class UnsignedAppletTrustConfirmation {
             return;
         }
 
-        YesNo warningResponse = SecurityDialogs.showUnsignedWarningDialog(file);
+        YesNo warningResponse = Dialogs.showUnsignedWarningDialog(file);
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
@@ -229,7 +229,7 @@ public class UnsignedAppletTrustConfirmation {
             return;
         }
 
-        YesNoSandbox warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
+        YesNoSandbox warningResponse = Dialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 

@@ -5,7 +5,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDownloadDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
-import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -25,11 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class JarExtractor {
-
-    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
 
     private final JNLPFileFactory jnlpFileFactory;
 
@@ -77,21 +74,18 @@ public class JarExtractor {
     }
 
     private Future<Void> addExtension(final JNLPFile parent, final ExtensionDesc extension) {
-        final CompletableFuture<Void> result = new CompletableFuture<>();
-        BACKGROUND_EXECUTOR.execute(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
                 addExtensionParts(parent, jnlpFile, extension.getDownloads());
                 addJnlpFile(jnlpFile, true);
-                result.complete(null);
             } catch (Exception e) {
-                result.completeExceptionally(e);
+                throw new RuntimeException("Error in adding extension " + extension.getName(), e);
             }
-        });
-        return result;
+        }, getClassloaderBackgroundExecutor());
     }
 
-    private void addExtensionParts(final JNLPFile parentFile, final JNLPFile extensionFile, final List<ExtensionDownloadDesc> downloads) throws ParseException {
+    private void addExtensionParts(final JNLPFile parentFile, final JNLPFile extensionFile, final List<ExtensionDownloadDesc> downloads) {
         partsLock.lock();
         try {
             for (ExtensionDownloadDesc download : downloads) {
@@ -113,7 +107,7 @@ public class JarExtractor {
     private Part getOrCreatePart(final JNLPFile jnlpFile, final String name, final boolean isExtension) {
         final URL location = jnlpFile.getSourceLocation();
         final String version = Optional.ofNullable(jnlpFile.getFileVersion())
-                .map(v -> v.toString())
+                .map(VersionId::toString)
                 .orElse(null);
         final Extension extension = isExtension ? new Extension(location, version) : null;
 

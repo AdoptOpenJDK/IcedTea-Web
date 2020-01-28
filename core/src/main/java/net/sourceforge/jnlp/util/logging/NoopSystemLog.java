@@ -38,9 +38,9 @@ package net.sourceforge.jnlp.util.logging;
 
 
 
-public class WinSystemLog implements SingleStreamLogger{
+public class NoopSystemLog implements SingleStreamLogger {
     
-    public WinSystemLog(){
+    public NoopSystemLog(){
     
     }
     

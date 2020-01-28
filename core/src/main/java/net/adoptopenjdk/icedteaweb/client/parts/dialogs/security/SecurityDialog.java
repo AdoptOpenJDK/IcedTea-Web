@@ -37,6 +37,8 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogType;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.AppTrustWarningDialog;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
@@ -57,7 +59,7 @@ import java.security.cert.X509Certificate;
  * Provides methods for showing security warning dialogs for a wide range of
  * JNLP security issues. Note that the security dialogs should be running in the
  * secure AppContext - this class should not be used directly from an applet or
- * application. See {@link SecurityDialogs} for a way to show security dialogs.
+ * application. See {@link Dialogs} for a way to show security dialogs.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
  */
@@ -66,7 +68,7 @@ public class SecurityDialog {
     /**
      * The type of dialog we want to show
      */
-    private final SecurityDialogs.DialogType dialogType;
+    private final DialogType dialogType;
 
     /**
      * The type of access that this dialog is for
@@ -103,8 +105,8 @@ public class SecurityDialog {
     /**
      * Create a SecurityDialog to display a certificate-related warning
      */
-    SecurityDialog(SecurityDialogs.DialogType dialogType, AccessType accessType,
-                           JNLPFile file, CertVerifier certVerifier) {
+    public SecurityDialog(DialogType dialogType, AccessType accessType,
+                   JNLPFile file, CertVerifier certVerifier) {
         this(dialogType, accessType, file, certVerifier, null, null);
     }
 
@@ -112,11 +114,11 @@ public class SecurityDialog {
      * Create a SecurityWarningDialog to display information about a single
      * certificate
      */
-    SecurityDialog(SecurityDialogs.DialogType dialogType, X509Certificate c) {
+    public SecurityDialog(DialogType dialogType, X509Certificate c) {
         this(dialogType, null, null, null, c, null);
     }
 
-    SecurityDialog(SecurityDialogs.DialogType dialogType, AccessType accessType,
+    SecurityDialog(DialogType dialogType, AccessType accessType,
                    JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
         this.viewableDialog = new ViewableDialog();
         this.dialogType = dialogType;
@@ -195,68 +197,68 @@ public class SecurityDialog {
         return cert;
     }
 
-    private static String createTitle(SecurityDialogs.DialogType dtype, AccessType atype) {
+    private static String createTitle(DialogType dtype, AccessType atype) {
         String dialogTitle = "";
-        if (dtype == SecurityDialogs.DialogType.CERT_WARNING) {
+        if (dtype == DialogType.CERT_WARNING) {
             if (atype == AccessType.VERIFIED)
                 dialogTitle = "Security Approval Required";
             else
                 dialogTitle = "Security Warning";
-        } else if (dtype == SecurityDialogs.DialogType.MORE_INFO)
+        } else if (dtype == DialogType.MORE_INFO)
             dialogTitle = "More Information";
-        else if (dtype == SecurityDialogs.DialogType.CERT_INFO)
+        else if (dtype == DialogType.CERT_INFO)
             dialogTitle = "Details - Certificate";
-        else if (dtype == SecurityDialogs.DialogType.ACCESS_WARNING)
+        else if (dtype == DialogType.ACCESS_WARNING)
             dialogTitle = "Security Warning";
-        else if (dtype == SecurityDialogs.DialogType.APPLET_WARNING)
+        else if (dtype == DialogType.APPLET_WARNING)
             dialogTitle = "Applet Warning";
-        else if (dtype == SecurityDialogs.DialogType.PARTIALLY_SIGNED_WARNING)
+        else if (dtype == DialogType.PARTIALLY_SIGNED_WARNING)
             dialogTitle = "Security Warning";
-        else if (dtype == SecurityDialogs.DialogType.AUTHENTICATION)
+        else if (dtype == DialogType.AUTHENTICATION)
             dialogTitle = "Authentication Required";
         return dialogTitle;
     }
 
     private static SecurityDialogPanel getPanel(SecurityDialog sd) {
-        final SecurityDialogs.DialogType type = sd.dialogType;
-        if (type == SecurityDialogs.DialogType.CERT_WARNING) {
+        final DialogType type = sd.dialogType;
+        if (type == DialogType.CERT_WARNING) {
             return new CertWarningPane(sd, sd.certVerifier, (SecurityDelegate) sd.extras[0]);
         }
-        if (type == SecurityDialogs.DialogType.MORE_INFO) {
+        if (type == DialogType.MORE_INFO) {
             return new MoreInfoPane(sd, sd.certVerifier);
         }
-        if (type == SecurityDialogs.DialogType.CERT_INFO) {
+        if (type == DialogType.CERT_INFO) {
             return new CertsInfoPane(sd, sd.certVerifier);
         }
-        if (type == SecurityDialogs.DialogType.SINGLE_CERT_INFO) {
+        if (type == DialogType.SINGLE_CERT_INFO) {
             return new SingleCertInfoPane(sd, sd.certVerifier);
         }
-        if (type == SecurityDialogs.DialogType.ACCESS_WARNING) {
+        if (type == DialogType.ACCESS_WARNING) {
             return new AccessWarningPane(sd, sd.extras, sd.certVerifier);
         }
-        if (type == SecurityDialogs.DialogType.APPLET_WARNING) {
+        if (type == DialogType.APPLET_WARNING) {
             return new AppletWarningPane(sd, sd.certVerifier);
         }
-        if (type == SecurityDialogs.DialogType.PARTIALLY_SIGNED_WARNING) {
+        if (type == DialogType.PARTIALLY_SIGNED_WARNING) {
             return AppTrustWarningDialog.partiallySigned(sd, sd.file, (SecurityDelegate) sd.extras[0]);
         }
-        if (type == SecurityDialogs.DialogType.UNSIGNED_WARNING) {
+        if (type == DialogType.UNSIGNED_WARNING) {
             return AppTrustWarningDialog.unsigned(sd, sd.file); // Only necessary for applets on 'high security' or above
         }
-        if (type == SecurityDialogs.DialogType.AUTHENTICATION) {
+        if (type == DialogType.AUTHENTICATION) {
             return new PasswordAuthenticationPane(sd, sd.extras);
         }
-        if (type == SecurityDialogs.DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
+        if (type == DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
             final String codeBase = sd.file.getNotNullProbableCodeBase().toExternalForm();
             return new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), codeBase);
         }
-        if (type == SecurityDialogs.DialogType.MISSING_ALACA) {
+        if (type == DialogType.MISSING_ALACA) {
             return new MissingALACAttributePanel(sd, sd.file.getTitle(), (String) sd.extras[0], (String) sd.extras[1]);
         }
-        if (type == SecurityDialogs.DialogType.MATCHING_ALACA) {
+        if (type == DialogType.MATCHING_ALACA) {
             return AppTrustWarningDialog.matchingAlaca(sd, sd.file, (String) sd.extras[0], (String) sd.extras[1]);
         }
-        if (type == SecurityDialogs.DialogType.SECURITY_511) {
+        if (type == DialogType.SECURITY_511) {
             return new InetSecurity511Panel(sd, (URL) sd.extras[0]);
         }
         throw new RuntimeException("Unknown value of " + sd.dialogType + ". Panel will be null. That's not allowed.");

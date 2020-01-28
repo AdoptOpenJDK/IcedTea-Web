@@ -38,7 +38,7 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.manifest;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
@@ -285,7 +285,7 @@ public class ManifestAttributesChecker {
                 throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
             }
             if (itwSecurityLevel == AppletSecurityLevel.ASK_UNSIGNED) {
-                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file);
+                final boolean userApproved = Dialogs.showMissingPermissionsAttributeDialogue(file);
                 if (!userApproved) {
                     throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
                 } else {
@@ -404,7 +404,7 @@ public class ManifestAttributesChecker {
         notOkResources.forEach(url -> LOG.warn("The resource '{}' is not from codebase '{}'", url, codebase));
 
         if (att == null) {
-            final boolean userApproved = SecurityDialogs.showMissingALACAttributePanel(file, codebase, notOkResources);
+            final boolean userApproved = Dialogs.showMissingALACAttributePanel(file, codebase, notOkResources);
             if (!userApproved) {
                 throw new LaunchException("The application uses non-codebase resources, has no Application-Library-Allowable-Codebase Attribute, and was blocked from running by the user");
             } else {
@@ -421,7 +421,7 @@ public class ManifestAttributesChecker {
             }
         }
 
-        final boolean userApproved = isLowSecurity() || SecurityDialogs.showMatchingALACAttributePanel(file, codebase, notOkResources);
+        final boolean userApproved = isLowSecurity() || Dialogs.showMatchingALACAttributePanel(file, codebase, notOkResources);
         if (!userApproved) {
             throw new LaunchException("The application uses non-codebase resources, which do match its Application-Library-Allowable-Codebase Attribute, but was blocked from running by the user.");
         } else {

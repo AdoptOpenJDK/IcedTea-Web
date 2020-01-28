@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.initializer;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.InetSecurity511Panel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -102,7 +102,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
 
             final UrlRequestResult response = UrlProber.getUrlResponseCodeWithRedirectionResult(url, requestProperties, requestMethod);
             if (response.getResponseCode() == NETWORK_AUTHENTICATION_REQUIRED && !InetSecurity511Panel.isSkip()) {
-                boolean result511 = SecurityDialogs.show511Dialogue(resource);
+                boolean result511 = Dialogs.show511Dialogue(resource);
                 if (!result511) {
                     throw new RuntimeException("Terminated on users request after encountering 'http 511 authentication'.");
                 }

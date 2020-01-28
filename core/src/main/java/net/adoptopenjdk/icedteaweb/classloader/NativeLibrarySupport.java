@@ -7,7 +7,6 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;

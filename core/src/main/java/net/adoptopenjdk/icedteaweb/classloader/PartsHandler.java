@@ -27,20 +27,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
 public class PartsHandler implements JarProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(PartsHandler.class);
-
-    private static final Executor BACKGROUND_EXECUTOR = Executors.newCachedThreadPool();
 
     private final List<Part> parts;
     private final Lock partsLock = new ReentrantLock();
@@ -180,16 +177,10 @@ public class PartsHandler implements JarProvider {
     }
 
     private Future<LoadableJar> downloadJar(final JARDesc jarDescription) {
-        final CompletableFuture<LoadableJar> downloadFuture = new CompletableFuture<>();
-        BACKGROUND_EXECUTOR.execute(() -> {
-            try {
-                final URL localCacheUrl = getLocalUrlForJar(jarDescription);
-                downloadFuture.complete(new LoadableJar(localCacheUrl, jarDescription.isNative()));
-            } catch (final Exception e) {
-                downloadFuture.completeExceptionally(e);
-            }
-        });
-        return downloadFuture;
+        return CompletableFuture.supplyAsync(() -> {
+            final URL localCacheUrl = getLocalUrlForJar(jarDescription);
+            return new LoadableJar(localCacheUrl, jarDescription.isNative());
+        }, getClassloaderBackgroundExecutor());
     }
 
     //Methods that are needed for JNLP DownloadService interface

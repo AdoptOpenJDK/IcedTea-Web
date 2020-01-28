@@ -34,9 +34,11 @@
  obligated to do so.  If you do not wish to do so, delete this
  exception statement from your version.
  */
-package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
+package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs.DialogType;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
@@ -81,9 +83,9 @@ import java.util.concurrent.Semaphore;
  * {@link SecurityDialogMessageHandler} and block waiting for a response.
  * </p>
  */
-public class SecurityDialogsImpl implements SecurityDialogs.Dialogs {
+public class DefaultDialogFactory implements DialogFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityDialogsImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultDialogFactory.class);
 
     /**
      * Shows a warning dialog for different types of system access (i.e. file
