@@ -145,7 +145,8 @@ public class Launcher {
             }
         }
 
-        final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(file, f -> launchApplicationInstance(f));
+        final String applicationTitle = file.getTitle();
+        final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(applicationTitle, () -> launchApplicationInstance(file));
         final ApplicationInstance applicationInstance = cf.join();
 
         if (handler != null) {
