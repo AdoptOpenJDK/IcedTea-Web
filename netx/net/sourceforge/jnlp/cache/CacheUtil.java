@@ -877,7 +877,7 @@ public class CacheUtil {
                     rStr = lruHandler.getCacheDir().getFullPath()+ rStr.substring(0, rStr.indexOf(File.separatorChar, 1));
                     long len = file.length();
 
-                    if (keep.contains(file.getPath().substring(rStr.length()))) {
+                    if (keep.contains(path)) {
                         lruHandler.removeEntry(key);
                         continue;
                     }
@@ -897,7 +897,7 @@ public class CacheUtil {
                     }
 
                     curSize += len;
-                    keep.add(file.getPath().substring(rStr.length()));
+                    keep.add(path);
 
                     for (File f : file.getParentFile().listFiles()) {
                         if (!(f.equals(file) || f.equals(pf.getStoreFile()))) {
