@@ -6,6 +6,7 @@ import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.NetscapeCertTypeExtension;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.CodeSigner;
@@ -62,7 +63,7 @@ public class SignVerifyUtils {
                 .sum();
     }
 
-    static Map<CertPath, Boolean> getSignByMagic(final String jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
+    static Map<CertPath, Boolean> getSignByMagic(final File jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
 
         final Map<CertPath, Boolean> result = new HashMap<>();
 
@@ -119,7 +120,7 @@ public class SignVerifyUtils {
                 boolean fullySignedByCert = jarSignCount.get(certPath) == numSignableEntriesInJar;
                 final CertInformation certInfo = certInfoProvider.apply(certPath);
                 certInfo.resetForReverification();
-                certInfo.setNumJarEntriesSigned(jarPath, numSignableEntriesInJar);
+                certInfo.setNumJarEntriesSigned(jarPath.toString(), numSignableEntriesInJar);
 
                 final Certificate cert = certPath.getCertificates().get(0);
                 if (cert instanceof X509Certificate) {

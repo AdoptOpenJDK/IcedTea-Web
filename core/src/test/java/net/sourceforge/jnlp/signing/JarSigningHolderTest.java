@@ -4,6 +4,7 @@ import net.sourceforge.jnlp.tools.CertInformation;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 public class JarSigningHolderTest {
 
     @Test(expected = NullPointerException.class)
-    public void testFailOnNullRessource() {
+    public void testFailOnNullResource() {
 
         //when
         new JarSigningHolder(null, p -> new CertInformation());
@@ -28,8 +29,7 @@ public class JarSigningHolderTest {
     public void testFailOnNullCertificate() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("unsigned.jar").getFile();
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
 
         //when
         holder.getState(null);
@@ -39,20 +39,17 @@ public class JarSigningHolderTest {
     public void testFailOnNullCertInformationProvider() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("unsigned.jar").getFile();
+        final File jarFile = getResourceAsFile("unsigned.jar");
 
         //when
-        new JarSigningHolder(jarUrl, null);
+        new JarSigningHolder(jarFile, null);
     }
 
     @Test
     public void testUnsignedJarHasNoCertificates() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("unsigned.jar").getFile();
-
-        //when
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
 
         //than
         assertTrue(holder.getCertificates().isEmpty());
@@ -62,25 +59,21 @@ public class JarSigningHolderTest {
     public void testUnsignedJarIsNotSignedByCertificate() throws Exception {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("unsigned.jar").getFile();
+        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
         final Certificate certificate = generateTestCertificate();
 
-
         //when
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final SigningState state = holder.getState(certificate);
 
         //than
-        assertEquals(SigningState.NONE, holder.getState(certificate));
+        assertEquals(SigningState.NONE, state);
     }
 
     @Test
     public void testSignedJarHasCertificates() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("signed.jar").getFile();
-
-        //when
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
 
         //than
         assertFalse(holder.getCertificatePaths().isEmpty());
@@ -90,9 +83,8 @@ public class JarSigningHolderTest {
     public void testSignedJarIsNotSignedByAnotherCertificate() throws Exception {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("signed.jar").getFile();
+        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
         final Certificate certificate = generateTestCertificate();
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
 
         //when
         final SigningState state = holder.getState(certificate);
@@ -105,8 +97,7 @@ public class JarSigningHolderTest {
     public void testSignedJarIsSignedBySignerCertificatePath() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("signed.jar").getFile();
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
         final CertPath certPath = holder.getCertificatePaths().iterator().next();
 
         //when
@@ -120,8 +111,7 @@ public class JarSigningHolderTest {
     public void testSignedJarIsSignedByCertificate() {
 
         //given
-        final String jarUrl = JarSigningHolderTest.class.getResource("signed.jar").getFile();
-        final JarSigningHolder holder = new JarSigningHolder(jarUrl, p -> new CertInformation());
+        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
 
         //when
         final Set<? extends Certificate> certificates = holder.getCertificatePaths().stream()
@@ -131,6 +121,15 @@ public class JarSigningHolderTest {
         //than
         assertFalse(certificates.isEmpty());
         certificates.forEach(c -> assertEquals(SigningState.FULL, holder.getState(c)));
+    }
+
+    private JarSigningHolder createJarSigningHolderFor(String fileName) {
+        final File jarFile = getResourceAsFile(fileName);
+        return new JarSigningHolder(jarFile, p -> new CertInformation());
+    }
+
+    private File getResourceAsFile(String fileName) {
+        return new File(JarSigningHolderTest.class.getResource(fileName).getFile());
     }
 
     private Certificate generateTestCertificate() throws Exception {

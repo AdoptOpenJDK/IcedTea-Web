@@ -46,8 +46,8 @@ public class NewJarCertVerifier {
         add(jarFile);
     }
 
-    public void add(final File jarFile) throws Exception {
-        final JarSigningHolder holder = new JarSigningHolder(jarFile.toURI().toURL().getFile(), certPath -> getFor(certPath));
+    public void add(final File jarFile) {
+        final JarSigningHolder holder = new JarSigningHolder(jarFile, certPath -> getFor(certPath));
         holders.add(holder);
     }
 

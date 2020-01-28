@@ -3,6 +3,7 @@ package net.sourceforge.jnlp.signing;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.tools.CertInformation;
 
+import java.io.File;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 public class JarSigningHolder {
 
     /**
-     * defintion of Boolean value:
+     * definition of Boolean value:
      * <p>
      * false -> partially signed with certificate
      * true -> fully signed with certificate
@@ -25,7 +26,7 @@ public class JarSigningHolder {
 
     private final SignVerifyResult signState;
 
-    public JarSigningHolder(final String jarUrl, final Function<CertPath, CertInformation> certInfoProvider) {
+    public JarSigningHolder(final File jarUrl, final Function<CertPath, CertInformation> certInfoProvider) {
         Assert.requireNonNull(jarUrl, "jarUrl");
         Assert.requireNonNull(certInfoProvider, "certInfoProvider");
 
