@@ -38,7 +38,6 @@ import sun.awt.SunToolkit;
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
 import java.applet.AppletStub;
-import java.awt.Container;
 import java.awt.SplashScreen;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -145,7 +144,8 @@ public class Launcher {
             }
         }
 
-        final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(file, f -> launchApplicationInstance(f));
+        final String applicationTitle = file.getTitle();
+        final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(applicationTitle, () -> launchApplicationInstance(file));
         final ApplicationInstance applicationInstance = cf.join();
 
         if (handler != null) {
@@ -490,7 +490,7 @@ public class Launcher {
         AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, null, threadGroup);
+            applet = createApplet(file, threadGroup);
             applet.initialize();
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
@@ -526,7 +526,6 @@ public class Launcher {
      * Create an AppletInstance.
      *
      * @param file the JNLP file
-     * @param cont container where to put applet
      * @return applet
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
@@ -534,7 +533,7 @@ public class Launcher {
     //and then applets creates in little bit strange manner. This issue is visible with
     //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
-    private AppletInstance createApplet(final JNLPFile file, final Container cont, final ThreadGroup threadGroup) throws
+    private AppletInstance createApplet(final JNLPFile file, final ThreadGroup threadGroup) throws
             LaunchException {
         try {
 
@@ -542,7 +541,7 @@ public class Launcher {
             // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
-            final AppletInstance appletInstance = new AppletInstance(file, cont, threadGroup);
+            final AppletInstance appletInstance = new AppletInstance(file, threadGroup);
 
             /*
              * Due to PR2968, moved to earlier phase, so early stages of applet
@@ -558,7 +557,7 @@ public class Launcher {
             String appletName = file.getApplet().getMainClass();
             Class<?> appletClass = appletInstance.getClassLoader().loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
-            applet.setStub((AppletStub) cont);
+            applet.setStub(null);
             // Finish setting up appletInstance.
             appletInstance.setApplet(applet);
             appletInstance.getAppletEnvironment().setApplet(applet);
