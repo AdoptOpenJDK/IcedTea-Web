@@ -79,7 +79,7 @@ public class Dialogs {
         void uninstall();
 
         @Override
-        default void close() throws Exception {
+        default void close() {
             uninstall();
         }
     }
