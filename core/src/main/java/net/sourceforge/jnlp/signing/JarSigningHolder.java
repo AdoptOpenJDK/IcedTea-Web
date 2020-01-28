@@ -15,13 +15,13 @@ public class JarSigningHolder {
 
     /**
      * defintion of Boolean value:
-     *
-     * false -> parcially signed with certificate
+     * <p>
+     * false -> partially signed with certificate
      * true -> fully signed with certificate
-     *
+     * <p>
      * If there is no entry for a certificate that the resource is not signed by the certificate
      */
-    private final Map<CertPath, Boolean> signStateForCertificats;
+    private final Map<CertPath, Boolean> signStateForCertificates;
 
     private final SignVerifyResult signState;
 
@@ -29,7 +29,7 @@ public class JarSigningHolder {
         Assert.requireNonNull(jarUrl, "jarUrl");
         Assert.requireNonNull(certInfoProvider, "certInfoProvider");
 
-        signStateForCertificats = SignVerifyUtils.getSignByMagic(jarUrl, certInfoProvider);
+        signStateForCertificates = SignVerifyUtils.getSignByMagic(jarUrl, certInfoProvider);
 
         signState = SignVerifyResult.SIGNED_NOT_OK; //TODO: By extracting getSignByMagic we currently can not set this...
     }
@@ -42,7 +42,7 @@ public class JarSigningHolder {
     }
 
     public Set<CertPath> getCertificatePaths() {
-        return Collections.unmodifiableSet(signStateForCertificats.keySet());
+        return Collections.unmodifiableSet(signStateForCertificates.keySet());
     }
 
     public SigningState getStateForPath(final CertPath certPath) {
