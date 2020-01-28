@@ -76,9 +76,9 @@ public class JarExtractor {
     private Future<Void> addExtension(final JNLPFile parent, final ExtensionDesc extension) {
         return CompletableFuture.runAsync(() -> {
             try {
-            final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
-            addExtensionParts(parent, jnlpFile, extension.getDownloads());
-            addJnlpFile(jnlpFile, true);
+                final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
+                addExtensionParts(parent, jnlpFile, extension.getDownloads());
+                addJnlpFile(jnlpFile, true);
             } catch (Exception e) {
                 throw new RuntimeException("Error in adding extension " + extension.getName(), e);
             }
