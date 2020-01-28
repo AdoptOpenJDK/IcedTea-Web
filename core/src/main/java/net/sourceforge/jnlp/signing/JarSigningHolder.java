@@ -1,15 +1,12 @@
 package net.sourceforge.jnlp.signing;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.sourceforge.jnlp.tools.CertInformation;
 
-import java.io.File;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JarSigningHolder {
@@ -26,13 +23,9 @@ public class JarSigningHolder {
 
     private final SignVerifyResult signState;
 
-    public JarSigningHolder(final File jarUrl, final Function<CertPath, CertInformation> certInfoProvider) {
-        Assert.requireNonNull(jarUrl, "jarUrl");
-        Assert.requireNonNull(certInfoProvider, "certInfoProvider");
-
-        signStateForCertificates = SignVerifyUtils.getSignByMagic(jarUrl, certInfoProvider);
-
-        signState = SignVerifyResult.SIGNED_NOT_OK; //TODO: By extracting getSignByMagic we currently can not set this...
+    public JarSigningHolder(Map<CertPath, Boolean> signStateForCertificates, SignVerifyResult signState) {
+        this.signStateForCertificates = signStateForCertificates;
+        this.signState = signState;
     }
 
     public Set<Certificate> getCertificates() {

@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.signing;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.util.JarFile;
 import sun.security.util.DerInputStream;
@@ -64,6 +65,8 @@ public class SignVerifyUtils {
     }
 
     static Map<CertPath, Boolean> getSignByMagic(final File jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
+        Assert.requireNonNull(jarPath, "jarPath");
+        Assert.requireNonNull(certInfoProvider, "certInfoProvider");
 
         final Map<CertPath, Boolean> result = new HashMap<>();
 

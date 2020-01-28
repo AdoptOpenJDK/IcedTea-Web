@@ -19,13 +19,6 @@ import static org.junit.Assert.assertTrue;
 public class JarSigningHolderTest {
 
     @Test(expected = NullPointerException.class)
-    public void testFailOnNullResource() {
-
-        //when
-        new JarSigningHolder(null, p -> new CertInformation());
-    }
-
-    @Test(expected = NullPointerException.class)
     public void testFailOnNullCertificate() {
 
         //given
@@ -33,16 +26,6 @@ public class JarSigningHolderTest {
 
         //when
         holder.getState(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testFailOnNullCertInformationProvider() {
-
-        //given
-        final File jarFile = getResourceAsFile("unsigned.jar");
-
-        //when
-        new JarSigningHolder(jarFile, null);
     }
 
     @Test
@@ -125,7 +108,7 @@ public class JarSigningHolderTest {
 
     private JarSigningHolder createJarSigningHolderFor(String fileName) {
         final File jarFile = getResourceAsFile(fileName);
-        return new JarSigningHolder(jarFile, p -> new CertInformation());
+        return new JarSigningHolder(SignVerifyUtils.getSignByMagic(jarFile, p -> new CertInformation()), SignVerifyResult.SIGNED_NOT_OK);
     }
 
     private File getResourceAsFile(String fileName) {

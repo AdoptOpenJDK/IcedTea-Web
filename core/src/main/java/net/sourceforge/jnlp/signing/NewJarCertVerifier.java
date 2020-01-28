@@ -47,11 +47,13 @@ public class NewJarCertVerifier {
     }
 
     public void add(final File jarFile) {
-        final JarSigningHolder holder = new JarSigningHolder(jarFile, certPath -> getFor(certPath));
+        final Map<CertPath, Boolean> signStateForCertificates = SignVerifyUtils.getSignByMagic(jarFile, this::getFor);
+        final SignVerifyResult signState = SignVerifyResult.SIGNED_NOT_OK;  //TODO: By extracting getSignByMagic we currently can not set this...
+        final JarSigningHolder holder = new JarSigningHolder(signStateForCertificates, signState);
         holders.add(holder);
     }
 
-    public CertInformation getFor(final CertPath certPath) {
+    private CertInformation getFor(final CertPath certPath) {
         Assert.requireNonNull(certPath, "certPath");
         return certInfoMap.computeIfAbsent(certPath, path -> new CertInformation());
     }
