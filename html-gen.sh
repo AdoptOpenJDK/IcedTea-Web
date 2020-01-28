@@ -96,6 +96,7 @@ do
     sed -i -r 's_(\&lt;)?(https?://[^ ]*)(\&gt;| |$)_\1<a href="\2">\2</a>\3_i' "./$FILE" # Create hyperlinks from http(s) URLs
     sed -i -r 's/\&lt;(.*@.*)\&gt;/\&lt;<a href="mailto:\1\?subject=IcedTea-Web">\1<\/a>\&gt;/i' "./$FILE" # Create mailto links from email addresses formatted as <email@example.com>
     sed -i -r 's/$/<br>/' "./$FILE" # "\n" -> "<br>"
+    sed -i '1i <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>' "./$FILE"
 
     mv "$FILE" "$FILE.html"
     print_debug "$FILE.html finished."
@@ -104,9 +105,9 @@ done
 print_debug "Done sed subs. Starting in-place additions"
 
 # Centre the column of author names in the Authors file
-sed -i '4i <center>' AUTHORS.html
+sed -i '5i <center>' AUTHORS.html
 # Insert jamIcon above author names
-sed -i '5i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html
+sed -i '6i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html
 echo "</center>" >> AUTHORS.html
 
 if [ -n "${REPO_URL}" ]; then
