@@ -47,24 +47,27 @@ public class JarSigningHolder {
 
     public SigningState getStateForPath(final CertPath certPath) {
         Assert.requireNonNull(certPath, "certPath");
-        final Boolean signState = signStateForCertificats.get(certPath);
-        if(signState == null) {
+        final Boolean signStateForCertPath = signStateForCertificates.get(certPath);
+        if (signStateForCertPath == null) {
             return SigningState.NONE;
         }
-        if(signState == false) {
-            return SigningState.PARTIAL;
-        }
-        return SigningState.FULL;
+        return signStateForCertPath ? SigningState.FULL : SigningState.PARTIAL;
     }
 
     public SigningState getState(final Certificate certificate) {
         Assert.requireNonNull(certificate, "certificate");
 
-        return getCertificatePaths().stream()
+        Set<SigningState> states = getCertificatePaths().stream()
                 .filter(certPath -> certPath.getCertificates().contains(certificate))
-                .findAny()
-                .map(certPath -> getStateForPath(certPath))
-                .orElse(SigningState.NONE);
-    }
+                .map(this::getStateForPath)
+                .collect(Collectors.toSet());
 
+        if (states.contains(SigningState.FULL)) {
+            return SigningState.FULL;
+        }
+        if (states.contains(SigningState.PARTIAL)) {
+            return SigningState.PARTIAL;
+        }
+        return SigningState.NONE;
+    }
 }
