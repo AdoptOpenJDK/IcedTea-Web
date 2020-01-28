@@ -137,7 +137,7 @@ public class JarSigningHolderTest {
         return keyGen.getSelfCertificate(new X500Name("CN=ROOT"), (long)365*24*3600);
         */
 
-        //Alternative version...
+        //Alternative version... (written as PEM)
 
         //Source: http://www.javased.com/index.php?source_dir=spring-security-oauth/spring-security-oauth/src/test/java/org/springframework/security/oauth/common/signature/TestRSA_SHA1SignatureMethod.java
         final String googleOAuthCert="-----BEGIN CERTIFICATE-----\n" +
