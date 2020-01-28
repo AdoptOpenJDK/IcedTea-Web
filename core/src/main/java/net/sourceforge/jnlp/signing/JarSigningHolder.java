@@ -48,6 +48,7 @@ public class JarSigningHolder {
         return signStateForCertPath ? SigningState.FULL : SigningState.PARTIAL;
     }
 
+    // TODO: should all certificates of a path be counted as 'signing' or only the first in the path (assuming the root cert is the last).
     public SigningState getState(final Certificate certificate) {
         Assert.requireNonNull(certificate, "certificate");
 
