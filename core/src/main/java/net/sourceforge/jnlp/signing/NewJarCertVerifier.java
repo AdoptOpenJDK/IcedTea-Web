@@ -47,9 +47,7 @@ public class NewJarCertVerifier {
     }
 
     public void add(final File jarFile) {
-        final Map<CertPath, Boolean> signStateForCertificates = SignVerifyUtils.getSignByMagic(jarFile, this::getFor);
-        final SignVerifyResult signState = SignVerifyResult.SIGNED_NOT_OK;  //TODO: By extracting getSignByMagic we currently can not set this...
-        final JarSigningHolder holder = new JarSigningHolder(signStateForCertificates, signState);
+        final JarSigningHolder holder = SignVerifyUtils.getSignByMagic(jarFile, this::getFor);
         holders.add(holder);
     }
 

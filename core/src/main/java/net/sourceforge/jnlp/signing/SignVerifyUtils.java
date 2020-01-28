@@ -64,7 +64,7 @@ public class SignVerifyUtils {
                 .sum();
     }
 
-    static Map<CertPath, Boolean> getSignByMagic(final File jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
+    static JarSigningHolder getSignByMagic(final File jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
         Assert.requireNonNull(jarPath, "jarPath");
         Assert.requireNonNull(certInfoProvider, "certInfoProvider");
 
@@ -141,7 +141,10 @@ public class SignVerifyUtils {
                 }
                 result.put(certPath, fullySignedByCert ? true : false);
             }
-            return result;
+
+            final SignVerifyResult signState = SignVerifyResult.SIGNED_NOT_OK;  //TODO: By extracting getSignByMagic we currently can not set this...
+            final JarSigningHolder holder = new JarSigningHolder(result, signState);
+            return holder;
         } catch (Exception e) {
             throw new RuntimeException("Error in verify jar " + jarPath, e);
         }

@@ -108,7 +108,7 @@ public class JarSigningHolderTest {
 
     private JarSigningHolder createJarSigningHolderFor(String fileName) {
         final File jarFile = getResourceAsFile(fileName);
-        return new JarSigningHolder(SignVerifyUtils.getSignByMagic(jarFile, p -> new CertInformation()), SignVerifyResult.SIGNED_NOT_OK);
+        return SignVerifyUtils.getSignByMagic(jarFile, p -> new CertInformation());
     }
 
     private File getResourceAsFile(String fileName) {

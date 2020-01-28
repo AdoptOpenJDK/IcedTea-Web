@@ -9,12 +9,12 @@ public class SignVerifyUtilsTest {
 
     @Test(expected = NullPointerException.class)
     public void testFailOnNullResource() {
-        new JarSigningHolder(SignVerifyUtils.getSignByMagic(null, p -> new CertInformation()), SignVerifyResult.SIGNED_NOT_OK);
+        SignVerifyUtils.getSignByMagic(null, p -> new CertInformation());
     }
 
     @Test(expected = NullPointerException.class)
     public void testFailOnNullCertInformationProvider() {
-        new JarSigningHolder(SignVerifyUtils.getSignByMagic(new File(""), null), SignVerifyResult.SIGNED_NOT_OK);
+        SignVerifyUtils.getSignByMagic(new File(""), null);
     }
 
 }
