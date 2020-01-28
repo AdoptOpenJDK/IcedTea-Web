@@ -28,6 +28,7 @@ import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.AppletInstance;
+import net.sourceforge.jnlp.runtime.ApplicationExecutor;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
@@ -37,7 +38,6 @@ import sun.awt.SunToolkit;
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
 import java.applet.AppletStub;
-import java.awt.Container;
 import java.awt.SplashScreen;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -46,10 +46,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
-import static net.sourceforge.jnlp.LaunchException.MINOR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -71,22 +71,30 @@ public class Launcher {
 
     // defines class Launcher.BgRunner, Launcher.TgThread
 
-    /** shared thread group */
+    /**
+     * shared thread group
+     */
     private static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
-    /** the handler */
+    /**
+     * the handler
+     */
     private final LaunchHandler handler = JNLPRuntime.getDefaultLaunchHandler();
 
-    /** the update policy */
+    /**
+     * the update policy
+     */
     private final UpdatePolicy updatePolicy = JNLPRuntime.getDefaultUpdatePolicy();
 
     private ParserSettings parserSettings = new ParserSettings();
 
     private Map<String, List<String>> extra = null;
 
+    private final ApplicationExecutor applicationExecutor = new ApplicationExecutor();
+
     /**
-     * @param settings  the parser settings to use when the Launcher initiates parsing of
-     * a JNLP file.
+     * @param settings the parser settings to use when the Launcher initiates parsing of
+     *                 a JNLP file.
      */
     public void setParserSettings(ParserSettings settings) {
         parserSettings = settings;
@@ -95,9 +103,10 @@ public class Launcher {
     /**
      * Set a map to use when trying to extract extra information, including
      * arguments, properties and parameters, to be merged into the main JNLP
+     *
      * @param input a map containing extra information to add to the main JNLP.
-     * the values for keys "arguments", "parameters", and "properties" are
-     * used.
+     *              the values for keys "arguments", "parameters", and "properties" are
+     *              used.
      */
     public void setInformationToMerge(Map<String, List<String>> input) {
         this.extra = input;
@@ -113,21 +122,6 @@ public class Launcher {
      * @throws LaunchException if an error occurred while launching (also sent to handler)
      */
     public ApplicationInstance launch(final JNLPFile file) throws LaunchException {
-        return launch(file, null);
-    }
-
-    /**
-     * Launches a JNLP file inside the given container if it is an applet.  Specifying a
-     * container has no effect for Applications and Installers.
-     *
-     * @param file the JNLP file to launch
-     * @param cont the container in which to place the application, if it is an applet
-     * @return the application instance
-     * @throws LaunchException if an error occurred while launching (also sent to handler)
-     */
-    public ApplicationInstance launch(JNLPFile file, Container cont) throws LaunchException {
-        TgThread tg;
-
         mergeExtraInformation(file, extra);
 
         JNLPRuntime.markNetxRunning();
@@ -150,28 +144,45 @@ public class Launcher {
             }
         }
 
-        tg = new TgThread(file, cont);
-        tg.start();
-
-        try {
-            tg.join();
-        } catch (InterruptedException ex) {
-            //By default, null is thrown here, and the message dialog is shown.
-            if (handler != null) {
-                handler.handleLaunchWarning(new LaunchException(file, ex, MINOR, "System Error", "Thread interrupted while waiting for file to launch.", "This can lead to deadlock or yield other damage during execution. Please restart your application/browser."));
-            }
-            throw new RuntimeException(ex);
-        }
-
-        if (tg.getException() != null) {
-            throw tg.getException();
-        } // passed to handler when first created
+        final String applicationTitle = file.getTitle();
+        final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(applicationTitle, () -> launchApplicationInstance(file));
+        final ApplicationInstance applicationInstance = cf.join();
 
         if (handler != null) {
-            handler.launchCompleted(tg.getApplication());
+            handler.launchCompleted(applicationInstance);
         }
+        return applicationInstance;
+    }
 
-        return tg.getApplication();
+    private ApplicationInstance launchApplicationInstance(final JNLPFile file) {
+        try {
+            // Do not create new AppContext if we're using NetX and icedteaplugin.
+            // The plugin needs an AppContext too, but it has to be created earlier.
+            SunToolkit.createNewAppContext();
+
+            doPerApplicationAppContextHacks();
+
+            final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+
+            if (file.isApplication()) {
+                return launchApplication(file, threadGroup);
+            } else if (file.isApplet()) {
+                return launchApplet(file, threadGroup);
+            } else if (file.isInstaller()) {
+                return launchInstaller(file);
+            } else {
+                throw launchError(new LaunchException(file, null,
+                        FATAL, "Application Error", "Not a launchable JNLP file.",
+                        "File must be a JNLP application, applet, or installer type."));
+            }
+        } catch (LaunchException ex) {
+            LOG.error("Launch exception", ex);
+            // Exit if we can't launch the application.
+            JNLPRuntime.exit(1);
+        } catch (Throwable ex) {
+            throw new RuntimeException("Error while starting application", ex);
+        }
+        return null;
     }
 
 
@@ -180,9 +191,9 @@ public class Launcher {
      * appropriate file type.
      *
      * @param location the URL of the JNLP file to launch
-     * location to get the pristine version
-     * @throws LaunchException if there was an exception
+     *                 location to get the pristine version
      * @return the application instance
+     * @throws LaunchException if there was an exception
      */
     public ApplicationInstance launch(URL location) throws LaunchException {
         JNLPRuntime.saveHistory(location.toExternalForm());
@@ -192,10 +203,10 @@ public class Launcher {
     /**
      * Merges extra information into the jnlp file
      *
-     * @param file the JNLPFile
+     * @param file  the JNLPFile
      * @param extra extra information to merge into the JNLP file
      * @throws LaunchException if an exception occurs while extracting
-     * extra information
+     *                         extra information
      */
     private void mergeExtraInformation(JNLPFile file, Map<String, List<String>> extra) throws LaunchException {
         if (extra == null) {
@@ -220,15 +231,16 @@ public class Launcher {
 
     /**
      * Add the properties to the JNLP file.
+     *
      * @throws LaunchException if an exception occurs while extracting
-     * extra information
+     *                         extra information
      */
     private void addProperties(JNLPFile file, List<String> props) throws LaunchException {
         ResourcesDesc resources = file.getResources();
         for (String input : props) {
-            try{
+            try {
                 resources.addResource(PropertyDesc.fromString(input));
-            }catch (LaunchException ex){
+            } catch (LaunchException ex) {
                 throw launchError(ex);
             }
         }
@@ -237,8 +249,9 @@ public class Launcher {
     /**
      * Add the params to the JNLP file; only call if file is
      * actually an applet file.
+     *
      * @throws LaunchException if an exception occurs while extracting
-     * extra information
+     *                         extra information
      */
     private void addParameters(JNLPFile file, List<String> params) throws LaunchException {
         AppletDesc applet = file.getApplet();
@@ -264,7 +277,7 @@ public class Launcher {
     private void addArguments(JNLPFile file, List<String> args) {
         ApplicationDesc app = file.getApplication();
 
-        for (String input : args ) {
+        for (String input : args) {
             app.addArgument(input);
         }
     }
@@ -272,7 +285,8 @@ public class Launcher {
     /**
      * Launches the JNLP file at the specified location in a new JVM
      * instance. All streams are properly redirected.
-     * @param file the JNLP file to read arguments and JVM details from
+     *
+     * @param file       the JNLP file to read arguments and JVM details from
      * @param javawsArgs the arguments to pass to javaws (aka Netx)
      * @throws LaunchException if there was an exception
      */
@@ -330,14 +344,16 @@ public class Launcher {
         }
     }
 
-   /**
+    /**
      * Launches a JNLP application.  This method should be called
      * from a thread in the application's thread group.
+     *
      * @param file jnlpfile - source of application
      * @return application to be launched
      * @throws net.sourceforge.jnlp.LaunchException if launch fails on unrecoverable exception
      */
-   private ApplicationInstance launchApplication(final JNLPFile file) throws LaunchException {
+    private ApplicationInstance launchApplication(final JNLPFile file, final ThreadGroup threadGroup) throws
+            LaunchException {
         if (!file.isApplication()) {
             throw launchError(new LaunchException(file, null, FATAL, "Application Error", "Not an application file.", "An attempt was made to load a non-application file as an application."));
         }
@@ -352,9 +368,9 @@ public class Launcher {
             }
 
             if (JNLPRuntime.getForksStrategy().needsToFork(file)) {
-                if (!JNLPRuntime.isHeadless()){
+                if (!JNLPRuntime.isHeadless()) {
                     SplashScreen sp = SplashScreen.getSplashScreen();
-                    if (sp!=null) {
+                    if (sp != null) {
                         sp.close();
                     }
                 }
@@ -367,7 +383,7 @@ public class Launcher {
 
             handler.launchInitialized(file);
 
-            final ApplicationInstance app = createApplication(file);
+            final ApplicationInstance app = createApplication(file, threadGroup);
             app.initialize();
 
             final String mainName = app.getMainClassName();
@@ -387,7 +403,8 @@ public class Launcher {
 
             // create EDT within application context:
             // dummy method to force Event Dispatch Thread creation
-            SwingUtils.callOnAppContext(() -> {});
+            SwingUtils.callOnAppContext(() -> {
+            });
 
             setContextClassLoaderForAllThreads(app.getThreadGroup(), app.getClassLoader());
 
@@ -396,7 +413,7 @@ public class Launcher {
             main.setAccessible(true);
 
             LOG.info("Invoking main() with args: {}", Arrays.toString(args));
-            main.invoke(null, new Object[] { args });
+            main.invoke(null, new Object[]{args});
 
             return app;
         } catch (LaunchException lex) {
@@ -413,7 +430,7 @@ public class Launcher {
      * may ask the swing thread to load resources from their JNLP, which
      * would only work if the Swing thread knows about the JNLPClassLoader.
      *
-     * @param tg The threadgroup for which the context classloader should be set
+     * @param tg          The threadgroup for which the context classloader should be set
      * @param classLoader the classloader to set as the context classloader
      */
     private void setContextClassLoaderForAllThreads(ThreadGroup tg, ClassLoader classLoader) {
@@ -450,11 +467,10 @@ public class Launcher {
      * </p>
      *
      * @param file the JNLP file
-     * @param cont container where to put application
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance launchApplet(final JNLPFile file, final Container cont) throws LaunchException {
+    private ApplicationInstance launchApplet(final JNLPFile file, final ThreadGroup threadGroup) throws LaunchException {
         if (!file.isApplet()) {
             throw launchError(new LaunchException(file, null, FATAL, "Application Error", "Not an applet file.", "An attempt was made to load a non-applet file as an applet."));
         }
@@ -474,7 +490,7 @@ public class Launcher {
         AppletInstance applet = null;
         try {
             ServiceUtil.checkExistingSingleInstance(file);
-            applet = createApplet(file, cont);
+            applet = createApplet(file, threadGroup);
             applet.initialize();
             applet.getAppletEnvironment().startApplet(); // this should be a direct call to applet instance
             return applet;
@@ -485,7 +501,7 @@ public class Launcher {
             throw launchError(lex);
         } catch (Exception ex) {
             throw launchError(new LaunchException(file, ex, FATAL, "Launch Error", "Could not launch JNLP file.", "The application has not been initialized, for more information execute javaws/browser from the command line and send a bug report."));
-        }finally{
+        } finally {
             if (handler != null) {
                 handler.launchStarting(applet);
             }
@@ -495,8 +511,9 @@ public class Launcher {
     /**
      * Launches a JNLP installer.  This method should be called from
      * a thread in the application's thread group.
+     *
      * @param file jnlp file to read installer from
-     * @return  application
+     * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
     private ApplicationInstance launchInstaller(final JNLPFile file) throws LaunchException {
@@ -509,38 +526,38 @@ public class Launcher {
      * Create an AppletInstance.
      *
      * @param file the JNLP file
-     * @param cont container where to put applet
      * @return applet
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-     //FIXME - when multiple applets are on one page, this method is visited simultaneously
+    //FIXME - when multiple applets are on one page, this method is visited simultaneously
     //and then applets creates in little bit strange manner. This issue is visible with
     //randomly showing/notshowing splashscreens.
     //See also PluginAppletViewer.framePanel
-    private AppletInstance createApplet(final JNLPFile file, final Container cont) throws LaunchException {
-         try {
+    private AppletInstance createApplet(final JNLPFile file, final ThreadGroup threadGroup) throws
+            LaunchException {
+        try {
 
 
             // appletInstance is needed by ServiceManager when looking up
             // services. This could potentially be done in applet constructor
             // so initialize appletInstance before creating applet.
-            final AppletInstance appletInstance = new AppletInstance(file, cont);
+            final AppletInstance appletInstance = new AppletInstance(file, threadGroup);
 
-             /*
-              * Due to PR2968, moved to earlier phase, so early stages of applet
-              * can access Thread.currentThread().getContextClassLoader().
-              *
-              * However it is notable, that init and start still do not have access to right classloader.
-              * See LoadResources test.
-              */
-             setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
+            /*
+             * Due to PR2968, moved to earlier phase, so early stages of applet
+             * can access Thread.currentThread().getContextClassLoader().
+             *
+             * However it is notable, that init and start still do not have access to right classloader.
+             * See LoadResources test.
+             */
+            setContextClassLoaderForAllThreads(appletInstance.getThreadGroup(), appletInstance.getClassLoader());
 
             // Initialize applet now that ServiceManager has access to its
             // appletInstance.
             String appletName = file.getApplet().getMainClass();
             Class<?> appletClass = appletInstance.getClassLoader().loadClass(appletName);
             Applet applet = (Applet) appletClass.newInstance();
-            applet.setStub((AppletStub)cont);
+            applet.setStub(null);
             // Finish setting up appletInstance.
             appletInstance.setApplet(applet);
             appletInstance.getAppletEnvironment().setApplet(applet);
@@ -553,13 +570,15 @@ public class Launcher {
 
     /**
      * Creates an Application.
+     *
      * @param file the JNLP file
      * @return application
      * @throws net.sourceforge.jnlp.LaunchException if deploy unrecoverably die
      */
-    private ApplicationInstance createApplication(final JNLPFile file) throws LaunchException {
+    private ApplicationInstance createApplication(final JNLPFile file, final ThreadGroup threadGroup) throws
+            LaunchException {
         try {
-            return new ApplicationInstance(file);
+            return new ApplicationInstance(file, threadGroup);
         } catch (Exception ex) {
             throw new LaunchException(file, ex, FATAL, "Initialization Error", "Could not initialize application.", "The application has not been initialized, for more information execute javaws from the command line.");
         }
@@ -567,10 +586,11 @@ public class Launcher {
 
     /**
      * Create a thread group for the JNLP file.
+     *
      * @param file the JNLP file
-     * @return  ThreadGroup for this app/applet
+     * @return ThreadGroup for this app/applet
      */
-    private ThreadGroup createThreadGroup(final JNLPFile file) {
+    private static ThreadGroup createThreadGroup(final JNLPFile file) {
         return new ThreadGroup(mainGroup, file.getTitle());
     }
 
@@ -588,7 +608,7 @@ public class Launcher {
 
     /**
      * Do hacks on per-application level to allow different AppContexts to work
-     *
+     * <p>
      * see JNLPRuntime#doMainAppContextHacks
      */
     private static void doPerApplicationAppContextHacks() {
@@ -601,66 +621,6 @@ public class Launcher {
          * result is that all other AppContexts see a null dtd.
          */
         new ParserDelegator();
-    }
-
-       /**
-     * This runnable is used to call the appropriate launch method
-     * for the application, applet, or installer in its thread group.
-     */
-    private class TgThread extends Thread { // ThreadGroupThread
-        private final JNLPFile file;
-        private ApplicationInstance application;
-        private LaunchException exception;
-        private final Container cont;
-
-        TgThread(JNLPFile file, Container cont) {
-            super(createThreadGroup(file), file.getTitle());
-            this.file = file;
-            this.cont = cont;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // Do not create new AppContext if we're using NetX and icedteaplugin.
-                // The plugin needs an AppContext too, but it has to be created earlier.
-                SunToolkit.createNewAppContext();
-
-                doPerApplicationAppContextHacks();
-
-                if (file.isApplication()) {
-                    application = launchApplication(file);
-                }
-                else if (file.isApplet()) {
-                    application = launchApplet(file, cont);
-                }
-                else if (file.isInstaller()) {
-                    application = launchInstaller(file);
-                }
-                else {
-                    throw launchError(new LaunchException(file, null,
-                            FATAL, "Application Error", "Not a launchable JNLP file.",
-                            "File must be a JNLP application, applet, or installer type."));
-                }
-            } catch (LaunchException ex) {
-                LOG.error("Launch exception", ex);
-                exception = ex;
-                // Exit if we can't launch the application.
-                JNLPRuntime.exit(1);
-            }  catch (Throwable ex) {
-                LOG.error("General Throwable encountered:", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        LaunchException getException() {
-            return exception;
-        }
-
-        ApplicationInstance getApplication() {
-            return application;
-        }
-
     }
 
 }
