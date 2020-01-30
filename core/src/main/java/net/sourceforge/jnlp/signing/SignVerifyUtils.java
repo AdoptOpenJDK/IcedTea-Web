@@ -119,7 +119,6 @@ public class SignVerifyUtils {
 
             // Find all signers that have signed every signable entry in this jar.
             for (final CertPath certPath : jarSignCount.keySet()) {
-
                 boolean fullySignedByCert = jarSignCount.get(certPath) == numSignableEntriesInJar;
                 final CertInformation certInfo = certInfoProvider.apply(certPath);
                 certInfo.resetForReverification();
@@ -127,17 +126,8 @@ public class SignVerifyUtils {
 
                 final Certificate cert = certPath.getCertificates().get(0);
                 if (cert instanceof X509Certificate) {
-                    checkCertUsage(certPath, (X509Certificate) cert, certInfoProvider);
-                    final ZonedDateTime notBefore = zonedDateTime(((X509Certificate) cert).getNotBefore());
-                    final ZonedDateTime notAfter = zonedDateTime(((X509Certificate) cert).getNotAfter());
-                    if (now.isBefore(notBefore)) {
-                        certInfo.setNotYetValidCert();
-                    }
-                    if (now.isAfter(notAfter)) {
-                        certInfo.setHasExpiredCert();
-                    } else if (now.plus(6, MONTHS).isAfter(notAfter)) {
-                        certInfo.setHasExpiringCert();
-                    }
+                    checkCertUsage((X509Certificate) cert, certInfo);
+                    checkExpiration((X509Certificate) cert, now, certInfo);
                 }
                 result.put(certPath, fullySignedByCert ? true : false);
             }
@@ -150,11 +140,24 @@ public class SignVerifyUtils {
         }
     }
 
+    private static void checkExpiration(final X509Certificate cert, final ZonedDateTime now, final CertInformation certInfo) {
+        final ZonedDateTime notBefore = zonedDateTime(cert.getNotBefore());
+        final ZonedDateTime notAfter = zonedDateTime(cert.getNotAfter());
+        if (now.isBefore(notBefore)) {
+            certInfo.setNotYetValidCert();
+        }
+        if (now.isAfter(notAfter)) {
+            certInfo.setHasExpiredCert();
+        } else if (now.plus(6, MONTHS).isAfter(notAfter)) {
+            certInfo.setHasExpiringCert();
+        }
+    }
+
     private static ZonedDateTime zonedDateTime(final Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault());
     }
 
-    private static void checkCertUsage(final CertPath certPath, final X509Certificate userCert, final Function<CertPath, CertInformation> certInfoProvider) {
+    private static void checkCertUsage(final X509Certificate userCert, final CertInformation certInformation) {
 
         // Can act as a signer?
         // 1. if KeyUsage, then [0] should be true
@@ -165,7 +168,7 @@ public class SignVerifyUtils {
         final boolean[] keyUsage = userCert.getKeyUsage();
         if (keyUsage != null) {
             if (keyUsage.length < 1 || !keyUsage[0]) {
-                certInfoProvider.apply(certPath).setBadKeyUsage();
+                certInformation.setBadKeyUsage();
             }
         }
 
@@ -174,7 +177,7 @@ public class SignVerifyUtils {
             if (xKeyUsage != null) {
                 if (!xKeyUsage.contains("2.5.29.37.0") // anyExtendedKeyUsage
                         && !xKeyUsage.contains("1.3.6.1.5.5.7.3.3")) { // codeSigning
-                    certInfoProvider.apply(certPath).setBadExtendedKeyUsage();
+                    certInformation.setBadExtendedKeyUsage();
                 }
             }
         } catch (java.security.cert.CertificateParsingException e) {
@@ -192,7 +195,7 @@ public class SignVerifyUtils {
                 final NetscapeCertTypeExtension extn = new NetscapeCertTypeExtension(encoded);
 
                 if (!extn.get(NetscapeCertTypeExtension.OBJECT_SIGNING)) {
-                    certInfoProvider.apply(certPath).setBadNetscapeCertType();
+                    certInformation.setBadNetscapeCertType();
                 }
             }
         } catch (IOException e) {
