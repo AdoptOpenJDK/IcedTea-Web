@@ -45,7 +45,7 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.DummySecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.signing.SigningState;
+import net.sourceforge.jnlp.signing.ApplicationSigningState;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class ManifestAttributesCheckerTest {
         JNLPFile file = new DummyJNLPFileWithJar(codebase, jar1, jar2);
         SecurityDesc security = new SecurityDesc(file, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
         SecurityDelegate securityDelegate = new DummySecurityDelegate();
-        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, SigningState.FULL, securityDelegate);
+        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, ApplicationSigningState.FULL, securityDelegate);
         JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
         checker.checkAll();
     }

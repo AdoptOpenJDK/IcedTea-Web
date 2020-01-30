@@ -1,5 +1,5 @@
 package net.sourceforge.jnlp.signing;
 
-public enum SigningState {
+public enum ApplicationSigningState {
     FULL, PARTIAL, NONE
 }

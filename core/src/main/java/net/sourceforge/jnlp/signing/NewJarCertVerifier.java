@@ -21,19 +21,19 @@ public class NewJarCertVerifier {
 
     private final Map<CertPath, CertInformation> certInfoMap = new HashMap<>();
 
-    private SigningState getState(final Certificate certificate) {
+    private ApplicationSigningState getState(final Certificate certificate) {
         final long numFullySignedResources = holders.stream()
                 .filter(jarSigningHolder -> jarSigningHolder.isFullySignedBy(certificate))
                 .count();
 
         if (numFullySignedResources == holders.size()) {
-            return SigningState.FULL;
+            return ApplicationSigningState.FULL;
         }
 
-        return numFullySignedResources == 0 ? SigningState.NONE : SigningState.PARTIAL;
+        return numFullySignedResources == 0 ? ApplicationSigningState.NONE : ApplicationSigningState.PARTIAL;
     }
 
-    public SigningState getState() {
+    public ApplicationSigningState getState() {
         final Set<Certificate> certificates = holders.stream()
                 .flatMap(r -> r.getCertificates().stream())
                 .collect(Collectors.toSet());
@@ -41,7 +41,7 @@ public class NewJarCertVerifier {
         return certificates.stream()
                 .map(certificate -> getState(certificate))
                 .reduce((state1, state2) -> SignVerifyUtils.mergeSigningState(state1, state2))
-                .orElse(SigningState.NONE); // What is the correct state if we do not have any certificates????
+                .orElse(ApplicationSigningState.NONE); // What is the correct state if we do not have any certificates????
     }
 
     @Deprecated

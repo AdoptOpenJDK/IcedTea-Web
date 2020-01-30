@@ -205,13 +205,13 @@ public class SignVerifyUtils {
         }
     }
 
-    static SigningState mergeSigningState(final SigningState state1, final SigningState state2) {
-        if (state1 == SigningState.FULL && state2 == SigningState.FULL) {
-            return SigningState.FULL;
+    static ApplicationSigningState mergeSigningState(final ApplicationSigningState state1, final ApplicationSigningState state2) {
+        if (state1 == ApplicationSigningState.FULL && state2 == ApplicationSigningState.FULL) {
+            return ApplicationSigningState.FULL;
         }
-        if (state1 == SigningState.NONE && state2 == SigningState.NONE) {
-            return SigningState.NONE;
+        if (state1 == ApplicationSigningState.NONE && state2 == ApplicationSigningState.NONE) {
+            return ApplicationSigningState.NONE;
         }
-        return SigningState.PARTIAL;
+        return ApplicationSigningState.PARTIAL;
     }
 }

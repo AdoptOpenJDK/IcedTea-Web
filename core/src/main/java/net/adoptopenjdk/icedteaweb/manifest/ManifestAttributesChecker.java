@@ -52,8 +52,8 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.signing.SigningState;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
+import net.sourceforge.jnlp.signing.ApplicationSigningState;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -77,11 +77,11 @@ public class ManifestAttributesChecker {
 
     private final SecurityDesc security;
     private final JNLPFile file;
-    private final SigningState signing;
+    private final ApplicationSigningState signing;
     private final SecurityDelegate securityDelegate;
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
-            final SigningState signing, final SecurityDelegate securityDelegate) {
+                                     final ApplicationSigningState signing, final SecurityDelegate securityDelegate) {
         this.security = security;
         this.file = file;
         this.signing = signing;
@@ -160,7 +160,7 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#entry_pt
      */
     private void checkEntryPoint() throws LaunchException {
-        if (signing == SigningState.NONE) {
+        if (signing == ApplicationSigningState.NONE) {
             return; /*when app is not signed at all, then skip this check*/
         }
         if (file.getEntryPointDesc() == null) {
@@ -216,7 +216,7 @@ public class ManifestAttributesChecker {
             securityType = "Unknown";
         }
 
-        final boolean isFullySigned = signing == SigningState.FULL;
+        final boolean isFullySigned = signing == ApplicationSigningState.FULL;
         final boolean isSandboxed = securityDelegate.getRunInSandbox();
         final boolean requestsCorrectPermissions = (isFullySigned && SecurityDesc.ALL_PERMISSIONS.equals(desc))
                 || (isSandboxed && SecurityDesc.SANDBOX_PERMISSIONS.equals(desc));
@@ -298,11 +298,11 @@ public class ManifestAttributesChecker {
         final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
         validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
         if (isNoneOrDefault(requestedPermissionLevel)) {
-            if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
+            if (sandboxForced == ManifestBoolean.TRUE && signing != ApplicationSigningState.NONE) {
                 LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
                 securityDelegate.setRunInSandbox();
             }
-            if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
+            if (sandboxForced == ManifestBoolean.FALSE && signing == ApplicationSigningState.NONE) {
                 LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
                 securityDelegate.setRunInSandbox();
             }
@@ -390,7 +390,7 @@ public class ManifestAttributesChecker {
         }
 
         final ClasspathMatchers att;
-        if (signing != SigningState.NONE) {
+        if (signing != ApplicationSigningState.NONE) {
             // we only consider values in manifest for signed apps (as they may be faked)
             att = file.getManifestAttributesReader().getApplicationLibraryAllowableCodebase();
         } else {
