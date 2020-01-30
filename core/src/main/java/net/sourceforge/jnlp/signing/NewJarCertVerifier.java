@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.signing;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.tools.CertInformation;
@@ -51,12 +50,7 @@ public class NewJarCertVerifier {
     }
 
     public void add(final File jarFile) {
-        final JarSigningHolder holder = SignVerifyUtils.getSignByMagic(jarFile, this::getFor);
+        final JarSigningHolder holder = SignVerifyUtils.getSignByMagic(jarFile);
         holders.add(holder);
-    }
-
-    private CertInformation getFor(final CertPath certPath) {
-        Assert.requireNonNull(certPath, "certPath");
-        return certInfoMap.computeIfAbsent(certPath, path -> new CertInformation());
     }
 }

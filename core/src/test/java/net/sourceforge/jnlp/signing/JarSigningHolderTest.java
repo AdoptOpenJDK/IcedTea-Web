@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.signing;
 
-import net.sourceforge.jnlp.tools.CertInformation;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -117,7 +116,7 @@ public class JarSigningHolderTest {
 
     private JarSigningHolder createJarSigningHolderFor(String fileName) {
         final File jarFile = getResourceAsFile(fileName);
-        return SignVerifyUtils.getSignByMagic(jarFile, p -> new CertInformation());
+        return SignVerifyUtils.getSignByMagic(jarFile);
     }
 
     private File getResourceAsFile(String fileName) {

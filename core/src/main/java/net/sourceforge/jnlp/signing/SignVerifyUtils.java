@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.CodeSigner;
 import java.security.cert.CertPath;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -20,13 +19,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.MONTHS;
 
@@ -66,11 +64,8 @@ public class SignVerifyUtils {
                 .sum();
     }
 
-    static JarSigningHolder getSignByMagic(final File jarPath, final Function<CertPath, CertInformation> certInfoProvider) {
+    static JarSigningHolder getSignByMagic(final File jarPath) {
         Assert.requireNonNull(jarPath, "jarPath");
-        Assert.requireNonNull(certInfoProvider, "certInfoProvider");
-
-        final Set<CertPath> result = new HashSet<>();
 
         try (final JarFile jarFile = new JarFile(jarPath, true)) {
             final List<JarEntry> entries = new ArrayList<>();
@@ -98,7 +93,6 @@ public class SignVerifyUtils {
             final boolean jarHasManifest = jarFile.getManifest() != null;
 
             // Record current time just before checking the jar begins.
-            final ZonedDateTime now = ZonedDateTime.now();
             if (jarHasManifest) {
                 for (JarEntry je : entries) {
                     final boolean shouldHaveSignature = !je.isDirectory() && !isMetaInfFile(je.getName());
@@ -120,21 +114,11 @@ public class SignVerifyUtils {
             }
 
             // Find all signers that have signed every signable entry in this jar.
-            for (final CertPath certPath : jarSignCount.keySet()) {
-                boolean fullySignedByCert = jarSignCount.get(certPath) == numSignableEntriesInJar;
-                final CertInformation certInfo = certInfoProvider.apply(certPath);
-                certInfo.resetForReverification();
-                certInfo.setNumJarEntriesSigned(jarPath.toString(), numSignableEntriesInJar);
-
-                final Certificate cert = certPath.getCertificates().get(0);
-                if (cert instanceof X509Certificate) {
-                    checkCertUsage((X509Certificate) cert, certInfo);
-                    checkExpiration((X509Certificate) cert, now, certInfo);
-                }
-                if (fullySignedByCert) {
-                    result.add(certPath);
-                }
-            }
+            final int x = numSignableEntriesInJar;
+            final Set<CertPath> result = jarSignCount.entrySet().stream()
+                    .filter(entry -> entry.getValue() == x)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
 
             return new JarSigningHolder(result);
         } catch (Exception e) {
@@ -142,7 +126,8 @@ public class SignVerifyUtils {
         }
     }
 
-    private static void checkExpiration(final X509Certificate cert, final ZonedDateTime now, final CertInformation certInfo) {
+    // TODO: need to use this method somewhere - do not delete yet
+    static void checkExpiration(final X509Certificate cert, final ZonedDateTime now, final CertInformation certInfo) {
         final ZonedDateTime notBefore = zonedDateTime(cert.getNotBefore());
         final ZonedDateTime notAfter = zonedDateTime(cert.getNotAfter());
         if (now.isBefore(notBefore)) {
@@ -159,7 +144,8 @@ public class SignVerifyUtils {
         return date.toInstant().atZone(ZoneId.systemDefault());
     }
 
-    private static void checkCertUsage(final X509Certificate userCert, final CertInformation certInformation) {
+    // TODO: need to use this method somewhere - do not delete yet
+    static void checkCertUsage(final X509Certificate userCert, final CertInformation certInformation) {
 
         // Can act as a signer?
         // 1. if KeyUsage, then [0] should be true
