@@ -120,10 +120,15 @@ public class JarCertVerifier implements CertVerifier {
     private SigningState getState(final Certificate certificate) {
         final List<JarSigningHolder> allResources = getAllResources();
 
-        return allResources.stream()
-                .map(resource -> resource.getState(certificate))
-                .reduce((state1, state2) -> SignVerifyUtils.mergeSigningState(state1, state2))
-                .orElse(SigningState.NONE); // What is the correct state if we do not have any resources????
+        final long numFullySignedResources = allResources.stream()
+                .filter(jarSigningHolder -> jarSigningHolder.isFullySignedBy(certificate))
+                .count();
+
+        if (numFullySignedResources == allResources.size()) {
+            return SigningState.FULL;
+        }
+
+        return numFullySignedResources == 0 ? SigningState.NONE : SigningState.PARTIAL;
     }
 
     public SigningState getState() {

@@ -12,7 +12,6 @@ import java.security.cert.CertificateFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -25,7 +24,17 @@ public class JarSigningHolderTest {
         final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
 
         //when
-        holder.getState(null);
+        holder.isFullySignedBy((Certificate)null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFailOnNullCertPath() {
+
+        //given
+        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
+
+        //when
+        holder.isFullySignedBy((CertPath) null);
     }
 
     @Test
@@ -46,10 +55,10 @@ public class JarSigningHolderTest {
         final Certificate certificate = generateTestCertificate();
 
         //when
-        final SigningState state = holder.getState(certificate);
+        final boolean fullySigned = holder.isFullySignedBy(certificate);
 
         //than
-        assertEquals(SigningState.NONE, state);
+        assertFalse(fullySigned);
     }
 
     @Test
@@ -70,10 +79,10 @@ public class JarSigningHolderTest {
         final Certificate certificate = generateTestCertificate();
 
         //when
-        final SigningState state = holder.getState(certificate);
+        final boolean fullySigned = holder.isFullySignedBy(certificate);
 
         //than
-        assertEquals(SigningState.NONE, state);
+        assertFalse(fullySigned);
     }
 
     @Test
@@ -84,10 +93,10 @@ public class JarSigningHolderTest {
         final CertPath certPath = holder.getCertificatePaths().iterator().next();
 
         //when
-        final SigningState state = holder.getStateForPath(certPath);
+        final boolean fullySigned = holder.isFullySignedBy(certPath);
 
         //than
-        assertEquals(SigningState.FULL, state);
+        assertTrue(fullySigned);
     }
 
     @Test
@@ -103,7 +112,7 @@ public class JarSigningHolderTest {
 
         //than
         assertFalse(certificates.isEmpty());
-        certificates.forEach(c -> assertEquals(SigningState.FULL, holder.getState(c)));
+        certificates.forEach(c -> assertTrue(holder.isFullySignedBy(c)));
     }
 
     private JarSigningHolder createJarSigningHolderFor(String fileName) {

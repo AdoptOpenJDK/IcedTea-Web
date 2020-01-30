@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
@@ -68,7 +70,7 @@ public class SignVerifyUtils {
         Assert.requireNonNull(jarPath, "jarPath");
         Assert.requireNonNull(certInfoProvider, "certInfoProvider");
 
-        final Map<CertPath, Boolean> result = new HashMap<>();
+        final Set<CertPath> result = new HashSet<>();
 
         try (final JarFile jarFile = new JarFile(jarPath, true)) {
             final List<JarEntry> entries = new ArrayList<>();
@@ -129,12 +131,12 @@ public class SignVerifyUtils {
                     checkCertUsage((X509Certificate) cert, certInfo);
                     checkExpiration((X509Certificate) cert, now, certInfo);
                 }
-                result.put(certPath, fullySignedByCert ? true : false);
+                if (fullySignedByCert) {
+                    result.add(certPath);
+                }
             }
 
-            final SignVerifyResult signState = SignVerifyResult.SIGNED_NOT_OK;  //TODO: By extracting getSignByMagic we currently can not set this...
-            final JarSigningHolder holder = new JarSigningHolder(result, signState);
-            return holder;
+            return new JarSigningHolder(result);
         } catch (Exception e) {
             throw new RuntimeException("Error in verify jar " + jarPath, e);
         }

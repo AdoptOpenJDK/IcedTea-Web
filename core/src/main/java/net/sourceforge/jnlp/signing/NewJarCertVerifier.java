@@ -22,11 +22,15 @@ public class NewJarCertVerifier {
     private final Map<CertPath, CertInformation> certInfoMap = new HashMap<>();
 
     private SigningState getState(final Certificate certificate) {
+        final long numFullySignedResources = holders.stream()
+                .filter(jarSigningHolder -> jarSigningHolder.isFullySignedBy(certificate))
+                .count();
 
-        return holders.stream()
-                .map(resource -> resource.getState(certificate))
-                .reduce((state1, state2) -> SignVerifyUtils.mergeSigningState(state1, state2))
-                .orElse(SigningState.NONE); // What is the correct state if we do not have any resources????
+        if (numFullySignedResources == holders.size()) {
+            return SigningState.FULL;
+        }
+
+        return numFullySignedResources == 0 ? SigningState.NONE : SigningState.PARTIAL;
     }
 
     public SigningState getState() {
