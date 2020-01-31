@@ -138,6 +138,14 @@ public class PartsHandler implements JarProvider {
                 final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
                         .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
 
+                final boolean hasTrustedFullySigningCertificate = certInfos.values().stream()
+                        .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
+                        .anyMatch(infos -> !infos.hasSigningIssues());
+
+                if (hasTrustedFullySigningCertificate) {
+                    return;
+                }
+
                 // find certPath with best info - what is best info? - no issues, trusted RootCA
 
             }
