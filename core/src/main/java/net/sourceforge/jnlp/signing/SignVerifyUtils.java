@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.CodeSigner;
 import java.security.cert.CertPath;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -127,7 +128,18 @@ public class SignVerifyUtils {
     }
 
     // TODO: need to use this method somewhere - do not delete yet
-    static void checkExpiration(final X509Certificate cert, final ZonedDateTime now, final CertInformation certInfo) {
+    static CertInformation calculateCertInformationFor(CertPath certPath, ZonedDateTime now) {
+        final CertInformation result = new CertInformation();
+        final Certificate certificate = certPath.getCertificates().get(0);
+        if (certificate instanceof X509Certificate) {
+            final X509Certificate x509Certificate = (X509Certificate) certificate;
+            checkCertUsage(x509Certificate, result);
+            checkExpiration(x509Certificate, now, result);
+        }
+        return result;
+    }
+
+    private static void checkExpiration(final X509Certificate cert, final ZonedDateTime now, final CertInformation certInfo) {
         final ZonedDateTime notBefore = zonedDateTime(cert.getNotBefore());
         final ZonedDateTime notAfter = zonedDateTime(cert.getNotAfter());
         if (now.isBefore(notBefore)) {
@@ -144,8 +156,7 @@ public class SignVerifyUtils {
         return date.toInstant().atZone(ZoneId.systemDefault());
     }
 
-    // TODO: need to use this method somewhere - do not delete yet
-    static void checkCertUsage(final X509Certificate userCert, final CertInformation certInformation) {
+    private static void checkCertUsage(final X509Certificate userCert, final CertInformation certInformation) {
 
         // Can act as a signer?
         // 1. if KeyUsage, then [0] should be true
