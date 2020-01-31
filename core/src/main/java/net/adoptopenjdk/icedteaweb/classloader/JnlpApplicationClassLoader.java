@@ -99,7 +99,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
          * @param name the name of the class/resource which is needed by the classloader.
          * @return the list of additional jars or an empty list if all jars have been loaded.
          */
-        List<LoadableJar> loadMoreJars(String name) throws LaunchException;
+        List<LoadableJar> loadMoreJars(String name);
     }
 
     public static class LoadableJar {
