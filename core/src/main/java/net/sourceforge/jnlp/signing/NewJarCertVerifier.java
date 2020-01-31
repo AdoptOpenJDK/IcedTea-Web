@@ -38,14 +38,16 @@ public class NewJarCertVerifier {
         return states.contains(ApplicationSigningState.PARTIAL) ? ApplicationSigningState.PARTIAL : ApplicationSigningState.NONE;
     }
 
-    @Deprecated
-    public void add(final JARDesc jar, final ResourceTracker tracker) {
-        final File jarFile = tracker.getCacheFile(jar.getLocation());
-        add(jarFile);
-    }
-
     public void add(final File jarFile) {
         final JarSigningHolder holder = SignVerifyUtils.getSignByMagic(jarFile);
         holders.add(holder);
+    }
+
+    public boolean allJarsSigned() {
+        throw new RuntimeException("Not implemented yet!");
+    }
+
+    public boolean isFullySigned() {
+        throw new RuntimeException("Not implemented yet!");
     }
 }

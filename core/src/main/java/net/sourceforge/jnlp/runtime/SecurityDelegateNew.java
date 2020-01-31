@@ -10,7 +10,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.signing.JarCertVerifier;
+import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 
 import java.net.URL;
 import java.security.Permission;
@@ -29,9 +29,9 @@ public class SecurityDelegateNew implements SecurityDelegate {
 
     private final JNLPFile jnlpFile;
 
-    private final JarCertVerifier certVerifier;
+    private final NewJarCertVerifier certVerifier;
 
-    public SecurityDelegateNew(final ApplicationPermissions applicationPermissions, final JNLPFile jnlpFile, final JarCertVerifier certVerifier) {
+    public SecurityDelegateNew(final ApplicationPermissions applicationPermissions, final JNLPFile jnlpFile, final NewJarCertVerifier certVerifier) {
         this.applicationPermissions = applicationPermissions;
         this.jnlpFile = jnlpFile;
         this.certVerifier = certVerifier;
@@ -130,7 +130,8 @@ public class SecurityDelegateNew implements SecurityDelegate {
             return;
         }
         promptedForPartialSigning = true;
-        UnsignedAppletTrustConfirmation.checkPartiallySignedWithUserIfRequired(this, jnlpFile, certVerifier);
+        // TODO: the following line will trigger a NPE further down in the call
+        UnsignedAppletTrustConfirmation.checkPartiallySignedWithUserIfRequired(this, jnlpFile, null);
     }
 
     @Override

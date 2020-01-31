@@ -8,14 +8,16 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
-import net.sourceforge.jnlp.signing.JarCertVerifier;
+import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,9 +51,7 @@ public class PartsHandler implements JarProvider {
 
     private final SecurityDelegate securityDelegate;
 
-    private final JarCertVerifier certVerifier;
-
-    private final JNLPFile file;
+    private final NewJarCertVerifier certVerifier;
 
     public PartsHandler(final List<Part> parts, final JNLPFile file) {
         this(parts, file, new DefaultResourceTrackerFactory().create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
@@ -64,9 +64,8 @@ public class PartsHandler implements JarProvider {
     public PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) {
         this.tracker = tracker;
         this.parts = new CopyOnWriteArrayList<>(parts);
-        this.file = file;
 
-        this.certVerifier = new JarCertVerifier();
+        this.certVerifier = new NewJarCertVerifier();
         this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
 
     }
@@ -112,8 +111,30 @@ public class PartsHandler implements JarProvider {
 
     private List<LoadableJar> loadPart(final Part part) {
         final List<LoadableJar> result = downloadAllOfPart(part);
+        validateJars(result);
         loadedByClassloader.add(part);
         return result;
+    }
+
+    private void validateJars(List<LoadableJar> jars) {
+        try {
+            for (LoadableJar jar : jars) {
+            final File jarFile = new File(jar.getLocation().toURI());
+            certVerifier.add(jarFile);
+            if (!securityDelegate.getRunInSandbox()) {
+                // TODO: work in progress
+                if (!certVerifier.isFullySigned()) {
+                    securityDelegate.promptUserOnPartialSigning();
+                }
+//            if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
+//                certVerifier.checkTrustWithUser(securityDelegate, file);
+//            }
+            }
+            }
+        } catch (LaunchException | URISyntaxException e) {
+            // TODO: LaunchException should not be wrapped in a RuntimeException
+            throw new RuntimeException(e);
+        }
     }
 
     private List<LoadableJar> downloadAllOfPart(final Part part) {
@@ -144,16 +165,6 @@ public class PartsHandler implements JarProvider {
         try {
             if (!tracker.isResourceAdded(jarDesc.getLocation())) {
                 tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
-            }
-            certVerifier.add(jarDesc, tracker);
-            if (!securityDelegate.getRunInSandbox()) {
-                // TODO: work in progress
-                if (!certVerifier.isFullySigned()) {
-                    securityDelegate.promptUserOnPartialSigning();
-                }
-                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
-                    certVerifier.checkTrustWithUser(securityDelegate, file);
-                }
             }
             final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
             LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);
