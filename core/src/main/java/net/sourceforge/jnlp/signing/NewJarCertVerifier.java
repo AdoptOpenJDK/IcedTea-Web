@@ -2,23 +2,17 @@ package net.sourceforge.jnlp.signing;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
-import net.sourceforge.jnlp.tools.CertInformation;
 
 import java.io.File;
-import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NewJarCertVerifier {
 
     private final List<JarSigningHolder> holders = new ArrayList<>();
-
-    private final Map<CertPath, CertInformation> certInfoMap = new HashMap<>();
 
     private ApplicationSigningState getState(final Certificate certificate) {
         final long numFullySignedResources = holders.stream()
@@ -33,18 +27,19 @@ public class NewJarCertVerifier {
     }
 
     public ApplicationSigningState getState() {
-        final Set<Certificate> certificates = holders.stream()
+        final Set<ApplicationSigningState> states = holders.stream()
                 .flatMap(r -> r.getCertificates().stream())
+                .map(this::getState)
                 .collect(Collectors.toSet());
 
-        return certificates.stream()
-                .map(certificate -> getState(certificate))
-                .reduce((state1, state2) -> SignVerifyUtils.mergeSigningState(state1, state2))
-                .orElse(ApplicationSigningState.NONE); // What is the correct state if we do not have any certificates????
+        if (states.contains(ApplicationSigningState.FULL)) {
+            return ApplicationSigningState.FULL;
+        }
+        return states.contains(ApplicationSigningState.PARTIAL) ? ApplicationSigningState.PARTIAL : ApplicationSigningState.NONE;
     }
 
     @Deprecated
-    public void add(final JARDesc jar, final ResourceTracker tracker) throws Exception {
+    public void add(final JARDesc jar, final ResourceTracker tracker) {
         final File jarFile = tracker.getCacheFile(jar.getLocation());
         add(jarFile);
     }
