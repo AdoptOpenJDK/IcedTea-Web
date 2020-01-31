@@ -65,10 +65,10 @@ public class SignVerifyUtils {
                 .sum();
     }
 
-    static JarSigningHolder getSignByMagic(final File jarPath) {
-        Assert.requireNonNull(jarPath, "jarPath");
+    static CertificatesFullySigningTheJar determineCertificatesFullySigningThe(final File file) {
+        Assert.requireNonNull(file, "file");
 
-        try (final JarFile jarFile = new JarFile(jarPath, true)) {
+        try (final JarFile jarFile = new JarFile(file, true)) {
             final List<JarEntry> entries = new ArrayList<>();
             final byte[] buffer = new byte[8192];
 
@@ -121,9 +121,9 @@ public class SignVerifyUtils {
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
 
-            return new JarSigningHolder(result);
+            return new CertificatesFullySigningTheJar(file, result);
         } catch (Exception e) {
-            throw new RuntimeException("Error in verify jar " + jarPath, e);
+            throw new RuntimeException("Error in verify jar " + file, e);
         }
     }
 

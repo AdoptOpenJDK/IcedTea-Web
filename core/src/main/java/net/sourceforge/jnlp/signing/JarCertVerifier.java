@@ -118,10 +118,10 @@ public class JarCertVerifier implements CertVerifier {
 
 
     private ApplicationSigningState getState(final Certificate certificate) {
-        final List<JarSigningHolder> allResources = getAllResources();
+        final List<CertificatesFullySigningTheJar> allResources = getAllResources();
 
         final long numFullySignedResources = allResources.stream()
-                .filter(jarSigningHolder -> jarSigningHolder.isFullySignedBy(certificate))
+                .filter(certificatesFullySigningTheJar -> certificatesFullySigningTheJar.contains(certificate))
                 .count();
 
         if (numFullySignedResources == allResources.size()) {
@@ -132,7 +132,7 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     public ApplicationSigningState getState() {
-        final List<JarSigningHolder> allResources = getAllResources();
+        final List<CertificatesFullySigningTheJar> allResources = getAllResources();
 
         final Set<Certificate> certificates = allResources.stream()
                 .flatMap(r -> r.getCertificates().stream())
@@ -144,7 +144,7 @@ public class JarCertVerifier implements CertVerifier {
                 .orElse(ApplicationSigningState.NONE); // What is the correct state if we do not have any certificates????
     }
 
-    public List<JarSigningHolder> getAllResources() {
+    public List<CertificatesFullySigningTheJar> getAllResources() {
         return null;
     }
 

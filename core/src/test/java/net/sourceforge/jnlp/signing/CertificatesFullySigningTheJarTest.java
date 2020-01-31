@@ -14,47 +14,47 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class JarSigningHolderTest {
+public class CertificatesFullySigningTheJarTest {
 
     @Test(expected = NullPointerException.class)
     public void testFailOnNullCertificate() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("unsigned.jar");
 
         //when
-        holder.isFullySignedBy((Certificate)null);
+        certificates.contains((Certificate)null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testFailOnNullCertPath() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("unsigned.jar");
 
         //when
-        holder.isFullySignedBy((CertPath) null);
+        certificates.contains((CertPath) null);
     }
 
     @Test
     public void testUnsignedJarHasNoCertificates() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("unsigned.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("unsigned.jar");
 
         //than
-        assertTrue(holder.getCertificates().isEmpty());
+        assertTrue(certificates.getCertificates().isEmpty());
     }
 
     @Test
     public void testUnsignedJarIsNotSignedByCertificate() throws Exception {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("signed.jar");
         final Certificate certificate = generateTestCertificate();
 
         //when
-        final boolean fullySigned = holder.isFullySignedBy(certificate);
+        final boolean fullySigned = certificates.contains(certificate);
 
         //than
         assertFalse(fullySigned);
@@ -64,21 +64,21 @@ public class JarSigningHolderTest {
     public void testSignedJarHasCertificates() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("signed.jar");
 
         //than
-        assertFalse(holder.getCertificatePaths().isEmpty());
+        assertFalse(certificates.getCertificatePaths().isEmpty());
     }
 
     @Test
     public void testSignedJarIsNotSignedByAnotherCertificate() throws Exception {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("signed.jar");
         final Certificate certificate = generateTestCertificate();
 
         //when
-        final boolean fullySigned = holder.isFullySignedBy(certificate);
+        final boolean fullySigned = certificates.contains(certificate);
 
         //than
         assertFalse(fullySigned);
@@ -88,11 +88,11 @@ public class JarSigningHolderTest {
     public void testSignedJarIsSignedBySignerCertificatePath() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
-        final CertPath certPath = holder.getCertificatePaths().iterator().next();
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("signed.jar");
+        final CertPath certPath = certificates.getCertificatePaths().iterator().next();
 
         //when
-        final boolean fullySigned = holder.isFullySignedBy(certPath);
+        final boolean fullySigned = certificates.contains(certPath);
 
         //than
         assertTrue(fullySigned);
@@ -102,25 +102,25 @@ public class JarSigningHolderTest {
     public void testSignedJarIsSignedByCertificate() {
 
         //given
-        final JarSigningHolder holder = createJarSigningHolderFor("signed.jar");
+        final CertificatesFullySigningTheJar certificates = determineCertificatesFullySigningThe("signed.jar");
 
         //when
-        final Set<? extends Certificate> certificates = holder.getCertificatePaths().stream()
+        final Set<? extends Certificate> certs = certificates.getCertificatePaths().stream()
                 .flatMap(certPath -> certPath.getCertificates().stream())
                 .collect(Collectors.toSet());
 
         //than
-        assertFalse(certificates.isEmpty());
-        certificates.forEach(c -> assertTrue(holder.isFullySignedBy(c)));
+        assertFalse(certs.isEmpty());
+        certs.forEach(c -> assertTrue(certificates.contains(c)));
     }
 
-    private JarSigningHolder createJarSigningHolderFor(String fileName) {
+    private CertificatesFullySigningTheJar determineCertificatesFullySigningThe(String fileName) {
         final File jarFile = getResourceAsFile(fileName);
-        return SignVerifyUtils.getSignByMagic(jarFile);
+        return SignVerifyUtils.determineCertificatesFullySigningThe(jarFile);
     }
 
     private File getResourceAsFile(String fileName) {
-        return new File(JarSigningHolderTest.class.getResource(fileName).getFile());
+        return new File(CertificatesFullySigningTheJarTest.class.getResource(fileName).getFile());
     }
 
     private Certificate generateTestCertificate() throws Exception {

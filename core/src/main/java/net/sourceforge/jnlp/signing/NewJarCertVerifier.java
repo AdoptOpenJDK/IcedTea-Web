@@ -1,34 +1,22 @@
 package net.sourceforge.jnlp.signing;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
-
 import java.io.File;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static net.sourceforge.jnlp.signing.SignVerifyUtils.determineCertificatesFullySigningThe;
+
 public class NewJarCertVerifier {
 
-    private final List<JarSigningHolder> holders = new ArrayList<>();
-
-    private ApplicationSigningState getState(final Certificate certificate) {
-        final long numFullySignedResources = holders.stream()
-                .filter(jarSigningHolder -> jarSigningHolder.isFullySignedBy(certificate))
-                .count();
-
-        if (numFullySignedResources == holders.size()) {
-            return ApplicationSigningState.FULL;
-        }
-
-        return numFullySignedResources == 0 ? ApplicationSigningState.NONE : ApplicationSigningState.PARTIAL;
-    }
+    private final Map<File, CertificatesFullySigningTheJar> jarToFullySigningCertificates = new HashMap<>();
 
     public ApplicationSigningState getState() {
-        final Set<ApplicationSigningState> states = holders.stream()
+        final Set<ApplicationSigningState> states = jarToFullySigningCertificates.values().stream()
                 .flatMap(r -> r.getCertificates().stream())
+                .collect(Collectors.toSet()).stream()
                 .map(this::getState)
                 .collect(Collectors.toSet());
 
@@ -38,9 +26,21 @@ public class NewJarCertVerifier {
         return states.contains(ApplicationSigningState.PARTIAL) ? ApplicationSigningState.PARTIAL : ApplicationSigningState.NONE;
     }
 
+    private ApplicationSigningState getState(final Certificate certificate) {
+        final long numFullySignedJars = jarToFullySigningCertificates.values().stream()
+                .filter(certs -> certs.contains(certificate))
+                .count();
+
+        if (numFullySignedJars == jarToFullySigningCertificates.size()) {
+            return ApplicationSigningState.FULL;
+        }
+
+        return numFullySignedJars == 0 ? ApplicationSigningState.NONE : ApplicationSigningState.PARTIAL;
+    }
+
     public void add(final File jarFile) {
-        final JarSigningHolder holder = SignVerifyUtils.getSignByMagic(jarFile);
-        holders.add(holder);
+        final CertificatesFullySigningTheJar certificatesFullySigningTheJar = determineCertificatesFullySigningThe(jarFile);
+        jarToFullySigningCertificates.put(jarFile, certificatesFullySigningTheJar);
     }
 
     public boolean allJarsSigned() {

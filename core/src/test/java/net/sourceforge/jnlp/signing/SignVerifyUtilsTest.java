@@ -6,7 +6,7 @@ public class SignVerifyUtilsTest {
 
     @Test(expected = NullPointerException.class)
     public void testFailOnNullResource() {
-        SignVerifyUtils.getSignByMagic(null);
+        SignVerifyUtils.determineCertificatesFullySigningThe(null);
     }
 
 }
