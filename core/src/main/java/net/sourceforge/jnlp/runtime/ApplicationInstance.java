@@ -16,7 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
+import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -130,7 +130,7 @@ public class ApplicationInstance {
         this.applicationPermissions = new ApplicationPermissions(tracker);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
-        final JarExtractor extractor = new JarExtractor(file, fileFactory);
+        final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
         try {
             final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker, applicationPermissions);

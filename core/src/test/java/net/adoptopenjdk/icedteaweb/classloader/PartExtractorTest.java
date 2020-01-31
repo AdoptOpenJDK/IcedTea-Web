@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Test that the right parts, packages and jars are extracted from JNLP files.
  */
-public class JarExtractorTest {
+public class PartExtractorTest {
 
     private static final String DEFAULT_NAME = null;
     private static final boolean LAZY = true;
@@ -45,7 +45,7 @@ public class JarExtractorTest {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(getUrl("empty.jnlp"));
 
         // when
-        final List<Part> parts = new JarExtractor(jnlpFile, jnlpFileFactory).getParts();
+        final List<Part> parts = new PartExtractor(jnlpFile, jnlpFileFactory).getParts();
 
         // then
         assertThat(parts, containsInAnyOrder(
@@ -60,7 +60,7 @@ public class JarExtractorTest {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(getUrl("eager-and-unnamedLazy.jnlp"));
 
         // when
-        final List<Part> parts = new JarExtractor(jnlpFile, jnlpFileFactory).getParts();
+        final List<Part> parts = new PartExtractor(jnlpFile, jnlpFileFactory).getParts();
 
         // then
         assertThat(parts, containsInAnyOrder(
@@ -75,7 +75,7 @@ public class JarExtractorTest {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(getUrl("eager-and-lazy.jnlp"));
 
         // when
-        final List<Part> parts = new JarExtractor(jnlpFile, jnlpFileFactory).getParts();
+        final List<Part> parts = new PartExtractor(jnlpFile, jnlpFileFactory).getParts();
 
         // then
         assertThat(parts, containsInAnyOrder(
@@ -183,8 +183,8 @@ public class JarExtractorTest {
 
     private URL getUrl(String s) {
         try {
-            final String selfClass = JarExtractorTest.class.getSimpleName() + ".class";
-            final URL selfUrl = JarExtractorTest.class.getResource(selfClass);
+            final String selfClass = PartExtractorTest.class.getSimpleName() + ".class";
+            final URL selfUrl = PartExtractorTest.class.getResource(selfClass);
             final String result = selfUrl.toString().replace(selfClass, s);
             return new URL(result);
         } catch (MalformedURLException e) {

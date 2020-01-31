@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
-import net.adoptopenjdk.icedteaweb.classloader.JarExtractor;
+import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -40,7 +40,7 @@ public class ClassloaderTestUtils {
         return JNLP_FILE_FACTORY.create(IntegrationTestResources.class.getResource(name));
     }
 
-    public static JarExtractor createFor(final JNLPFile file) {
-        return new JarExtractor(file, JNLP_FILE_FACTORY);
+    public static PartExtractor createFor(final JNLPFile file) {
+        return new PartExtractor(file, JNLP_FILE_FACTORY);
     }
 }

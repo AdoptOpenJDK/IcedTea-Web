@@ -26,7 +26,7 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
-public class JarExtractor {
+public class PartExtractor {
 
     private final JNLPFileFactory jnlpFileFactory;
 
@@ -36,7 +36,7 @@ public class JarExtractor {
     private final Part defaultEagerPart;
     private final Part defaultLazyPart;
 
-    public JarExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
+    public PartExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
         this.jnlpFileFactory = jnlpFileFactory;
 
         this.defaultEagerPart = new Part(null);

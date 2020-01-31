@@ -226,9 +226,9 @@ public class JnlpApplicationClassLoaderTest {
         return jnlpFileFactory.create(JnlpApplicationClassLoaderTest.class.getResource(name));
     }
 
-    public static JarExtractor createFor(final JNLPFile file) {
+    public static PartExtractor createFor(final JNLPFile file) {
         final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
-        return new JarExtractor(file, jnlpFileFactory);
+        return new PartExtractor(file, jnlpFileFactory);
     }
 
 }
