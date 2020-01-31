@@ -118,22 +118,31 @@ public class PartsHandler implements JarProvider {
 
     private void validateJars(List<LoadableJar> jars) {
         try {
-            for (LoadableJar jar : jars) {
-            final File jarFile = new File(jar.getLocation().toURI());
-            certVerifier.add(jarFile);
+            addAllJarsToVerifier(jars);
+
             if (!securityDelegate.getRunInSandbox()) {
                 // TODO: work in progress
                 if (!certVerifier.isFullySigned()) {
                     securityDelegate.promptUserOnPartialSigning();
                 }
-//            if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
-//                certVerifier.checkTrustWithUser(securityDelegate, file);
-//            }
+//                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
+//                    certVerifier.checkTrustWithUser(securityDelegate, file);
+//                }
             }
-            }
-        } catch (LaunchException | URISyntaxException e) {
+        } catch (LaunchException e) {
             // TODO: LaunchException should not be wrapped in a RuntimeException
             throw new RuntimeException(e);
+        }
+    }
+
+    private void addAllJarsToVerifier(List<LoadableJar> jars) {
+        for (LoadableJar jar : jars) {
+            try {
+                final File jarFile = new File(jar.getLocation().toURI());
+                certVerifier.add(jarFile);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
