@@ -41,7 +41,7 @@ public class PartsHandler implements JarProvider {
     private final List<Part> parts;
     private final Lock partsLock = new ReentrantLock();
     private final Set<Part> downloadedParts = new HashSet<>();
-    private final Set<Part> loadedParts = new HashSet<>();
+    private final Set<Part> loadedByClassloader = new HashSet<>();
 
     private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
 
@@ -77,7 +77,7 @@ public class PartsHandler implements JarProvider {
         try {
             return parts.stream()
                     .filter(part -> !part.isLazy())
-                    .filter(part -> !loadedParts.contains(part))
+                    .filter(part -> !loadedByClassloader.contains(part))
                     .map(this::loadPart)
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
@@ -86,20 +86,54 @@ public class PartsHandler implements JarProvider {
         }
     }
 
-    //JUST FOR CURRENT TESTS!
-    @Deprecated
-    private void print(final String message) {
-        try (FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.home") + "/Desktop/itw-log.txt"), true)) {
-            out.write((message + System.lineSeparator()).getBytes());
-        } catch (final Exception e) {
-            throw new RuntimeException("Can not write message to file!", e);
+
+    @Override
+    public List<LoadableJar> loadMoreJars(String resourceName) {
+        partsLock.lock();
+        try {
+            final List<Part> notLoaded = parts.stream()
+                    .filter(o -> !loadedByClassloader.contains(o))
+                    .collect(Collectors.toList());
+
+            if (notLoaded.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            final Part next = notLoaded.stream()
+                    .filter(part -> part.supports(resourceName))
+                    .findFirst()
+                    .orElse(notLoaded.get(0));
+
+            return loadPart(next);
         } finally {
-            System.out.println(message);
+            partsLock.unlock();
         }
     }
 
-    private synchronized Lock getOrCreateLock(final URL resourceUrl) {
-        return resourceDownloadLocks.computeIfAbsent(resourceUrl, url -> new ReentrantLock());
+    private List<LoadableJar> loadPart(final Part part) {
+        final List<LoadableJar> result = downloadAllOfPart(part);
+        loadedByClassloader.add(part);
+        return result;
+    }
+
+    private List<LoadableJar> downloadAllOfPart(final Part part) {
+        final List<Future<LoadableJar>> tasks = part.getJars().stream()
+                .map(this::downloadJar)
+                .collect(Collectors.toList());
+
+        final List<LoadableJar> result = tasks.stream()
+                .map(future -> waitForCompletion(future, "Error while downloading jar!"))
+                .collect(Collectors.toList());
+
+        downloadedParts.add(part);
+        return result;
+    }
+
+    private Future<LoadableJar> downloadJar(final JARDesc jarDescription) {
+        return CompletableFuture.supplyAsync(() -> {
+            final URL localCacheUrl = getLocalUrlForJar(jarDescription);
+            return new LoadableJar(localCacheUrl, jarDescription.isNative());
+        }, getClassloaderBackgroundExecutor());
     }
 
     protected URL getLocalUrlForJar(final JARDesc jarDesc) {
@@ -133,53 +167,8 @@ public class PartsHandler implements JarProvider {
         }
     }
 
-    @Override
-    public List<LoadableJar> loadMoreJars(String name) {
-        partsLock.lock();
-        try {
-            final List<Part> notLoaded = parts.stream()
-                    .filter(o -> !loadedParts.contains(o))
-                    .collect(Collectors.toList());
-
-            if (notLoaded.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            final Part next = notLoaded.stream()
-                    .filter(part -> part.supports(name))
-                    .findFirst()
-                    .orElse(notLoaded.get(0));
-
-            return loadPart(next);
-        } finally {
-            partsLock.unlock();
-        }
-    }
-
-    private List<LoadableJar> loadPart(final Part part) {
-        final List<LoadableJar> result = downloadAllOfPart(part);
-        loadedParts.add(part);
-        return result;
-    }
-
-    private List<LoadableJar> downloadAllOfPart(final Part part) {
-        final List<Future<LoadableJar>> tasks = part.getJars().stream()
-                .map(this::downloadJar)
-                .collect(Collectors.toList());
-
-        final List<LoadableJar> result = tasks.stream()
-                .map(future -> waitForCompletion(future, "Error while downloading jar!"))
-                .collect(Collectors.toList());
-
-        downloadedParts.add(part);
-        return result;
-    }
-
-    private Future<LoadableJar> downloadJar(final JARDesc jarDescription) {
-        return CompletableFuture.supplyAsync(() -> {
-            final URL localCacheUrl = getLocalUrlForJar(jarDescription);
-            return new LoadableJar(localCacheUrl, jarDescription.isNative());
-        }, getClassloaderBackgroundExecutor());
+    private synchronized Lock getOrCreateLock(final URL resourceUrl) {
+        return resourceDownloadLocks.computeIfAbsent(resourceUrl, url -> new ReentrantLock());
     }
 
     //Methods that are needed for JNLP DownloadService interface
@@ -214,6 +203,18 @@ public class PartsHandler implements JarProvider {
                     .anyMatch(downloadedParts::contains);
         } finally {
             partsLock.unlock();
+        }
+    }
+
+    //JUST FOR CURRENT TESTS!
+    @Deprecated
+    private void print(final String message) {
+        try (FileOutputStream out = new FileOutputStream(new File(System.getProperty("user.home") + "/Desktop/itw-log.txt"), true)) {
+            out.write((message + System.lineSeparator()).getBytes());
+        } catch (final Exception e) {
+            throw new RuntimeException("Can not write message to file!", e);
+        } finally {
+            System.out.println(message);
         }
     }
 }
