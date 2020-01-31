@@ -179,6 +179,11 @@ public class JnlpApplicationClassLoaderTest {
         }
 
         @Override
+        protected void validateJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+            // do nothing
+        }
+
+        @Override
         protected URL getLocalUrlForJar(final JARDesc jarDesc) {
             System.out.println("Should load " + jarDesc.getLocation());
             downloaded.add(jarDesc);
@@ -200,6 +205,11 @@ public class JnlpApplicationClassLoaderTest {
 
         public ErrorPartsHandler(final List<Part> parts, final JNLPFile file) {
             super(parts, file);
+        }
+
+        @Override
+        protected void validateJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+            // do nothing
         }
 
         @Override

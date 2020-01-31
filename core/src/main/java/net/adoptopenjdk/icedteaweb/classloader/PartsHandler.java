@@ -116,7 +116,7 @@ public class PartsHandler implements JarProvider {
         return result;
     }
 
-    private void validateJars(List<LoadableJar> jars) {
+    protected void validateJars(List<LoadableJar> jars) {
         try {
             addAllJarsToVerifier(jars);
 

@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -18,6 +19,11 @@ public class DummyPartsHandler extends PartsHandler {
     }
 
     private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();
+
+    @Override
+    protected void validateJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+        // do nothing
+    }
 
     @Override
     protected URL getLocalUrlForJar(final JARDesc jarDesc) {
