@@ -1,9 +1,12 @@
 package net.sourceforge.jnlp.signing;
 
 import java.io.File;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,14 +19,15 @@ public class NewJarCertVerifier {
 
     private final Map<File, CertificatesFullySigningTheJar> jarToFullySigningCertificates = new HashMap<>();
 
-    public Map<Certificate, ApplicationSigningState> getState() {
+    public Map<CertPath, ApplicationSigningState> verify() {
         return jarToFullySigningCertificates.values().stream()
-                .flatMap(r -> r.getCertificates().stream())
+                .flatMap(r -> r.getCertificatePaths().stream())
                 .collect(Collectors.toSet()).stream()
                 .collect(Collectors.toMap(Function.identity(), this::getStateForSingleCertificate));
     }
 
-    private ApplicationSigningState getStateForSingleCertificate(final Certificate certificate) {
+    private ApplicationSigningState getStateForSingleCertificate(final CertPath certPath) {
+        final Certificate certificate = certPath.getCertificates().get(0);
         final long numFullySignedJars = jarToFullySigningCertificates.values().stream()
                 .filter(certs -> certs.contains(certificate))
                 .count();
@@ -33,6 +37,12 @@ public class NewJarCertVerifier {
         }
 
         return numFullySignedJars == 0 ? ApplicationSigningState.NONE : ApplicationSigningState.PARTIAL;
+    }
+
+    public void addAll(final List<File> jars) {
+        for (File jarFile : jars) {
+            add(jarFile);
+        }
     }
 
     public void add(final File jarFile) {
@@ -46,5 +56,12 @@ public class NewJarCertVerifier {
 
     public boolean isFullySigned() {
         throw new RuntimeException("Not implemented yet!");
+    }
+
+    public Set<CertPath> getFullySigningCertificates() {
+        return verify().entrySet().stream()
+                .filter(e -> e.getValue() == ApplicationSigningState.FULL)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 }

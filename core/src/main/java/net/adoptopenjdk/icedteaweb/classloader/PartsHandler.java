@@ -14,11 +14,15 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
+import net.sourceforge.jnlp.signing.SignVerifyUtils;
+import net.sourceforge.jnlp.tools.CertInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.cert.CertPath;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
@@ -117,33 +122,49 @@ public class PartsHandler implements JarProvider {
     }
 
     protected void validateJars(List<LoadableJar> jars) {
-        try {
-            addAllJarsToVerifier(jars);
+        if (securityDelegate.getRunInSandbox()) {
+            return;
+        }
 
-            if (!securityDelegate.getRunInSandbox()) {
-                // TODO: work in progress
-                if (!certVerifier.isFullySigned()) {
-                    securityDelegate.promptUserOnPartialSigning();
-                }
+        try {
+            certVerifier.addAll(toFiles(jars));
+
+            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
+
+            if (fullySigningCertificates.isEmpty()) {
+                // TODO: HILFE
+            } else {
+                final ZonedDateTime now = ZonedDateTime.now();
+                final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
+                        .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
+
+                // find certPath with best info - what is best info? - no issues, trusted RootCA
+
+            }
+
+            // TODO: work in progress
+            if (!certVerifier.isFullySigned()) {
+                securityDelegate.promptUserOnPartialSigning();
+            }
 //                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
 //                    certVerifier.checkTrustWithUser(securityDelegate, file);
 //                }
-            }
         } catch (LaunchException e) {
             // TODO: LaunchException should not be wrapped in a RuntimeException
             throw new RuntimeException(e);
         }
     }
 
-    private void addAllJarsToVerifier(List<LoadableJar> jars) {
-        for (LoadableJar jar : jars) {
-            try {
-                final File jarFile = new File(jar.getLocation().toURI());
-                certVerifier.add(jarFile);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    private static List<File> toFiles(List<LoadableJar> jars) {
+        return jars.stream()
+                .map(loadableJar -> {
+                    try {
+                        return new File(loadableJar.getLocation().toURI());
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private List<LoadableJar> downloadAllOfPart(final Part part) {
