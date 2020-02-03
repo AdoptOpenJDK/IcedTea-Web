@@ -1523,9 +1523,9 @@ public class JNLPClassLoader extends URLClassLoader {
         // Give read permissions to the cached jar file
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             Permission p = getReadPermission(desc);
-
-            resourcePermissions.add(p);
-
+            if (p != null) {
+                resourcePermissions.add(p);
+            }
             return null;
         });
 
