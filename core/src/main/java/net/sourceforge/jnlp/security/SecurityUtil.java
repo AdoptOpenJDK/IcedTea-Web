@@ -357,6 +357,7 @@ public class SecurityUtil {
 
     public static void loadKeyStore(KeyStore ks, File f) throws IOException, NoSuchAlgorithmException, CertificateException {
         try {
+            LOG.info("Loading Keystore {}", f != null ? f.toString() : "Unknown");
             KeystorePasswordAttempter.INSTANCE.unlockKeystore(
                     new KeystorePasswordAttempter.KeystoreOperation(ks, f) {
 

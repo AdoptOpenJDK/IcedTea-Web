@@ -141,6 +141,7 @@ public final class KeyStores {
         String location = getKeyStoreLocation(level, type).getFullPath();
         KeyStore ks = null;
         try {
+            LOG.info("Creating Keystore {}", location);
             ks = createKeyStoreFromFile(new File(location), create);
             //hashcode is used instead of instance so when no references are left
             //to keystore, then this will not be blocker for garbage collection

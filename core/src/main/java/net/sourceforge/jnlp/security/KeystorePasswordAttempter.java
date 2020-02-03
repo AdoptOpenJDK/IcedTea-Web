@@ -144,6 +144,7 @@ class KeystorePasswordAttempter {
         SavedPassword successfulKey = successfulPerKeystore.get(operation.ks);
         Exception firstEx = null;
         String messages = "";
+        final String keyStoreFileName = operation.f != null ? operation.f.toString() : "Unknown";
         List<SavedPassword>  localPasses = new ArrayList<>();
         if (successfulKey != null){
             //successful must be first. If it is not, then writing to keystore by illegal password, will kill keystore's integrity
@@ -153,6 +154,7 @@ class KeystorePasswordAttempter {
         for (int i = 0; i < localPasses.size(); i++) {
             SavedPassword pass = localPasses.get(i);
             try {
+                LOG.info("Operating Keystore {}", keyStoreFileName);
                 //we expect, that any keystore is loaded before read.
                 //so we are writing by correct password
                 //if no successful password was provided during reading, then finish(firstEx); will save us from overwrite
@@ -169,9 +171,9 @@ class KeystorePasswordAttempter {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 //tried all known, ask for new or finally die
                 if (i + 1 == localPasses.size()) {
-                    String s1 = "Got "+messages+" during keystore operation "+operation.getId()+". Attempts to unlock: "+(i + 1);
+                    String s1 = "Got "+messages+" during keystore operation "+ operation.getId() + " on keystore " + keyStoreFileName +". Attempts to unlock: "+(i + 1);
                     LOG.info(s1);
-                    LOG.info("Invalid password?");
+                    LOG.info("Invalid password? For keystore {}", keyStoreFileName);
                     if (JNLPRuntime.isHeadless()) {
                         OutputController.getLogger().printOutLn(s1 + "\n" + "Type new password and press ok. Give up by pressing return on empty line.");
                         String s = OutputController.getLogger().readLine();
