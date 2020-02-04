@@ -8,21 +8,13 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
-import net.sourceforge.jnlp.signing.NewJarCertVerifier;
-import net.sourceforge.jnlp.signing.SignVerifyUtils;
-import net.sourceforge.jnlp.tools.CertInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.cert.CertPath;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +27,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
@@ -54,9 +45,7 @@ public class PartsHandler implements JarProvider {
 
     private final ResourceTracker tracker;
 
-    private final SecurityDelegate securityDelegate;
-
-    private final NewJarCertVerifier certVerifier;
+    private final ApplicationTrustValidator trustValidator;
 
     public PartsHandler(final List<Part> parts, final JNLPFile file) {
         this(parts, file, new DefaultResourceTrackerFactory().create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
@@ -70,9 +59,7 @@ public class PartsHandler implements JarProvider {
         this.tracker = tracker;
         this.parts = new CopyOnWriteArrayList<>(parts);
 
-        this.certVerifier = new NewJarCertVerifier();
-        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
-
+        this.trustValidator = new ApplicationTrustValidator(file, applicationPermissions);
     }
 
     @Override
@@ -122,45 +109,7 @@ public class PartsHandler implements JarProvider {
     }
 
     protected void validateJars(List<LoadableJar> jars) {
-        if (securityDelegate.getRunInSandbox()) {
-            return;
-        }
-
-        try {
-            certVerifier.addAll(toFiles(jars));
-
-            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
-
-            if (fullySigningCertificates.isEmpty()) {
-                // TODO: HILFE
-            } else {
-                final ZonedDateTime now = ZonedDateTime.now();
-                final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
-                        .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
-
-                final boolean hasTrustedFullySigningCertificate = certInfos.values().stream()
-                        .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
-                        .anyMatch(infos -> !infos.hasSigningIssues());
-
-                if (hasTrustedFullySigningCertificate) {
-                    return;
-                }
-
-                // find certPath with best info - what is best info? - no issues, trusted RootCA
-
-            }
-
-            // TODO: work in progress
-            if (!certVerifier.isFullySigned()) {
-                securityDelegate.promptUserOnPartialSigning();
-            }
-//                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
-//                    certVerifier.checkTrustWithUser(securityDelegate, file);
-//                }
-        } catch (LaunchException e) {
-            // TODO: LaunchException should not be wrapped in a RuntimeException
-            throw new RuntimeException(e);
-        }
+        trustValidator.validateJars(jars);
     }
 
     private static List<File> toFiles(List<LoadableJar> jars) {
