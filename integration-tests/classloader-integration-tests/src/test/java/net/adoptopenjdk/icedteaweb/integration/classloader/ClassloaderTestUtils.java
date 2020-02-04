@@ -29,7 +29,7 @@ public class ClassloaderTestUtils {
     public static DummyPartsHandler createDummyPartsHandlerFor(final String name) throws IOException, ParseException {
         final JNLPFile jnlpFile = createFile(name);
         final List<Part> parts = createPartsFor(jnlpFile);
-        return new DummyPartsHandler(parts, jnlpFile);
+        return new DummyPartsHandler(parts);
     }
 
     public static List<Part> createPartsFor(final JNLPFile file) {

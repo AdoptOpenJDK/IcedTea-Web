@@ -4,7 +4,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,6 +13,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class JnlpApplicationClassLoaderTest {
 
@@ -59,8 +62,8 @@ public class JnlpApplicationClassLoaderTest {
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assert.assertTrue(partsHandler.hasTriedToDownload("eager.jar"));
-        Assert.assertFalse(partsHandler.hasTriedToDownload("lazy.jar"));
+        assertTrue(partsHandler.hasTriedToDownload("eager.jar"));
+        assertFalse(partsHandler.hasTriedToDownload("lazy.jar"));
     }
 
     @Test
@@ -76,8 +79,8 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertTrue(partsHandler.hasTriedToDownload("eager.jar"));
-        Assert.assertTrue(partsHandler.hasTriedToDownload("lazy.jar"));
+        assertTrue(partsHandler.hasTriedToDownload("eager.jar"));
+        assertTrue(partsHandler.hasTriedToDownload("lazy.jar"));
     }
 
     @Test
@@ -90,7 +93,7 @@ public class JnlpApplicationClassLoaderTest {
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assert.assertEquals(0, partsHandler.getDownloaded().size());
+        assertEquals(0, partsHandler.getDownloaded().size());
     }
 
     @Test
@@ -106,7 +109,7 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertEquals(1, partsHandler.getDownloaded().size());
+        assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     @Test
@@ -122,7 +125,7 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertEquals(1, partsHandler.getDownloaded().size());
+        assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     @Test
@@ -135,7 +138,7 @@ public class JnlpApplicationClassLoaderTest {
         new JnlpApplicationClassLoader(partsHandler);
 
         //than
-        Assert.assertEquals(0, partsHandler.getDownloaded().size());
+        assertEquals(0, partsHandler.getDownloaded().size());
     }
 
     @Test
@@ -151,7 +154,7 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertEquals(1, partsHandler.getDownloaded().size());
+        assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     @Test
@@ -167,20 +170,15 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        Assert.assertEquals(1, partsHandler.getDownloaded().size());
+        assertEquals(1, partsHandler.getDownloaded().size());
     }
 
     private static class DummyPartsHandler extends PartsHandler {
 
         private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();
 
-        public DummyPartsHandler(final List<Part> parts, final JNLPFile file) {
-            super(parts, file);
-        }
-
-        @Override
-        protected void validateJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
-            // do nothing
+        public DummyPartsHandler(final List<Part> parts) {
+            super(parts, (jars) -> {});
         }
 
         @Override
@@ -203,13 +201,8 @@ public class JnlpApplicationClassLoaderTest {
     private static class ErrorPartsHandler extends PartsHandler {
 
 
-        public ErrorPartsHandler(final List<Part> parts, final JNLPFile file) {
-            super(parts, file);
-        }
-
-        @Override
-        protected void validateJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
-            // do nothing
+        public ErrorPartsHandler(final List<Part> parts) {
+            super(parts, (jars) -> {});
         }
 
         @Override
@@ -222,13 +215,13 @@ public class JnlpApplicationClassLoaderTest {
     public static ErrorPartsHandler createErrorPartsHandler(final String name) throws IOException, ParseException {
         final JNLPFile file = createFile(name);
         final List<Part> parts = createFor(file).getParts();
-        return new ErrorPartsHandler(parts, file);
+        return new ErrorPartsHandler(parts);
     }
 
     public static DummyPartsHandler createDummyPartsHandlerFor(final String name) throws IOException, ParseException {
         final JNLPFile file = createFile(name);
         final List<Part> parts = createFor(file).getParts();
-        return new DummyPartsHandler(parts, file);
+        return new DummyPartsHandler(parts);
     }
 
     public static JNLPFile createFile(final String name) throws IOException, ParseException {

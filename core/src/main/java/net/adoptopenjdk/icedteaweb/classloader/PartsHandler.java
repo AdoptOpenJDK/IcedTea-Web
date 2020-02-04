@@ -7,13 +7,13 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,22 +44,21 @@ public class PartsHandler implements JarProvider {
     private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
 
     private final ResourceTracker tracker;
-
     private final ApplicationTrustValidator trustValidator;
 
-    public PartsHandler(final List<Part> parts, final JNLPFile file) {
-        this(parts, file, new DefaultResourceTrackerFactory().create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy()));
-    }
-
-    private PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker) {
-        this(parts, file, tracker, new ApplicationPermissions(tracker));
+    /* Only used in tests. */
+    protected PartsHandler(final List<Part> parts, final ApplicationTrustValidator trustValidator) {
+        this(parts, new DefaultResourceTrackerFactory().create(true, DownloadOptions.NONE, JNLPRuntime.getDefaultUpdatePolicy()), trustValidator);
     }
 
     public PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) {
+        this(parts, tracker, new ApplicationTrustValidatorImpl(file, applicationPermissions));
+    }
+
+    private PartsHandler(final List<Part> parts, final ResourceTracker tracker, final ApplicationTrustValidator trustValidator) {
         this.tracker = tracker;
         this.parts = new CopyOnWriteArrayList<>(parts);
-
-        this.trustValidator = new ApplicationTrustValidator(file, applicationPermissions);
+        this.trustValidator = trustValidator;
     }
 
     @Override
@@ -103,25 +102,9 @@ public class PartsHandler implements JarProvider {
 
     private List<LoadableJar> loadPart(final Part part) {
         final List<LoadableJar> result = downloadAllOfPart(part);
-        validateJars(result);
+        trustValidator.validateJars(result);
         loadedByClassloader.add(part);
         return result;
-    }
-
-    protected void validateJars(List<LoadableJar> jars) {
-        trustValidator.validateJars(jars);
-    }
-
-    private static List<File> toFiles(List<LoadableJar> jars) {
-        return jars.stream()
-                .map(loadableJar -> {
-                    try {
-                        return new File(loadableJar.getLocation().toURI());
-                    } catch (URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
     }
 
     private List<LoadableJar> downloadAllOfPart(final Part part) {
