@@ -117,16 +117,20 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
+        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',')
+                .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
+
+        if (whitelist.isEmpty()) {
+            return; // empty whitelist == allow all connections
+        }
+
         if (UrlUtils.isLocalhost(url)) {
             return; // local server need not be in whitelist
         }
 
         final String urlString = url.getProtocol() + "://" + url.getHost() + ((url.getPort() != -1) ? ":" + url.getPort() : "");
 
-        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',')
-                .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
-
-        if (!whitelist.isEmpty() && !whitelist.contains(urlString)) {
+        if (!whitelist.contains(urlString)) {
             BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
             LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
             JNLPRuntime.exit(-1);
