@@ -37,6 +37,7 @@ package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosingListener;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
 import org.junit.After;
 import org.junit.Assert;
@@ -52,6 +53,7 @@ import java.util.Random;
 
 public class OutputControllerTest {
 
+    private static boolean originalDebug;
     private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
     private static final String line1 = "I'm logged line one";
@@ -80,11 +82,13 @@ public class OutputControllerTest {
 
     @Before
     public void setUp() {
+        originalDebug = JNLPRuntime.isSetDebug();
         LogConfig.resetLogConfig();
     }
 
     @After
     public void tearDown() {
+        JNLPRuntime.setDebug(originalDebug);
         LogConfig.resetLogConfig();
     }
 
@@ -93,6 +97,7 @@ public class OutputControllerTest {
         ByteArrayOutputStream os1 = new ByteArrayOutputStream();
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         OutputController oc = new OutputController(new PrintStream(os1), new PrintStream(os2));
+        JNLPRuntime.setDebug(false);
         LogConfig.getLogConfig().setEnableLogging(false);
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);

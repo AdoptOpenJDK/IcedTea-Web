@@ -106,6 +106,10 @@ public class NoStdOutErrTest {
             ServerAccess.logException(ex);
         }
     }
+    
+    protected void setEnableLogging(boolean enableLogging) {
+        LogConfig.getLogConfig().setEnableLogging(enableLogging);
+    }
 
     private static synchronized void invokeSetLogToStreams(boolean state) {
         try {
