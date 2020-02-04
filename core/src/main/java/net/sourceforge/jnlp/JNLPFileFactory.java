@@ -59,23 +59,8 @@ public class JNLPFileFactory {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile create(final URL location, final ParserSettings settings) throws IOException, ParseException {
-        return create(location, null, settings, JNLPRuntime.getDefaultUpdatePolicy());
-    }
-
-    /**
-     * Create a JNLPFile from a URL and a version, checking for updates
-     * using the specified policy.
-     *
-     * @param location the location of the JNLP file
-     * @param version  the version of the JNLP file
-     * @param settings the {@link ParserSettings} to use when parsing the {@code location}
-     * @param policy   the update policy
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    public JNLPFile create(final URL location, final VersionString version, final ParserSettings settings, UpdatePolicy policy) throws IOException, ParseException {
         final String uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" + ((int) (Math.random() * Integer.MAX_VALUE)) + "-" + location;
-        return create(location, uniqueKey, version, settings, policy);
+        return create(location, uniqueKey, null, settings, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
     /**
@@ -107,7 +92,7 @@ public class JNLPFileFactory {
      * @return opened stream from given url
      * @throws IOException if something goes wrong
      */
-    protected InputStream openURL(final URL location, final VersionString version, final UpdatePolicy policy) throws IOException {
+    private InputStream openURL(final URL location, final VersionString version, final UpdatePolicy policy) throws IOException {
         Assert.requireNonNull(location, "location");
         Assert.requireNonNull(policy, "policy");
 
