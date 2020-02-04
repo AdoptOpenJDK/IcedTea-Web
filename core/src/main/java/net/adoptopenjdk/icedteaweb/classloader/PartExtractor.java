@@ -26,6 +26,12 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
+/**
+ * Extracts parts out of the JNLPFile.
+ * During extractions only the resources relevant for the current runtime environment (Java Version, Locale, OS, ...)
+ * are added to the resulting parts.
+ * The extractor also loads the extensions (JNLPs) and extracts the parts from them.
+ */
 public class PartExtractor {
 
     private final JNLPFileFactory jnlpFileFactory;
