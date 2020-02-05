@@ -12,7 +12,7 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.IpUtil;
 
 import java.io.File;
 import java.net.URL;
@@ -124,7 +124,7 @@ class ResourceHandler {
             return; // empty whitelist == allow all connections
         }
 
-        if (UrlUtils.isLocalhost(url)) {
+        if (IpUtil.isLocalhostOrLoopback(url)) {
             return; // local server need not be in whitelist
         }
 
