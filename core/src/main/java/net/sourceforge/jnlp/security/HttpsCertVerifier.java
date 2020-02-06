@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import sun.security.util.DerValue;
@@ -71,7 +70,7 @@ public class HttpsCertVerifier implements CertVerifier {
     private final boolean hostMatched;
     private final ArrayList<String> details = new ArrayList<>();
 
-    HttpsCertVerifier(final X509Certificate[] chain, final String authType,
+    HttpsCertVerifier(final X509Certificate[] chain,
                       final boolean isTrusted, final boolean hostMatched,
                       final String hostName) {
         this.chain = chain;
@@ -101,7 +100,7 @@ public class HttpsCertVerifier implements CertVerifier {
         try {
             certPaths.add(CertificateFactory.getInstance("X.509").generateCertPath(list));
         } catch (CertificateException ce) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ce);
+            LOG.error("Failed to create certificate for cert paths", ce);
             // carry on
         }
 
@@ -170,7 +169,7 @@ public class HttpsCertVerifier implements CertVerifier {
                 }
             }
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Exception while handling certificate " + c, e);
         }
 
         return names.stream().filter(Objects::nonNull).collect(joining(", "));
@@ -201,10 +200,10 @@ public class HttpsCertVerifier implements CertVerifier {
     @Override
     public boolean getRootInCaCerts() {
         try {
-            final KeyStore[] caCertsKeyStores = KeyStores.getCAKeyStores();
+            final List<KeyStore> caCertsKeyStores = KeyStores.getCAKeyStores();
             return CertificateUtils.inKeyStores((X509Certificate) getRoot(null), caCertsKeyStores);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Exception while getting root in ca certs", e);
         }
         return false;
     }

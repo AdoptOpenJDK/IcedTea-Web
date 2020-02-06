@@ -36,16 +36,14 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.AllPermission;
 import java.security.KeyStore;
@@ -64,7 +62,7 @@ import java.util.StringTokenizer;
  */
 public final class KeyStores {
 
-    private final static Logger LOG = LoggerFactory.getLogger(KeyStores.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeyStores.class);
 
     public static class KeyStoreWithPath {
 
@@ -107,53 +105,31 @@ public final class KeyStores {
      * Returns a KeyStore corresponding to the appropriate level level (user or
      * system) and type.
      *
-     * @param level whether the KeyStore desired is a user-level or system-level
-     * KeyStore
-     * @param type the type of KeyStore desired
+     * @param level whether the KeyStore desired is a user-level or system-level KeyStore
+     * @param type  the type of KeyStore desired
      * @return a KeyStore containing certificates from the appropriate
      */
-    public static final KeyStoreWithPath getKeyStore(Level level, Type type) {
-        boolean create;
-        if (level == Level.USER) {
-            create = true;
-        } else {
-            create = false;
-        }
-        return getKeyStore(level, type, create);
-    }
-
-    /**
-     * Returns a KeyStore corresponding to the appropriate level level (user or
-     * system) and type.
-     *
-     * @param level whether the KeyStore desired is a user-level or system-level
-     * KeyStore
-     * @param type the type of KeyStore desired
-     * @param create true if keystore can be created
-     * @return a KeyStore containing certificates from the appropriate
-     */
-    private static final KeyStoreWithPath getKeyStore(Level level, Type type, boolean create) {
-        SecurityManager sm = System.getSecurityManager();
+    public static KeyStoreWithPath getKeyStore(Level level, Type type) {
+        final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new AllPermission());
         }
 
-        String location = getKeyStoreLocation(level, type).getFullPath();
+        final String location = getKeyStoreLocation(level, type).getFullPath();
         KeyStore ks = null;
         try {
-            LOG.debug("Creating Keystore {} ", location);
-            ks = createKeyStoreFromFile(new File(location), create);
+            ks = createKeyStoreFromFile(new File(location), level == Level.USER);
             //hashcode is used instead of instance so when no references are left
             //to keystore, then this will not be blocker for garbage collection
             keystoresPaths.put(ks.hashCode(), location);
         } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("failed to get keystore " + level + " " + type + " -> " + location, e);
         }
         return new KeyStoreWithPath(ks, location);
     }
 
-    public static String getPathToKeystore(int k) {
-        String s = keystoresPaths.get(k);
+    public static String getPathToKeystore(KeyStore k) {
+        final String s = keystoresPaths.get(k.hashCode());
         if (s == null) {
             return "unknown keystore location";
         }
@@ -166,10 +142,11 @@ public final class KeyStores {
      *
      * @return an array of KeyStore containing trusted Certificates
      */
-    public static final KeyStore[] getCertKeyStores() {
-        List<KeyStore> result = new ArrayList<>(10);
+    public static List<KeyStore> getCertKeyStores() {
+        final List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE certificates */
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS).getKs();
+        KeyStore ks;
+        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -189,7 +166,7 @@ public final class KeyStores {
             result.add(ks);
         }
 
-        return result.toArray(new KeyStore[result.size()]);
+        return result;
     }
 
     /**
@@ -197,10 +174,11 @@ public final class KeyStores {
      *
      * @return an array of KeyStore containing trusted CA certificates
      */
-    public static final KeyStore[] getCAKeyStores() {
+    public static List<KeyStore> getCAKeyStores() {
         List<KeyStore> result = new ArrayList<>(10);
         /* System-level JSSE CA certificates */
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS).getKs();
+        KeyStore ks;
+        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -220,7 +198,7 @@ public final class KeyStores {
             result.add(ks);
         }
 
-        return result.toArray(new KeyStore[result.size()]);
+        return result;
     }
 
     /**
@@ -229,10 +207,11 @@ public final class KeyStores {
      * @return an array of KeyStore objects that can be used to check client
      * authentication certificates
      */
-    public static KeyStore[] getClientKeyStores() {
+    public static List<KeyStore> getClientKeyStores() {
         List<KeyStore> result = new ArrayList<>();
 
-        KeyStore ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS).getKs();
+        KeyStore ks;
+        ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS).getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -242,7 +221,7 @@ public final class KeyStores {
             result.add(ks);
         }
 
-        return result.toArray(new KeyStore[result.size()]);
+        return result;
     }
 
     /**
@@ -250,10 +229,10 @@ public final class KeyStores {
      * type.
      *
      * @param level the specified level of the key store to be returned.
-     * @param type the specified type of the key store to be returned.
+     * @param type  the specified type of the key store to be returned.
      * @return the location of the key store.
      */
-    public static final InfrastructureFileDescriptor getKeyStoreLocation(Level level, Type type) {
+    public static InfrastructureFileDescriptor getKeyStoreLocation(Level level, Type type) {
         switch (level) {
             case SYSTEM:
                 switch (type) {
@@ -296,10 +275,10 @@ public final class KeyStores {
      * removing the _'s. (USER,CA_CERTS) becomes UserCaCerts.
      *
      * @param level the level of the key store.
-     * @param type the type of the key store.
+     * @param type  the type of the key store.
      * @return the translation key.
      */
-    public static final String toTranslatableString(Level level, Type type) {
+    public static String toTranslatableString(Level level, Type type) {
         StringBuilder response = new StringBuilder();
 
         response.append("KS");
@@ -327,7 +306,7 @@ public final class KeyStores {
      * Returns a human readable name for this KeyStore
      *
      * @param level the level of the KeyStore
-     * @param type the type of KeyStore
+     * @param type  the type of KeyStore
      * @return a localized name for this KeyStore
      */
     public static String toDisplayableString(Level level, Type type) {
@@ -342,40 +321,28 @@ public final class KeyStores {
      * @param file the file to load information from
      * @return a KeyStore containing data from the file
      */
-    private static final KeyStore createKeyStoreFromFile(File file, boolean createIfNotFound) throws IOException, KeyStoreException, NoSuchAlgorithmException,
-            CertificateException {
-        FileInputStream fis = null;
-        KeyStore ks = null;
+    private static KeyStore createKeyStoreFromFile(File file, boolean createIfNotFound) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+        final KeyStore ks = KeyStore.getInstance(KEYSTORE_TYPE);
+        if (file.exists()) {
+            LOG.debug("Keystore file {} exists.", file.toString());
+            SecurityUtil.loadKeyStore(ks, file);
+        } else {
+            LOG.debug("Keystore file {} does not exists.", file.toString());
+            SecurityUtil.loadKeyStore(ks, null);
 
-        try {
-            if (createIfNotFound && !file.exists()) {
-                File parent = file.getParentFile();
+            if (createIfNotFound) {
+                LOG.debug("Trying to create keystore file {}", file.toString());
+                final File parent = file.getParentFile();
                 if (!parent.isDirectory() && !parent.mkdirs()) {
                     throw new IOException("unable to create " + parent);
                 }
                 FileUtils.createRestrictedFile(file);
-                LOG.debug("Created Keystore {}", file.toString());
-                ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                SecurityUtil.loadKeyStore(ks, null);
-                SecurityUtil.storeKeyStore(ks, file);
-            }
+                LOG.debug("Created keystore file {}", file.toString());
 
-            if (file.exists()) {
-                ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                LOG.debug("Keystore File {} Exists.", file.toString());
-                SecurityUtil.loadKeyStore(ks, file);
-            } else {
-                ks = KeyStore.getInstance(KEYSTORE_TYPE);
-                LOG.debug("Keystore File {} Does Not Exists.", file.toString());
-                SecurityUtil.loadKeyStore(ks, null);
-            }
-        } finally {
-            if (fis != null) {
-                fis.close();
+                SecurityUtil.storeKeyStore(ks, file);
+                LOG.debug("Saved to keystore file {}", file.toString());
             }
         }
-
         return ks;
     }
-
 }
