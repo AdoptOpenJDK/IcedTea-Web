@@ -398,11 +398,11 @@ public class JarCertVerifier implements CertVerifier {
         final CertInformation info = certs.get(certPath);
         try {
             final X509Certificate publisher = (X509Certificate) getPublisher(certPath);
-            final KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
+            final List<KeyStore> certKeyStores = KeyStores.getCertKeyStores();
             if (CertificateUtils.inKeyStores(publisher, certKeyStores)) {
                 info.setAlreadyTrustPublisher();
             }
-            final KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
+            final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
             // Check entire cert path for a trusted CA
             for (final Certificate c : certPath.getCertificates()) {
                 if (c instanceof X509Certificate) {

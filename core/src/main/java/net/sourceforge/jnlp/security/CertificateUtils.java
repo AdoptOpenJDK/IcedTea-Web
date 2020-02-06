@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -58,6 +57,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -68,26 +68,27 @@ import java.util.Random;
  */
 public class CertificateUtils {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CertificateUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateUtils.class);
 
     public static final String X_509 = "X509";
 
     /**
      * Adds the X509Certificate in the file to the KeyStore. Note that it does
      * not update the copy of the KeyStore on disk.
+     *
      * @param file file with certificate
-     * @param ks keystore to save to
+     * @param ks   keystore to save to
      * @throws java.security.cert.CertificateException if certificate is wrong
-     * @throws java.io.IOException if IO fails
-     * @throws java.security.KeyStoreException if keystore fails
+     * @throws java.io.IOException                     if IO fails
+     * @throws java.security.KeyStoreException         if keystore fails
      */
-    public static final void addToKeyStore(final File file, final KeyStore ks) throws CertificateException,
+    public static void addToKeyStore(final File file, final KeyStore ks) throws CertificateException,
             IOException, KeyStoreException {
 
         LOG.debug("Importing certificate from {} into {}", file, ks);
 
         final CertificateFactory cf = CertificateFactory.getInstance(X_509);
-        try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+        try (final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
             addToKeyStore(cert, ks);
         } catch (ClassCastException cce) {
@@ -98,28 +99,29 @@ public class CertificateUtils {
     /**
      * Adds an X509Certificate to the KeyStore. Note that it does not update the
      * copy of the KeyStore on disk.
+     *
      * @param cert certificate to import
-     * @param ks keystore to save to
+     * @param ks   keystore to save to
      * @throws java.security.KeyStoreException if keystore fails
      */
-    public static final void addToKeyStore(final X509Certificate cert, final KeyStore ks)
+    public static void addToKeyStore(final X509Certificate cert, final KeyStore ks)
             throws KeyStoreException {
         Objects.requireNonNull(ks);
 
         LOG.debug("Importing {}", cert.getSubjectX500Principal().getName());
 
         // does this certificate already exist?
-        if(ks.getCertificateAlias(cert) != null) {
+        if (ks.getCertificateAlias(cert) != null) {
             return;
         }
 
         // create a unique alias for this new certificate
         final Random random = new Random(System.currentTimeMillis());
-        if(ks.getCertificateAlias(cert) == null) {
+        if (ks.getCertificateAlias(cert) == null) {
             final String alias = new BigInteger(20, random).toString();
-            if(ks.getCertificate(alias) == null) {
-        ks.setCertificateEntry(alias, cert);
-    }
+            if (ks.getCertificate(alias) == null) {
+                ks.setCertificateEntry(alias, cert);
+            }
         }
     }
 
@@ -169,11 +171,12 @@ public class CertificateUtils {
 
     /**
      * Checks whether an X509Certificate is already in one of the keystores
-     * @param c the certificate
+     *
+     * @param c         the certificate
      * @param keyStores the KeyStores to check in
      * @return true if the certificate is present in one of the keystores, false otherwise
      */
-    public static final boolean inKeyStores(X509Certificate c, KeyStore[] keyStores) {
+    public static boolean inKeyStores(X509Certificate c, List<KeyStore> keyStores) {
         for (KeyStore keyStore : keyStores) {
             try {
                 // Check against all certs
@@ -182,12 +185,12 @@ public class CertificateUtils {
                     // Verify against this entry
                     String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
-                        LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore.hashCode()));
+                        LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore));
                         return true;
                     } // else continue
                 }
-            }catch (KeyStoreException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            } catch (KeyStoreException e) {
+                LOG.error("exception while checking if certificate " + c + " is in keystore " + keyStore, e);
                 // continue
             }
         }
@@ -197,8 +200,9 @@ public class CertificateUtils {
     /**
      * Writes the certificate in base64 encoded from to the print stream.
      * See http://tools.ietf.org/html/rfc4945#section-6.1 for more information
+     *
      * @param cert certificate to export
-     * @param out stream to print it to
+     * @param out  stream to print it to
      * @throws java.security.cert.CertificateException if certificate fails
      */
     public static void dump(Certificate cert, PrintStream out) throws CertificateException {
