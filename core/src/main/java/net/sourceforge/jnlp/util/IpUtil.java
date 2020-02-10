@@ -24,7 +24,7 @@ public class IpUtil {
         if (StringUtils.isBlank(host)) {
             return false;
         }
-        HostName hostName = new HostName(host);
+        final HostName hostName = new HostName(host);
         return hostName.resolvesToSelf();
     }
 }

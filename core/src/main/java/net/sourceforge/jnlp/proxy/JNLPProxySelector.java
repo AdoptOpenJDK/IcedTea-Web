@@ -25,7 +25,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluator;
 import net.sourceforge.jnlp.proxy.pac.PacEvaluatorFactory;
 import net.sourceforge.jnlp.proxy.pac.PacUtils;
-import net.sourceforge.jnlp.util.IpUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -224,7 +223,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 case HTTPS_SCHEMA:
                 case FTP_SCHEMA:
                     URL url = uri.toURL();
-                    if (bypassLocal && IpUtil.isLocalhostOrLoopback(url)) {
+                    if (bypassLocal && isLocalhostOrLoopback(url)) {
                         return true;
                     }
                     if (bypassList.contains(url.getHost())) {
