@@ -53,7 +53,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
@@ -61,7 +60,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -113,12 +111,9 @@ public class UrlUtils {
 
     public static boolean isLocalFile(final URL url) {
         Objects.requireNonNull(url);
-        if (Objects.equals(url.getProtocol(), FILE_PROTOCOL)
+        return Objects.equals(url.getProtocol(), FILE_PROTOCOL)
                 && (url.getAuthority() == null || Objects.equals(url.getAuthority(), ""))
-                && (url.getHost() == null || Objects.equals(url.getHost(), ""))) {
-            return true;
-        }
-        return false;
+                && (url.getHost() == null || Objects.equals(url.getHost(), ""));
     }
 
     /* Decode a percent-encoded URL. Catch checked exceptions and log. */
@@ -164,9 +159,7 @@ public class UrlUtils {
         final URI uri = new URI(decodedURL.getProtocol(), null, decodedURL.getHost(), decodedURL.getPort(), decodedURL.getPath(), decodedURL.getQuery(), null);
 
         //Returns the encoded URL
-        final URL encodedURL = new URL(uri.toASCIIString());
-
-        return encodedURL;
+        return new URL(uri.toASCIIString());
     }
 
     /* Ensure a URL is properly percent-encoded. Does not encode local-file URLs. */
@@ -256,9 +249,7 @@ public class UrlUtils {
 
         remoteUrls.stream()
                 .limit(max)
-                .forEach(url -> {
-                    sb.append(LI_TAG_OPEN).append(url.toExternalForm()).append(LI_TAG_CLOSE);
-                });
+                .forEach(url -> sb.append(LI_TAG_OPEN).append(url.toExternalForm()).append(LI_TAG_CLOSE));
 
         if (remoteUrls.size() > max) {
             sb.append(LI_TAG_OPEN)
@@ -486,8 +477,7 @@ public class UrlUtils {
                 return normalized;
             }
             final String parent = file.substring(0, i + 1);
-            final String stripped = normalized.replace(file, parent);
-            return stripped;
+            return normalized.replace(file, parent);
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             return documentbase.toExternalForm();
@@ -634,47 +624,4 @@ public class UrlUtils {
 
         return s;
     }
-
-    public static boolean isLocalhost(URL url) {
-        return isLocalhost(url.getHost());
-    }
-
-    public static boolean isLocalhost(URI uri) {
-        return isLocalhost(uri.getHost());
-    }
-
-    /**
-     * @return true if the host is the hostname or the IP address of the
-     * localhost
-     * @param  host host to verify
-     */
-    public static boolean isLocalhost(String host) {
-
-        try {
-            if (InetAddress.getByName(host).isLoopbackAddress()) {
-                return true;
-            }
-        } catch (UnknownHostException e1) {
-            // continue
-        }
-
-        try {
-            if (host.equals(InetAddress.getLocalHost().getHostName())) {
-                return true;
-            }
-        } catch (UnknownHostException e) {
-            // continue
-        }
-
-        try {
-            if (host.equals(InetAddress.getLocalHost().getHostAddress())) {
-                return true;
-            }
-        } catch (UnknownHostException e) {
-            // continue
-        }
-
-        return false;
-    }
-
 }

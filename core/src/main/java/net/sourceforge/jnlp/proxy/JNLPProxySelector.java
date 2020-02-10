@@ -44,7 +44,7 @@ import static net.sourceforge.jnlp.proxy.ProxyConstants.FTP_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTPS_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTP_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.SOCKET_SCHEMA;
-import static net.sourceforge.jnlp.util.UrlUtils.isLocalhost;
+import static net.sourceforge.jnlp.util.IpUtil.isLocalhostOrLoopback;
 
 /**
  * A ProxySelector specific to JNLPs. This proxy uses the deployment
@@ -223,7 +223,7 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 case HTTPS_SCHEMA:
                 case FTP_SCHEMA:
                     URL url = uri.toURL();
-                    if (bypassLocal && isLocalhost(url.getHost())) {
+                    if (bypassLocal && isLocalhostOrLoopback(url)) {
                         return true;
                     }
                     if (bypassList.contains(url.getHost())) {
@@ -231,11 +231,10 @@ public abstract class JNLPProxySelector extends ProxySelector {
                     }
                     break;
                 case SOCKET_SCHEMA:
-                    String host = uri.getHost();
-                    if (bypassLocal && isLocalhost(host)) {
+                    if (bypassLocal && isLocalhostOrLoopback(uri)) {
                         return true;
                     }
-                    if (bypassList.contains(host)) {
+                    if (bypassList.contains(uri.getHost())) {
                         return true;
                     }
                     break;

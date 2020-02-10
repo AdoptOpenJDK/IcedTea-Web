@@ -46,6 +46,10 @@
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.mozilla</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>inet.ipaddr</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.inet.ipaddr</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>org.ccil.cowan.tagsoup</pattern>
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.tagsoup</shadedPattern>
                                 </relocation>
