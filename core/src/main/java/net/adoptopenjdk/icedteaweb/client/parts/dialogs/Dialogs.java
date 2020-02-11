@@ -161,10 +161,10 @@ public class Dialogs {
     }
 
     /**
-     * see {@link DialogFactory#showMoreInfoDialog(CertVerifier, SecurityDialog)}.
+     * see {@link DialogFactory#showMoreInfoDialog(CertVerifier, JNLPFile)}.
      */
-    public static void showMoreInfoDialog(CertVerifier certVerifier, SecurityDialog parent) {
-        getDialogs().showMoreInfoDialog(certVerifier, parent);
+    public static void showMoreInfoDialog(CertVerifier certVerifier, JNLPFile file) {
+        getDialogs().showMoreInfoDialog(certVerifier, file);
     }
 
     /**

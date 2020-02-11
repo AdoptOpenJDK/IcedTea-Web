@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -94,7 +93,9 @@ public class NewDialogFactory implements DialogFactory {
     }
 
     @Override
-    public void showMoreInfoDialog(final CertVerifier certVerifier, final SecurityDialog parent) {
+    public void showMoreInfoDialog(final CertVerifier certVerifier, final JNLPFile file) {
+
+        // MoreInfoPane
 
     }
 

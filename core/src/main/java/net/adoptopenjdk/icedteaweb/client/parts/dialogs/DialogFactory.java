@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -115,9 +114,9 @@ public interface DialogFactory {
      * Shows more information regarding jar code signing
      *
      * @param certVerifier the JarCertVerifier used to verify this application
-     * @param parent       the parent NumberOfArguments pane
+     * @param file       the JNLP file
      */
-    void showMoreInfoDialog(CertVerifier certVerifier, SecurityDialog parent);
+    void showMoreInfoDialog(CertVerifier certVerifier, JNLPFile file);
 
     /**
      * Displays CertPath information in a readable table format.

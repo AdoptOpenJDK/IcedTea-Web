@@ -116,7 +116,7 @@ public class DefaultDialogFactory implements DialogFactory {
     public static void main1(String[] args) throws Exception {
         JNLPRuntime.initialize();
         JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, new Object[] {"test"});
+        new DefaultDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, new Object[]{"test"});
     }
 
     /**
@@ -412,19 +412,25 @@ public class DefaultDialogFactory implements DialogFactory {
      * Shows more information regarding jar code signing
      *
      * @param certVerifier the JarCertVerifier used to verify this application
-     * @param parent       the parent NumberOfArguments pane
+     * @param file       the JNLP file
      */
     @Override
     public void showMoreInfoDialog(
-            CertVerifier certVerifier, SecurityDialog parent) {
+            CertVerifier certVerifier, JNLPFile file) {
 
-        JNLPFile file = parent.getFile();
         SecurityDialog dialog =
                 new SecurityDialog(DialogType.MORE_INFO, null, file,
                         certVerifier);
         dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.getViewableDialog().show();
         dialog.getViewableDialog().dispose();
+    }
+
+    // TODO cleanup main
+    public static void main10(String[] args) throws Exception {
+        JNLPRuntime.initialize();
+        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        new DefaultDialogFactory().showMoreInfoDialog(new JarCertVerifier(), file);
     }
 
     /**

@@ -62,6 +62,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
@@ -195,7 +196,9 @@ public class JarCertVerifier implements CertVerifier {
         if (certPath != null) {
             currentlyUsed = certPath;
         }
-        return certs.get(currentlyUsed).getDetailsAsStrings();
+        return Optional.ofNullable(certs.get(currentlyUsed))
+                .map(ci -> ci.getDetailsAsStrings())
+                .orElse(Collections.emptyList());
     }
 
     @Override
