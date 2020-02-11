@@ -55,6 +55,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.signing.JarCertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
@@ -173,6 +174,13 @@ public class DefaultDialogFactory implements DialogFactory {
         return (YesNoSandbox) selectedValue;
     }
 
+    // TODO cleanup main
+    public static void main3(String[] args) throws Exception {
+        JNLPRuntime.initialize();
+        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        new DefaultDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new JarCertVerifier(), null);
+    }
+
     /**
      * Shows a warning dialog for when an applet or application is partially
      * signed.
@@ -194,6 +202,13 @@ public class DefaultDialogFactory implements DialogFactory {
 
         DialogResult r = getUserResponse(message);
         return (YesNoSandbox) r;
+    }
+
+    // TODO cleanup main
+    public static void main4(String[] args) throws Exception {
+        JNLPRuntime.initialize();
+        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        new DefaultDialogFactory().showPartiallySignedWarningDialog(file, new JarCertVerifier(), null);
     }
 
     /**

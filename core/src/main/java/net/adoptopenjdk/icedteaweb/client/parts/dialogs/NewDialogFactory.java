@@ -51,6 +51,8 @@ public class NewDialogFactory implements DialogFactory {
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         String title = getTitleFor(DialogType.CERT_WARNING, accessType);
 
+        // calls CertWarningPane
+
         return null;
     }
 
