@@ -1,12 +1,14 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
+import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -17,15 +19,13 @@ import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Optional;
 
-public class NetworkAccessWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
-
-    private final static Logger LOG = LoggerFactory.getLogger(NetworkAccessWarningDialog.class);
-
+public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
+    private final static Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
 
-    private NetworkAccessWarningDialog(final JNLPFile file, final String title, final String message, final DialogButton<AccessWarningResult>... buttons) {
+    private AccessWarningDialog(final JNLPFile file, final String title, final String message, final DialogButton<AccessWarningResult>... buttons) {
         super(title, message, buttons);
         this.file = file;
     }
@@ -97,16 +97,16 @@ public class NetworkAccessWarningDialog extends BasicSecurityDialog<AccessWarnin
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static NetworkAccessWarningDialog create(final JNLPFile jnlpFile, final String item) {
-        final String title = TRANSLATOR.translate("SecurityWarningDialogTitle");
-        final String message = TRANSLATOR.translate("SNetworkAccess", item);
+    public static AccessWarningDialog create(String title, String message, final JNLPFile jnlpFile, final Object item) {
         DialogButton<AccessWarningResult> okButton = BasicSecurityDialog.createOkButton(() -> null);
         DialogButton<AccessWarningResult> cancelButton = BasicSecurityDialog.createCancelButton(() -> null);
-        return new NetworkAccessWarningDialog(jnlpFile, title, message, okButton, cancelButton);
+        return new AccessWarningDialog(jnlpFile, title, message, okButton, cancelButton);
     }
 
     public static void main(String[] args) throws Exception {
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/hendrikebbers/Desktop/AccessibleScrollDemo.jnlpx"));
-        AccessWarningResult result = create(file, "ITEM").showAndWait();
+        final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        final Object[] extras = {"extra item 1"};
+
+        new NewDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, extras);
     }
 }

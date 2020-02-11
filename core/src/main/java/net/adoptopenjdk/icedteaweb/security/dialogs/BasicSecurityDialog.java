@@ -100,18 +100,26 @@ public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult
 
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        final String msg1 = "This is a long text that should be displayed in more than 1 line. This is a long text that should be displayed in more than 1 line. This is a long text that should be displayed in more than 1 line.";
+        final String msg1 = "This is a long text that should be displayed in more than 1 line. " +
+                "This is a long text that should be displayed in more than 1 line. " +
+                "This is a long text that should be displayed in more than 1 line.";
         final String msg2 = "Connection failed for URL: https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp." +
                 "\n\nDo you want to continue with no proxy or exit the application?";
-        final DialogButton<Integer> exitButton = new DialogButton<>("Exit", () -> 0);
+
+        final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
 
         new BasicSecurityDialog<Integer>("Security Warning", msg1, exitButton){
             @Override
             protected JComponent createDetailPaneContent() {
-                return new JLabel("huhu");
+                return new JLabel("Detail pane content");
             }
         }.showAndWait();
-    //   new BasicSecurityDialog<>("Title", msg2, new ImageIcon(Images.NETWORK_64_URL), exitButton).showAndWait();
-    }
 
+        new BasicSecurityDialog<Integer>("BasicSecurityDialog 2 Title", msg2, exitButton) {
+            @Override
+            protected JComponent createDetailPaneContent() {
+                return new JLabel("Detail pane content");
+            }
+        }.showAndWait();
+    }
 }
