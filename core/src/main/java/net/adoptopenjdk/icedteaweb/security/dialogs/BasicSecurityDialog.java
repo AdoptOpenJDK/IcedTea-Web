@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.ButtonBasedDialogWithResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -9,6 +10,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -19,8 +21,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
-public class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
+public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
+
+    private final static Translator TRANSLATOR = Translator.getInstance();
+
     private String message;
 
     public BasicSecurityDialog(String title, String message, DialogButton<R> ...buttons) {
@@ -31,6 +37,8 @@ public class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
         super(title, buttons);
         this.message = message;
     }
+
+    protected abstract JComponent createDetailPaneContent();
 
     @Override
     protected JPanel createContentPane(final List<DialogButton<R>> buttons) {
@@ -54,7 +62,7 @@ public class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
 
         final JPanel detailPanel = new JPanel();
         detailPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        detailPanel.add(new JLabel("content"));
+        detailPanel.add(createDetailPaneContent());
 
         final JPanel actionWrapperPanel = new JPanel();
         actionWrapperPanel.setLayout(new BoxLayout(actionWrapperPanel, BoxLayout.LINE_AXIS));
@@ -82,6 +90,14 @@ public class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
         return contentPanel;
     }
 
+    public static <R> DialogButton<R> createOkButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButOk"), onAction);
+    }
+
+    public static <R> DialogButton<R> createCancelButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction);
+    }
+
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         final String msg1 = "This is a long text that should be displayed in more than 1 line. This is a long text that should be displayed in more than 1 line. This is a long text that should be displayed in more than 1 line.";
@@ -89,7 +105,12 @@ public class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
                 "\n\nDo you want to continue with no proxy or exit the application?";
         final DialogButton<Integer> exitButton = new DialogButton<>("Exit", () -> 0);
 
-        new BasicSecurityDialog<Integer>("Security Warning", msg1, exitButton).showAndWait();
+        new BasicSecurityDialog<Integer>("Security Warning", msg1, exitButton){
+            @Override
+            protected JComponent createDetailPaneContent() {
+                return new JLabel("huhu");
+            }
+        }.showAndWait();
     //   new BasicSecurityDialog<>("Title", msg2, new ImageIcon(Images.NETWORK_64_URL), exitButton).showAndWait();
     }
 

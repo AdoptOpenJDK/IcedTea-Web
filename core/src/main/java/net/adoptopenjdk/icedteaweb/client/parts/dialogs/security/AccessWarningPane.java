@@ -201,8 +201,8 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 
-        final JButton run = new JButton(R("ButOk"));
-        final JButton cancel = new JButton(R("ButCancel"));
+        final JButton okButton = new JButton(R("ButOk"));
+        final JButton cancelButton = new JButton(R("ButCancel"));
         
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -269,8 +269,8 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         //run and cancel buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton showAdvanced = new JButton(R("ButAdvancedOptions"));
-        showAdvanced.addActionListener(new ActionListener() {
+        JButton showAdvancedButton = new JButton(R("ButAdvancedOptions"));
+        showAdvancedButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -288,7 +288,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             }
         }
         );
-        run.addActionListener(new ActionListener() {
+        okButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -296,7 +296,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 parent.getViewableDialog().dispose();
             }
         });
-        cancel.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -304,10 +304,10 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 parent.getViewableDialog().dispose();
             }
         });
-        initialFocusComponent = cancel;
-        buttonPanel.add(run);
-        buttonPanel.add(cancel);
-        buttonPanel.add(showAdvanced);
+        initialFocusComponent = cancelButton;
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(showAdvancedButton);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //all of the above
