@@ -505,7 +505,7 @@ public final class Parser {
         final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
         final List<ResourcesDesc> resources = getResources(node, true);
 
-        return new JREDesc(version, location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(version, vendor, location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     private static void checkJreVersionWithSystemProperty(final VersionString version, final boolean strict) {
