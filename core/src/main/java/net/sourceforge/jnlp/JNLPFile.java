@@ -224,7 +224,7 @@ public class JNLPFile {
      * Empty stub, allowing child classes to override the constructor
      */
     // only used for tests
-    protected JNLPFile() {
+    public JNLPFile() {
         this.parserSettings = null;
         this.fileLocation = null;
         this.uniqueKey = null;
