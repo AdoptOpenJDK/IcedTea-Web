@@ -39,16 +39,22 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
+        String title = getTitleFor(DialogType.UNSIGNED_WARNING, AccessType.UNSIGNED);
+
         return null;
     }
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+        String title = getTitleFor(DialogType.CERT_WARNING, accessType);
+
         return null;
     }
 
     @Override
     public YesNoSandbox showPartiallySignedWarningDialog(final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+        String title = getTitleFor(DialogType.PARTIALLY_SIGNED_WARNING, AccessType.PARTIALLY_SIGNED);
+
         return null;
     }
 
