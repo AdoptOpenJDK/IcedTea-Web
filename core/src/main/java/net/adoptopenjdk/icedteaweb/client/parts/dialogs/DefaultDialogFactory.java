@@ -111,7 +111,8 @@ public class DefaultDialogFactory implements DialogFactory {
 
     }
 
-    public static void main(String[] args) throws Exception {
+    // TODO cleanup main
+    public static void main1(String[] args) throws Exception {
         JNLPRuntime.initialize();
         JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
         new DefaultDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, new Object[] {"test"});
@@ -134,6 +135,13 @@ public class DefaultDialogFactory implements DialogFactory {
         DialogResult r = getUserResponse(message);
 
         return (YesNoSandboxLimited) r;
+    }
+
+    // TODO cleanup main
+    public static void main2(String[] args) throws Exception {
+        JNLPRuntime.initialize();
+        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        new DefaultDialogFactory().showUnsignedWarningDialog(file);
     }
 
     /**

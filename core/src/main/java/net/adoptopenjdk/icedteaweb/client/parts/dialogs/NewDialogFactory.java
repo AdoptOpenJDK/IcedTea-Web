@@ -34,12 +34,15 @@ public class NewDialogFactory implements DialogFactory {
 
         final AccessWarningResult accessWarningResult = dialogWithResult.showAndWait();
 
-        return null; // TODO produce correct result here
+        return new AccessWarningPaneComplexReturn(accessWarningResult == AccessWarningResult.OK);
     }
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
         String title = getTitleFor(DialogType.UNSIGNED_WARNING, AccessType.UNSIGNED);
+
+        // calls UnsignedAppletTrustWarningPanel
+        // to be removed as Applets are not longer supported?
 
         return null;
     }
