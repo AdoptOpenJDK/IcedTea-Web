@@ -487,7 +487,12 @@ public final class Parser {
      * @throws ParseException if the JNLP file is invalid
      */
     private JREDesc getJRE(final Node node) throws ParseException {
+
+        // require version attribute
+        getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
         final VersionString version = getVersionString(node, JREDesc.VERSION_ATTRIBUTE, null);
+        checkJreVersionWithSystemProperty(version, strict);
+
         final URL location = getURL(node, JREDesc.HREF_ATTRIBUTE, base, strict);
         String vmArgs = getAttribute(node, JREDesc.JAVA_VM_ARGS_ATTRIBUTE, null);
         try {
@@ -495,14 +500,10 @@ public final class Parser {
         } catch (IllegalArgumentException argumentException) {
             vmArgs = null;
         }
+        final String vendor = getAttribute(node, JREDesc.VENDOR_ATTRIBUTE, null);
         final String initialHeap = getAttribute(node, JREDesc.INITIAL_HEAP_SIZE_ATTRIBUTE, null);
         final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
         final List<ResourcesDesc> resources = getResources(node, true);
-
-        // require version attribute
-        getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
-
-        checkJreVersionWithSystemProperty(version, strict);
 
         return new JREDesc(version, location, vmArgs, initialHeap, maxHeap, resources);
     }
