@@ -303,6 +303,13 @@ public class DefaultDialogFactory implements DialogFactory {
         return false;
     }
 
+    // TODO cleanup main
+    public static void main8(String[] args) throws Exception {
+        JNLPRuntime.initialize();
+        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
+        new DefaultDialogFactory().showMissingPermissionsAttributeDialogue(file);
+    }
+
     /**
      * Posts the message to the SecurityThread and gets the response. Blocks
      * until a response has been received. It's safe to call this from an
