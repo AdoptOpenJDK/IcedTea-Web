@@ -218,11 +218,11 @@ public class SignVerifyUtils {
     private static void checkTrustedCerts(final CertPath certPath, final CertInformation info) {
         try {
             final X509Certificate publisher = (X509Certificate) certPath.getCertificates().get(0);
-            final KeyStore[] certKeyStores = KeyStores.getCertKeyStores();
+            final List<KeyStore> certKeyStores = KeyStores.getCertKeyStores();
             if (CertificateUtils.inKeyStores(publisher, certKeyStores)) {
                 info.setAlreadyTrustPublisher();
             }
-            final KeyStore[] caKeyStores = KeyStores.getCAKeyStores();
+            final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
             // Check entire cert path for a trusted CA
             for (final Certificate c : certPath.getCertificates()) {
                 if (c instanceof X509Certificate) {

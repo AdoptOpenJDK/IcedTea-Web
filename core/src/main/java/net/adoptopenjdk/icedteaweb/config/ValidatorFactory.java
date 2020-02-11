@@ -1,16 +1,17 @@
 package net.adoptopenjdk.icedteaweb.config;
 
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.adoptopenjdk.icedteaweb.config.validators.BooleanValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.ManifestAttributeCheckValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.MultipleStringValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.PortValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.RangedIntegerValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.RustCpValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.StringValueValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.UrlValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 /**
  * Provides {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} implementations for some common value types
@@ -111,6 +112,14 @@ public class ValidatorFactory {
      */
     public static ValueValidator createUrlValidator() {
         return new UrlValidator();
+    }
+
+    /**
+     * @return a {@link net.adoptopenjdk.icedteaweb.config.validators.PortValidator} that checks if a port is null or
+     * within a valid port range
+     */
+    public static PortValidator createPortValidator() {
+        return new PortValidator();
     }
 
     public static ValueValidator createRustCpValidator() {

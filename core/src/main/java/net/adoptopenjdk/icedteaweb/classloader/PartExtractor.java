@@ -82,7 +82,7 @@ public class PartExtractor {
     private Future<Void> addExtension(final JNLPFile parent, final ExtensionDesc extension) {
         return CompletableFuture.runAsync(() -> {
             try {
-                final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings(), JNLPRuntime.getDefaultUpdatePolicy());
+                final JNLPFile jnlpFile = jnlpFileFactory.create(extension.getLocation(), extension.getVersion(), parent.getParserSettings());
                 addExtensionParts(parent, jnlpFile, extension.getDownloads());
                 addJnlpFile(jnlpFile, true);
             } catch (Exception e) {

@@ -103,19 +103,19 @@ public final class VariableX509TrustManager {
      */
     public VariableX509TrustManager() {
         try {
-            loadManagers(Arrays.asList(KeyStores.getCertKeyStores()), certTrustManagers);
+            loadManagers(KeyStores.getCertKeyStores(), certTrustManagers);
         } catch (Exception e) {
             LOG.error("Exception while loading CertKeyStores", e);
         }
 
         try {
-            loadManagers(Arrays.asList(KeyStores.getCAKeyStores()), caTrustManagers);
+            loadManagers(KeyStores.getCAKeyStores(), caTrustManagers);
         } catch (Exception e) {
             LOG.error("Exception while loading CaKeyStores", e);
         }
 
         try {
-            loadManagers(Arrays.asList(KeyStores.getClientKeyStores()), clientTrustManagers);
+            loadManagers(KeyStores.getClientKeyStores(), clientTrustManagers);
         } catch (Exception e) {
             LOG.error("Exception while loading ClientKeyStores", e);
         }
@@ -227,7 +227,7 @@ public final class VariableX509TrustManager {
         // ((it is not in store) OR (there is a host mismatch))
         if (!trusted || !CNMatched) {
             if (!isTemporarilyUntrusted(chain[0])) {
-                boolean b = askUser(chain, authType, trusted, CNMatched, hostName);
+                boolean b = askUser(chain, trusted, CNMatched, hostName);
 
                 if (b) {
                     temporarilyTrust(chain[0]);
@@ -292,6 +292,9 @@ public final class VariableX509TrustManager {
         }
 
         for (X509TrustManager certTrustManager : certTrustManagers) {
+            if (isNullOrEmpty(certTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             try {
                 certTrustManager.checkServerTrusted(chain, authType);
                 return;
@@ -343,6 +346,9 @@ public final class VariableX509TrustManager {
         List<X509Certificate> issuers = new ArrayList<>();
 
         for (X509TrustManager caTrustManager : caTrustManagers) {
+            if (isNullOrEmpty(caTrustManager.getAcceptedIssuers())) {
+                continue;
+            }
             issuers.addAll(Arrays.asList(caTrustManager.getAcceptedIssuers()));
         }
 
@@ -382,21 +388,21 @@ public final class VariableX509TrustManager {
     /**
      * Ask user if the certificate should be trusted
      *
-     * @param chain    The certificate chain
-     * @param authType The authentication algorithm
+     * @param chain The certificate chain
      * @return user's response
      */
-    private boolean askUser(final X509Certificate[] chain, final String authType,
+    private boolean askUser(final X509Certificate[] chain,
                             final boolean isTrusted, final boolean hostMatched,
                             final String hostName) {
         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
                 YesNoSandbox r = Dialogs.showCertWarningDialog(
-                        AccessType.UNVERIFIED, null,
-                        new HttpsCertVerifier(chain, authType,
-                                isTrusted, hostMatched,
-                                hostName), null);
+                        AccessType.UNVERIFIED,
+                        null,
+                        new HttpsCertVerifier(chain, isTrusted, hostMatched, hostName),
+                        null
+                );
                 if (r == null) {
                     return false;
                 }

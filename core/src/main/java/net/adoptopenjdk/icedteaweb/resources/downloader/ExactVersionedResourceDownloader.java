@@ -2,16 +2,21 @@ package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 
 import java.net.URL;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_PREFIX;
+
 /**
  * ...
  */
 class ExactVersionedResourceDownloader extends BaseResourceDownloader {
+    private static final Logger LOG = LoggerFactory.getLogger(ExactVersionedResourceDownloader.class);
 
     private final VersionId versionId;
 
@@ -26,11 +31,12 @@ class ExactVersionedResourceDownloader extends BaseResourceDownloader {
             return versionId;
         }
 
-        if (downloadFrom.getPath().contains(versionId.toString())) {
+        if (downloadFrom.getPath().contains(VERSION_PREFIX + versionId.toString())) {
             return versionId;
         }
 
-        throw new IllegalStateException("could not determine the version-id from the response of " + downloadFrom + " -> " + versionHeaderValue);
+        LOG.warn("could not determine the version-id from the response of {} -> {}", downloadFrom, versionHeaderValue);
+        return null;
     }
 
     @Override

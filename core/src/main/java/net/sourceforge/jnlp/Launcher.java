@@ -340,7 +340,7 @@ public class Launcher {
             }
             return file;
         } catch (Exception ex) {
-            throw launchError(new LaunchException(null, ex, FATAL, "Read Error", "Could not read or parse the JNLP file.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
+            throw launchError(new LaunchException(null, ex, FATAL, "Read Error", "Could not read or parse the JNLP file at '" + location + "'.", "You can try to download this file manually and send it as bug report to IcedTea-Web team."));
         }
     }
 
