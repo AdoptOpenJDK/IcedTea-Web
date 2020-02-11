@@ -23,13 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Responsible for validating the trust we have in the application.
- * <ul>
- *     <li>Jar Signatures</li>
- *     <li>JNLP Signature</li>
- *     <li>Certificates used for signing</li>
- *     <li>Content of manifest</li>
- * </ul>
+ * See {@link ApplicationTrustValidator}.
  */
 public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator {
 
