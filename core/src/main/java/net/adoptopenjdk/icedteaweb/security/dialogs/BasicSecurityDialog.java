@@ -43,8 +43,6 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
     @Override
     protected JPanel createContentPane() {
-        final List<DialogButton<R>> buttons = createButtons();
-
         JLabel iconComponent = new JLabel("", createIcon(), SwingConstants.LEFT);
         final JTextArea messageLabel = new JTextArea(message);
         messageLabel.setEditable(false);
@@ -71,6 +69,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         actionWrapperPanel.add(Box.createHorizontalGlue());
 
+        final List<DialogButton<R>> buttons = createButtons();
         buttons.forEach(b -> {
             final JButton button = b.createButton(r -> close(r));
             actionWrapperPanel.add(button);

@@ -36,7 +36,6 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final static Translator TRANSLATOR = Translator.getInstance();
 
     private final DialogButton<AccessWarningResult> runButton;
-    private final DialogButton<AccessWarningResult> advancedButton;
     private final DialogButton<AccessWarningResult> sandboxButton;
     private final DialogButton<AccessWarningResult> cancelButton;
 
@@ -55,11 +54,10 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         this.securityDelegate = securityDelegate;
         this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
 
-        runButton = ButtonFactory.createRunButton(() -> null);
-        advancedButton = ButtonFactory.createAdvancedOptionsButton(() -> null);
-        sandboxButton = ButtonFactory.createSandboxButton(() -> null);
+        runButton = ButtonFactory.createRunButton(() -> AccessWarningResult.YES);
+        sandboxButton = ButtonFactory.createSandboxButton(() -> AccessWarningResult.SANDBOX);
         sandboxButton.setEnabled(!alwaysTrustSelected);
-        cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> null);
+        cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> AccessWarningResult.NO);
     }
 
     @Override
@@ -114,7 +112,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
 
     @Override
     protected List<DialogButton<AccessWarningResult>> createButtons() {
-        return Arrays.asList(runButton, sandboxButton, advancedButton, cancelButton);
+        return Arrays.asList(runButton, sandboxButton, cancelButton);
     }
 
     private JCheckBox createAlwaysTrustCheckbox() {

@@ -28,10 +28,6 @@ public class ButtonFactory {
         return new DialogButton<>(TRANSLATOR.translate("ButSandbox"), onAction, TRANSLATOR.translate("CertWarnSandboxTip"));
     }
 
-    public static <R> DialogButton<R> createAdvancedOptionsButton(final Supplier<R> onAction) {
-        return new DialogButton<>("\u2630", onAction, TRANSLATOR.translate("CertWarnPolicyTip"));
-    }
-
     public static <R> DialogButton<R> createYesButton(final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButYes"), onAction, TRANSLATOR.translate("CertWarnHTTPSAcceptTip"));
     }
