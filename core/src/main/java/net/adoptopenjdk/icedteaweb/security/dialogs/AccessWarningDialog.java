@@ -37,7 +37,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
     }
 
     @Override
-    public String getTitle() {
+    public String createTitle() {
         return "Security Warning";
     }
 

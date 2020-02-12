@@ -58,14 +58,24 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         runButton = ButtonFactory.createRunButton(() -> null);
         advancedButton = ButtonFactory.createAdvancedOptionsButton(() -> null);
         sandboxButton = ButtonFactory.createSandboxButton(() -> null);
+        sandboxButton.setEnabled(!alwaysTrustSelected);
         cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> null);
-
     }
 
     @Override
-    public String getTitle() {
+    public String createTitle() {
         // TODO localization
         return accessType == AccessType.VERIFIED ? "Security Approval Required" : "Security Warning";
+    }
+
+    @Override
+    protected ImageIcon createIcon() {
+        switch (accessType) {
+            case VERIFIED:
+                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
+            default:
+                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
+        }
     }
 
     @Override
@@ -94,7 +104,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
 
-            addAlwaysTrustCheckbox(panel);
+            addRow(createAlwaysTrustCheckbox(), panel, 3);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);
@@ -107,12 +117,12 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         return Arrays.asList(runButton, sandboxButton, advancedButton, cancelButton);
     }
 
-    private void addAlwaysTrustCheckbox(JPanel panel) {
+    private JCheckBox createAlwaysTrustCheckbox() {
         JCheckBox alwaysTrustCheckBox = new JCheckBox(R("SAlwaysTrustPublisher"));
         alwaysTrustCheckBox.setEnabled(true);
         alwaysTrustCheckBox.setSelected(alwaysTrustSelected);
         alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(!alwaysTrustCheckBox.isSelected()));
-        panel.add(alwaysTrustCheckBox);
+        return alwaysTrustCheckBox;
     }
 
     protected void addRow(String key, String value, JPanel panel, int row) {
@@ -144,6 +154,16 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.add(valueLabel, valueLabelConstraints);
     }
 
+     protected void addRow(JComponent child, JPanel panel, int row) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = row;
+        constraints.ipady = 8;
+        constraints.gridwidth = 3;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(child, constraints);
+    }
+
     public static CertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
 
         final String message = getMessageFor(accessType);
@@ -160,16 +180,6 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
                 return R("SSignatureError");
             default:
                 return "";
-        }
-    }
-
-    @Override
-    protected ImageIcon createIcon() {
-        switch (accessType) {
-            case VERIFIED:
-                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
-            default:
-                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
         }
     }
 

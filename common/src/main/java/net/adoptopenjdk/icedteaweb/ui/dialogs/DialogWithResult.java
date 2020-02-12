@@ -16,6 +16,8 @@ public abstract class DialogWithResult<R> extends JDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
+    protected abstract String createTitle();
+
     protected abstract JPanel createContentPane();
 
     protected void close(final R result) {
@@ -26,6 +28,7 @@ public abstract class DialogWithResult<R> extends JDialog {
 
     public R showAndWait() {
         if (SwingUtilities.isEventDispatchThread()) {
+            setTitle(createTitle());
             getContentPane().removeAll();
             getContentPane().add(createContentPane());
             pack();

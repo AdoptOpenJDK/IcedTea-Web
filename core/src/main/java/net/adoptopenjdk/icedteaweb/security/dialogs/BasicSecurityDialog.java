@@ -96,7 +96,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
         new BasicSecurityDialog<Integer>(msg1){
             @Override
-            public String getTitle() {
+            public String createTitle() {
                 return "Security Warning 1";
             }
             @Override
@@ -112,7 +112,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
         new BasicSecurityDialog<Integer>(msg2) {
             @Override
-            public String getTitle() {
+            public String createTitle() {
                 return "Security Warning 2";
             }
             @Override
