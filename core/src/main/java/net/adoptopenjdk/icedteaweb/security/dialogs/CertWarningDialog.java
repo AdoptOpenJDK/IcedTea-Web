@@ -31,6 +31,12 @@ import java.util.Optional;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
+/**
+ * TODO: advancedOptions button
+ * TODO: CertificateUtils.saveCertificate logic after runButton is pressed when alwaysTrustSelected
+ *
+ *
+ */
 public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
     private final static Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
@@ -115,11 +121,11 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         return Arrays.asList(runButton, sandboxButton, cancelButton);
     }
 
-    private JCheckBox createAlwaysTrustCheckbox() {
+    protected JCheckBox createAlwaysTrustCheckbox() {
         JCheckBox alwaysTrustCheckBox = new JCheckBox(R("SAlwaysTrustPublisher"));
         alwaysTrustCheckBox.setEnabled(true);
         alwaysTrustCheckBox.setSelected(alwaysTrustSelected);
-        alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(!alwaysTrustCheckBox.isSelected()));
+        alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(alwaysTrustSelected = !alwaysTrustCheckBox.isSelected()));
         return alwaysTrustCheckBox;
     }
 
