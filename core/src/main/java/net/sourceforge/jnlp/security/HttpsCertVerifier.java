@@ -70,7 +70,7 @@ public class HttpsCertVerifier implements CertVerifier {
     private final boolean hostMatched;
     private final ArrayList<String> details = new ArrayList<>();
 
-    HttpsCertVerifier(final X509Certificate[] chain,
+    public HttpsCertVerifier(final X509Certificate[] chain,
                       final boolean isTrusted, final boolean hostMatched,
                       final String hostName) {
         this.chain = chain;

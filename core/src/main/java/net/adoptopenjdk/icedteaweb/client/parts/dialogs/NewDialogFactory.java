@@ -6,6 +6,8 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
+import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
@@ -15,6 +17,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.HttpsCertVerifier;
 
 import java.awt.Component;
 import java.awt.Window;
@@ -27,9 +30,9 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
-        String title = getTitleFor(DialogType.ACCESS_WARNING, accessType);
-        String message = getMessageFor(accessType, extras);
-        AccessWarningDialog dialogWithResult = AccessWarningDialog.create(title, message, file, extras[0]);
+        final String title = getTitleFor(DialogType.ACCESS_WARNING, accessType);
+        final String message = getMessageFor(accessType, extras);
+        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(title, message, file);
 
         final AccessWarningResult accessWarningResult = dialogWithResult.showAndWait();
 
@@ -48,10 +51,22 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        String title = getTitleFor(DialogType.CERT_WARNING, accessType);
+        final String title = getTitleFor(DialogType.CERT_WARNING, accessType);
+        final Object[] extras = {securityDelegate};
+        final String message = getMessageFor(accessType, extras);
+
+        CertWarningDialog dialogWithResult;
+        if (certVerifier instanceof HttpsCertVerifier) {
+            dialogWithResult = HttpsCertTrustDialog.create(title, message, file, (HttpsCertVerifier) certVerifier);
+        }
+        else {
+            dialogWithResult = CertWarningDialog.create(title, message, file, certVerifier, securityDelegate);
+        }
+
+        final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();
 
         // calls CertWarningPane
-
+        // TODO return value
         return null;
     }
 

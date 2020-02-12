@@ -55,6 +55,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -175,10 +176,11 @@ public class DefaultDialogFactory implements DialogFactory {
     }
 
     // TODO cleanup main
-    public static void main3(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         JNLPRuntime.initialize();
         JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
         new DefaultDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new JarCertVerifier(), null);
+        new DefaultDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname"), null);
     }
 
     /**
@@ -448,6 +450,11 @@ public class DefaultDialogFactory implements DialogFactory {
         dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.getViewableDialog().show();
         dialog.getViewableDialog().dispose();
+    }
+
+    // TODO cleanup main
+    public static void main11(String[] args) throws Exception {
+        new DefaultDialogFactory().showCertInfoDialog(new JarCertVerifier(), null);
     }
 
     /**

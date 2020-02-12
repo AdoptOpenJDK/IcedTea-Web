@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -8,8 +7,13 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityUtil;
+import net.sourceforge.jnlp.signing.JarCertVerifier;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,23 +21,39 @@ import javax.swing.SwingConstants;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
-    private final static Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
+import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+
+public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
+    private final static Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
 
-    private final JNLPFile file;
-    DialogButton<AccessWarningResult> okButton;
-    DialogButton<AccessWarningResult> cancelButton;
+    protected final CertVerifier certVerifier;
+    protected final SecurityDelegate securityDelegate;
+    protected final JNLPFile file;
+    protected boolean alwaysTrustSelected;
+    private final DialogButton<AccessWarningResult> runButton;
+    private final DialogButton<AccessWarningResult> advancedButton;
+    private final DialogButton<AccessWarningResult> sandboxButton;
+    private final DialogButton<AccessWarningResult> cancelButton;
 
-    private AccessWarningDialog(final JNLPFile file, final String title, final String message) {
+
+    protected CertWarningDialog(final JNLPFile file, final String title, final String message, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         super(title, message);
         this.file = file;
-        okButton = ButtonFactory.createOkButton(() -> null);
-        cancelButton = ButtonFactory.createCancelButton(() -> null);
+        this.certVerifier = certVerifier;
+        this.securityDelegate = securityDelegate;
+
+        runButton = ButtonFactory.createRunButton(() -> null);
+        advancedButton = ButtonFactory.createAdvancedOptionsButton(() -> null);
+        sandboxButton = ButtonFactory.createSandboxButton(() -> null);
+        cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> null);
+
     }
 
     @Override
@@ -47,39 +67,43 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
 
-
-            final String publisher = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getVendor())
-                    .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
+            Certificate cert = certVerifier.getPublisher(null);
+            String publisher = "";
+            if (cert instanceof X509Certificate) {
+                publisher = SecurityUtil.getCN(((X509Certificate) cert)
+                        .getSubjectX500Principal().getName());
+            }
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
-
-
-            final String fromFallback = Optional.ofNullable(file)
-                    .map(f -> f.getSourceLocation())
-                    .map(s -> s.getAuthority())
-                    .orElse("");
 
             final String from = Optional.ofNullable(file)
                     .map(f -> f.getInformation())
                     .map(i -> i.getHomepage())
                     .map(u -> u.toString())
-                    .map(i -> !StringUtils.isBlank(i) ? i : null)
-                    .orElse(fromFallback);
+                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
+
+            addAlwaysTrustCheckbox(panel);
+
         } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for Access warning dialog!", e);
+            LOG.error("Error while trying to read properties for CertWarningDialog!", e);
         }
         return panel;
     }
 
     @Override
     protected List<DialogButton<AccessWarningResult>> createButtons() {
-        return Arrays.asList(okButton, cancelButton);
+        return Arrays.asList(runButton, sandboxButton, advancedButton, cancelButton);
     }
 
-    private void addRow(String key, String value, JPanel panel, int row) {
+    private void addAlwaysTrustCheckbox(JPanel panel) {
+        JCheckBox alwaysTrustCheckBox = new JCheckBox(R("SAlwaysTrustPublisher"));
+        alwaysTrustCheckBox.setEnabled(true);
+        alwaysTrustCheckBox.setSelected(alwaysTrustSelected);
+        alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(!alwaysTrustCheckBox.isSelected()));
+        panel.add(alwaysTrustCheckBox);
+    }
+
+    protected void addRow(String key, String value, JPanel panel, int row) {
         final JLabel keyLabel = new JLabel(key + ":");
         keyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         GridBagConstraints keyLabelConstraints = new GridBagConstraints();
@@ -108,14 +132,15 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static AccessWarningDialog create(String title, String message, final JNLPFile jnlpFile) {
-        return new AccessWarningDialog(jnlpFile, title, message);
+    public static CertWarningDialog create(String title, String message, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+         return new CertWarningDialog(jnlpFile, title, message, certVerifier, securityDelegate);
     }
 
     public static void main(String[] args) throws Exception {
         final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
         final Object[] extras = {"extra item 1"};
 
-        new NewDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, extras);
+        new NewDialogFactory().showCertWarningDialog(AccessType.NETWORK, file, new JarCertVerifier(), null);
     }
+
 }

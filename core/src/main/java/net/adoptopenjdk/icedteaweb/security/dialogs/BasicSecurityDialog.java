@@ -2,8 +2,8 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
-import net.adoptopenjdk.icedteaweb.ui.dialogs.ButtonBasedDialogWithResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
+import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogWithResult;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -19,29 +19,28 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
-public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult<R> {
+public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
     private final static Translator TRANSLATOR = Translator.getInstance();
 
     private String message;
 
-    public BasicSecurityDialog(String title, String message, DialogButton<R> ...buttons) {
-        this(title, message, Arrays.asList(buttons));
-    }
-
-    public BasicSecurityDialog(String title, String message, List<DialogButton<R>> buttons) {
-        super(title, buttons);
+    public BasicSecurityDialog(String title, String message) {
+        super(title);
         this.message = message;
     }
+
+    protected abstract List<DialogButton<R>> createButtons();
 
     protected abstract JComponent createDetailPaneContent();
 
     @Override
-    protected JPanel createContentPane(final List<DialogButton<R>> buttons) {
+    protected JPanel createContentPane() {
+        final List<DialogButton<R>> buttons = createButtons();
+
         final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
 
         JLabel iconComponent = new JLabel("", icon, SwingConstants.LEFT);
@@ -71,14 +70,7 @@ public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult
         actionWrapperPanel.add(Box.createHorizontalGlue());
 
         buttons.forEach(b -> {
-            final JButton button = new JButton(b.getText());
-            if (b.getDescription() != null) {
-                button.setToolTipText(b.getDescription());
-            }
-            button.addActionListener(e -> {
-                final R result = b.getOnAction().get();
-                close(result);
-            });
+            final JButton button = b.createButton(r -> close(r));
             actionWrapperPanel.add(button);
         });
 
@@ -88,14 +80,6 @@ public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult
         contentPanel.add(detailPanel, BorderLayout.CENTER);
         contentPanel.add(actionWrapperPanel, BorderLayout.SOUTH);
         return contentPanel;
-    }
-
-    public static <R> DialogButton<R> createOkButton(final Supplier<R> onAction) {
-        return new DialogButton<>(TRANSLATOR.translate("ButOk"), onAction);
-    }
-
-    public static <R> DialogButton<R> createCancelButton(final Supplier<R> onAction) {
-        return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction);
     }
 
     public static void main(String[] args) throws Exception {
@@ -108,18 +92,30 @@ public abstract class BasicSecurityDialog<R> extends ButtonBasedDialogWithResult
 
         final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
 
-        new BasicSecurityDialog<Integer>("Security Warning", msg1, exitButton){
+        new BasicSecurityDialog<Integer>("Security Warning", msg1){
+            @Override
+            protected List<DialogButton<Integer>> createButtons() {
+                return Collections.singletonList(exitButton);
+            }
+
             @Override
             protected JComponent createDetailPaneContent() {
                 return new JLabel("Detail pane content");
             }
         }.showAndWait();
 
-        new BasicSecurityDialog<Integer>("BasicSecurityDialog 2 Title", msg2, exitButton) {
+        new BasicSecurityDialog<Integer>("BasicSecurityDialog 2 Title", msg2) {
+            @Override
+            protected List<DialogButton<Integer>> createButtons() {
+                return Collections.singletonList(exitButton);
+            }
+
             @Override
             protected JComponent createDetailPaneContent() {
                 return new JLabel("Detail pane content");
             }
+
+
         }.showAndWait();
     }
 }
