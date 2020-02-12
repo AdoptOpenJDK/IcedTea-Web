@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -11,6 +12,7 @@ import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
@@ -28,12 +30,12 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> noButton;
 
 
-
     private HttpsCertTrustDialog(final String message, final AccessType accessType, final JNLPFile file, final HttpsCertVerifier certVerifier) {
         super(message, accessType, file, certVerifier, null);
+        this.alwaysTrustSelected = false;
 
-        yesButton = ButtonFactory.createYesButton(() -> null);
-        noButton = ButtonFactory.createNoButton(() -> null);
+        this.yesButton = ButtonFactory.createYesButton(() -> null);
+        this.noButton = ButtonFactory.createNoButton(() -> null);
     }
 
     @Override
@@ -47,8 +49,7 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
             if (cert instanceof X509Certificate) {
                 name = SecurityUtil.getCN(((X509Certificate) cert).getSubjectX500Principal().getName());
                 publisher = name;
-            }
-            else {
+            } else {
                 name = file.getInformation().getTitle();
             }
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
@@ -69,6 +70,12 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
         return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
     }
+
+    @Override
+    protected ImageIcon createIcon() {
+        return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
+    }
+
 
     public static void main(String[] args) throws Exception {
         final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));

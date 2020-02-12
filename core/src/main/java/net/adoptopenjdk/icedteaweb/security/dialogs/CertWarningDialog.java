@@ -53,6 +53,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         this.accessType = accessType;
         this.certVerifier = certVerifier;
         this.securityDelegate = securityDelegate;
+        this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
 
         runButton = ButtonFactory.createRunButton(() -> null);
         advancedButton = ButtonFactory.createAdvancedOptionsButton(() -> null);
