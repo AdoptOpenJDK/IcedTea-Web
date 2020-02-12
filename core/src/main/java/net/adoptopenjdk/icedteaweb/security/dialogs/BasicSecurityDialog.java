@@ -33,6 +33,10 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         this.message = message;
     }
 
+    protected ImageIcon createIcon() {
+        return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
+    }
+
     protected abstract List<DialogButton<R>> createButtons();
 
     protected abstract JComponent createDetailPaneContent();
@@ -41,9 +45,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
     protected JPanel createContentPane() {
         final List<DialogButton<R>> buttons = createButtons();
 
-        final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
-
-        JLabel iconComponent = new JLabel("", icon, SwingConstants.LEFT);
+        JLabel iconComponent = new JLabel("", createIcon(), SwingConstants.LEFT);
         final JTextArea messageLabel = new JTextArea(message);
         messageLabel.setEditable(false);
         messageLabel.setBackground(null);

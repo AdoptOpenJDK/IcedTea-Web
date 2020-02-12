@@ -23,11 +23,15 @@ import java.util.List;
 public class HttpsCertTrustDialog extends CertWarningDialog {
     private final static Logger LOG = LoggerFactory.getLogger(HttpsCertTrustDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
+
     private final DialogButton<AccessWarningResult> yesButton;
     private final DialogButton<AccessWarningResult> noButton;
 
+
+
     private HttpsCertTrustDialog(final String message, final AccessType accessType, final JNLPFile file, final HttpsCertVerifier certVerifier) {
         super(message, accessType, file, certVerifier, null);
+
         yesButton = ButtonFactory.createYesButton(() -> null);
         noButton = ButtonFactory.createNoButton(() -> null);
     }
@@ -61,14 +65,15 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         return Arrays.asList(yesButton, noButton);
     }
 
-    public static HttpsCertTrustDialog create(String message, final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
-         return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
+    public static HttpsCertTrustDialog create(final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
+        final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
+        return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
     }
 
     public static void main(String[] args) throws Exception {
         final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
         final Object[] extras = {"extra item 1"};
 
-        new NewDialogFactory().showCertWarningDialog(AccessType.NETWORK, file, new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname"), null);
+        new NewDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname"), null);
     }
 }

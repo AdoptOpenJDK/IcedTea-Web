@@ -32,7 +32,6 @@ public class NewDialogFactory implements DialogFactory {
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
         final String message = getMessageFor(accessType, extras);
         final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(message, file);
-
         final AccessWarningResult accessWarningResult = dialogWithResult.showAndWait();
 
         return new AccessWarningPaneComplexReturn(accessWarningResult == AccessWarningResult.OK);
@@ -55,10 +54,10 @@ public class NewDialogFactory implements DialogFactory {
 
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
-            dialogWithResult = HttpsCertTrustDialog.create(message, accessType, file, (HttpsCertVerifier) certVerifier);
+            dialogWithResult = HttpsCertTrustDialog.create(accessType, file, (HttpsCertVerifier) certVerifier);
         }
         else {
-            dialogWithResult = CertWarningDialog.create(message, accessType, file, certVerifier, securityDelegate);
+            dialogWithResult = CertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
         }
 
         final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();

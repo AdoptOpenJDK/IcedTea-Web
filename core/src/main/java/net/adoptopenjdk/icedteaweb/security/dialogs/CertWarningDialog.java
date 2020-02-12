@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -13,6 +14,7 @@ import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
 
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -33,15 +35,16 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final static Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
 
+    private final DialogButton<AccessWarningResult> runButton;
+    private final DialogButton<AccessWarningResult> advancedButton;
+    private final DialogButton<AccessWarningResult> sandboxButton;
+    private final DialogButton<AccessWarningResult> cancelButton;
+
     private AccessType accessType;
     protected final CertVerifier certVerifier;
     protected final SecurityDelegate securityDelegate;
     protected final JNLPFile file;
     protected boolean alwaysTrustSelected;
-    private final DialogButton<AccessWarningResult> runButton;
-    private final DialogButton<AccessWarningResult> advancedButton;
-    private final DialogButton<AccessWarningResult> sandboxButton;
-    private final DialogButton<AccessWarningResult> cancelButton;
 
 
     protected CertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
@@ -61,7 +64,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     @Override
     public String getTitle() {
         // TODO localization
-        return accessType == AccessType.VERIFIED ? "Security Approval Required": "Security Warning";
+        return accessType == AccessType.VERIFIED ? "Security Approval Required" : "Security Warning";
     }
 
     @Override
@@ -140,8 +143,33 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static CertWarningDialog create(String message, final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-         return new CertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
+    public static CertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+
+        final String message = getMessageFor(accessType);
+        return new CertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
+    }
+
+    private static String getMessageFor(final AccessType accessType) {
+        switch (accessType) {
+            case VERIFIED:
+                return R("SSigVerified");
+            case UNVERIFIED:
+                return R("SSigUnverified");
+            case SIGNING_ERROR:
+                return R("SSignatureError");
+            default:
+                return "";
+        }
+    }
+
+    @Override
+    protected ImageIcon createIcon() {
+        switch (accessType) {
+            case VERIFIED:
+                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
+            default:
+                return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
+        }
     }
 
     public static void main(String[] args) throws Exception {
