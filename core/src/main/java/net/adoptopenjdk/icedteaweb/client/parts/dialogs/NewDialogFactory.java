@@ -30,9 +30,8 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
-        final String title = getTitleFor(DialogType.ACCESS_WARNING, accessType);
         final String message = getMessageFor(accessType, extras);
-        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(title, message, file);
+        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(message, file);
 
         final AccessWarningResult accessWarningResult = dialogWithResult.showAndWait();
 
@@ -51,16 +50,15 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        final String title = getTitleFor(DialogType.CERT_WARNING, accessType);
         final Object[] extras = {securityDelegate};
         final String message = getMessageFor(accessType, extras);
 
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
-            dialogWithResult = HttpsCertTrustDialog.create(title, message, file, (HttpsCertVerifier) certVerifier);
+            dialogWithResult = HttpsCertTrustDialog.create(message, accessType, file, (HttpsCertVerifier) certVerifier);
         }
         else {
-            dialogWithResult = CertWarningDialog.create(title, message, file, certVerifier, securityDelegate);
+            dialogWithResult = CertWarningDialog.create(message, accessType, file, certVerifier, securityDelegate);
         }
 
         final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();
@@ -127,18 +125,10 @@ public class NewDialogFactory implements DialogFactory {
         // TODO do translations
 
         String title = "";
-        if (dialogType == DialogType.CERT_WARNING) {
-            if (accessType == AccessType.VERIFIED) {
-                title = "Security Approval Required";
-            } else {
-                title = "Security Warning";
-            }
-        } else if (dialogType == DialogType.MORE_INFO) {
+         if (dialogType == DialogType.MORE_INFO) {
             title = "More Information";
         } else if (dialogType == DialogType.CERT_INFO) {
             title = "Details - Certificate";
-        } else if (dialogType == DialogType.ACCESS_WARNING) {
-            title = "Security Warning";
         } else if (dialogType == DialogType.APPLET_WARNING) {
             title = "Applet Warning";
         } else if (dialogType == DialogType.PARTIALLY_SIGNED_WARNING) {

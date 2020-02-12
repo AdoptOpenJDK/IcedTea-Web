@@ -9,12 +9,11 @@ public abstract class DialogWithResult<R> extends JDialog {
 
     private R result;
 
-    public DialogWithResult(final String title) {
+    public DialogWithResult() {
         setModal(true);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setResizable(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        setTitle(title);
     }
 
     protected abstract JPanel createContentPane();

@@ -26,8 +26,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> yesButton;
     private final DialogButton<AccessWarningResult> noButton;
 
-    private HttpsCertTrustDialog(final JNLPFile file, final String title, final String message, final HttpsCertVerifier certVerifier) {
-        super(file, title, message, certVerifier, null);
+    private HttpsCertTrustDialog(final String message, final AccessType accessType, final JNLPFile file, final HttpsCertVerifier certVerifier) {
+        super(message, accessType, file, certVerifier, null);
         yesButton = ButtonFactory.createYesButton(() -> null);
         noButton = ButtonFactory.createNoButton(() -> null);
     }
@@ -61,8 +61,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         return Arrays.asList(yesButton, noButton);
     }
 
-    public static HttpsCertTrustDialog create(String title, String message, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
-         return new HttpsCertTrustDialog(jnlpFile, title, message, certVerifier);
+    public static HttpsCertTrustDialog create(String message, final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
+         return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
     }
 
     public static void main(String[] args) throws Exception {

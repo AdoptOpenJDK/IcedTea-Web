@@ -28,8 +28,8 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
     private String message;
 
-    public BasicSecurityDialog(String title, String message) {
-        super(title);
+    public BasicSecurityDialog(String message) {
+        super();
         this.message = message;
     }
 
@@ -92,7 +92,11 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
         final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
 
-        new BasicSecurityDialog<Integer>("Security Warning", msg1){
+        new BasicSecurityDialog<Integer>(msg1){
+            @Override
+            public String getTitle() {
+                return "Security Warning 1";
+            }
             @Override
             protected List<DialogButton<Integer>> createButtons() {
                 return Collections.singletonList(exitButton);
@@ -104,7 +108,11 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
             }
         }.showAndWait();
 
-        new BasicSecurityDialog<Integer>("BasicSecurityDialog 2 Title", msg2) {
+        new BasicSecurityDialog<Integer>(msg2) {
+            @Override
+            public String getTitle() {
+                return "Security Warning 2";
+            }
             @Override
             protected List<DialogButton<Integer>> createButtons() {
                 return Collections.singletonList(exitButton);
@@ -114,7 +122,6 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
             protected JComponent createDetailPaneContent() {
                 return new JLabel("Detail pane content");
             }
-
 
         }.showAndWait();
     }

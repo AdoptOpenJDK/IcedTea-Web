@@ -33,6 +33,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final static Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
     private final static Translator TRANSLATOR = Translator.getInstance();
 
+    private AccessType accessType;
     protected final CertVerifier certVerifier;
     protected final SecurityDelegate securityDelegate;
     protected final JNLPFile file;
@@ -43,9 +44,10 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final DialogButton<AccessWarningResult> cancelButton;
 
 
-    protected CertWarningDialog(final JNLPFile file, final String title, final String message, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        super(title, message);
+    protected CertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+        super(message);
         this.file = file;
+        this.accessType = accessType;
         this.certVerifier = certVerifier;
         this.securityDelegate = securityDelegate;
 
@@ -54,6 +56,12 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         sandboxButton = ButtonFactory.createSandboxButton(() -> null);
         cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> null);
 
+    }
+
+    @Override
+    public String getTitle() {
+        // TODO localization
+        return accessType == AccessType.VERIFIED ? "Security Approval Required": "Security Warning";
     }
 
     @Override
@@ -132,15 +140,15 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static CertWarningDialog create(String title, String message, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-         return new CertWarningDialog(jnlpFile, title, message, certVerifier, securityDelegate);
+    public static CertWarningDialog create(String message, final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+         return new CertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
     }
 
     public static void main(String[] args) throws Exception {
         final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
         final Object[] extras = {"extra item 1"};
 
-        new NewDialogFactory().showCertWarningDialog(AccessType.NETWORK, file, new JarCertVerifier(), null);
+        new NewDialogFactory().showCertWarningDialog(AccessType.VERIFIED, file, new JarCertVerifier(), null);
     }
 
 }

@@ -29,11 +29,16 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
     DialogButton<AccessWarningResult> okButton;
     DialogButton<AccessWarningResult> cancelButton;
 
-    private AccessWarningDialog(final JNLPFile file, final String title, final String message) {
-        super(title, message);
+    private AccessWarningDialog(final JNLPFile file, final String message) {
+        super(message);
         this.file = file;
         okButton = ButtonFactory.createOkButton(() -> null);
         cancelButton = ButtonFactory.createCancelButton(() -> null);
+    }
+
+    @Override
+    public String getTitle() {
+        return "Security Warning";
     }
 
     @Override
@@ -108,8 +113,8 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static AccessWarningDialog create(String title, String message, final JNLPFile jnlpFile) {
-        return new AccessWarningDialog(jnlpFile, title, message);
+    public static AccessWarningDialog create(String message, final JNLPFile jnlpFile) {
+        return new AccessWarningDialog(jnlpFile, message);
     }
 
     public static void main(String[] args) throws Exception {
