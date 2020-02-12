@@ -47,6 +47,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 
@@ -55,6 +56,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -213,7 +215,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                         if (dialog.getSecurityDialogPanel() instanceof CertWarningPane) {
                             CertWarningPane cp = (CertWarningPane) (dialog.getSecurityDialogPanel());
                             if (remember) {
-                                cp.saveCert();
+                                CertificateUtils.saveCertificate((X509Certificate) dialog.getCertVerifier().getPublisher(null));
                             }
                         }
                         RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));
