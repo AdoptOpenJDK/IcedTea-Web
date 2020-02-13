@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyRemember;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyResult;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
@@ -31,10 +32,14 @@ public class NewDialogFactory implements DialogFactory {
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
         final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-        final AllowDenyResult allowDenyResult = dialogWithResult.showAndWait();
+        final AllowDenyRemember allowDenyRemember = dialogWithResult.showAndWait();
 
-        return new AccessWarningPaneComplexReturn(allowDenyResult == AllowDenyResult.ALLOW);
+        // doAccessWarningDialogSideEffects();
+
+        return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDenyResult.ALLOW);
     }
+
+
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
