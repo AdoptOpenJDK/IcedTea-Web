@@ -2,13 +2,11 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -19,18 +17,17 @@ import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
-
-public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> {
-    private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
+public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember> {
+    private static final Logger LOG = LoggerFactory.getLogger(CreateShortcutDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
     DialogButton<AllowDenyRemember> allowButton;
     DialogButton<AllowDenyRemember> denyButton;
 
-    private AccessWarningDialog(final JNLPFile file, final String message) {
+    private CreateShortcutDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
         allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRemember(AllowDenyResult.ALLOW, null));
@@ -47,14 +44,14 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> 
         final JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         try {
-            final String name = ofNullable(file)
+            final String name = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
 
 
-            final String publisher = ofNullable(file)
+            final String publisher = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
@@ -62,12 +59,12 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> 
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
 
 
-            final String fromFallback = ofNullable(file)
+            final String fromFallback = Optional.ofNullable(file)
                     .map(JNLPFile::getSourceLocation)
                     .map(URL::getAuthority)
                     .orElse("");
 
-            final String from = ofNullable(file)
+            final String from = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getHomepage)
                     .map(URL::toString)
@@ -114,46 +111,8 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> 
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static AccessWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final Object[] extras) {
-        return new AccessWarningDialog(jnlpFile, getMessageFor(accessType, extras));
+    public static CreateShortcutDialog create(final JNLPFile jnlpFile) {
+        return new CreateShortcutDialog(jnlpFile, TRANSLATOR.translate("SDesktopShortcut"));
     }
 
-    private static String getMessageFor(final AccessType accessType, final Object[] extras) {
-
-        switch (accessType) {
-            case READ_WRITE_FILE:
-                return TRANSLATOR.translate("SFileReadWriteAccess", filePath(extras));
-            case READ_FILE:
-                return TRANSLATOR.translate("SFileReadAccess", filePath(extras));
-            case WRITE_FILE:
-                return TRANSLATOR.translate("SFileWriteAccess", filePath(extras));
-            case CLIPBOARD_READ:
-                return TRANSLATOR.translate("SClipboardReadAccess");
-            case CLIPBOARD_WRITE:
-                return TRANSLATOR.translate("SClipboardWriteAccess");
-            case PRINTER:
-                return TRANSLATOR.translate("SPrinterAccess");
-            case NETWORK:
-                return TRANSLATOR.translate("SNetworkAccess", address(extras));
-            default:
-                return "";
-        }
-    }
-
-    private static String filePath(Object[] extras) {
-        return ofNullable(extras)
-                .filter(a -> a.length > 0)
-                .map(a -> a[0])
-                .filter(o -> o instanceof String)
-                .map(o -> (String) o)
-                .map(FileUtils::displayablePath)
-                .orElse(TRANSLATOR.translate("AFileOnTheMachine"));
-    }
-
-    private static Object address(Object[] extras) {
-        return ofNullable(extras)
-                .filter(a -> a.length > 0)
-                .map(a -> a[0])
-                .orElse("(address here)");
-    }
 }

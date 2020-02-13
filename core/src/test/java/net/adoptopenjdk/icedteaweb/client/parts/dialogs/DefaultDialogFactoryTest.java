@@ -28,11 +28,11 @@ public class DefaultDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showCertWarning();
+        new DefaultDialogFactoryTest().showAccessWarning();
     }
 
     private void showAccessWarning() {
-        dialogFactory.showAccessWarningDialog(AccessType.NETWORK, file, new Object[]{"test"});
+        dialogFactory.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, new Object[]{"test"});
     }
 
     private void showUnsignedWarning() {

@@ -8,6 +8,7 @@ import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyRemember;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyResult;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
+import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
@@ -24,19 +25,33 @@ import java.awt.Component;
 import java.awt.Window;
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Set;
+
+import static net.sourceforge.jnlp.security.AccessType.*;
 
 public class NewDialogFactory implements DialogFactory {
     private final static Translator TRANSLATOR = Translator.getInstance();
 
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
-        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-        final AllowDenyRemember allowDenyRemember = dialogWithResult.showAndWait();
+        if (Arrays.asList(VERIFIED, UNVERIFIED, PARTIALLY_SIGNED, UNSIGNED, SIGNING_ERROR).contains(accessType)) {
+            throw new RuntimeException(accessType + " cannot be displayed in AccessWarningDialog");
+        }
 
-        // doAccessWarningDialogSideEffects();
+        if (accessType == CREATE_DESKTOP_SHORTCUT) {
+            final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
+            final AllowDenyRemember result = createShortcutDialog.showAndWait();
 
-        return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDenyResult.ALLOW);
+            throw new RuntimeException("not implemented yet!");
+        } else {
+            final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
+            final AllowDenyRemember allowDenyRemember = dialogWithResult.showAndWait();
+
+            // doAccessWarningDialogSideEffects();
+
+            return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDenyResult.ALLOW);
+        }
     }
 
 
