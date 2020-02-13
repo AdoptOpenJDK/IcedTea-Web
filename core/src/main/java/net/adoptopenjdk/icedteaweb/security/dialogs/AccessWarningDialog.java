@@ -21,19 +21,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
+public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyResult> {
     private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<AccessWarningResult> okButton;
-    DialogButton<AccessWarningResult> cancelButton;
+    DialogButton<AllowDenyResult> allowButton;
+    DialogButton<AllowDenyResult> denyButton;
 
     private AccessWarningDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        okButton = ButtonFactory.createOkButton(() -> null);
-        cancelButton = ButtonFactory.createCancelButton(() -> null);
+        allowButton = ButtonFactory.createAllowButton(() -> AllowDenyResult.ALLOW);
+        denyButton = ButtonFactory.createDenyButton(() -> AllowDenyResult.DENY);
     }
 
     @Override
@@ -80,8 +80,8 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
     }
 
     @Override
-    protected List<DialogButton<AccessWarningResult>> createButtons() {
-        return Arrays.asList(okButton, cancelButton);
+    protected List<DialogButton<AllowDenyResult>> createButtons() {
+        return Arrays.asList(allowButton, denyButton);
     }
 
     private void addRow(String key, String value, JPanel panel, int row) {

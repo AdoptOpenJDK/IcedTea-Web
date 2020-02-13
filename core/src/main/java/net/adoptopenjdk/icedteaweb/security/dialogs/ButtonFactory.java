@@ -8,12 +8,12 @@ import java.util.function.Supplier;
 public class ButtonFactory {
     private static final Translator TRANSLATOR = Translator.getInstance();
 
-    public static <R> DialogButton<R> createOkButton(final Supplier<R> onAction) {
-        return new DialogButton<>(TRANSLATOR.translate("ButOk"), onAction);
+    public static <R> DialogButton<R> createAllowButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButAllow"), onAction);
     }
 
-    public static <R> DialogButton<R> createCancelButton(final Supplier<R> onAction) {
-        return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction);
+    public static <R> DialogButton<R> createDenyButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButDeny"), onAction);
     }
 
     public static <R> DialogButton<R> createCancelButton(String toolTipText, final Supplier<R> onAction) {

@@ -13,7 +13,6 @@ import java.security.cert.X509Certificate;
  * Helper class to start dialogs without starting ITW.
  */
 public class NewDialogFactoryTest {
-
     private final JNLPFile file;
     private final HttpsCertVerifier httpsCertVerifier;
     private final JarCertVerifier jarCertVerifier;
@@ -28,7 +27,7 @@ public class NewDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new NewDialogFactoryTest().showCertWarning();
+        new NewDialogFactoryTest().showAccessWarning();
     }
 
     private void showAccessWarning() {
