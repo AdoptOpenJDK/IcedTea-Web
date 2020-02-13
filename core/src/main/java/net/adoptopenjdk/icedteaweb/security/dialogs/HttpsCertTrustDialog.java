@@ -7,6 +7,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
@@ -33,6 +34,11 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
         this.yesButton = ButtonFactory.createYesButton(() -> null);
         this.noButton = ButtonFactory.createNoButton(() -> null);
+    }
+
+    public static HttpsCertTrustDialog create(final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
+        final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
+        return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
     }
 
     @Override
@@ -65,9 +71,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         return Arrays.asList(yesButton, noButton);
     }
 
-    public static HttpsCertTrustDialog create(final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
-        final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
-        return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
+    protected String getMoreInformationText(final AccessType accessType, final CertVerifier certVerifier) {
+        return certVerifier.getRootInCaCerts() ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
     }
 
     @Override

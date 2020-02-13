@@ -12,6 +12,7 @@ import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,6 +20,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
@@ -68,6 +70,12 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         advancedOptionsButton = createAdvancedOptionsButton();
     }
 
+    public static CertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+
+        final String message = getMessageFor(accessType);
+        return new CertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
+    }
+
     @Override
     public String createTitle() {
         // TODO localization
@@ -112,6 +120,8 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
 
             addRow(createAlwaysTrustCheckbox(), panel, 3);
 
+            addRow(createMoreInformationPanel(), panel, 4);
+
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);
         }
@@ -136,6 +146,17 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         alwaysTrustCheckBox.setSelected(alwaysTrustSelected);
         alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(alwaysTrustSelected = !alwaysTrustCheckBox.isSelected()));
         return alwaysTrustCheckBox;
+    }
+
+    private JPanel createMoreInformationPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        final String moreInformationText = getMoreInformationText(accessType, certVerifier);
+        final JLabel moreInformationLabel = new JLabel(htmlWrap(moreInformationText));
+        panel.add(moreInformationLabel);
+        panel.add(new JButton("More Information..."));
+        panel.setPreferredSize(new Dimension(600, 100));
+        return panel;
     }
 
     protected void addRow(String key, String value, JPanel panel, int row) {
@@ -177,10 +198,17 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.add(child, constraints);
     }
 
-    public static CertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+    protected String getMoreInformationText(final AccessType accessType, final CertVerifier certVerifier) {
+        String moreInformationText = certVerifier.getRootInCaCerts() ?
+                TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
 
-        final String message = getMessageFor(accessType);
-        return new CertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
+        switch (accessType) {
+            case UNVERIFIED:
+            case SIGNING_ERROR:
+                return moreInformationText + " " + TRANSLATOR.translate("SWarnFullPermissionsIgnorePolicy");
+            default:
+                return moreInformationText;
+        }
     }
 
     private static String getMessageFor(final AccessType accessType) {
@@ -195,4 +223,14 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
                 return "";
         }
     }
+
+    /**
+     * Needed to get word wrap working in JLabels.
+     * @param s string to be wrapped to html tag
+     * @return
+     */
+    public  static String htmlWrap(String s) {
+        return "<html>" + s + "</html>";
+    }
+
 }
