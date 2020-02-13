@@ -55,7 +55,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -113,13 +112,6 @@ public class DefaultDialogFactory implements DialogFactory {
 
     }
 
-    // TODO cleanup main
-    public static void main1(String[] args) throws Exception {
-        JNLPRuntime.initialize();
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, new Object[]{"test"});
-    }
-
     /**
      * Shows a warning dialog for when a plugin applet is unsigned. This is used
      * with 'high-security' setting.
@@ -137,13 +129,6 @@ public class DefaultDialogFactory implements DialogFactory {
         DialogResult r = getUserResponse(message);
 
         return (YesNoSandboxLimited) r;
-    }
-
-    // TODO cleanup main
-    public static void main2(String[] args) throws Exception {
-        JNLPRuntime.initialize();
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showUnsignedWarningDialog(file);
     }
 
     /**
@@ -175,14 +160,6 @@ public class DefaultDialogFactory implements DialogFactory {
         return (YesNoSandbox) selectedValue;
     }
 
-    // TODO cleanup main
-    public static void main(String[] args) throws Exception {
-        JNLPRuntime.initialize();
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new JarCertVerifier(), null);
-        new DefaultDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname"), null);
-    }
-
     /**
      * Shows a warning dialog for when an applet or application is partially
      * signed.
@@ -204,13 +181,6 @@ public class DefaultDialogFactory implements DialogFactory {
 
         DialogResult r = getUserResponse(message);
         return (YesNoSandbox) r;
-    }
-
-    // TODO cleanup main
-    public static void main4(String[] args) throws Exception {
-        JNLPRuntime.initialize();
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showPartiallySignedWarningDialog(file, new JarCertVerifier(), null);
     }
 
     /**
