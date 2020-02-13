@@ -376,7 +376,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         }
 
         private RememberPanelResult getResult() {
-            return new RememberPanelResult(isRemembered(), isRememberedForCodebase());
+           return new RememberPanelResult(isRemembered(), isRememberedForCodebase());
         }
 
     }
