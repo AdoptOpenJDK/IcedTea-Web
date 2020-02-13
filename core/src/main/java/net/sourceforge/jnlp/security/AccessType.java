@@ -13,6 +13,8 @@ public enum AccessType {
     CLIPBOARD_WRITE,
     PRINTER,
     NETWORK,
+
+    // the following are certificate related states and have nothing to do with access types
     VERIFIED,
     UNVERIFIED,
     PARTIALLY_SIGNED,

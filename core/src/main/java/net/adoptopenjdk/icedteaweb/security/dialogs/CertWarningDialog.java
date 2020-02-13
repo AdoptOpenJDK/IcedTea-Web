@@ -41,7 +41,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final DialogButton<AccessWarningResult> sandboxButton;
     private final DialogButton<AccessWarningResult> cancelButton;
 
-    private AccessType accessType;
+    private final AccessType accessType;
     protected final CertVerifier certVerifier;
     protected final SecurityDelegate securityDelegate;
     protected final JNLPFile file;
