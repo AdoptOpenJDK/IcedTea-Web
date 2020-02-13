@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -155,7 +156,9 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         final String moreInformationText = getMoreInformationText(accessType, certVerifier);
         final JLabel moreInformationLabel = new JLabel(htmlWrap(moreInformationText));
         panel.add(moreInformationLabel);
-        panel.add(new JButton("More Information..."));
+        JButton moreInfoButton = new JButton(TRANSLATOR.translate("ButMoreInformation"));
+        moreInfoButton.addActionListener((e) -> Dialogs.showMoreInfoDialog(certVerifier, file));
+        panel.add(moreInfoButton);
         panel.setPreferredSize(new Dimension(600, 100));
         return panel;
     }
