@@ -2,11 +2,13 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -111,7 +113,46 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-    public static AccessWarningDialog create(String message, final JNLPFile jnlpFile) {
-        return new AccessWarningDialog(jnlpFile, message);
+    public static AccessWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final Object[] extras) {
+        return new AccessWarningDialog(jnlpFile, getMessageFor(accessType, extras));
+    }
+
+    private static String getMessageFor(final AccessType accessType, final Object[] extras) {
+        switch (accessType) {
+            case READ_WRITE_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    return TRANSLATOR.translate("SFileReadWriteAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    return TRANSLATOR.translate("SFileReadWriteAccess", TRANSLATOR.translate("AFileOnTheMachine"));
+                }
+            case READ_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    return TRANSLATOR.translate("SFileReadAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    return TRANSLATOR.translate("SFileReadAccess", TRANSLATOR.translate("AFileOnTheMachine"));
+                }
+            case WRITE_FILE:
+                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
+                    return TRANSLATOR.translate("SFileWriteAccess", FileUtils.displayablePath((String) extras[0]));
+                } else {
+                    return TRANSLATOR.translate("SFileWriteAccess", TRANSLATOR.translate("AFileOnTheMachine"));
+                }
+            case CREATE_DESKTOP_SHORTCUT:
+                return TRANSLATOR.translate("SDesktopShortcut");
+            case CLIPBOARD_READ:
+                return TRANSLATOR.translate("SClipboardReadAccess");
+            case CLIPBOARD_WRITE:
+                return TRANSLATOR.translate("SClipboardWriteAccess");
+            case PRINTER:
+                return TRANSLATOR.translate("SPrinterAccess");
+            case NETWORK:
+                if (extras != null && extras.length >= 0) {
+                    return TRANSLATOR.translate("SNetworkAccess", extras[0]);
+                } else {
+                    return TRANSLATOR.translate("SNetworkAccess", "(address here)");
+                }
+            default:
+                return "";
+        }
     }
 }

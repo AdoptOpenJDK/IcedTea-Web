@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
@@ -30,8 +29,7 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
-        final String message = getMessageFor(accessType, extras);
-        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(message, file);
+        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
         final AccessWarningResult accessWarningResult = dialogWithResult.showAndWait();
 
         return new AccessWarningPaneComplexReturn(accessWarningResult == AccessWarningResult.OK);
@@ -39,19 +37,13 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
-        String title = getTitleFor(DialogType.UNSIGNED_WARNING, AccessType.UNSIGNED);
-
         // calls UnsignedAppletTrustWarningPanel
         // to be removed as Applets are not longer supported?
-
         return null;
     }
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        final Object[] extras = {securityDelegate};
-        final String message = getMessageFor(accessType, extras);
-
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
             dialogWithResult = HttpsCertTrustDialog.create(accessType, file, (HttpsCertVerifier) certVerifier);
@@ -74,8 +66,6 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandbox showPartiallySignedWarningDialog(final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        String title = getTitleFor(DialogType.PARTIALLY_SIGNED_WARNING, AccessType.PARTIALLY_SIGNED);
-
         return null;
     }
 
@@ -125,7 +115,7 @@ public class NewDialogFactory implements DialogFactory {
     public void showSingleCertInfoDialog(final X509Certificate c, final Window parent) {
     }
 
-    private static String getTitleFor(DialogType dialogType, AccessType accessType) {
+    private static String getTitleFor(DialogType dialogType) {
         // TODO do translations
 
         String title = "";
@@ -142,44 +132,5 @@ public class NewDialogFactory implements DialogFactory {
         }
 
         return TRANSLATOR.translate(title);
-    }
-
-    private static String getMessageFor(final AccessType accessType, final Object[] extras) {
-        switch (accessType) {
-            case READ_WRITE_FILE:
-                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
-                    return TRANSLATOR.translate("SFileReadWriteAccess", FileUtils.displayablePath((String) extras[0]));
-                } else {
-                    return TRANSLATOR.translate("SFileReadWriteAccess", TRANSLATOR.translate("AFileOnTheMachine"));
-                }
-            case READ_FILE:
-                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
-                    return TRANSLATOR.translate("SFileReadAccess", FileUtils.displayablePath((String) extras[0]));
-                } else {
-                    return TRANSLATOR.translate("SFileReadAccess", TRANSLATOR.translate("AFileOnTheMachine"));
-                }
-            case WRITE_FILE:
-                if (extras != null && extras.length > 0 && extras[0] instanceof String) {
-                    return TRANSLATOR.translate("SFileWriteAccess", FileUtils.displayablePath((String) extras[0]));
-                } else {
-                    return TRANSLATOR.translate("SFileWriteAccess", TRANSLATOR.translate("AFileOnTheMachine"));
-                }
-            case CREATE_DESKTOP_SHORTCUT:
-                return TRANSLATOR.translate("SDesktopShortcut");
-            case CLIPBOARD_READ:
-                return TRANSLATOR.translate("SClipboardReadAccess");
-            case CLIPBOARD_WRITE:
-                return TRANSLATOR.translate("SClipboardWriteAccess");
-            case PRINTER:
-                return TRANSLATOR.translate("SPrinterAccess");
-            case NETWORK:
-                if (extras != null && extras.length >= 0) {
-                    return TRANSLATOR.translate("SNetworkAccess", extras[0]);
-                } else {
-                    return TRANSLATOR.translate("SNetworkAccess", "(address here)");
-                }
-            default:
-                return "";
-        }
     }
 }
