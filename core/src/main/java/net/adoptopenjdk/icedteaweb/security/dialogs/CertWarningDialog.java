@@ -186,11 +186,11 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private static String getMessageFor(final AccessType accessType) {
         switch (accessType) {
             case VERIFIED:
-                return R("SSigVerified");
+                return TRANSLATOR.translate("SSigVerified");
             case UNVERIFIED:
-                return R("SSigUnverified");
+                return TRANSLATOR.translate("SSigUnverified");
             case SIGNING_ERROR:
-                return R("SSignatureError");
+                return TRANSLATOR.translate("SSignatureError");
             default:
                 return "";
         }
