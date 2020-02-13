@@ -37,7 +37,6 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
@@ -47,6 +46,7 @@ import javax.swing.ImageIcon;
 import java.awt.Dimension;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
@@ -80,7 +80,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getTopPanelTextKey()));
+        return htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -95,11 +95,11 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return SecurityDialogPanel.htmlWrap(text);
+        return htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getQuestionPanelTextKey()));
+        return htmlWrap(R(getQuestionPanelTextKey()));
     }
 }

@@ -37,19 +37,18 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SetValueHandler;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.TemporaryPermissionsButton;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SetValueHandler;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
-import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
+import net.sourceforge.jnlp.tools.CertInformation;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -58,6 +57,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
@@ -136,7 +136,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getTopPanelTextKey()));
+        return htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -153,12 +153,12 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return SecurityDialogPanel.htmlWrap(text);
+        return htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getQuestionPanelTextKey()));
+        return htmlWrap(R(getQuestionPanelTextKey()));
     }
 
          @Override

@@ -70,6 +70,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
+
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);

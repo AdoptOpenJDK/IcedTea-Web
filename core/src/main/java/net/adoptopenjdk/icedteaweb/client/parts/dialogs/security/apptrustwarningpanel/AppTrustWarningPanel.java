@@ -77,6 +77,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /*
  * This class is meant to provide a common layout and functionality for warning dialogs

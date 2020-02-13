@@ -74,6 +74,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
+
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
  */

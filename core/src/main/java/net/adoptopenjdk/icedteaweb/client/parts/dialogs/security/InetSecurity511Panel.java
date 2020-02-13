@@ -62,6 +62,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
+
 public class InetSecurity511Panel extends SecurityDialogPanel {
 
     private final static Logger LOG = LoggerFactory.getLogger(InetSecurity511Panel.class);

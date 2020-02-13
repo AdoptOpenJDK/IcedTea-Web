@@ -57,6 +57,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an

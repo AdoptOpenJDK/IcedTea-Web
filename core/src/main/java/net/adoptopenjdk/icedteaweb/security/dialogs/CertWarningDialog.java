@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * TODO: advancedOptions button
@@ -223,14 +224,4 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
                 return "";
         }
     }
-
-    /**
-     * Needed to get word wrap working in JLabels.
-     * @param s string to be wrapped to html tag
-     * @return
-     */
-    public  static String htmlWrap(String s) {
-        return "<html>" + s + "</html>";
-    }
-
 }

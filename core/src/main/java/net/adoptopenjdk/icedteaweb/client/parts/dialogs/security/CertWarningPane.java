@@ -71,6 +71,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides the panel for using inside a SecurityDialog. These dialogs are

@@ -37,7 +37,6 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
@@ -55,6 +54,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public class RememberPanel extends JPanel implements RememberActionProvider {
 
@@ -86,7 +86,7 @@ public class RememberPanel extends JPanel implements RememberActionProvider {
     private JPanel createCheckBoxPanel() {
         JPanel checkBoxPanel = new JPanel(new BorderLayout());
 
-        permanencyCheckBox = new JCheckBox(SecurityDialogPanel.htmlWrap(R("SRememberOption")));
+        permanencyCheckBox = new JCheckBox(htmlWrap(R("SRememberOption")));
         permanencyCheckBox.addActionListener(permanencyListener());
         checkBoxPanel.add(permanencyCheckBox, BorderLayout.SOUTH);
 
@@ -101,7 +101,7 @@ public class RememberPanel extends JPanel implements RememberActionProvider {
         applyToAppletButton.setSelected(true);
         applyToAppletButton.setEnabled(false); // Start disabled until 'Remember this NumberOfArguments' is selected
 
-        applyToCodeBaseButton = new JRadioButton(SecurityDialogPanel.htmlWrap(R("SRememberCodebase", codebase)));
+        applyToCodeBaseButton = new JRadioButton(htmlWrap(R("SRememberCodebase", codebase)));
         applyToCodeBaseButton.setEnabled(false);
 
         group.add(applyToAppletButton);

@@ -79,6 +79,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are
