@@ -77,12 +77,4 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     protected ImageIcon createIcon() {
         return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
     }
-
-
-    public static void main(String[] args) throws Exception {
-        final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        final Object[] extras = {"extra item 1"};
-
-        new NewDialogFactory().showCertWarningDialog(AccessType.UNVERIFIED, file, new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname"), null);
-    }
 }

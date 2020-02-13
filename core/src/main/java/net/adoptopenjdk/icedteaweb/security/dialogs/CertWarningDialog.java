@@ -186,12 +186,4 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
                 return "";
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        final Object[] extras = {"extra item 1"};
-
-        new NewDialogFactory().showCertWarningDialog(AccessType.VERIFIED, file, new JarCertVerifier(), null);
-    }
-
 }

@@ -12,23 +12,23 @@ import java.security.cert.X509Certificate;
 /**
  * Helper class to start dialogs without starting ITW.
  */
-public class DefaultDialogFactoryTest {
+public class NewDialogFactoryTest {
 
     private final JNLPFile file;
     private final HttpsCertVerifier httpsCertVerifier;
     private final JarCertVerifier jarCertVerifier;
-    private final DefaultDialogFactory dialogFactory;
+    private final NewDialogFactory dialogFactory;
 
-    public DefaultDialogFactoryTest() throws Exception {
+    public NewDialogFactoryTest() throws Exception {
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
         httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname");
         jarCertVerifier = new JarCertVerifier();
-        dialogFactory = new DefaultDialogFactory();
+        dialogFactory = new NewDialogFactory();
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showCertWarning();
+        new NewDialogFactoryTest().showCertWarning();
     }
 
     private void showAccessWarning() {

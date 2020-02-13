@@ -116,11 +116,4 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
     public static AccessWarningDialog create(String message, final JNLPFile jnlpFile) {
         return new AccessWarningDialog(jnlpFile, message);
     }
-
-    public static void main(String[] args) throws Exception {
-        final JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        final Object[] extras = {"extra item 1"};
-
-        new NewDialogFactory().showAccessWarningDialog(AccessType.NETWORK, file, extras);
-    }
 }
