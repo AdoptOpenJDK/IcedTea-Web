@@ -13,6 +13,7 @@ import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -32,6 +33,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 /**
  * TODO: advancedOptions button
  * TODO: CertificateUtils.saveCertificate logic after runButton is pressed when alwaysTrustSelected
+ * TODO: bottomPanel of old CertWarningPane
+ *
+ *
  */
 public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
     private static final Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
@@ -40,6 +44,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     private final DialogButton<AccessWarningResult> runButton;
     private final DialogButton<AccessWarningResult> sandboxButton;
     private final DialogButton<AccessWarningResult> cancelButton;
+    private final JButton advancedOptionsButton;
 
     private final AccessType accessType;
     protected final CertVerifier certVerifier;
@@ -60,6 +65,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         sandboxButton = ButtonFactory.createSandboxButton(() -> AccessWarningResult.SANDBOX);
         sandboxButton.setEnabled(!alwaysTrustSelected);
         cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> AccessWarningResult.NO);
+        advancedOptionsButton = createAdvancedOptionsButton();
     }
 
     @Override
@@ -115,6 +121,13 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
     @Override
     protected List<DialogButton<AccessWarningResult>> createButtons() {
         return Arrays.asList(runButton, sandboxButton, cancelButton);
+    }
+
+    private JButton createAdvancedOptionsButton() {
+        JButton advancedOptions = new JButton("\u2630");
+        advancedOptions.setEnabled(file != null && securityDelegate != null);
+        advancedOptions.setToolTipText(TRANSLATOR.translate("CertWarnPolicyTip"));
+        return advancedOptions;
     }
 
     protected JCheckBox createAlwaysTrustCheckbox() {
