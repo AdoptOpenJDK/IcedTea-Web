@@ -1,14 +1,12 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPFileFactory;
-import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -22,8 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
-    private final static Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
-    private final static Translator TRANSLATOR = Translator.getInstance();
+    private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
     DialogButton<AccessWarningResult> okButton;
@@ -47,29 +45,29 @@ public class AccessWarningDialog extends BasicSecurityDialog<AccessWarningResult
         panel.setLayout(new GridBagLayout());
         try {
             final String name = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getTitle())
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
 
 
             final String publisher = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getVendor())
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
 
 
             final String fromFallback = Optional.ofNullable(file)
-                    .map(f -> f.getSourceLocation())
-                    .map(s -> s.getAuthority())
+                    .map(JNLPFile::getSourceLocation)
+                    .map(URL::getAuthority)
                     .orElse("");
 
             final String from = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getHomepage())
-                    .map(u -> u.toString())
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getHomepage)
+                    .map(URL::toString)
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
             addRow(TRANSLATOR.translate("From"), from, panel, 2);

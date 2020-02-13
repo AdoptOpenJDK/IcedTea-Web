@@ -1,18 +1,16 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.sourceforge.jnlp.signing.JarCertVerifier;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -34,12 +32,10 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 /**
  * TODO: advancedOptions button
  * TODO: CertificateUtils.saveCertificate logic after runButton is pressed when alwaysTrustSelected
- *
- *
  */
 public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
-    private final static Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
-    private final static Translator TRANSLATOR = Translator.getInstance();
+    private static final Logger LOG = LoggerFactory.getLogger(CertWarningDialog.class);
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final DialogButton<AccessWarningResult> runButton;
     private final DialogButton<AccessWarningResult> sandboxButton;
@@ -88,8 +84,8 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.setLayout(new GridBagLayout());
         try {
             final String name = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getTitle())
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
 
@@ -102,9 +98,9 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
 
             final String from = Optional.ofNullable(file)
-                    .map(f -> f.getInformation())
-                    .map(i -> i.getHomepage())
-                    .map(u -> u.toString())
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getHomepage)
+                    .map(URL::toString)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
 
@@ -158,7 +154,7 @@ public class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> 
         panel.add(valueLabel, valueLabelConstraints);
     }
 
-     protected void addRow(JComponent child, JPanel panel, int row) {
+    protected void addRow(JComponent child, JPanel panel, int row) {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = row;

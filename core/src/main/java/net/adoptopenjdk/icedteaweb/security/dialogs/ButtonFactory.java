@@ -6,7 +6,7 @@ import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import java.util.function.Supplier;
 
 public class ButtonFactory {
-    private final static Translator TRANSLATOR = Translator.getInstance();
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     public static <R> DialogButton<R> createOkButton(final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButOk"), onAction);

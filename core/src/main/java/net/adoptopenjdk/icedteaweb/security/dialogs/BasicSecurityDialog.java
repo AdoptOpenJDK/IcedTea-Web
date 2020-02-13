@@ -24,7 +24,7 @@ import java.util.List;
 
 public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
-    private final static Translator TRANSLATOR = Translator.getInstance();
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     private String message;
 
@@ -71,7 +71,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
         final List<DialogButton<R>> buttons = createButtons();
         buttons.forEach(b -> {
-            final JButton button = b.createButton(r -> close(r));
+            final JButton button = b.createButton(this::close);
             actionWrapperPanel.add(button);
         });
 
@@ -93,11 +93,12 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
         final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
 
-        new BasicSecurityDialog<Integer>(msg1){
+        new BasicSecurityDialog<Integer>(msg1) {
             @Override
             public String createTitle() {
                 return "Security Warning 1";
             }
+
             @Override
             protected List<DialogButton<Integer>> createButtons() {
                 return Collections.singletonList(exitButton);
@@ -114,6 +115,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
             public String createTitle() {
                 return "Security Warning 2";
             }
+
             @Override
             protected List<DialogButton<Integer>> createButtons() {
                 return Collections.singletonList(exitButton);

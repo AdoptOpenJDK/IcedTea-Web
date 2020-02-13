@@ -1,13 +1,11 @@
 package net.adoptopenjdk.icedteaweb.security.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.NewDialogFactory;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -16,15 +14,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
-import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
 public class HttpsCertTrustDialog extends CertWarningDialog {
-    private final static Logger LOG = LoggerFactory.getLogger(HttpsCertTrustDialog.class);
-    private final static Translator TRANSLATOR = Translator.getInstance();
+    private static final Logger LOG = LoggerFactory.getLogger(HttpsCertTrustDialog.class);
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final DialogButton<AccessWarningResult> yesButton;
     private final DialogButton<AccessWarningResult> noButton;
