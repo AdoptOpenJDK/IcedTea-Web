@@ -62,9 +62,14 @@ public class NewDialogFactory implements DialogFactory {
 
         final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();
 
-        // calls CertWarningPane
-        // TODO return value
-        return null;
+        switch (certWarningResult) {
+            case YES:
+                return YesNoSandbox.yes();
+            case SANDBOX:
+                return YesNoSandbox.sandbox();
+            default:
+                return YesNoSandbox.no();
+        }
     }
 
     @Override
