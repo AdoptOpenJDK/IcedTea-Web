@@ -14,6 +14,7 @@ import net.adoptopenjdk.icedteaweb.security.dialogs.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
@@ -45,7 +46,10 @@ public class NewDialogFactory implements DialogFactory {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
             final Optional<ShortcutResult> result = createShortcutDialog.showAndWait();
 
-            throw new RuntimeException("not implemented yet!");
+            if (result.isPresent()) {
+                throw new RuntimeException("not implemented yet!");
+            }
+            return new AccessWarningPaneComplexReturn(Primitive.NO);
         } else {
             final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
             final AllowDenyRememberResult allowDenyRemember = dialogWithResult.showAndWait();
