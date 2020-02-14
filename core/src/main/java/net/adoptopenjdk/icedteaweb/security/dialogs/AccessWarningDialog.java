@@ -142,18 +142,18 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> 
 
     private static String filePath(Object[] extras) {
         return ofNullable(extras)
-                .filter(a -> a.length > 0)
-                .map(a -> a[0])
-                .filter(o -> o instanceof String)
-                .map(o -> (String) o)
+                .filter(nonNullExtras -> nonNullExtras.length > 0)
+                .map(nonEmptyExtras -> nonEmptyExtras[0])
+                .filter(firstObject -> firstObject instanceof String)
+                .map(firstObject -> (String) firstObject)
                 .map(FileUtils::displayablePath)
                 .orElse(TRANSLATOR.translate("AFileOnTheMachine"));
     }
 
     private static Object address(Object[] extras) {
         return ofNullable(extras)
-                .filter(a -> a.length > 0)
-                .map(a -> a[0])
+                .filter(nonNullExtras -> nonNullExtras.length > 0)
+                .map(nonEmptyExtras -> nonEmptyExtras[0])
                 .orElse("(address here)");
     }
 }
