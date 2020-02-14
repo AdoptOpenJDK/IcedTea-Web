@@ -25,20 +25,20 @@ import java.util.Optional;
 /**
  * <img src="doc-files/CreateShortcutDialog.png"></img>
  */
-public class CreateShortcutDialog extends BasicSecurityDialog<Optional<ShortcutResult>> {
+public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateShortcutResult>> {
     private static final Logger LOG = LoggerFactory.getLogger(CreateShortcutDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<Optional<ShortcutResult>> createButton;
-    DialogButton<Optional<ShortcutResult>> cancelButton;
+    DialogButton<Optional<CreateShortcutResult>> createButton;
+    DialogButton<Optional<CreateShortcutResult>> cancelButton;
     private JCheckBox desktopCheckBox;
     private JCheckBox menuCheckBox;
 
     private CreateShortcutDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new ShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), null)));
+        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new CreateShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), null)));
         cancelButton = ButtonFactory.createCancelButton(Optional::empty);
     }
 
@@ -134,7 +134,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<ShortcutR
     }
 
     @Override
-    protected List<DialogButton<Optional<ShortcutResult>>> createButtons() {
+    protected List<DialogButton<Optional<CreateShortcutResult>>> createButtons() {
         return Arrays.asList(createButton, cancelButton);
     }
 

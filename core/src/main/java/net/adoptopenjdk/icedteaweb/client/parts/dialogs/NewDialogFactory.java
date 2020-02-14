@@ -10,11 +10,12 @@ import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDeny;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.ShortcutResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
@@ -44,22 +45,27 @@ public class NewDialogFactory implements DialogFactory {
 
         if (accessType == CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
-            final Optional<ShortcutResult> result = createShortcutDialog.showAndWait();
+            final Optional<CreateShortcutResult> result = createShortcutDialog.showAndWait();
 
-            if (result.isPresent()) {
-                throw new RuntimeException("not implemented yet!");
+            if (!result.isPresent()) {
+                return new AccessWarningPaneComplexReturn(Primitive.CANCEL);
             }
-            return new AccessWarningPaneComplexReturn(Primitive.NO);
+            final AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(Primitive.YES);
+            ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
+            ar.setDesktop(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
+
+            // TODO handle remember
+
+            return ar;
         } else {
             final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
             final AllowDenyRememberResult allowDenyRemember = dialogWithResult.showAndWait();
 
-            // doAccessWarningDialogSideEffects();
+            //TODO doAccessWarningDialogSideEffects();
 
             return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDeny.ALLOW);
         }
     }
-
 
 
     @Override
@@ -74,8 +80,7 @@ public class NewDialogFactory implements DialogFactory {
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
             dialogWithResult = HttpsCertTrustDialog.create(accessType, file, (HttpsCertVerifier) certVerifier);
-        }
-        else {
+        } else {
             dialogWithResult = CertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
         }
 
@@ -146,7 +151,7 @@ public class NewDialogFactory implements DialogFactory {
         // TODO do translations
 
         String title = "";
-         if (dialogType == DialogType.MORE_INFO) {
+        if (dialogType == DialogType.MORE_INFO) {
             title = "More Information";
         } else if (dialogType == DialogType.CERT_INFO) {
             title = "Details - Certificate";
