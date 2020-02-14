@@ -126,9 +126,12 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
 
             desktopCheckBox = createDesktopCheckBox();
             addRow(desktopCheckBox, panel, 4);
-
             menuCheckBox = createMenuCheckBox();
             addRow(menuCheckBox, panel, 5);
+
+            addSeparatorRow(false, panel, 6);
+
+            addRow(new RememberUserDecisionPanel(), panel, 7);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
