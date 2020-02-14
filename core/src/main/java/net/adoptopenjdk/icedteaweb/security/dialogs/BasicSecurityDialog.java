@@ -85,52 +85,6 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         return contentPanel;
     }
 
-    public static void main(String[] args) throws Exception {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        final String msg1 = "This is a long text that should be displayed in more than 1 line. " +
-                "This is a long text that should be displayed in more than 1 line. " +
-                "This is a long text that should be displayed in more than 1 line.";
-        final String msg2 = "Connection failed for URL: https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp." +
-                "\n\nDo you want to continue with no proxy or exit the application?";
-
-        final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
-
-        new BasicSecurityDialog<Integer>(msg1) {
-            @Override
-            public String createTitle() {
-                return "Security Warning 1";
-            }
-
-            @Override
-            protected List<DialogButton<Integer>> createButtons() {
-                return Collections.singletonList(exitButton);
-            }
-
-            @Override
-            protected JComponent createDetailPaneContent() {
-                return new JLabel("Detail pane content");
-            }
-        }.showAndWait();
-
-        new BasicSecurityDialog<Integer>(msg2) {
-            @Override
-            public String createTitle() {
-                return "Security Warning 2";
-            }
-
-            @Override
-            protected List<DialogButton<Integer>> createButtons() {
-                return Collections.singletonList(exitButton);
-            }
-
-            @Override
-            protected JComponent createDetailPaneContent() {
-                return new JLabel("Detail pane content");
-            }
-
-        }.showAndWait();
-    }
-
     protected void addRow(String key, String value, JPanel panel, int row) {
         final JLabel keyLabel = new JLabel(key + ":");
         keyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -178,5 +132,51 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         panel.add(child, constraints);
+    }
+
+    public static void main(String[] args) throws Exception {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        final String msg1 = "This is a long text that should be displayed in more than 1 line. " +
+                "This is a long text that should be displayed in more than 1 line. " +
+                "This is a long text that should be displayed in more than 1 line.";
+        final String msg2 = "Connection failed for URL: https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp." +
+                "\n\nDo you want to continue with no proxy or exit the application?";
+
+        final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);
+
+        new BasicSecurityDialog<Integer>(msg1) {
+            @Override
+            public String createTitle() {
+                return "Security Warning 1";
+            }
+
+            @Override
+            protected List<DialogButton<Integer>> createButtons() {
+                return Collections.singletonList(exitButton);
+            }
+
+            @Override
+            protected JComponent createDetailPaneContent() {
+                return new JLabel("Detail pane content");
+            }
+        }.showAndWait();
+
+        new BasicSecurityDialog<Integer>(msg2) {
+            @Override
+            public String createTitle() {
+                return "Security Warning 2";
+            }
+
+            @Override
+            protected List<DialogButton<Integer>> createButtons() {
+                return Collections.singletonList(exitButton);
+            }
+
+            @Override
+            protected JComponent createDetailPaneContent() {
+                return new JLabel("Detail pane content");
+            }
+
+        }.showAndWait();
     }
 }
