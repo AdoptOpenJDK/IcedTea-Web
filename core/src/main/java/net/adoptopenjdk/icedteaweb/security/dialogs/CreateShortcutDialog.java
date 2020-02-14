@@ -14,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -121,11 +122,13 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
                     .orElse(fromFallback);
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
 
+            addSeparatorRow(false, panel, 3);
+
             desktopCheckBox = createDesktopCheckBox();
-            addRow(desktopCheckBox, panel, 3);
+            addRow(desktopCheckBox, panel, 4);
 
             menuCheckBox = createMenuCheckBox();
-            addRow(menuCheckBox, panel, 4);
+            addRow(menuCheckBox, panel, 5);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
@@ -171,9 +174,19 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = row;
-        constraints.ipady = 8;
+        constraints.ipady = 0;
         constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         panel.add(child, constraints);
+    }
+
+    protected void addSeparatorRow(boolean hasLine, JPanel panel, int row) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = row;
+        constraints.ipady = 4;
+        constraints.gridwidth = 3;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(hasLine ? new JSeparator() : new JPanel(), constraints);
     }
 }
