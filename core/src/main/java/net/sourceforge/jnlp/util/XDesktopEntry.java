@@ -26,6 +26,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -123,7 +124,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @param info result of user's interference
      * @return string with desktop shortcut specification
      */
-    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info) {
+    String getContent(boolean menu, ShortcutResult info) {
         File generatedJnlp = null;
 
         String fileContents = "[Desktop Entry]\n";
@@ -243,7 +244,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @param desktop how to create on desktop
      */
     @Override
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
+    public void createDesktopShortcuts(ShortcutResult menu, ShortcutResult desktop) {
         boolean isDesktop = false;
         if (desktop != null && desktop.isCreate()) {
             isDesktop = true;
@@ -275,7 +276,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's menu.
      */
-    private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
+    private void installMenuLauncher(ShortcutResult info) {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
@@ -291,7 +292,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
-    private void installDesktopLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
+    private void installDesktopLauncher(ShortcutResult info) {
         File shortcutFile = getShortcutTmpFile();
         try {
 

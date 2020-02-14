@@ -8,6 +8,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.security.AccessType;
@@ -131,12 +132,12 @@ public class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
             AccessWarningPaneComplexReturn r = new AccessWarningPaneComplexReturn(mainResult);
             if (mainResult){
                 if (sd.onDesktop()){
-                    r.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.setDesktop(new ShortcutResult(true));
                     r.getDesktop().setBrowser(XDesktopEntry.getBrowserBin());
                     r.getDesktop().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
                 if (sd.getMenu() != null){
-                    r.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.setMenu(new ShortcutResult(true));
                     r.getMenu().setBrowser(XDesktopEntry.getBrowserBin());
                     r.getMenu().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }

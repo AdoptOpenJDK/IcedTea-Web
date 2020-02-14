@@ -45,6 +45,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -330,7 +331,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 ar.setDesktop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
             } else {
                 //jnlp
-                ar.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(desktopCheck.isSelected()));
+                ar.setDesktop(new ShortcutResult(desktopCheck.isSelected()));
             }
         }
         if (menuCheck != null) {
@@ -339,7 +340,7 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
                 ar.setMenu(htmlPanelMenu.getShortcutResult(menuCheck.isSelected()));
             } else {
                 //jnlp
-                ar.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(menuCheck.isSelected()));
+                ar.setMenu(new ShortcutResult(menuCheck.isSelected()));
             }
         }
         return ar;
@@ -420,8 +421,8 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
 
         }
 
-        public AccessWarningPaneComplexReturn.ShortcutResult getShortcutResult(boolean mainResolution) {
-            AccessWarningPaneComplexReturn.ShortcutResult r = new AccessWarningPaneComplexReturn.ShortcutResult(mainResolution);
+        public ShortcutResult getShortcutResult(boolean mainResolution) {
+            ShortcutResult r = new ShortcutResult(mainResolution);
             r.setBrowser((String) browsers.getSelectedItem());
             r.setFixHref(fix.isSelected());
             if (browser.isSelected()) {
