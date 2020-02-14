@@ -22,6 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * <img src="doc-files/CreateShortcutDialog.png"></img>
+ */
 public class CreateShortcutDialog extends BasicSecurityDialog<Optional<ShortcutResult>> {
     private static final Logger LOG = LoggerFactory.getLogger(CreateShortcutDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
