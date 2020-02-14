@@ -12,11 +12,7 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Arrays;
@@ -144,54 +140,5 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
     @Override
     protected List<DialogButton<Optional<CreateShortcutResult>>> createButtons() {
         return Arrays.asList(createButton, cancelButton);
-    }
-
-    private void addRow(String key, String value, JPanel panel, int row) {
-        final JLabel keyLabel = new JLabel(key + ":");
-        keyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        GridBagConstraints keyLabelConstraints = new GridBagConstraints();
-        keyLabelConstraints.gridx = 0;
-        keyLabelConstraints.gridy = row;
-        keyLabelConstraints.ipady = 8;
-        keyLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(keyLabel, keyLabelConstraints);
-
-        final JPanel seperatorPanel = new JPanel();
-        seperatorPanel.setSize(8, 0);
-        GridBagConstraints seperatorPanelConstraints = new GridBagConstraints();
-        keyLabelConstraints.gridx = 1;
-        keyLabelConstraints.gridy = row;
-        keyLabelConstraints.ipady = 8;
-        keyLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(seperatorPanel, seperatorPanelConstraints);
-
-        final JLabel valueLabel = new JLabel(value);
-        GridBagConstraints valueLabelConstraints = new GridBagConstraints();
-        valueLabelConstraints.gridx = 2;
-        valueLabelConstraints.gridy = row;
-        valueLabelConstraints.ipady = 8;
-        valueLabelConstraints.weightx = 1;
-        valueLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(valueLabel, valueLabelConstraints);
-    }
-
-    protected void addRow(JComponent child, JPanel panel, int row) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = row;
-        constraints.ipady = 0;
-        constraints.gridwidth = 3;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(child, constraints);
-    }
-
-    protected void addSeparatorRow(boolean hasLine, JPanel panel, int row) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = row;
-        constraints.ipady = 4;
-        constraints.gridwidth = 3;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(hasLine ? new JSeparator() : new JPanel(), constraints);
     }
 }

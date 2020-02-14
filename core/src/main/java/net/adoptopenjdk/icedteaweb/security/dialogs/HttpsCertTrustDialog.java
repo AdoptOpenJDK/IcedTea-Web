@@ -58,7 +58,9 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
 
-            addRow(createAlwaysTrustCheckbox(), panel, 2);
+            addSeparatorRow(false, panel, 2);
+
+            addRow(createAlwaysTrustCheckbox(), panel, 3);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);

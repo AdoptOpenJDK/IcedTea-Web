@@ -11,10 +11,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Arrays;
@@ -27,14 +24,15 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberRe
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<AllowDenyRememberResult> allowButton;
-    DialogButton<AllowDenyRememberResult> denyButton;
+    private final DialogButton<AllowDenyRememberResult> allowButton;
+    private final DialogButton<AllowDenyRememberResult> denyButton;
+    private RememberUserDecisionPanel rememberUserDecisionPanel;
 
     private AccessWarningDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRememberResult(AllowDeny.ALLOW, null));
-        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRememberResult(AllowDeny.DENY, null));
+        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRememberResult(AllowDeny.ALLOW, rememberUserDecisionPanel.getResult()));
+        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRememberResult(AllowDeny.DENY, rememberUserDecisionPanel.getResult()));
     }
 
     @Override
@@ -74,6 +72,12 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberRe
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
+
+            addSeparatorRow(false, panel, 3);
+
+            rememberUserDecisionPanel = new RememberUserDecisionPanel();
+            addRow(rememberUserDecisionPanel, panel, 4);
+
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
         }
@@ -83,35 +87,6 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberRe
     @Override
     protected List<DialogButton<AllowDenyRememberResult>> createButtons() {
         return Arrays.asList(allowButton, denyButton);
-    }
-
-    private void addRow(String key, String value, JPanel panel, int row) {
-        final JLabel keyLabel = new JLabel(key + ":");
-        keyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        GridBagConstraints keyLabelConstraints = new GridBagConstraints();
-        keyLabelConstraints.gridx = 0;
-        keyLabelConstraints.gridy = row;
-        keyLabelConstraints.ipady = 8;
-        keyLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(keyLabel, keyLabelConstraints);
-
-        final JPanel seperatorPanel = new JPanel();
-        seperatorPanel.setSize(8, 0);
-        GridBagConstraints seperatorPanelConstraints = new GridBagConstraints();
-        keyLabelConstraints.gridx = 1;
-        keyLabelConstraints.gridy = row;
-        keyLabelConstraints.ipady = 8;
-        keyLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(seperatorPanel, seperatorPanelConstraints);
-
-        final JLabel valueLabel = new JLabel(value);
-        GridBagConstraints valueLabelConstraints = new GridBagConstraints();
-        valueLabelConstraints.gridx = 2;
-        valueLabelConstraints.gridy = row;
-        valueLabelConstraints.ipady = 8;
-        valueLabelConstraints.weightx = 1;
-        valueLabelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(valueLabel, valueLabelConstraints);
     }
 
     public static AccessWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final Object[] extras) {
