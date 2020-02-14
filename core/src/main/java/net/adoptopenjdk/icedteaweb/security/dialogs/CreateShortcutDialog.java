@@ -22,19 +22,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember> {
+public class CreateShortcutDialog extends BasicSecurityDialog<Optional<ShortcutResult>> {
     private static final Logger LOG = LoggerFactory.getLogger(CreateShortcutDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<AllowDenyRemember> allowButton;
-    DialogButton<AllowDenyRemember> denyButton;
+    DialogButton<Optional<ShortcutResult>> createButton;
+    DialogButton<Optional<ShortcutResult>> cancelButton;
+    private JCheckBox desktopCheckBox;
+    private JCheckBox menuCheckBox;
 
     private CreateShortcutDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRemember(AllowDenyResult.ALLOW, null));
-        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRemember(AllowDenyResult.DENY, null));
+        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new ShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), null)));
+        cancelButton = ButtonFactory.createCancelButton(Optional::empty);
+    }
+
+    public static CreateShortcutDialog create(final JNLPFile jnlpFile) {
+        return new CreateShortcutDialog(jnlpFile, TRANSLATOR.translate("SDesktopShortcut"));
     }
 
     private JCheckBox createDesktopCheckBox() {
@@ -112,8 +118,11 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
                     .orElse(fromFallback);
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
 
-            addRow(createDesktopCheckBox(), panel, 3);
-            addRow(createMenuCheckBox(), panel, 4);
+            desktopCheckBox = createDesktopCheckBox();
+            addRow(desktopCheckBox, panel, 3);
+
+            menuCheckBox = createMenuCheckBox();
+            addRow(menuCheckBox, panel, 4);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
@@ -122,8 +131,8 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
     }
 
     @Override
-    protected List<DialogButton<AllowDenyRemember>> createButtons() {
-        return Arrays.asList(allowButton, denyButton);
+    protected List<DialogButton<Optional<ShortcutResult>>> createButtons() {
+        return Arrays.asList(createButton, cancelButton);
     }
 
     private void addRow(String key, String value, JPanel panel, int row) {
@@ -163,9 +172,5 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
         constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         panel.add(child, constraints);
-    }
-
-    public static CreateShortcutDialog create(final JNLPFile jnlpFile) {
-        return new CreateShortcutDialog(jnlpFile, TRANSLATOR.translate("SDesktopShortcut"));
     }
 }

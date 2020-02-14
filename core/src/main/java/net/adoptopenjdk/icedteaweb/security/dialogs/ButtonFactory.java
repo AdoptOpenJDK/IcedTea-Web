@@ -12,11 +12,19 @@ public class ButtonFactory {
         return new DialogButton<>(TRANSLATOR.translate("ButAllow"), onAction);
     }
 
+    public static <R> DialogButton<R> createCreateButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButCreate"), onAction);
+    }
+
     public static <R> DialogButton<R> createDenyButton(final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButDeny"), onAction);
     }
 
-    public static <R> DialogButton<R> createCancelButton(String toolTipText, final Supplier<R> onAction) {
+    public static <R> DialogButton<R> createCancelButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction);
+    }
+
+   public static <R> DialogButton<R> createCancelButton(String toolTipText, final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction, toolTipText);
     }
 

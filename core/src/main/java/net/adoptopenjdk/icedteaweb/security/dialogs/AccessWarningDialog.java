@@ -22,19 +22,19 @@ import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
-public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> {
+public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberResult> {
     private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<AllowDenyRemember> allowButton;
-    DialogButton<AllowDenyRemember> denyButton;
+    DialogButton<AllowDenyRememberResult> allowButton;
+    DialogButton<AllowDenyRememberResult> denyButton;
 
     private AccessWarningDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRemember(AllowDenyResult.ALLOW, null));
-        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRemember(AllowDenyResult.DENY, null));
+        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRememberResult(AllowDeny.ALLOW, null));
+        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRememberResult(AllowDeny.DENY, null));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRemember> 
     }
 
     @Override
-    protected List<DialogButton<AllowDenyRemember>> createButtons() {
+    protected List<DialogButton<AllowDenyRememberResult>> createButtons() {
         return Arrays.asList(allowButton, denyButton);
     }
 

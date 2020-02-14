@@ -5,11 +5,12 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyRemember;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyRememberResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDeny;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
+import net.adoptopenjdk.icedteaweb.security.dialogs.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
@@ -26,6 +27,7 @@ import java.awt.Window;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 import static net.sourceforge.jnlp.security.AccessType.*;
@@ -41,16 +43,16 @@ public class NewDialogFactory implements DialogFactory {
 
         if (accessType == CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
-            final AllowDenyRemember result = createShortcutDialog.showAndWait();
+            final Optional<ShortcutResult> result = createShortcutDialog.showAndWait();
 
             throw new RuntimeException("not implemented yet!");
         } else {
             final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-            final AllowDenyRemember allowDenyRemember = dialogWithResult.showAndWait();
+            final AllowDenyRememberResult allowDenyRemember = dialogWithResult.showAndWait();
 
             // doAccessWarningDialogSideEffects();
 
-            return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDenyResult.ALLOW);
+            return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDeny.ALLOW);
         }
     }
 
