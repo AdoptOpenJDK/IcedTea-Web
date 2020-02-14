@@ -31,15 +31,16 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    DialogButton<Optional<CreateShortcutResult>> createButton;
-    DialogButton<Optional<CreateShortcutResult>> cancelButton;
+    private final DialogButton<Optional<CreateShortcutResult>> createButton;
+    private final DialogButton<Optional<CreateShortcutResult>> cancelButton;
     private JCheckBox desktopCheckBox;
     private JCheckBox menuCheckBox;
+    private RememberUserDecisionPanel rememberUserDecisionPanel;
 
     private CreateShortcutDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new CreateShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), null)));
+        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new CreateShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), rememberUserDecisionPanel.getResult())));
         cancelButton = ButtonFactory.createCancelButton(Optional::empty);
     }
 
@@ -131,7 +132,8 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
 
             addSeparatorRow(false, panel, 6);
 
-            addRow(new RememberUserDecisionPanel(), panel, 7);
+            rememberUserDecisionPanel = new RememberUserDecisionPanel();
+            addRow(rememberUserDecisionPanel, panel, 7);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
