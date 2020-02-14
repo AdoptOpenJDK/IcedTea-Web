@@ -3,11 +3,14 @@ package net.adoptopenjdk.icedteaweb.security.dialogs;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,6 +35,43 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
         this.file = file;
         allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRemember(AllowDenyResult.ALLOW, null));
         denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRemember(AllowDenyResult.DENY, null));
+    }
+
+    private JCheckBox createDesktopCheckBox() {
+        final Boolean applicationRequested = Optional.ofNullable(file.getInformation())
+                .map(InformationDesc::getShortcut)
+                .map(ShortcutDesc::onDesktop)
+                .orElse(false);
+
+        final String textKey = applicationRequested ? "EXAWdesktopWants" : "EXAWdesktopDontWants";
+
+        return new JCheckBox(TRANSLATOR.translate(textKey), applicationRequested);
+    }
+
+    private JCheckBox createMenuCheckBox() {
+
+        final Boolean includeInMenuRequested = Optional.ofNullable(file.getInformation())
+                .map(InformationDesc::getShortcut)
+                .map(ShortcutDesc::toMenu)
+                .orElse(false);
+
+        final Optional<String> subMenu = Optional.ofNullable(file.getInformation())
+                .map(InformationDesc::getShortcut)
+                .map(ShortcutDesc::getMenu)
+                .map(MenuDesc::getSubMenu);
+
+        if (includeInMenuRequested) {
+            final String text;
+            if (subMenu.isPresent()) {
+                text = TRANSLATOR.translate("EXAWsubmenu", subMenu.get());
+            } else {
+                text = TRANSLATOR.translate("EXAWmenuWants");
+            }
+            return new JCheckBox(text, true);
+
+        } else {
+            return new JCheckBox(TRANSLATOR.translate("EXAWmenuDontWants"), false);
+        }
     }
 
     @Override
@@ -71,6 +111,10 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
             addRow(TRANSLATOR.translate("From"), from, panel, 2);
+
+            addRow(createDesktopCheckBox(), panel, 3);
+            addRow(createMenuCheckBox(), panel, 4);
+
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
         }
@@ -111,8 +155,17 @@ public class CreateShortcutDialog extends BasicSecurityDialog<AllowDenyRemember>
         panel.add(valueLabel, valueLabelConstraints);
     }
 
+    protected void addRow(JComponent child, JPanel panel, int row) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = row;
+        constraints.ipady = 8;
+        constraints.gridwidth = 3;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(child, constraints);
+    }
+
     public static CreateShortcutDialog create(final JNLPFile jnlpFile) {
         return new CreateShortcutDialog(jnlpFile, TRANSLATOR.translate("SDesktopShortcut"));
     }
-
 }

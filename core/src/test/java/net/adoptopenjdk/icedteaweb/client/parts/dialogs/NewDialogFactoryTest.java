@@ -31,7 +31,7 @@ public class NewDialogFactoryTest {
     }
 
     private void showAccessWarning() {
-        dialogFactory.showAccessWarningDialog(AccessType.NETWORK, file, new Object[]{"test"});
+        dialogFactory.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, new Object[]{"test"});
     }
 
     private void showUnsignedWarning() {
