@@ -7,6 +7,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.security.dialogs.panel.RememberUserDecisionPanel;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 

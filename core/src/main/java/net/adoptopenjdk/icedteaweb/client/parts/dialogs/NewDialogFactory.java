@@ -4,13 +4,13 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogM
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningResult;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDenyRememberResult;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.AccessWarningResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDenyRememberResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDeny;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutDialog;
 import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutResult;
+import net.adoptopenjdk.icedteaweb.security.dialogs.results.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
@@ -55,6 +55,9 @@ public class NewDialogFactory implements DialogFactory {
             ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
 
             // TODO handle remember
+            //
+            // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
+            //
 
             return ar;
         } else {
