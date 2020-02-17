@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.userdecision;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Remember;
 import net.sourceforge.jnlp.JNLPFile;
 
 import java.util.Optional;
@@ -12,11 +12,11 @@ public interface UserDecisions {
 
     <T extends Enum<T>> void saveForApplication(JNLPFile file, UserDecision<T> userDecision);
 
-    default <T extends Enum<T>> void save(RememberResult result, JNLPFile file, UserDecision<T> userDecision) {
-        if (result == RememberResult.REMEMBER_BY_DOMAIN) {
+    default <T extends Enum<T>> void save(Remember result, JNLPFile file, UserDecision<T> userDecision) {
+        if (result == Remember.REMEMBER_BY_DOMAIN) {
             saveForDomain(file, userDecision);
         }
-        else if (result == RememberResult.REMEMBER_BY_APPLICATION) {
+        else if (result == Remember.REMEMBER_BY_APPLICATION) {
             saveForApplication(file, userDecision);
         }
     }

@@ -7,8 +7,8 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
-import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
@@ -62,15 +62,15 @@ public class NewDialogFactory implements DialogFactory {
 
         if (accessType == AccessType.CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
-            final Optional<CreateShortcutResult> result = createShortcutDialog.showAndWait();
+            final Optional<RememberableResult<CreateShortcutResult>> result = createShortcutDialog.showAndWait();
 
             final AccessWarningPaneComplexReturn ar;
             if (!result.isPresent()) {
                 ar = new AccessWarningPaneComplexReturn(Primitive.CANCEL);
             } else {
                 ar = new AccessWarningPaneComplexReturn(Primitive.YES);
-                ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
-                ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
+                ar.setDesktop(new ShortcutResult(result.get().getResult().getCreateDesktopShortcut() == AllowDeny.ALLOW));
+                ar.setMenu(new ShortcutResult(result.get().getResult().getCreateMenuShortcut() == AllowDeny.ALLOW));
 
                 handleRememberUserDecision(file, result.get());
             }
@@ -80,9 +80,9 @@ public class NewDialogFactory implements DialogFactory {
 
             final AllowDeny result = rememberedDecision.orElseGet(() -> {
                 final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-                final AllowDenyRememberResult dialogResult = dialogWithResult.showAndWait();
+                final RememberableResult<AllowDeny> dialogResult = dialogWithResult.showAndWait();
                 handleRememberUserDecision(file, accessType, dialogResult);
-                return dialogResult.getAllowDenyResult();
+                return dialogResult.getResult();
             });
 
             return new AccessWarningPaneComplexReturn(result == AllowDeny.ALLOW);
@@ -90,13 +90,13 @@ public class NewDialogFactory implements DialogFactory {
 
     }
 
-    private void handleRememberUserDecision(final JNLPFile file, final CreateShortcutResult result) {
-        userDecisions.save(result.getRememberResult(), file, of(CREATE_DESKTOP_SHORTCUT, result.getCreateDesktopShortcut()));
-        userDecisions.save(result.getRememberResult(), file, of(CREATE_MENU_SHORTCUT, result.getCreateMenuShortcut()));
+    private void handleRememberUserDecision(final JNLPFile file, final RememberableResult<CreateShortcutResult> result) {
+        userDecisions.save(result.getRemember(), file, of(CREATE_DESKTOP_SHORTCUT, result.getResult().getCreateDesktopShortcut()));
+        userDecisions.save(result.getRemember(), file, of(CREATE_MENU_SHORTCUT, result.getResult().getCreateMenuShortcut()));
     }
 
-    private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final AllowDenyRememberResult result) {
-        userDecisions.save(result.getRememberResult(), file, of(accessType, result.getAllowDenyResult()));
+    private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final RememberableResult<AllowDeny> result) {
+        userDecisions.save(result.getRemember(), file, of(accessType, result.getResult()));
     }
 
     @Override

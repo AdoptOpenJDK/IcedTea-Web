@@ -8,7 +8,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
-import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
@@ -22,20 +22,20 @@ import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
-public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberResult> {
+public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<AllowDeny>> {
     private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    private final DialogButton<AllowDenyRememberResult> allowButton;
-    private final DialogButton<AllowDenyRememberResult> denyButton;
+    private final DialogButton<RememberableResult<AllowDeny>> allowButton;
+    private final DialogButton<RememberableResult<AllowDeny>> denyButton;
     private RememberUserDecisionPanel rememberUserDecisionPanel;
 
     private AccessWarningDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        allowButton = ButtonFactory.createAllowButton(() -> new AllowDenyRememberResult(AllowDeny.ALLOW, rememberUserDecisionPanel.getResult()));
-        denyButton = ButtonFactory.createDenyButton(() -> new AllowDenyRememberResult(AllowDeny.DENY, rememberUserDecisionPanel.getResult()));
+        allowButton = ButtonFactory.createAllowButton(() -> new RememberableResult<>(AllowDeny.ALLOW, rememberUserDecisionPanel.getResult()));
+        denyButton = ButtonFactory.createDenyButton(() -> new RememberableResult<>(AllowDeny.DENY, rememberUserDecisionPanel.getResult()));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<AllowDenyRememberRe
     }
 
     @Override
-    protected List<DialogButton<AllowDenyRememberResult>> createButtons() {
+    protected List<DialogButton<RememberableResult<AllowDeny>>> createButtons() {
         return Arrays.asList(allowButton, denyButton);
     }
 

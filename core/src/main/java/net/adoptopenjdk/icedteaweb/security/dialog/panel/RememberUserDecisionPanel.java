@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog.panel;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberResult;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.Remember;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import javax.swing.ButtonGroup;
@@ -36,13 +36,13 @@ public class RememberUserDecisionPanel extends JPanel {
         this.validate();
     }
 
-    public RememberResult getResult() {
+    public Remember getResult() {
         if (forApplicationRadioButton.isSelected()) {
-            return RememberResult.REMEMBER_BY_APPLICATION;
+            return Remember.REMEMBER_BY_APPLICATION;
         }
         if (forDomainRadioButton.isSelected()) {
-            return RememberResult.REMEMBER_BY_DOMAIN;
+            return Remember.REMEMBER_BY_DOMAIN;
         }
-        return RememberResult.DO_NOT_REMEMBER;
+        return Remember.DO_NOT_REMEMBER;
     }
 }

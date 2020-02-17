@@ -8,8 +8,8 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
-import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 
@@ -22,16 +22,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.valueOf;
+
 /**
  * <img src="doc-files/CreateShortcutDialog.png"></img>
  */
-public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateShortcutResult>> {
+public class CreateShortcutDialog extends BasicSecurityDialog<Optional<RememberableResult<CreateShortcutResult>>> {
     private static final Logger LOG = LoggerFactory.getLogger(CreateShortcutDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final JNLPFile file;
-    private final DialogButton<Optional<CreateShortcutResult>> createButton;
-    private final DialogButton<Optional<CreateShortcutResult>> cancelButton;
+    private final DialogButton<Optional<RememberableResult<CreateShortcutResult>>> createButton;
+    private final DialogButton<Optional<RememberableResult<CreateShortcutResult>>> cancelButton;
     private JCheckBox desktopCheckBox;
     private JCheckBox menuCheckBox;
     private RememberUserDecisionPanel rememberUserDecisionPanel;
@@ -39,7 +41,10 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
     private CreateShortcutDialog(final JNLPFile file, final String message) {
         super(message);
         this.file = file;
-        createButton = ButtonFactory.createCreateButton(() -> Optional.of(new CreateShortcutResult(AllowDeny.valueOf(desktopCheckBox), AllowDeny.valueOf(menuCheckBox), rememberUserDecisionPanel.getResult())));
+        createButton = ButtonFactory.createCreateButton(() -> {
+            final CreateShortcutResult shortcutResult = new CreateShortcutResult(valueOf(desktopCheckBox), valueOf(menuCheckBox));
+            return Optional.of(new RememberableResult<>(shortcutResult, rememberUserDecisionPanel.getResult()));
+        });
         cancelButton = ButtonFactory.createCancelButton(Optional::empty);
     }
 
@@ -141,7 +146,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<CreateSho
     }
 
     @Override
-    protected List<DialogButton<Optional<CreateShortcutResult>>> createButtons() {
+    protected List<DialogButton<Optional<RememberableResult<CreateShortcutResult>>>> createButtons() {
         return Arrays.asList(createButton, cancelButton);
     }
 }
