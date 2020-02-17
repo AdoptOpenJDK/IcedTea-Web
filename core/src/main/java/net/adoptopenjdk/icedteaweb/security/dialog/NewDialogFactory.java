@@ -16,6 +16,8 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
+import net.adoptopenjdk.icedteaweb.userdecision.UserDecisions;
+import net.adoptopenjdk.icedteaweb.userdecision.UserDecisionsFileStore;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
@@ -30,7 +32,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import static net.sourceforge.jnlp.security.AccessType.CREATE_DESKTOP_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_DESKTOP_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_MENU_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
 import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
 import static net.sourceforge.jnlp.security.AccessType.SIGNING_ERROR;
 import static net.sourceforge.jnlp.security.AccessType.UNSIGNED;
@@ -39,6 +43,15 @@ import static net.sourceforge.jnlp.security.AccessType.VERIFIED;
 
 public class NewDialogFactory implements DialogFactory {
     private final static Translator TRANSLATOR = Translator.getInstance();
+    private final UserDecisions userDecisions;
+
+    NewDialogFactory() {
+        this(new UserDecisionsFileStore());
+    }
+
+    NewDialogFactory(final UserDecisions userDecisions) {
+        this.userDecisions = userDecisions;
+    }
 
     @Override
     public AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType, final JNLPFile file, final Object[] extras) {
@@ -48,14 +61,13 @@ public class NewDialogFactory implements DialogFactory {
 
         AccessWarningPaneComplexReturn ar;
 
-        if (accessType == CREATE_DESKTOP_SHORTCUT) {
+        if (accessType == AccessType.CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
             final Optional<CreateShortcutResult> result = createShortcutDialog.showAndWait();
 
             if (!result.isPresent()) {
                 ar = new AccessWarningPaneComplexReturn(Primitive.CANCEL);
-            }
-            else {
+            } else {
                 ar = new AccessWarningPaneComplexReturn(Primitive.YES);
                 ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
                 ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
@@ -76,17 +88,12 @@ public class NewDialogFactory implements DialogFactory {
     }
 
     private void handleRememberUserDecision(final JNLPFile file, final CreateShortcutResult result) {
-        // TODO handle remember
-        //
-        // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
-        //
+        userDecisions.save(result.getRememberResult(), file, of(CREATE_DESKTOP_SHORTCUT, result.getCreateDesktopShortcut()));
+        userDecisions.save(result.getRememberResult(), file, of(CREATE_MENU_SHORTCUT, result.getCreateMenuShortcut()));
     }
 
-   private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final AllowDenyRememberResult result) {
-        // TODO handle remember
-        //
-        // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
-        //
+    private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final AllowDenyRememberResult result) {
+        userDecisions.save(result.getRememberResult(), file, of(accessType, result.getAllowDenyResult()));
     }
 
     @Override
