@@ -1,15 +1,13 @@
-package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
+package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogType;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.security.dialog.AccessWarningDialog;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
-import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
-import net.adoptopenjdk.icedteaweb.security.dialog.CertWarningDialog;
-import net.adoptopenjdk.icedteaweb.security.dialog.CreateShortcutDialog;
-import net.adoptopenjdk.icedteaweb.security.dialog.HttpsCertTrustDialog;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
@@ -32,7 +30,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import static net.sourceforge.jnlp.security.AccessType.*;
+import static net.sourceforge.jnlp.security.AccessType.CREATE_DESKTOP_SHORTCUT;
+import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
+import static net.sourceforge.jnlp.security.AccessType.SIGNING_ERROR;
+import static net.sourceforge.jnlp.security.AccessType.UNSIGNED;
+import static net.sourceforge.jnlp.security.AccessType.UNVERIFIED;
+import static net.sourceforge.jnlp.security.AccessType.VERIFIED;
 
 public class NewDialogFactory implements DialogFactory {
     private final static Translator TRANSLATOR = Translator.getInstance();

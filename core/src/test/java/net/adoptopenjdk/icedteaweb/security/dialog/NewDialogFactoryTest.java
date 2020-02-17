@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
+package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
