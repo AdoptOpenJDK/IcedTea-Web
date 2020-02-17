@@ -16,6 +16,7 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
+import net.adoptopenjdk.icedteaweb.userdecision.UserDecision;
 import net.adoptopenjdk.icedteaweb.userdecision.UserDecisions;
 import net.adoptopenjdk.icedteaweb.userdecision.UserDecisionsFileStore;
 import net.sourceforge.jnlp.JNLPFile;
@@ -59,12 +60,11 @@ public class NewDialogFactory implements DialogFactory {
             throw new RuntimeException(accessType + " cannot be displayed in AccessWarningDialog");
         }
 
-        AccessWarningPaneComplexReturn ar;
-
         if (accessType == AccessType.CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
             final Optional<CreateShortcutResult> result = createShortcutDialog.showAndWait();
 
+            final AccessWarningPaneComplexReturn ar;
             if (!result.isPresent()) {
                 ar = new AccessWarningPaneComplexReturn(Primitive.CANCEL);
             } else {
@@ -74,17 +74,20 @@ public class NewDialogFactory implements DialogFactory {
 
                 handleRememberUserDecision(file, result.get());
             }
-
+            return ar;
         } else {
-            final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-            final AllowDenyRememberResult result = dialogWithResult.showAndWait();
+            final Optional<AllowDeny> rememberedDecision = this.userDecisions.getUserDecisions(UserDecision.Key.valueOf(accessType), file, AllowDeny.class);
 
-            ar = new AccessWarningPaneComplexReturn(result.getAllowDenyResult() == AllowDeny.ALLOW);
+            final AllowDeny result = rememberedDecision.orElseGet(() -> {
+                final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
+                final AllowDenyRememberResult dialogResult = dialogWithResult.showAndWait();
+                handleRememberUserDecision(file, accessType, dialogResult);
+                return dialogResult.getAllowDenyResult();
+            });
 
-            handleRememberUserDecision(file, accessType, result);
+            return new AccessWarningPaneComplexReturn(result == AllowDeny.ALLOW);
         }
 
-        return ar;
     }
 
     private void handleRememberUserDecision(final JNLPFile file, final CreateShortcutResult result) {

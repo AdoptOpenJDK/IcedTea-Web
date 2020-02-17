@@ -24,6 +24,14 @@ public class UserDecision<T extends Enum<T>> {
         Key(AccessType accessType) {
             this.accessType = accessType;
         }
+
+        public static Key valueOf(AccessType accessType) {
+            return Stream.of(Key.values())
+                    .filter(k -> k.accessType == accessType)
+                    .findFirst()
+                    .orElseThrow(()->new IllegalArgumentException("Could not find key for access type " + accessType));
+
+        }
     }
 
     private UserDecision(final Key key, final T value) {
@@ -36,11 +44,7 @@ public class UserDecision<T extends Enum<T>> {
     }
 
     public static <T extends Enum<T>> UserDecision<T> of(final AccessType accessType, final T value) {
-        final Key key = Stream.of(Key.values())
-                .filter(k -> k.accessType == accessType)
-                .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("Could not find key for access type " + accessType));
-        return new UserDecision<T>(key, value);
+        return new UserDecision<>(Key.valueOf(accessType), value);
     }
 
     public Key getKey() {
