@@ -52,7 +52,7 @@ public class NewDialogFactory implements DialogFactory {
             }
             final AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(Primitive.YES);
             ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
-            ar.setDesktop(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
+            ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
 
             // TODO handle remember
 
