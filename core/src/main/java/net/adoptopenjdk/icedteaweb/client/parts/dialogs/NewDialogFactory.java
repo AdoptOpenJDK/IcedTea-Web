@@ -3,14 +3,14 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
-import net.adoptopenjdk.icedteaweb.security.dialogs.AccessWarningDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.AccessWarningResult;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDenyRememberResult;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDeny;
-import net.adoptopenjdk.icedteaweb.security.dialogs.CertWarningDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.CreateShortcutDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.HttpsCertTrustDialog;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.CreateShortcutResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.AccessWarningDialog;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialog.CertWarningDialog;
+import net.adoptopenjdk.icedteaweb.security.dialog.CreateShortcutDialog;
+import net.adoptopenjdk.icedteaweb.security.dialog.HttpsCertTrustDialog;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
@@ -43,33 +43,48 @@ public class NewDialogFactory implements DialogFactory {
             throw new RuntimeException(accessType + " cannot be displayed in AccessWarningDialog");
         }
 
+        AccessWarningPaneComplexReturn ar;
+
         if (accessType == CREATE_DESKTOP_SHORTCUT) {
             final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
             final Optional<CreateShortcutResult> result = createShortcutDialog.showAndWait();
 
             if (!result.isPresent()) {
-                return new AccessWarningPaneComplexReturn(Primitive.CANCEL);
+                ar = new AccessWarningPaneComplexReturn(Primitive.CANCEL);
             }
-            final AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(Primitive.YES);
-            ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
-            ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
+            else {
+                ar = new AccessWarningPaneComplexReturn(Primitive.YES);
+                ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
+                ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
 
-            // TODO handle remember
-            //
-            // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
-            //
+                handleRememberUserDecision(file, result.get());
+            }
 
-            return ar;
         } else {
             final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-            final AllowDenyRememberResult allowDenyRemember = dialogWithResult.showAndWait();
+            final AllowDenyRememberResult result = dialogWithResult.showAndWait();
 
-            //TODO doAccessWarningDialogSideEffects();
+            ar = new AccessWarningPaneComplexReturn(result.getAllowDenyResult() == AllowDeny.ALLOW);
 
-            return new AccessWarningPaneComplexReturn(allowDenyRemember.getAllowDenyResult() == AllowDeny.ALLOW);
+            handleRememberUserDecision(file, accessType, result);
         }
+
+        return ar;
     }
 
+    private void handleRememberUserDecision(final JNLPFile file, final CreateShortcutResult result) {
+        // TODO handle remember
+        //
+        // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
+        //
+    }
+
+   private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final AllowDenyRememberResult result) {
+        // TODO handle remember
+        //
+        // store user decision in file (today: UnsignedAppletTrustConfirmation.updateAppletAction()
+        //
+    }
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {

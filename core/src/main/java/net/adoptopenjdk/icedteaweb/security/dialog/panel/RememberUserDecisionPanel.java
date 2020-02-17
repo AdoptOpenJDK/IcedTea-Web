@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.security.dialogs.panel;
+package net.adoptopenjdk.icedteaweb.security.dialog.panel;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberResult;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;

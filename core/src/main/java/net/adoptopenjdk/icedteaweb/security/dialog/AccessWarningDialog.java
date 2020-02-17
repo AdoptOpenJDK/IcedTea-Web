@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.security.dialogs;
+package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -6,9 +6,9 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.security.dialogs.panel.RememberUserDecisionPanel;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDeny;
-import net.adoptopenjdk.icedteaweb.security.dialogs.results.AllowDenyRememberResult;
+import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenyRememberResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;

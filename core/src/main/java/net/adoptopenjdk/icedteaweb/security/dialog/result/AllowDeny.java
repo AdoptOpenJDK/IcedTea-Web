@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.security.dialogs.results;
+package net.adoptopenjdk.icedteaweb.security.dialog.result;
 
 import javax.swing.JCheckBox;
 

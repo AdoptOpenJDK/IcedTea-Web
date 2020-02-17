@@ -1,4 +1,4 @@
-package net.adoptopenjdk.icedteaweb.security.dialogs;
+package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
