@@ -1,9 +1,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogType;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
@@ -33,6 +31,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.DENY;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_DESKTOP_SHORTCUT;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_MENU_SHORTCUT;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
@@ -43,7 +42,6 @@ import static net.sourceforge.jnlp.security.AccessType.UNVERIFIED;
 import static net.sourceforge.jnlp.security.AccessType.VERIFIED;
 
 public class NewDialogFactory implements DialogFactory {
-    private final static Translator TRANSLATOR = Translator.getInstance();
     private final UserDecisions userDecisions;
 
     NewDialogFactory() {
@@ -61,41 +59,72 @@ public class NewDialogFactory implements DialogFactory {
         }
 
         if (accessType == AccessType.CREATE_DESKTOP_SHORTCUT) {
-            final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
-            final Optional<RememberableResult<CreateShortcutResult>> result = createShortcutDialog.showAndWait();
-
-            final AccessWarningPaneComplexReturn ar;
-            if (!result.isPresent()) {
-                ar = new AccessWarningPaneComplexReturn(Primitive.CANCEL);
-            } else {
-                ar = new AccessWarningPaneComplexReturn(Primitive.YES);
-                ar.setDesktop(new ShortcutResult(result.get().getResult().getCreateDesktopShortcut() == AllowDeny.ALLOW));
-                ar.setMenu(new ShortcutResult(result.get().getResult().getCreateMenuShortcut() == AllowDeny.ALLOW));
-
-                handleRememberUserDecision(file, result.get());
-            }
-            return ar;
+            return askForPermissionToCreateShortcuts(file);
         } else {
-            final Optional<AllowDeny> rememberedDecision = this.userDecisions.getUserDecisions(UserDecision.Key.valueOf(accessType), file, AllowDeny.class);
-
-            final AllowDeny result = rememberedDecision.orElseGet(() -> {
-                final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-                final RememberableResult<AllowDeny> dialogResult = dialogWithResult.showAndWait();
-                handleRememberUserDecision(file, accessType, dialogResult);
-                return dialogResult.getResult();
-            });
-
-            return new AccessWarningPaneComplexReturn(result == AllowDeny.ALLOW);
+            return askForAccessPermission(accessType, file, extras);
         }
-
     }
 
-    private void handleRememberUserDecision(final JNLPFile file, final RememberableResult<CreateShortcutResult> result) {
+    private AccessWarningPaneComplexReturn askForPermissionToCreateShortcuts(JNLPFile file) {
+        final Optional<Optional<CreateShortcutResult>> rememberedDecision = getRememberedUserDecision(file).map(Optional::of);
+
+        final Optional<CreateShortcutResult> result = rememberedDecision.orElseGet(() -> showCreateShortcutDialog(file));
+
+        if (!result.isPresent()) {
+            return new AccessWarningPaneComplexReturn(Primitive.CANCEL);
+        } else {
+            final AccessWarningPaneComplexReturn ar;
+            ar = new AccessWarningPaneComplexReturn(Primitive.YES);
+            ar.setDesktop(new ShortcutResult(result.get().getCreateDesktopShortcut() == AllowDeny.ALLOW));
+            ar.setMenu(new ShortcutResult(result.get().getCreateMenuShortcut() == AllowDeny.ALLOW));
+            return ar;
+        }
+    }
+
+    private Optional<CreateShortcutResult> showCreateShortcutDialog(JNLPFile file) {
+        final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
+        return createShortcutDialog.showAndWait()
+                .map(r -> {
+                    rememberUserDecision(file, r);
+                    return r.getResult();
+                });
+    }
+
+    private Optional<CreateShortcutResult> getRememberedUserDecision(JNLPFile file) {
+        final Optional<AllowDeny> createDesktop = userDecisions.getUserDecisions(CREATE_DESKTOP_SHORTCUT, file, AllowDeny.class);
+        final Optional<AllowDeny> createMenu = userDecisions.getUserDecisions(CREATE_MENU_SHORTCUT, file, AllowDeny.class);
+
+        if (createDesktop.isPresent() || createMenu.isPresent()) {
+            return Optional.of(new CreateShortcutResult(createDesktop.orElse(DENY), createMenu.orElse(DENY)));
+        }
+        return Optional.empty();
+    }
+
+    private void rememberUserDecision(final JNLPFile file, final RememberableResult<CreateShortcutResult> result) {
         userDecisions.save(result.getRemember(), file, of(CREATE_DESKTOP_SHORTCUT, result.getResult().getCreateDesktopShortcut()));
         userDecisions.save(result.getRemember(), file, of(CREATE_MENU_SHORTCUT, result.getResult().getCreateMenuShortcut()));
     }
 
-    private void handleRememberUserDecision(final JNLPFile file, final AccessType accessType, final RememberableResult<AllowDeny> result) {
+    private AccessWarningPaneComplexReturn askForAccessPermission(AccessType accessType, JNLPFile file, Object[] extras) {
+        final Optional<AllowDeny> rememberedDecision = getRememberedUserDecision(accessType, file);
+
+        final AllowDeny result = rememberedDecision.orElseGet(() -> showAccessPermissionDialog(accessType, file, extras));
+
+        return new AccessWarningPaneComplexReturn(result == AllowDeny.ALLOW);
+    }
+
+    private AllowDeny showAccessPermissionDialog(AccessType accessType, JNLPFile file, Object[] extras) {
+        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
+        final RememberableResult<AllowDeny> dialogResult = dialogWithResult.showAndWait();
+        rememberUserDecision(file, accessType, dialogResult);
+        return dialogResult.getResult();
+    }
+
+    private Optional<AllowDeny> getRememberedUserDecision(AccessType accessType, JNLPFile file) {
+        return userDecisions.getUserDecisions(UserDecision.Key.valueOf(accessType), file, AllowDeny.class);
+    }
+
+    private void rememberUserDecision(final JNLPFile file, final AccessType accessType, final RememberableResult<AllowDeny> result) {
         userDecisions.save(result.getRemember(), file, of(accessType, result.getResult()));
     }
 
@@ -176,24 +205,5 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public void showSingleCertInfoDialog(final X509Certificate c, final Window parent) {
-    }
-
-    private static String getTitleFor(DialogType dialogType) {
-        // TODO do translations
-
-        String title = "";
-        if (dialogType == DialogType.MORE_INFO) {
-            title = "More Information";
-        } else if (dialogType == DialogType.CERT_INFO) {
-            title = "Details - Certificate";
-        } else if (dialogType == DialogType.APPLET_WARNING) {
-            title = "Applet Warning";
-        } else if (dialogType == DialogType.PARTIALLY_SIGNED_WARNING) {
-            title = "Security Warning";
-        } else if (dialogType == DialogType.AUTHENTICATION) {
-            title = "Authentication Required";
-        }
-
-        return TRANSLATOR.translate(title);
     }
 }
