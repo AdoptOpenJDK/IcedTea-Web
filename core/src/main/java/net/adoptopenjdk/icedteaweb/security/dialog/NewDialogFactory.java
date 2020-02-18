@@ -139,9 +139,9 @@ public class NewDialogFactory implements DialogFactory {
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
-            dialogWithResult = HttpsCertTrustDialog.create(accessType, file, (HttpsCertVerifier) certVerifier);
+            dialogWithResult = HttpsCertTrustDialog.create(file, (HttpsCertVerifier) certVerifier);
         } else {
-            dialogWithResult = CertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
+            dialogWithResult = JarCertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
         }
 
         final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();

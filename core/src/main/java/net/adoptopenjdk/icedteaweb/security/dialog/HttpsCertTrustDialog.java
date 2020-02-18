@@ -7,9 +7,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.ImageIcon;
@@ -27,19 +25,22 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
     private final DialogButton<AccessWarningResult> yesButton;
     private final DialogButton<AccessWarningResult> noButton;
+    private final JNLPFile file;
+    private final CertVerifier certVerifier;
 
 
-    private HttpsCertTrustDialog(final String message, final AccessType accessType, final JNLPFile file, final HttpsCertVerifier certVerifier) {
-        super(message, accessType, file, certVerifier, null);
-        this.alwaysTrustSelected = false;
+    private HttpsCertTrustDialog(final String message, final JNLPFile file, final CertVerifier certVerifier) {
+        super(message, file, certVerifier, false);
+        this.file = file;
+        this.certVerifier = certVerifier;
 
         this.yesButton = ButtonFactory.createYesButton(() -> null);
         this.noButton = ButtonFactory.createNoButton(() -> null);
     }
 
-    public static HttpsCertTrustDialog create(final AccessType accessType, final JNLPFile jnlpFile, final HttpsCertVerifier certVerifier) {
+    public static HttpsCertTrustDialog create(final JNLPFile jnlpFile, final CertVerifier certVerifier) {
         final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
-        return new HttpsCertTrustDialog(message, accessType, jnlpFile, certVerifier);
+        return new HttpsCertTrustDialog(message, jnlpFile, certVerifier);
     }
 
     @Override
@@ -74,7 +75,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         return Arrays.asList(yesButton, noButton);
     }
 
-    protected String getMoreInformationText(final AccessType accessType, final CertVerifier certVerifier) {
+    @Override
+    protected String getMoreInformationText(final CertVerifier certVerifier) {
         return certVerifier.getRootInCaCerts() ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
     }
 
