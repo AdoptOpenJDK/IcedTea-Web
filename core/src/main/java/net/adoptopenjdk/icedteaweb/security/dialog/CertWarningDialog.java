@@ -43,11 +43,13 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
     private final CertVerifier certVerifier;
     private final JNLPFile file;
     private boolean initiallyAlwaysTrustedSelected;
+    private final Certificate certificate;
 
     protected CertWarningDialog(final String message, final JNLPFile file, final CertVerifier certVerifier, boolean initiallyAlwaysTrustedSelected) {
         super(message);
         this.file = file;
         this.certVerifier = certVerifier;
+        this.certificate = certVerifier.getPublisher(null);
         this.initiallyAlwaysTrustedSelected = initiallyAlwaysTrustedSelected;
     }
 
@@ -68,10 +70,9 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             addRow(TRANSLATOR.translate("Name"), name, panel, 0);
 
-            Certificate cert = certVerifier.getPublisher(null);
             String publisher = "";
-            if (cert instanceof X509Certificate) {
-                publisher = SecurityUtil.getCN(((X509Certificate) cert)
+            if (certificate instanceof X509Certificate) {
+                publisher = SecurityUtil.getCN(((X509Certificate) certificate)
                         .getSubjectX500Principal().getName());
             }
             addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
@@ -105,7 +106,7 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
     protected JPanel createMoreInformationPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        final String moreInformationText = getMoreInformationText(certVerifier);
+        final String moreInformationText = getMoreInformationText();
         final JLabel moreInformationLabel = new JLabel(htmlWrap(moreInformationText));
         panel.add(moreInformationLabel);
         JButton moreInfoButton = new JButton(TRANSLATOR.translate("ButMoreInformation"));
@@ -115,5 +116,5 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
         return panel;
     }
 
-    protected abstract String getMoreInformationText(final CertVerifier certVerifier);
+    protected abstract String getMoreInformationText();
 }

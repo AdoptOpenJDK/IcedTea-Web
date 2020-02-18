@@ -27,11 +27,15 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> noButton;
     private final JNLPFile file;
     private final CertVerifier certVerifier;
+    private final Certificate certificate;
+    private boolean rootInCaCerts;
 
 
     private HttpsCertTrustDialog(final String message, final JNLPFile file, final CertVerifier certVerifier) {
         super(message, file, certVerifier, false);
         this.file = file;
+        this.certificate = certVerifier.getPublisher(null);
+        this.rootInCaCerts = certVerifier.getRootInCaCerts();
         this.certVerifier = certVerifier;
 
         this.yesButton = ButtonFactory.createYesButton(() -> null);
@@ -48,11 +52,10 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         final JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         try {
-            Certificate cert = certVerifier.getPublisher(null);
             String name;
             String publisher = "";
-            if (cert instanceof X509Certificate) {
-                name = SecurityUtil.getCN(((X509Certificate) cert).getSubjectX500Principal().getName());
+            if (certificate instanceof X509Certificate) {
+                name = SecurityUtil.getCN(((X509Certificate) certificate).getSubjectX500Principal().getName());
                 publisher = name;
             } else {
                 name = file.getInformation().getTitle();
@@ -76,8 +79,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     }
 
     @Override
-    protected String getMoreInformationText(final CertVerifier certVerifier) {
-        return certVerifier.getRootInCaCerts() ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
+    protected String getMoreInformationText() {
+        return rootInCaCerts ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
     }
 
     @Override

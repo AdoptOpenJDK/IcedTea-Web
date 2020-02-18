@@ -33,6 +33,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> cancelButton;
     private final JButton advancedOptionsButton;
 
+    private final boolean rootInCaCerts;
     private final AccessType accessType;
     private final SecurityDelegate securityDelegate;
     private final JNLPFile file;
@@ -44,6 +45,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
         this.accessType = accessType;
         this.securityDelegate = securityDelegate;
         this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
+        this.rootInCaCerts = certVerifier.getRootInCaCerts();
 
         runButton = ButtonFactory.createRunButton(() -> AccessWarningResult.YES);
         sandboxButton = ButtonFactory.createSandboxButton(() -> AccessWarningResult.SANDBOX);
@@ -84,8 +86,8 @@ public class JarCertWarningDialog extends CertWarningDialog {
         return alwaysTrustCheckBox;
     }
 
-    protected String getMoreInformationText(final CertVerifier certVerifier) {
-        String moreInformationText = certVerifier.getRootInCaCerts() ?
+    protected String getMoreInformationText() {
+        String moreInformationText = rootInCaCerts ?
                 TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
 
         switch (accessType) {
