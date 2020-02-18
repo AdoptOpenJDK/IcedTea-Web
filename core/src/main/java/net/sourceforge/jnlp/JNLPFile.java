@@ -842,58 +842,21 @@ public class JNLPFile {
         return manifestAttributesReader;
     }
 
-
-    public String createJnlpVendorValue() {
-        final String location;
+    private String createShortcutNameFromLocation() {
         if (getSourceLocation() != null) {
-            location = getSourceLocation().toString();
+            return new File(getSourceLocation().getFile()).getName();
+        } else if (getCodeBase() != null) {
+            return new File(getCodeBase().getFile()).getName();
+        } else {
+            return "unknown";
         }
-        else if (getCodeBase() != null) {
-            location = getCodeBase().toString();
-        }
-        else {
-            location = "unknown";
-        }
-        return location;
     }
 
-    public String createJnlpVendor() {
-        return "Generated from applet from " + createJnlpVendorValue();
-    }
-
-    private String createJnlpTitleValue() {
-        final String location;
-        if (getSourceLocation() != null) {
-            location = new File(getSourceLocation().getFile()).getName();
-        }
-        else if (getCodeBase() != null) {
-            location = new File(getCodeBase().getFile()).getName();
-        }
-        else {
-            location = "unknown";
-        }
-        return location;
-    }
-
-    public String createJnlpTitle() {
-        //case when creating name from already created name
-        String shortenedTitle = getTitle();
-        int i = shortenedTitle.lastIndexOf("(");
-        if (i >= 2) { // not cutting immediately...
-            shortenedTitle = shortenedTitle.substring(0, i - 1);
-        }
-        if (createJnlpTitleValue().startsWith(shortenedTitle)) {
-            return createJnlpTitleValue();
-        }
-        return getTitle() + " from " + createJnlpTitleValue();
-    }
-
-    public String createNameForDesktopFile() {
-        String basicTitle = getTitle();
-        if (basicTitle == null || basicTitle.trim().isEmpty()) {
-            return createJnlpTitleValue().replaceAll(".jnlp$", "");
-        }
-        else {
+    public String getShortcutName() {
+        String basicTitle = getInformation().getTitle();
+        if (StringUtils.isBlank(basicTitle)) {
+            return createShortcutNameFromLocation().replaceAll("\\.jnlp$", "");
+        } else {
             return basicTitle;
         }
     }

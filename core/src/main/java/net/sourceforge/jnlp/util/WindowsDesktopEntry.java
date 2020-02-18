@@ -43,7 +43,7 @@ import static net.sourceforge.jnlp.util.WindowsShortcutManager.getWindowsShortcu
  */
 public class WindowsDesktopEntry implements GenericDesktopEntry {
 
-    private final static Logger LOG = LoggerFactory.getLogger(WindowsDesktopEntry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WindowsDesktopEntry.class);
 
     private final JNLPFile file;
     private final LazyLoaded<String> iconLocation;
@@ -53,13 +53,24 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         this.iconLocation = new LazyLoaded<>(() -> new XDesktopEntry(file).cacheAndGetIconLocation());
     }
 
-    @Override
-    public String getDesktopIconFileName() {
-        return XDesktopEntry.getDesktopIconName(file) + ".lnk";
+    private String getShortcutFileName() {
+        return getShortcutName() + ".lnk";
+    }
+
+    private String getShortcutName() {
+        return sanitize(file.getShortcutName());
+    }
+
+    private String sanitize(String fileName) {
+        if (fileName != null) {/* key=value pairs must be a single line */
+            //return first line or replace new lines by space?
+            return FileUtils.sanitizeFileName(fileName, '-').split("\\R")[0];
+        }
+        return "";
     }
 
     private String getDesktopLnkPath() {
-        return System.getenv("userprofile") + "/Desktop/" + getDesktopIconFileName();
+        return System.getenv("userprofile") + "/Desktop/" + getShortcutFileName();
     }
 
     @Override
@@ -106,7 +117,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             pathSuffix = null;
         }        
         if (pathSuffix == null) {
-            pathSuffix = XDesktopEntry.getDesktopIconName(file);
+            pathSuffix = getShortcutName();
         }
                         
         final String path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + pathSuffix;        
@@ -123,7 +134,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             sl.setIconLocation(iconLocation.get());
             ul.setIconLocation(iconLocation.get());
         }
-        final String link = FileUtils.sanitizeFileName(file.getInformation().getTitle() + ".lnk", '-');
+        final String link = getShortcutFileName();
         sl.saveTo(path + "/" + link);
         ul.saveTo(path + "/Uninstall " + link);
         // write shortcuts to list
