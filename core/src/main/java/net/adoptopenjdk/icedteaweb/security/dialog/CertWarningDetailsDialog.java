@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     private final List<String> details;
     private final DialogButton<Void> closeButton;
 
-    CertWarningDetailsDialog(final JNLPFile file, final CertVerifier certVerifier) {
+    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final CertVerifier certVerifier) {
+        super(owner);
         this.file = file;
         details = new ArrayList<>(certVerifier.getDetails(null));
 

@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.ui.dialogs;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import java.awt.Dialog;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class DialogWithResult<R> extends JDialog {
@@ -10,7 +11,11 @@ public abstract class DialogWithResult<R> extends JDialog {
     private R result;
 
     public DialogWithResult() {
-        setModal(true);
+        this((Dialog) null);
+    }
+
+    public DialogWithResult(final Dialog owner) {
+        super(owner, true);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setResizable(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
