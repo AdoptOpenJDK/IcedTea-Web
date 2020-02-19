@@ -193,14 +193,13 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public void showMoreInfoDialog(final CertVerifier certVerifier, final JNLPFile file) {
-
-        // MoreInfoPane
-
+         CertWarningDetailsDialog dialog = new CertWarningDetailsDialog(null, file, certVerifier);
+         dialog.showAndWait();
     }
 
     @Override
     public void showCertInfoDialog(final CertVerifier certVerifier, final Component parent) {
-
+        // obsolete, as we show this not longer as a modal dialog but as part of the CertWarningDetailsDialog (collapsible panel: CertificateDetailsPanel)
     }
 
     @Override

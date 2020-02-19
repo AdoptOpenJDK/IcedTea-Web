@@ -109,7 +109,8 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
         final JLabel moreInformationLabel = new JLabel(htmlWrap(moreInformationText));
         panel.add(moreInformationLabel);
         JButton moreInfoButton = new JButton(TRANSLATOR.translate("ButMoreInformation"));
-        moreInfoButton.addActionListener((e) -> new CertWarningDetailsDialog(this, file, certVerifier).showAndWait());
+        // TODO use Dialogs here?
+        moreInfoButton.addActionListener((e) -> new NewDialogFactory().showMoreInfoDialog(certVerifier, file));
         panel.add(moreInfoButton);
         panel.setPreferredSize(new Dimension(600, 100));
         return panel;
