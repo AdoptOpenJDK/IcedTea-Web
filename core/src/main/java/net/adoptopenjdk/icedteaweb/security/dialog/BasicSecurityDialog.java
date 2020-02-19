@@ -68,7 +68,6 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         final JPanel actionWrapperPanel = new JPanel();
         actionWrapperPanel.setLayout(new BoxLayout(actionWrapperPanel, BoxLayout.LINE_AXIS));
         actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         actionWrapperPanel.add(Box.createHorizontalGlue());
 
         final List<DialogButton<R>> buttons = createButtons();

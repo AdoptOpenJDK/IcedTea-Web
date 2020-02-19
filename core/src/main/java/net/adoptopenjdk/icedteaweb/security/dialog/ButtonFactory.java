@@ -24,6 +24,10 @@ public class ButtonFactory {
         return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction);
     }
 
+    public static <R> DialogButton<R> createCloseButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("ButClose"), onAction);
+    }
+
    public static <R> DialogButton<R> createCancelButton(String toolTipText, final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButCancel"), onAction, toolTipText);
     }

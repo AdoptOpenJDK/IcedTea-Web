@@ -19,11 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.security.cert.CertPath;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
@@ -34,6 +36,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
     private final JNLPFile file;
     private final List<String> details;
+    private CertPath certPath;
     private final DialogButton<Void> closeButton;
 
     CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final CertVerifier certVerifier) {
@@ -41,13 +44,22 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         this.file = file;
         details = new ArrayList<>(certVerifier.getDetails(null));
 
+        // TODO remove this after debugging
+        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
+        details.add("Vivamus ac faucibus erat, quis placerat dolor. Quisque tincidunt vel orci ut accumsan.");
+        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
+        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
+
+
+        certPath = certVerifier.getCertPath();
+
         // Show signed JNLP warning if the signed main jar does not have a
         // signed JNLP file and the launching JNLP file contains special properties
         if (file != null && file.requiresSignedJNLPWarning()) {
             details.add(TRANSLATOR.translate("SJNLPFileIsNotSigned"));
         }
 
-        this.closeButton = ButtonFactory.createNoButton(() -> null);
+        this.closeButton = ButtonFactory.createCloseButton(() -> null);
     }
 
     @Override
@@ -57,24 +69,30 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     }
 
     private List<DialogButton<Void>> createButtons() {
-        return Arrays.asList(closeButton);
+        return Collections.singletonList(closeButton);
+    }
+
+    private JButton getShowCertificateDetailsButton() {
+        final JButton button = new JButton(TRANSLATOR.translate("SCertificateDetails"));
+
+
+        return button;
     }
 
     private JComponent createDetailPaneContent() {
         int numLabels = details.size();
         JPanel errorPanel = new JPanel(new GridLayout(numLabels, 1));
-        errorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        errorPanel.setPreferredSize(new Dimension(400, 50 * (numLabels)));
+        errorPanel.setPreferredSize(new Dimension(600, 50 * (numLabels)));
 
-        for (int i = 0; i < numLabels; i++) {
+        for (String detail : details) {
             ImageIcon icon = null;
-            if (details.get(i).equals(TRANSLATOR.translate("STrustedCertificate"))) {
+            if (detail.equals(TRANSLATOR.translate("STrustedCertificate"))) {
                 icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/info-small.png");
             } else {
                 icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning-small.png");
             }
 
-            errorPanel.add(new JLabel(htmlWrap(details.get(i)), icon, SwingConstants.LEFT));
+            errorPanel.add(new JLabel(htmlWrap(detail), icon, SwingConstants.LEFT));
         }
         return errorPanel;
     }
@@ -85,10 +103,11 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         detailPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         detailPanel.add(createDetailPaneContent());
 
+        final JPanel collapsiblePanel = createCertificateDetailsCollapsiblePanel();
+
         final JPanel actionWrapperPanel = new JPanel();
         actionWrapperPanel.setLayout(new BoxLayout(actionWrapperPanel, BoxLayout.LINE_AXIS));
         actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         actionWrapperPanel.add(Box.createHorizontalGlue());
 
         final List<DialogButton<Void>> buttons = createButtons();
@@ -99,8 +118,27 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout(12, 12));
-        contentPanel.add(detailPanel, BorderLayout.CENTER);
+        contentPanel.add(detailPanel, BorderLayout.NORTH);
+        contentPanel.add(collapsiblePanel, BorderLayout.CENTER);
         contentPanel.add(actionWrapperPanel, BorderLayout.SOUTH);
         return contentPanel;
+    }
+
+    private JPanel createCertificateDetailsCollapsiblePanel() {
+        final JPanel collapsiblePanel = new JPanel();
+        collapsiblePanel.setLayout(new BorderLayout());
+
+        final JButton showCertificateDetailsButton = getShowCertificateDetailsButton();
+        collapsiblePanel.add(showCertificateDetailsButton, BorderLayout.NORTH);
+        JPanel certificateDetailsPanel = new JPanel();
+        certificateDetailsPanel.setBackground(Color.RED);
+        certificateDetailsPanel.setPreferredSize(new Dimension(800, 400));
+        certificateDetailsPanel.setVisible(false);
+        showCertificateDetailsButton.addActionListener(e-> {
+            certificateDetailsPanel.setVisible(!certificateDetailsPanel.isVisible());
+            this.pack();
+        });
+        collapsiblePanel.add(certificateDetailsPanel, BorderLayout.CENTER);
+        return collapsiblePanel;
     }
 }
