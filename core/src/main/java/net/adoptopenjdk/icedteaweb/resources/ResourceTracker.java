@@ -129,11 +129,6 @@ public class ResourceTracker {
         this.updatePolicy = Assert.requireNonNull(updatePolicy, "updatePolicy");
     }
 
-    public void addResource(URL location, final VersionId version) {
-        final VersionString versionString = version != null ? version.asVersionString() : null;
-        addResource(location, versionString, updatePolicy);
-    }
-
     public void addResource(URL location, final VersionString version) {
         addResource(location, version, updatePolicy);
     }
