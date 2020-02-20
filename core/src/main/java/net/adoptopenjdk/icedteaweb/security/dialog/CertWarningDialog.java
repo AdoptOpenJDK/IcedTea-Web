@@ -66,27 +66,27 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
             String publisher = "";
             if (certificate instanceof X509Certificate) {
                 publisher = SecurityUtil.getCN(((X509Certificate) certificate)
                         .getSubjectX500Principal().getName());
             }
-            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
 
             final String from = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getHomepage)
                     .map(URL::toString)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
 
-            gridBuilder.addSeparatorRow(false);
+            gridBuilder.addHorizontalSpacer();
 
-            gridBuilder.addRow(createAlwaysTrustCheckbox());
+            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
 
-            gridBuilder.addRow(createMoreInformationPanel());
+            gridBuilder.addComponentRow(createMoreInformationPanel());
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);

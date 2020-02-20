@@ -101,7 +101,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
 
             final String publisher = Optional.ofNullable(file)
@@ -109,7 +109,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
                     .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
 
 
             final String fromFallback = Optional.ofNullable(file)
@@ -123,22 +123,22 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
                     .map(URL::toString)
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
-            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
 
-            gridBuilder.addSeparatorRow(false);
+            gridBuilder.addHorizontalSpacer();
 
             desktopCheckBox = createDesktopCheckBox();
-            gridBuilder.addRow(desktopCheckBox);
+            gridBuilder.addComponentRow(desktopCheckBox);
             menuCheckBox = createMenuCheckBox();
-            gridBuilder.addRow(menuCheckBox);
+            gridBuilder.addComponentRow(menuCheckBox);
 
-            gridBuilder.addSeparatorRow(false);
+            gridBuilder.addHorizontalSpacer();
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            gridBuilder.addRow(rememberUserDecisionPanel);
+            gridBuilder.addComponentRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for Access warning dialog!", e);
+            LOG.error("Error while trying to read properties for create shortcut dialog!", e);
         }
         return gridBuilder.createGrid();
     }

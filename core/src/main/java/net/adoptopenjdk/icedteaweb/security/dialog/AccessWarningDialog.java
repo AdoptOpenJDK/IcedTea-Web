@@ -50,7 +50,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
 
             final String publisher = ofNullable(file)
@@ -58,7 +58,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
 
 
             final String fromFallback = ofNullable(file)
@@ -72,12 +72,12 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .map(URL::toString)
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
-            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
 
-            gridBuilder.addSeparatorRow(false);
+            gridBuilder.addHorizontalSpacer();
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            gridBuilder.addRow(rememberUserDecisionPanel);
+            gridBuilder.addComponentRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);

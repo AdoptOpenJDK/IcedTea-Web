@@ -56,15 +56,15 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
             } else {
                 name = file.getInformation().getTitle();
             }
-            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
-            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
 
-            gridBuilder.addSeparatorRow(false);
+            gridBuilder.addHorizontalSpacer();
 
-            gridBuilder.addRow(createAlwaysTrustCheckbox());
+            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
 
         } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for CertWarningDialog!", e);
+            LOG.error("Error while trying to read properties for HttpsCertWarningDialog!", e);
         }
         return gridBuilder.createGrid();
     }

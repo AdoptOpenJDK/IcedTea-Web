@@ -24,20 +24,20 @@ public class GridBagPanelBuilder {
         Assert.requireNonNull(rows, "rows").forEach(this::addRow);
     }
 
-    public void addRow(final String key, final String value) {
+    public void addKeyValueRow(final String key, final String value) {
         rows.add(new KeyValueRow(key, value));
     }
 
-    public void addRow(final JComponent component) {
+    public void addComponentRow(final JComponent component) {
         rows.add(new ComponentRow(component));
     }
 
-    public void addSeparatorRow(boolean hasLine) {
-        if (hasLine) {
-            rows.add(SeparatorRow.createHorizontalLine());
-        } else {
-            rows.add(SeparatorRow.createBlankRow());
-        }
+    public void addHorizontalSpacer() {
+        rows.add(SeparatorRow.createBlankRow());
+    }
+
+    public void addHorizontalLine() {
+        rows.add(SeparatorRow.createHorizontalLine());
     }
 
     public JPanel createGrid() {
