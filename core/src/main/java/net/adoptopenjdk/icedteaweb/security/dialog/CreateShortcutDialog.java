@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
@@ -15,8 +16,6 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -96,14 +95,13 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
 
     @Override
     protected JComponent createDetailPaneContent() {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             final String name = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("Name"), name, panel, 0);
+            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
 
 
             final String publisher = Optional.ofNullable(file)
@@ -111,7 +109,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
                     .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
+            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
 
 
             final String fromFallback = Optional.ofNullable(file)
@@ -125,24 +123,24 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
                     .map(URL::toString)
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
-            addRow(TRANSLATOR.translate("From"), from, panel, 2);
+            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
 
-            addSeparatorRow(false, panel, 3);
+            gridBuilder.addSeparatorRow(false);
 
             desktopCheckBox = createDesktopCheckBox();
-            addRow(desktopCheckBox, panel, 4);
+            gridBuilder.addRow(desktopCheckBox);
             menuCheckBox = createMenuCheckBox();
-            addRow(menuCheckBox, panel, 5);
+            gridBuilder.addRow(menuCheckBox);
 
-            addSeparatorRow(false, panel, 6);
+            gridBuilder.addSeparatorRow(false);
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            addRow(rememberUserDecisionPanel, panel, 7);
+            gridBuilder.addRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
         }
-        return panel;
+        return gridBuilder.createGrid();
     }
 
     @Override

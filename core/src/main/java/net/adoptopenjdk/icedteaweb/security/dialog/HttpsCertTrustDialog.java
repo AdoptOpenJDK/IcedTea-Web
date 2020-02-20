@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -12,8 +13,6 @@ import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -26,7 +25,6 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> yesButton;
     private final DialogButton<AccessWarningResult> noButton;
     private final JNLPFile file;
-    private final CertVerifier certVerifier;
     private final Certificate certificate;
     private boolean rootInCaCerts;
 
@@ -36,7 +34,6 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
         this.file = file;
         this.certificate = certVerifier.getPublisher(null);
         this.rootInCaCerts = certVerifier.getRootInCaCerts();
-        this.certVerifier = certVerifier;
 
         this.yesButton = ButtonFactory.createYesButton(() -> null);
         this.noButton = ButtonFactory.createNoButton(() -> null);
@@ -49,8 +46,7 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
     @Override
     protected JComponent createDetailPaneContent() {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             String name;
             String publisher = "";
@@ -60,17 +56,17 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
             } else {
                 name = file.getInformation().getTitle();
             }
-            addRow(TRANSLATOR.translate("Name"), name, panel, 0);
-            addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
+            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
+            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
 
-            addSeparatorRow(false, panel, 2);
+            gridBuilder.addSeparatorRow(false);
 
-            addRow(createAlwaysTrustCheckbox(), panel, 3);
+            gridBuilder.addRow(createAlwaysTrustCheckbox());
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);
         }
-        return panel;
+        return gridBuilder.createGrid();
     }
 
     @Override

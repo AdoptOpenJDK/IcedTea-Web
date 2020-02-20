@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -16,7 +17,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -60,39 +60,38 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
 
     @Override
     protected JComponent createDetailPaneContent() {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             final String name = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("Name"), name, panel, 0);
+            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
 
             String publisher = "";
             if (certificate instanceof X509Certificate) {
                 publisher = SecurityUtil.getCN(((X509Certificate) certificate)
                         .getSubjectX500Principal().getName());
             }
-            addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
+            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
 
             final String from = Optional.ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getHomepage)
                     .map(URL::toString)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("From"), from, panel, 2);
+            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
 
-            addSeparatorRow(false, panel, 3);
+            gridBuilder.addSeparatorRow(false);
 
-            addRow(createAlwaysTrustCheckbox(), panel, 4);
+            gridBuilder.addRow(createAlwaysTrustCheckbox());
 
-            addRow(createMoreInformationPanel(), panel, 5);
+            gridBuilder.addRow(createMoreInformationPanel());
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);
         }
-        return panel;
+        return gridBuilder.createGrid();
     }
 
     protected JCheckBox createAlwaysTrustCheckbox() {

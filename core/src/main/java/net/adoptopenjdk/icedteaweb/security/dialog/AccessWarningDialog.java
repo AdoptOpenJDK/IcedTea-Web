@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -14,8 +15,6 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -45,14 +44,13 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
 
     @Override
     protected JComponent createDetailPaneContent() {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             final String name = ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("Name"), name, panel, 0);
+            gridBuilder.addRow(TRANSLATOR.translate("Name"), name);
 
 
             final String publisher = ofNullable(file)
@@ -60,7 +58,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .map(InformationDesc::getVendor)
                     .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            addRow(TRANSLATOR.translate("Publisher"), publisher, panel, 1);
+            gridBuilder.addRow(TRANSLATOR.translate("Publisher"), publisher);
 
 
             final String fromFallback = ofNullable(file)
@@ -74,17 +72,17 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .map(URL::toString)
                     .map(i -> !StringUtils.isBlank(i) ? i : null)
                     .orElse(fromFallback);
-            addRow(TRANSLATOR.translate("From"), from, panel, 2);
+            gridBuilder.addRow(TRANSLATOR.translate("From"), from);
 
-            addSeparatorRow(false, panel, 3);
+            gridBuilder.addSeparatorRow(false);
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            addRow(rememberUserDecisionPanel, panel, 4);
+            gridBuilder.addRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
         }
-        return panel;
+        return gridBuilder.createGrid();
     }
 
     @Override
