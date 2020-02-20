@@ -92,15 +92,20 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     private String getJavaWsBin() throws FileNotFoundException {
         final String javaWsBin = JvmUtils.getJavaWsBin();
-        if (new File(javaWsBin).exists()) {
-            return javaWsBin;
-        }
 
+        // first look for exe
         final String javaWsBinExe = javaWsBin + ".exe";
         if (new File(javaWsBinExe).exists()) {
+            LOG.debug("For Shortcut Returning EXE : {}", javaWsBinExe);
             return javaWsBinExe;
         }
 
+        if (new File(javaWsBin).exists()) {
+            LOG.debug("For Shortcut Returning {}", javaWsBin);
+            return javaWsBin;
+        }
+
+        LOG.debug("Could not find the javaws binary to create desktop shortcut");
         throw new FileNotFoundException("Could not find the javaws binary to create desktop shortcut");
     }
 
@@ -166,7 +171,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 }
             }
             if (fAdd) {
-                LOG.debug("Adding sCut to list = ", sItem);
+                LOG.debug("Adding Shortcut to list = ", sItem);
                 String scInfo = file.getFileLocation().toString() + ",";
                 scInfo += path + "\r\n";
                 Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
@@ -203,5 +208,4 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private String quoted(URL url) {
         return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
-
 }
