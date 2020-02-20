@@ -129,7 +129,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
-        fileContents += "Name=" + getDesktopIconName() + "\n";
+        fileContents += "Name=" + getShortcutName() + "\n";
         fileContents += "GenericName=Java Web Start Application\n";
         fileContents += "Comment=" + sanitize(file.getInformation().getDescription()) + "\n";
         if (menu) {
@@ -212,30 +212,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
         /* key=value pairs must be a single line */
         input = FileUtils.sanitizeFileName(input, '-');
         //return first line or replace new lines by space?
-        return input.split("\n")[0];
-    }
-
-    /**
-     * @return the size of the icon (in pixels) for the desktop shortcut
-     */
-    private int getIconSize() {
-        return iconSize;
+        return input.split("\\R")[0];
     }
 
     File getShortcutTmpFile() {
         String userTmp = PathsAndFiles.TMP_DIR.getFullPath();
-        File shortcutFile = new File(userTmp + File.separator + getDesktopIconFileName());
+        File shortcutFile = new File(userTmp + File.separator + getShortcutFileName());
         return shortcutFile;
-    }
-
-    /**
-     * Set the icon size to use for the desktop shortcut
-     *
-     * @param size the size (in pixels) of the icon to use. Commonly used sizes
-     *        are of 16, 22, 32, 48, 64 and 128
-     */
-    private void setIconSize(int size) {
-        iconSize = size;
     }
 
     /**
@@ -341,7 +324,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public File getGeneratedJnlpFileName() {
-        String name = FileUtils.sanitizeFileName(file.createNameForDesktopFile());
+        String name = FileUtils.sanitizeFileName(file.getShortcutName());
         while (name.endsWith(".jnlp")) {
             name = name.substring(0, name.length() - 5);
         }
@@ -543,17 +526,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
         throw new NonFileProtocolException("Unable to cache icon");
     }
 
-    private String getDesktopIconName() {
-        return getDesktopIconName(file);
-    }
-
-    static String getDesktopIconName(JNLPFile file) {
-        return sanitize(file.createNameForDesktopFile());
+    private String getShortcutName() {
+        return sanitize(file.getShortcutName());
     }
 
     @Override
     public File getDesktopIconFile() {
-            return new File(getDesktop(), getDesktopIconFileName());
+            return new File(getDesktop(), getShortcutFileName());
     }
 
     static File getDesktop() {
@@ -562,12 +541,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public File getLinuxMenuIconFile() {
-        return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
+        return new File(findAndVerifyJavawsMenuDir() + "/" + getShortcutFileName());
     }
 
-    @Override
-    public String getDesktopIconFileName() {
-        return getDesktopIconName() + ".desktop";
+    private String getShortcutFileName() {
+        return getShortcutName() + ".desktop";
     }
 
     private static String findAndVerifyGeneratedJnlpDir() {

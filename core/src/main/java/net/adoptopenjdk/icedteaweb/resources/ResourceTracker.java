@@ -16,34 +16,11 @@
 
 package net.adoptopenjdk.icedteaweb.resources;
 
-import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
-import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
-import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
 /**
  * This class tracks the downloading of various resources of a
@@ -72,11 +49,6 @@ import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
  * @version $Revision: 1.22 $
  */
 public interface ResourceTracker {
-
-    default void addResource(URL location, final VersionId version) {
-        final VersionString versionString = version != null ? version.asVersionString() : null;
-        addResource(location, versionString);
-    }
 
     void addResource(URL location, final VersionString version);
 
