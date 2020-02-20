@@ -26,8 +26,10 @@ import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import java.awt.Component;
 import java.awt.Window;
 import java.net.URL;
+import java.security.cert.CertPath;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -193,8 +195,10 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public void showMoreInfoDialog(final CertVerifier certVerifier, final JNLPFile file) {
-         CertWarningDetailsDialog dialog = new CertWarningDetailsDialog(null, file, certVerifier);
-         dialog.showAndWait();
+        final CertPath certPath = certVerifier.getCertPath();
+        final List<String> certIssues = certVerifier.getDetails(null);
+        CertWarningDetailsDialog dialog = new CertWarningDetailsDialog(null, file, certPath, certIssues);
+        dialog.showAndWait();
     }
 
     @Override

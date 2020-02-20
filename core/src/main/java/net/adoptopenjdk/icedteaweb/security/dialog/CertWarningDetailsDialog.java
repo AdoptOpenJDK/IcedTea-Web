@@ -23,7 +23,6 @@ import net.adoptopenjdk.icedteaweb.security.dialog.panel.CertificateDetailsPanel
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogWithResult;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.CertVerifier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -53,23 +52,19 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     private CertificateDetailsPanel certificateDetailsPanel;
     private final DialogButton<Void> closeButton;
 
-    private final JNLPFile file;
     private final List<String> details;
     private CertPath certPath;
 
-    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final CertVerifier certVerifier) {
+    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final CertPath certPath, final List<String> certIssues) {
         super(owner);
-        this.file = file;
-        details = new ArrayList<>(certVerifier.getDetails(null));
+        this.certPath = certPath;
+        details = new ArrayList<>(certIssues);
 
         // TODO remove this after debugging
         details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
         details.add("Vivamus ac faucibus erat, quis placerat dolor. Quisque tincidunt vel orci ut accumsan.");
         details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras consectetur adipiscing lacinia consectetur. Vivamus ac faucibus erat, quis placerat dolor. Quisque tincidunt vel consectetur adipiscing orci ut accumsan.");
         details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
-
-
-        certPath = certVerifier.getCertPath();
 
         // Show signed JNLP warning if the signed main jar does not have a
         // signed JNLP file and the launching JNLP file contains special properties
