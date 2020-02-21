@@ -47,6 +47,7 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
             final String name = ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
+                    .map(s -> s + " " + TRANSLATOR.translate("SUnverified"))
                     .orElse("");
             gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
