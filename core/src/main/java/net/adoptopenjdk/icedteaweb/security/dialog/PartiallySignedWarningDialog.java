@@ -57,7 +57,7 @@ public class PartiallySignedWarningDialog extends BasicSecurityDialog<Rememberab
             gridBuilder.addComponentRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for unsigned warning dialog!", e);
+            LOG.error("Error while trying to read properties for partially signed warning dialog!", e);
         }
         return gridBuilder.createGrid();
     }
