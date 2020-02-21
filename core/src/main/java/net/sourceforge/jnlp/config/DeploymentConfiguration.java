@@ -562,17 +562,25 @@ public final class DeploymentConfiguration {
         }
 
         final Set<String> keys = properties.stringPropertyNames();
+        // first collect real keys and assume they are unlocked
+        for (final String key : keys) {
+            if (!key.endsWith(LOCKED_POSTFIX)) {
+                final String newValue = properties.getProperty(key);
+                result.put(key, Setting.createFromPropertyFile(key, newValue, false, propertiesFile));
+            }
+        }
+        // now process keys with locked postfix
         for (final String key : keys) {
             if (key.endsWith(LOCKED_POSTFIX)) {
                 final String realKey = key.substring(0, key.length() - LOCKED_POSTFIX.length());
-                final Setting<String> configValue = result.get(realKey);
-                final String value = configValue == null ? null : configValue.getValue();
-                result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
-            } else {
-                final String newValue = properties.getProperty(key);
-                final Setting<String> configValue = result.get(key);
-                final boolean locked = configValue != null && configValue.isLocked();
-                result.put(key, Setting.createFromPropertyFile(key, newValue, locked, propertiesFile));
+                // if realKey for the lockedkey is not present, create it with default value
+                if (!keys.contains(realKey)) {
+                    final String value = Defaults.getDefaults().get(realKey).getDefaultValue();
+                    result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
+                } else { // if realKey is present then set lock for the realKey
+                    final Setting<String> configValue = result.get(realKey);
+                    configValue.setLocked(true);
+                }
             }
         }
         return result;
