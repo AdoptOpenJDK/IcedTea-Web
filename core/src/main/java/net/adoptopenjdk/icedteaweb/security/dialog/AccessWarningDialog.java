@@ -1,10 +1,8 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
@@ -15,7 +13,6 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.JComponent;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,33 +43,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            final String name = ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getTitle)
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
-
-            final String publisher = ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getVendor)
-                    .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
-
-
-            final String fromFallback = ofNullable(file)
-                    .map(JNLPFile::getSourceLocation)
-                    .map(URL::getAuthority)
-                    .orElse("");
-
-            final String from = ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getHomepage)
-                    .map(URL::toString)
-                    .map(i -> !StringUtils.isBlank(i) ? i : null)
-                    .orElse(fromFallback);
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
-
+            gridBuilder.addRows(getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();

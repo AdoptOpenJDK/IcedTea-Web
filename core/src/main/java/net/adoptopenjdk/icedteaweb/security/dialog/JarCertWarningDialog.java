@@ -85,26 +85,8 @@ public class JarCertWarningDialog extends CertWarningDialog {
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            final String name = Optional.ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getTitle)
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
-            String publisher = "";
-            if (certificate instanceof X509Certificate) {
-                publisher = SecurityUtil.getCN(((X509Certificate) certificate)
-                        .getSubjectX500Principal().getName());
-            }
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
-
-            final String from = Optional.ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getHomepage)
-                    .map(URL::toString)
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
-
+            gridBuilder.addRows(getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             gridBuilder.addComponentRow(createAlwaysTrustCheckbox());

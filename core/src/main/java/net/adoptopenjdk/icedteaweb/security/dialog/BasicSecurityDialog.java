@@ -1,8 +1,14 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagRow;
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.KeyValueRow;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogWithResult;
+import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,10 +24,16 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Optional.ofNullable;
+
 public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
+
+    private static final Translator TRANSLATOR = Translator.getInstance();
 
     private String message;
 
@@ -77,6 +89,37 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         contentPanel.add(detailPanel, BorderLayout.CENTER);
         contentPanel.add(actionWrapperPanel, BorderLayout.SOUTH);
         return contentPanel;
+    }
+
+    protected static List<GridBagRow> getApplicationDetails(JNLPFile file) {
+        final List<GridBagRow> rows = new ArrayList<>();
+        final String name = ofNullable(file)
+                .map(JNLPFile::getInformation)
+                .map(InformationDesc::getTitle)
+                .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
+        rows.add(new KeyValueRow(TRANSLATOR.translate("Name"), name));
+
+        final String publisher = ofNullable(file)
+                .map(JNLPFile::getInformation)
+                .map(InformationDesc::getVendor)
+                .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
+                .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
+        rows.add(new KeyValueRow(TRANSLATOR.translate("Publisher"), publisher));
+
+
+        final String fromFallback = ofNullable(file)
+                .map(JNLPFile::getSourceLocation)
+                .map(URL::getAuthority)
+                .orElse("");
+
+        final String from = ofNullable(file)
+                .map(JNLPFile::getInformation)
+                .map(InformationDesc::getHomepage)
+                .map(URL::toString)
+                .map(i -> !StringUtils.isBlank(i) ? i : null)
+                .orElse(fromFallback);
+        rows.add(new KeyValueRow(TRANSLATOR.translate("From"), from));
+        return rows;
     }
 
     public static void main(String[] args) throws Exception {

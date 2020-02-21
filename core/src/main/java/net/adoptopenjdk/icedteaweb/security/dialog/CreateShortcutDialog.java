@@ -97,34 +97,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            final String name = Optional.ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getTitle)
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
-
-
-            final String publisher = Optional.ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getVendor)
-                    .map(v -> v + " " + TRANSLATOR.translate("SUnverified"))
-                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
-
-
-            final String fromFallback = Optional.ofNullable(file)
-                    .map(JNLPFile::getSourceLocation)
-                    .map(URL::getAuthority)
-                    .orElse("");
-
-            final String from = Optional.ofNullable(file)
-                    .map(JNLPFile::getInformation)
-                    .map(InformationDesc::getHomepage)
-                    .map(URL::toString)
-                    .map(i -> !StringUtils.isBlank(i) ? i : null)
-                    .orElse(fromFallback);
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
-
+            gridBuilder.addRows(getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             desktopCheckBox = createDesktopCheckBox();
