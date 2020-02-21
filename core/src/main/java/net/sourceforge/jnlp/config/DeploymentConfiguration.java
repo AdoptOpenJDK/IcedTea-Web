@@ -509,7 +509,8 @@ public final class DeploymentConfiguration {
             final String defaultValue = defaultSetting == null ? null : defaultSetting.getValue();
             final String newValue = currentSetting == null ? null : currentSetting.getValue();
 
-            if (newValue != null && !newValue.equals(defaultValue)) {
+            // save the property if it has non default value or has default value and it is locked
+            if (newValue != null && (!newValue.equals(defaultValue) || currentSetting.isLocked())) {
                 LOG.debug("Will save property '{}' with value ('{}')", key, newValue);
                 toSave.setProperty(key, newValue);
             } else {
