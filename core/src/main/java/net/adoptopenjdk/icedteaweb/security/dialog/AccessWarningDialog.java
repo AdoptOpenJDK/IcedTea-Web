@@ -52,7 +52,6 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
                     .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
             gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
-
             final String publisher = ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getVendor)

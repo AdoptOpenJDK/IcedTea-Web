@@ -132,8 +132,10 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
-        // calls UnsignedAppletTrustWarningPanel
-        // to be removed as Applets are not longer supported?
+        final UnsignedWarningDialog unsignedWarningDialog = new UnsignedWarningDialog(file);
+        unsignedWarningDialog.showAndWait();
+
+        // TODO: return
         return null;
     }
 
