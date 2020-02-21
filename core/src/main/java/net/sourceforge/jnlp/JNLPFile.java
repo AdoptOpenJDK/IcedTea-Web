@@ -760,6 +760,13 @@ public class JNLPFile {
         missingSignedJNLP = true;
     }
 
+    /**
+     * Informs that a signed JNLP file is missing in the main jar
+     */
+    public boolean isUnsigend() {
+        return missingSignedJNLP;
+    }
+
     public ManifestAttributesReader getManifestAttributesReader() {
         return manifestAttributesReader;
     }

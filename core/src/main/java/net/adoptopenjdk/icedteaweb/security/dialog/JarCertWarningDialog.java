@@ -88,10 +88,11 @@ public class JarCertWarningDialog extends CertWarningDialog {
 
             gridBuilder.addRows(getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
-
-            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
+            gridBuilder.addHorizontalSpacer();
 
             gridBuilder.addComponentRow(createMoreInformationPanel());
+
+            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);

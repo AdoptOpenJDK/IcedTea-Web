@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.ComponentRow;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagRow;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.KeyValueRow;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -23,11 +24,15 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.font.TextAttribute;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 
@@ -93,6 +98,25 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
     protected static List<GridBagRow> getApplicationDetails(JNLPFile file) {
         final List<GridBagRow> rows = new ArrayList<>();
+
+        final JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        final JLabel applicationLabel = new JLabel(TRANSLATOR.translate("Application"));
+        final Map<TextAttribute, Object> underlineAttributes = new HashMap<>(applicationLabel.getFont().getAttributes());
+        underlineAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        applicationLabel.setFont(applicationLabel.getFont().deriveFont(underlineAttributes));
+        titlePanel.add(applicationLabel);
+
+        if (file.isUnsigend()) {
+            final JLabel warningLabel = new JLabel(TRANSLATOR.translate("SUnverifiedJnlp"));
+            final Map<TextAttribute, Object> boldAttributes = new HashMap<>(warningLabel.getFont().getAttributes());
+            boldAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_ULTRABOLD);
+            warningLabel.setFont(warningLabel.getFont().deriveFont(boldAttributes));
+            titlePanel.add(warningLabel);
+        }
+
+        rows.add(new ComponentRow(titlePanel));
+
         final String name = ofNullable(file)
                 .map(JNLPFile::getInformation)
                 .map(InformationDesc::getTitle)
