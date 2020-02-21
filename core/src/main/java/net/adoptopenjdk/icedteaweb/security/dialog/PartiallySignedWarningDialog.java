@@ -12,8 +12,6 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 
