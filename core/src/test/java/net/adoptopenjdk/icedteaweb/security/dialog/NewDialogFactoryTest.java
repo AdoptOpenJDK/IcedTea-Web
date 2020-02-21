@@ -31,13 +31,16 @@ public class NewDialogFactoryTest {
     public NewDialogFactoryTest() throws Exception {
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
+        file.setSignedJNLPAsMissing();
         httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname");
         jarCertVerifier = new JarCertVerifier();
         dialogFactory = new NewDialogFactory();
     }
 
     public static void main(String[] args) throws Exception {
-        new NewDialogFactoryTest().showUnsignedWarningDialog();
+        // new NewDialogFactoryTest().showAccessWarning();
+        // new NewDialogFactoryTest().showCertWarning();
+        new NewDialogFactoryTest().showUnsignedWarning();
     }
 
     private void showAccessWarning() {
@@ -56,9 +59,5 @@ public class NewDialogFactoryTest {
 
     private void showPartiallySignedWarning() {
         dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, null);
-    }
-
-    private void showUnsignedWarningDialog() {
-        dialogFactory.showUnsignedWarningDialog(file);
     }
 }
