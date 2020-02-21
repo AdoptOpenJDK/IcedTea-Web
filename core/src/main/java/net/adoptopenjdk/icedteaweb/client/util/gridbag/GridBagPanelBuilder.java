@@ -41,8 +41,7 @@ public class GridBagPanelBuilder {
     }
 
     public JPanel createGrid() {
-        final JPanel result = new JPanel();
-        result.setLayout(new GridBagLayout());
+        final JPanel result = new JPanel(new GridBagLayout());
         final int numRows = rows.size();
         for (int i = 0; i < numRows; i++) {
             rows.get(i).addTo(result, i);

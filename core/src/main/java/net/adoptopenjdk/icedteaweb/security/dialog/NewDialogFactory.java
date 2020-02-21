@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogM
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenySandbox;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -37,6 +38,7 @@ import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.ALLOW
 import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.DENY;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_DESKTOP_SHORTCUT;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_MENU_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_PARTIALLY_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_UNSIGNED_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
 import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
@@ -170,7 +172,18 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandbox showPartiallySignedWarningDialog(final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        return null;
+        final Optional<AllowDenySandbox> remembered = this.userDecisions.getUserDecisions(RUN_PARTIALLY_APPLICATION, file, AllowDenySandbox.class);
+
+        final AllowDenySandbox result = remembered.orElseGet(() -> {
+            final PartiallySignedWarningDialog dialog = new PartiallySignedWarningDialog(file);
+            final RememberableResult<AllowDenySandbox> dialogResult = dialog.showAndWait();
+
+            userDecisions.save(dialogResult.getRemember(), file, of(RUN_PARTIALLY_APPLICATION, dialogResult.getResult()));
+            return dialogResult.getResult();
+        });
+
+        return result == AllowDenySandbox.ALLOW ? YesNoSandbox.yes() :
+                result == AllowDenySandbox.SANDBOX ? YesNoSandbox.sandbox() : YesNoSandbox.no();
     }
 
     @Override

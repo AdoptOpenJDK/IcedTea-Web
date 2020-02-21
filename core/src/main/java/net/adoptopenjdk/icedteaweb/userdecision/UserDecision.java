@@ -33,7 +33,8 @@ public class UserDecision<T extends Enum<T>> {
         READ_CLIPBOARD(AccessType.CLIPBOARD_READ),
         WRITE_CLIPBOARD(AccessType.CLIPBOARD_WRITE),
         USE_PRINTER(AccessType.PRINTER),
-        RUN_UNSIGNED_APPLICATION
+        RUN_UNSIGNED_APPLICATION,
+        RUN_PARTIALLY_APPLICATION,
 
         ;
 

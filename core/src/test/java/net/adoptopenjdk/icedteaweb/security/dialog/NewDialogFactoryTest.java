@@ -40,7 +40,8 @@ public class NewDialogFactoryTest {
     public static void main(String[] args) throws Exception {
         // new NewDialogFactoryTest().showAccessWarning();
         // new NewDialogFactoryTest().showCertWarning();
-        new NewDialogFactoryTest().showUnsignedWarning();
+        // new NewDialogFactoryTest().showUnsignedWarning();
+        new NewDialogFactoryTest().showPartiallySignedWarning();
     }
 
     private void showAccessWarning() {

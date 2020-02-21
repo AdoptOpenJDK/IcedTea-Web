@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
@@ -28,7 +29,7 @@ public class DefaultDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showUnsignedWarning();
+        new DefaultDialogFactoryTest().showPartiallySignedWarning();
     }
 
     private void showAccessWarning() {
@@ -45,7 +46,7 @@ public class DefaultDialogFactoryTest {
     }
 
     private void showPartiallySignedWarning() {
-        dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, null);
+        dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, new SecurityDelegateNew(null, file, null));
     }
 
 }
