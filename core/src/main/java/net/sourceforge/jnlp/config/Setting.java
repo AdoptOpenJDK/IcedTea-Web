@@ -72,7 +72,7 @@ public class Setting<T> {
     private final String source;
     private final T defaultValue;
 
-    private T value = null;
+    private T value;
     private boolean locked;
 
     /**
@@ -113,7 +113,14 @@ public class Setting<T> {
      * - source
      */
     Setting<T> copyValuesFrom(Setting<T> src) {
-        return new Setting<>(name, description, src.locked, validator, defaultValue, src.value, src.source);
+        if (locked) {
+            return this;
+        }
+
+        final T newValue = src.value != null ? src.value : value;
+        final String newSource = src.value != null ? src.source : source;
+
+        return new Setting<>(name, description, src.locked, validator, defaultValue, newValue, newSource);
     }
 
     /**
