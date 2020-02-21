@@ -32,6 +32,6 @@ public class SeparatorRow implements GridBagRow {
         constraints.ipady = 4;
         constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(separator);
+        panel.add(separator, constraints);
     }
 }
