@@ -24,17 +24,24 @@ public class UserDecision<T extends Enum<T>> {
     private T value;
 
     public enum Key {
-        CREATE_DESKTOP_SHORTCUT(null),
-        CREATE_MENU_SHORTCUT(null),
+        CREATE_DESKTOP_SHORTCUT,
+        CREATE_MENU_SHORTCUT,
         ESTABLISH_NETWORK_CONNECTION(AccessType.NETWORK),
         READ_FILE(AccessType.READ_FILE),
         WRITE_FILE(AccessType.WRITE_FILE),
         READ_WRITE_FILE(AccessType.READ_WRITE_FILE),
         READ_CLIPBOARD(AccessType.CLIPBOARD_READ),
         WRITE_CLIPBOARD(AccessType.CLIPBOARD_WRITE),
-        USE_PRINTER(AccessType.PRINTER);
+        USE_PRINTER(AccessType.PRINTER),
+        RUN_UNSIGNED_APPLICATION
+
+        ;
 
         private final AccessType accessType;
+
+        Key() {
+            this.accessType = null;
+        }
 
         Key(AccessType accessType) {
             this.accessType = accessType;

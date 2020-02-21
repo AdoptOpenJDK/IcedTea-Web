@@ -33,9 +33,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.ALLOW;
 import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.DENY;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_DESKTOP_SHORTCUT;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_MENU_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_UNSIGNED_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
 import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
 import static net.sourceforge.jnlp.security.AccessType.SIGNING_ERROR;
@@ -132,18 +134,24 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
-        final UnsignedWarningDialog unsignedWarningDialog = new UnsignedWarningDialog(file);
-        unsignedWarningDialog.showAndWait();
+        final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
 
-        // TODO: return
-        return null;
+        final AllowDeny result = remembered.orElseGet(() -> {
+            final UnsignedWarningDialog unsignedWarningDialog = new UnsignedWarningDialog(file);
+            final RememberableResult<AllowDeny> dialogResult = unsignedWarningDialog.showAndWait();
+
+            userDecisions.save(dialogResult.getRemember(), file, of(RUN_UNSIGNED_APPLICATION, dialogResult.getResult()));
+            return dialogResult.getResult();
+        });
+
+        return result == ALLOW ? YesNoSandboxLimited.yes() : YesNoSandboxLimited.no();
     }
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         CertWarningDialog dialogWithResult;
         if (certVerifier instanceof HttpsCertVerifier) {
-            dialogWithResult = HttpsCertTrustDialog.create(file, (HttpsCertVerifier) certVerifier);
+            dialogWithResult = HttpsCertTrustDialog.create(file, certVerifier);
         } else {
             dialogWithResult = JarCertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
         }
