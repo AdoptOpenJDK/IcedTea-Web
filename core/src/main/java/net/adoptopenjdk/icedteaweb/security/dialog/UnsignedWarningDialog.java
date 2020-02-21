@@ -65,7 +65,7 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
 
             gridBuilder.addHorizontalSpacer();
 
-            gridBuilder.addComponentRow(new JLabel(htmlWrap(TRANSLATOR.translate("<b>It is recommended you only run applications from sites you trust.</b>"))));
+            gridBuilder.addComponentRow(new JLabel(htmlWrap(TRANSLATOR.translate("SUntrustedRecommendation"))));
 
             gridBuilder.addHorizontalSpacer();
 
@@ -73,7 +73,7 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
             gridBuilder.addComponentRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for Access warning dialog!", e);
+            LOG.error("Error while trying to read properties for unsigned warning dialog!", e);
         }
         return gridBuilder.createGrid();
     }
