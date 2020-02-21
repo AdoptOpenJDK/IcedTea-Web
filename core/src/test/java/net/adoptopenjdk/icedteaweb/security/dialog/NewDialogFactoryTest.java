@@ -3,11 +3,21 @@ package net.adoptopenjdk.icedteaweb.security.dialog;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
 
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
+import static net.sourceforge.jnlp.security.AccessType.CLIPBOARD_READ;
+import static net.sourceforge.jnlp.security.AccessType.CLIPBOARD_WRITE;
+import static net.sourceforge.jnlp.security.AccessType.CREATE_DESKTOP_SHORTCUT;
+import static net.sourceforge.jnlp.security.AccessType.NETWORK;
+import static net.sourceforge.jnlp.security.AccessType.PRINTER;
+import static net.sourceforge.jnlp.security.AccessType.READ_FILE;
+import static net.sourceforge.jnlp.security.AccessType.READ_WRITE_FILE;
+import static net.sourceforge.jnlp.security.AccessType.UNVERIFIED;
+import static net.sourceforge.jnlp.security.AccessType.WRITE_FILE;
 
 /**
  * Helper class to start dialogs without starting ITW.
@@ -31,7 +41,8 @@ public class NewDialogFactoryTest {
     }
 
     private void showAccessWarning() {
-        dialogFactory.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, new Object[]{"test"});
+        Arrays.asList(READ_WRITE_FILE, READ_FILE, WRITE_FILE, CLIPBOARD_READ, CLIPBOARD_WRITE, PRINTER, NETWORK, CREATE_DESKTOP_SHORTCUT)
+                .forEach(accessType -> dialogFactory.showAccessWarningDialog(accessType, file, new Object[]{"test"}));
     }
 
     private void showUnsignedWarning() {
@@ -39,8 +50,8 @@ public class NewDialogFactoryTest {
     }
 
     private void showCertWarning() {
-        dialogFactory.showCertWarningDialog(AccessType.UNVERIFIED, file, jarCertVerifier, null);
-        dialogFactory.showCertWarningDialog(AccessType.UNVERIFIED, file, httpsCertVerifier, null);
+        dialogFactory.showCertWarningDialog(UNVERIFIED, file, jarCertVerifier, null);
+        dialogFactory.showCertWarningDialog(UNVERIFIED, file, httpsCertVerifier, null);
     }
 
     private void showPartiallySignedWarning() {

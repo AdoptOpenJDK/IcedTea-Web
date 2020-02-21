@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -12,8 +13,6 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,41 +42,40 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
 
     @Override
     protected JComponent createDetailPaneContent() {
-        final JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             final String name = ofNullable(file)
                     .map(JNLPFile::getInformation)
                     .map(InformationDesc::getTitle)
                     .orElse("");
-            addRow(TRANSLATOR.translate("Name"), name, panel, 0);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
 
             final String codebase = ofNullable(file)
                     .map(JNLPFile::getCodeBase)
                     .map(url -> url.toString())
                     .orElse("");
-            addRow(TRANSLATOR.translate("Codebase"), codebase, panel, 1);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Codebase"), codebase);
 
             final String sourceLocation = ofNullable(file)
                     .map(JNLPFile::getSourceLocation)
                     .map(url -> url.toString())
                     .orElse("");
 
-            addRow(TRANSLATOR.translate("SourceLocation"), sourceLocation, panel, 2);
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("SourceLocation"), sourceLocation);
 
-            addSeparatorRow(false, panel, 3);
+            gridBuilder.addHorizontalSpacer();
 
-            addRow(new JLabel(htmlWrap(TRANSLATOR.translate("<b>It is recommended you only run applications from sites you trust.</b>"))), panel, 4);
+            gridBuilder.addComponentRow(new JLabel(htmlWrap(TRANSLATOR.translate("<b>It is recommended you only run applications from sites you trust.</b>"))));
 
-            addSeparatorRow(false, panel, 5);
+            gridBuilder.addHorizontalSpacer();
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            addRow(rememberUserDecisionPanel, panel, 6);
+            gridBuilder.addComponentRow(rememberUserDecisionPanel);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for Access warning dialog!", e);
         }
-        return panel;
+        return gridBuilder.createGrid();
     }
 
     @Override

@@ -1,19 +1,29 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
+import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import java.net.URL;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * TODO: advancedOptions button
@@ -26,6 +36,7 @@ import java.util.List;
  * - list of issues with current certificate path
  */
 public class JarCertWarningDialog extends CertWarningDialog {
+    private static final Logger LOG = LoggerFactory.getLogger(JarCertWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
     private final DialogButton<AccessWarningResult> runButton;
@@ -37,11 +48,13 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final AccessType accessType;
     private final SecurityDelegate securityDelegate;
     private final JNLPFile file;
+    private final Certificate certificate;
     private boolean alwaysTrustSelected;
 
     protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         super(message, file,certVerifier, accessType == AccessType.VERIFIED);
         this.file = file;
+        this.certificate = certVerifier.getPublisher(null);
         this.accessType = accessType;
         this.securityDelegate = securityDelegate;
         this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
@@ -66,6 +79,42 @@ public class JarCertWarningDialog extends CertWarningDialog {
             return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
         }
         return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
+    }
+
+    @Override
+    protected JComponent createDetailPaneContent() {
+        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
+        try {
+            final String name = Optional.ofNullable(file)
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getTitle)
+                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Name"), name);
+
+            String publisher = "";
+            if (certificate instanceof X509Certificate) {
+                publisher = SecurityUtil.getCN(((X509Certificate) certificate)
+                        .getSubjectX500Principal().getName());
+            }
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Publisher"), publisher);
+
+            final String from = Optional.ofNullable(file)
+                    .map(JNLPFile::getInformation)
+                    .map(InformationDesc::getHomepage)
+                    .map(URL::toString)
+                    .orElse(TRANSLATOR.translate("SNoAssociatedCertificate"));
+            gridBuilder.addKeyValueRow(TRANSLATOR.translate("From"), from);
+
+            gridBuilder.addHorizontalSpacer();
+
+            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
+
+            gridBuilder.addComponentRow(createMoreInformationPanel());
+
+        } catch (final Exception e) {
+            LOG.error("Error while trying to read properties for CertWarningDialog!", e);
+        }
+        return gridBuilder.createGrid();
     }
 
     @Override
