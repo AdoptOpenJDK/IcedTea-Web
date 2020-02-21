@@ -28,7 +28,7 @@ public class DefaultDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showAccessWarning();
+        new DefaultDialogFactoryTest().showUnsignedWarning();
     }
 
     private void showAccessWarning() {

@@ -27,7 +27,7 @@ public class NewDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new NewDialogFactoryTest().showCertWarning();
+        new NewDialogFactoryTest().showUnsignedWarningDialog();
     }
 
     private void showAccessWarning() {
@@ -47,4 +47,7 @@ public class NewDialogFactoryTest {
         dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, null);
     }
 
+    private void showUnsignedWarningDialog() {
+        dialogFactory.showUnsignedWarningDialog(file);
+    }
 }
