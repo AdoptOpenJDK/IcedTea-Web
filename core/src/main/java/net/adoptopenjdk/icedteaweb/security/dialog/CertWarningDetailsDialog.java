@@ -37,7 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.security.cert.CertPath;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,11 +53,11 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     private final DialogButton<Void> closeButton;
 
     private final List<String> details;
-    private CertPath certPath;
+    private List<? extends Certificate> certificates;
 
-    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final CertPath certPath, final List<String> certIssues) {
+    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
         super(owner);
-        this.certPath = certPath;
+        this.certificates = certificates;
         details = new ArrayList<>(certIssues);
 
         // TODO remove this after debugging
@@ -136,7 +136,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         final JButton showCertificateDetailsButton = createShowCertificateDetailsButton();
         collapsiblePanel.add(showCertificateDetailsButton, BorderLayout.NORTH);
 
-        certificateDetailsPanel = new CertificateDetailsPanel(certPath);
+        certificateDetailsPanel = new CertificateDetailsPanel(certificates);
         certificateDetailsPanel.setVisible(false);
 
         showCertificateDetailsButton.addActionListener(e -> {

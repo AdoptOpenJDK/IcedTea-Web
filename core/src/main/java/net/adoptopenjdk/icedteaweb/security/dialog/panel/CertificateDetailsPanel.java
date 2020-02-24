@@ -39,7 +39,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -57,19 +56,16 @@ public class CertificateDetailsPanel extends JPanel {
 
     private static String[] columnNames = {TRANSLATOR.translate("Field"), TRANSLATOR.translate("Value")};
 
-    private List<? extends Certificate> certificates;
+    private List<? extends Certificate> certs;
     private List<String[][]> certsData;
 
 
-    public CertificateDetailsPanel(final CertPath certPath) {
-        certificates = certPath != null ? certPath.getCertificates() : Collections.emptyList();
+    public CertificateDetailsPanel(final List<? extends Certificate> certificates) {
+        certs = certificates != null ? certificates : Collections.emptyList();
         certsData = new ArrayList<>();
 
-        if (certPath != null) {
-            for (int i = 0; i < certPath.getCertificates().size(); i++) {
-                X509Certificate c = (X509Certificate) certificates.get(i);
-                certsData.add(parseCert(c));
-            }
+        for (Certificate cert : certs) {
+            certsData.add(parseCert((X509Certificate) cert));
         }
 
         createContent();
@@ -113,16 +109,16 @@ public class CertificateDetailsPanel extends JPanel {
         JTree tree = new JTree();
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        if (!certificates.isEmpty()) {
-            X509Certificate firstCert = ((X509Certificate) certificates.get(0));
+        if (!certs.isEmpty()) {
+            X509Certificate firstCert = ((X509Certificate) certs.get(0));
             String subjectString = SecurityUtil.getCN(firstCert.getSubjectX500Principal().getName());
             String issuerString = SecurityUtil.getCN(firstCert.getIssuerX500Principal().getName());
 
             DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectString + " (" + issuerString + ")");
 
             //not self signed
-            if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN()) && (certificates.size() > 1)) {
-                X509Certificate secondCert = ((X509Certificate) certificates.get(1));
+            if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN()) && (certs.size() > 1)) {
+                X509Certificate secondCert = ((X509Certificate) certs.get(1));
                 subjectString = SecurityUtil.getCN(secondCert.getSubjectX500Principal().getName());
                 issuerString = SecurityUtil.getCN(secondCert.getIssuerX500Principal().getName());
                 top.add(new DefaultMutableTreeNode(subjectString + " (" + issuerString + ")"));
