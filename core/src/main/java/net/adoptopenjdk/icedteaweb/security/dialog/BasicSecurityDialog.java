@@ -5,7 +5,7 @@ import net.adoptopenjdk.icedteaweb.client.util.gridbag.ComponentRow;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagRow;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.KeyValueRow;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogWithResult;
@@ -19,7 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
@@ -46,7 +47,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
     }
 
     protected ImageIcon createIcon() {
-        return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/question.png");
+        return ImageGallery.QUESTION.asImageIcon();
     }
 
     protected abstract List<DialogButton<R>> createButtons();
@@ -63,11 +64,9 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
     }
 
     private JPanel createBanner() {
-        final JPanel bannerPanel = new JPanel();
-        bannerPanel.setLayout(new BorderLayout(15, 0));
+        final JPanel bannerPanel = new JPanel(new BorderLayout(15, 0));
         bannerPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         bannerPanel.setBackground(Color.WHITE);
-
         bannerPanel.add(createBannerImage(), BorderLayout.WEST);
         bannerPanel.add(createBannerMessage(), BorderLayout.CENTER);
         return bannerPanel;
@@ -81,16 +80,12 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         return alignHelperPanel;
     }
 
-    private JTextArea createBannerMessage() {
-        final JTextArea messageLabel = new JTextArea(message);
-        messageLabel.setEditable(false);
-        messageLabel.setBackground(null);
-        messageLabel.setWrapStyleWord(true);
-        messageLabel.setLineWrap(true);
-        messageLabel.setColumns(50);
-        messageLabel.setFont(messageLabel.getFont().deriveFont(14f));
-
-        return messageLabel;
+    private JLabel createBannerMessage() {
+        final JLabel bannerText = new JLabel(htmlWrap(message), SwingConstants.CENTER);
+        bannerText.setIconTextGap(10);
+        bannerText.setBackground(null);
+        bannerText.setFont(bannerText.getFont().deriveFont(18f));
+        return bannerText;
     }
 
     private JPanel createDetails() {

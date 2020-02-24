@@ -4,6 +4,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class DialogWithResult<R> extends JDialog {
@@ -29,6 +30,10 @@ public abstract class DialogWithResult<R> extends JDialog {
         this.result = result;
         this.setVisible(false);
         this.dispose();
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(800, super.getPreferredSize().height);
     }
 
     public R showAndWait() {

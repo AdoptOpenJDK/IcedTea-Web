@@ -16,7 +16,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.CertificateDetailsPanel;
@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -100,31 +99,29 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
     private JComponent createDetailPaneContent() {
         int numLabels = details.size();
-        JPanel errorPanel = new JPanel(new GridLayout(numLabels, 1));
-        errorPanel.setPreferredSize(new Dimension(600, 50 * (numLabels)));
+        JPanel errorPanel = new JPanel(new GridLayout(numLabels, 1, 0, 10));
+        errorPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         for (String detail : details) {
             ImageIcon icon = null;
             if (detail.equals(TRANSLATOR.translate("STrustedCertificate"))) {
-                icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/info-small.png");
+                icon = ImageGallery.INFO_SMALL.asImageIcon();
             } else {
-                icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning-small.png");
+                icon = ImageGallery.WARNING_SMALL.asImageIcon();
             }
 
-            errorPanel.add(new JLabel(htmlWrap(detail), icon, SwingConstants.LEFT));
+            final JLabel imageLabel = new JLabel(htmlWrap(detail), icon, SwingConstants.LEFT);
+            imageLabel.setIconTextGap(10);
+            errorPanel.add(imageLabel);
         }
         return errorPanel;
     }
 
     @Override
     protected JPanel createContentPane() {
-        final JPanel detailPanel = new JPanel();
-        detailPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        detailPanel.add(createDetailPaneContent());
-
         final JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        contentPanel.add(detailPanel, BorderLayout.NORTH);
+        contentPanel.add(createDetailPaneContent(), BorderLayout.NORTH);
         contentPanel.add(createCertificateDetailsCollapsiblePanel(), BorderLayout.CENTER);
         contentPanel.add(createActionButtons(), BorderLayout.SOUTH);
         return contentPanel;
@@ -132,6 +129,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
     private JPanel createCertificateDetailsCollapsiblePanel() {
         final JPanel collapsiblePanel = new JPanel(new BorderLayout());
+        collapsiblePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         final JButton showCertificateDetailsButton = createShowCertificateDetailsButton();
         collapsiblePanel.add(showCertificateDetailsButton, BorderLayout.NORTH);
@@ -141,7 +139,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
         showCertificateDetailsButton.addActionListener(e -> {
             certificateDetailsPanel.setVisible(!certificateDetailsPanel.isVisible());
-            this.pack();
+            pack();
         });
 
         collapsiblePanel.add(certificateDetailsPanel, BorderLayout.CENTER);

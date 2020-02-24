@@ -2,7 +2,7 @@ package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
+import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
@@ -87,6 +87,6 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
     @Override
     protected ImageIcon createIcon() {
-        return SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning.png");
+        return ImageGallery.WARNING.asImageIcon();
     }
 }

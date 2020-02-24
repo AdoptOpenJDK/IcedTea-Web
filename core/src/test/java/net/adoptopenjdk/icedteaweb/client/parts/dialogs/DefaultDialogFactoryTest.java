@@ -53,7 +53,6 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
          new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
         //new DefaultDialogFactoryTest().show511Dialog();
-
     }
 
     private void showCertInfoDialog() {

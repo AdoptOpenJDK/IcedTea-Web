@@ -76,7 +76,7 @@ public class CertInfoDialog extends DialogWithResult<Void> {
     @Override
     protected JPanel createContentPane() {
         final JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         contentPanel.add(new CertificateDetailsPanel(certificates), BorderLayout.CENTER);
         contentPanel.add(createActionButtons(), BorderLayout.SOUTH);
         return contentPanel;

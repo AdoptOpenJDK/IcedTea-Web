@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.TemporaryPermis
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
+import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
@@ -77,7 +78,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         sandboxButton = new JButton();
         sandboxButton.setText(R("ButSandbox"));
         sandboxButton.addActionListener(SetValueHandler.createSetValueListener(parent,
-                 YesNoSandbox.sandbox()));
+                YesNoSandbox.sandbox()));
         advancedOptionsButton = new TemporaryPermissionsButton(file, securityDelegate, sandboxButton);
 
         buttons.add(1, sandboxButton);
@@ -105,7 +106,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         } catch (Exception e) {
         }
 
-        return "<br>" + R("Publisher") + ":  " + publisher + "<br>" + R("From") + ": <a href='"+from+"'>" + from + "</a>";
+        return "<br>" + R("Publisher") + ":  " + publisher + "<br>" + R("From") + ": <a href='" + from + "'>" + from + "</a>";
     }
 
     private String getSigningInfo() {
@@ -122,8 +123,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected ImageIcon getInfoImage() {
-        final String location = "net/sourceforge/jnlp/resources/warning.png";
-        return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(location));
+        return ImageGallery.WARNING.asImageIcon();
     }
 
     protected static String getTopPanelTextKey() {
@@ -148,7 +148,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         String text = getAppletInfo();
         text += "<br><br>" + R(getInfoPanelTextKey(), file.getCodeBase(), file.getSourceLocation());
         text += "<br><br>" + getSigningInfo();
-        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file,  this.getClass());
+        UnsignedAppletActionEntry rememberedEntry = UnsignedAppletTrustConfirmation.getStoredEntry(file, this.getClass());
         if (rememberedEntry != null) {
             ExecuteAppletAction rememberedAction = rememberedEntry.getAppletSecurityActions().getAction(this.getClass());
             if (rememberedAction == ExecuteAppletAction.YES) {
@@ -165,7 +165,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
         return htmlWrap(R(getQuestionPanelTextKey()));
     }
 
-         @Override
+    @Override
     public DialogResult readValue(String s) {
         return YesNoSandbox.readValue(s);
     }
@@ -184,6 +184,7 @@ public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
     public DialogResult readFromStdIn(String what) {
         return YesNoSandbox.readValue(what);
     }
+
     @Override
     public String helpToStdIn() {
         return YesNoSandbox.sandbox().getAllowedValues().toString();

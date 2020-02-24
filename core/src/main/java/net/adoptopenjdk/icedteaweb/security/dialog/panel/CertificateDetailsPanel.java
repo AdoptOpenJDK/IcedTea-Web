@@ -22,6 +22,7 @@ import net.sourceforge.jnlp.security.SecurityUtil;
 import sun.security.x509.CertificateValidity;
 
 import javax.security.auth.x500.X500Principal;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -34,6 +35,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -85,6 +87,14 @@ public class CertificateDetailsPanel extends JPanel {
         final JScrollPane tablePane = new JScrollPane(table);
         final JScrollPane valuePane = new JScrollPane(value);
 
+        tree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        table.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        value.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        treePane.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        tablePane.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        valuePane.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+
+
         JSplitPane tableToValueSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tablePane, valuePane);
         tableToValueSplitPane.setDividerLocation(0.70);
         tableToValueSplitPane.setResizeWeight(0.70);
@@ -93,6 +103,9 @@ public class CertificateDetailsPanel extends JPanel {
         treeToDetailsSplitPane.setPreferredSize(new Dimension(800, 300));
         treeToDetailsSplitPane.setDividerLocation(0.30);
         treeToDetailsSplitPane.setResizeWeight(0.30);
+
+        tableToValueSplitPane.setBorder(BorderFactory.createLineBorder(this.getBackground()));
+        treeToDetailsSplitPane.setBorder(BorderFactory.createLineBorder(this.getBackground()));
 
         add(treeToDetailsSplitPane, BorderLayout.CENTER);
     }
