@@ -27,7 +27,7 @@ public class KeyValueRow implements GridBagRow {
 
         final JPanel separatorPanel = new JPanel();
         final GridBagConstraints separatorPanelConstraints = createConstraint(row, 1);
-        separatorPanel.setSize(8, 0);
+        separatorPanel.setSize(5, 0);
         panel.add(separatorPanel, separatorPanelConstraints);
 
         final JLabel valueLabel = new JLabel(value);
@@ -40,7 +40,7 @@ public class KeyValueRow implements GridBagRow {
         final GridBagConstraints result = new GridBagConstraints();
         result.gridx = column;
         result.gridy = row;
-        result.ipady = 8;
+        result.ipady = 5;
         result.fill = GridBagConstraints.HORIZONTAL;
         return result;
     }

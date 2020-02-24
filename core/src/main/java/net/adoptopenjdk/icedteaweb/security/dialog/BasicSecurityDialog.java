@@ -20,12 +20,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,43 +55,63 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
 
     @Override
     protected JPanel createContentPane() {
-        JLabel iconComponent = new JLabel("", createIcon(), SwingConstants.LEFT);
+        final JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(createBanner(), BorderLayout.NORTH);
+        contentPanel.add(createDetails(), BorderLayout.CENTER);
+        contentPanel.add(createActionButtons(), BorderLayout.SOUTH);
+        return contentPanel;
+    }
+
+    private JPanel createBanner() {
+        final JPanel bannerPanel = new JPanel();
+        bannerPanel.setLayout(new BorderLayout(15, 0));
+        bannerPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        bannerPanel.setBackground(Color.WHITE);
+
+        bannerPanel.add(createBannerImage(), BorderLayout.WEST);
+        bannerPanel.add(createBannerMessage(), BorderLayout.CENTER);
+        return bannerPanel;
+    }
+
+    private JPanel createBannerImage() {
+        JPanel alignHelperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        alignHelperPanel.setBackground(null);
+        final JLabel iconLabel = new JLabel(createIcon());
+        alignHelperPanel.add(iconLabel);
+        return alignHelperPanel;
+    }
+
+    private JTextArea createBannerMessage() {
         final JTextArea messageLabel = new JTextArea(message);
         messageLabel.setEditable(false);
         messageLabel.setBackground(null);
         messageLabel.setWrapStyleWord(true);
         messageLabel.setLineWrap(true);
         messageLabel.setColumns(50);
-        messageLabel.setFont(messageLabel.getFont().deriveFont(Font.BOLD));
+        messageLabel.setFont(messageLabel.getFont().deriveFont(14f));
 
-        final JPanel messageWrapperPanel = new JPanel();
-        messageWrapperPanel.setLayout(new BorderLayout(12, 12));
-        messageWrapperPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        messageWrapperPanel.setBackground(Color.WHITE);
-        messageWrapperPanel.add(iconComponent, BorderLayout.WEST);
-        messageWrapperPanel.add(messageLabel, BorderLayout.CENTER);
+        return messageLabel;
+    }
 
+    private JPanel createDetails() {
         final JPanel detailPanel = new JPanel();
-        detailPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        detailPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         detailPanel.add(createDetailPaneContent());
+        return detailPanel;
+    }
 
-        final JPanel actionWrapperPanel = new JPanel();
-        actionWrapperPanel.setLayout(new BoxLayout(actionWrapperPanel, BoxLayout.LINE_AXIS));
-        actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        actionWrapperPanel.add(Box.createHorizontalGlue());
+    private JPanel createActionButtons() {
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        buttonPanel.add(Box.createHorizontalGlue());
 
         final List<DialogButton<R>> buttons = createButtons();
         buttons.forEach(b -> {
             final JButton button = b.createButton(this::close);
-            actionWrapperPanel.add(button);
+            buttonPanel.add(button);
         });
-
-        final JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout(12, 12));
-        contentPanel.add(messageWrapperPanel, BorderLayout.NORTH);
-        contentPanel.add(detailPanel, BorderLayout.CENTER);
-        contentPanel.add(actionWrapperPanel, BorderLayout.SOUTH);
-        return contentPanel;
+        return buttonPanel;
     }
 
     protected static List<GridBagRow> getApplicationDetails(JNLPFile file) {
@@ -151,7 +169,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         final String msg1 = "This is a long text that should be displayed in more than 1 line. " +
                 "This is a long text that should be displayed in more than 1 line. " +
                 "This is a long text that should be displayed in more than 1 line.";
-        final String msg2 = "Connection failed for URL: https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/AccessibleScrollDemoProject/AccessibleScrollDemo.jnlp." +
+        final String msg2 = "This is a small text line." +
                 "\n\nDo you want to continue with no proxy or exit the application?";
 
         final DialogButton<Integer> exitButton = new DialogButton<>("BasicSecurityDialog 1 Title", () -> 0);

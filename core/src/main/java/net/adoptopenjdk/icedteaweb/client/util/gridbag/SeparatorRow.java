@@ -29,7 +29,7 @@ public class SeparatorRow implements GridBagRow {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = row;
-        constraints.ipady = 4;
+        constraints.ipady = 5;
         constraints.gridwidth = 3;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         panel.add(separator, constraints);

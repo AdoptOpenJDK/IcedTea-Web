@@ -95,7 +95,8 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         copyToClipboard.addActionListener(e -> {
             certificateDetailsPanel.copyToClipboard();
         });
-        return copyToClipboard;    }
+        return copyToClipboard;
+    }
 
     private JComponent createDetailPaneContent() {
         int numLabels = details.size();
@@ -118,29 +119,14 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     @Override
     protected JPanel createContentPane() {
         final JPanel detailPanel = new JPanel();
-        detailPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        detailPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         detailPanel.add(createDetailPaneContent());
 
-        final JPanel collapsiblePanel = createCertificateDetailsCollapsiblePanel();
-
-        final JPanel actionWrapperPanel = new JPanel();
-        actionWrapperPanel.setLayout(new BoxLayout(actionWrapperPanel, BoxLayout.LINE_AXIS));
-        actionWrapperPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        actionWrapperPanel.add(Box.createHorizontalGlue());
-
-        actionWrapperPanel.add(createCopyToClipboardButton());
-
-        final List<DialogButton<Void>> buttons = createButtons();
-        buttons.forEach(b -> {
-            final JButton button = b.createButton(this::close);
-            actionWrapperPanel.add(button);
-        });
-
-        final JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout(12, 12));
+        final JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         contentPanel.add(detailPanel, BorderLayout.NORTH);
-        contentPanel.add(collapsiblePanel, BorderLayout.CENTER);
-        contentPanel.add(actionWrapperPanel, BorderLayout.SOUTH);
+        contentPanel.add(createCertificateDetailsCollapsiblePanel(), BorderLayout.CENTER);
+        contentPanel.add(createActionButtons(), BorderLayout.SOUTH);
         return contentPanel;
     }
 
@@ -153,12 +139,28 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         certificateDetailsPanel = new CertificateDetailsPanel(certPath);
         certificateDetailsPanel.setVisible(false);
 
-        showCertificateDetailsButton.addActionListener(e-> {
+        showCertificateDetailsButton.addActionListener(e -> {
             certificateDetailsPanel.setVisible(!certificateDetailsPanel.isVisible());
             this.pack();
         });
 
         collapsiblePanel.add(certificateDetailsPanel, BorderLayout.CENTER);
         return collapsiblePanel;
+    }
+
+    private JPanel createActionButtons() {
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.add(Box.createHorizontalGlue());
+
+        buttonPanel.add(createCopyToClipboardButton());
+
+        final List<DialogButton<Void>> buttons = createButtons();
+        buttons.forEach(b -> {
+            final JButton button = b.createButton(this::close);
+            buttonPanel.add(button);
+        });
+
+        return buttonPanel;
     }
 }

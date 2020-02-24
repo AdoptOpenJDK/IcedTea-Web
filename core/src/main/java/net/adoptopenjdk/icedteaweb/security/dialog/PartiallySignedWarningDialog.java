@@ -29,6 +29,7 @@ public class PartiallySignedWarningDialog extends BasicSecurityDialog<Rememberab
 
     PartiallySignedWarningDialog(final JNLPFile file) {
         super(TRANSLATOR.translate("SUnsignedSummary"));
+
         this.file = file;
         allowButton = ButtonFactory.createAllowButton(() -> new RememberableResult<>(AllowDenySandbox.ALLOW, rememberUserDecisionPanel.getResult()));
         sandboxButton = ButtonFactory.createSandboxButton(() -> new RememberableResult<>(AllowDenySandbox.SANDBOX, rememberUserDecisionPanel.getResult()));
