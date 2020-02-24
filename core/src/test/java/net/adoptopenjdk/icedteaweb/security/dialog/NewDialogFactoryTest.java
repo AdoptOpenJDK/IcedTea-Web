@@ -5,6 +5,7 @@ import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
+import sun.security.x509.X509CertImpl;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -32,16 +33,17 @@ public class NewDialogFactoryTest {
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
         file.setSignedJNLPAsMissing();
-        httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[0], true, true, "hostname");
+        httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[] {new X509CertImpl(), new X509CertImpl()}, true, true, "hostname");
         jarCertVerifier = new JarCertVerifier();
         dialogFactory = new NewDialogFactory();
     }
 
     public static void main(String[] args) throws Exception {
         // new NewDialogFactoryTest().showAccessWarning();
-         new NewDialogFactoryTest().showCertWarning();
+        // new NewDialogFactoryTest().showCertWarning();
         // new NewDialogFactoryTest().showUnsignedWarning();
         // new NewDialogFactoryTest().showPartiallySignedWarning();
+         new NewDialogFactoryTest().showCertInfoDialog();
     }
 
     private void showAccessWarning() {
@@ -60,5 +62,10 @@ public class NewDialogFactoryTest {
 
     private void showPartiallySignedWarning() {
         dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, null);
+    }
+
+    private void showCertInfoDialog() {
+        dialogFactory.showCertInfoDialog(httpsCertVerifier, null);
+        dialogFactory.showSingleCertInfoDialog(new X509CertImpl(), null);
     }
 }

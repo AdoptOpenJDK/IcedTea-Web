@@ -422,11 +422,6 @@ public class DefaultDialogFactory implements DialogFactory {
         dialog.getViewableDialog().dispose();
     }
 
-    // TODO cleanup main
-    public static void main11(String[] args) throws Exception {
-        new DefaultDialogFactory().showCertInfoDialog(new JarCertVerifier(), null);
-    }
-
     /**
      * Displays a single certificate's information.
      *

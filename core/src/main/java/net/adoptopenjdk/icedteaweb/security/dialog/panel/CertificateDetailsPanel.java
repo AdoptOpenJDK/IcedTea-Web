@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import sun.security.x509.CertificateValidity;
 
+import javax.security.auth.x500.X500Principal;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -44,6 +45,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This panel displays data from X509Certificate(s) used in jar signing.
@@ -80,7 +83,7 @@ public class CertificateDetailsPanel extends JPanel {
 
         final JScrollPane treePane = new JScrollPane(tree);
         final JScrollPane tablePane = new JScrollPane(table);
-        final JScrollPane valuePane =  new JScrollPane(value);
+        final JScrollPane valuePane = new JScrollPane(value);
 
         JSplitPane tableToValueSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tablePane, valuePane);
         tableToValueSplitPane.setDividerLocation(0.70);
@@ -111,16 +114,16 @@ public class CertificateDetailsPanel extends JPanel {
 
         if (!certs.isEmpty()) {
             X509Certificate firstCert = ((X509Certificate) certs.get(0));
-            String subjectString = SecurityUtil.getCN(firstCert.getSubjectX500Principal().getName());
-            String issuerString = SecurityUtil.getCN(firstCert.getIssuerX500Principal().getName());
+            String subjectString = SecurityUtil.getCN(Optional.ofNullable(firstCert).map(c -> c.getSubjectX500Principal()).map(X500Principal::getName).orElse(""));
+            String issuerString = SecurityUtil.getCN(Optional.ofNullable(firstCert).map(c -> c.getIssuerX500Principal()).map(X500Principal::getName).orElse(""));
 
             DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectString + " (" + issuerString + ")");
 
             //not self signed
-            if (!firstCert.getSubjectDN().equals(firstCert.getIssuerDN()) && (certs.size() > 1)) {
+            if (!Objects.equals(firstCert.getSubjectDN(), firstCert.getIssuerDN()) && (certs.size() > 1)) {
                 X509Certificate secondCert = ((X509Certificate) certs.get(1));
-                subjectString = SecurityUtil.getCN(secondCert.getSubjectX500Principal().getName());
-                issuerString = SecurityUtil.getCN(secondCert.getIssuerX500Principal().getName());
+                subjectString = SecurityUtil.getCN(Optional.ofNullable(secondCert).map(c -> c.getSubjectX500Principal()).map(X500Principal::getName).orElse(""));
+                issuerString = SecurityUtil.getCN(Optional.ofNullable(secondCert).map(c -> c.getIssuerX500Principal()).map(X500Principal::getName).orElse(""));
                 top.add(new DefaultMutableTreeNode(subjectString + " (" + issuerString + ")"));
             }
             tree.setModel(new DefaultTreeModel(top, false));
@@ -196,14 +199,13 @@ public class CertificateDetailsPanel extends JPanel {
 
     private static String[][] parseCert(X509Certificate c) {
         String version = "" + c.getVersion();
-        String serialNumber = c.getSerialNumber().toString();
+        String serialNumber = String.valueOf(c.getSerialNumber());
         String signatureAlg = c.getSigAlgName();
-        String issuer = c.getIssuerX500Principal().toString();
-        String validity = new CertificateValidity(c.getNotBefore(),
-                c.getNotAfter()).toString();
-        String subject = c.getSubjectX500Principal().toString();
+        String issuer = String.valueOf(c.getIssuerX500Principal());
+        String validity = String.valueOf(new CertificateValidity(c.getNotBefore(), c.getNotAfter()));
+        String subject = String.valueOf(c.getSubjectX500Principal());
 
-        String signature = jdkIndependentHexEncoder(c.getSignature());
+        String signature = c.getSignature() != null ? jdkIndependentHexEncoder(c.getSignature()) : null;
 
         String md5Hash = "";
         String sha1Hash = "";

@@ -11,12 +11,14 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
+import javax.security.auth.x500.X500Principal;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class HttpsCertTrustDialog extends CertWarningDialog {
     private static final Logger LOG = LoggerFactory.getLogger(HttpsCertTrustDialog.class);
@@ -51,7 +53,11 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
             String name;
             String publisher = "";
             if (certificate instanceof X509Certificate) {
-                name = SecurityUtil.getCN(((X509Certificate) certificate).getSubjectX500Principal().getName());
+                name = SecurityUtil.getCN(Optional.ofNullable(certificate)
+                        .map(cert -> (X509Certificate) certificate)
+                        .map(X509Certificate::getSubjectX500Principal)
+                        .map(X500Principal::getName)
+                .orElse(""));
                 publisher = name;
             } else {
                 name = file.getInformation().getTitle();

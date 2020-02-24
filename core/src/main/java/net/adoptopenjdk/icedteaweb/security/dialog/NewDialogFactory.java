@@ -27,6 +27,7 @@ import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import java.awt.Component;
 import java.awt.Window;
 import java.net.URL;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -156,23 +157,35 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public void showMoreInfoDialog(final CertVerifier certVerifier, final JNLPFile file) {
-        final List<? extends Certificate> certificates = Optional.of(certVerifier)
+        final Optional<CertVerifier> certVerifierOptional = Optional.ofNullable(certVerifier);
+
+        final List<? extends Certificate> certificates = certVerifierOptional
                 .map(cp -> certVerifier.getCertPath())
-                .map(cp -> cp.getCertificates())
+                .map(CertPath::getCertificates)
                 .orElse(Collections.emptyList());
 
-        final List<String> certIssues = certVerifier.getDetails(null);
+        final List<String> certIssues = certVerifierOptional
+                .map(cv -> cv.getDetails(null))
+                .orElse(Collections.emptyList());
+
         CertWarningDetailsDialog dialog = new CertWarningDetailsDialog(null, file, certificates, certIssues);
         dialog.showAndWait();
     }
 
     @Override
     public void showCertInfoDialog(final CertVerifier certVerifier, final Component parent) {
-        // obsolete, as we show this not longer as a modal dialog but as part of the CertWarningDetailsDialog (collapsible panel: CertificateDetailsPanel)
+        final List<? extends Certificate> certificates = Optional.ofNullable(certVerifier)
+                .map(cp -> certVerifier.getCertPath())
+                .map(CertPath::getCertificates)
+                .orElse(Collections.emptyList());
+        CertInfoDialog dialog = new CertInfoDialog(null, certificates);
+        dialog.showAndWait();
     }
 
     @Override
     public void showSingleCertInfoDialog(final X509Certificate c, final Window parent) {
+        CertInfoDialog dialog = new CertInfoDialog(null, Collections.singletonList(c));
+        dialog.showAndWait();
     }
 
     private AccessWarningPaneComplexReturn askForPermissionToCreateShortcuts(JNLPFile file) {

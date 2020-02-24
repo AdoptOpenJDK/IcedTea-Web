@@ -3,7 +3,6 @@ package net.adoptopenjdk.icedteaweb.security.dialog;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
-import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
@@ -12,18 +11,14 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import java.net.URL;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * TODO: advancedOptions button
@@ -85,7 +80,6 @@ public class JarCertWarningDialog extends CertWarningDialog {
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-
             gridBuilder.addRows(getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
             gridBuilder.addHorizontalSpacer();

@@ -29,7 +29,13 @@ public class DefaultDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showPartiallySignedWarning();
+        // new DefaultDialogFactoryTest().showPartiallySignedWarning();
+        new DefaultDialogFactoryTest().showCertInfoDialog();
+
+    }
+
+    private void showCertInfoDialog() {
+        new DefaultDialogFactory().showCertInfoDialog(httpsCertVerifier, null);
     }
 
     private void showAccessWarning() {
