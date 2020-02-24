@@ -80,6 +80,8 @@ public interface JavaSystemPropertiesConstants {
 
     String AWT_ERASE_BACKGROUND_ON_RESIZE = "sun.awt.erasebackgroundonresize";
 
+    String AWT_DISABLE_MIXING = "sun.awt.disableMixing";
+
     String JAVA2D_D3D = "sun.java2d.d3d";
 
     String JAVA2D_DPI_AWARE = "sun.java2d.dpiaware";
