@@ -87,7 +87,10 @@ import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
  * printer, etc) is needed with unsigned code.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class AccessWarningPane extends SecurityDialogPanel implements RememberableDialog{
 
     private Object[] extras;

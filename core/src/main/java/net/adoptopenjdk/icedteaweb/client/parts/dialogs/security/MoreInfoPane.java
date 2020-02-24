@@ -64,7 +64,10 @@ import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
  * application's signing status.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MoreInfoPane extends SecurityDialogPanel {
 
     private final boolean showSignedJNLPWarning;

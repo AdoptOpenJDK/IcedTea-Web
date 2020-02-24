@@ -45,11 +45,18 @@ import net.sourceforge.jnlp.runtime.SecurityDelegate;
  */
 public class AppTrustWarningDialog  {
 
+    /**
+     * @deprecated will be replaced by new security dialogs
+     * @param dialog
+     * @param file
+     * @return
+     */
     public static AppTrustWarningPanel unsigned(final SecurityDialog dialog, final JNLPFile file) {
         return new UnsignedAppletTrustWarningPanel(dialog, file);
 
     }
 
+    @Deprecated
     public static AppTrustWarningPanel partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
         return new PartiallySignedAppTrustWarningPanel(file, dialog, securityDelegate);
     }

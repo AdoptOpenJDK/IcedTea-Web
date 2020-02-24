@@ -48,7 +48,10 @@ import java.awt.Dimension;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
-
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file) {

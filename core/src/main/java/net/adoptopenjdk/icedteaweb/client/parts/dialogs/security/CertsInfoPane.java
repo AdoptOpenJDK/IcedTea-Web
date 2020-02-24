@@ -87,7 +87,10 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * X509Certificate(s) used in jar signing.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class CertsInfoPane extends SecurityDialogPanel {
 
     private final static Logger LOG = LoggerFactory.getLogger(CertsInfoPane.class);

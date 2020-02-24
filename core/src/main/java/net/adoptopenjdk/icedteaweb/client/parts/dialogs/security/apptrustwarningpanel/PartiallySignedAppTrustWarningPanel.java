@@ -59,6 +59,10 @@ import java.security.cert.X509Certificate;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class PartiallySignedAppTrustWarningPanel extends AppTrustWarningPanel {
 
     private final JarCertVerifier jcv;
