@@ -53,7 +53,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -152,15 +151,6 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
 
     }
 
-    public static void main(String[] args) {
-        MissingPermissionsAttributePanel w = new MissingPermissionsAttributePanel(null, "HelloWorld", "http://nbblah.url");
-        JFrame f = new JFrame();
-        f.setSize(400, 400);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-    
     @Override
     public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();
