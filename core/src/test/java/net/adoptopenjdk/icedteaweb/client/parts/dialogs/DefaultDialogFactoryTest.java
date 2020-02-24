@@ -1,10 +1,12 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.ResourceFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -16,6 +18,7 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -43,8 +46,11 @@ public class DefaultDialogFactoryTest {
     public static void main(String[] args) throws Exception {
         // new DefaultDialogFactoryTest().showPartiallySignedWarning();
         // new DefaultDialogFactoryTest().showCertInfoDialog();
-        // new DefaultDialogFactoryTest().showMissingALACAttributePanel();
-        new DefaultDialogFactoryTest().show511Dialog();
+        // new DefaultDialogFactoryTest().showMoreInfoDialog();
+
+        new DefaultDialogFactoryTest().showMissingALACAttributePanel();
+        // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
+        //new DefaultDialogFactoryTest().show511Dialog();
 
     }
 
@@ -81,9 +87,25 @@ public class DefaultDialogFactoryTest {
         f.setVisible(true);
     }
 
+    private void showMatchingALACAttributePanel() throws MalformedURLException {
+        Set<URL> s = new HashSet<>();
+        s.add(new URL("http:/blah.com/blah"));
+        s.add(new URL("http:/blah.com/blah/blah"));
+        MatchingALACAttributePanel w = new MatchingALACAttributePanel(null, file, "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
+        JFrame f = new JFrame();
+        f.setSize(600, 400);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+    }
+
     private void show511Dialog() throws MalformedURLException {
         Resource resource = ResourceFactory.createResource(new URL("http://example.com/test.jar"), VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
 
         dialogFactory.show511Dialogue(resource);
+    }
+
+    private void showMoreInfoDialog() throws IOException, ParseException {
+        new DefaultDialogFactory().showMoreInfoDialog(new JarCertVerifier(), file);
     }
 }

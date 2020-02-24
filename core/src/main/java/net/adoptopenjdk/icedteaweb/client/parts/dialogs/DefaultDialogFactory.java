@@ -55,7 +55,6 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.sourceforge.jnlp.signing.JarCertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
@@ -396,13 +395,6 @@ public class DefaultDialogFactory implements DialogFactory {
         dialog.getViewableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.getViewableDialog().show();
         dialog.getViewableDialog().dispose();
-    }
-
-    // TODO cleanup main
-    public static void main10(String[] args) throws Exception {
-        JNLPRuntime.initialize();
-        JNLPFile file = new JNLPFileFactory().create(new URL("file:///Users/andreasehret/Desktop/version-check.jnlp"));
-        new DefaultDialogFactory().showMoreInfoDialog(new JarCertVerifier(), file);
     }
 
     /**
