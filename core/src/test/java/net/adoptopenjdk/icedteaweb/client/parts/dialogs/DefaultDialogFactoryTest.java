@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -7,8 +8,15 @@ import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
+import net.sourceforge.jnlp.util.UrlUtils;
 
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Helper class to start dialogs without starting ITW.
@@ -30,7 +38,8 @@ public class DefaultDialogFactoryTest {
 
     public static void main(String[] args) throws Exception {
         // new DefaultDialogFactoryTest().showPartiallySignedWarning();
-        new DefaultDialogFactoryTest().showCertInfoDialog();
+        // new DefaultDialogFactoryTest().showCertInfoDialog();
+        new DefaultDialogFactoryTest().showMissingALACAttributePanel();
 
     }
 
@@ -55,4 +64,15 @@ public class DefaultDialogFactoryTest {
         dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, new SecurityDelegateNew(null, file, null));
     }
 
+    private void showMissingALACAttributePanel() throws MalformedURLException {
+        Set<URL> s = new HashSet<>();
+        s.add(new URL("http:/blah.com/blah"));
+        s.add(new URL("http:/blah.com/blah/blah"));
+        MissingALACAttributePanel w = new MissingALACAttributePanel(null, "HelloWorld", "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
+        JFrame f = new JFrame();
+        f.setSize(600, 400);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+    }
 }
