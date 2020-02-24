@@ -1,6 +1,10 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.Resource;
+import net.adoptopenjdk.icedteaweb.resources.ResourceFactory;
+import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -39,7 +43,8 @@ public class DefaultDialogFactoryTest {
     public static void main(String[] args) throws Exception {
         // new DefaultDialogFactoryTest().showPartiallySignedWarning();
         // new DefaultDialogFactoryTest().showCertInfoDialog();
-        new DefaultDialogFactoryTest().showMissingALACAttributePanel();
+        // new DefaultDialogFactoryTest().showMissingALACAttributePanel();
+        new DefaultDialogFactoryTest().show511Dialog();
 
     }
 
@@ -74,5 +79,11 @@ public class DefaultDialogFactoryTest {
         f.add(w, BorderLayout.CENTER);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
+    }
+
+    private void show511Dialog() throws MalformedURLException {
+        Resource resource = ResourceFactory.createResource(new URL("http://example.com/test.jar"), VersionString.fromString("1.0"), null, UpdatePolicy.ALWAYS);
+
+        dialogFactory.show511Dialogue(resource);
     }
 }
