@@ -84,7 +84,7 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
         final JLabel bannerText = new JLabel(htmlWrap(message), SwingConstants.CENTER);
         bannerText.setIconTextGap(10);
         bannerText.setBackground(null);
-        bannerText.setFont(bannerText.getFont().deriveFont(18f));
+        bannerText.setFont(bannerText.getFont().deriveFont(16f));
         return bannerText;
     }
 
