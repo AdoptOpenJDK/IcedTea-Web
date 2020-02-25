@@ -49,7 +49,8 @@ public class NewDialogFactoryTest {
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
         // new NewDialogFactoryTest().showCertInfoDialog();
         // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
-        new NewDialogFactoryTest().showMissingALACAttributeDialog();
+         new NewDialogFactoryTest().showMatchingALACAttributeDialog();
+        //new NewDialogFactoryTest().showMissingALACAttributeDialog();
 
     }
 
@@ -87,5 +88,14 @@ public class NewDialogFactoryTest {
         remoteUrls.add(new URL("http:/differentlocation.com/one/two"));
 
         dialogFactory.showMissingALACAttributePanel(file, codeBase, remoteUrls);
+    }
+
+    private void showMatchingALACAttributeDialog() throws MalformedURLException {
+        final URL codeBase = new URL("http://localhost/");
+        Set<URL> remoteUrls = new HashSet<>();
+        remoteUrls.add(new URL("http:/localhost/one"));
+        remoteUrls.add(new URL("http:/localhost/one/two"));
+
+        dialogFactory.showMatchingALACAttributePanel(file, codeBase, remoteUrls);
     }
 }

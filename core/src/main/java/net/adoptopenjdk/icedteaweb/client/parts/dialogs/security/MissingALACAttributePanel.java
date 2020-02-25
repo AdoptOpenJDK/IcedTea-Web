@@ -73,7 +73,10 @@ import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MissingALACAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingALACAttributePanel.class);

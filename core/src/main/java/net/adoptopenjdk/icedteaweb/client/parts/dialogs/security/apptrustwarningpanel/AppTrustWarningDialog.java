@@ -60,7 +60,8 @@ public class AppTrustWarningDialog  {
     public static AppTrustWarningPanel partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
         return new PartiallySignedAppTrustWarningPanel(file, dialog, securityDelegate);
     }
-    
+
+    @Deprecated
     public static AppTrustWarningPanel matchingAlaca(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
         return new MatchingALACAttributePanel(x, file, codebase, remoteUrls);
     }

@@ -37,7 +37,7 @@ public class UserDecision<T extends Enum<T>> {
         RUN_PARTIALLY_APPLICATION,
         RUN_MISSING_PERMISSIONS_APPLICATION,
         RUN_MISSING_ALAC_APPLICATION,
-
+        RUN_MATCHING_ALAC_APPLICATION,
         ;
 
         private final AccessType accessType;

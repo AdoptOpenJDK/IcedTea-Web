@@ -51,7 +51,10 @@ import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MatchingALACAttributePanel extends AppTrustWarningPanel {
 
     private final String title;
