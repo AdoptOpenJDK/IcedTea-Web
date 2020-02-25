@@ -123,6 +123,12 @@ public interface JavaSystemPropertiesConstants {
 
     String HTTP_KEEP_ALIVE = "http.keepAlive";
 
+    String HTTP_MAX_REDIRECTS = "http.maxRedirects";
+
+    String HTTP_AUTH_DIGEST_VALIDATEPROXY = "http.auth.digest.validateProxy";
+
+    String HTTP_AUTH_DIGEST_VALIDATESERVER = "http.auth.digest.validateServer";
+
     String ITW_EDT_DEBUG = "icedtea-web.edt.debug";
 
     String ITW_BIN_NAME = "icedtea-web.bin.name";
