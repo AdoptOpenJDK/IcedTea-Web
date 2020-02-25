@@ -71,6 +71,10 @@ import java.net.URL;
 
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);

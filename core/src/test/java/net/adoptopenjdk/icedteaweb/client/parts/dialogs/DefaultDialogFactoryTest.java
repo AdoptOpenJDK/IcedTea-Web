@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingPermissionsAttributePanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
@@ -49,9 +48,9 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showCertInfoDialog();
         // new DefaultDialogFactoryTest().showMoreInfoDialog();
 
-        // new DefaultDialogFactoryTest().showMissingALACAttributePanel();
+         new DefaultDialogFactoryTest().showMissingALACAttributePanel();
         // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
-         new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
+        // new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
         //new DefaultDialogFactoryTest().show511Dialog();
     }
 
@@ -102,12 +101,7 @@ public class DefaultDialogFactoryTest {
 
 
     private void showMissingPermissionsAttributeDialogue() {
-        MissingPermissionsAttributePanel w = new MissingPermissionsAttributePanel(null, "HelloWorld", "http://nbblah.url");
-        JFrame f = new JFrame();
-        f.setSize(400, 400);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
+        new DefaultDialogFactory().showMissingPermissionsAttributeDialogue(file);
     }
 
     private void show511Dialog() throws MalformedURLException {

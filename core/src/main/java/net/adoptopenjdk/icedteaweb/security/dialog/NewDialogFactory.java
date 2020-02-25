@@ -40,8 +40,10 @@ import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.ALLOW
 import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.DENY;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_DESKTOP_SHORTCUT;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.CREATE_MENU_SHORTCUT;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_MISSING_ALAC_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_PARTIALLY_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_UNSIGNED_APPLICATION;
+import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_MISSING_PERMISSIONS_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
 import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
 import static net.sourceforge.jnlp.security.AccessType.SIGNING_ERROR;
@@ -131,8 +133,18 @@ public class NewDialogFactory implements DialogFactory {
     }
 
     @Override
-    public boolean showMissingALACAttributePanel(final JNLPFile file, final URL codeBase, final Set<URL> remoteUrls) {
-        return false;
+    public boolean showMissingALACAttributePanel(final JNLPFile file, final URL codeBase, final Set<URL> locations) {
+        final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MISSING_ALAC_APPLICATION, file, AllowDeny.class);
+
+        final AllowDeny result = remembered.orElseGet(() -> {
+            final MissingALACAttributeDialog dialog = MissingALACAttributeDialog.create(file, locations);
+            final RememberableResult<AllowDeny> dialogResult = dialog.showAndWait();
+
+            userDecisions.save(dialogResult.getRemember(), file, of(RUN_MISSING_ALAC_APPLICATION, dialogResult.getResult()));
+            return dialogResult.getResult();
+        });
+
+        return result == ALLOW;
     }
 
     @Override
@@ -142,7 +154,17 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public boolean showMissingPermissionsAttributeDialogue(final JNLPFile file) {
-        return false;
+        final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MISSING_PERMISSIONS_APPLICATION, file, AllowDeny.class);
+
+        final AllowDeny result = remembered.orElseGet(() -> {
+            final MissingPermissionsAttributeDialog dialog = MissingPermissionsAttributeDialog.create(file);
+            final RememberableResult<AllowDeny> dialogResult = dialog.showAndWait();
+
+            userDecisions.save(dialogResult.getRemember(), file, of(RUN_MISSING_PERMISSIONS_APPLICATION, dialogResult.getResult()));
+            return dialogResult.getResult();
+        });
+
+        return result == ALLOW;
     }
 
     @Override

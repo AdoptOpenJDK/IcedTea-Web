@@ -35,6 +35,8 @@ public class UserDecision<T extends Enum<T>> {
         USE_PRINTER(AccessType.PRINTER),
         RUN_UNSIGNED_APPLICATION,
         RUN_PARTIALLY_APPLICATION,
+        RUN_MISSING_PERMISSIONS_APPLICATION,
+        RUN_MISSING_ALAC_APPLICATION,
 
         ;
 

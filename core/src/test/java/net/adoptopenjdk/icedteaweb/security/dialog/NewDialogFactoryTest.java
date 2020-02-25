@@ -7,8 +7,12 @@ import net.sourceforge.jnlp.security.HttpsCertVerifier;
 import net.sourceforge.jnlp.signing.JarCertVerifier;
 import sun.security.x509.X509CertImpl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.sourceforge.jnlp.security.AccessType.CLIPBOARD_READ;
 import static net.sourceforge.jnlp.security.AccessType.CLIPBOARD_WRITE;
@@ -39,33 +43,49 @@ public class NewDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        // new NewDialogFactoryTest().showAccessWarning();
-        new NewDialogFactoryTest().showCertWarning();
-        // new NewDialogFactoryTest().showUnsignedWarning();
-        // new NewDialogFactoryTest().showPartiallySignedWarning();
+        // new NewDialogFactoryTest().showAccessWarningDialog();
+        // new NewDialogFactoryTest().showCertWarningDialog();
+        // new NewDialogFactoryTest().showUnsignedWarningDialog();
+        // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
         // new NewDialogFactoryTest().showCertInfoDialog();
+        // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
+        new NewDialogFactoryTest().showMissingALACAttributeDialog();
+
     }
 
-    private void showAccessWarning() {
+    private void showAccessWarningDialog() {
         Arrays.asList(READ_WRITE_FILE, READ_FILE, WRITE_FILE, CLIPBOARD_READ, CLIPBOARD_WRITE, PRINTER, NETWORK, CREATE_DESKTOP_SHORTCUT)
                 .forEach(accessType -> dialogFactory.showAccessWarningDialog(accessType, file, new Object[]{"test"}));
     }
 
-    private void showUnsignedWarning() {
+    private void showUnsignedWarningDialog() {
         dialogFactory.showUnsignedWarningDialog(file);
     }
 
-    private void showCertWarning() {
+    private void showCertWarningDialog() {
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, jarCertVerifier, null);
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, httpsCertVerifier, null);
     }
 
-    private void showPartiallySignedWarning() {
+    private void showPartiallySignedWarningDialog() {
         dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, null);
     }
 
     private void showCertInfoDialog() {
         dialogFactory.showCertInfoDialog(httpsCertVerifier, null);
         dialogFactory.showSingleCertInfoDialog(new X509CertImpl(), null);
+    }
+
+    private void showMissingPermissionsAttributeDialog() {
+        dialogFactory.showMissingPermissionsAttributeDialogue(file);
+    }
+
+    private void showMissingALACAttributeDialog() throws MalformedURLException {
+        final URL codeBase = new URL("http://localhost/");
+        Set<URL> remoteUrls = new HashSet<>();
+        remoteUrls.add(new URL("http:/differentlocation.com/one"));
+        remoteUrls.add(new URL("http:/differentlocation.com/one/two"));
+
+        dialogFactory.showMissingALACAttributePanel(file, codeBase, remoteUrls);
     }
 }
