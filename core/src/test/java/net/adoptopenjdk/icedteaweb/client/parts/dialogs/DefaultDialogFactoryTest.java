@@ -52,8 +52,9 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
         // new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
 
+        new DefaultDialogFactoryTest().showAuthenticationPrompt();
         //new DefaultDialogFactoryTest().show511Dialog();
-        new DefaultDialogFactoryTest().showAppletWarningPane();
+        // new DefaultDialogFactoryTest().showAppletWarningPane(); -> applets only
     }
 
     private void showCertInfoDialog() {
@@ -101,7 +102,6 @@ public class DefaultDialogFactoryTest {
         f.setVisible(true);
     }
 
-
     private void showMissingPermissionsAttributeDialogue() {
         new DefaultDialogFactory().showMissingPermissionsAttributeDialogue(file);
     }
@@ -116,8 +116,7 @@ public class DefaultDialogFactoryTest {
         new DefaultDialogFactory().showMoreInfoDialog(new JarCertVerifier(), file);
     }
 
-
-    private void showAppletWarningPane()  {
+    private void showAppletWarningPane() {
         AppletWarningPane w = new AppletWarningPane(null, null);
         JFrame f = new JFrame();
         f.setSize(600, 400);
@@ -126,4 +125,7 @@ public class DefaultDialogFactoryTest {
         f.setVisible(true);
     }
 
+    public void showAuthenticationPrompt() {
+        new DefaultDialogFactory().showAuthenticationPrompt("host", 666, "prompt", "type");
+    }
 }

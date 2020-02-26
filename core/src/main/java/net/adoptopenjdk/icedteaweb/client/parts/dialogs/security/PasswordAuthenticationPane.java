@@ -42,11 +42,9 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -78,7 +76,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         type = (String) extras[3];
 
         addComponents();
-     }
+    }
 
     /**
      * Initialized the dialog components
@@ -87,7 +85,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     public final void addComponents() {
 
         JLabel jlInfo = new JLabel("");
-        jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt)  + "</html>");
+        jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt) + "</html>");
 
         setLayout(new GridBagLayout());
 
@@ -157,7 +155,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         setMaximumSize(new Dimension(1024, 150));
 
         setSize(400, 150);
-        if (parent!=null){
+        if (parent != null) {
             parent.getViewableDialog().setLocationRelativeTo(null);
         }
         initialFocusComponent = jtfUserName;
@@ -208,15 +206,4 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     public String helpToStdIn() {
         return Translator.R("PAPstdinInfo");
     }
-    
-    
-    public static void main(String[] args) {
-        PasswordAuthenticationPane w = new PasswordAuthenticationPane(null, new Object[]{"host",666,"prompt","type"});
-        JFrame f = new JFrame();
-        f.setSize(400, 200);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-
 }

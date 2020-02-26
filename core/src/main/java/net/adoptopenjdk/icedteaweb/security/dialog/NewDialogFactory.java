@@ -128,6 +128,10 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public NamePassword showAuthenticationPrompt(final String host, final int port, final String prompt, final String type) {
+
+
+
+
         return null;
     }
 

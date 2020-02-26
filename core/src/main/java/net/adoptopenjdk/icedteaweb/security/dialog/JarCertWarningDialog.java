@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.security.dialog.panel.LayoutPartsBuilder;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
@@ -77,7 +78,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            gridBuilder.addRows(getApplicationDetails(file));
+            gridBuilder.addRows(LayoutPartsBuilder.getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
             gridBuilder.addHorizontalSpacer();
 

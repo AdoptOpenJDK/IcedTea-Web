@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
@@ -9,6 +8,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
+import net.adoptopenjdk.icedteaweb.security.dialog.panel.LayoutPartsBuilder;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -16,7 +16,6 @@ import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +96,7 @@ public class CreateShortcutDialog extends BasicSecurityDialog<Optional<Remembera
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            gridBuilder.addRows(getApplicationDetails(file));
+            gridBuilder.addRows(LayoutPartsBuilder.getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             desktopCheckBox = createDesktopCheckBox();

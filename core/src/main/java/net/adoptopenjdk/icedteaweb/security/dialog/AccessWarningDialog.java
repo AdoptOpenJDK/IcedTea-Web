@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
+import net.adoptopenjdk.icedteaweb.security.dialog.panel.LayoutPartsBuilder;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -43,7 +44,7 @@ public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            gridBuilder.addRows(getApplicationDetails(file));
+            gridBuilder.addRows(LayoutPartsBuilder.getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             rememberUserDecisionPanel = new RememberUserDecisionPanel();

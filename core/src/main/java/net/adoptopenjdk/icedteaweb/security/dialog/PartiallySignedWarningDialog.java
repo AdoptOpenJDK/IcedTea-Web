@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
+import net.adoptopenjdk.icedteaweb.security.dialog.panel.LayoutPartsBuilder;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenySandbox;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
@@ -45,7 +46,7 @@ public class PartiallySignedWarningDialog extends BasicSecurityDialog<Rememberab
     protected JComponent createDetailPaneContent() {
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
-            gridBuilder.addRows(getApplicationDetails(file));
+            gridBuilder.addRows(LayoutPartsBuilder.getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
 
             gridBuilder.addComponentRow(new JLabel(htmlWrap(TRANSLATOR.translate("SPartiallySignedDetail"))));
