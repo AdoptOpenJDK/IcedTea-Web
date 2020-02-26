@@ -21,18 +21,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.font.TextAttribute;
+import java.awt.Font;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static net.adoptopenjdk.icedteaweb.ui.ApplicationStyleConstants.PRIMARY_WARNING_COLOR;
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
@@ -112,23 +112,19 @@ public abstract class BasicSecurityDialog<R> extends DialogWithResult<R> {
     protected static List<GridBagRow> getApplicationDetails(JNLPFile file) {
         final List<GridBagRow> rows = new ArrayList<>();
 
-        final JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JLabel applicationSectionTitle = new JLabel(TRANSLATOR.translate("ApplicationDetails"));
+        applicationSectionTitle.setFont(applicationSectionTitle.getFont().deriveFont(Font.BOLD));
+        applicationSectionTitle.setBorder(new EmptyBorder(0, 0, 5, 0));
 
-        final JLabel applicationLabel = new JLabel(TRANSLATOR.translate("Application"));
-        final Map<TextAttribute, Object> underlineAttributes = new HashMap<>(applicationLabel.getFont().getAttributes());
-        underlineAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        applicationLabel.setFont(applicationLabel.getFont().deriveFont(underlineAttributes));
-        titlePanel.add(applicationLabel);
+        rows.add(new ComponentRow(applicationSectionTitle));
 
         if (file.isUnsigend()) {
-            final JLabel warningLabel = new JLabel(TRANSLATOR.translate("SUnverifiedJnlp"));
-            final Map<TextAttribute, Object> boldAttributes = new HashMap<>(warningLabel.getFont().getAttributes());
-            boldAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_ULTRABOLD);
-            warningLabel.setFont(warningLabel.getFont().deriveFont(boldAttributes));
-            titlePanel.add(warningLabel);
-        }
+            final JLabel unsignedWarningLabel = new JLabel(TRANSLATOR.translate("SUnverifiedJnlp"));
+            unsignedWarningLabel.setBorder(new EmptyBorder(0, 0, 5, 0));
+            unsignedWarningLabel.setForeground(PRIMARY_WARNING_COLOR);
 
-        rows.add(new ComponentRow(titlePanel));
+            rows.add(new ComponentRow(unsignedWarningLabel));
+        }
 
         final String name = ofNullable(file)
                 .map(JNLPFile::getInformation)

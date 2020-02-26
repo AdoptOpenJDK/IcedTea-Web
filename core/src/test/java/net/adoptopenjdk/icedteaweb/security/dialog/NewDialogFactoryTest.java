@@ -12,6 +12,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import static net.sourceforge.jnlp.security.AccessType.CLIPBOARD_READ;
@@ -34,7 +35,8 @@ public class NewDialogFactoryTest {
     private final NewDialogFactory dialogFactory;
 
     public NewDialogFactoryTest() throws Exception {
-        // Locale.setDefault(Locale.GERMAN);
+        Locale.setDefault(Locale.GERMAN);
+        // Locale.setDefault(Locale.US);
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
         file.setSignedJNLPAsMissing();
