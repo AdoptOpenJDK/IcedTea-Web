@@ -53,7 +53,7 @@ public class AuthenticationDialog extends BasicSecurityDialog<Optional<NamePassw
 
     @Override
     protected ImageIcon createIcon() {
-        return ImageGallery.WARNING.asImageIcon();
+        return ImageGallery.LOGIN.asImageIcon();
     }
 
     @Override

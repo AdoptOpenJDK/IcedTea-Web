@@ -10,7 +10,8 @@ public enum ImageGallery {
     WARNING("net/adoptopenjdk/icedteaweb/image/warn64.png"),
     INFO_SMALL("net/adoptopenjdk/icedteaweb/image/info32.png"),
     QUESTION_SMALL("net/adoptopenjdk/icedteaweb/image/question32.png"),
-    WARNING_SMALL("net/adoptopenjdk/icedteaweb/image/warn32.png");
+    WARNING_SMALL("net/adoptopenjdk/icedteaweb/image/warn32.png"),
+    LOGIN("net/adoptopenjdk/icedteaweb/image/login64.png");
 
     private String path;
 
