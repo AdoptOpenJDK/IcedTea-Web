@@ -135,7 +135,9 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public boolean showMissingALACAttributePanel(final JNLPFile file, final URL codeBase, final Set<URL> locations) {
-        // TODO handle codeBase
+        // On the only place where "codeBase" is handed in, it is done as file.getCodebase().
+        // In the dialog this is checked by file.getNotNullProbableCodeBase() first, which makes
+        // the handover of codebase obsolete here
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MISSING_ALAC_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
@@ -151,7 +153,9 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public boolean showMatchingALACAttributePanel(final JNLPFile file, final URL documentBase, final Set<URL> locations) {
-        // TODO handle documentBase
+        // On the only place where "documentBase" is handed in, it is done as file.getCodebase().
+        // In the dialog this is checked by file.getNotNullProbableCodeBase() first, which makes
+        // the handover of codebase obsolete here
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MATCHING_ALAC_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
