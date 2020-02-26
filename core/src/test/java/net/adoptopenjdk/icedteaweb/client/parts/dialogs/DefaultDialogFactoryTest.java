@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.AppletWarningPane;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.MissingALACAttributePanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel.MatchingALACAttributePanel;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
@@ -51,7 +52,8 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
         // new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
 
-        new DefaultDialogFactoryTest().show511Dialog();
+        //new DefaultDialogFactoryTest().show511Dialog();
+        new DefaultDialogFactoryTest().showAppletWarningPane();
     }
 
     private void showCertInfoDialog() {
@@ -113,4 +115,15 @@ public class DefaultDialogFactoryTest {
     private void showMoreInfoDialog() throws IOException, ParseException {
         new DefaultDialogFactory().showMoreInfoDialog(new JarCertVerifier(), file);
     }
+
+
+    private void showAppletWarningPane()  {
+        AppletWarningPane w = new AppletWarningPane(null, null);
+        JFrame f = new JFrame();
+        f.setSize(600, 400);
+        f.add(w, BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+    }
+
 }

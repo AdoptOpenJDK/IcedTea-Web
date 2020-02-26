@@ -42,7 +42,10 @@ import net.sourceforge.jnlp.runtime.SecurityDelegate;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class AppTrustWarningDialog  {
 
     /**
@@ -51,6 +54,7 @@ public class AppTrustWarningDialog  {
      * @param file
      * @return
      */
+    @Deprecated
     public static AppTrustWarningPanel unsigned(final SecurityDialog dialog, final JNLPFile file) {
         return new UnsignedAppletTrustWarningPanel(dialog, file);
 
