@@ -53,7 +53,8 @@ public class NewDialogFactoryTest {
         // new NewDialogFactoryTest().showCertInfoDialog();
         // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
         // new NewDialogFactoryTest().showMissingALACAttributeDialog();
-        new NewDialogFactoryTest().showMatchingALACAttributeDialog();
+        // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
+        new NewDialogFactoryTest().showAuthenticationPrompt();
 
     }
 
@@ -100,5 +101,9 @@ public class NewDialogFactoryTest {
         remoteUrls.add(new URL("http:/localhost/one/two"));
 
         dialogFactory.showMatchingALACAttributePanel(file, codeBase, remoteUrls);
+    }
+
+    private void showAuthenticationPrompt() {
+        dialogFactory.showAuthenticationPrompt("http://localhost/", 666, "Authentication required with pro account credentials", "Web");
     }
 }

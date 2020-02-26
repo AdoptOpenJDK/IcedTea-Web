@@ -128,11 +128,8 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public NamePassword showAuthenticationPrompt(final String host, final int port, final String prompt, final String type) {
-
-
-
-
-        return null;
+        AuthenticationDialog dialog = AuthenticationDialog.create(host, port, prompt, type);
+        return dialog.showAndWait().orElse(null);
     }
 
     @Override

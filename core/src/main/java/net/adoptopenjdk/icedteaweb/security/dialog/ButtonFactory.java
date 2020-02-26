@@ -36,6 +36,10 @@ public class ButtonFactory {
         return new DialogButton<>(TRANSLATOR.translate("ButRun"), onAction, TRANSLATOR.translate("CertWarnRunTip"));
     }
 
+    public static <R> DialogButton<R> createLoginButton(final Supplier<R> onAction) {
+        return new DialogButton<>(TRANSLATOR.translate("Login"), onAction, TRANSLATOR.translate("LoginButtonTooltip"));
+    }
+
     public static <R> DialogButton<R> createSandboxButton(final Supplier<R> onAction) {
         return new DialogButton<>(TRANSLATOR.translate("ButSandbox"), onAction, TRANSLATOR.translate("CertWarnSandboxTip"));
     }
