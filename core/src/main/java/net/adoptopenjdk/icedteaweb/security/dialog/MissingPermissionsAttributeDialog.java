@@ -19,7 +19,7 @@ public class MissingPermissionsAttributeDialog extends MissingAttributeDialog {
     private static final Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributeDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
 
-    public MissingPermissionsAttributeDialog(final String message, final JNLPFile file) {
+    private MissingPermissionsAttributeDialog(final String message, final JNLPFile file) {
         super(message, file);
     }
 

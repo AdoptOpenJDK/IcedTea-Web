@@ -34,6 +34,7 @@ public class NewDialogFactoryTest {
     private final NewDialogFactory dialogFactory;
 
     public NewDialogFactoryTest() throws Exception {
+        // Locale.setDefault(Locale.GERMAN);
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
         file.setSignedJNLPAsMissing();
@@ -48,8 +49,8 @@ public class NewDialogFactoryTest {
         // new NewDialogFactoryTest().showUnsignedWarningDialog();
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
         // new NewDialogFactoryTest().showCertInfoDialog();
-        // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
-         new NewDialogFactoryTest().showMatchingALACAttributeDialog();
+        new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
+        // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
         //new NewDialogFactoryTest().showMissingALACAttributeDialog();
 
     }
