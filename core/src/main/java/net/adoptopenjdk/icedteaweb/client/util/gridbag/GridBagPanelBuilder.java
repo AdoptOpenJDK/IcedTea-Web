@@ -28,6 +28,10 @@ public class GridBagPanelBuilder {
         rows.add(new KeyValueRow(key, value));
     }
 
+    public void addKeyComponentRow(final String key, final JComponent component) {
+        rows.add(new KeyComponentRow(key, component));
+    }
+
     public void addComponentRow(final JComponent component) {
         rows.add(new ComponentRow(component));
     }
