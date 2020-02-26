@@ -284,8 +284,7 @@ public class DefaultDialogFactory implements DialogFactory {
      * type of message, but generally an Integer corresponding to the value 0
      * indicates success/proceed, and everything else indicates failure
      */
-    @Override
-    public DialogResult getUserResponse(final SecurityDialogMessage message) {
+    private DialogResult getUserResponse(final SecurityDialogMessage message) {
         /*
          * Want to show a security warning, while blocking the client
          * application. This would be easy except there is a bug in showing

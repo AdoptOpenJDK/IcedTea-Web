@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
@@ -9,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenySandbox;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
@@ -182,11 +180,6 @@ public class NewDialogFactory implements DialogFactory {
         });
 
         return result == ALLOW;
-    }
-
-    @Override
-    public DialogResult getUserResponse(final SecurityDialogMessage message) {
-        return null;
     }
 
     @Override

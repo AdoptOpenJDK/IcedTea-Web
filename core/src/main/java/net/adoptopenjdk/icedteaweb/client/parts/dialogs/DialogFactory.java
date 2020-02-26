@@ -1,9 +1,7 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessage;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
@@ -90,19 +88,6 @@ public interface DialogFactory {
     boolean showMatchingALACAttributePanel(JNLPFile file, URL documentBase, Set<URL> remoteUrls);
 
     boolean showMissingPermissionsAttributeDialogue(JNLPFile file);
-
-    /**
-     * Posts the message to the SecurityThread and gets the response. Blocks
-     * until a response has been received. It's safe to call this from an
-     * EventDispatchThread.
-     *
-     * @param message the SecurityDialogMessage indicating what type of dialog to
-     *                display
-     * @return The user's response. Can be null. The exact answer depends on the
-     * type of message, but generally an Integer corresponding to the value 0
-     * indicates success/proceed, and everything else indicates failure
-     */
-    DialogResult getUserResponse(final SecurityDialogMessage message);
 
     /**
      * false = terminate ITW

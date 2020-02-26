@@ -47,11 +47,11 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showPartiallySignedWarning();
         // new DefaultDialogFactoryTest().showCertInfoDialog();
         // new DefaultDialogFactoryTest().showMoreInfoDialog();
-
-         new DefaultDialogFactoryTest().showMissingALACAttributePanel();
+        // new DefaultDialogFactoryTest().showMissingALACAttributePanel();
         // new DefaultDialogFactoryTest().showMatchingALACAttributePanel();
         // new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
-        //new DefaultDialogFactoryTest().show511Dialog();
+
+        new DefaultDialogFactoryTest().show511Dialog();
     }
 
     private void showCertInfoDialog() {
