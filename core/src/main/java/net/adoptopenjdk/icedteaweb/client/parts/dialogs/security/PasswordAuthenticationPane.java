@@ -89,8 +89,8 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
 
         setLayout(new GridBagLayout());
 
-        JLabel jlUserName = new JLabel(R("Username"));
-        JLabel jlPassword = new JLabel(R("Password"));
+        JLabel jlUserName = new JLabel(R("Username") + ":");
+        JLabel jlPassword = new JLabel(R("Password") + ":");
         JButton jbOK = new JButton(R("ButOk"));
         JButton jbCancel = new JButton(R("ButCancel"));
 
