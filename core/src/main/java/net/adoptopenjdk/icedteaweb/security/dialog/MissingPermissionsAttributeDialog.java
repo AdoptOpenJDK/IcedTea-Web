@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
+import net.adoptopenjdk.icedteaweb.client.util.gridbag.GridBagPanelBuilder;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -21,6 +22,11 @@ public class MissingPermissionsAttributeDialog extends MissingAttributeDialog {
 
     private MissingPermissionsAttributeDialog(final String message, final JNLPFile file) {
         super(message, file);
+    }
+
+    @Override
+    protected void getAdditionalApplicationDetails(final GridBagPanelBuilder gridBuilder) {
+        gridBuilder.addKeyValueRow(TRANSLATOR.translate("Codebase"), file.getNotNullProbableCodeBase().toString());
     }
 
     public static MissingPermissionsAttributeDialog create(final JNLPFile file) {

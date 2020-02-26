@@ -6,11 +6,9 @@ import net.adoptopenjdk.icedteaweb.image.ImageGallery;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.panel.ReferencesPanel;
-import net.adoptopenjdk.icedteaweb.security.dialog.panel.RememberUserDecisionPanel;
 import net.sourceforge.jnlp.JNLPFile;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import java.net.URL;
 import java.util.Set;
 
@@ -44,29 +42,10 @@ public class MatchingALACAttributeDialog extends MissingAttributeDialog {
     }
 
     @Override
-    protected JComponent createDetailPaneContent() {
-        final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
-        try {
-            gridBuilder.addRows(getApplicationDetails(file));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Codebase"), file.getNotNullProbableCodeBase().toString());
-
-            gridBuilder.addHorizontalSpacer();
-
-            gridBuilder.addComponentRow(createLocationList(locations));
-
-            gridBuilder.addHorizontalSpacer();
-
-            gridBuilder.addComponentRow(createMoreInformationPanel());
-
-            gridBuilder.addHorizontalSpacer();
-
-            rememberUserDecisionPanel = new RememberUserDecisionPanel();
-            gridBuilder.addComponentRow(rememberUserDecisionPanel);
-
-        } catch (final Exception e) {
-            LOG.error("Error while trying to read properties for MatchingAttributeDialog!", e);
-        }
-        return gridBuilder.createGrid();
+    protected void getAdditionalApplicationDetails(final GridBagPanelBuilder gridBuilder) {
+        gridBuilder.addKeyValueRow(TRANSLATOR.translate("Codebase"), file.getNotNullProbableCodeBase().toString());
+        gridBuilder.addHorizontalSpacer();
+        gridBuilder.addComponentRow(createLocationList(locations));
     }
 
     private static ReferencesPanel createLocationList(final Set<URL> locations) {

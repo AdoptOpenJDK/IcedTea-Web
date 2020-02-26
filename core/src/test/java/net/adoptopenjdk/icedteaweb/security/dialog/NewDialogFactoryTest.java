@@ -35,12 +35,12 @@ public class NewDialogFactoryTest {
     private final NewDialogFactory dialogFactory;
 
     public NewDialogFactoryTest() throws Exception {
-        Locale.setDefault(Locale.GERMAN);
-        // Locale.setDefault(Locale.US);
+        // Locale.setDefault(Locale.GERMAN);
+        Locale.setDefault(Locale.ENGLISH);
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
         file.setSignedJNLPAsMissing();
-        httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[] {new X509CertImpl(), new X509CertImpl()}, true, true, "hostname");
+        httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[]{new X509CertImpl(), new X509CertImpl()}, true, true, "hostname");
         jarCertVerifier = new JarCertVerifier();
         dialogFactory = new NewDialogFactory();
     }
@@ -51,9 +51,9 @@ public class NewDialogFactoryTest {
         // new NewDialogFactoryTest().showUnsignedWarningDialog();
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
         // new NewDialogFactoryTest().showCertInfoDialog();
-        new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
-        // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
-        //new NewDialogFactoryTest().showMissingALACAttributeDialog();
+        // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
+        // new NewDialogFactoryTest().showMissingALACAttributeDialog();
+        new NewDialogFactoryTest().showMatchingALACAttributeDialog();
 
     }
 

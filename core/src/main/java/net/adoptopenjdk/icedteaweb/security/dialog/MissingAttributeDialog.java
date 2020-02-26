@@ -44,7 +44,7 @@ public abstract class MissingAttributeDialog extends BasicSecurityDialog<Remembe
         final GridBagPanelBuilder gridBuilder = new GridBagPanelBuilder();
         try {
             gridBuilder.addRows(getApplicationDetails(file));
-            gridBuilder.addKeyValueRow(TRANSLATOR.translate("Codebase"), file.getNotNullProbableCodeBase().toString());
+            getAdditionalApplicationDetails(gridBuilder);
 
             gridBuilder.addHorizontalSpacer();
 
@@ -60,6 +60,8 @@ public abstract class MissingAttributeDialog extends BasicSecurityDialog<Remembe
         }
         return gridBuilder.createGrid();
     }
+
+    protected abstract void getAdditionalApplicationDetails(final GridBagPanelBuilder gridBuilder);
 
     protected abstract ReferencesPanel createMoreInformationPanel();
 
