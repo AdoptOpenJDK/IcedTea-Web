@@ -59,12 +59,6 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         this.certificates = certificates;
         details = new ArrayList<>(certIssues);
 
-        // TODO remove this after debugging
-        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
-        details.add("Vivamus ac faucibus erat, quis placerat dolor. Quisque tincidunt vel orci ut accumsan.");
-        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras consectetur adipiscing lacinia consectetur. Vivamus ac faucibus erat, quis placerat dolor. Quisque tincidunt vel consectetur adipiscing orci ut accumsan.");
-        details.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras lacinia tortor nec sem laoreet consectetur. ");
-
         // Show signed JNLP warning if the signed main jar does not have a
         // signed JNLP file and the launching JNLP file contains special properties
         if (file != null && file.requiresSignedJNLPWarning()) {

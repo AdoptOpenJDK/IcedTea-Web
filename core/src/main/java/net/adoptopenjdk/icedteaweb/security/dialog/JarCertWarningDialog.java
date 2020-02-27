@@ -80,9 +80,10 @@ public class JarCertWarningDialog extends CertWarningDialog {
         try {
             gridBuilder.addRows(LayoutPartsBuilder.getApplicationDetails(file));
             gridBuilder.addHorizontalSpacer();
-            gridBuilder.addHorizontalSpacer();
 
             gridBuilder.addComponentRow(createMoreInformationPanel());
+
+            gridBuilder.addHorizontalSpacer();
 
             gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
 

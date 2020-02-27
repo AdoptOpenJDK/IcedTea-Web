@@ -5,15 +5,17 @@ import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.CertVerifier;
 
-import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * TODO: advancedOptions button
@@ -52,16 +54,26 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
     }
 
     protected JPanel createMoreInformationPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        final String moreInformationText = getMoreInformationText();
-        final JLabel moreInformationLabel = new JLabel(htmlWrap(moreInformationText));
-        panel.add(moreInformationLabel);
+        JPanel panel = new JPanel(new BorderLayout());
+        //panel.setBackground(null);
+        final JTextArea moreInfoTextArea = new JTextArea(getMoreInformationText());
+        moreInfoTextArea.setBackground(getBackground());
+        moreInfoTextArea.setWrapStyleWord(true);
+        moreInfoTextArea.setLineWrap(true);
+        moreInfoTextArea.setEditable(false);
+
+        final JScrollPane scrollPane = new JScrollPane(moreInfoTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBar(null);
+
+        panel.add(scrollPane, BorderLayout.CENTER);
         JButton moreInfoButton = new JButton(TRANSLATOR.translate("ButMoreInformation"));
         // TODO use Dialogs here?
         moreInfoButton.addActionListener((e) -> new NewDialogFactory().showMoreInfoDialog(certVerifier, file));
-        panel.add(moreInfoButton);
-        panel.setPreferredSize(new Dimension(600, 100));
+        JPanel alignHelperPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        alignHelperPanel.add(moreInfoButton);
+        panel.add(alignHelperPanel, BorderLayout.SOUTH);
+        panel.setPreferredSize(new Dimension(720, 110));
         return panel;
     }
 
