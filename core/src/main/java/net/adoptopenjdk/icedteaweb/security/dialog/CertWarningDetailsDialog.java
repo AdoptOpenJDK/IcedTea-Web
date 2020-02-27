@@ -76,8 +76,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
 
     @Override
     protected String createTitle() {
-        // TODO localization
-        return "More Information";
+        return TRANSLATOR.translate("MoreInformation");
     }
 
     private List<DialogButton<Void>> createButtons() {

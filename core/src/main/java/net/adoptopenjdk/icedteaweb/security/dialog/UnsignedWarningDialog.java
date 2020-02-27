@@ -36,8 +36,7 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
     }
     @Override
     protected String createTitle() {
-        // TODO localization
-        return "Unsigned Application";
+        return TRANSLATOR.translate("SUnsignedApplication");
     }
 
     @Override

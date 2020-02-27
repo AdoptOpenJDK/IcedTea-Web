@@ -38,8 +38,7 @@ public class PartiallySignedWarningDialog extends BasicSecurityDialog<Rememberab
     }
     @Override
     protected String createTitle() {
-        // TODO localization
-        return "Unsigned Application";
+        return TRANSLATOR.translate("SPartiallySignedApplication");
     }
 
     @Override
