@@ -41,8 +41,7 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
 
     @Override
     public String createTitle() {
-        // TODO localization
-        return initiallyAlwaysTrustedSelected ? "Security Approval Required" : "Security Warning";
+        return TRANSLATOR.translate(initiallyAlwaysTrustedSelected ? "SSecurityApprovalRequired" : "SSecurityWarning");
     }
 
     protected JCheckBox createAlwaysTrustCheckbox() {
