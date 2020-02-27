@@ -20,9 +20,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
-/**
- * TODO: handover the list of references (Name/URL) instead of having this in the title
- */
 public class ReferencesPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ReferencesPanel.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

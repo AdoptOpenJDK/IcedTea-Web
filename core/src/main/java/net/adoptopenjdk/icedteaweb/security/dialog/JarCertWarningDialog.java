@@ -22,15 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO: advancedOptions button
- * TODO: CertificateUtils.saveCertificate logic after runButton is pressed when alwaysTrustSelected
- * TODO: bottomPanel of old CertWarningPane
- * <p>
- * Required input
- * - Current certificate path
- * - is root of current path in CA trust store
- * - list of issues with current certificate path
- */
+ * TODO: check if advancedOptions (temporary permissions) should still be supported
+*/
 public class JarCertWarningDialog extends CertWarningDialog {
     private static final Logger LOG = LoggerFactory.getLogger(JarCertWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

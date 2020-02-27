@@ -17,16 +17,6 @@ import java.awt.FlowLayout;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
-/**
- * TODO: advancedOptions button
- * TODO: CertificateUtils.saveCertificate logic after runButton is pressed when alwaysTrustSelected
- * TODO: bottomPanel of old CertWarningPane
- * <p>
- * Required input
- * - Current certificate path
- * - is root of current path in CA trust store
- * - list of issues with current certificate path
- */
 abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
     private static final Translator TRANSLATOR = Translator.getInstance();
 
@@ -55,7 +45,6 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
 
     protected JPanel createMoreInformationPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        //panel.setBackground(null);
         final JTextArea moreInfoTextArea = new JTextArea(getMoreInformationText());
         moreInfoTextArea.setBackground(getBackground());
         moreInfoTextArea.setWrapStyleWord(true);
