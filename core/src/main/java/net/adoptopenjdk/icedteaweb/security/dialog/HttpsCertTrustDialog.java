@@ -66,6 +66,11 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
             gridBuilder.addHorizontalSpacer();
 
+            gridBuilder.addComponentRow(createMoreInformationPanel());
+
+            gridBuilder.addHorizontalSpacer();
+
+
             gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
 
         } catch (final Exception e) {
