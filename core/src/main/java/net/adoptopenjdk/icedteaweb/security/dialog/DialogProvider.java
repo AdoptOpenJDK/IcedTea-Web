@@ -89,8 +89,8 @@ public class DialogProvider {
         return createShortcutDialog.showAndWait();
     }
 
-    public static void showCertWarningDetailsDialog(final Object o, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
-        CertWarningDetailsDialog dialog = CertWarningDetailsDialog.create(null, file, certificates, certIssues);
+    public static void showCertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
+        CertWarningDetailsDialog dialog = CertWarningDetailsDialog.create(owner, file, certificates, certIssues);
         dialog.showAndWait();
     }
 

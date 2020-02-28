@@ -47,11 +47,11 @@ public class NewDialogFactoryTest {
 
     public static void main(String[] args) throws Exception {
         // new NewDialogFactoryTest().showAccessWarningDialog();
-        // new NewDialogFactoryTest().showCertWarningDialog();
+        new NewDialogFactoryTest().showCertWarningDialog();
         // new NewDialogFactoryTest().showMoreInfoDialog();
         // new NewDialogFactoryTest().showUnsignedWarningDialog();
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
-         new NewDialogFactoryTest().showCertInfoDialog();
+        // new NewDialogFactoryTest().showCertInfoDialog();
         // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
         // new NewDialogFactoryTest().showMissingALACAttributeDialog();
         // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
