@@ -12,7 +12,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.CertVerifier;
 
 import java.awt.Dialog;
 import java.net.URL;
@@ -99,13 +98,13 @@ public class DialogProvider {
         return unsignedWarningDialog.showAndWait();
     }
 
-    public static AccessWarningResult showHttpsCertTrustDialog(final JNLPFile file, final CertVerifier certVerifier) {
-        final HttpsCertTrustDialog dialog = HttpsCertTrustDialog.create(file, certVerifier);
+    public static AccessWarningResult showHttpsCertTrustDialog(final JNLPFile file, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues) {
+        final HttpsCertTrustDialog dialog = HttpsCertTrustDialog.create(file, certificate, rootInCaCerts, certificates, certIssues);
         return dialog.showAndWait();
     }
 
-    public static AccessWarningResult showJarCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        final JarCertWarningDialog dialog = JarCertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
+    public static AccessWarningResult showJarCertWarningDialog(final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
+        final JarCertWarningDialog dialog = JarCertWarningDialog.create(accessType, file, rootInCaCerts, certificates, certIssues, securityDelegate);
         return dialog.showAndWait();
     }
 
@@ -137,5 +136,9 @@ public class DialogProvider {
     public static NamePassword showAuthenticationDialog(final String host, final int port, final String prompt, final String type) {
         AuthenticationDialog dialog = AuthenticationDialog.create(host, port, prompt, type);
         return dialog.showAndWait().orElse(null);
+    }
+
+    public static void showMoreInfoDialog(final List<? extends Certificate> certificates, final List<String> certIssues, final JNLPFile file) {
+        DialogProvider.showCertWarningDetailsDialog(null, file, certificates, certIssues);
     }
 }

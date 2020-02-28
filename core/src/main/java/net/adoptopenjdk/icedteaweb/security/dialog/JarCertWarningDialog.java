@@ -11,12 +11,12 @@ import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
-import net.sourceforge.jnlp.security.CertVerifier;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,13 +38,13 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final JNLPFile file;
     private boolean alwaysTrustSelected;
 
-    protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        super(message, file, certVerifier, accessType == AccessType.VERIFIED);
+    protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
+        super(message, file, certificates, certIssues, accessType == AccessType.VERIFIED);
         this.file = file;
         this.accessType = accessType;
         this.securityDelegate = securityDelegate;
         this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
-        this.rootInCaCerts = certVerifier.getRootInCaCerts();
+        this.rootInCaCerts = rootInCaCerts;
 
         runButton = ButtonFactory.createRunButton(() -> AccessWarningResult.YES);
         sandboxButton = ButtonFactory.createSandboxButton(() -> AccessWarningResult.SANDBOX);
@@ -53,9 +53,9 @@ public class JarCertWarningDialog extends CertWarningDialog {
         advancedOptionsButton = createAdvancedOptionsButton();
     }
 
-    public static JarCertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
+    public static JarCertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
         final String message = getMessageFor(accessType);
-        return new JarCertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
+        return new JarCertWarningDialog(message, accessType, jnlpFile, rootInCaCerts, certificates, certIssues, securityDelegate);
     }
 
     @Override

@@ -8,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
 import javax.security.auth.x500.X500Principal;
@@ -28,22 +27,22 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> noButton;
     private final JNLPFile file;
     private final Certificate certificate;
-    private boolean rootInCaCerts;
+    private final boolean rootInCaCerts;
 
 
-    private HttpsCertTrustDialog(final String message, final JNLPFile file, final CertVerifier certVerifier) {
-        super(message, file, certVerifier, false);
+    private HttpsCertTrustDialog(final String message, final JNLPFile file, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues) {
+        super(message, file, certificates, certIssues, false);
         this.file = file;
-        this.certificate = certVerifier.getPublisher(null);
-        this.rootInCaCerts = certVerifier.getRootInCaCerts();
+        this.certificate = certificate;
+        this.rootInCaCerts = rootInCaCerts;
 
-        this.yesButton = ButtonFactory.createYesButton(() -> null);
-        this.noButton = ButtonFactory.createNoButton(() -> null);
+        this.yesButton = ButtonFactory.createYesButton(() -> AccessWarningResult.YES);
+        this.noButton = ButtonFactory.createNoButton(() -> AccessWarningResult.NO);
     }
 
-    public static HttpsCertTrustDialog create(final JNLPFile jnlpFile, final CertVerifier certVerifier) {
+    public static HttpsCertTrustDialog create(final JNLPFile jnlpFile, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues) {
         final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
-        return new HttpsCertTrustDialog(message, jnlpFile, certVerifier);
+        return new HttpsCertTrustDialog(message, jnlpFile, certificate, rootInCaCerts, certificates, certIssues);
     }
 
     @Override

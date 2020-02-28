@@ -3,7 +3,6 @@ package net.adoptopenjdk.icedteaweb.security.dialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.security.CertVerifier;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -14,20 +13,24 @@ import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.security.cert.Certificate;
+import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult> {
     private static final Translator TRANSLATOR = Translator.getInstance();
 
-    private final CertVerifier certVerifier;
     private final JNLPFile file;
+    private final List<? extends Certificate> certificates;
+    private final List<String> certIssues;
     private boolean initiallyAlwaysTrustedSelected;
 
-    protected CertWarningDialog(final String message, final JNLPFile file, final CertVerifier certVerifier, boolean initiallyAlwaysTrustedSelected) {
+    protected CertWarningDialog(final String message, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, boolean initiallyAlwaysTrustedSelected) {
         super(message);
         this.file = file;
-        this.certVerifier = certVerifier;
+        this.certificates = certificates;
+        this.certIssues = certIssues;
         this.initiallyAlwaysTrustedSelected = initiallyAlwaysTrustedSelected;
     }
 
@@ -57,8 +60,8 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
 
         panel.add(scrollPane, BorderLayout.CENTER);
         JButton moreInfoButton = new JButton(TRANSLATOR.translate("ButMoreInformation"));
-        // TODO use Dialogs here?
-        moreInfoButton.addActionListener((e) -> new NewDialogFactory().showMoreInfoDialog(certVerifier, file));
+
+        moreInfoButton.addActionListener((e) -> DialogProvider.showMoreInfoDialog(certificates, certIssues, file));
         JPanel alignHelperPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         alignHelperPanel.add(moreInfoButton);
         panel.add(alignHelperPanel, BorderLayout.SOUTH);

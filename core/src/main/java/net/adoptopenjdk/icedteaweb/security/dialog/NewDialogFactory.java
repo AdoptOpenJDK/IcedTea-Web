@@ -91,10 +91,23 @@ public class NewDialogFactory implements DialogFactory {
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         final AccessWarningResult certWarningResult;
 
+        final Optional<CertVerifier> certVerifierOptional = Optional.ofNullable(certVerifier);
+
+        final List<? extends Certificate> certificates = certVerifierOptional
+                .map(cp -> certVerifier.getCertPath())
+                .map(CertPath::getCertificates)
+                .orElse(Collections.emptyList());
+
+        final List<String> certIssues = certVerifierOptional
+                .map(cv -> cv.getDetails(null))
+                .orElse(Collections.emptyList());
+
+        final boolean rootInCaCerts = certVerifierOptional.map(CertVerifier::getRootInCaCerts).orElse(Boolean.FALSE);
+
         if (certVerifier instanceof HttpsCertVerifier) {
-            certWarningResult = DialogProvider.showHttpsCertTrustDialog(file, certVerifier);
+            certWarningResult = DialogProvider.showHttpsCertTrustDialog(file, certVerifier.getPublisher(null), rootInCaCerts, certificates, certIssues);
         } else {
-            certWarningResult = DialogProvider.showJarCertWarningDialog(accessType, file, certVerifier, securityDelegate);
+            certWarningResult = DialogProvider.showJarCertWarningDialog(accessType, file, rootInCaCerts, certificates, certIssues, securityDelegate);
         }
         switch (certWarningResult) {
             case YES:
