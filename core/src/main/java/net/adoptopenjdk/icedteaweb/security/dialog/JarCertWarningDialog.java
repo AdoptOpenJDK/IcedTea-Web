@@ -17,7 +17,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,13 +36,11 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final AccessType accessType;
     private final SecurityDelegate securityDelegate;
     private final JNLPFile file;
-    private final Certificate certificate;
     private boolean alwaysTrustSelected;
 
     protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
         super(message, file, certVerifier, accessType == AccessType.VERIFIED);
         this.file = file;
-        this.certificate = certVerifier.getPublisher(null);
         this.accessType = accessType;
         this.securityDelegate = securityDelegate;
         this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
