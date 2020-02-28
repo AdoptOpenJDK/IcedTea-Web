@@ -29,11 +29,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
 import static net.sourceforge.jnlp.util.WindowsShortcutManager.getWindowsShortcutsFile;
@@ -151,9 +154,17 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         if (!getWindowsShortcutsFile().exists()) {
             getWindowsShortcutsFile().createNewFile();
         }
-
+        LOG.debug("Using WindowsShortCutManager {}", getWindowsShortcutsFile().toString());
         if (ManageMode.A == mode) {
-            List<String> lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
+            List<String> lines = null;
+            // if UTF-8 fails, try ISO-8859-1
+            try {
+                LOG.debug("Reading Shortcuts with UTF-8");
+                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
+            } catch (MalformedInputException me) {
+                LOG.debug("Reading Shortcuts with ISO-8859-1");
+                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), ISO_8859_1);
+            }
             Iterator it = lines.iterator();
             String sItem = "";
             String sPath;
@@ -171,10 +182,13 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 }
             }
             if (fAdd) {
-                LOG.debug("Adding Shortcut to list = ", sItem);
-                String scInfo = file.getFileLocation().toString() + ",";
-                scInfo += path + "\r\n";
-                Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
+                LOG.debug("Adding Shortcut to list = {}", sItem);
+                LOG.debug("Default encoding is {}", Charset.defaultCharset().name());
+                StringBuilder stringBuilder = new StringBuilder().append(file.getFileLocation().toString())
+                        .append(",")
+                        .append(path)
+                        .append("\r\n");
+                Files.write(getWindowsShortcutsFile().toPath(), stringBuilder.toString().getBytes(UTF_8), StandardOpenOption.APPEND);
             }
         }
     }
