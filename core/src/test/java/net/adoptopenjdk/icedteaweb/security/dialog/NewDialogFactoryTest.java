@@ -35,7 +35,7 @@ public class NewDialogFactoryTest {
     private final NewDialogFactory dialogFactory;
 
     public NewDialogFactoryTest() throws Exception {
-        // Locale.setDefault(Locale.GERMAN);
+        //Locale.setDefault(Locale.GERMAN);
         Locale.setDefault(Locale.ENGLISH);
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
@@ -47,15 +47,15 @@ public class NewDialogFactoryTest {
 
     public static void main(String[] args) throws Exception {
         // new NewDialogFactoryTest().showAccessWarningDialog();
-        new NewDialogFactoryTest().showCertWarningDialog();
+        // new NewDialogFactoryTest().showCertWarningDialog();
+        // new NewDialogFactoryTest().showMoreInfoDialog();
         // new NewDialogFactoryTest().showUnsignedWarningDialog();
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
-        // new NewDialogFactoryTest().showCertInfoDialog();
+         new NewDialogFactoryTest().showCertInfoDialog();
         // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
         // new NewDialogFactoryTest().showMissingALACAttributeDialog();
         // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
         // new NewDialogFactoryTest().showAuthenticationPrompt();
-
     }
 
     private void showAccessWarningDialog() {
@@ -70,6 +70,10 @@ public class NewDialogFactoryTest {
     private void showCertWarningDialog() {
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, jarCertVerifier, null);
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, httpsCertVerifier, null);
+    }
+
+    private void showMoreInfoDialog() {
+        dialogFactory.showMoreInfoDialog(jarCertVerifier, file);
     }
 
     private void showPartiallySignedWarningDialog() {

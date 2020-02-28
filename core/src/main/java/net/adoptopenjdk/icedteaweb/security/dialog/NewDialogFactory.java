@@ -79,9 +79,7 @@ public class NewDialogFactory implements DialogFactory {
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
-            final UnsignedWarningDialog unsignedWarningDialog = new UnsignedWarningDialog(file);
-            final RememberableResult<AllowDeny> dialogResult = unsignedWarningDialog.showAndWait();
-
+            final RememberableResult<AllowDeny> dialogResult = DialogProvider.showUnsignedWarningDialog(file);
             userDecisions.save(dialogResult.getRemember(), file, of(RUN_UNSIGNED_APPLICATION, dialogResult.getResult()));
             return dialogResult.getResult();
         });
@@ -91,15 +89,13 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public YesNoSandbox showCertWarningDialog(final AccessType accessType, final JNLPFile file, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-        CertWarningDialog dialogWithResult;
+        final AccessWarningResult certWarningResult;
+
         if (certVerifier instanceof HttpsCertVerifier) {
-            dialogWithResult = HttpsCertTrustDialog.create(file, certVerifier);
+            certWarningResult = DialogProvider.showHttpsCertTrustDialog(file, certVerifier);
         } else {
-            dialogWithResult = JarCertWarningDialog.create(accessType, file, certVerifier, securityDelegate);
+            certWarningResult = DialogProvider.showJarCertWarningDialog(accessType, file, certVerifier, securityDelegate);
         }
-
-        final AccessWarningResult certWarningResult = dialogWithResult.showAndWait();
-
         switch (certWarningResult) {
             case YES:
                 return YesNoSandbox.yes();
@@ -115,9 +111,7 @@ public class NewDialogFactory implements DialogFactory {
         final Optional<AllowDenySandbox> remembered = this.userDecisions.getUserDecisions(RUN_PARTIALLY_APPLICATION, file, AllowDenySandbox.class);
 
         final AllowDenySandbox result = remembered.orElseGet(() -> {
-            final PartiallySignedWarningDialog dialog = new PartiallySignedWarningDialog(file);
-            final RememberableResult<AllowDenySandbox> dialogResult = dialog.showAndWait();
-
+            final RememberableResult<AllowDenySandbox> dialogResult = DialogProvider.showPartiallySignedWarningDialog(file);
             userDecisions.save(dialogResult.getRemember(), file, of(RUN_PARTIALLY_APPLICATION, dialogResult.getResult()));
             return dialogResult.getResult();
         });
@@ -128,8 +122,7 @@ public class NewDialogFactory implements DialogFactory {
 
     @Override
     public NamePassword showAuthenticationPrompt(final String host, final int port, final String prompt, final String type) {
-        AuthenticationDialog dialog = AuthenticationDialog.create(host, port, prompt, type);
-        return dialog.showAndWait().orElse(null);
+        return DialogProvider.showAuthenticationDialog(host, port, prompt, type);
     }
 
     @Override
@@ -140,9 +133,7 @@ public class NewDialogFactory implements DialogFactory {
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MISSING_ALAC_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
-            final MissingALACAttributeDialog dialog = MissingALACAttributeDialog.create(file, locations);
-            final RememberableResult<AllowDeny> dialogResult = dialog.showAndWait();
-
+            final RememberableResult<AllowDeny> dialogResult = DialogProvider.showMissingALACAttributeDialog(file, locations);
             userDecisions.save(dialogResult.getRemember(), file, of(RUN_MISSING_ALAC_APPLICATION, dialogResult.getResult()));
             return dialogResult.getResult();
         });
@@ -158,9 +149,7 @@ public class NewDialogFactory implements DialogFactory {
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MATCHING_ALAC_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
-            final MatchingALACAttributeDialog dialog = MatchingALACAttributeDialog.create(file, locations);
-            final RememberableResult<AllowDeny> dialogResult = dialog.showAndWait();
-
+            final RememberableResult<AllowDeny> dialogResult = DialogProvider.showMatchingALACAttributeDialog(file, locations);
             userDecisions.save(dialogResult.getRemember(), file, of(RUN_MATCHING_ALAC_APPLICATION, dialogResult.getResult()));
             return dialogResult.getResult();
         });
@@ -173,9 +162,7 @@ public class NewDialogFactory implements DialogFactory {
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_MISSING_PERMISSIONS_APPLICATION, file, AllowDeny.class);
 
         final AllowDeny result = remembered.orElseGet(() -> {
-            final MissingPermissionsAttributeDialog dialog = MissingPermissionsAttributeDialog.create(file);
-            final RememberableResult<AllowDeny> dialogResult = dialog.showAndWait();
-
+            final RememberableResult<AllowDeny> dialogResult = DialogProvider.showMissingPermissionsAttributeDialog(file);
             userDecisions.save(dialogResult.getRemember(), file, of(RUN_MISSING_PERMISSIONS_APPLICATION, dialogResult.getResult()));
             return dialogResult.getResult();
         });
@@ -201,8 +188,7 @@ public class NewDialogFactory implements DialogFactory {
                 .map(cv -> cv.getDetails(null))
                 .orElse(Collections.emptyList());
 
-        CertWarningDetailsDialog dialog = new CertWarningDetailsDialog(null, file, certificates, certIssues);
-        dialog.showAndWait();
+        DialogProvider.showCertWarningDetailsDialog(null, file, certificates, certIssues);
     }
 
     @Override
@@ -211,14 +197,12 @@ public class NewDialogFactory implements DialogFactory {
                 .map(cp -> certVerifier.getCertPath())
                 .map(CertPath::getCertificates)
                 .orElse(Collections.emptyList());
-        CertInfoDialog dialog = new CertInfoDialog(null, certificates);
-        dialog.showAndWait();
+        DialogProvider.showCertInfoDialog(null, certificates);
     }
 
     @Override
     public void showSingleCertInfoDialog(final X509Certificate c, final Window parent) {
-        CertInfoDialog dialog = new CertInfoDialog(null, Collections.singletonList(c));
-        dialog.showAndWait();
+        DialogProvider.showCertInfoDialog(null, Collections.singletonList(c));
     }
 
     private AccessWarningPaneComplexReturn askForPermissionToCreateShortcuts(JNLPFile file) {
@@ -238,12 +222,11 @@ public class NewDialogFactory implements DialogFactory {
     }
 
     private Optional<CreateShortcutResult> showCreateShortcutDialog(JNLPFile file) {
-        final CreateShortcutDialog createShortcutDialog = CreateShortcutDialog.create(file);
-        return createShortcutDialog.showAndWait()
-                .map(r -> {
-                    rememberUserDecision(file, r);
-                    return r.getResult();
-                });
+        final Optional<RememberableResult<CreateShortcutResult>> result = DialogProvider.showCreateShortcutDialog(file);
+        return result.map(r -> {
+            rememberUserDecision(file, r);
+            return r.getResult();
+        });
     }
 
     private Optional<CreateShortcutResult> getRememberedUserDecision(JNLPFile file) {
@@ -270,8 +253,39 @@ public class NewDialogFactory implements DialogFactory {
     }
 
     private AllowDeny showAccessPermissionDialog(AccessType accessType, JNLPFile file, Object[] extras) {
-        final AccessWarningDialog dialogWithResult = AccessWarningDialog.create(accessType, file, extras);
-        final RememberableResult<AllowDeny> dialogResult = dialogWithResult.showAndWait();
+        final RememberableResult<AllowDeny> dialogResult;
+
+        final Object extra = Optional.ofNullable(extras)
+                .filter(nonNullExtras -> nonNullExtras.length > 0)
+                .map(nonEmptyExtras -> nonEmptyExtras[0])
+                .orElse("<unkown>");
+
+        switch (accessType) {
+            case READ_WRITE_FILE:
+                dialogResult = DialogProvider.showReadWriteFileAccessWarningDialog(file, extra.toString());
+                break;
+            case READ_FILE:
+                dialogResult = DialogProvider.showReadFileAccessWarningDialog(file, extra.toString());
+                break;
+            case WRITE_FILE:
+                dialogResult = DialogProvider.showWriteFileAccessWarningDialog(file, extra.toString());
+                break;
+            case CLIPBOARD_READ:
+                dialogResult = DialogProvider.showReadClipboardAccessWarningDialog(file);
+                break;
+            case CLIPBOARD_WRITE:
+                dialogResult = DialogProvider.showWriteClipboardAccessWarningDialog(file);
+                break;
+            case PRINTER:
+                dialogResult = DialogProvider.showPrinterAccessWarningDialog(file);
+                break;
+            case NETWORK:
+                dialogResult = DialogProvider.showNetworkAccessWarningDialog(file, extra);
+                break;
+            default:
+                dialogResult = DialogProvider.showAccessWarningDialog(file, "");
+        }
+
         rememberUserDecision(file, accessType, dialogResult);
         return dialogResult.getResult();
     }

@@ -44,16 +44,14 @@ public class CertInfoDialog extends DialogWithResult<Void> {
 
     private List<? extends Certificate> certificates;
 
-    CertInfoDialog(final Dialog owner, final Certificate certificate) {
-        super(owner);
-        this.certificates = Collections.singletonList(certificate);
-        this.closeButton = ButtonFactory.createCloseButton(() -> null);
-    }
-
-    CertInfoDialog(final Dialog owner, final List<? extends Certificate> certificates) {
+    private CertInfoDialog(final Dialog owner, final List<? extends Certificate> certificates) {
         super(owner);
         this.certificates = certificates;
         this.closeButton = ButtonFactory.createCloseButton(() -> null);
+    }
+
+    public static CertInfoDialog create(final Dialog owner, final List<? extends Certificate> certificates) {
+        return new CertInfoDialog(owner, certificates);
     }
 
     @Override

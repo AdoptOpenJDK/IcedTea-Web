@@ -54,7 +54,7 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     private final List<String> details;
     private List<? extends Certificate> certificates;
 
-    CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
+    private CertWarningDetailsDialog(final Dialog owner, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
         super(owner);
         this.certificates = certificates;
         details = new ArrayList<>(certIssues);
@@ -66,6 +66,10 @@ public class CertWarningDetailsDialog extends DialogWithResult<Void> {
         }
 
         this.closeButton = ButtonFactory.createCloseButton(() -> null);
+    }
+
+    public static CertWarningDetailsDialog create(final Dialog owner, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues) {
+        return new CertWarningDetailsDialog(owner, file, certificates, certIssues);
     }
 
     @Override

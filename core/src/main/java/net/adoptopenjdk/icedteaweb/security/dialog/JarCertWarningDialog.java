@@ -57,7 +57,6 @@ public class JarCertWarningDialog extends CertWarningDialog {
     }
 
     public static JarCertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final CertVerifier certVerifier, final SecurityDelegate securityDelegate) {
-
         final String message = getMessageFor(accessType);
         return new JarCertWarningDialog(message, accessType, jnlpFile, certVerifier, securityDelegate);
     }

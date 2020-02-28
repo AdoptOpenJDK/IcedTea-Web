@@ -28,12 +28,17 @@ public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResul
     private final DialogButton<RememberableResult<AllowDeny>> denyButton;
     private RememberUserDecisionPanel rememberUserDecisionPanel;
 
-    UnsignedWarningDialog(final JNLPFile file) {
+    private UnsignedWarningDialog(final JNLPFile file) {
         super(TRANSLATOR.translate("SUnsignedSummary"));
         this.file = file;
         allowButton = ButtonFactory.createAllowButton(() -> new RememberableResult<>(AllowDeny.ALLOW, rememberUserDecisionPanel.getResult()));
         denyButton = ButtonFactory.createDenyButton(() -> new RememberableResult<>(AllowDeny.DENY, rememberUserDecisionPanel.getResult()));
     }
+
+    public static UnsignedWarningDialog create(final JNLPFile file) {
+        return new UnsignedWarningDialog(file);
+    }
+
     @Override
     protected String createTitle() {
         return TRANSLATOR.translate("SUnsignedApplication");
