@@ -157,10 +157,10 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile.toString());
         List<String> lines = readAllLine(shortcutFile);
-        Iterator it = lines.iterator();
+        Iterator<String> it = lines.iterator();
         String sItem = "";
         String sPath;
-        Boolean fAdd = true;
+        boolean fAdd = true;
         // check to see if line exists, if not add it
         while (it.hasNext()) {
             sItem = it.next().toString();
