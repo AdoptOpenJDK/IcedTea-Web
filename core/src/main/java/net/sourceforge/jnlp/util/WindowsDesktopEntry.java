@@ -150,18 +150,19 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     }
 
     private void manageShortcutList(String path) throws IOException {
-        if (!getWindowsShortcutsFile().exists()) {
-            getWindowsShortcutsFile().createNewFile();
+        final File shortcutFile = getWindowsShortcutsFile();
+        if (!shortcutFile.exists()) {
+            shortcutFile.createNewFile();
         }
-        LOG.debug("Using WindowsShortCutManager {}", getWindowsShortcutsFile().toString());
+        LOG.debug("Using WindowsShortCutManager {}", shortcutFile.toString());
         List<String> lines = null;
         // if UTF-8 fails, try ISO-8859-1
         try {
             LOG.debug("Reading Shortcuts with UTF-8");
-            lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
+            lines = Files.readAllLines(shortcutFile.toPath(), UTF_8);
         } catch (MalformedInputException me) {
             LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
-            lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), Charset.defaultCharset());
+            lines = Files.readAllLines(shortcutFile.toPath(), Charset.defaultCharset());
         }
         Iterator it = lines.iterator();
         String sItem = "";
@@ -184,7 +185,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             LOG.debug("Adding Shortcut to list = {} with UTF-8 encoding", sItem);
             String scInfo = file.getFileLocation().toString() + ",";
             scInfo += path + "\r\n";
-            Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
+            Files.write(shortcutFile.toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
         }
     }
 
