@@ -151,6 +151,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         final File shortcutFile = getWindowsShortcutsFile();
         if (!shortcutFile.exists() && !shortcutFile.createNewFile()) {
             // TODO: how should we handle this case?
+            LOG.info("could not create shortcut file {}", shortcutFile);
             return;
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
