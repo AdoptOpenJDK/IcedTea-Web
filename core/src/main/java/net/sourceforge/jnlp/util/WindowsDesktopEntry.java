@@ -32,7 +32,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
-import java.util.Iterator;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -155,29 +154,21 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             return;
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
-        List<String> lines = readAllLine(shortcutFile);
-        Iterator<String> it = lines.iterator();
-        String sItem = "";
-        String sPath;
-        boolean fAdd = true;
-        // check to see if line exists, if not add it
-        while (it.hasNext()) {
-            sItem = it.next();
-            String[] sArray = sItem.split(",");
-            sPath = sArray[1];
-            if (sPath.equalsIgnoreCase(path)) {
-                // it exists don't add
-                fAdd = false;
-                break;
-            }
-        }
-        if (fAdd) {
+        final List<String> lines = readAllLine(shortcutFile);
+        if (needToAddNewShortcutEntry(path, lines)) {
             final String scInfo = file.getFileLocation().toString() + "," + path;
             LOG.debug("Adding Shortcut to list: {}", scInfo);
             lines.add(scInfo);
             final String content = String.join("\r\n", lines);
             FileUtils.saveFileUtf8(content, shortcutFile);
         }
+    }
+
+    private boolean needToAddNewShortcutEntry(String path, List<String> lines) {
+        return lines.stream()
+                .map(line -> line.split(","))
+                .map(array -> array[1])
+                .anyMatch(sPath -> sPath.equalsIgnoreCase(path));
     }
 
     private List<String> readAllLine(File shortcutFile) throws IOException {
