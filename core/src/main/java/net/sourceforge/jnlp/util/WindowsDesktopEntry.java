@@ -36,7 +36,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
 import static net.sourceforge.jnlp.util.WindowsShortcutManager.getWindowsShortcutsFile;
@@ -162,8 +161,8 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 LOG.debug("Reading Shortcuts with UTF-8");
                 lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
             } catch (MalformedInputException me) {
-                LOG.debug("Reading Shortcuts with ISO-8859-1");
-                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), ISO_8859_1);
+                LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
+                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), Charset.defaultCharset());
             }
             Iterator it = lines.iterator();
             String sItem = "";
@@ -182,17 +181,14 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
                 }
             }
             if (fAdd) {
-                LOG.debug("Adding Shortcut to list = {}", sItem);
                 LOG.debug("Default encoding is {}", Charset.defaultCharset().name());
-                StringBuilder stringBuilder = new StringBuilder().append(file.getFileLocation().toString())
-                        .append(",")
-                        .append(path)
-                        .append("\r\n");
-                Files.write(getWindowsShortcutsFile().toPath(), stringBuilder.toString().getBytes(UTF_8), StandardOpenOption.APPEND);
+                LOG.debug("Adding Shortcut to list = {} with UTF-8 encoding", sItem);
+                String scInfo = file.getFileLocation().toString() + ",";
+                scInfo += path + "\r\n";
+                Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
             }
         }
     }
-
 
     @Override
     public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
