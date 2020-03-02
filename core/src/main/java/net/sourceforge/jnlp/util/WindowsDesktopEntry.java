@@ -154,39 +154,37 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             getWindowsShortcutsFile().createNewFile();
         }
         LOG.debug("Using WindowsShortCutManager {}", getWindowsShortcutsFile().toString());
-        if (true) {
-            List<String> lines = null;
-            // if UTF-8 fails, try ISO-8859-1
-            try {
-                LOG.debug("Reading Shortcuts with UTF-8");
-                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
-            } catch (MalformedInputException me) {
-                LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
-                lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), Charset.defaultCharset());
+        List<String> lines = null;
+        // if UTF-8 fails, try ISO-8859-1
+        try {
+            LOG.debug("Reading Shortcuts with UTF-8");
+            lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
+        } catch (MalformedInputException me) {
+            LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
+            lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), Charset.defaultCharset());
+        }
+        Iterator it = lines.iterator();
+        String sItem = "";
+        String sPath;
+        Boolean fAdd = true;
+        // check to see if line exists, if not add it
+        while (it.hasNext()) {
+            sItem = it.next().toString();
+            String[] sArray = sItem.split(",");
+            String application = sArray[0]; //??
+            sPath = sArray[1];
+            if (sPath.equalsIgnoreCase(path)) {
+                // it exists don't add
+                fAdd = false;
+                break;
             }
-            Iterator it = lines.iterator();
-            String sItem = "";
-            String sPath;
-            Boolean fAdd = true;
-            // check to see if line exists, if not add it
-            while (it.hasNext()) {
-                sItem = it.next().toString();
-                String[] sArray = sItem.split(",");
-                String application = sArray[0]; //??
-                sPath = sArray[1];
-                if (sPath.equalsIgnoreCase(path)) {
-                    // it exists don't add
-                    fAdd = false;
-                    break;
-                }
-            }
-            if (fAdd) {
-                LOG.debug("Default encoding is {}", Charset.defaultCharset().name());
-                LOG.debug("Adding Shortcut to list = {} with UTF-8 encoding", sItem);
-                String scInfo = file.getFileLocation().toString() + ",";
-                scInfo += path + "\r\n";
-                Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
-            }
+        }
+        if (fAdd) {
+            LOG.debug("Default encoding is {}", Charset.defaultCharset().name());
+            LOG.debug("Adding Shortcut to list = {} with UTF-8 encoding", sItem);
+            String scInfo = file.getFileLocation().toString() + ",";
+            scInfo += path + "\r\n";
+            Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
         }
     }
 
