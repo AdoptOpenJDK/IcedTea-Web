@@ -155,7 +155,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             // TODO: how should we handle this case?
             return;
         }
-        LOG.debug("Using WindowsShortCutManager {}", shortcutFile.toString());
+        LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
         List<String> lines = readAllLine(shortcutFile);
         Iterator<String> it = lines.iterator();
         String sItem = "";
@@ -163,9 +163,8 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         boolean fAdd = true;
         // check to see if line exists, if not add it
         while (it.hasNext()) {
-            sItem = it.next().toString();
+            sItem = it.next();
             String[] sArray = sItem.split(",");
-            String application = sArray[0]; //??
             sPath = sArray[1];
             if (sPath.equalsIgnoreCase(path)) {
                 // it exists don't add
