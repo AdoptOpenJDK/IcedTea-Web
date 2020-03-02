@@ -107,7 +107,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         final File f = File.createTempFile("emptyDeployment", "properties");
         f.deleteOnExit();
 
-        final Map<String, Setting<String>> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
+        final Map<String, Setting> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
 
         Assert.assertThat(properties.keySet(), is(empty()));
     }
@@ -115,7 +115,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
     @Test
     public void loadNonExistentOptionalDeploymentPropertiesFile() throws ConfigurationException, IOException {
         final File f = new File("nonExistentDeployment.properties");
-        final Map<String, Setting<String>> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
+        final Map<String, Setting> properties = DeploymentConfiguration.loadProperties(ConfigType.SYSTEM, f.toURI().toURL(), false);
 
         Assert.assertThat(properties.keySet(), is(empty()));
     }

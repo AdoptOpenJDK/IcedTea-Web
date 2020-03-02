@@ -52,27 +52,27 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * _must_ be valid. Null values can not originate externally so are (mostly)
  * considered valid.
  */
-public class Setting<T> {
+public class Setting {
 
-    public static Setting<String> createDefault(final String key, final String value, final ValueValidator validator) {
-        return new Setting<>(key, R("Unknown"), false, validator, value, value, R("DCSourceInternal"));
+    public static Setting createDefault(final String key, final String value, final ValueValidator validator) {
+        return new Setting(key, R("Unknown"), false, validator, value, value, R("DCSourceInternal"));
     }
 
-    public static Setting<String> createUnknown(final String key, final String value) {
-        return new Setting<>(key, R("Unknown"), false, null, null, value, R("Unknown"));
+    public static Setting createUnknown(final String key, final String value) {
+        return new Setting(key, R("Unknown"), false, null, null, value, R("Unknown"));
     }
 
-    public static Setting<String> createFromPropertyFile(final String key, final String value, boolean locked, final URL propertyFile) {
-        return new Setting<>(key, R("Unknown"), locked, null, null, value, propertyFile.toExternalForm());
+    public static Setting createFromPropertyFile(final String key, final String value, boolean locked, final URL propertyFile) {
+        return new Setting(key, R("Unknown"), locked, null, null, value, propertyFile.toExternalForm());
     }
 
     private final String name;
     private final String description;
     private final ValueValidator validator;
     private final String source;
-    private final T defaultValue;
+    private final String defaultValue;
 
-    private T value;
+    private String value;
     private boolean locked;
 
     /**
@@ -89,7 +89,7 @@ public class Setting<T> {
      * @param source the origin of the value (a file, or perhaps "{@code <internal>}")
      */
     private Setting(String name, String description, boolean locked,
-                   ValueValidator validator, T defaultValue, T value, String source) {
+                   ValueValidator validator, String defaultValue, String value, String source) {
         this.name = name;
         this.description = description;
         this.locked = locked;
@@ -102,8 +102,8 @@ public class Setting<T> {
     /**
      * Creates a copy of this setting
      */
-    public Setting<T> copy() {
-        return new Setting<>(name, description, locked, validator, defaultValue, value, source);
+    public Setting copy() {
+        return new Setting(name, description, locked, validator, defaultValue, value, source);
     }
 
     /**
@@ -112,15 +112,15 @@ public class Setting<T> {
      * - locked
      * - source
      */
-    Setting<T> copyValuesFrom(Setting<T> src) {
+    Setting copyValuesFrom(Setting src) {
         if (locked) {
             return this;
         }
 
-        final T newValue = src.value != null ? src.value : value;
+        final String newValue = src.value != null ? src.value : value;
         final String newSource = src.value != null ? src.source : source;
 
-        return new Setting<>(name, description, src.locked, validator, defaultValue, newValue, newSource);
+        return new Setting(name, description, src.locked, validator, defaultValue, newValue, newSource);
     }
 
     /**
@@ -135,7 +135,7 @@ public class Setting<T> {
      * @return the default value for this setting. May be null if this is not
      * one of the supported settings
      */
-    public T getDefaultValue() {
+    public String getDefaultValue() {
         return defaultValue;
     }
 
@@ -164,7 +164,7 @@ public class Setting<T> {
     /**
      * @return the current value of this setting
      */
-    public T getValue() {
+    public String getValue() {
         return value;
     }
 
@@ -182,7 +182,7 @@ public class Setting<T> {
      *
      * @param value the new value
      */
-    public void setValue(T value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -192,7 +192,7 @@ public class Setting<T> {
 
     @Override
     public String toString() {
-        return value.toString();
+        return value;
     }
 
 }
