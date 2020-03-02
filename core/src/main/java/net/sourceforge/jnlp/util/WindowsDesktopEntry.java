@@ -178,7 +178,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         return lines.stream()
                 .map(line -> line.split(","))
                 .map(array -> array[1])
-                .anyMatch(sPath -> sPath.equalsIgnoreCase(path));
+                .noneMatch(sPath -> sPath.equalsIgnoreCase(path));
     }
 
     @Override
