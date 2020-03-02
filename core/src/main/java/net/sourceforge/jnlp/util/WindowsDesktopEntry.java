@@ -151,8 +151,9 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 
     private void manageShortcutList(String path) throws IOException {
         final File shortcutFile = getWindowsShortcutsFile();
-        if (!shortcutFile.exists()) {
-            shortcutFile.createNewFile();
+        if (!shortcutFile.exists() && !shortcutFile.createNewFile()) {
+            // TODO: how should we handle this case?
+            return;
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile.toString());
         List<String> lines = null;
