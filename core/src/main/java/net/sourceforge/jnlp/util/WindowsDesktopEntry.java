@@ -150,7 +150,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private void manageShortcutList(String path) throws IOException {
         final File shortcutFile = getWindowsShortcutsFile();
         if (!shortcutFile.exists() && !shortcutFile.createNewFile()) {
-            LOG.info("could not create file for shortcut manager: {}", shortcutFile);
+            LOG.warn("could not create file for shortcut manager: {}", shortcutFile);
             return;
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
@@ -164,13 +164,6 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         }
     }
 
-    private boolean needToAddNewShortcutEntry(String path, List<String> lines) {
-        return lines.stream()
-                .map(line -> line.split(","))
-                .map(array -> array[1])
-                .anyMatch(sPath -> sPath.equalsIgnoreCase(path));
-    }
-
     private List<String> readAllLine(File shortcutFile) throws IOException {
         try {
             LOG.debug("Reading Shortcuts with UTF-8");
@@ -179,6 +172,13 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
             return Files.readAllLines(shortcutFile.toPath(), Charset.defaultCharset());
         }
+    }
+
+    private boolean needToAddNewShortcutEntry(String path, List<String> lines) {
+        return lines.stream()
+                .map(line -> line.split(","))
+                .map(array -> array[1])
+                .anyMatch(sPath -> sPath.equalsIgnoreCase(path));
     }
 
     @Override
