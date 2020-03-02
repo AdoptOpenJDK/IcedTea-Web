@@ -32,7 +32,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.List;
 
@@ -173,11 +172,11 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             }
         }
         if (fAdd) {
-            LOG.debug("Default encoding is {}", Charset.defaultCharset().name());
-            LOG.debug("Adding Shortcut to list = {} with UTF-8 encoding", sItem);
-            String scInfo = file.getFileLocation().toString() + ",";
-            scInfo += path + "\r\n";
-            Files.write(shortcutFile.toPath(), scInfo.getBytes(UTF_8), StandardOpenOption.APPEND);
+            final String scInfo = file.getFileLocation().toString() + "," + path;
+            LOG.debug("Adding Shortcut to list: {}", scInfo);
+            lines.add(scInfo);
+            final String content = String.join("\r\n", lines);
+            FileUtils.saveFileUtf8(content, shortcutFile);
         }
     }
 
