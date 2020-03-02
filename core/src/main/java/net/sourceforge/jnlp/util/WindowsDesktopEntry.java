@@ -89,7 +89,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         final String path = getDesktopLnkPath();
         sl.saveTo(path);
         // write shortcut path to list
-        manageShortcutList(ManageMode.A, path);
+        manageShortcutList(path);
     }
 
     private String getJavaWsBin() throws FileNotFoundException {
@@ -145,16 +145,16 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         sl.saveTo(path + "/" + link);
         ul.saveTo(path + "/Uninstall " + link);
         // write shortcuts to list
-        manageShortcutList(ManageMode.A, path + "/" + link);
-        manageShortcutList(ManageMode.A, path + "/Uninstall " + link);
+        manageShortcutList(path + "/" + link);
+        manageShortcutList(path + "/Uninstall " + link);
     }
 
-    private void manageShortcutList(ManageMode mode, String path) throws IOException {
+    private void manageShortcutList(String path) throws IOException {
         if (!getWindowsShortcutsFile().exists()) {
             getWindowsShortcutsFile().createNewFile();
         }
         LOG.debug("Using WindowsShortCutManager {}", getWindowsShortcutsFile().toString());
-        if (ManageMode.A == mode) {
+        if (true) {
             List<String> lines = null;
             // if UTF-8 fails, try ISO-8859-1
             try {
@@ -208,11 +208,6 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     @Override
     public File getLinuxMenuIconFile() {
         throw new UnsupportedOperationException("not supported on windows like systems");
-    }
-
-    private static enum ManageMode {
-        //append?
-        A
     }
 
     private String quoted(URL url) {
