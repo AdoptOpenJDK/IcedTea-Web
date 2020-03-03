@@ -3,6 +3,9 @@ package net.adoptopenjdk.icedteaweb.classloader;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.LoadableJar;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.security.RememberingSecurityUserInteractions;
+import net.adoptopenjdk.icedteaweb.security.SecurityUserInteractions;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
@@ -29,15 +32,22 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationTrustValidatorImpl.class);
 
+    private final SecurityUserInteractions userInteractions;
     private final SecurityDelegate securityDelegate;
 
     private final NewJarCertVerifier certVerifier;
+    private final JNLPFile file;
 
 
     public ApplicationTrustValidatorImpl(final JNLPFile file, final ApplicationPermissions applicationPermissions) {
+        this(file, applicationPermissions, new RememberingSecurityUserInteractions());
+    }
+
+    public ApplicationTrustValidatorImpl(final JNLPFile file, final ApplicationPermissions applicationPermissions, final SecurityUserInteractions userInteractions) {
+        this.file = file;
         this.certVerifier = new NewJarCertVerifier();
         this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
-
+        this.userInteractions = userInteractions;
     }
 
     @Override
@@ -52,7 +62,10 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
             final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
 
             if (fullySigningCertificates.isEmpty()) {
-                // TODO: HILFE
+                if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
+                    // TODO: add details to exception
+                    throw new LaunchException("");
+                }
             } else {
                 final ZonedDateTime now = ZonedDateTime.now();
                 final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
