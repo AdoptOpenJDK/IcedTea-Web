@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.security.dialog;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
@@ -51,6 +52,8 @@ import static net.sourceforge.jnlp.security.AccessType.UNVERIFIED;
 import static net.sourceforge.jnlp.security.AccessType.VERIFIED;
 
 public class NewDialogFactory implements DialogFactory {
+    private static final Translator TRANSLATOR = Translator.getInstance();
+
     private final UserDecisions userDecisions;
 
     NewDialogFactory() {
@@ -107,7 +110,11 @@ public class NewDialogFactory implements DialogFactory {
         if (certVerifier instanceof HttpsCertVerifier) {
             certWarningResult = DialogProvider.showHttpsCertTrustDialog(file, certVerifier.getPublisher(null), rootInCaCerts, certificates, certIssues);
         } else {
-            certWarningResult = DialogProvider.showJarCertWarningDialog(accessType, file, rootInCaCerts, certificates, certIssues, securityDelegate);
+            final String message = getMessageFor(accessType);
+            final String moreInformationText = getMoreInformationText(accessType, rootInCaCerts);
+            final boolean alwaysTrustSelected = (accessType == AccessType.VERIFIED);
+
+            certWarningResult = DialogProvider.showJarCertWarningDialog(file, rootInCaCerts, certificates, certIssues, securityDelegate, message, alwaysTrustSelected, moreInformationText);
         }
         switch (certWarningResult) {
             case YES:
@@ -116,6 +123,32 @@ public class NewDialogFactory implements DialogFactory {
                 return YesNoSandbox.sandbox();
             default:
                 return YesNoSandbox.no();
+        }
+    }
+
+    private static String getMoreInformationText(final AccessType accessType, final boolean rootInCaCerts) {
+        String moreInformationText = rootInCaCerts ?
+                TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
+
+        switch (accessType) {
+            case UNVERIFIED:
+            case SIGNING_ERROR:
+                return moreInformationText + " " + TRANSLATOR.translate("SWarnFullPermissionsIgnorePolicy");
+            default:
+                return moreInformationText;
+        }
+    }
+
+    private static String getMessageFor(final AccessType accessType) {
+        switch (accessType) {
+            case VERIFIED:
+                return TRANSLATOR.translate("SSigVerified");
+            case UNVERIFIED:
+                return TRANSLATOR.translate("SSigUnverified");
+            case SIGNING_ERROR:
+                return TRANSLATOR.translate("SSignatureError");
+            default:
+                return "";
         }
     }
 
