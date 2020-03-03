@@ -10,7 +10,6 @@ import net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult;
 import net.adoptopenjdk.icedteaweb.ui.dialogs.DialogButton;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.security.AccessType;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -33,17 +32,15 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final JButton advancedOptionsButton;
 
     private final boolean rootInCaCerts;
-    private final AccessType accessType;
     private final SecurityDelegate securityDelegate;
     private final JNLPFile file;
     private boolean alwaysTrustSelected;
 
-    protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate, final String moreInformationText) {
-        super(message, file, certificates, certIssues, accessType == AccessType.VERIFIED, moreInformationText);
+    protected JarCertWarningDialog(final String message, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate, final String moreInformationText, final boolean alwaysTrustSelected) {
+        super(message, file, certificates, certIssues, alwaysTrustSelected, moreInformationText);
         this.file = file;
-        this.accessType = accessType;
         this.securityDelegate = securityDelegate;
-        this.alwaysTrustSelected = (accessType == AccessType.VERIFIED);
+        this.alwaysTrustSelected = alwaysTrustSelected;
         this.rootInCaCerts = rootInCaCerts;
 
         runButton = ButtonFactory.createRunButton(() -> AccessWarningResult.YES);
@@ -53,10 +50,8 @@ public class JarCertWarningDialog extends CertWarningDialog {
         advancedOptionsButton = createAdvancedOptionsButton();
     }
 
-    public static JarCertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
-        final String message = getMessageFor(accessType);
-        final String moreInformationText = getMoreInformationText(accessType, rootInCaCerts);
-        return new JarCertWarningDialog(message, accessType, jnlpFile, rootInCaCerts, certificates, certIssues, securityDelegate, moreInformationText);
+    public static JarCertWarningDialog create(final String message, final JNLPFile jnlpFile, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate, final String moreInformationText, final boolean alwaysTrustSelected) {
+        return new JarCertWarningDialog(message, jnlpFile, rootInCaCerts, certificates, certIssues, securityDelegate, moreInformationText, alwaysTrustSelected);
     }
 
     @Override
@@ -99,31 +94,5 @@ public class JarCertWarningDialog extends CertWarningDialog {
         JCheckBox alwaysTrustCheckBox = super.createAlwaysTrustCheckbox();
         alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(alwaysTrustSelected = !alwaysTrustCheckBox.isSelected()));
         return alwaysTrustCheckBox;
-    }
-
-    private static String getMoreInformationText(final AccessType accessType, final boolean rootInCaCerts) {
-        String moreInformationText = rootInCaCerts ?
-                TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
-
-        switch (accessType) {
-            case UNVERIFIED:
-            case SIGNING_ERROR:
-                return moreInformationText + " " + TRANSLATOR.translate("SWarnFullPermissionsIgnorePolicy");
-            default:
-                return moreInformationText;
-        }
-    }
-
-    private static String getMessageFor(final AccessType accessType) {
-        switch (accessType) {
-            case VERIFIED:
-                return TRANSLATOR.translate("SSigVerified");
-            case UNVERIFIED:
-                return TRANSLATOR.translate("SSigUnverified");
-            case SIGNING_ERROR:
-                return TRANSLATOR.translate("SSignatureError");
-            default:
-                return "";
-        }
     }
 }

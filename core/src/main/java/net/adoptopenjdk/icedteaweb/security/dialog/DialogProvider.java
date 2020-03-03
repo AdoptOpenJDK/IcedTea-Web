@@ -104,8 +104,38 @@ public class DialogProvider {
     }
 
     public static AccessWarningResult showJarCertWarningDialog(final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
-        final JarCertWarningDialog dialog = JarCertWarningDialog.create(accessType, file, rootInCaCerts, certificates, certIssues, securityDelegate);
+        final String message = getMessageFor(accessType);
+        final String moreInformationText = getMoreInformationText(accessType, rootInCaCerts);
+        final boolean alwaysTrustSelected = (accessType == AccessType.VERIFIED);
+
+        final JarCertWarningDialog dialog = JarCertWarningDialog.create(message, file, rootInCaCerts, certificates, certIssues, securityDelegate, moreInformationText, alwaysTrustSelected);
         return dialog.showAndWait();
+    }
+
+    private static String getMoreInformationText(final AccessType accessType, final boolean rootInCaCerts) {
+        String moreInformationText = rootInCaCerts ?
+                TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
+
+        switch (accessType) {
+            case UNVERIFIED:
+            case SIGNING_ERROR:
+                return moreInformationText + " " + TRANSLATOR.translate("SWarnFullPermissionsIgnorePolicy");
+            default:
+                return moreInformationText;
+        }
+    }
+
+    private static String getMessageFor(final AccessType accessType) {
+        switch (accessType) {
+            case VERIFIED:
+                return TRANSLATOR.translate("SSigVerified");
+            case UNVERIFIED:
+                return TRANSLATOR.translate("SSigUnverified");
+            case SIGNING_ERROR:
+                return TRANSLATOR.translate("SSignatureError");
+            default:
+                return "";
+        }
     }
 
     public static RememberableResult<AllowDenySandbox> showPartiallySignedWarningDialog(final JNLPFile file) {
