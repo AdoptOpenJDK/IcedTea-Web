@@ -45,7 +45,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
@@ -197,28 +196,6 @@ public class UnsignedAppletTrustConfirmation {
             result.add(jar.getLocation().toString());
         }
         return result;
-    }
-
-    public static void checkUnsignedWithUserIfRequired(JNLPFile file) throws LaunchException {
-
-        if (unsignedAppletsAreForbidden()) {
-            LOG.debug("Not running unsigned applet at {} because unsigned applets are disallowed by security policy.", file.getCodeBase());
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.PolicyDenied");
-        }
-
-        if (!unsignedConfirmationIsRequired()) {
-            LOG.debug("Running unsigned applet at {} does not require confirmation according to security policy.", file.getCodeBase());
-            return;
-        }
-
-        YesNo warningResponse = Dialogs.showUnsignedWarningDialog(file);
-
-        LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
-
-        if (warningResponse == null || !warningResponse.compareValue(Primitive.YES)) {
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.UserDenied");
-        }
-
     }
 
     public static void checkPartiallySignedWithUserIfRequired(SecurityDelegate securityDelegate, JNLPFile file,

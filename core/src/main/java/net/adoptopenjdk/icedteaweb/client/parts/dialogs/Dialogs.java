@@ -43,7 +43,6 @@ import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
@@ -100,13 +99,6 @@ public class Dialogs {
     public static AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,
                                                                          final JNLPFile file, final Object[] extras) {
         return getDialogs().showAccessWarningDialog(accessType, file, extras);
-    }
-
-    /**
-     * see {@link DialogFactory#showUnsignedWarningDialog(JNLPFile)}.
-     */
-    public static YesNoSandboxLimited showUnsignedWarningDialog(JNLPFile file) {
-        return getDialogs().showUnsignedWarningDialog(file);
     }
 
     /**

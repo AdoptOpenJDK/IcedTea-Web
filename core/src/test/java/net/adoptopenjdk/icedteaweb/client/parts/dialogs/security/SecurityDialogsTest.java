@@ -36,19 +36,11 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
@@ -62,7 +54,6 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -71,6 +62,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 
 @Ignore
 public class SecurityDialogsTest extends NoStdOutErrTest {
@@ -220,11 +220,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -245,11 +245,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogsNullResults();
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             System.setIn(backup);
             resetQueue();
@@ -268,11 +268,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -290,11 +290,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.NegativeResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -307,8 +307,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //shortcut
         AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
-        YesNo r3 = Dialogs.showUnsignedWarningDialog(crtJnlpF());
-        Assert.assertEquals(r.ea, r3);
         //cant emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
@@ -331,8 +329,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //shortcut
         AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(null, r2);
-        YesNo r3 = Dialogs.showUnsignedWarningDialog(crtJnlpF());
-        Assert.assertEquals(null, r3);
         //cant emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
@@ -348,30 +344,13 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(false, r9);
     }
 
-    private void checkUnsignedActing(Boolean b) throws MalformedURLException {
-        checkUnsignedActing(b, b);
-    }
-
     /*
      *  testPartiallySignedBehaviour(); needs security delegate to set sandbox, so sometimes results are strange
      */
-    private void checkUnsignedActing(Boolean b1, Boolean b2) throws MalformedURLException {
-        if (b1 != null) {
-            boolean r10 = testUnsignedBehaviour();
-            Assert.assertEquals(b1.booleanValue(), r10);
-        }
+    private void checkUnsignedActing(Boolean b2) throws MalformedURLException {
         if (b2 != null) {
             boolean r11 = testPartiallySignedBehaviour();
             Assert.assertEquals(b2.booleanValue(), r11);
-        }
-    }
-
-    private boolean testUnsignedBehaviour() throws MalformedURLException {
-        try {
-            UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired(crtJnlpF());
-            return true;
-        } catch (LaunchException ex) {
-            return false;
         }
     }
 
@@ -410,12 +389,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             metcounter++;
             //shortcut
             Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
-        } catch (NullPointerException ex) {
-            npecounter++;
-        }
-        try {
-            metcounter++;
-            Dialogs.showUnsignedWarningDialog(crtJnlpF());
         } catch (NullPointerException ex) {
             npecounter++;
         }
@@ -469,7 +442,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         int metcounter = 0;
         int maxcount = 0;
         boolean ex1 = false;
-        boolean ex2 = false;
         if (b1 != null) {
             maxcount++;
             try {
@@ -479,21 +451,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
                 ex1 = true;
             }
         }
-        if (b2 != null) {
-            maxcount++;
-            try {
-                metcounter++;
-                testUnsignedBehaviour();
-            } catch (NullPointerException ex) {
-                ex2 = true;
-            }
-        }
         Assert.assertEquals(maxcount, metcounter);
         if (b1 != null) {
             Assert.assertEquals(b1.booleanValue(), ex1);
-        }
-        if (b2 != null) {
-            Assert.assertEquals(b2.booleanValue(), ex2);
         }
     }
 
@@ -529,11 +489,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         try {
             fakeQueue();
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -546,8 +506,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustNone(true);
         setPrompt(true); //ignored
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        boolean r10 = testUnsignedBehaviour();
-        Assert.assertEquals(true, r10);
         checkUnsignedNPE(false);
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         try {
@@ -555,42 +513,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 //            Assert.assertEquals(false, r11);
             checkUnsignedNPE(true);
             setAS(AppletSecurityLevel.DENY_ALL);
-            boolean r12 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r12);
             checkUnsignedNPE(true, false);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            boolean r13 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r13);
             checkUnsignedNPE(true, false);
-        } finally {
-            resetQueue();
-        }
-    }
-
-    @Test(timeout = 10000)//if gui pops up
-    public void testUnsignedDialogsNotHeadlessTrustNoneTrustAllPrompt() throws Exception {
-        JNLPRuntime.setHeadless(false);
-        JNLPRuntime.setTrustAll(true);
-        JNLPRuntime.setTrustNone(true);
-        setPrompt(true); //ignored
-        setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        boolean a = testUnsignedBehaviour();
-        Assert.assertTrue(a);
-        checkUnsignedNPE(false);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        try {
-            fakeQueue();
-            boolean r10 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r10);
-            checkUnsignedNPE(null, false);
-            setAS(AppletSecurityLevel.DENY_ALL);
-            boolean r11 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r11);
-            checkUnsignedNPE(null, false);
-            setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            boolean r12 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r12);
-            checkUnsignedNPE(null, false);
         } finally {
             resetQueue();
         }
@@ -607,12 +532,8 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         checkUnsignedNPE(true, true);
         setAS(AppletSecurityLevel.DENY_ALL);
-        boolean r11 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r11);
         checkUnsignedNPE(true, false);
         setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        boolean r12 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r12);
         checkUnsignedNPE(true, false);
     }
 
@@ -636,8 +557,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(r.b, r7);
         boolean r8 = Dialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         Assert.assertEquals(r.b, r8);
-        boolean r9 = testUnsignedBehaviour();
-        Assert.assertEquals(r.b, r9);
         //skipping this one, ahrd to mock certVerifier
         // boolean r5 = testPartiallySignedBehaviour();
         //Assert.assertEquals(r.b, r5);
