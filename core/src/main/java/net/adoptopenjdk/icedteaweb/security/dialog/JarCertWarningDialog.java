@@ -100,6 +100,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
         return alwaysTrustCheckBox;
     }
 
+    @Override
     protected String getMoreInformationText() {
         String moreInformationText = rootInCaCerts ?
                 TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
