@@ -30,6 +30,13 @@ public class RememberingSecurityUserInteractions implements SecurityUserInteract
         this.userDecisions = userDecisions;
     }
 
+    /**
+     * Ask the user for permission by showing an {@link net.adoptopenjdk.icedteaweb.security.dialog.UnsignedWarningDialog}
+     * when an application is unsigned. This is used with 'high-security' setting.
+     *
+     * @param file
+     * @return
+     */
     public AllowDeny askUserForPermissionToRunUnsignedApplication(final JNLPFile file) {
         DeploymentConfiguration conf = JNLPRuntime.getConfiguration();
         if (conf == null) {

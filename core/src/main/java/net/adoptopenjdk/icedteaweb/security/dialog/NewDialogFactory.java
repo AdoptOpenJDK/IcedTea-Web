@@ -13,7 +13,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.adoptopenjdk.icedteaweb.userdecision.UserDecision;
 import net.adoptopenjdk.icedteaweb.userdecision.UserDecisions;
 import net.adoptopenjdk.icedteaweb.userdecision.UserDecisionsFileStore;
@@ -43,7 +42,6 @@ import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_MATC
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_MISSING_ALAC_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_MISSING_PERMISSIONS_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_PARTIALLY_APPLICATION;
-import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_UNSIGNED_APPLICATION;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.of;
 import static net.sourceforge.jnlp.security.AccessType.PARTIALLY_SIGNED;
 import static net.sourceforge.jnlp.security.AccessType.SIGNING_ERROR;
@@ -75,19 +73,6 @@ public class NewDialogFactory implements DialogFactory {
         } else {
             return askForAccessPermission(accessType, file, extras);
         }
-    }
-
-    @Override
-    public YesNoSandboxLimited showUnsignedWarningDialog(final JNLPFile file) {
-        final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
-
-        final AllowDeny result = remembered.orElseGet(() -> {
-            final RememberableResult<AllowDeny> dialogResult = DialogProvider.showUnsignedWarningDialog(file);
-            userDecisions.save(dialogResult.getRemember(), file, of(RUN_UNSIGNED_APPLICATION, dialogResult.getResult()));
-            return dialogResult.getResult();
-        });
-
-        return result == ALLOW ? YesNoSandboxLimited.yes() : YesNoSandboxLimited.no();
     }
 
     @Override

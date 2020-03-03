@@ -4,7 +4,6 @@ import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
@@ -29,15 +28,6 @@ public interface DialogFactory {
      */
     AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,
                                                            final JNLPFile file, final Object[] extras);
-
-    /**
-     * Shows a warning dialog for when a plugin applet is unsigned. This is used
-     * with 'high-security' setting.
-     *
-     * @param file the file to be base as information source for this dialogue
-     * @return true if permission was granted by the user, false otherwise.
-     */
-    YesNoSandboxLimited showUnsignedWarningDialog(JNLPFile file);
 
     /**
      * Shows a security warning dialog according to the specified type of
