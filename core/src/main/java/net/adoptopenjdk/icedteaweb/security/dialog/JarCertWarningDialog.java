@@ -38,8 +38,8 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final JNLPFile file;
     private boolean alwaysTrustSelected;
 
-    protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
-        super(message, file, certificates, certIssues, accessType == AccessType.VERIFIED);
+    protected JarCertWarningDialog(final String message, final AccessType accessType, final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate, final String moreInformationText) {
+        super(message, file, certificates, certIssues, accessType == AccessType.VERIFIED, moreInformationText);
         this.file = file;
         this.accessType = accessType;
         this.securityDelegate = securityDelegate;
@@ -55,7 +55,8 @@ public class JarCertWarningDialog extends CertWarningDialog {
 
     public static JarCertWarningDialog create(final AccessType accessType, final JNLPFile jnlpFile, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate) {
         final String message = getMessageFor(accessType);
-        return new JarCertWarningDialog(message, accessType, jnlpFile, rootInCaCerts, certificates, certIssues, securityDelegate);
+        final String moreInformationText = getMoreInformationText(accessType, rootInCaCerts);
+        return new JarCertWarningDialog(message, accessType, jnlpFile, rootInCaCerts, certificates, certIssues, securityDelegate, moreInformationText);
     }
 
     @Override
@@ -100,8 +101,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
         return alwaysTrustCheckBox;
     }
 
-    @Override
-    protected String getMoreInformationText() {
+    private static String getMoreInformationText(final AccessType accessType, final boolean rootInCaCerts) {
         String moreInformationText = rootInCaCerts ?
                 TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
 

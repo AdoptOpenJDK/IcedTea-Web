@@ -25,13 +25,15 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
     private final List<? extends Certificate> certificates;
     private final List<String> certIssues;
     private boolean initiallyAlwaysTrustedSelected;
+    private final String moreInformationText;
 
-    protected CertWarningDialog(final String message, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, boolean initiallyAlwaysTrustedSelected) {
+    protected CertWarningDialog(final String message, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, boolean initiallyAlwaysTrustedSelected, final String moreInformationText) {
         super(message);
         this.file = file;
         this.certificates = certificates;
         this.certIssues = certIssues;
         this.initiallyAlwaysTrustedSelected = initiallyAlwaysTrustedSelected;
+        this.moreInformationText = moreInformationText;
     }
 
     @Override
@@ -48,7 +50,7 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
 
     protected JPanel createMoreInformationPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        final JTextArea moreInfoTextArea = new JTextArea(getMoreInformationText());
+        final JTextArea moreInfoTextArea = new JTextArea(moreInformationText);
         moreInfoTextArea.setBackground(getBackground());
         moreInfoTextArea.setWrapStyleWord(true);
         moreInfoTextArea.setLineWrap(true);
@@ -68,6 +70,4 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
         panel.setPreferredSize(new Dimension(720, 110));
         return panel;
     }
-
-    protected abstract String getMoreInformationText();
 }

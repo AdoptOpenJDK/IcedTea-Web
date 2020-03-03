@@ -30,8 +30,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     private final boolean rootInCaCerts;
 
 
-    private HttpsCertTrustDialog(final String message, final JNLPFile file, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues) {
-        super(message, file, certificates, certIssues, false);
+    private HttpsCertTrustDialog(final String message, final JNLPFile file, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final String moreInformationText) {
+        super(message, file, certificates, certIssues, false, moreInformationText);
         this.file = file;
         this.certificate = certificate;
         this.rootInCaCerts = rootInCaCerts;
@@ -42,7 +42,8 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
 
     public static HttpsCertTrustDialog create(final JNLPFile jnlpFile, final Certificate certificate, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues) {
         final String message = TRANSLATOR.translate("SHttpsUnverified") + " " + TRANSLATOR.translate("Continue");
-        return new HttpsCertTrustDialog(message, jnlpFile, certificate, rootInCaCerts, certificates, certIssues);
+        final String moreInformationText = getMoreInformationText(rootInCaCerts);
+        return new HttpsCertTrustDialog(message, jnlpFile, certificate, rootInCaCerts, certificates, certIssues, moreInformationText);
     }
 
     @Override
@@ -85,12 +86,11 @@ public class HttpsCertTrustDialog extends CertWarningDialog {
     }
 
     @Override
-    protected String getMoreInformationText() {
-        return rootInCaCerts ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
-    }
-
-    @Override
     protected ImageIcon createIcon() {
         return ImageGallery.WARNING.asImageIcon();
+    }
+
+    private static String getMoreInformationText(final boolean rootInCaCerts) {
+        return rootInCaCerts ? TRANSLATOR.translate("STrustedSource") : TRANSLATOR.translate("SUntrustedSource");
     }
 }
