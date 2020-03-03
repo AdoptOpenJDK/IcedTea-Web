@@ -16,11 +16,12 @@
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.SUCCESS;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_LEVEL;
@@ -49,6 +50,12 @@ public class InfoCommandTest extends AbstractCommandTest {
 
         // THEN ------------
         assertEquals(SUCCESS, status);
-        assertThat(getOutContent(), containsString("Possible values " + AppletSecurityLevel.allToString()));
+
+        final String strings = Arrays.stream(SecurityLevel.values())
+                .map(Enum::name)
+                .collect(Collectors.toList())
+                .toString();
+
+        assertThat(getOutContent(), containsString("Possible values " + strings));
     }
 }
