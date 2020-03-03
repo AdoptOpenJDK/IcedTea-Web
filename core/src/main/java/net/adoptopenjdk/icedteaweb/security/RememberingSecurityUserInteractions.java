@@ -42,14 +42,13 @@ public class RememberingSecurityUserInteractions implements SecurityUserInteract
         if (conf == null) {
             throw new StorageIoException("JNLPRuntime configuration is null. Try to reinstall IcedTea-Web");
         }
-        String s = conf.getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL);
+        SecurityLevel securityLevel = SecurityLevel.valueOf(conf.getProperty(ConfigurationConstants.KEY_SECURITY_LEVEL));
 
-        // TODO: refactor usage of magic string to Enum
-        if ("VERY_HIGH".equalsIgnoreCase(s)) {
+        if (securityLevel == SecurityLevel.VERY_HIGH) {
             return AllowDeny.DENY;
         }
 
-        if ("MEDIUM".equalsIgnoreCase(s)) {
+        if (securityLevel == SecurityLevel.MEDIUM) {
             return AllowDeny.ALLOW;
         }
 

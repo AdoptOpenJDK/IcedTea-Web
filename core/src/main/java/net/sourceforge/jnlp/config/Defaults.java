@@ -42,6 +42,7 @@ import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
 import net.adoptopenjdk.icedteaweb.config.validators.SecurityValueValidator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
 import net.sourceforge.jnlp.proxy.ProxyType;
 
 import java.util.Arrays;
@@ -468,7 +469,7 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_LEVEL,
-                    null,
+                    SecurityLevel.HIGH.name(),
                     new SecurityValueValidator()
             ),
 

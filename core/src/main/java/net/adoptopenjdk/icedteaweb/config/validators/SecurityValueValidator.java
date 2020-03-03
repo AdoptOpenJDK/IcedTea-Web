@@ -35,7 +35,10 @@
  */
 package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class SecurityValueValidator implements ValueValidator {
 
@@ -45,32 +48,20 @@ public class SecurityValueValidator implements ValueValidator {
     @Override
     public void validate(final Object value) throws IllegalArgumentException {
         if (value == null) {
-            // null is correct, it means it is not user set
-            // and so default should be used whatever it is
-            // returning to prevent NPE in fromString
-            return;
+            throw new IllegalArgumentException("Expected value of type SecurityLevel, but was null");
         }
-        if (value instanceof AppletSecurityLevel) {
-            //??
-            return;
-        }
-        if (!(value instanceof String)) {
-            throw new IllegalArgumentException("Expected was String, was " + value.getClass());
-        }
-        try {
-            final AppletSecurityLevel validated = AppletSecurityLevel.fromString((String) value);
-            if (validated == null) {
-                throw new IllegalArgumentException("Result can't be null, was");
+        if (value instanceof String) {
+            try {
+                SecurityLevel.valueOf((String) value);
+
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException(String.format("'%s' is not a valid value of SecurityLevel", value));
             }
-            //thrown by fromString
-        } catch (final RuntimeException ex) {
-            throw new IllegalArgumentException("Error in validation", ex);
         }
     }
 
     @Override
     public String getPossibleValues() {
-        return AppletSecurityLevel.allToString();
+        return Arrays.stream(SecurityLevel.values()).map(Enum::name).collect(Collectors.joining(","));
     }
-    
 }
