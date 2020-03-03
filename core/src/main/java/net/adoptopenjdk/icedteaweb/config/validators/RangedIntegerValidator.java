@@ -18,26 +18,18 @@ public class RangedIntegerValidator implements ValueValidator {
     }
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
+    public void validate(final String value) throws IllegalArgumentException {
+        if (value == null) {
+            throw new IllegalArgumentException("Must not be null");
+        }
 
-        long actualValue = 0;
         try {
-            if (value instanceof String) {
-                actualValue = Long.valueOf((String) value);
-            } else if (value instanceof Integer) {
-                actualValue = (Integer) value;
-            } else if (value instanceof Long) {
-                actualValue = (Long) value;
-            } else {
-                throw new IllegalArgumentException("Must be an integer");
+            final long actualValue = Long.parseLong(value);
+            if (actualValue < low || actualValue > high) {
+                throw new IllegalArgumentException("Not in range from " + low + " to " + high);
             }
         } catch (final NumberFormatException e) {
             throw new IllegalArgumentException("Must be an integer", e);
-
-        }
-
-        if (actualValue < low || actualValue > high) {
-            throw new IllegalArgumentException("Not in range from " + low + " to " + high);
         }
     }
 

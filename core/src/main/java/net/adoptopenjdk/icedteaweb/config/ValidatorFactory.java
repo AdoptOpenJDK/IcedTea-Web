@@ -13,6 +13,9 @@ import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * Provides {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} implementations for some common value types
  *
@@ -43,14 +46,11 @@ public class ValidatorFactory {
     public static ValueValidator createBrowserPathValidator() {
         return new ValueValidator() {
             @Override
-            public void validate(final Object value) throws IllegalArgumentException {
+            public void validate(final String value) throws IllegalArgumentException {
                 if (value == null) {
                     return;
                 }
-                if (!(value instanceof String)) {
-                    throw new IllegalArgumentException("Value should be string!");
-                }
-               if (ValidatorUtils.verifyFileOrCommand((String)value) == null){
+                if (ValidatorUtils.verifyFileOrCommand(value) == null){
                     //just warn?
                     throw new IllegalArgumentException("Value should be file, or on PATH, or known keyword. See possible values.");
                }
@@ -83,6 +83,20 @@ public class ValidatorFactory {
      */
     public static ValueValidator createStringValidator(final String[] validValues) {
         return new StringValueValidator(validValues);
+    }
+
+    /**
+     * Returns a {@link net.adoptopenjdk.icedteaweb.config.validators.ValueValidator} that checks if an object is a string from
+     * one of the provided Strings.
+     * @param validValues an array of enums which are considered valid
+     * @return validator for given strings
+     */
+    public static ValueValidator createStringValidator(final Enum<?>[] validValues) {
+        final String[] validStrings = Arrays.stream(validValues)
+                .map(Enum::name)
+                .collect(Collectors.toList())
+                .toArray(new String[0]);
+        return new StringValueValidator(validStrings);
     }
 
     /**

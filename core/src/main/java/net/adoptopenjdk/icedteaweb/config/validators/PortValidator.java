@@ -13,7 +13,7 @@ public class PortValidator extends RangedIntegerValidator {
     }
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
+    public void validate(final String value) throws IllegalArgumentException {
         if (value == null) {
             return; // null for a port tells ITW to use the default port
         }

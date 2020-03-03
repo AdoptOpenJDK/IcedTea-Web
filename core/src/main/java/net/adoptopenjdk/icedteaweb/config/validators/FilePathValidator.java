@@ -12,18 +12,12 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class FilePathValidator implements ValueValidator {
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
+    public void validate(final String value) throws IllegalArgumentException {
         if (value == null) {
             return;
         }
 
-        if (!(value instanceof String)) {
-            throw new IllegalArgumentException("Value should be string!");
-        }
-
-        final String possibleFile = (String) value;
-
-        if (!new File(possibleFile).isAbsolute()) {
+        if (!new File(value).isAbsolute()) {
             throw new IllegalArgumentException("File must be absolute");
         }
 

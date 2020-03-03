@@ -10,12 +10,12 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class UrlValidator implements ValueValidator {
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
+    public void validate(final String value) throws IllegalArgumentException {
         if (value == null) {
             return;
         }
         try {
-            new URL((String) value);
+            new URL(value);
         } catch (final Exception e) {
             throw new IllegalArgumentException("Not a valid URL", e);
         }
