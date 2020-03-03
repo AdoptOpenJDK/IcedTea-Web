@@ -150,9 +150,9 @@ public class CommandLine {
             JNLPRuntime.setDebug(true);
         }
 
-        Map<String, Setting<String>> all = config.getRaw();
+        Map<String, Setting> all = config.getRaw();
         for (String key : all.keySet()) {
-            Setting<String> value = all.get(key);
+            Setting value = all.get(key);
             OutputController.getLogger().printOutLn(key + ": " + value.getValue());
             if (JNLPRuntime.isDebug()) {
                 OutputController.getLogger().printOutLn("\t" + R("CLDescription", value.getDescription()));
@@ -183,7 +183,7 @@ public class CommandLine {
         }
 
         List<String> args = optionParser.getParams(CommandLineOptions.GET);
-        Map<String, Setting<String>> all = config.getRaw();
+        Map<String, Setting> all = config.getRaw();
 
         List<String> unknownProperties = new ArrayList<>(args);
         unknownProperties.removeAll(all.keySet());
@@ -263,7 +263,7 @@ public class CommandLine {
     }
 
     private int validateValue(final String key, final String value) {
-        Setting<String> old = config.getRaw().get(key);
+        Setting old = config.getRaw().get(key);
         if (old.getValidator() != null) {
             try {
                 old.getValidator().validate(value);
@@ -310,11 +310,11 @@ public class CommandLine {
             }
         }
 
-        Map<String, Setting<String>> all = config.getRaw();
+        Map<String, Setting> all = config.getRaw();
 
         if (resetAll) {
             for (String aKey: all.keySet()) {
-                Setting<String> setting = all.get(aKey);
+                Setting setting = all.get(aKey);
                 setting.setValue(setting.getDefaultValue());
             }
         } else {
@@ -323,7 +323,7 @@ public class CommandLine {
                     LOG.info("Unknown property-name {}", key);
                     return ERROR;
                 } else {
-                    Setting<String> setting = all.get(key);
+                    Setting setting = all.get(key);
                     setting.setValue(setting.getDefaultValue());
                 }
             }
@@ -362,10 +362,10 @@ public class CommandLine {
 
         List<String> args = optionParser.getParams(CommandLineOptions.INFO);
 
-        Map<String, Setting<String>> all = config.getRaw();
+        Map<String, Setting> all = config.getRaw();
 
         for (String key : args) {
-            Setting<String> value = all.get(key);
+            Setting value = all.get(key);
             if (value == null) {
                 LOG.info("No information available (is this a valid option?).");
             } else {
@@ -408,18 +408,18 @@ public class CommandLine {
             return ERROR;
         }
 
-        Map<String, Setting<String>> all = config.getRaw();
+        Map<String, Setting> all = config.getRaw();
 
         ConfigurationValidator validator = new ConfigurationValidator(all);
         validator.validate();
 
         boolean allValid = true;
-        for (Setting<String> setting : validator.getIncorrectSetting()) {
+        for (Setting setting : validator.getIncorrectSetting()) {
             LOG.info("Property {} has incorrect value {}. Possible values {}.", setting.getName(), setting.getValue(), setting.getValidator().getPossibleValues());
             allValid = false;
         }
 
-        for (Setting<String> setting : validator.getUnrecognizedSetting()) {
+        for (Setting setting : validator.getUnrecognizedSetting()) {
             LOG.info("Unknown property-name {}", setting.getName());
             allValid = false;
         }
