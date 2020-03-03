@@ -19,9 +19,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -45,10 +45,10 @@ public class SetCommandTest extends AbstractCommandTest {
     @Test
     public void testSetCommand() throws IOException {
         // GIVEN -----------
-        final String[] args = { "-set", "deployment.security.level", "ALLOW_UNSIGNED" }; // use literals for readability
+        final String[] args = { "-set", "deployment.security.level", "VERY_HIGH" }; // use literals for readability
 
         // test if literals still backed by constants
-        assertThat(Arrays.asList(args), contains(CommandLineOptions.SET.getOption(), KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.name()));
+        assertThat(Arrays.asList(args), contains(CommandLineOptions.SET.getOption(), KEY_SECURITY_LEVEL, SecurityLevel.VERY_HIGH.name()));
 
         // WHEN ------------
         final int status = getCommandLine(args).handle();
@@ -56,7 +56,7 @@ public class SetCommandTest extends AbstractCommandTest {
         // THEN ------------
         assertEquals(CommandLine.SUCCESS, status);
         assertTrue(getOutContent().isEmpty());
-        assertThat(getUserDeploymentPropertiesFileContent(), containsString(AppletSecurityLevel.ALLOW_UNSIGNED.name()));
+        assertThat(getUserDeploymentPropertiesFileContent(), containsString(SecurityLevel.VERY_HIGH.name()));
     }
 
     @Test
