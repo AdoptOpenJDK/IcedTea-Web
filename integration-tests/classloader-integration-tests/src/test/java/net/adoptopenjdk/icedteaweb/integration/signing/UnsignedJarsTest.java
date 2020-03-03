@@ -1,11 +1,10 @@
 package net.adoptopenjdk.icedteaweb.integration.signing;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogFactory;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.integration.DummyResourceTracker;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
+import net.adoptopenjdk.icedteaweb.security.SecurityUserInteractions;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
@@ -29,17 +28,15 @@ class UnsignedJarsTest {
     @Test
     @Execution(ExecutionMode.SAME_THREAD)
     @Disabled
-    void launchUnsignedApp(@Mock DialogFactory dialogFactory) throws Exception {
+    void launchUnsignedApp(@Mock SecurityUserInteractions userInteractions) throws Exception {
         final JNLPFile jnlpFile = new JNLPFileFactory().create(IntegrationTestResources.load("integration-app-25.jnlp"));
         final ResourceTrackerFactory resourceTrackerFactory = new DummyResourceTracker.Factory();
 
-        when(dialogFactory.showUnsignedWarningDialog(jnlpFile)).thenReturn(YesNoSandboxLimited.yes());
+        when(userInteractions.askUserForPermissionToRunUnsignedApplication(jnlpFile)).thenReturn(AllowDeny.ALLOW);
 
-        try (Dialogs.Uninstaller uninstaller = Dialogs.setDialogFactory(dialogFactory)) {
-            // when
-            final ThreadGroup threadGroup = new ThreadGroup("Test-Group");
-            new ApplicationInstance(jnlpFile, resourceTrackerFactory, threadGroup);
-        }
-        verify(dialogFactory).showUnsignedWarningDialog(jnlpFile);
+        // when
+        final ThreadGroup threadGroup = new ThreadGroup("Test-Group");
+        new ApplicationInstance(jnlpFile, resourceTrackerFactory, threadGroup);
+        verify(userInteractions).askUserForPermissionToRunUnsignedApplication(jnlpFile);
     }
 }

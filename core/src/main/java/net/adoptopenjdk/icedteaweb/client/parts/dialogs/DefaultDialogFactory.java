@@ -111,25 +111,6 @@ public class DefaultDialogFactory implements DialogFactory {
     }
 
     /**
-     * Shows a warning dialog for when a plugin applet is unsigned. This is used
-     * with 'high-security' setting.
-     *
-     * @param file the file to be base as information source for this dialogue
-     * @return true if permission was granted by the user, false otherwise.
-     */
-    @Override
-    public YesNoSandboxLimited showUnsignedWarningDialog(JNLPFile file) {
-
-        final SecurityDialogMessage message = new SecurityDialogMessage(file);
-        message.dialogType = DialogType.UNSIGNED_WARNING;
-        message.accessType = AccessType.UNSIGNED;
-
-        DialogResult r = getUserResponse(message);
-
-        return (YesNoSandboxLimited) r;
-    }
-
-    /**
      * Shows a security warning dialog according to the specified type of
      * access. If {@code accessType} is one of {@link AccessType#VERIFIED} or
      * {@link AccessType#UNVERIFIED}, extra details will be available with

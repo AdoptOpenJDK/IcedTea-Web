@@ -66,10 +66,6 @@ public class DefaultDialogFactoryTest {
         dialogFactory.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, new Object[]{"test"});
     }
 
-    private void showUnsignedWarning() {
-        dialogFactory.showUnsignedWarningDialog(file);
-    }
-
     private void showCertWarning() {
         dialogFactory.showCertWarningDialog(AccessType.UNVERIFIED, file, jarCertVerifier, null);
         dialogFactory.showCertWarningDialog(AccessType.UNVERIFIED, file, httpsCertVerifier, null);

@@ -63,10 +63,6 @@ public class NewDialogFactoryTest {
                 .forEach(accessType -> dialogFactory.showAccessWarningDialog(accessType, file, new Object[]{"test"}));
     }
 
-    private void showUnsignedWarningDialog() {
-        dialogFactory.showUnsignedWarningDialog(file);
-    }
-
     private void showCertWarningDialog() {
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, jarCertVerifier, null);
         dialogFactory.showCertWarningDialog(UNVERIFIED, file, httpsCertVerifier, null);
