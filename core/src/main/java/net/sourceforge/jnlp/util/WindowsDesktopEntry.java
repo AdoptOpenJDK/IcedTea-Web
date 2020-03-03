@@ -154,7 +154,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             return;
         }
         LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
-        final List<String> lines = readAllLine(shortcutFile);
+        final List<String> lines = readAllLines(shortcutFile);
         if (needToAddNewShortcutEntry(path, lines)) {
             final String scInfo = file.getFileLocation().toString() + "," + path;
             LOG.debug("Adding Shortcut to list: {}", scInfo);
@@ -164,7 +164,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         }
     }
 
-    private List<String> readAllLine(File shortcutFile) throws IOException {
+    private List<String> readAllLines(File shortcutFile) throws IOException {
         try {
             LOG.debug("Reading Shortcuts with UTF-8");
             return Files.readAllLines(shortcutFile.toPath(), UTF_8);
