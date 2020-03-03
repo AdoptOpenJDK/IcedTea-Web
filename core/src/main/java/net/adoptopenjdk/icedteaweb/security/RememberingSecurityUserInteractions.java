@@ -36,6 +36,7 @@ public class RememberingSecurityUserInteractions implements SecurityUserInteract
      *
      * @param file
      * @return
+     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/properties.html#sthref373">Java 8 Properties</a>
      */
     public AllowDeny askUserForPermissionToRunUnsignedApplication(final JNLPFile file) {
         DeploymentConfiguration conf = JNLPRuntime.getConfiguration();
@@ -46,10 +47,6 @@ public class RememberingSecurityUserInteractions implements SecurityUserInteract
 
         if (securityLevel == SecurityLevel.VERY_HIGH) {
             return AllowDeny.DENY;
-        }
-
-        if (securityLevel == SecurityLevel.MEDIUM) {
-            return AllowDeny.ALLOW;
         }
 
         final Optional<AllowDeny> remembered = this.userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
