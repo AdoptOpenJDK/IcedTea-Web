@@ -42,7 +42,16 @@ public class JvmUtils {
     }
 
     private static boolean isInvalidValidArgument(final String argument) {
-        return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument);
+        return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isSecurePropertyAValidJVMArg(argument);
+    }
+
+    static boolean isSecurePropertyAValidJVMArg(String argument) {
+        if (argument.startsWith("-D") && argument.length() > 2) {
+            final int indexOfEqual = argument.indexOf('=');
+            final int lastIndex = indexOfEqual == -1 ? argument.length()  : indexOfEqual;
+            return isValidSecureProperty(argument.substring(2, lastIndex));
+        }
+        return false;
     }
 
     private static boolean isValidStartingArgument(final String argument) {
