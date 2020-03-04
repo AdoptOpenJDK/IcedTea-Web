@@ -17,5 +17,5 @@ public interface DefaultsProvider {
      * @return default settings
      * @implNote use {@link Setting#createDefault(String, String, ValueValidator)} to create default settings.
      */
-    List<Setting<String>> getDefaults();
+    List<Setting> getDefaults();
 }

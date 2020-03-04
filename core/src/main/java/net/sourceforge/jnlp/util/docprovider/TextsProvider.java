@@ -163,7 +163,7 @@ public abstract class TextsProvider {
 
     protected String getFiles(List<InfrastructureFileDescriptor> files) {
         StringBuilder sb = new StringBuilder();
-        Set<Map.Entry<String, Setting<String>>> defs = Defaults.getDefaults().entrySet();
+        Set<Map.Entry<String, Setting>> defs = Defaults.getDefaults().entrySet();
         files.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
         for (InfrastructureFileDescriptor f : files) {
             String path = expandVariables ? f.getFullPath() : f.toString();
@@ -174,7 +174,7 @@ public abstract class TextsProvider {
                 modified = getFormatter().getBold("[" + Translator.R("BUTmodified") + "] ");
             }
             String controlledBy = "";
-            for (Map.Entry<String, Setting<String>> entry : defs) {
+            for (Map.Entry<String, Setting> entry : defs) {
                 if (matchStringsValueWithInfrastructureFile(entry.getValue(), f)) {
                     controlledBy = " " + Translator.R("BUTControlledBy", getFormatter().getBold(entry.getKey()));
                     break;
@@ -185,7 +185,7 @@ public abstract class TextsProvider {
         return formatter.wrapParagraph(sb.toString());
     }
 
-    protected boolean matchStringsValueWithInfrastructureFile(Setting<String> entry, InfrastructureFileDescriptor f) {
+    protected boolean matchStringsValueWithInfrastructureFile(Setting entry, InfrastructureFileDescriptor f) {
         if (entry == null || entry.getDefaultValue() == null) {
             return false;
         }

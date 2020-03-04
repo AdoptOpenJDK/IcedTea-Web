@@ -81,7 +81,7 @@ public class Defaults {
      * configuration page, with occasional replacements of "" or no-defaults
      * with null
      */
-    private static final List<Setting<String>> DEFAULTS = Arrays.asList(
+    private static final List<Setting> DEFAULTS = Arrays.asList(
             /*
              * infrastructure
              */
@@ -553,7 +553,7 @@ public class Defaults {
             )
     );
 
-    private static final List<Setting<String>> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
+    private static final List<Setting> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
             .flatMap(provider -> provider.getDefaults().stream())
             .collect(Collectors.toList());
 
@@ -562,7 +562,7 @@ public class Defaults {
      *
      * @return the default settings for deployment
      */
-    public static Map<String, Setting<String>> getDefaults() {
+    public static Map<String, Setting> getDefaults() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkRead(USER_DEPLOYMENT_FILE.getDefaultFullPath());

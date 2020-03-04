@@ -29,9 +29,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -87,20 +87,25 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         final String path = getDesktopLnkPath();
         sl.saveTo(path);
         // write shortcut path to list
-        manageShortcutList(ManageMode.A, path);
+        manageShortcutList(path);
     }
 
     private String getJavaWsBin() throws FileNotFoundException {
         final String javaWsBin = JvmUtils.getJavaWsBin();
-        if (new File(javaWsBin).exists()) {
-            return javaWsBin;
-        }
 
+        // first look for exe
         final String javaWsBinExe = javaWsBin + ".exe";
         if (new File(javaWsBinExe).exists()) {
+            LOG.debug("For Shortcut Returning EXE : {}", javaWsBinExe);
             return javaWsBinExe;
         }
 
+        if (new File(javaWsBin).exists()) {
+            LOG.debug("For Shortcut Returning {}", javaWsBin);
+            return javaWsBin;
+        }
+
+        LOG.debug("Could not find the javaws binary to create desktop shortcut");
         throw new FileNotFoundException("Could not find the javaws binary to create desktop shortcut");
     }
 
@@ -138,42 +143,43 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         sl.saveTo(path + "/" + link);
         ul.saveTo(path + "/Uninstall " + link);
         // write shortcuts to list
-        manageShortcutList(ManageMode.A, path + "/" + link);
-        manageShortcutList(ManageMode.A, path + "/Uninstall " + link);
+        manageShortcutList(path + "/" + link);
+        manageShortcutList(path + "/Uninstall " + link);
     }
 
-    private void manageShortcutList(ManageMode mode, String path) throws IOException {
-        if (!getWindowsShortcutsFile().exists()) {
-            getWindowsShortcutsFile().createNewFile();
+    private void manageShortcutList(String path) throws IOException {
+        final File shortcutFile = getWindowsShortcutsFile();
+        if (!shortcutFile.exists() && !shortcutFile.createNewFile()) {
+            LOG.warn("could not create file for shortcut manager: {}", shortcutFile);
+            return;
         }
-
-        if (ManageMode.A == mode) {
-            List<String> lines = Files.readAllLines(getWindowsShortcutsFile().toPath(), UTF_8);
-            Iterator it = lines.iterator();
-            String sItem = "";
-            String sPath;
-            Boolean fAdd = true;
-            // check to see if line exists, if not add it
-            while (it.hasNext()) {
-                sItem = it.next().toString();
-                String[] sArray = sItem.split(",");
-                String application = sArray[0]; //??
-                sPath = sArray[1];
-                if (sPath.equalsIgnoreCase(path)) {
-                    // it exists don't add
-                    fAdd = false;
-                    break;
-                }
-            }
-            if (fAdd) {
-                LOG.debug("Adding sCut to list = ", sItem);
-                String scInfo = file.getFileLocation().toString() + ",";
-                scInfo += path + "\r\n";
-                Files.write(getWindowsShortcutsFile().toPath(), scInfo.getBytes(), StandardOpenOption.APPEND);
-            }
+        LOG.debug("Using WindowsShortCutManager {}", shortcutFile);
+        final List<String> lines = readAllLines(shortcutFile);
+        if (needToAddNewShortcutEntry(path, lines)) {
+            final String scInfo = file.getFileLocation().toString() + "," + path;
+            LOG.debug("Adding Shortcut to list: {}", scInfo);
+            lines.add(scInfo);
+            final String content = String.join("\r\n", lines);
+            FileUtils.saveFileUtf8(content, shortcutFile);
         }
     }
 
+    private List<String> readAllLines(File shortcutFile) throws IOException {
+        try {
+            LOG.debug("Reading Shortcuts with UTF-8");
+            return Files.readAllLines(shortcutFile.toPath(), UTF_8);
+        } catch (MalformedInputException me) {
+            LOG.debug("Fallback to reading Shortcuts with default encoding {}", Charset.defaultCharset().name());
+            return Files.readAllLines(shortcutFile.toPath(), Charset.defaultCharset());
+        }
+    }
+
+    private boolean needToAddNewShortcutEntry(String path, List<String> lines) {
+        return lines.stream()
+                .map(line -> line.split(","))
+                .map(array -> array[1])
+                .noneMatch(sPath -> sPath.equalsIgnoreCase(path));
+    }
 
     @Override
     public void createDesktopShortcuts(ShortcutResult menu, ShortcutResult desktop) {
@@ -195,13 +201,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         throw new UnsupportedOperationException("not supported on windows like systems");
     }
 
-    private static enum ManageMode {
-        //append?
-        A
-    }
-
     private String quoted(URL url) {
         return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
-
 }

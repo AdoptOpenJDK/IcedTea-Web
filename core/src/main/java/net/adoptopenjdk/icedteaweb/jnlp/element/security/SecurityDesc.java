@@ -49,6 +49,7 @@ import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ARRAY_LEGACY_MERGE_SORT;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_AA_FONT_SETTINGS;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_DISABLE_MIXING;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_ERASE_BACKGROUND_ON_RESIZE;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_NO_ERASE_BACKGROUND;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_SYNC_LWREQUESTS;
@@ -232,6 +233,7 @@ public class SecurityDesc {
             new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION),
             new PropertyPermission(AWT_SYNC_LWREQUESTS, PROPERTY_RW_ACTION),
             new PropertyPermission(AWT_WINDOW_LOCATION_BY_PLATFORM, PROPERTY_RW_ACTION),
+            new PropertyPermission(AWT_DISABLE_MIXING, PROPERTY_RW_ACTION),
             new PropertyPermission(WEBSTART_JAUTHENTICATOR, PROPERTY_RW_ACTION),
             new PropertyPermission(SWING_DEFAULT_LF, PROPERTY_RW_ACTION),
             new PropertyPermission(AWT_NO_ERASE_BACKGROUND, PROPERTY_RW_ACTION),
