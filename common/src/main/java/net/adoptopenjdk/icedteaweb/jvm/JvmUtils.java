@@ -48,7 +48,7 @@ public class JvmUtils {
     static boolean isSecurePropertyAValidJVMArg(String argument) {
         if (argument.startsWith("-D") && argument.length() > 2) {
             final int indexOfEqual = argument.indexOf('=');
-            final int lastIndex = indexOfEqual == -1 ? argument.length()  : indexOfEqual;
+            final int lastIndex = indexOfEqual == -1 ? argument.length() : indexOfEqual;
             return isValidSecureProperty(argument.substring(2, lastIndex));
         }
         return false;
@@ -74,7 +74,7 @@ public class JvmUtils {
      * Returns an array of valid (ie safe and supported) arguments for the JVM
      * <p>
      * Based on
-     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
+     * https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property
      */
     private static String[] getValidVMArguments() {
         return new String[]{
@@ -104,7 +104,38 @@ public class JvmUtils {
                 "-Xfuture", /* enable strictest checks, anticipating future default */
                 "-Xrs", /* reduce use of OS signals by Java/VM (see documentation) */
                 "-XX:+ForceTimeHighResolution", /* use high resolution timer */
-                "-XX:-ForceTimeHighResolution", /* use low resolution (default) */};
+                "-XX:-ForceTimeHighResolution", /* use low resolution (default) */
+                "-XX:+PrintGCDetails", /* Gives some details about the GCs */
+                "-XX:+PrintGCTimeStamps", /* Prints GCs times happen to the start of the application */
+                "-XX:+PrintHeapAtGC", /* Prints detailed GC info including heap occupancy */
+                "-XX:+PrintTenuringDistribution", /* Gives the aging distribution of the allocated objects */
+                "-XX:+TraceClassUnloading", /* Display classes as they are unloaded */
+                "-XX:+CMSClassUnloadingEnabled", /* It needs to be combined with -XX:+CMSPermGenSweepingEnabled */
+                "-XX:+CMSIncrementalPacing", /* Automatic adjustment of the incremental mode duty cycle */
+                "-XX:+UseConcMarkSweepGC", /* Turns on concurrent garbage collection */
+                "-XX:-ParallelRefProcEnabled",
+                "-XX:+DisableExplicitGC", /* Disable calls to System.gc() */
+                "-XX:+UseG1GC",
+                "-XX:+HeapDumpOnOutOfMemoryError",
+                "-XX:-TransmitErrorReport",
+                "-XstartOnFirstThread",
+                "-XX:+UseStringDeduplication",
+                "-XX:+PrintStringDeduplicationStatistics",
+                "-XX:+UseParallelOldGC",
+                "-XX:-UseParallelOldGC",
+                "-XX:+UseParallelOldGCCompacting",
+                "-XX:-UseParallelOldGCCompacting",
+                "-XX:+UseParallelGC",
+                "-XX:-UseParallelGC",
+                "-XX:+UseGCTimeLimit",
+                "-XX:-UseGCTimeLimit",
+                "-XX:+UseGCOverheadLimit",
+                "-XX:-UseGCOverheadLimit",
+                "-XX:+ScavengeBeforeFullGC",
+                "-XX:-ScavengeBeforeFullGC",
+                "-XX:+UseParallelScavenge",
+                "-XX:-UseParallelScavenge"
+        };
     }
 
     /**
@@ -112,7 +143,7 @@ public class JvmUtils {
      * arguments for the JVM
      * <p>
      * Based on
-     * http://java.sun.com/javase/6/docs/technotes/guides/javaws/developersguide/syntax.html
+     * https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property
      */
     private static String[] getValidStartingVMArguments() {
         return new String[]{
@@ -132,10 +163,29 @@ public class JvmUtils {
                 "-XX:MaxHeapFreeRatio", /* heap free percentage (default 70) */
                 "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
                 "-XX:UseSerialGC", /* use serial garbage collection */
+                "-XX:-UseSerialGC",
                 "-XX:ThreadStackSize", /* thread stack size (in KB) */
                 "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
                 "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
-                "-XX:MaxDirectMemorySize",};
+                "-XX:MaxDirectMemorySize", /* set maximum direct memory size */
+                "-XX:PrintCMSStatistics", /* If > 0, Print statistics about the concurrent collections */
+                "-XX:SurvivorRatio",                    /* Sets the ratio of the survivor spaces */
+                "-XX:MaxTenuringThreshold",             /* Determines how much the objects may age */
+                "-XX:CMSMarkStackSize",
+                "-XX:CMSMarkStackSizeMax",
+                "-XX:CMSIncrementalDutyCycleMin",       /* The percentage which is the lower bound on the duty cycle */
+                "-XX:ParallelCMSThreads",
+                "-XX:ParallelGCThreads",                /* Sets the number of parallel GC threads */
+                "-XX:CMSInitiatingOccupancyFraction",   /* Sets the threshold percentage of the used heap */
+                "-XX:+UseCompressedOops",               /* Enables compressed references in 64-bit JVMs */
+                "-XX:GCPauseIntervalMillis",
+                "-XX:MaxGCPauseMillis",                 /* A hint to the virtual machine to pause times */
+                "-XX:+CMSIncrementalMode",              /* Enables the incremental mode */
+                "-XX:MaxMetaspaceSize",                 /* Sets an upper limit on memory used for class metadata */
+                "-XX:StringDeduplicationAgeThreshold",
+                "-XX:GCTimeLimit",
+                "-XX:GCHeapFreeLimit"
+        };
     }
 
     /**

@@ -65,4 +65,14 @@ public class JvmUtilsTest {
         final String javaVMArgs = "-Dsun.java2d.d3d=true -Dunknown=x";
         JvmUtils.checkVMArgs(javaVMArgs);
     }
+
+    @Test
+    public void testJava8JavaVMArgs() {
+        final String javaVMArgs = "-XX:SurvivorRatio=6 -XX:PrintCMSStatistics=8 -XX:ParallelGCThreads=5 -XX:+UseParallelOldGC -XX:-UseParallelOldGC -XX:+UseParallelScavenge -XX:-UseParallelScavenge";
+        try {
+            JvmUtils.checkVMArgs(javaVMArgs);
+        } catch (IllegalArgumentException ile) {
+            fail(ile.getMessage());
+        }
+    }
 }
