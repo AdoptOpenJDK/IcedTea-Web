@@ -16,6 +16,21 @@ public class JvmUtilsTest {
     }
 
     @Test
+    public void testValidJnlpPrefixProperty() {
+        final String property = "jnlp.abc";
+        final boolean result = JvmUtils.isValidSecureProperty(property);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testValidJavawsPrefixProperty() {
+        final String property = "javaws.efg";
+        final boolean result = JvmUtils.isValidSecureProperty(property);
+        assertTrue(result);
+    }
+
+
+    @Test
     public void testInvalidProperty() {
         final String property = "-Dsun.java2d.d3d";
         final boolean result = JvmUtils.isValidSecureProperty(property);
@@ -52,7 +67,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testValidPropertyInJavaVMArgs() {
-        final String javaVMArgs = "-Dsun.java2d.d3d=true -Dsun.java2d.dpiaware=false";
+        final String javaVMArgs = "-Dsun.java2d.d3d=true -Dsun.java2d.dpiaware=false -Djnlp.abc=def -Djavaws.xyz=uvw";
         try {
             JvmUtils.checkVMArgs(javaVMArgs);
         } catch (IllegalArgumentException ile) {

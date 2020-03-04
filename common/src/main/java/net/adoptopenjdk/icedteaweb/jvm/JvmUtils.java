@@ -45,6 +45,14 @@ public class JvmUtils {
         return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isSecurePropertyAValidJVMArg(argument);
     }
 
+    /**
+     * Properties set in the JNLP file will normally be set by Web Start after the VM is started but before the
+     * application is invoked. Some properties are considered "secure" properties and can be passed
+     * as -Dkey=value arguments on the java invocation command line.
+     *
+     * @param argument
+     * @return
+     */
     static boolean isSecurePropertyAValidJVMArg(String argument) {
         if (argument.startsWith("-D") && argument.length() > 2) {
             final int indexOfEqual = argument.indexOf('=');
@@ -63,11 +71,19 @@ public class JvmUtils {
         return false;
     }
 
+    /**
+     * A secure property is valid if it is in the whitelist or it begins with "jnlp." or "javaws."
+     *
+     *
+     * @param argument
+     * @return
+     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
+     */
     static boolean isValidSecureProperty(final String argument) {
-        if (VALID_SECURE_PROPERTIES.contains(argument)) {
+        if (argument.startsWith("jnlp.") || argument.startsWith("javaws.")) {
             return true;
         }
-        return false;
+        return VALID_SECURE_PROPERTIES.contains(argument);
     }
 
     /**
@@ -234,6 +250,10 @@ public class JvmUtils {
                 "http.auth.digest.validateProxy",
                 "http.auth.digest.validateServer"
         };
+    }
+
+    public static List<String> getValidSecurePropertiesList() {
+        return VALID_SECURE_PROPERTIES;
     }
 
     /**
