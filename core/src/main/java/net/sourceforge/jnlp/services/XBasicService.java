@@ -52,6 +52,7 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
@@ -78,10 +79,10 @@ class XBasicService implements BasicService {
      */
     @Override
     public URL getCodeBase() {
-        final ApplicationInstance app = JNLPRuntime.getApplication();
+        final Optional<ApplicationInstance> app = JNLPRuntime.getApplication();
 
-        if (app != null) {
-            final JNLPFile file = app.getJNLPFile();
+        if (app.isPresent()) {
+            final JNLPFile file = app.get().getJNLPFile();
 
             // return the codebase.
             if (file.getCodeBase() != null) {
@@ -121,10 +122,10 @@ class XBasicService implements BasicService {
      */
     private URL findFirstURLFromJNLPFile() {
 
-        final ApplicationInstance app = JNLPRuntime.getApplication();
+        final Optional<ApplicationInstance> app = JNLPRuntime.getApplication();
 
-        if (app != null) {
-            final JNLPFile jnlpFile = app.getJNLPFile();
+        if (app.isPresent()) {
+            final JNLPFile jnlpFile = app.get().getJNLPFile();
 
             final URL sourceURL = jnlpFile.getSourceLocation();
             if (sourceURL != null) {

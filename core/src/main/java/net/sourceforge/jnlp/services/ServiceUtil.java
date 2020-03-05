@@ -260,7 +260,7 @@ public class ServiceUtil {
                 return false;
             }
             if (app == null) {
-                app = JNLPRuntime.getApplication();
+                app = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("Could not determine application"));
             }
 
             final AccessType tmpType = type;
@@ -316,9 +316,6 @@ public class ServiceUtil {
 
     public static boolean isSigned(ApplicationInstance app) {
 
-        if (app == null) {
-            app = JNLPRuntime.getApplication();
-        }
 
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
@@ -329,6 +326,9 @@ public class ServiceUtil {
             } catch (Exception e1) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                 try {
+                    if (app == null) {
+                        app = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("Could not determine application"));
+                    }
                     c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
                 }catch (Exception e2) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);

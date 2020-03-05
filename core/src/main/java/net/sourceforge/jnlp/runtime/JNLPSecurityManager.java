@@ -24,6 +24,7 @@ import sun.awt.AppContext;
 
 import java.awt.Window;
 import java.security.Permission;
+import java.util.Optional;
 
 /**
  * Security manager for JNLP environment. This security manager
@@ -106,7 +107,7 @@ class JNLPSecurityManager extends SecurityManager {
      * Return the current Application, or null if none can be
      * determined.
      */
-    protected ApplicationInstance getApplication() {
+    protected Optional<ApplicationInstance> getApplication() {
         return ApplicationManager.getApplication();
     }
 
@@ -136,12 +137,9 @@ class JNLPSecurityManager extends SecurityManager {
      */
     @Override
     public ThreadGroup getThreadGroup() {
-        ApplicationInstance app = getApplication();
-        if (app == null) {
-            return super.getThreadGroup();
-        }
-
-        return app.getThreadGroup();
+        return getApplication()
+                .map(ApplicationInstance::getThreadGroup)
+                .orElse(super.getThreadGroup());
     }
 
     /**

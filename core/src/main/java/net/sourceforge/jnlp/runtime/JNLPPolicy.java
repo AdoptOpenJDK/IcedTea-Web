@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -39,6 +40,7 @@ import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
+import java.util.Optional;
 
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
@@ -112,12 +114,13 @@ public class JNLPPolicy extends Policy {
 
         // if we check the SecurityDesc here then keep in mind that
         // code can add properties at runtime to the ResourcesDesc!
-        final ApplicationInstance application = securityManager.getApplication();
-        if (application != null) {
-            final PermissionCollection clPermissions = application.getPermissions(source);
+        final Optional<ApplicationInstance> application = securityManager.getApplication();
+        if (application.isPresent()) {
+            final PermissionCollection clPermissions = application.get().getPermissions(source);
 
             Enumeration<Permission> e;
-            CodeSource appletCS = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getSourceLocation(), (java.security.cert.Certificate[]) null);
+            final JNLPFile jnlpFile = application.get().getJNLPFile();
+            CodeSource appletCS = new CodeSource(jnlpFile.getSourceLocation(), (java.security.cert.Certificate[]) null);
 
             // systempolicy permissions need to be accounted for as well
             e = systemPolicy.getPermissions(appletCS).elements();
@@ -140,7 +143,7 @@ public class JNLPPolicy extends Policy {
                     clPermissions.add(e.nextElement());
                 }
 
-                CodeSource appletCodebaseSource = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getCodeBase(), (java.security.cert.Certificate[]) null);
+                CodeSource appletCodebaseSource = new CodeSource(jnlpFile.getCodeBase(), (java.security.cert.Certificate[]) null);
                 e = userJnlpPolicy.getPermissions(appletCodebaseSource).elements();
                 while (e.hasMoreElements()) {
                     clPermissions.add(e.nextElement());

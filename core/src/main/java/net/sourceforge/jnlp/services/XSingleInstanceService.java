@@ -109,7 +109,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     public void initializeSingleInstance() {
         // this is called after the application has started. so safe to use
         // JNLPRuntime.getApplication()
-        JNLPFile jnlpFile = JNLPRuntime.getApplication().getJNLPFile();
+        JNLPFile jnlpFile = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("could not get application")).getJNLPFile();
         if (!initialized) {
             // Either a new process or a new applet being handled by the plugin.
             checkSingleInstanceRunning(jnlpFile);

@@ -57,9 +57,7 @@ class XPersistenceService implements PersistenceService {
      * @throws MalformedURLException if the application cannot access the location
      */
     private void checkLocation(URL location) throws MalformedURLException {
-        ApplicationInstance app = JNLPRuntime.getApplication();
-        if (app == null)
-            throw new MalformedURLException("Cannot determine the current application.");
+        ApplicationInstance app = JNLPRuntime.getApplication().orElseThrow(() -> new MalformedURLException("Cannot determine the current application."));
 
         URL source = app.getJNLPFile().getCodeBase();
 

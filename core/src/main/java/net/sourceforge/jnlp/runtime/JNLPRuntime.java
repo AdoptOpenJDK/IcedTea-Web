@@ -76,6 +76,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
@@ -559,7 +560,7 @@ public class JNLPRuntime {
      * @return the current Application, or null if none can be
      * determined.
      */
-    public static ApplicationInstance getApplication() {
+    public static Optional<ApplicationInstance> getApplication() {
         return ApplicationManager.getApplication();
     }
 
