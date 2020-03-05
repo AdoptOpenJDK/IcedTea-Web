@@ -29,8 +29,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
@@ -497,15 +496,8 @@ public class JNLPFile {
     /**
      * @return the requested security level of the application represented by this JNLP file.
      */
-    public ApplicationPermissionLevel getApplicationPermissionLevel() {
-        return this.security.getApplicationPermissionLevel();
-    }
-
-    /**
-     * @return the requested security level of the applet represented by this JNLP file.
-     */
-    public AppletPermissionLevel getAppletPermissionLevel() {
-        return this.security.getAppletPermissionLevel();
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return this.security.getApplicationEnvironment();
     }
 
     /**

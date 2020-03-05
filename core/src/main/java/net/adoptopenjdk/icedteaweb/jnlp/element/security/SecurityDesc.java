@@ -102,12 +102,11 @@ import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
  * @version $Revision: 1.7 $
  */
 public class SecurityDesc {
-    private final static Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
 
     public static final String SECURITY_ELEMENT = "security";
 
-    private ApplicationPermissionLevel applicationPermissionLevel;
-    private AppletPermissionLevel appletPermissionLevel;
+    private final ApplicationEnvironment applicationEnvironment;
 
     /*
      * We do not verify security here, the classloader deals with security
@@ -126,7 +125,7 @@ public class SecurityDesc {
     private Object type;
 
     /** the download host */
-    final private URL downloadHost;
+    private final URL downloadHost;
 
     /** whether sandbox applications should get the show window without banner permission */
     private final boolean grantAwtPermissions;
@@ -252,44 +251,21 @@ public class SecurityDesc {
      * Create a security descriptor.
      *
      * @param file the JNLP file
-     * @param applicationPermissionLevel the permissions specified in the JNLP
+     * @param applicationEnvironment the permissions specified in the JNLP
      * @param type the type of security
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(final JNLPFile file, final ApplicationPermissionLevel applicationPermissionLevel, final Object type, final URL downloadHost) {
+    public SecurityDesc(final JNLPFile file, final ApplicationEnvironment applicationEnvironment, final Object type, final URL downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
         this.file = file;
-        this.applicationPermissionLevel = applicationPermissionLevel;
+        this.applicationEnvironment = applicationEnvironment;
         this.type = type;
         this.downloadHost = downloadHost;
 
         String key = ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
-        grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
-
-        customTrustedPolicy = getCustomTrustedPolicy();
-    }
-
-    /**
-     * Create a security descriptor.
-     *
-     * @param file the JNLP file
-     * @param appletPermissionLevel the permissions specified in the JNLP
-     * @param type the type of security
-     * @param downloadHost the download host (can always connect to)
-     */
-    public SecurityDesc(final JNLPFile file, final AppletPermissionLevel appletPermissionLevel, final Object type, final URL downloadHost) {
-        if (file == null) {
-            throw new NullJnlpFileException();
-        }
-        this.file = file;
-        this.appletPermissionLevel = appletPermissionLevel;
-        this.type = type;
-        this.downloadHost = downloadHost;
-
-        String key = ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
-        grantAwtPermissions = Boolean.valueOf(JNLPRuntime.getConfiguration().getProperty(key));
+        grantAwtPermissions = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(key));
 
         customTrustedPolicy = getCustomTrustedPolicy();
     }
@@ -356,12 +332,8 @@ public class SecurityDesc {
         return permissions;
     }
 
-    public ApplicationPermissionLevel getApplicationPermissionLevel() {
-        return applicationPermissionLevel;
-    }
-
-    public AppletPermissionLevel getAppletPermissionLevel() {
-        return appletPermissionLevel;
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return applicationEnvironment;
     }
 
     /**
@@ -377,14 +349,12 @@ public class SecurityDesc {
         if (grantAwtPermissions) {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
         }
-        if (true) {
-            if (file == null) {
-                throw new NullJnlpFileException("Can not return sandbox permissions, file is null");
-            }
-            if (file.isApplication()) {
-                for (Permission jnlpRIAPermission : jnlpRIAPermissions) {
-                    permissions.add(jnlpRIAPermission);
-                }
+        if (file == null) {
+            throw new NullJnlpFileException("Can not return sandbox permissions, file is null");
+        }
+        if (file.isApplication()) {
+            for (Permission jnlpRIAPermission : jnlpRIAPermissions) {
+                permissions.add(jnlpRIAPermission);
             }
         }
 
@@ -442,9 +412,8 @@ public class SecurityDesc {
      * Gets the host domain part of an applet's codebase. Removes path, query, and fragment, but preserves scheme,
      * user info, and host. The port used is overridden with the specified port.
      * @param codebase the applet codebase URL
-     * @param port
+     * @param port the port
      * @return the host domain of the codebase
-     * @throws URISyntaxException
      */
     static URI getHostWithSpecifiedPort(final URI codebase, final int port) throws URISyntaxException {
         Objects.requireNonNull(codebase);
@@ -456,7 +425,6 @@ public class SecurityDesc {
      * user info, host, and port.
      * @param codebase the applet codebase URL
      * @return the host domain of the codebase
-     * @throws URISyntaxException
      */
     static URI getHost(final URI codebase) throws URISyntaxException {
         Objects.requireNonNull(codebase);

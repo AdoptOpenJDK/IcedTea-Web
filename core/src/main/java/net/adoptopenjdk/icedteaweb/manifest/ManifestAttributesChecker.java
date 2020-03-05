@@ -44,7 +44,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendeds
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -295,9 +295,9 @@ public class ManifestAttributesChecker {
             return;
         }
 
-        final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
-        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
-        if (isNoneOrDefault(requestedPermissionLevel)) {
+        final ApplicationEnvironment requestedEnvironment = file.getApplicationEnvironment();
+        validateRequestedEnvironmentMatchesManifestPermissions(requestedEnvironment, sandboxForced);
+        if (requestedEnvironment == ApplicationEnvironment.SANDBOX) {
             if (sandboxForced == ManifestBoolean.TRUE && signing != ApplicationSigningState.NONE) {
                 LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
                 securityDelegate.setRunInSandbox();
@@ -313,16 +313,12 @@ public class ManifestAttributesChecker {
         return AppletStartupSecuritySettings.getInstance().getSecurityLevel().equals(AppletSecurityLevel.ALLOW_UNSIGNED);
     }
 
-    private static boolean isNoneOrDefault(final AppletPermissionLevel requested) {
-        return requested == AppletPermissionLevel.NONE || requested == AppletPermissionLevel.DEFAULT;
-    }
-
-    private void validateRequestedPermissionLevelMatchesManifestPermissions(final AppletPermissionLevel requested, final ManifestBoolean sandboxForced) throws LaunchException {
-        if (requested == AppletPermissionLevel.ALL && sandboxForced != ManifestBoolean.FALSE) {
+    private void validateRequestedEnvironmentMatchesManifestPermissions(final ApplicationEnvironment requested, final ManifestBoolean sandboxForced) throws LaunchException {
+        if (requested == ApplicationEnvironment.ALL && sandboxForced != ManifestBoolean.FALSE) {
             throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
 
-        if (requested == AppletPermissionLevel.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
+        if (requested == ApplicationEnvironment.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
             throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
     }
@@ -455,9 +451,9 @@ public class ManifestAttributesChecker {
         final String value = file.getManifestAttributesReader().getPermissions();
         if (value == null) {
             return "Not defined";
-        } else if (value.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
+        } else if (value.trim().equalsIgnoreCase("sandbox")) {
             return value.trim();
-        } else if (value.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
+        } else if (value.trim().equalsIgnoreCase("all-permissions")) {
             return value.trim();
         } else {
             return "illegal";
@@ -468,15 +464,15 @@ public class ManifestAttributesChecker {
         final String permissionLevel = file.getManifestAttributesReader().getPermissions();
         if (permissionLevel == null) {
             return ManifestBoolean.UNDEFINED;
-        } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.SANDBOX.getValue())) {
+        } else if (permissionLevel.trim().equalsIgnoreCase("sandbox")) {
             return ManifestBoolean.TRUE;
-        } else if (permissionLevel.trim().equalsIgnoreCase(AppletPermissionLevel.ALL.getValue())) {
+        } else if (permissionLevel.trim().equalsIgnoreCase("all-permissions")) {
             return ManifestBoolean.FALSE;
         } else {
             throw new IllegalArgumentException(
                     String.format("Unknown value of %s attribute %s. Expected %s or %s",
                             ManifestAttributes.PERMISSIONS.toString(), permissionLevel,
-                            AppletPermissionLevel.SANDBOX.getValue(), AppletPermissionLevel.ALL.getValue())
+                            "sandbox", "all-permissions")
             );
         }
     }

@@ -38,7 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -182,52 +182,52 @@ public class JNLPFileTest extends NoStdOutErrTest{
             + "</jnlp>";
 
     @Test
-    public void testGetRequestedPermissionLevel1() throws MalformedURLException, ParseException {
+    public void testGetRequestedEnvironment1() throws MalformedURLException, ParseException {
         String jnlpContents = minimalJnlp.replace("SECURITY", "");
         URL codeBase = new URL("http://icedtea.classpath.org");
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, null, codeBase, new ParserSettings(false, false, false), null);
-        Assert.assertEquals(ApplicationPermissionLevel.NONE, jnlpFile.getApplicationPermissionLevel());
+        Assert.assertEquals(ApplicationEnvironment.SANDBOX, jnlpFile.getApplicationEnvironment());
     }
 
     @Test
-    public void testGetRequestedPermissionLevel2() throws MalformedURLException, ParseException {
-        String jnlpContents = minimalJnlp.replace("SECURITY", "<security><"+ ApplicationPermissionLevel.ALL.getValue()+"/></security>");
+    public void testGetRequestedEnvironment2() throws MalformedURLException, ParseException {
+        String jnlpContents = minimalJnlp.replace("SECURITY", "<security><"+ ApplicationEnvironment.ALL.getValue()+"/></security>");
 
         URL codeBase = new URL("http://icedtea.classpath.org");
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, null, codeBase, new ParserSettings(false, false, false), null);
-        Assert.assertEquals(ApplicationPermissionLevel.ALL, jnlpFile.getApplicationPermissionLevel());
+        Assert.assertEquals(ApplicationEnvironment.ALL, jnlpFile.getApplicationEnvironment());
     }
 
     @Test
-    public void testGetRequestedPermissionLevel3() throws MalformedURLException, ParseException {
+    public void testGetRequestedEnvironment3() throws MalformedURLException, ParseException {
         String jnlpContents = minimalJnlp.replace("SECURITY", "<security></security>");
 
         URL codeBase = new URL("http://icedtea.classpath.org");
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, null, codeBase, new ParserSettings(false, false, false), null);
-        Assert.assertEquals(ApplicationPermissionLevel.NONE, jnlpFile.getApplicationPermissionLevel());
+        Assert.assertEquals(ApplicationEnvironment.SANDBOX, jnlpFile.getApplicationEnvironment());
     }
 
     @Test
-    public void testGetRequestedPermissionLevel4() throws MalformedURLException, ParseException {
+    public void testGetRequestedEnvironment4() throws MalformedURLException, ParseException {
         String jnlpContents = minimalJnlp.replace("SECURITY", "<security>unknown</security>");
 
         URL codeBase = new URL("http://icedtea.classpath.org");
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, null, codeBase, new ParserSettings(false, false, false), null);
-        Assert.assertEquals(ApplicationPermissionLevel.NONE, jnlpFile.getApplicationPermissionLevel());
+        Assert.assertEquals(ApplicationEnvironment.SANDBOX, jnlpFile.getApplicationEnvironment());
     }
     
     @Test
-    public void testGetRequestedPermissionLevel5() throws MalformedURLException, ParseException {
-        String jnlpContents = minimalJnlp.replace("SECURITY", "<security><"+ ApplicationPermissionLevel.J2EE.getValue()+"/></security>");
+    public void testGetRequestedEnvironment5() throws MalformedURLException, ParseException {
+        String jnlpContents = minimalJnlp.replace("SECURITY", "<security><"+ ApplicationEnvironment.J2EE.getValue()+"/></security>");
 
         URL codeBase = new URL("http://icedtea.classpath.org");
         InputStream is = new ByteArrayInputStream(jnlpContents.getBytes());
         JNLPFile jnlpFile = new JNLPFile(is, null, codeBase, new ParserSettings(false, false, false), null);
-        Assert.assertEquals(ApplicationPermissionLevel.J2EE, jnlpFile.getApplicationPermissionLevel());
+        Assert.assertEquals(ApplicationEnvironment.J2EE, jnlpFile.getApplicationEnvironment());
     }
 
     @Test

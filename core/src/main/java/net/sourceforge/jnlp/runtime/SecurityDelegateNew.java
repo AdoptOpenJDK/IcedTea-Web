@@ -3,7 +3,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -54,7 +54,7 @@ public class SecurityDelegateNew implements SecurityDelegate {
     @Override
     public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
         if (runInSandbox) {
-            return new SecurityDesc(jnlpFile, AppletPermissionLevel.NONE,
+            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
         } else {
@@ -93,7 +93,7 @@ public class SecurityDelegateNew implements SecurityDelegate {
         if (!runInSandbox && certVerifier.isFullySigned()) {
             return jnlpFile.getSecurity();
         } else {
-            return new SecurityDesc(jnlpFile, AppletPermissionLevel.NONE,
+            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
         }
@@ -103,11 +103,11 @@ public class SecurityDelegateNew implements SecurityDelegate {
     public SecurityDesc getJarPermissions(final URL codebaseHost) {
         if (!runInSandbox && certVerifier.isFullySigned()) {
             // Already trust application, nested jar should be given
-            return new SecurityDesc(jnlpFile, AppletPermissionLevel.NONE,
+            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
                     SecurityDesc.ALL_PERMISSIONS,
                     codebaseHost);
         } else {
-            return new SecurityDesc(jnlpFile, AppletPermissionLevel.NONE,
+            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
                     SecurityDesc.SANDBOX_PERMISSIONS,
                     codebaseHost);
         }

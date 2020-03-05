@@ -43,7 +43,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
@@ -794,25 +794,25 @@ public final class Parser {
         }
 
         Object type = SecurityDesc.SANDBOX_PERMISSIONS;
-        ApplicationPermissionLevel applicationPermissionLevel = ApplicationPermissionLevel.NONE;
+        ApplicationEnvironment applicationEnvironment = ApplicationEnvironment.SANDBOX;
 
         if (nodes.length == 0) {
             type = SecurityDesc.SANDBOX_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.NONE;
-        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.ALL.getValue())) {
+            applicationEnvironment = ApplicationEnvironment.SANDBOX;
+        } else if (null != getChildNode(nodes[0], ApplicationEnvironment.ALL.getValue())) {
             type = SecurityDesc.ALL_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.ALL;
-        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.J2EE.getValue())) {
+            applicationEnvironment = ApplicationEnvironment.ALL;
+        } else if (null != getChildNode(nodes[0], ApplicationEnvironment.J2EE.getValue())) {
             type = SecurityDesc.J2EE_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
+            applicationEnvironment = ApplicationEnvironment.J2EE;
         } else if (strict) {
             throw new ParseException("security element specified but does not contain a permissions element.");
         }
 
         if (base != null) {
-            return new SecurityDesc(file, applicationPermissionLevel, type, base);
+            return new SecurityDesc(file, applicationEnvironment, type, base);
         } else {
-            return new SecurityDesc(file, applicationPermissionLevel, type, null);
+            return new SecurityDesc(file, applicationEnvironment, type, null);
         }
     }
 
@@ -823,8 +823,8 @@ public final class Parser {
         final Node security = getChildNode(root, SECURITY_ELEMENT);
 
         if (security != null) {
-            if (getChildNode(security, ApplicationPermissionLevel.ALL.getValue()) != null
-                    || getChildNode(security, ApplicationPermissionLevel.J2EE.getValue()) != null) {
+            if (getChildNode(security, ApplicationEnvironment.ALL.getValue()) != null
+                    || getChildNode(security, ApplicationEnvironment.J2EE.getValue()) != null) {
                 return true;
             }
         }

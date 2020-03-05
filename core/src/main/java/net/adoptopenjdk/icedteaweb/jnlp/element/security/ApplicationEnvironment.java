@@ -30,31 +30,29 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.security;
  * for a detailed specification of this class.
  * @see SecurityDesc
  */
-public enum ApplicationPermissionLevel {
+public enum ApplicationEnvironment {
     /**
-     * The all-permissions indicates that the application needs full access the the local
+     * The all-permissions trusted environment indicates that the application needs full access the the local
      * system and network.
      */
     ALL("all-permissions"),
 
     /**
-     * The j2ee-application-client-permissions element indicates that the application needs the set of
+     * The j2ee-application-client-permissions trusted environment indicates that the application needs the set of
      * permissions defined for a J2EE application client.
      */
     J2EE("j2ee-application-client-permissions"),
 
     /**
-     * Indicates that no application permissions are specified.
-     * @deprecated
+     * Indicates that no application permissions are specified in the JNLP file.
+     * This indicates that the application is able to run in an untrusted (sandboxed) environment.
+     * As a consequence only the minimal permissions are granted.
      */
-    @Deprecated
-    // consider to handle the absence of a security element in the jnlp file different
-    // as there is no such thing as NONE in the specs
-    NONE(null);
+    SANDBOX(null);
 
     private final String value;
 
-    ApplicationPermissionLevel(final String value) {
+    ApplicationEnvironment(final String value) {
         this.value = value;
     }
 
