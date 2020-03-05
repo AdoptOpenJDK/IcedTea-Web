@@ -498,6 +498,7 @@ public final class Parser {
         try {
             JvmUtils.checkVMArgs(vmArgs);
         } catch (IllegalArgumentException argumentException) {
+            LOG.warn("Ignoring java-vm-args due to illegal Property {}", argumentException.getMessage());
             vmArgs = null;
         }
         final String vendor = getAttribute(node, JREDesc.VENDOR_ATTRIBUTE, null);
