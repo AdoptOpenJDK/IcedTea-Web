@@ -74,12 +74,11 @@ public class JvmUtils {
     /**
      * A secure property is valid if it is in the whitelist or it begins with "jnlp." or "javaws."
      *
-     *
      * @param argument
      * @return
      * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
      */
-    static boolean isValidSecureProperty(final String argument) {
+    public static boolean isValidSecureProperty(final String argument) {
         if (argument.startsWith("jnlp.") || argument.startsWith("javaws.")) {
             return true;
         }
@@ -250,10 +249,6 @@ public class JvmUtils {
                 "http.auth.digest.validateProxy",
                 "http.auth.digest.validateServer"
         };
-    }
-
-    public static List<String> getValidSecurePropertiesList() {
-        return VALID_SECURE_PROPERTIES;
     }
 
     /**
