@@ -238,7 +238,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPFile dummyJnlpFile = new DummyJNLPFile() {
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(null, ApplicationEnvironment.SANDBOX, null);
             }
         };
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);

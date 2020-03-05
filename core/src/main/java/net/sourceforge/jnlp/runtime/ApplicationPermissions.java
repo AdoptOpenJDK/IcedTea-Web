@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -144,11 +145,11 @@ public class ApplicationPermissions {
                     if (codeSourceSecurity == null) {
                         throw new IllegalStateException("Code source security was null");
                     }
-                    if (codeSourceSecurity.getSecurityType() == null) {
-                        LOG.error("Warning! Code source security type was null");
+                    final ApplicationEnvironment applicationEnvironment = codeSourceSecurity.getApplicationEnvironment();
+                    if (applicationEnvironment == null) {
+                        LOG.error("Warning! Code source security application environment was null");
                     }
-                    Object securityType = codeSourceSecurity.getSecurityType();
-                    if (SecurityDesc.ALL_PERMISSIONS.equals(securityType) || SecurityDesc.J2EE_PERMISSIONS.equals(securityType)) {
+                    if (applicationEnvironment == ApplicationEnvironment.ALL || applicationEnvironment == ApplicationEnvironment.J2EE) {
                         permissions = codeSourceSecurity.getPermissions(codeSource);
                     }
                 }

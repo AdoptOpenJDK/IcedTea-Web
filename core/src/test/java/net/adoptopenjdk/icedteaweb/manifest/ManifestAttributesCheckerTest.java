@@ -73,7 +73,7 @@ public class ManifestAttributesCheckerTest {
         URL jar1 = new URL("http://aaa/bb/a.jar");
         URL jar2 = new URL("http://aaa/bb/lib/a.jar");
         JNLPFile file = new DummyJNLPFileWithJar(codebase, jar1, jar2);
-        SecurityDesc security = new SecurityDesc(file, ApplicationEnvironment.ALL, SecurityDesc.ALL_PERMISSIONS, codebase);
+        SecurityDesc security = new SecurityDesc(file, ApplicationEnvironment.ALL, codebase);
         SecurityDelegate securityDelegate = new DummySecurityDelegate();
         ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, ApplicationSigningState.FULL, securityDelegate);
         JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());

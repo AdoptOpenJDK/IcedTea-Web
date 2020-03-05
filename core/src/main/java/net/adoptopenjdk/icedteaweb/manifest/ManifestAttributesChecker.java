@@ -69,6 +69,7 @@ import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.*;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 public class ManifestAttributesChecker {
@@ -201,16 +202,17 @@ public class ManifestAttributesChecker {
             return;
         }
 
-        final Object desc = security.getSecurityType();
+        //final Object desc = security.getSecurityType();
+        final ApplicationEnvironment applicationEnvironment = security.getApplicationEnvironment();
 
         final String securityType;
-        if (desc == null) {
+        if (applicationEnvironment == null) {
             securityType = "Not Specified";
-        } else if (desc.equals(SecurityDesc.ALL_PERMISSIONS)) {
+        } else if (applicationEnvironment == ALL) {
             securityType = "All-Permission";
-        } else if (desc.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+        } else if (applicationEnvironment == SANDBOX) {
             securityType = "Sandbox";
-        } else if (desc.equals(SecurityDesc.J2EE_PERMISSIONS)) {
+        } else if (applicationEnvironment == J2EE) {
             securityType = "J2EE";
         } else {
             securityType = "Unknown";
@@ -218,8 +220,8 @@ public class ManifestAttributesChecker {
 
         final boolean isFullySigned = signing == ApplicationSigningState.FULL;
         final boolean isSandboxed = securityDelegate.getRunInSandbox();
-        final boolean requestsCorrectPermissions = (isFullySigned && SecurityDesc.ALL_PERMISSIONS.equals(desc))
-                || (isSandboxed && SecurityDesc.SANDBOX_PERMISSIONS.equals(desc));
+        final boolean requestsCorrectPermissions = (isFullySigned && applicationEnvironment == ALL)
+                || (isSandboxed && applicationEnvironment == SANDBOX);
         final String signedMsg;
         if (isFullySigned && !isSandboxed) {
             signedMsg = R("STOAsignedMsgFully");
@@ -242,14 +244,14 @@ public class ManifestAttributesChecker {
             LOG.warn("The application is a local file. Codebase validation is disabled. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             return;
         }
-        final Object securityType = security.getSecurityType();
+        final ApplicationEnvironment applicationEnvironment = security.getApplicationEnvironment();
         final URL codebase = UrlUtils.guessCodeBase(file);
         final ClasspathMatchers codebaseAtt = file.getManifestAttributesReader().getCodebase();
         if (codebaseAtt == null) {
             LOG.warn("This application does not specify a Codebase in its manifest. Please verify with the applet''s vendor. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             return;
         }
-        if (securityType.equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+        if (applicationEnvironment == SANDBOX) {
             if (codebaseAtt.matches(codebase)) {
                 LOG.info("Codebase matches codebase manifest attribute, but application is unsigned. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.");
             } else {
@@ -297,7 +299,7 @@ public class ManifestAttributesChecker {
 
         final ApplicationEnvironment requestedEnvironment = file.getApplicationEnvironment();
         validateRequestedEnvironmentMatchesManifestPermissions(requestedEnvironment, sandboxForced);
-        if (requestedEnvironment == ApplicationEnvironment.SANDBOX) {
+        if (requestedEnvironment == SANDBOX) {
             if (sandboxForced == ManifestBoolean.TRUE && signing != ApplicationSigningState.NONE) {
                 LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
                 securityDelegate.setRunInSandbox();
@@ -314,11 +316,11 @@ public class ManifestAttributesChecker {
     }
 
     private void validateRequestedEnvironmentMatchesManifestPermissions(final ApplicationEnvironment requested, final ManifestBoolean sandboxForced) throws LaunchException {
-        if (requested == ApplicationEnvironment.ALL && sandboxForced != ManifestBoolean.FALSE) {
+        if (requested == ALL && sandboxForced != ManifestBoolean.FALSE) {
             throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
 
-        if (requested == ApplicationEnvironment.SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
+        if (requested == SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
             throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
         }
     }

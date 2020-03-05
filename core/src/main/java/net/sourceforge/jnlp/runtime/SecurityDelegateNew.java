@@ -3,7 +3,6 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -16,6 +15,8 @@ import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
 
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.SANDBOX;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
 
 public class SecurityDelegateNew implements SecurityDelegate {
@@ -54,9 +55,7 @@ public class SecurityDelegateNew implements SecurityDelegate {
     @Override
     public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
         if (runInSandbox) {
-            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
-                    SecurityDesc.SANDBOX_PERMISSIONS,
-                    codebaseHost);
+            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
         } else {
             return jnlpFile.getSecurity();
         }
@@ -76,7 +75,7 @@ public class SecurityDelegateNew implements SecurityDelegate {
          * Unsigned      no <security>     Sandbox
          *
          */
-        if (!runInSandbox && !jnlpFile.getSecurity().getSecurityType().equals(SecurityDesc.SANDBOX_PERMISSIONS)) {
+        if (!(runInSandbox || jnlpFile.getSecurity().getApplicationEnvironment() == SANDBOX)) {
             if (certVerifier.allJarsSigned()) {
                 LaunchException ex = new LaunchException(jnlpFile, null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
                 consultCertificateSecurityException(ex);
@@ -93,9 +92,7 @@ public class SecurityDelegateNew implements SecurityDelegate {
         if (!runInSandbox && certVerifier.isFullySigned()) {
             return jnlpFile.getSecurity();
         } else {
-            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
-                    SecurityDesc.SANDBOX_PERMISSIONS,
-                    codebaseHost);
+            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
         }
     }
 
@@ -103,13 +100,9 @@ public class SecurityDelegateNew implements SecurityDelegate {
     public SecurityDesc getJarPermissions(final URL codebaseHost) {
         if (!runInSandbox && certVerifier.isFullySigned()) {
             // Already trust application, nested jar should be given
-            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
-                    SecurityDesc.ALL_PERMISSIONS,
-                    codebaseHost);
+            return new SecurityDesc(jnlpFile, ALL, codebaseHost);
         } else {
-            return new SecurityDesc(jnlpFile, ApplicationEnvironment.SANDBOX,
-                    SecurityDesc.SANDBOX_PERMISSIONS,
-                    codebaseHost);
+            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
         }
     }
 

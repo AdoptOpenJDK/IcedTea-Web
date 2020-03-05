@@ -16,7 +16,6 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -107,33 +106,11 @@ public class SecurityDesc {
     public static final String SECURITY_ELEMENT = "security";
 
     private final ApplicationEnvironment applicationEnvironment;
-
-    /*
-     * We do not verify security here, the classloader deals with security
-     */
-
-    /** All permissions. */
-    public static final Object ALL_PERMISSIONS = "All";
-
-    /** Applet permissions. */
-    public static final Object SANDBOX_PERMISSIONS = "Sandbox";
-
-    /** J2EE permissions. */
-    public static final Object J2EE_PERMISSIONS = "J2SE";
-
-    /** permissions type */
-    private Object type;
-
-    /** the download host */
     private final URL downloadHost;
-
+    private final JNLPFile file;
+    private final Policy customTrustedPolicy;
     /** whether sandbox applications should get the show window without banner permission */
     private final boolean grantAwtPermissions;
-
-    /** the JNLP file */
-    private final JNLPFile file;
-
-    private final Policy customTrustedPolicy;
 
     /**
      * URLPermission is new in Java 8, so we use reflection to check for it to keep compatibility
@@ -251,20 +228,18 @@ public class SecurityDesc {
      * Create a security descriptor.
      *
      * @param file the JNLP file
-     * @param applicationEnvironment the permissions specified in the JNLP
-     * @param type the type of security
+     * @param applicationEnvironment the permissions environment as specified in the JNLP
      * @param downloadHost the download host (can always connect to)
      */
-    public SecurityDesc(final JNLPFile file, final ApplicationEnvironment applicationEnvironment, final Object type, final URL downloadHost) {
+    public SecurityDesc(final JNLPFile file, final ApplicationEnvironment applicationEnvironment, final URL downloadHost) {
         if (file == null) {
             throw new NullJnlpFileException();
         }
         this.file = file;
         this.applicationEnvironment = applicationEnvironment;
-        this.type = type;
         this.downloadHost = downloadHost;
 
-        String key = ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
+        final String key = ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING;
         grantAwtPermissions = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(key));
 
         customTrustedPolicy = getCustomTrustedPolicy();
@@ -279,28 +254,21 @@ public class SecurityDesc {
      * instead.
      */
     private Policy getCustomTrustedPolicy() {
-        String key = ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY;
-        String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
+        final String key = ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY;
+        final String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
 
         Policy policy = null;
+
         if (policyLocation != null) {
             try {
-                URI policyUri = new URI("file://" + policyLocation);
+                final URI policyUri = new URI("file://" + policyLocation);
                 policy = Policy.getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Unable to create trusted policy for policy file at " + policyLocation, e);
             }
         }
-        // return the appropriate policy, or null
-        return policy;
-    }
 
-    /**
-     * @return the permissions type, one of: ALL,
-     * SANDBOX_PERMISSIONS, J2EE_PERMISSIONS.
-     */
-    public Object getSecurityType() {
-        return type;
+        return policy;
     }
 
     /**
@@ -309,11 +277,10 @@ public class SecurityDesc {
      *
      * @param cs the CodeSource to get permissions for
      */
-    public PermissionCollection getPermissions(CodeSource cs) {
+    public PermissionCollection getPermissions(final CodeSource cs) {
         PermissionCollection permissions = getSandBoxPermissions();
 
-        // discard sandbox, give all
-        if (ALL_PERMISSIONS.equals(type)) {
+        if (applicationEnvironment == ApplicationEnvironment.ALL) {
             permissions = new Permissions();
             if (customTrustedPolicy == null) {
                 permissions.add(new AllPermission());
@@ -323,8 +290,7 @@ public class SecurityDesc {
             }
         }
 
-        // add j2ee to sandbox if needed
-        if (J2EE_PERMISSIONS.equals(type))
+        if (applicationEnvironment == ApplicationEnvironment.J2EE)
             for (Permission j2eePermission : j2eePermissions) {
                 permissions.add(j2eePermission);
         }
@@ -350,7 +316,7 @@ public class SecurityDesc {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
         }
         if (file == null) {
-            throw new NullJnlpFileException("Can not return sandbox permissions, file is null");
+            throw new NullJnlpFileException("Can not return sandbox permissions, JNLP file is null");
         }
         if (file.isApplication()) {
             for (Permission jnlpRIAPermission : jnlpRIAPermissions) {
@@ -359,8 +325,7 @@ public class SecurityDesc {
         }
 
         if (downloadHost != null && downloadHost.getHost().length() > 0) {
-            permissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost),
-                    "connect, accept"));
+            permissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost), "connect, accept"));
         }
 
         final Collection<Permission> urlPermissions = getUrlPermissions();

@@ -793,26 +793,22 @@ public final class Parser {
             }
         }
 
-        Object type = SecurityDesc.SANDBOX_PERMISSIONS;
         ApplicationEnvironment applicationEnvironment = ApplicationEnvironment.SANDBOX;
 
         if (nodes.length == 0) {
-            type = SecurityDesc.SANDBOX_PERMISSIONS;
             applicationEnvironment = ApplicationEnvironment.SANDBOX;
         } else if (null != getChildNode(nodes[0], ApplicationEnvironment.ALL.getValue())) {
-            type = SecurityDesc.ALL_PERMISSIONS;
             applicationEnvironment = ApplicationEnvironment.ALL;
         } else if (null != getChildNode(nodes[0], ApplicationEnvironment.J2EE.getValue())) {
-            type = SecurityDesc.J2EE_PERMISSIONS;
             applicationEnvironment = ApplicationEnvironment.J2EE;
         } else if (strict) {
             throw new ParseException("security element specified but does not contain a permissions element.");
         }
 
         if (base != null) {
-            return new SecurityDesc(file, applicationEnvironment, type, base);
+            return new SecurityDesc(file, applicationEnvironment, base);
         } else {
-            return new SecurityDesc(file, applicationEnvironment, type, null);
+            return new SecurityDesc(file, applicationEnvironment, null);
         }
     }
 

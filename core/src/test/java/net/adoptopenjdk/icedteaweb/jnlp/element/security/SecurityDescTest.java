@@ -50,7 +50,7 @@ public class SecurityDescTest {
     public void testNotNullJnlpFile() throws Exception {
         Throwable t = null;
         try {
-            new SecurityDesc(new DummyJNLPFile(), ApplicationEnvironment.SANDBOX, SecurityDesc.SANDBOX_PERMISSIONS, null);
+            new SecurityDesc(new DummyJNLPFile(), ApplicationEnvironment.SANDBOX, null);
         } catch (Exception ex) {
             t = ex;
         }
@@ -59,7 +59,7 @@ public class SecurityDescTest {
 
     @Test(expected = NullPointerException.class)
     public void testNullJnlpFile() throws Exception {
-        new SecurityDesc(null, ApplicationEnvironment.SANDBOX, SecurityDesc.SANDBOX_PERMISSIONS, null);
+        new SecurityDesc(null, ApplicationEnvironment.SANDBOX, null);
     }
 
     @Test

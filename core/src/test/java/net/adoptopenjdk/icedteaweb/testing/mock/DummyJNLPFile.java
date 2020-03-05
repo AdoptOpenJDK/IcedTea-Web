@@ -61,7 +61,7 @@ public class DummyJNLPFile extends JNLPFile {
     }
 
     {
-        this.security = new SecurityDesc(this, ApplicationEnvironment.SANDBOX, SecurityDesc.SANDBOX_PERMISSIONS, null);
+        this.security = new SecurityDesc(this, ApplicationEnvironment.SANDBOX, null);
     }
 
     @Override
