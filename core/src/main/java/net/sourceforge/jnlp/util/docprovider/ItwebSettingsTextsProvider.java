@@ -131,10 +131,10 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
 
     private String getProperties() {
         StringBuilder sb = new StringBuilder();
-        List<Map.Entry<String, Setting<String>>> defaults = new ArrayList<>(Defaults.getDefaults().entrySet());
+        List<Map.Entry<String, Setting>> defaults = new ArrayList<>(Defaults.getDefaults().entrySet());
         defaults.sort((o1, o2) -> o1.getKey().compareTo(o2.getKey()));
         List<InfrastructureFileDescriptor> files = PathsAndFiles.getAllFiles();
-        for (Map.Entry<String, Setting<String>> entry : defaults) {
+        for (Map.Entry<String, Setting> entry : defaults) {
             String defaultValue = entry.getValue().getDefaultValue();
             String fileAcronom = null;
             for (InfrastructureFileDescriptor f : files) {

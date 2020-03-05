@@ -51,16 +51,16 @@ import java.util.Map;
  */
 public class ConfigurationValidator {
 
-    private final List<Setting<String>> incorrectEntries = new ArrayList<>();
-    private final List<Setting<String>> unrecognizedEntries = new ArrayList<>();
-    private final Map<String, Setting<String>> toValidate;
+    private final List<Setting> incorrectEntries = new ArrayList<>();
+    private final List<Setting> unrecognizedEntries = new ArrayList<>();
+    private final Map<String, Setting> toValidate;
 
     private boolean validated = false;
 
     /**
      * @param toValidate the settings to validate
      */
-    public ConfigurationValidator(final Map<String, Setting<String>> toValidate) {
+    public ConfigurationValidator(final Map<String, Setting> toValidate) {
         this.toValidate = toValidate;
     }
 
@@ -73,19 +73,19 @@ public class ConfigurationValidator {
         incorrectEntries.clear();
         unrecognizedEntries.clear();
 
-        final Map<String, Setting<String>> knownGood = Defaults.getDefaults();
+        final Map<String, Setting> knownGood = Defaults.getDefaults();
 
         for (final String key : toValidate.keySet()) {
             // check for known incorrect settings
             if (knownGood.containsKey(key)) {
-                final Setting<String> good = knownGood.get(key);
-                final Setting<String> unknown = toValidate.get(key);
+                final Setting good = knownGood.get(key);
+                final Setting unknown = toValidate.get(key);
                 final ValueValidator checker = good.getValidator();
                 if (checker != null) {
                     try {
                         checker.validate(unknown.getValue());
                     } catch (final IllegalArgumentException e) {
-                        final Setting<String> strange = unknown.copy();
+                        final Setting strange = unknown.copy();
                         strange.setValue(unknown.getValue());
                         incorrectEntries.add(strange);
                     }
@@ -102,7 +102,7 @@ public class ConfigurationValidator {
     /**
      * @return a list of settings which have incorrect values
      */
-    public List<Setting<String>> getIncorrectSetting() {
+    public List<Setting> getIncorrectSetting() {
         if (!validated) {
             throw new IllegalStateException("Validation has not been done");
         }
@@ -113,7 +113,7 @@ public class ConfigurationValidator {
     /**
      * @return a list of settings which are not recognized
      */
-    public List<Setting<String>> getUnrecognizedSetting() {
+    public List<Setting> getUnrecognizedSetting() {
         if (!validated) {
             throw new IllegalStateException("Validation has not been done");
         }
