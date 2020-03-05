@@ -50,6 +50,36 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         this.userInteractions = userInteractions;
     }
 
+    /**
+     * Use the certVerifier to find certificates which sign all jars
+     *
+     * <pre>
+     * Eager jars added:
+     * - no certificate which signs all jars
+     *      -> if main jar is signed by a certificate
+     *          -> find the certificate with the least (or no) problems (remember this decision)
+     *          -> if certificate has problems ask user to trust certificate
+     *          -> check if the JNLP file is signed
+     *      -> ask user for permission to run unsigned application
+     * - one or more certificates which sign all jars
+     *      -> find the certificate with the least (or no) problems (remember this decision)
+     *      -> if certificate has problems ask user to trust certificate
+     *      -> check if the JNLP file is signed
+     *
+     *
+     * Lazy Jar:
+     * - new jar is unsigned os signed by a certificate which does not sign all other jars
+     *      -> ask user for permission to run unsigned application
+     * - new jar is signed by the remembered certificate
+     *      -> OK
+     * - new jar is signed by a certificate which also signs all other jars and has no issues
+     *      -> change remembered decision
+     * - new jar is signed by a certificate which also signs all other jars and has issues
+     *      -> ask user to trust certificate -> change remembered decision
+     * </pre>
+     *
+     * @param jars the new jars to add.
+     */
     @Override
     public void validateJars(List<LoadableJar> jars) {
         if (securityDelegate.getRunInSandbox()) {
