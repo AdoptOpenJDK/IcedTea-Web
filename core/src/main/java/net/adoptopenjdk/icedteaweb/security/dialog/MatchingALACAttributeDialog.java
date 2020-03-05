@@ -13,7 +13,10 @@ import java.net.URL;
 import java.util.Set;
 
 /**
- * The ALAC attribute identifies the locations where your signed application is expected to be found.
+ * The ALAC attribute identifies the locations where your signed application is expected to
+ * be found.
+ *
+ * <img src="doc-files/MatchingALACAttributeDialog.png"></img>
  */
 public class MatchingALACAttributeDialog extends MissingAttributeDialog {
     private static final Logger LOG = LoggerFactory.getLogger(MatchingALACAttributeDialog.class);

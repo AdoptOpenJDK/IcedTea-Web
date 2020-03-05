@@ -19,6 +19,9 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
+/**
+ *  <img src="doc-files/UnsignedWarningDialog.png"></img>
+ */
 public class UnsignedWarningDialog extends BasicSecurityDialog<RememberableResult<AllowDeny>> {
     private static final Logger LOG = LoggerFactory.getLogger(UnsignedWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

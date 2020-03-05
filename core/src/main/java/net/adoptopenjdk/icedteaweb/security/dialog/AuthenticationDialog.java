@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * <img src="doc-files/AuthenticationDialog.png"></img>
+ */
 public class AuthenticationDialog extends BasicSecurityDialog<Optional<NamePassword>> {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

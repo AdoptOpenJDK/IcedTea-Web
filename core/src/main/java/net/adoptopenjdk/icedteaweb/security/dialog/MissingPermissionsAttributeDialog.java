@@ -15,6 +15,8 @@ import java.net.URL;
  *
  * The Permissions attribute is used to verify that the permissions level requested by the application when
  * it runs matches the permissions level that was set when the JAR file was created.
+ *
+ * <img src="doc-files/MissingPermissionsAttributeDialog.png"></img>
  */
 public class MissingPermissionsAttributeDialog extends MissingAttributeDialog {
     private static final Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributeDialog.class);

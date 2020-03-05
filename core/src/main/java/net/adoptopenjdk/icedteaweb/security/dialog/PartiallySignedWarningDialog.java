@@ -21,6 +21,9 @@ import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *  <img src="doc-files/PartiallySignedWarningDialog.png"></img>
+ */
 public class PartiallySignedWarningDialog extends BasicSecurityDialog<RememberableResult<AllowDenySandbox>> {
     private static final Logger LOG = LoggerFactory.getLogger(PartiallySignedWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

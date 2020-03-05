@@ -44,6 +44,9 @@ import java.util.List;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
+/**
+ * <img src="doc-files/CertWarningDetailsDialog.png"></img>
+ */
 public class CertWarningDetailsDialog extends DialogWithResult<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(CertWarningDetailsDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

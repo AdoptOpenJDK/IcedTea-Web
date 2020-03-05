@@ -15,6 +15,9 @@ import javax.swing.JComponent;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * <img src="doc-files/AccessWarningDialog.png"></img>
+ */
 public class AccessWarningDialog extends BasicSecurityDialog<RememberableResult<AllowDeny>> {
     private static final Logger LOG = LoggerFactory.getLogger(AccessWarningDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

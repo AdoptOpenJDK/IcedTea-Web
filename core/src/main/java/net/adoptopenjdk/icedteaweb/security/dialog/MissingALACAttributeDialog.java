@@ -16,7 +16,10 @@ import java.util.Set;
  * correspond to the locations of the JAR file and the JNLP file. The user can decide to run the
  * application and remember the decision to show this dialog again for the application or domain.
  *
- * The ALAC attribute identifies the locations where your signed application is expected to be found.
+ * The ALAC attribute identifies the locations where your signed application is expected to be
+ * found.
+ *
+ * <img src="doc-files/MissingALACAttributeDialog.png"></img>
  */
 public class MissingALACAttributeDialog extends MissingAttributeDialog {
     private static final Logger LOG = LoggerFactory.getLogger(MissingALACAttributeDialog.class);

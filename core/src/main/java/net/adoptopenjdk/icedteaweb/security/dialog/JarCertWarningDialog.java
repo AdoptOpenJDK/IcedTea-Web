@@ -21,6 +21,8 @@ import java.util.List;
 
 /**
  * TODO: check if advancedOptions (temporary permissions) should still be supported
+ *
+ * <img src="doc-files/JarCertWarningDialog.png"></img>
 */
 public class JarCertWarningDialog extends CertWarningDialog {
     private static final Logger LOG = LoggerFactory.getLogger(JarCertWarningDialog.class);

@@ -35,6 +35,9 @@ import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
+/**
+ * <img src="doc-files/CertInfoDialog.png"></img>
+ */
 public class CertInfoDialog extends DialogWithResult<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(CertInfoDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();

@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ *  <img src="doc-files/HttpsCertTrustDialog.png"></img>
+ */
 public class HttpsCertTrustDialog extends CertWarningDialog {
     private static final Logger LOG = LoggerFactory.getLogger(HttpsCertTrustDialog.class);
     private static final Translator TRANSLATOR = Translator.getInstance();
