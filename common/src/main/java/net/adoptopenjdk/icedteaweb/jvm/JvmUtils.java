@@ -17,7 +17,7 @@ public class JvmUtils {
 
     private static final Set<String> VALID_VM_ARGUMENTS = unmodifiableSet(new HashSet<>(asList(getValidVMArguments())));
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
-    private static final List<String> VALID_SECURE_PROPERTIES = unmodifiableList(asList(getValidSecureProperties()));
+    private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
 
     /**
      * Check that the VM args are valid and safe.
@@ -74,12 +74,11 @@ public class JvmUtils {
     /**
      * A secure property is valid if it is in the whitelist or it begins with "jnlp." or "javaws."
      *
-     *
      * @param argument
      * @return
      * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
      */
-    static boolean isValidSecureProperty(final String argument) {
+    public static boolean isValidSecureProperty(final String argument) {
         if (argument.startsWith("jnlp.") || argument.startsWith("javaws.")) {
             return true;
         }
@@ -250,10 +249,6 @@ public class JvmUtils {
                 "http.auth.digest.validateProxy",
                 "http.auth.digest.validateServer"
         };
-    }
-
-    public static List<String> getValidSecurePropertiesList() {
-        return VALID_SECURE_PROPERTIES;
     }
 
     /**
