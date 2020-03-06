@@ -178,7 +178,7 @@ public class JnlpApplicationClassLoaderTest {
         private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();
 
         public DummyPartsHandler(final List<Part> parts) {
-            super(parts, (jars) -> {});
+            super(parts, new JnlpApplicationClassLoaderTest.DummyApplicationTrustValidator());
         }
 
         @Override
@@ -196,13 +196,14 @@ public class JnlpApplicationClassLoaderTest {
         public List<JARDesc> getDownloaded() {
             return Collections.unmodifiableList(downloaded);
         }
+
     }
 
     private static class ErrorPartsHandler extends PartsHandler {
 
 
         public ErrorPartsHandler(final List<Part> parts) {
-            super(parts, (jars) -> {});
+            super(parts, new DummyApplicationTrustValidator());
         }
 
         @Override
@@ -210,6 +211,16 @@ public class JnlpApplicationClassLoaderTest {
             throw new RuntimeException("Can not download " + jarDesc.getLocation());
         }
 
+    }
+
+    private static class DummyApplicationTrustValidator implements ApplicationTrustValidator {
+        @Override
+        public void validateEagerJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+        }
+
+        @Override
+        public void validateLazyJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+        }
     }
 
     public static ErrorPartsHandler createErrorPartsHandler(final String name) throws IOException, ParseException {
@@ -233,5 +244,4 @@ public class JnlpApplicationClassLoaderTest {
         final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
         return new PartExtractor(file, jnlpFileFactory);
     }
-
 }

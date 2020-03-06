@@ -1,6 +1,8 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.classloader.ApplicationTrustValidator;
+import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.Part;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -13,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DummyPartsHandler extends PartsHandler {
 
     public DummyPartsHandler(final List<Part> parts) {
-        super(parts, (jars) -> {});
+        super(parts, new DummyApplicationTrustValidator());
     }
 
     private final List<JARDesc> downloaded = new CopyOnWriteArrayList<>();
@@ -37,4 +39,15 @@ public class DummyPartsHandler extends PartsHandler {
     public List<JARDesc> getDownloaded() {
         return Collections.unmodifiableList(downloaded);
     }
+
+    private static class DummyApplicationTrustValidator implements ApplicationTrustValidator {
+        @Override
+        public void validateEagerJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+        }
+
+        @Override
+        public void validateLazyJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
+        }
+    }
+
 }
