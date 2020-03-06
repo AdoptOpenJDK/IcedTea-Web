@@ -193,6 +193,8 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                     .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
                     .anyMatch(infos -> !infos.hasSigningIssues());
 
+            // TODO: if certificate has issues ask user if it should be trusted
+
             if (! hasTrustedCertificate) {
                 return false;
             }
