@@ -63,7 +63,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     @Test
     @Ignore
     @KnownToFail
-    public void testTemplateCDATA() throws JNLPMatcherException, IOException {
+    public void testTemplateCDATA() throws Exception {
 
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template0.jnlp")) {
@@ -74,7 +74,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateDuplicate() throws JNLPMatcherException, IOException {
+    public void testTemplateDuplicate() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template1.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -83,7 +83,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateWildCharsRandom() throws JNLPMatcherException, IOException {
+    public void testTemplateWildCharsRandom() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template2.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -92,7 +92,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateDifferentOrder() throws JNLPMatcherException, IOException {
+    public void testTemplateDifferentOrder() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template3.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -113,7 +113,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     @Test
     @Ignore
     @KnownToFail
-    public void testTemplateComments() throws JNLPMatcherException, IOException {
+    public void testTemplateComments() throws Exception {
     //having comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
@@ -123,7 +123,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateDifferentValues() throws JNLPMatcherException, IOException {
+    public void testTemplateDifferentValues() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template6.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -132,7 +132,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateExtraChild() throws JNLPMatcherException, IOException {
+    public void testTemplateExtraChild() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template7.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -141,7 +141,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateFewerChild() throws JNLPMatcherException, IOException {
+    public void testTemplateFewerChild() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template8.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -150,7 +150,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testTemplateDifferentFile() throws JNLPMatcherException, IOException {
+    public void testTemplateDifferentFile() throws Exception {
 
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/templates/template9.jnlp")) {
@@ -162,7 +162,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     @Test
     @Ignore
     @KnownToFail
-    public void testApplicationCDATA() throws JNLPMatcherException, IOException {
+    public void testApplicationCDATA() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application0.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -171,7 +171,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationDuplicate() throws JNLPMatcherException, IOException {
+    public void testApplicationDuplicate() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application1.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -180,7 +180,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationDifferentOrder() throws JNLPMatcherException, IOException {
+    public void testApplicationDifferentOrder() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application2.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -189,7 +189,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationComments() throws JNLPMatcherException, IOException {
+    public void testApplicationComments() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application3.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -198,7 +198,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationWildCharsRandom() throws JNLPMatcherException, IOException {
+    public void testApplicationWildCharsRandom() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application4.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -217,7 +217,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationExtraChild() throws JNLPMatcherException, IOException {
+    public void testApplicationExtraChild() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application6.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -226,7 +226,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationFewerChild() throws JNLPMatcherException, IOException {
+    public void testApplicationFewerChild() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application7.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -235,7 +235,7 @@ public class JNLPMatcherTestMalformedAllowedTest {
     }
 
     @Test
-    public void testApplicationDifferentFile() throws JNLPMatcherException, IOException {
+    public void testApplicationDifferentFile() throws Exception {
         try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
                 .getResourceAsStream("net/sourceforge/jnlp/application/application8.jnlp")) {
             JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
@@ -243,47 +243,8 @@ public class JNLPMatcherTestMalformedAllowedTest {
         }
     }
 
-    @SuppressWarnings("unused")
     @Test
-    public void testNullJNLPFiles() throws IOException {
-
-        Exception expectedException = null;
-        InputStream fileStream;
-        try (InputStream launchReader = this.getLaunchReader()) {
-            fileStream = cl
-                    .getResourceAsStream("net/sourceforge/jnlp/application/application8.jnlp");
-            try {
-                JNLPMatcher test = new JNLPMatcher(null, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with null signed application/template reader",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-            try {
-                JNLPMatcher test = new JNLPMatcher(fileStream, null, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with null launching JNLP file reader",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-            try {
-                JNLPMatcher test = new JNLPMatcher(null, null, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with both readers being null",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-        }        fileStream.close();
-    }
-
-    @Test
-    public void testCallingMatchMultiple() throws JNLPMatcherException, IOException {
+    public void testCallingMatchMultiple() throws Exception {
         // Check with application
         InputStream launchReader = this.getLaunchReader();
         InputStream fileStream = cl
