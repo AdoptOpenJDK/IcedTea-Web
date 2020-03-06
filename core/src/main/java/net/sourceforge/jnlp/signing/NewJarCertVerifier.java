@@ -50,10 +50,6 @@ public class NewJarCertVerifier {
         jarToFullySigningCertificates.put(jarFile, certificatesFullySigningTheJar);
     }
 
-    public boolean allJarsSigned() {
-        throw new RuntimeException("Not implemented yet!");
-    }
-
     public boolean isNotFullySigned() {
         return getFullySigningCertificates().isEmpty();
     }
@@ -63,5 +59,9 @@ public class NewJarCertVerifier {
                 .filter(e -> e.getValue() == ApplicationSigningState.FULL)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
+    }
+
+    public CertificatesFullySigningTheJar certificatesSigning(final File jarFile) {
+        return jarToFullySigningCertificates.get(jarFile);
     }
 }

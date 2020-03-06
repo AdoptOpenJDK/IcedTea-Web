@@ -14,8 +14,7 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.ApplicationManager;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
-import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
+import net.sourceforge.jnlp.signing.CertificatesFullySigningTheJar;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 import net.sourceforge.jnlp.signing.SignVerifyUtils;
 import net.sourceforge.jnlp.tools.CertInformation;
@@ -26,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.security.cert.CertPath;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -52,7 +50,6 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     private static final String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
 
     private final SecurityUserInteractions userInteractions;
-    private final SecurityDelegate securityDelegate;
 
     private final NewJarCertVerifier certVerifier;
     private final JNLPFile file;
@@ -65,7 +62,6 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     public ApplicationTrustValidatorImpl(final JNLPFile file, final ApplicationPermissions applicationPermissions, final SecurityUserInteractions userInteractions) {
         this.file = file;
         this.certVerifier = new NewJarCertVerifier();
-        this.securityDelegate = new SecurityDelegateNew(applicationPermissions, file, certVerifier);
         this.userInteractions = userInteractions;
     }
 
@@ -147,75 +143,95 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
     private static List<File> toFiles(List<LoadableJar> jars) {
         return jars.stream()
-                .map(loadableJar -> {
-                    try {
-                        return new File(loadableJar.getLocation().toURI());
-                    } catch (URISyntaxException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(ApplicationTrustValidatorImpl::toFile)
                 .collect(Collectors.toList());
     }
 
+    private static File toFile(LoadableJar loadableJar) {
+        try {
+            return new File(loadableJar.getLocation().toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    private static boolean isJnlpSigned(final List<LoadableJar> jars, final JNLPFile file) {
-        final JARDesc mainJAR = file.getResources().getMainJAR();
 
-        if (mainJAR == null) {
+    private boolean isJnlpSigned(final List<LoadableJar> jars, final JNLPFile file) {
+        final JARDesc mainJarDesc = file.getResources().getMainJAR();
+
+        if (mainJarDesc == null) {
             return false;
         }
 
         final LoadableJar mainJar = jars.stream()
-                .filter(jar -> Objects.equals(jar.getJarDesc(), mainJAR))
+                .filter(jar -> Objects.equals(jar.getJarDesc(), mainJarDesc))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Main jar not found"));
-        try {
-            final File localFile = Paths.get(mainJar.getLocation().toURI()).toFile();
+        final File mainJarFile = toFile(mainJar);
 
-            try (final JarFile jarFile = new JarFile(localFile)) {
-                for (JarEntry entry : Collections.list(jarFile.entries())) {
-                    final String entryName = entry.getName().toUpperCase();
+        if (certVerifier.isNotFullySigned()) {
 
-                    if (entryName.equals(TEMPLATE) || entryName.equals(APPLICATION)) {
-                        LOG.debug("JNLP file found in main jar.");
+            final ZonedDateTime now = ZonedDateTime.now();
+            final CertificatesFullySigningTheJar certs = certVerifier.certificatesSigning(mainJarFile);
 
-                        try (final InputStream inStream = jarFile.getInputStream(entry)) {
-                            final File jnlpFile;
-                            // If the file is on the local file system, use original path, otherwise find cached file
-                            if (file.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
-                                jnlpFile = new File(file.getFileLocation().getPath());
-                            } else {
-                                jnlpFile = Cache.getCacheFile(file.getFileLocation(), file.getFileVersion());
-                            }
+            final Map<CertPath, CertInformation> certInfos = certs.getCertificatePaths().stream()
+                    .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
 
-                            try (InputStream jnlpStream = new FileInputStream(jnlpFile)) {
-                                final JNLPMatcher matcher;
-                                if (entryName.equals(APPLICATION)) { // If signed application was found
-                                    LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verification...");
-                                    matcher = new JNLPMatcher(inStream, jnlpStream, false, file.getParserSettings());
-                                } else {
-                                    LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
-                                    matcher = new JNLPMatcher(inStream, jnlpStream, true, file.getParserSettings());
-                                }
-                                if (!matcher.isMatch()) {
-                                    LOG.warn("Signed JNLP file in main jar does not match launching JNLP file");
-                                    return false;
-                                }
-                                LOG.debug("JNLP file verification successful");
-                                return true;
-                            } catch (IOException e) {
-                                LOG.error("Could not read local JNLP file: {}", e.getMessage());
-                            }
-                        } catch (IOException e) {
-                            LOG.error("Could not read JNLP jar entry: {}", e.getMessage());
+            final boolean hasTrustedCertificate = certInfos.values().stream()
+                    .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
+                    .anyMatch(infos -> !infos.hasSigningIssues());
+
+            if (! hasTrustedCertificate) {
+                return false;
+            }
+        }
+
+        return isJnlpSigned(file, mainJarFile);
+    }
+
+    private static boolean isJnlpSigned(JNLPFile file, File mainJarFile) {
+
+        try (final JarFile jarFile = new JarFile(mainJarFile)) {
+            for (JarEntry entry : Collections.list(jarFile.entries())) {
+                final String entryName = entry.getName().toUpperCase();
+
+                if (entryName.equals(TEMPLATE) || entryName.equals(APPLICATION)) {
+                    LOG.debug("JNLP file found in main jar.");
+
+                    try (final InputStream inStream = jarFile.getInputStream(entry)) {
+                        final File jnlpFile;
+                        // If the file is on the local file system, use original path, otherwise find cached file
+                        if (file.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
+                            jnlpFile = new File(file.getFileLocation().getPath());
+                        } else {
+                            jnlpFile = Cache.getCacheFile(file.getFileLocation(), file.getFileVersion());
                         }
+
+                        try (InputStream jnlpStream = new FileInputStream(jnlpFile)) {
+                            final JNLPMatcher matcher;
+                            if (entryName.equals(APPLICATION)) { // If signed application was found
+                                LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verification...");
+                                matcher = new JNLPMatcher(inStream, jnlpStream, false, file.getParserSettings());
+                            } else {
+                                LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
+                                matcher = new JNLPMatcher(inStream, jnlpStream, true, file.getParserSettings());
+                            }
+                            if (!matcher.isMatch()) {
+                                LOG.warn("Signed JNLP file in main jar does not match launching JNLP file");
+                                return false;
+                            }
+                            LOG.debug("JNLP file verification successful");
+                            return true;
+                        } catch (IOException e) {
+                            LOG.error("Could not read local JNLP file: {}", e.getMessage());
+                        }
+                    } catch (IOException e) {
+                        LOG.error("Could not read JNLP jar entry: {}", e.getMessage());
                     }
                 }
-            } catch (IOException e) {
-                LOG.error("Could not read local main jar file: {}", e.getMessage());
             }
-        } catch (URISyntaxException e) {
-            LOG.error("Could not convert main jar location to URI: {}", e.getMessage());
+        } catch (IOException e) {
+            LOG.error("Could not read local main jar file: {}", e.getMessage());
         }
         return false;
     }
