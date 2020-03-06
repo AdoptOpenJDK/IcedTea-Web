@@ -194,7 +194,7 @@ public class JNLPFile {
     /**
      * A signed JNLP file is missing from the main jar
      */
-    private boolean missingSignedJNLP = false;
+    private boolean isSigned = false;
 
     /**
      * List of acceptable properties (not-special)
@@ -743,21 +743,21 @@ public class JNLPFile {
      * @return true if a warning should be displayed; otherwise false
      */
     public boolean requiresSignedJNLPWarning() {
-        return (missingSignedJNLP && checkForSpecialProperties());
+        return (isUnsigend() && checkForSpecialProperties());
     }
 
     /**
-     * Informs that a signed JNLP file is missing in the main jar
+     * Marks this file as signed. I.e. the file is matched by an entry in the main jar.
      */
-    public void setSignedJNLPAsMissing() {
-        missingSignedJNLP = true;
+    public void markFileAsSigned() {
+        isSigned = true;
     }
 
     /**
      * Informs that a signed JNLP file is missing in the main jar
      */
     public boolean isUnsigend() {
-        return missingSignedJNLP;
+        return !isSigned;
     }
 
     public ManifestAttributesReader getManifestAttributesReader() {

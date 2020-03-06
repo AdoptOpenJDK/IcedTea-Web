@@ -39,7 +39,6 @@ public class NewDialogFactoryTest {
         Locale.setDefault(Locale.ENGLISH);
         JNLPRuntime.initialize();
         file = new JNLPFileFactory().create(getClass().getResource("/net/sourceforge/jnlp/basic.jnlp"));
-        file.setSignedJNLPAsMissing();
         httpsCertVerifier = new HttpsCertVerifier(new X509Certificate[]{}, true, true, "hostname");
         jarCertVerifier = new JarCertVerifier();
         dialogFactory = new NewDialogFactory();
