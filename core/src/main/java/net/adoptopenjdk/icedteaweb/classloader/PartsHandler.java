@@ -120,10 +120,10 @@ public class PartsHandler implements JarProvider {
         return result;
     }
 
-    private Future<LoadableJar> downloadJar(final JARDesc jarDescription) {
+    private Future<LoadableJar> downloadJar(final JARDesc jarDesc) {
         return CompletableFuture.supplyAsync(() -> {
-            final URL localCacheUrl = getLocalUrlForJar(jarDescription);
-            return new LoadableJar(localCacheUrl, jarDescription.isNative());
+            final URL localCacheUrl = getLocalUrlForJar(jarDesc);
+            return new LoadableJar(localCacheUrl, jarDesc);
         }, getClassloaderBackgroundExecutor());
     }
 

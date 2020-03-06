@@ -1,6 +1,6 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
-import net.sourceforge.jnlp.LaunchException;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 
 import java.io.IOException;
 import java.net.URL;
@@ -104,11 +104,11 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     public static class LoadableJar {
         private final URL location;
-        private final boolean containsNativeLib;
+        private final JARDesc jarDesc;
 
-        LoadableJar(URL location, boolean containsNativeLib) {
+        LoadableJar(final URL location, final JARDesc jarDesc) {
             this.location = location;
-            this.containsNativeLib = containsNativeLib;
+            this.jarDesc = jarDesc;
         }
 
         public URL getLocation() {
@@ -116,7 +116,11 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         }
 
         public boolean containsNativeLib() {
-            return containsNativeLib;
+            return jarDesc.isNative();
+        }
+
+        public JARDesc getJarDesc() {
+            return jarDesc;
         }
     }
 }

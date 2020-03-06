@@ -37,7 +37,6 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
@@ -45,7 +44,6 @@ import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -74,18 +72,9 @@ public final class JNLPMatcher {
      * @param launchJNLP  the reader stream of the launching JNLP file
      * @param isTemplate  a boolean that specifies if appTemplateFile is a template
      * @param p           settings of parser
-     * @throws JNLPMatcherException if IOException, XMLParseException is thrown during parsing;
-     *                              Or launchJNLP/appTemplate is null
      */
     public JNLPMatcher(InputStream appTemplate, InputStream launchJNLP,
-                       boolean isTemplate, ParserSettings p) throws JNLPMatcherException {
-
-        if (appTemplate == null && launchJNLP == null)
-            throw new JNLPMatcherException("Template JNLP file and Launching JNLP file are both null.");
-        else if (appTemplate == null)
-            throw new JNLPMatcherException("Template JNLP file is null.");
-        else if (launchJNLP == null)
-            throw new JNLPMatcherException("Launching JNLP file is null.");
+                       boolean isTemplate, ParserSettings p) {
 
         try {
             final XMLParser xmlParser = XmlParserFactory.getParser(p.getParserType());
@@ -93,11 +82,7 @@ public final class JNLPMatcher {
             this.launchJNLPNode = xmlParser.getRootNode(launchJNLP);
             this.isTemplate = isTemplate;
         } catch (Exception e) {
-            throw new JNLPMatcherException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);
-        } finally {
-            closeInputStream(appTemplate);
-            closeInputStream(launchJNLP);
-
+            throw new RuntimeException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);
         }
     }
 
@@ -123,14 +108,12 @@ public final class JNLPMatcher {
 
         if (appTemplate != null && launchJNLP != null) {
 
-            Node templateNode = appTemplate;
-            Node launchNode = launchJNLP;
             // Store children of Node
-            List<Node> appTemplateChild = new LinkedList<>(Arrays.asList(templateNode.getChildNodes()));
-            List<Node> launchJNLPChild = new LinkedList<>(Arrays.asList(launchNode.getChildNodes()));
+            List<Node> appTemplateChild = new LinkedList<>(Arrays.asList(appTemplate.getChildNodes()));
+            List<Node> launchJNLPChild = new LinkedList<>(Arrays.asList(launchJNLP.getChildNodes()));
 
             // Compare only if both Nodes have the same name, else return false
-            if (templateNode.getNodeName().equals(launchNode.getNodeName())) {
+            if (appTemplate.getNodeName().equals(launchJNLP.getNodeName())) {
 
                 if (appTemplateChild.size() == launchJNLPChild.size()) { // Compare
                     // children
@@ -151,10 +134,10 @@ public final class JNLPMatcher {
                         }
                     }
 
-                    if (!templateNode.getNodeValue().equals(launchNode.getNodeValue())) {
+                    if (!appTemplate.getNodeValue().equals(launchJNLP.getNodeValue())) {
 
                         // If it's a template and the template's value is NOT '*'
-                        if (isTemplate && !templateNode.getNodeValue().equals("*")) {
+                        if (isTemplate && !appTemplate.getNodeValue().equals("*")) {
                             return false;
                         }
                         // Else if it's not a template, then return false
@@ -163,7 +146,7 @@ public final class JNLPMatcher {
                         }
                     }
                     // Compare attributes of both Nodes
-                    return matchAttributes(templateNode, launchNode);
+                    return matchAttributes(appTemplate, launchJNLP);
                 }
 
             }
@@ -215,35 +198,5 @@ public final class JNLPMatcher {
             }
         }
         return false;
-    }
-
-    /***
-     * Closes an input stream
-     *
-     * @param stream
-     *            The input stream that will be closed
-     */
-    private void closeInputStream(InputStream stream) {
-        if (stream != null)
-            try {
-                stream.close();
-            } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
-    }
-
-    /***
-     * Closes an output stream
-     *
-     * @param stream
-     *            The output stream that will be closed
-     */
-    private void closeOutputStream(OutputStream stream) {
-        if (stream != null)
-            try {
-                stream.close();
-            } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
     }
 }
