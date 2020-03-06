@@ -57,7 +57,7 @@ public class DummyJNLPFileWithJar extends JNLPFile {
 
         }
         infos = new ArrayList<>();
-        this.security = new SecurityDesc(this, ApplicationEnvironment.SANDBOX, null);
+        this.security = new SecurityDesc(ApplicationEnvironment.SANDBOX);
     }
 
     public URL getJarLocation() {

@@ -8,6 +8,8 @@ import net.adoptopenjdk.icedteaweb.security.SecurityUserInteractions;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.ApplicationManager;
 import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.SecurityDelegateNew;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.SANDBOX;
 
 /**
  * See {@link ApplicationTrustValidator}.
@@ -82,22 +86,24 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
      */
     @Override
     public void validateJars(List<LoadableJar> jars) {
-        if (securityDelegate.getRunInSandbox()) {
+
+        final ApplicationInstance applicationInstance = ApplicationManager.getApplication(file)
+                .orElseThrow(() -> new IllegalStateException("No ApplicationInstance found for " + file.getTitleFromJnlp()));
+        if (applicationInstance.getApplicationEnvironment() == SANDBOX) {
             return;
         }
 
         try {
             certVerifier.addAll(toFiles(jars));
 
-            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
-
-            if (fullySigningCertificates.isEmpty()) {
+            if (certVerifier.isNotFullySigned()) {
                 if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
                     // TODO: add details to exception
                     throw new LaunchException("");
                 }
             } else {
                 final ZonedDateTime now = ZonedDateTime.now();
+                final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
                 final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
                         .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
 
@@ -113,10 +119,6 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
             }
 
-            // TODO: work in progress
-            if (!certVerifier.isFullySigned()) {
-                securityDelegate.promptUserOnPartialSigning();
-            }
 //                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
 //                    certVerifier.checkTrustWithUser(securityDelegate, file);
 //                }

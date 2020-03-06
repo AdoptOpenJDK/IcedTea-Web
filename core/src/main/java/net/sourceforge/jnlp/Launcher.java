@@ -37,7 +37,6 @@ import sun.awt.SunToolkit;
 
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
-import java.applet.AppletStub;
 import java.awt.SplashScreen;
 import java.io.File;
 import java.lang.reflect.Method;

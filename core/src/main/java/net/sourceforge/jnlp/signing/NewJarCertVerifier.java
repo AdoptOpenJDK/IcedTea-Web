@@ -54,8 +54,8 @@ public class NewJarCertVerifier {
         throw new RuntimeException("Not implemented yet!");
     }
 
-    public boolean isFullySigned() {
-        throw new RuntimeException("Not implemented yet!");
+    public boolean isNotFullySigned() {
+        return getFullySigningCertificates().isEmpty();
     }
 
     public Set<CertPath> getFullySigningCertificates() {

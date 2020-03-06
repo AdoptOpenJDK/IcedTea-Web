@@ -2,8 +2,10 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.JNLPFile;
 
 import java.security.PrivilegedAction;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -39,6 +41,12 @@ public class ApplicationManager {
             LOG.warn("Exception while getting parent class loader", e);
             return empty();
         }
+    }
+
+    public static Optional<ApplicationInstance> getApplication(final JNLPFile file) {
+        return applicationHolder.values().stream()
+                .filter(instance -> Objects.equals(instance.getJNLPFile(), file))
+                .findFirst();
     }
 
     public static void addApplication(final ApplicationInstance applicationInstance) {

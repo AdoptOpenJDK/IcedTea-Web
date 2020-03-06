@@ -30,6 +30,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
@@ -198,7 +199,7 @@ public class JNLPFile {
     /**
      * List of acceptable properties (not-special)
      */
-    final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
+    final private String[] generalProperties = PermissionsManager.getJnlpRIAPermissions();
 
     /**
      * important manifests' attributes

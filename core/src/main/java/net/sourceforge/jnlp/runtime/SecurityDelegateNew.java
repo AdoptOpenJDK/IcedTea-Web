@@ -2,8 +2,6 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -11,14 +9,23 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 
-import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
 
-import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.SANDBOX;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
 
+/**
+ * Various combinations of the jars being signed and <security> tags being
+ * present are possible. They are treated as follows
+ *
+ * Jars          JNLP File         Result
+ *
+ * Signed        <security>        Appropriate Permissions
+ * Signed        no <security>     Sandbox
+ * Unsigned      <security>        Error
+ * Unsigned      no <security>     Sandbox
+ *
+ */
 public class SecurityDelegateNew implements SecurityDelegate {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityDelegateNew.class);
@@ -53,63 +60,8 @@ public class SecurityDelegateNew implements SecurityDelegate {
     }
 
     @Override
-    public SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost) {
-        if (runInSandbox) {
-            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
-        } else {
-            return jnlpFile.getSecurity();
-        }
-    }
-
-    @Override
-    public SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException {
-        /*
-         * Various combinations of the jars being signed and <security> tags being
-         * present are possible. They are treated as follows
-         *
-         * Jars          JNLP File         Result
-         *
-         * Signed        <security>        Appropriate Permissions
-         * Signed        no <security>     Sandbox
-         * Unsigned      <security>        Error
-         * Unsigned      no <security>     Sandbox
-         *
-         */
-        if (!(runInSandbox || jnlpFile.getSecurity().getApplicationEnvironment() == SANDBOX)) {
-            if (certVerifier.allJarsSigned()) {
-                LaunchException ex = new LaunchException(jnlpFile, null, FATAL, "Application Error", "The JNLP application is not fully signed by a single cert.", "The JNLP application has its components individually signed, however there must be a common signer to all entries.");
-                consultCertificateSecurityException(ex);
-                return consultResult(codebaseHost);
-            } else {
-                LaunchException ex = new LaunchException(jnlpFile, null, FATAL, "Application Error", "Cannot grant permissions to unsigned jars.", "Application requested security permissions, but jars are not signed.");
-                consultCertificateSecurityException(ex);
-                return consultResult(codebaseHost);
-            }
-        } else return consultResult(codebaseHost);
-    }
-
-    private SecurityDesc consultResult(URL codebaseHost) {
-        if (!runInSandbox && certVerifier.isFullySigned()) {
-            return jnlpFile.getSecurity();
-        } else {
-            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
-        }
-    }
-
-    @Override
-    public SecurityDesc getJarPermissions(final URL codebaseHost) {
-        if (!runInSandbox && certVerifier.isFullySigned()) {
-            // Already trust application, nested jar should be given
-            return new SecurityDesc(jnlpFile, ALL, codebaseHost);
-        } else {
-            return new SecurityDesc(jnlpFile, SANDBOX, codebaseHost);
-        }
-    }
-
-    @Override
     public void setRunInSandbox() throws LaunchException {
-        if (runInSandbox && applicationPermissions.getSecurity() != null
-                && !applicationPermissions.getAllJarLocations().isEmpty()) {
+        if (runInSandbox && !applicationPermissions.getAllJarLocations().isEmpty()) {
             throw new LaunchException(jnlpFile, null, FATAL, "Initialization Error", "Run in Sandbox call performed too late.", "The classloader was notified to run the applet sandboxed, but security settings were already initialized.");
         }
 

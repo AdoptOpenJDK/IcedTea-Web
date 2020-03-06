@@ -795,21 +795,16 @@ public final class Parser {
 
         ApplicationEnvironment applicationEnvironment = ApplicationEnvironment.SANDBOX;
 
-        if (nodes.length == 0) {
-            applicationEnvironment = ApplicationEnvironment.SANDBOX;
-        } else if (null != getChildNode(nodes[0], ApplicationEnvironment.ALL.getValue())) {
-            applicationEnvironment = ApplicationEnvironment.ALL;
-        } else if (null != getChildNode(nodes[0], ApplicationEnvironment.J2EE.getValue())) {
-            applicationEnvironment = ApplicationEnvironment.J2EE;
-        } else if (strict) {
-            throw new ParseException("security element specified but does not contain a permissions element.");
+        if (nodes.length == 1) {
+            if (null != getChildNode(nodes[0], ApplicationEnvironment.ALL.getValue())) {
+                applicationEnvironment = ApplicationEnvironment.ALL;
+            } else if (null != getChildNode(nodes[0], ApplicationEnvironment.J2EE.getValue())) {
+                applicationEnvironment = ApplicationEnvironment.J2EE;
+            } else if (strict) {
+                throw new ParseException("security element specified but does not contain a permissions element.");
+            }
         }
-
-        if (base != null) {
-            return new SecurityDesc(file, applicationEnvironment, base);
-        } else {
-            return new SecurityDesc(file, applicationEnvironment, null);
-        }
+        return new SecurityDesc(applicationEnvironment);
     }
 
     /**

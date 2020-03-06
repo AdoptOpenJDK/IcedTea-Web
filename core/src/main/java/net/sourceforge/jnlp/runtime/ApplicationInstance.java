@@ -16,12 +16,13 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
@@ -32,6 +33,7 @@ import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
@@ -69,10 +71,10 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-    /**
-     * the file
-     */
+    private final PermissionsManager permissionsManager;
+
     private final JNLPFile file;
+    private final ApplicationEnvironment applicationEnvironment;
 
     /**
      * the thread group
@@ -125,9 +127,11 @@ public class ApplicationInstance {
      */
     public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, final ThreadGroup applicationThreadGroup) {
         this.file = file;
+        this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
+        this.permissionsManager = new PermissionsManager(file, UrlUtils.guessCodeBase(file));
         this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
-        this.applicationPermissions = new ApplicationPermissions(tracker);
+        this.applicationPermissions = new ApplicationPermissions(permissionsManager, tracker);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
@@ -200,8 +204,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final SecurityDesc s = applicationPermissions.getSecurity();
-            final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
+            final ProtectionDomain pd = new ProtectionDomain(cs, permissionsManager.getPermissions(cs, applicationEnvironment), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
@@ -227,6 +230,14 @@ public class ApplicationInstance {
      */
     public JNLPFile getJNLPFile() {
         return file;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return applicationEnvironment;
     }
 
     /**
