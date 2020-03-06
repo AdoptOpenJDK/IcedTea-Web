@@ -14,5 +14,6 @@ import java.util.List;
  * </ul>
  */
 public interface ApplicationTrustValidator {
-    void validateJars(List<LoadableJar> jars);
+    void validateEagerJars(List<LoadableJar> jars);
+    void validateLazyJars(List<LoadableJar> jars);
 }

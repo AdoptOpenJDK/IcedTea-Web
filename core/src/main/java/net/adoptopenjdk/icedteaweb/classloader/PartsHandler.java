@@ -68,7 +68,7 @@ public class PartsHandler implements JarProvider {
             return parts.stream()
                     .filter(part -> !part.isLazy())
                     .filter(part -> !loadedByClassloader.contains(part))
-                    .map(this::loadPart)
+                    .map(this::loadEagerPart)
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
         } finally {
@@ -76,6 +76,12 @@ public class PartsHandler implements JarProvider {
         }
     }
 
+    private List<LoadableJar> loadEagerPart(final Part part) {
+        final List<LoadableJar> result = downloadAllOfPart(part);
+        trustValidator.validateEagerJars(result);
+        loadedByClassloader.add(part);
+        return result;
+    }
 
     @Override
     public List<LoadableJar> loadMoreJars(String resourceName) {
@@ -94,15 +100,15 @@ public class PartsHandler implements JarProvider {
                     .findFirst()
                     .orElse(notLoaded.get(0));
 
-            return loadPart(next);
+            return loadLazyPart(next);
         } finally {
             partsLock.unlock();
         }
     }
 
-    private List<LoadableJar> loadPart(final Part part) {
+    private List<LoadableJar> loadLazyPart(final Part part) {
         final List<LoadableJar> result = downloadAllOfPart(part);
-        trustValidator.validateJars(result);
+        trustValidator.validateLazyJars(result);
         loadedByClassloader.add(part);
         return result;
     }
