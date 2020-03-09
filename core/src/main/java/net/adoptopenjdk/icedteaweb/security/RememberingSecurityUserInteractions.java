@@ -14,9 +14,11 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
+import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.tools.CertInformation;
 
 import java.security.cert.CertPath;
+import java.security.cert.X509Certificate;
 import java.util.Optional;
 
 import static net.adoptopenjdk.icedteaweb.security.dialog.result.AccessWarningResult.ALWAYS;
@@ -87,7 +89,11 @@ public class RememberingSecurityUserInteractions implements SecurityUserInteract
         final AccessWarningResult result = DialogProvider.showJarCertWarningDialog(file, certPath.getCertificates(), certInfo.getDetailsAsStrings(), message, alwaysTrustSelected, moreInformationText);
 
         if (result == ALWAYS) {
-            // TODO: store vertificate in trust store
+            certPath.getCertificates().stream()
+                    .findFirst()
+                    .filter(cert -> cert instanceof X509Certificate)
+                    .map(cert -> (X509Certificate) cert)
+                    .ifPresent(CertificateUtils::saveCertificate);
         }
 
         switch (result) {
