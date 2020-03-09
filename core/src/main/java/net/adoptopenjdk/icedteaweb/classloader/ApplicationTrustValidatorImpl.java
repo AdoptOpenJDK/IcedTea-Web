@@ -14,7 +14,7 @@ import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.ApplicationManager;
-import net.sourceforge.jnlp.runtime.ApplicationPermissions;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.signing.CertificatesFullySigningTheJar;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 import net.sourceforge.jnlp.signing.SignVerifyUtils;
@@ -41,20 +41,17 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationTrustValidatorImpl.class);
 
-    private static final String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
-    private static final String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
-
     private final SecurityUserInteractions userInteractions;
 
     private final NewJarCertVerifier certVerifier;
     private final JNLPFile file;
 
 
-    public ApplicationTrustValidatorImpl(final JNLPFile file, final ApplicationPermissions applicationPermissions) {
-        this(file, applicationPermissions, new RememberingSecurityUserInteractions());
+    public ApplicationTrustValidatorImpl(final JNLPFile file) {
+        this(file, new RememberingSecurityUserInteractions());
     }
 
-    public ApplicationTrustValidatorImpl(final JNLPFile file, final ApplicationPermissions applicationPermissions, final SecurityUserInteractions userInteractions) {
+    public ApplicationTrustValidatorImpl(final JNLPFile file, final SecurityUserInteractions userInteractions) {
         this.file = file;
         this.certVerifier = new NewJarCertVerifier();
         this.userInteractions = userInteractions;
@@ -116,14 +113,22 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                 // find certPath with best info - what is best info? - no issues, trusted RootCA
                 CertPath certPath = findBestCertificate(certInfos);
                 final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(file, certPath, certInfos.get(certPath));
+
+                switch (result) {
+                    case SANDBOX:
+                        applicationInstance.setApplicationEnvironment(SANDBOX);
+                    case ALLOW:
+                        return;
+                    default:
+                        LOG.warn("User prevented the application from starting");
+                        JNLPRuntime.exit(0);
+                }
             }
 
-//                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
-//                    certVerifier.checkTrustWithUser(securityDelegate, file);
-//                }
-        } catch (LaunchException e) {
-            // TODO: LaunchException should not be wrapped in a RuntimeException
-            throw new RuntimeException(e);
+        }
+        catch (LaunchException e) {
+            LOG.info("Abort application launch - {}", e.getMessage());
+            JNLPRuntime.exit(0);
         }
     }
 

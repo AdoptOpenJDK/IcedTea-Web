@@ -9,7 +9,6 @@ import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.ApplicationPermissions;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
@@ -51,8 +50,8 @@ public class PartsHandler implements JarProvider {
         this(parts, new DefaultResourceTrackerFactory().create(true, DownloadOptions.NONE, JNLPRuntime.getDefaultUpdatePolicy()), trustValidator);
     }
 
-    public PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker, final ApplicationPermissions applicationPermissions) {
-        this(parts, tracker, new ApplicationTrustValidatorImpl(file, applicationPermissions));
+    public PartsHandler(final List<Part> parts, final JNLPFile file, final ResourceTracker tracker) {
+        this(parts, tracker, new ApplicationTrustValidatorImpl(file));
     }
 
     private PartsHandler(final List<Part> parts, final ResourceTracker tracker, final ApplicationTrustValidator trustValidator) {

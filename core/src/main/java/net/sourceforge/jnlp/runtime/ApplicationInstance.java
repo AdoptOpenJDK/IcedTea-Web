@@ -74,7 +74,8 @@ public class ApplicationInstance {
     private final PermissionsManager permissionsManager;
 
     private final JNLPFile file;
-    private final ApplicationEnvironment applicationEnvironment;
+
+    private ApplicationEnvironment applicationEnvironment;
 
     /**
      * the thread group
@@ -137,7 +138,7 @@ public class ApplicationInstance {
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
         try {
-            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker, applicationPermissions);
+            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
             this.loader = new JnlpApplicationClassLoader(partsHandler);
         } catch (final Exception e) {
             throw new RuntimeException("ARGH!!!", e);
@@ -238,6 +239,10 @@ public class ApplicationInstance {
      */
     public ApplicationEnvironment getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    public void setApplicationEnvironment(ApplicationEnvironment applicationEnvironment) {
+        this.applicationEnvironment = applicationEnvironment;
     }
 
     /**
