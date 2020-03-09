@@ -24,7 +24,7 @@ abstract class CertWarningDialog extends BasicSecurityDialog<AccessWarningResult
     private final JNLPFile file;
     private final List<? extends Certificate> certificates;
     private final List<String> certIssues;
-    private boolean initiallyAlwaysTrustedSelected;
+    protected final boolean initiallyAlwaysTrustedSelected;
     private final String moreInformationText;
 
     protected CertWarningDialog(final String message, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, boolean initiallyAlwaysTrustedSelected, final String moreInformationText) {

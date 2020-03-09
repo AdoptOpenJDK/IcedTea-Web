@@ -31,17 +31,16 @@ public class JarCertWarningDialog extends CertWarningDialog {
     private final DialogButton<AccessWarningResult> cancelButton;
 
     private final JNLPFile file;
-    private boolean alwaysTrustSelected;
+    private final JCheckBox alwaysTrustCheckbox;
 
     protected JarCertWarningDialog(final String message, final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, final String moreInformationText, final boolean alwaysTrustSelected) {
         super(message, file, certificates, certIssues, alwaysTrustSelected, moreInformationText);
         this.file = file;
-        this.alwaysTrustSelected = alwaysTrustSelected;
-
-        runButton = ButtonFactory.createRunButton(() -> AccessWarningResult.YES);
+        runButton = ButtonFactory.createRunButton(() -> alwaysTrustSelected ? AccessWarningResult.ALWAYS : AccessWarningResult.YES);
         sandboxButton = ButtonFactory.createSandboxButton(() -> AccessWarningResult.SANDBOX);
         sandboxButton.setEnabled(!alwaysTrustSelected);
         cancelButton = ButtonFactory.createCancelButton(TRANSLATOR.translate("CertWarnCancelTip"), () -> AccessWarningResult.NO);
+        alwaysTrustCheckbox = createAlwaysTrustCheckbox(sandboxButton);
     }
 
     public static JarCertWarningDialog create(final String message, final JNLPFile jnlpFile, final List<? extends Certificate> certificates, final List<String> certIssues, final String moreInformationText, final boolean alwaysTrustSelected) {
@@ -50,7 +49,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
 
     @Override
     protected ImageIcon createIcon() {
-        return alwaysTrustSelected ? ImageGallery.QUESTION.asImageIcon() : ImageGallery.WARNING.asImageIcon();
+        return initiallyAlwaysTrustedSelected ? ImageGallery.QUESTION.asImageIcon() : ImageGallery.WARNING.asImageIcon();
     }
 
     @Override
@@ -64,7 +63,7 @@ public class JarCertWarningDialog extends CertWarningDialog {
 
             gridBuilder.addHorizontalSpacer();
 
-            gridBuilder.addComponentRow(createAlwaysTrustCheckbox());
+            gridBuilder.addComponentRow(alwaysTrustCheckbox);
 
         } catch (final Exception e) {
             LOG.error("Error while trying to read properties for CertWarningDialog!", e);
@@ -77,9 +76,9 @@ public class JarCertWarningDialog extends CertWarningDialog {
         return Arrays.asList(runButton, sandboxButton, cancelButton);
     }
 
-    protected JCheckBox createAlwaysTrustCheckbox() {
+    protected JCheckBox createAlwaysTrustCheckbox(final DialogButton<AccessWarningResult> sandboxButton) {
         JCheckBox alwaysTrustCheckBox = super.createAlwaysTrustCheckbox();
-        alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(alwaysTrustSelected = !alwaysTrustCheckBox.isSelected()));
+        alwaysTrustCheckBox.addActionListener(e -> sandboxButton.setEnabled(!alwaysTrustCheckBox.isSelected()));
         return alwaysTrustCheckBox;
     }
 }

@@ -8,6 +8,7 @@ import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.security.RememberingSecurityUserInteractions;
 import net.adoptopenjdk.icedteaweb.security.SecurityUserInteractions;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny;
+import net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDenySandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPMatcher;
 import net.sourceforge.jnlp.LaunchException;
@@ -95,11 +96,11 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         try {
             certVerifier.addAll(toFiles(jars));
 
-            if (certVerifier.isNotFullySigned()) {
-                if (isJnlpSigned(jars, file)) {
-                    file.markFileAsSigned();
-                }
+            if (isJnlpSigned(jars, file)) {
+                file.markFileAsSigned();
+            }
 
+            if (certVerifier.isNotFullySigned()) {
                 if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
                     // TODO: add details to exception
                     throw new LaunchException("");
@@ -119,7 +120,8 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                 }
 
                 // find certPath with best info - what is best info? - no issues, trusted RootCA
-
+                CertPath certPath = findBestCertificate(certInfos);
+                final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(file, certPath, certInfos.get(certPath));
             }
 
 //                if (!certVerifier.isFullySigned() && !certVerifier.getAlreadyTrustPublisher()) {
@@ -129,6 +131,11 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
             // TODO: LaunchException should not be wrapped in a RuntimeException
             throw new RuntimeException(e);
         }
+    }
+
+    private CertPath findBestCertificate(final Map<CertPath, CertInformation> certInfos) {
+        // TODO: improve implementation to find best
+        return certInfos.keySet().iterator().next();
     }
 
 
@@ -181,23 +188,18 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                 .orElseThrow(() -> new IllegalArgumentException("Main jar not found"));
         final File mainJarFile = toFile(mainJar);
 
-        if (certVerifier.isNotFullySigned()) {
+        final ZonedDateTime now = ZonedDateTime.now();
+        final CertificatesFullySigningTheJar certs = certVerifier.certificatesSigning(mainJarFile);
 
-            final ZonedDateTime now = ZonedDateTime.now();
-            final CertificatesFullySigningTheJar certs = certVerifier.certificatesSigning(mainJarFile);
+        final Map<CertPath, CertInformation> certInfos = certs.getCertificatePaths().stream()
+                .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
 
-            final Map<CertPath, CertInformation> certInfos = certs.getCertificatePaths().stream()
-                    .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
+        final boolean hasTrustedCertificate = certInfos.values().stream()
+                .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
+                .anyMatch(infos -> !infos.hasSigningIssues());
 
-            final boolean hasTrustedCertificate = certInfos.values().stream()
-                    .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
-                    .anyMatch(infos -> !infos.hasSigningIssues());
-
-            // TODO: if certificate has issues ask user if it should be trusted
-
-            if (! hasTrustedCertificate) {
-                return false;
-            }
+        if (!hasTrustedCertificate) {
+            return false;
         }
 
         return isJnlpSigned(file, mainJarFile);
