@@ -99,7 +99,7 @@ public class NewDialogFactory implements DialogFactory {
             final String moreInformationText = getMoreInformationText(accessType, rootInCaCerts);
             final boolean alwaysTrustSelected = (accessType == AccessType.VERIFIED);
 
-            certWarningResult = DialogProvider.showJarCertWarningDialog(file, rootInCaCerts, certificates, certIssues, securityDelegate, message, alwaysTrustSelected, moreInformationText);
+            certWarningResult = DialogProvider.showJarCertWarningDialog(file, certificates, certIssues, message, alwaysTrustSelected, moreInformationText);
         }
         switch (certWarningResult) {
             case YES:

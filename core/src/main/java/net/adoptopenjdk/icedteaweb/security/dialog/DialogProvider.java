@@ -10,7 +10,6 @@ import net.adoptopenjdk.icedteaweb.security.dialog.result.CreateShortcutResult;
 import net.adoptopenjdk.icedteaweb.security.dialog.result.RememberableResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.SecurityDelegate;
 
 import java.awt.Dialog;
 import java.net.URL;
@@ -102,8 +101,8 @@ public class DialogProvider {
         return dialog.showAndWait();
     }
 
-    public static AccessWarningResult showJarCertWarningDialog(final JNLPFile file, final boolean rootInCaCerts, final List<? extends Certificate> certificates, final List<String> certIssues, final SecurityDelegate securityDelegate, final String message, final boolean alwaysTrustSelected, final String moreInformationText) {
-        final JarCertWarningDialog dialog = JarCertWarningDialog.create(message, file, rootInCaCerts, certificates, certIssues, securityDelegate, moreInformationText, alwaysTrustSelected);
+    public static AccessWarningResult showJarCertWarningDialog(final JNLPFile file, final List<? extends Certificate> certificates, final List<String> certIssues, final String message, final boolean alwaysTrustSelected, final String moreInformationText) {
+        final JarCertWarningDialog dialog = JarCertWarningDialog.create(message, file, certificates, certIssues, moreInformationText, alwaysTrustSelected);
         return dialog.showAndWait();
     }
 
