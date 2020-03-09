@@ -46,6 +46,9 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     private final NewJarCertVerifier certVerifier;
     private final JNLPFile file;
 
+    private boolean allowUnsignedApplicationToRun = false; // set to true if the user accepts to run unsigned application
+    private CertPath currentCertPath = null; // certificate which was confirmed by the user
+
 
     public ApplicationTrustValidatorImpl(final JNLPFile file) {
         this(file, new RememberingSecurityUserInteractions());
@@ -77,63 +80,13 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
      */
     @Override
     public void validateEagerJars(List<LoadableJar> jars) {
-
-        final ApplicationInstance applicationInstance = ApplicationManager.getApplication(file)
-                .orElseThrow(() -> new IllegalStateException("No ApplicationInstance found for " + file.getTitleFromJnlp()));
-        if (applicationInstance.getApplicationEnvironment() == SANDBOX) {
-            return;
-        }
-
         try {
-            certVerifier.addAll(toFiles(jars));
+            validateJars(jars, true);
 
-            if (isJnlpSigned(jars, file)) {
-                file.markFileAsSigned();
-            }
-
-            if (certVerifier.isNotFullySigned()) {
-                if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
-                    // TODO: add details to exception
-                    throw new LaunchException("");
-                }
-            } else {
-                final ZonedDateTime now = ZonedDateTime.now();
-                final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
-                final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
-                        .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
-
-                final boolean hasTrustedFullySigningCertificate = certInfos.values().stream()
-                        .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
-                        .anyMatch(infos -> !infos.hasSigningIssues());
-
-                if (hasTrustedFullySigningCertificate) {
-                    return;
-                }
-
-                // find certPath with best info - what is best info? - no issues, trusted RootCA
-                CertPath certPath = findBestCertificate(certInfos);
-                final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(file, certPath, certInfos.get(certPath));
-
-                switch (result) {
-                    case SANDBOX:
-                        applicationInstance.setApplicationEnvironment(SANDBOX);
-                    case ALLOW:
-                        return;
-                    default:
-                        throw new LaunchException("User canceled launch of application when asked to how to run application with certificate issues");
-                }
-            }
-
-        }
-        catch (LaunchException e) {
+        } catch (LaunchException e) {
             LOG.info("Abort application launch - {}", e.getMessage());
             JNLPRuntime.exit(0);
         }
-    }
-
-    private CertPath findBestCertificate(final Map<CertPath, CertInformation> certInfos) {
-        // TODO: improve implementation to find best
-        return certInfos.keySet().iterator().next();
     }
 
 
@@ -141,7 +94,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
      * Use the certVerifier to find certificates which sign all jars
      *
      * <pre>
-     * - new jar is unsigned os signed by a certificate which does not sign all other jars
+     * - new jar is unsigned or signed by a certificate which does not sign all other jars
      *      -> ask user for permission to run unsigned application
      * - new jar is signed by the remembered certificate
      *      -> OK
@@ -155,7 +108,67 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
      */
     @Override
     public void validateLazyJars(List<LoadableJar> jars) {
-        throw new RuntimeException("Not implemented yet!");
+        try {
+            validateJars(jars, false);
+        } catch (LaunchException e) {
+            LOG.info("Abort application - {}", e.getMessage());
+            JNLPRuntime.exit(0);
+        }
+    }
+
+    private void validateJars(List<LoadableJar> jars, boolean mustContainMainJar) throws LaunchException {
+        final ApplicationInstance applicationInstance = ApplicationManager.getApplication(file)
+                .orElseThrow(() -> new IllegalStateException("No ApplicationInstance found for " + file.getTitleFromJnlp()));
+
+        if (applicationInstance.getApplicationEnvironment() == SANDBOX || allowUnsignedApplicationToRun) {
+            return;
+        }
+
+        certVerifier.addAll(toFiles(jars));
+
+        if (mustContainMainJar && isJnlpSigned(jars, file)) {
+            file.markFileAsSigned();
+        }
+
+        if (certVerifier.isNotFullySigned()) {
+            if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
+                // TODO: add details to exception
+                throw new LaunchException("");
+            }
+            allowUnsignedApplicationToRun = true;
+        } else {
+            final ZonedDateTime now = ZonedDateTime.now();
+            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
+            final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
+                    .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
+
+            final boolean hasTrustedFullySigningCertificate = certInfos.values().stream()
+                    .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
+                    .anyMatch(infos -> !infos.hasSigningIssues());
+
+            if (hasTrustedFullySigningCertificate || certInfos.containsKey(currentCertPath)) {
+                return;
+            }
+
+            // find certPath with best info - what is best info? - no issues, trusted RootCA
+            final CertPath certPath = findBestCertificate(certInfos);
+            final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(file, certPath, certInfos.get(certPath));
+
+            switch (result) {
+                case SANDBOX:
+                    applicationInstance.setApplicationEnvironment(SANDBOX);
+                case ALLOW:
+                    currentCertPath = certPath;
+                    return;
+                default:
+                    throw new LaunchException("User exited application when asked to how to run application with certificate issues");
+            }
+        }
+    }
+
+    private CertPath findBestCertificate(final Map<CertPath, CertInformation> certInfos) {
+        // TODO: improve implementation to find best
+        return certInfos.keySet().iterator().next();
     }
 
     private static List<File> toFiles(List<LoadableJar> jars) {
