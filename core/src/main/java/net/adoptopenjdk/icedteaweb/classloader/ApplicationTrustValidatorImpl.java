@@ -126,8 +126,11 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
         certVerifier.addAll(toFiles(jars));
 
-        if (mustContainMainJar && isJnlpSigned(jars, file)) {
-            file.markFileAsSigned();
+        if (mustContainMainJar) {
+            if (isJnlpSigned(jars, file)) {
+                file.markFileAsSigned();
+            }
+            // TODO: check manifest
         }
 
         if (certVerifier.isNotFullySigned()) {
