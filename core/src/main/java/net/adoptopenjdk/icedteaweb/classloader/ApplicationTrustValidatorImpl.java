@@ -19,22 +19,16 @@ import net.sourceforge.jnlp.signing.CertificatesFullySigningTheJar;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 import net.sourceforge.jnlp.signing.SignVerifyUtils;
 import net.sourceforge.jnlp.tools.CertInformation;
-import net.sourceforge.jnlp.util.JarFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.cert.CertPath;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.SANDBOX;
@@ -205,50 +199,16 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         return isJnlpSigned(file, mainJarFile);
     }
 
-    private static boolean isJnlpSigned(JNLPFile file, File mainJarFile) {
+    private static boolean isJnlpSigned(final JNLPFile file, final File mainJarFile) {
+        return new JNLPMatcher(mainJarFile, getLocalFile(file), file.getParserSettings()).isMatch();
+    }
 
-        try (final JarFile jarFile = new JarFile(mainJarFile)) {
-            for (JarEntry entry : Collections.list(jarFile.entries())) {
-                final String entryName = entry.getName().toUpperCase();
-
-                if (entryName.equals(TEMPLATE) || entryName.equals(APPLICATION)) {
-                    LOG.debug("JNLP file found in main jar.");
-
-                    try (final InputStream inStream = jarFile.getInputStream(entry)) {
-                        final File jnlpFile;
-                        // If the file is on the local file system, use original path, otherwise find cached file
-                        if (file.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
-                            jnlpFile = new File(file.getFileLocation().getPath());
-                        } else {
-                            jnlpFile = Cache.getCacheFile(file.getFileLocation(), file.getFileVersion());
-                        }
-
-                        try (InputStream jnlpStream = new FileInputStream(jnlpFile)) {
-                            final JNLPMatcher matcher;
-                            if (entryName.equals(APPLICATION)) { // If signed application was found
-                                LOG.debug("APPLICATION.JNLP has been located within signed JAR. Starting verification...");
-                                matcher = new JNLPMatcher(inStream, jnlpStream, false, file.getParserSettings());
-                            } else {
-                                LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
-                                matcher = new JNLPMatcher(inStream, jnlpStream, true, file.getParserSettings());
-                            }
-                            if (!matcher.isMatch()) {
-                                LOG.warn("Signed JNLP file in main jar does not match launching JNLP file");
-                                return false;
-                            }
-                            LOG.debug("JNLP file verification successful");
-                            return true;
-                        } catch (IOException e) {
-                            LOG.error("Could not read local JNLP file: {}", e.getMessage());
-                        }
-                    } catch (IOException e) {
-                        LOG.error("Could not read JNLP jar entry: {}", e.getMessage());
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOG.error("Could not read local main jar file: {}", e.getMessage());
+    private static File getLocalFile(final JNLPFile file) {
+        // If the file is on the local file system, use original path, otherwise find cached file
+        if (file.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
+            return new File(file.getFileLocation().getPath());
+        } else {
+            return Cache.getCacheFile(file.getFileLocation(), file.getFileVersion());
         }
-        return false;
     }
 }
