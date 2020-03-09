@@ -120,8 +120,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                     case ALLOW:
                         return;
                     default:
-                        LOG.warn("User prevented the application from starting");
-                        JNLPRuntime.exit(0);
+                        throw new LaunchException("User canceled launch of application when asked to how to run application with certificate issues");
                 }
             }
 
