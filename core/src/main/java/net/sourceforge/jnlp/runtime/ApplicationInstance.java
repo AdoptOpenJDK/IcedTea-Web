@@ -22,23 +22,21 @@ import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
-import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.WeakList;
 import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.security.AccessControlContext;
@@ -48,7 +46,6 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.jar.Attributes;
 import java.util.stream.Stream;
@@ -91,11 +88,6 @@ public class ApplicationInstance {
      * whether the application has stopped running
      */
     private boolean stopped = false;
-
-    /**
-     * weak list of windows opened by the application
-     */
-    private final WeakList<Window> weakWindows = new WeakList<>();
 
     /**
      * list of application listeners
@@ -267,15 +259,12 @@ public class ApplicationInstance {
      * Stop the application and destroy its resources.
      */
     @SuppressWarnings("deprecation")
-    public void destroy() {
+    public synchronized void destroy() {
         if (stopped)
             return;
 
         try {
-            weakWindows.forEach(w -> Optional.ofNullable(w).ifPresent(win -> win.dispose()));
-            weakWindows.clear();
-
-            Thread[] threads = new Thread[group.activeCount() * 2];
+             Thread[] threads = new Thread[group.activeCount() * 2];
             group.enumerate(threads);
             Stream.of(threads).forEach(t -> {
                 try {
@@ -336,17 +325,6 @@ public class ApplicationInstance {
         }
 
         return null;
-    }
-
-    /**
-     * Adds a window that this application opened.  When the
-     * application is disposed, these windows will also be disposed.
-     *
-     * @param window to be added
-     */
-    void addWindow(Window window) {
-        weakWindows.add(window);
-        weakWindows.trimToSize();
     }
 
     /**

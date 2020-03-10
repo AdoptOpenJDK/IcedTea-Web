@@ -20,8 +20,11 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.util.WeakList;
 
 import java.applet.Applet;
+import java.awt.Window;
+import java.util.Optional;
 
 /**
  * Represents a launched application instance created from a JNLP
@@ -43,6 +46,11 @@ public class AppletInstance extends ApplicationInstance {
 
     /** the applet environment */
     private final AppletEnvironment environment;
+
+    /**
+     * weak list of windows opened by the application
+     */
+    private final WeakList<Window> weakWindows = new WeakList<>();
 
     /**
      * Create a New Task based on the Specified URL
@@ -92,7 +100,7 @@ public class AppletInstance extends ApplicationInstance {
      * Stop the application and destroy its resources.
      */
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
         if (appletStopped)
             return;
 
@@ -107,7 +115,21 @@ public class AppletInstance extends ApplicationInstance {
 
         environment.destroy();
 
+        weakWindows.forEach(w -> Optional.ofNullable(w).ifPresent(win -> win.dispose()));
+        weakWindows.clear();
+
         super.destroy();
+    }
+
+    /**
+     * Adds a window that this application opened.  When the
+     * application is disposed, these windows will also be disposed.
+     *
+     * @param window to be added
+     */
+    void addWindow(Window window) {
+        weakWindows.add(window);
+        weakWindows.trimToSize();
     }
 
 }
