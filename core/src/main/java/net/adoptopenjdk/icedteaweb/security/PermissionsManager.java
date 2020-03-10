@@ -242,18 +242,14 @@ public class PermissionsManager {
     public PermissionCollection getSandBoxPermissions() {
         final Permissions permissions = new Permissions();
 
-        for (Permission sandboxPermission : sandboxPermissions) {
-            permissions.add(sandboxPermission);
-        }
+        Arrays.stream(sandboxPermissions).forEach(permissions::add);
 
         if (shouldAddShowWindowWithoutWarningBannerAwtPermission()) {
             permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
         }
 
         if (file.isApplication()) {
-            for (Permission jnlpRIAPermission : jnlpRIAPermissions) {
-                permissions.add(jnlpRIAPermission);
-            }
+            Arrays.stream(jnlpRIAPermissions).forEach(permissions::add);
         }
 
         if (downloadHost != null && downloadHost.getHost().length() > 0) {
@@ -261,9 +257,7 @@ public class PermissionsManager {
         }
 
         final Collection<Permission> urlPermissions = getUrlPermissions(file);
-        for (final Permission permission : urlPermissions) {
-            permissions.add(permission);
-        }
+        urlPermissions.forEach(permissions::add);
 
         return permissions;
     }
@@ -271,24 +265,20 @@ public class PermissionsManager {
     /**
      * @return a PermissionCollection containing the J2EE permissions
      */
-    public PermissionCollection getJ2EEPermissions() {
+    public static PermissionCollection getJ2EEPermissions() {
         final Permissions permissions = new Permissions();
         Arrays.stream(j2eePermissions).forEach(permissions::add);
 
         return permissions;
     }
 
-    /**
-     * @return all the names of the basic JNLP system properties accessible by RIAs
-     */
-    public static String[] getJnlpRIAPermissions() {
-        String[] jnlpPermissions = new String[jnlpRIAPermissions.length];
+    public static PermissionCollection getJnlpRiaPermissions() {
+        final Permissions permissions = new Permissions();
+        Arrays.stream(jnlpRIAPermissions).forEach(permissions::add);
 
-        for (int i = 0; i < jnlpRIAPermissions.length; i++)
-            jnlpPermissions[i] = jnlpRIAPermissions[i].getName();
-
-        return jnlpPermissions;
+        return permissions;
     }
+
     /**
      * Check whether {@link AWTPermission} should be added, as a property is defined in the {@link JNLPRuntime}
      * {@link net.sourceforge.jnlp.config.DeploymentConfiguration}.

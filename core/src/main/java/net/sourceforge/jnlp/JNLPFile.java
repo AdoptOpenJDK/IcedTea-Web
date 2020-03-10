@@ -30,14 +30,13 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
-import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
@@ -48,8 +47,9 @@ import sun.net.www.protocol.http.HttpURLConnection;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.PermissionCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -199,7 +199,7 @@ public class JNLPFile {
     /**
      * List of acceptable properties (not-special)
      */
-    final private String[] generalProperties = PermissionsManager.getJnlpRIAPermissions();
+    final private PermissionCollection generalProperties = PermissionsManager.getJnlpRiaPermissions();
 
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
@@ -672,7 +672,8 @@ public class JNLPFile {
      */
     private boolean checkForSpecialProperties() {
         final Map<String, String> props = getJnlpResources().getPropertiesMap();
-        return Arrays.stream(generalProperties).anyMatch(gp -> !props.containsKey(gp));
+
+        return Collections.list(generalProperties.elements()).stream().anyMatch(gp -> !props.containsKey(gp.getName()));
     }
 
     /**
