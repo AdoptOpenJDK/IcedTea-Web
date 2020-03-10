@@ -136,8 +136,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
         if (certVerifier.isNotFullySigned()) {
             if (userInteractions.askUserForPermissionToRunUnsignedApplication(jnlpFile) != AllowDeny.ALLOW) {
-                // TODO: add details to exception
-                throw new LaunchException("");
+                throw new LaunchException("User declined running unsigned application");
             }
             allowUnsignedApplicationToRun = true;
         } else {
