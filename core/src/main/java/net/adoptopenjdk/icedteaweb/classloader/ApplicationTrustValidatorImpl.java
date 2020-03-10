@@ -4,6 +4,8 @@ import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.Loadab
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.security.RememberingSecurityUserInteractions;
 import net.adoptopenjdk.icedteaweb.security.SecurityUserInteractions;
@@ -15,7 +17,6 @@ import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.ApplicationManager;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.signing.CertificatesFullySigningTheJar;
 import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 import net.sourceforge.jnlp.signing.SignVerifyUtils;
 import net.sourceforge.jnlp.tools.CertInformation;
@@ -41,21 +42,22 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationTrustValidatorImpl.class);
 
+    private final ZonedDateTime now = ZonedDateTime.now();
     private final SecurityUserInteractions userInteractions;
 
     private final NewJarCertVerifier certVerifier;
-    private final JNLPFile file;
+    private final JNLPFile jnlpFile;
 
     private boolean allowUnsignedApplicationToRun = false; // set to true if the user accepts to run unsigned application
     private CertPath currentCertPath = null; // certificate which was confirmed by the user
 
 
-    public ApplicationTrustValidatorImpl(final JNLPFile file) {
-        this(file, new RememberingSecurityUserInteractions());
+    public ApplicationTrustValidatorImpl(final JNLPFile jnlpFile) {
+        this(jnlpFile, new RememberingSecurityUserInteractions());
     }
 
-    public ApplicationTrustValidatorImpl(final JNLPFile file, final SecurityUserInteractions userInteractions) {
-        this.file = file;
+    public ApplicationTrustValidatorImpl(final JNLPFile jnlpFile, final SecurityUserInteractions userInteractions) {
+        this.jnlpFile = jnlpFile;
         this.certVerifier = new NewJarCertVerifier();
         this.userInteractions = userInteractions;
     }
@@ -117,8 +119,8 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     }
 
     private void validateJars(List<LoadableJar> jars, boolean mustContainMainJar) throws LaunchException {
-        final ApplicationInstance applicationInstance = ApplicationManager.getApplication(file)
-                .orElseThrow(() -> new IllegalStateException("No ApplicationInstance found for " + file.getTitleFromJnlp()));
+        final ApplicationInstance applicationInstance = ApplicationManager.getApplication(jnlpFile)
+                .orElseThrow(() -> new IllegalStateException("No ApplicationInstance found for " + jnlpFile.getTitleFromJnlp()));
 
         if (applicationInstance.getApplicationEnvironment() == SANDBOX || allowUnsignedApplicationToRun) {
             return;
@@ -126,51 +128,47 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
 
         certVerifier.addAll(toFiles(jars));
 
+        File mainJarFile = null;
         if (mustContainMainJar) {
-            if (isJnlpSigned(jars, file)) {
-                file.markFileAsSigned();
-            }
-            // TODO: check manifest
+            mainJarFile = getMainJarFile(jars, jnlpFile);
+            markJnlpAsSignedIfContainedInMainJarAndMainJarIsSignedByTrustedCertificate(jnlpFile, mainJarFile);
         }
 
         if (certVerifier.isNotFullySigned()) {
-            if (userInteractions.askUserForPermissionToRunUnsignedApplication(file) != AllowDeny.ALLOW) {
+            if (userInteractions.askUserForPermissionToRunUnsignedApplication(jnlpFile) != AllowDeny.ALLOW) {
                 // TODO: add details to exception
                 throw new LaunchException("");
             }
             allowUnsignedApplicationToRun = true;
         } else {
-            final ZonedDateTime now = ZonedDateTime.now();
-            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
-            final Map<CertPath, CertInformation> certInfos = fullySigningCertificates.stream()
-                    .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
+            if (!hasTrustedCertificate(certVerifier.getFullySigningCertificates())) {
+                final Map<CertPath, CertInformation> certInfos = calculateCertInfo(certVerifier.getFullySigningCertificates());
+                final CertPath certPath = findBestCertificate(certInfos);
+                final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(jnlpFile, certPath, certInfos.get(certPath));
 
-            final boolean hasTrustedFullySigningCertificate = certInfos.values().stream()
-                    .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
-                    .anyMatch(infos -> !infos.hasSigningIssues());
-
-            if (hasTrustedFullySigningCertificate || certInfos.containsKey(currentCertPath)) {
-                return;
+                switch (result) {
+                    case SANDBOX:
+                        applicationInstance.setApplicationEnvironment(SANDBOX);
+                    case ALLOW:
+                        currentCertPath = certPath;
+                        if (mustContainMainJar) {
+                            markJnlpAsSignedIfContainedInMainJarAndMainJarIsSignedByTrustedCertificate(jnlpFile, mainJarFile);
+                        }
+                        break;
+                    default:
+                        throw new LaunchException("User exited application when asked to how to run application with certificate issues");
+                }
             }
+        }
 
-            // find certPath with best info - what is best info? - no issues, trusted RootCA
-            final CertPath certPath = findBestCertificate(certInfos);
-            final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(file, certPath, certInfos.get(certPath));
-
-            switch (result) {
-                case SANDBOX:
-                    applicationInstance.setApplicationEnvironment(SANDBOX);
-                case ALLOW:
-                    currentCertPath = certPath;
-                    return;
-                default:
-                    throw new LaunchException("User exited application when asked to how to run application with certificate issues");
-            }
+        if (mustContainMainJar) {
+            new ManifestAttributesChecker(jnlpFile, !certVerifier.isNotFullySigned(), new ManifestAttributesReader(mainJarFile)).checkAll();
         }
     }
 
     private CertPath findBestCertificate(final Map<CertPath, CertInformation> certInfos) {
         // TODO: improve implementation to find best
+        // find certPath with best info - what is best info? - no issues, trusted RootCA
         return certInfos.keySet().iterator().next();
     }
 
@@ -189,38 +187,48 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     }
 
 
-    private boolean isJnlpSigned(final List<LoadableJar> jars, final JNLPFile file) {
+    private File getMainJarFile(List<LoadableJar> jars, JNLPFile file) throws LaunchException {
         final JARDesc mainJarDesc = file.getResources().getMainJAR();
 
         if (mainJarDesc == null) {
-            return false;
+            throw new LaunchException("no main jar defined");
         }
 
         final LoadableJar mainJar = jars.stream()
                 .filter(jar -> Objects.equals(jar.getJarDesc(), mainJarDesc))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Main jar not found"));
-        final File mainJarFile = toFile(mainJar);
+                .orElseThrow(() -> new LaunchException("Main jar not found"));
+        return toFile(mainJar);
+    }
 
-        final ZonedDateTime now = ZonedDateTime.now();
-        final CertificatesFullySigningTheJar certs = certVerifier.certificatesSigning(mainJarFile);
+    private void markJnlpAsSignedIfContainedInMainJarAndMainJarIsSignedByTrustedCertificate(final JNLPFile file, final File mainJarFile) {
+        if (file.isUnsigend() && isJarSignedByTrustedCertificate(mainJarFile)) {
+            final JNLPMatcher jnlpMatcher = new JNLPMatcher(mainJarFile, getLocalFile(file), file.getParserSettings());
+            if (jnlpMatcher.isMatch()) {
+                file.markFileAsSigned();
+            }
+        }
+    }
 
-        final Map<CertPath, CertInformation> certInfos = certs.getCertificatePaths().stream()
-                .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
+    private boolean isJarSignedByTrustedCertificate(final File jarFile) {
+        final Set<CertPath> certPaths = certVerifier.certificatesSigning(jarFile).getCertificatePaths();
+        return hasTrustedCertificate(certPaths);
+    }
+
+    private boolean hasTrustedCertificate(final Set<CertPath> certPaths) {
+
+        final Map<CertPath, CertInformation> certInfos = calculateCertInfo(certPaths);
 
         final boolean hasTrustedCertificate = certInfos.values().stream()
                 .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
                 .anyMatch(infos -> !infos.hasSigningIssues());
 
-        if (!hasTrustedCertificate) {
-            return false;
-        }
-
-        return isJnlpSigned(file, mainJarFile);
+        return hasTrustedCertificate || certInfos.containsKey(currentCertPath);
     }
 
-    private static boolean isJnlpSigned(final JNLPFile file, final File mainJarFile) {
-        return new JNLPMatcher(mainJarFile, getLocalFile(file), file.getParserSettings()).isMatch();
+    private Map<CertPath, CertInformation> calculateCertInfo(Set<CertPath> certPaths) {
+        return certPaths.stream()
+                .collect(Collectors.toMap(Function.identity(), certPath -> SignVerifyUtils.calculateCertInformationFor(certPath, now)));
     }
 
     private static File getLocalFile(final JNLPFile file) {
