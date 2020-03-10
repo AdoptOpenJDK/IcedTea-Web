@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.security;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -24,6 +23,7 @@ import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
 import java.security.URIParameter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -84,13 +84,12 @@ public class PermissionsManager {
 
     private final URL downloadHost;
     private final JNLPFile file;
-    private final Policy customTrustedPolicy;
 
     /**
      * URLPermission is new in Java 8, so we use reflection to check for it to keep compatibility
      * with Java 6/7. If we can't find the class or fail to construct it then we continue as usual
      * without.
-     *
+     * <p>
      * These are saved as fields so that the reflective lookup only needs to be performed once
      * when the SecurityDesc is constructed, rather than every time a call is made to
      * {@link PermissionsManager#getSandBoxPermissions()}, which is called frequently.
@@ -201,7 +200,7 @@ public class PermissionsManager {
     /**
      * Create a security descriptor.
      *
-     * @param file the JNLP file
+     * @param file         the JNLP file
      * @param downloadHost the download host (can always connect to)
      */
     public PermissionsManager(final JNLPFile file, final URL downloadHost) {
@@ -209,8 +208,6 @@ public class PermissionsManager {
 
         this.file = file;
         this.downloadHost = downloadHost;
-
-        customTrustedPolicy = getCustomTrustedPolicy();
     }
 
     /**
@@ -221,7 +218,7 @@ public class PermissionsManager {
      * indicates that no policy exists and AllPermissions should be granted
      * instead.
      */
-    private static Policy getCustomTrustedPolicy() {
+    public static Policy getCustomTrustedPolicy() {
         final String key = ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY;
         final String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
 
@@ -237,33 +234,6 @@ public class PermissionsManager {
         }
 
         return policy;
-    }
-
-    /**
-     * @return a PermissionCollection containing the basic
-     * permissions granted depending on the security type.
-     *
-     * @param cs the CodeSource to get permissions for
-     */
-    public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
-        PermissionCollection permissions = getSandBoxPermissions();
-
-        if (applicationEnvironment == ApplicationEnvironment.ALL) {
-            permissions = new Permissions();
-            if (customTrustedPolicy == null) {
-                permissions.add(new AllPermission());
-                return permissions;
-            } else {
-                return customTrustedPolicy.getPermissions(cs);
-            }
-        }
-
-        if (applicationEnvironment == ApplicationEnvironment.J2EE)
-            for (Permission j2eePermission : j2eePermissions) {
-                permissions.add(j2eePermission);
-        }
-
-        return permissions;
     }
 
     /**
@@ -294,10 +264,31 @@ public class PermissionsManager {
         for (final Permission permission : urlPermissions) {
             permissions.add(permission);
         }
-        
+
         return permissions;
     }
 
+    /**
+     * @return a PermissionCollection containing the J2EE permissions
+     */
+    public PermissionCollection getJ2EEPermissions() {
+        final Permissions permissions = new Permissions();
+        Arrays.stream(j2eePermissions).forEach(permissions::add);
+
+        return permissions;
+    }
+
+    /**
+     * @return all the names of the basic JNLP system properties accessible by RIAs
+     */
+    public static String[] getJnlpRIAPermissions() {
+        String[] jnlpPermissions = new String[jnlpRIAPermissions.length];
+
+        for (int i = 0; i < jnlpRIAPermissions.length; i++)
+            jnlpPermissions[i] = jnlpRIAPermissions[i].getName();
+
+        return jnlpPermissions;
+    }
     /**
      * Check whether {@link AWTPermission} should be added, as a property is defined in the {@link JNLPRuntime}
      * {@link net.sourceforge.jnlp.config.DeploymentConfiguration}.
@@ -328,7 +319,7 @@ public class PermissionsManager {
             } catch (final ReflectiveOperationException e) {
                 LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
             } catch (final URISyntaxException e) {
-                LOG.error("Could not determine codebase host for resource at " + jar.getLocation() +  " while generating URLPermissions", e);
+                LOG.error("Could not determine codebase host for resource at " + jar.getLocation() + " while generating URLPermissions", e);
             }
         }
         try {
@@ -341,7 +332,7 @@ public class PermissionsManager {
         } catch (final ReflectiveOperationException e) {
             LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
         } catch (final URISyntaxException e) {
-            LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() +  "  while generating URLPermissions", e);
+            LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() + "  while generating URLPermissions", e);
         }
         return permissions;
     }
@@ -349,8 +340,9 @@ public class PermissionsManager {
     /**
      * Gets the host domain part of an applet's codebase. Removes path, query, and fragment, but preserves scheme,
      * user info, and host. The port used is overridden with the specified port.
+     *
      * @param codebase the applet codebase URL
-     * @param port the port
+     * @param port     the port
      * @return the host domain of the codebase
      */
     static URI getHostWithSpecifiedPort(final URI codebase, final int port) throws URISyntaxException {
@@ -361,6 +353,7 @@ public class PermissionsManager {
     /**
      * Gets the host domain part of an applet's codebase. Removes path, query, and fragment, but preserves scheme,
      * user info, host, and port.
+     *
      * @param codebase the applet codebase URL
      * @return the host domain of the codebase
      */
@@ -373,6 +366,7 @@ public class PermissionsManager {
      * Appends a recursive access marker to a codebase host, for granting Java 8 URLPermissions which are no
      * more restrictive than the existing SocketPermissions
      * See http://docs.oracle.com/javase/8/docs/api/java/net/URLPermission.html
+     *
      * @param codebaseHost the applet's codebase's host domain URL as a String. Expected to be formatted as eg
      *                     "http://example.com:8080" or "http://example.com/"
      * @return the resulting String eg "http://example.com:8080/-
@@ -387,17 +381,4 @@ public class PermissionsManager {
         result = result + "/-"; // allow access to any resources recursively on the host domain
         return result;
     }
-
-    /**
-     * @return all the names of the basic JNLP system properties accessible by RIAs
-     */
-    public static String[] getJnlpRIAPermissions() {
-        String[] jnlpPermissions = new String[jnlpRIAPermissions.length];
-
-        for (int i = 0; i < jnlpRIAPermissions.length; i++)
-            jnlpPermissions[i] = jnlpRIAPermissions[i].getName();
-
-        return jnlpPermissions;
-    }
-
 }

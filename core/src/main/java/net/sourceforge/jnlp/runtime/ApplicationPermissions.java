@@ -27,6 +27,7 @@ import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
+import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -130,7 +131,7 @@ public class ApplicationPermissions {
                     LOG.error("Warning! Code source security application environment was null");
                 }
                 if (applicationEnvironment == ApplicationEnvironment.ALL || applicationEnvironment == ApplicationEnvironment.J2EE) {
-                    permissions = permissionsManager.getPermissions(codeSource, applicationEnvironment);
+                    permissions = getPermissions(codeSource, applicationEnvironment);
                 }
             }
             for (Permission perm : Collections.list(permissions.elements())) {
@@ -159,6 +160,36 @@ public class ApplicationPermissions {
             throw new RuntimeException("Failed to get permissions", ex);
         }
     }
+
+    /**
+     * @param cs the CodeSource to get permissions for
+     * @return a PermissionCollection containing the basic
+     * permissions granted depending on the security type.
+     */
+    public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
+        PermissionCollection permissions = permissionsManager.getSandBoxPermissions();
+        final Policy customTrustedPolicy = permissionsManager.getCustomTrustedPolicy();
+        final PermissionCollection j2eePermissions = permissionsManager.getJ2EEPermissions();
+
+
+        if (applicationEnvironment == ApplicationEnvironment.ALL) {
+            permissions = new Permissions();
+            if (customTrustedPolicy == null) {
+                permissions.add(new AllPermission());
+                return permissions;
+            } else {
+                return customTrustedPolicy.getPermissions(cs);
+            }
+        }
+
+        if (applicationEnvironment == ApplicationEnvironment.J2EE)
+            for (Permission j2eePermission : Collections.list(j2eePermissions.elements())) {
+                permissions.add(j2eePermission);
+            }
+
+        return permissions;
+    }
+
 
     public void addSecurityForJarLocation(final URL location, SecurityDesc securityDesc) {
         jarLocationSecurityMap.put(location, securityDesc);

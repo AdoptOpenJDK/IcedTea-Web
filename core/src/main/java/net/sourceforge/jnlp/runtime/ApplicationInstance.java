@@ -68,8 +68,6 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-    private final PermissionsManager permissionsManager;
-
     private final JNLPFile file;
 
     private ApplicationEnvironment applicationEnvironment;
@@ -121,9 +119,9 @@ public class ApplicationInstance {
     public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, final ThreadGroup applicationThreadGroup) {
         this.file = file;
         this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
-        this.permissionsManager = new PermissionsManager(file, UrlUtils.guessCodeBase(file));
         this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        final PermissionsManager permissionsManager = new PermissionsManager(file, UrlUtils.guessCodeBase(file));
         this.applicationPermissions = new ApplicationPermissions(permissionsManager, tracker);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
@@ -197,7 +195,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final ProtectionDomain pd = new ProtectionDomain(cs, permissionsManager.getPermissions(cs, applicationEnvironment), null, null);
+            final ProtectionDomain pd = new ProtectionDomain(cs, applicationPermissions.getPermissions(cs, applicationEnvironment), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
@@ -258,7 +256,6 @@ public class ApplicationInstance {
     /**
      * Stop the application and destroy its resources.
      */
-    @SuppressWarnings("deprecation")
     public synchronized void destroy() {
         if (stopped)
             return;
