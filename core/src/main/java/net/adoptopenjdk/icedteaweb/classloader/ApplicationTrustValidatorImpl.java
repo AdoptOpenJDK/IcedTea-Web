@@ -49,7 +49,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     private final JNLPFile jnlpFile;
 
     private boolean allowUnsignedApplicationToRun = false; // set to true if the user accepts to run unsigned application
-    private CertPath currentCertPath = null; // certificate which was confirmed by the user
+    private CertPath trustedCertificate = null; // certificate which was confirmed by the user
 
 
     public ApplicationTrustValidatorImpl(final JNLPFile jnlpFile) {
@@ -142,20 +142,24 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         } else {
             if (!hasTrustedCertificate(certVerifier.getFullySigningCertificates())) {
                 final Map<CertPath, CertInformation> certInfos = calculateCertInfo(certVerifier.getFullySigningCertificates());
-                final CertPath certPath = findBestCertificate(certInfos);
-                final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(jnlpFile, certPath, certInfos.get(certPath));
 
-                switch (result) {
-                    case SANDBOX:
+                for (final Map.Entry<CertPath, CertInformation> entry : certInfos.entrySet()) {
+                    final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(jnlpFile, entry.getKey(), entry.getValue());
+
+                    if (result == AllowDenySandbox.SANDBOX) {
                         applicationInstance.setApplicationEnvironment(SANDBOX);
-                    case ALLOW:
-                        currentCertPath = certPath;
+                        return;
+                    } else if (result == AllowDenySandbox.ALLOW) {
+                        trustedCertificate = entry.getKey();
                         if (mustContainMainJar) {
                             markJnlpAsSignedIfContainedInMainJarAndMainJarIsSignedByTrustedCertificate(jnlpFile, mainJarFile);
                         }
                         break;
-                    default:
-                        throw new LaunchException("User exited application when asked to how to run application with certificate issues");
+                    }
+                }
+
+                if (!hasTrustedCertificate(certVerifier.getFullySigningCertificates())) {
+                    throw new LaunchException("User exited application when asked to how to run application with certificate issues");
                 }
             }
         }
@@ -163,12 +167,6 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         if (mustContainMainJar) {
             new ManifestAttributesChecker(jnlpFile, !certVerifier.isNotFullySigned(), new ManifestAttributesReader(mainJarFile)).checkAll();
         }
-    }
-
-    private CertPath findBestCertificate(final Map<CertPath, CertInformation> certInfos) {
-        // TODO: improve implementation to find best
-        // find certPath with best info - what is best info? - no issues, trusted RootCA
-        return certInfos.keySet().iterator().next();
     }
 
     private static List<File> toFiles(List<LoadableJar> jars) {
@@ -222,7 +220,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                 .filter(infos -> infos.isRootInCacerts() || infos.isPublisherAlreadyTrusted())
                 .anyMatch(infos -> !infos.hasSigningIssues());
 
-        return hasTrustedCertificate || certInfos.containsKey(currentCertPath);
+        return hasTrustedCertificate || certInfos.containsKey(trustedCertificate);
     }
 
     private Map<CertPath, CertInformation> calculateCertInfo(Set<CertPath> certPaths) {
