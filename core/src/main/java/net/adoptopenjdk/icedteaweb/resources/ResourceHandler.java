@@ -117,7 +117,7 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
-        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',')
+        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
                 .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
 
         if (whitelist.isEmpty()) {

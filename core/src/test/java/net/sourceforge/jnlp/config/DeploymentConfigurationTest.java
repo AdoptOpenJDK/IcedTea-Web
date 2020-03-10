@@ -304,7 +304,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         config.load();
 
         config.setProperty(key, String.join(", ", values));
-        final List<String> result = config.getPropertyAsList(key, ',');
+        final List<String> result = config.getPropertyAsList(key);
 
         assertEquals(values, result);
     }

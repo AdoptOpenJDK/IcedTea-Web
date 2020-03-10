@@ -37,20 +37,25 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 
 public class ValidatorUtils {
 
+    public static final char DELIMITER = ',';
 
-    public final static String DELIMITER = ",";
-
-    public static String[] splitCombination(final String value) {
-        Assert.requireNonNull(value, "value");
-        return value.split(DELIMITER);
+    public static List<String> splitCombination(final String value) {
+        return Optional.ofNullable(value)
+                .map(v -> v.split("\\s*" + Pattern.quote(Character.toString(DELIMITER)) + "\\s*"))
+                .map(Arrays::asList)
+                .orElseGet(Collections::emptyList);
     }
 
     public static String verifyFileOrCommand(final String value) {

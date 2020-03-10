@@ -201,11 +201,6 @@ public class JNLPFile {
      */
     final private String[] generalProperties = PermissionsManager.getJnlpRIAPermissions();
 
-    /**
-     * important manifests' attributes
-     */
-    private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
-
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
 
@@ -276,19 +271,9 @@ public class JNLPFile {
     }
 
     private String getTitleImpl() {
-        String jnlpTitle = getTitleFromJnlp();
-        String manifestTitle = getTitleFromManifest();
-        if (jnlpTitle != null && manifestTitle != null) {
-            if (jnlpTitle.equals(manifestTitle)) {
-                return jnlpTitle;
-            }
-            return jnlpTitle + " (" + manifestTitle + ")";
-        }
-        if (jnlpTitle != null && manifestTitle == null) {
+        final String jnlpTitle = getTitleFromJnlp();
+        if (jnlpTitle != null) {
             return jnlpTitle;
-        }
-        if (jnlpTitle == null && manifestTitle != null) {
-            return manifestTitle;
         }
         return null;
     }
@@ -299,11 +284,6 @@ public class JNLPFile {
      */
     public String getTitleFromJnlp() {
         return getInformation().getTitle();
-    }
-
-    public String getTitleFromManifest() {
-        String inManifestTitle = getManifestAttributesReader().getApplicationName();
-        return inManifestTitle;
     }
 
     /**
@@ -758,10 +738,6 @@ public class JNLPFile {
      */
     public boolean isUnsigend() {
         return !isSigned;
-    }
-
-    public ManifestAttributesReader getManifestAttributesReader() {
-        return manifestAttributesReader;
     }
 
     private String createShortcutNameFromLocation() {

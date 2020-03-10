@@ -41,30 +41,18 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.DummySecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.SecurityDelegate;
-import net.sourceforge.jnlp.signing.ApplicationSigningState;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ManifestAttributesCheckerTest {
+import static net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK;
 
-    @Test
-    public void stripDocbaseTest() throws Exception {
-        tryTest("http://aaa.bb/ccc/file.html", "http://aaa.bb/ccc/");
-        tryTest("http://aaa.bb/ccc/file.html/", "http://aaa.bb/ccc/file.html/");
-        tryTest("http://aaa.bb/ccc/dir/", "http://aaa.bb/ccc/dir/");
-        tryTest("http://aaa.bb/ccc/dir", "http://aaa.bb/ccc/");
-        tryTest("http://aaa.bb/ccc/", "http://aaa.bb/ccc/");
-        tryTest("http://aaa.bb/ccc", "http://aaa.bb/");
-        tryTest("http://aaa.bb/", "http://aaa.bb/");
-        tryTest("http://aaa.bb", "http://aaa.bb");
-    }
+public class ManifestAttributesCheckerTest {
 
     @Test
     public void checkAllCheckAlacTest() throws LaunchException, MalformedURLException {
@@ -75,16 +63,9 @@ public class ManifestAttributesCheckerTest {
         JNLPFile file = new DummyJNLPFileWithJar(codebase, jar1, jar2);
         SecurityDesc security = new SecurityDesc(ApplicationEnvironment.ALL);
         SecurityDelegate securityDelegate = new DummySecurityDelegate();
-        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, ApplicationSigningState.FULL, securityDelegate);
-        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
+        ManifestAttributesChecker checker = new ManifestAttributesChecker(file, true, null);
+        JNLPRuntime.getConfiguration().setProperty(KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ALAC.name());
         checker.checkAll();
-    }
-
-    private static void tryTest(String src, String expected) throws MalformedURLException {
-        URL s = new URL(src);
-        URL q = ManifestAttributesChecker.stripDocbase(s);
-        //junit is failing for me on url.equals(url)...
-        Assert.assertEquals(expected, q.toExternalForm());
     }
 
 }
