@@ -6,11 +6,11 @@ import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
-import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -27,7 +27,6 @@ import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
-import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class ApplicationPermissions {
     /**
      * Permissions granted by the user during runtime.
      */
-    private final ArrayList<Permission> runtimePermissions = new ArrayList<>();
+    private final List<Permission> runtimePermissions = new ArrayList<>();
 
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
 
@@ -131,7 +130,7 @@ public class ApplicationPermissions {
                     LOG.error("Warning! Code source security application environment was null");
                 }
                 if (applicationEnvironment == ApplicationEnvironment.ALL || applicationEnvironment == ApplicationEnvironment.J2EE) {
-                    permissions = getPermissions(codeSource, applicationEnvironment);
+                    permissions = permissionsManager.getPermissions(codeSource, applicationEnvironment);
                 }
             }
             for (Permission perm : Collections.list(permissions.elements())) {
@@ -167,27 +166,7 @@ public class ApplicationPermissions {
      * permissions granted depending on the security type.
      */
     public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
-        PermissionCollection permissions = permissionsManager.getSandBoxPermissions();
-        final Policy customTrustedPolicy = permissionsManager.getCustomTrustedPolicy();
-        final PermissionCollection j2eePermissions = permissionsManager.getJ2EEPermissions();
-
-
-        if (applicationEnvironment == ApplicationEnvironment.ALL) {
-            permissions = new Permissions();
-            if (customTrustedPolicy == null) {
-                permissions.add(new AllPermission());
-                return permissions;
-            } else {
-                return customTrustedPolicy.getPermissions(cs);
-            }
-        }
-
-        if (applicationEnvironment == ApplicationEnvironment.J2EE)
-            for (Permission j2eePermission : Collections.list(j2eePermissions.elements())) {
-                permissions.add(j2eePermission);
-            }
-
-        return permissions;
+        return permissionsManager.getPermissions(cs, applicationEnvironment);
     }
 
 

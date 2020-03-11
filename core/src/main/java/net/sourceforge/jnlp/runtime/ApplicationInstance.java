@@ -33,7 +33,6 @@ import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.UrlUtils;
 import sun.awt.AppContext;
 
 import javax.swing.event.EventListenerList;
@@ -121,7 +120,7 @@ public class ApplicationInstance {
         this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
         this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
-        final PermissionsManager permissionsManager = new PermissionsManager(file, UrlUtils.guessCodeBase(file));
+        final PermissionsManager permissionsManager = new PermissionsManager(file);
         this.applicationPermissions = new ApplicationPermissions(permissionsManager, tracker);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
@@ -195,7 +194,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final ProtectionDomain pd = new ProtectionDomain(cs, applicationPermissions.getPermissions(cs, applicationEnvironment), null, null);
+        final ProtectionDomain pd = new ProtectionDomain(cs, applicationPermissions.getPermissions(cs, applicationEnvironment), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {

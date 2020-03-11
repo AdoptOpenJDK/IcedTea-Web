@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.security;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -23,13 +24,9 @@ import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
 import java.security.URIParameter;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.PropertyPermission;
-import java.util.Set;
 
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ARRAY_LEGACY_MERGE_SORT;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_AA_FONT_SETTINGS;
@@ -97,6 +94,11 @@ public class PermissionsManager {
     private static Class<Permission> urlPermissionClass;
     private static Constructor<Permission> urlPermissionConstructor;
 
+    private static PermissionCollection j2EEPermissions;
+    private static PermissionCollection jnlpRIAPermissions;
+    private PermissionCollection sandboxPermissions;
+    private static PermissionCollection urlPermissions;
+
     static {
         try {
             urlPermissionClass = (Class<Permission>) Class.forName("java.net.URLPermission");
@@ -115,99 +117,220 @@ public class PermissionsManager {
     // Allow only what is specifically allowed, and deny everything else
 
     /**
-     * basic permissions for restricted mode
-     */
-    private static final Permission[] j2eePermissions = {
-            new AWTPermission("accessClipboard"),
-            // disabled because we can't at this time prevent an
-            // application from accessing other applications' event
-            // queues, or even prevent access to security dialog queues.
-            //
-            // new AWTPermission("accessEventQueue"),
-            new RuntimePermission("exitVM"),
-            new RuntimePermission("loadLibrary"),
-            new RuntimePermission("queuePrintJob"),
-            new SocketPermission("*", "connect"),
-            new SocketPermission("localhost:1024-", "accept, listen"),
-            new FilePermission("*", "read, write"),
-            new PropertyPermission("*", PROPERTY_READ_ACTION),
-    };
-
-    /**
-     * basic permissions for restricted mode
-     */
-    private static final Permission[] sandboxPermissions = {
-            new SocketPermission("localhost:1024-", "listen"),
-            // new SocketPermission("<DownloadHost>", "connect, accept"), // added by code
-            new PropertyPermission(ARRAY_LEGACY_MERGE_SORT, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVA_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_VENDOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_VENDOR_URL, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_CLASS_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(OS_NAME, PROPERTY_READ_ACTION),
-            new PropertyPermission(OS_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(OS_ARCH, PROPERTY_READ_ACTION),
-            new PropertyPermission(FILE_SEPARATOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(PATH_SEPARATOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(LINE_SEPARATOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_SPEC_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_SPEC_VENDOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_SPEC_NAME, PROPERTY_READ_ACTION),
-            new PropertyPermission(VM_SPEC_VENDOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(VM_SPEC_NAME, PROPERTY_READ_ACTION),
-            new PropertyPermission(VM_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(VM_VENDOR, PROPERTY_READ_ACTION),
-            new PropertyPermission(VM_NAME, PROPERTY_READ_ACTION),
-            new PropertyPermission(WEBSTART_VERSION, PROPERTY_READ_ACTION),
-            new PropertyPermission(JAVA_PLUGIN, PROPERTY_READ_ACTION),
-            new PropertyPermission(JNLP, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVAWS, PROPERTY_RW_ACTION),
-            new PropertyPermission(BROWSER, PROPERTY_READ_ACTION),
-            new PropertyPermission(BROWSER_STAR, PROPERTY_READ_ACTION),
-            new RuntimePermission(EXIT_VM),
-            new RuntimePermission(STOP_THREAD),
-            // disabled because we can't at this time prevent an
-            // application from accessing other applications' event
-            // queues, or even prevent access to security dialog queues.
-            //
-            // new AWTPermission("accessEventQueue"),
-    };
-
-    /**
-     * basic permissions for restricted mode
-     */
-    private static final Permission[] jnlpRIAPermissions = {
-            new PropertyPermission(AWT_AA_FONT_SETTINGS, PROPERTY_RW_ACTION),
-            new PropertyPermission(HTTP_AGENT, PROPERTY_RW_ACTION),
-            new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION),
-            new PropertyPermission(AWT_SYNC_LWREQUESTS, PROPERTY_RW_ACTION),
-            new PropertyPermission(AWT_WINDOW_LOCATION_BY_PLATFORM, PROPERTY_RW_ACTION),
-            new PropertyPermission(AWT_DISABLE_MIXING, PROPERTY_RW_ACTION),
-            new PropertyPermission(WEBSTART_JAUTHENTICATOR, PROPERTY_RW_ACTION),
-            new PropertyPermission(SWING_DEFAULT_LF, PROPERTY_RW_ACTION),
-            new PropertyPermission(AWT_NO_ERASE_BACKGROUND, PROPERTY_RW_ACTION),
-            new PropertyPermission(AWT_ERASE_BACKGROUND_ON_RESIZE, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVA2D_D3D, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVA2D_DPI_AWARE, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVA2D_NO_DDRAW, PROPERTY_RW_ACTION),
-            new PropertyPermission(JAVA2D_OPENGL, PROPERTY_RW_ACTION),
-            new PropertyPermission(SWING_BOLD_METAL, PROPERTY_RW_ACTION),
-            new PropertyPermission(SWING_METAL_THEME, PROPERTY_RW_ACTION),
-            new PropertyPermission(SWING_NO_XP, PROPERTY_RW_ACTION),
-            new PropertyPermission(SWING_USE_SYSTEM_FONT, PROPERTY_RW_ACTION),
-    };
-
-    /**
      * Create a security descriptor.
      *
      * @param file         the JNLP file
-     * @param downloadHost the download host (can always connect to)
      */
-    public PermissionsManager(final JNLPFile file, final URL downloadHost) {
+    public PermissionsManager(final JNLPFile file) {
         Assert.requireNonNull(file, "file");
 
         this.file = file;
-        this.downloadHost = downloadHost;
+        this.downloadHost = UrlUtils.guessCodeBase(file);
+    }
+
+    /**
+     * @return a PermissionCollection containing the sandbox permissions
+     */
+    public PermissionCollection getSandBoxPermissions() {
+        if (sandboxPermissions == null) {
+            sandboxPermissions = new Permissions();
+
+            sandboxPermissions.add(new SocketPermission("localhost:1024-", "listen"));
+            // sandboxPermissions.add(new SocketPermission("<DownloadHost>", "connect, accept")); // added by code
+            sandboxPermissions.add(new PropertyPermission(ARRAY_LEGACY_MERGE_SORT, PROPERTY_RW_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_VENDOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_VENDOR_URL, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_CLASS_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(OS_NAME, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(OS_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(OS_ARCH, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(FILE_SEPARATOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(PATH_SEPARATOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(LINE_SEPARATOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_SPEC_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_SPEC_VENDOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_SPEC_NAME, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(VM_SPEC_VENDOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(VM_SPEC_NAME, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(VM_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(VM_VENDOR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(VM_NAME, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(WEBSTART_VERSION, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVA_PLUGIN, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JNLP, PROPERTY_RW_ACTION));
+            sandboxPermissions.add(new PropertyPermission(JAVAWS, PROPERTY_RW_ACTION));
+            sandboxPermissions.add(new PropertyPermission(BROWSER, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new PropertyPermission(BROWSER_STAR, PROPERTY_READ_ACTION));
+            sandboxPermissions.add(new RuntimePermission(EXIT_VM));
+            sandboxPermissions.add(new RuntimePermission(STOP_THREAD));
+            // disabled because we can't at this time prevent an
+            // application from accessing other applications' event
+            // queues, or even prevent access to security dialog queues.
+            //
+            // sandboxPermissions.add(new AWTPermission("accessEventQueue"));
+
+            if (shouldAddShowWindowWithoutWarningBannerAwtPermission()) {
+                sandboxPermissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
+            }
+
+            if (file.isApplication()) {
+                Collections.list(getJnlpRiaPermissions().elements()).forEach(sandboxPermissions::add);
+            }
+
+            if (downloadHost != null && downloadHost.getHost().length() > 0) {
+                sandboxPermissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost), "connect, accept"));
+            }
+
+            Collections.list(getUrlPermissions(file).elements()).forEach(sandboxPermissions::add);
+
+            sandboxPermissions.setReadOnly(); // set permission collection to readonly
+        }
+        return sandboxPermissions;
+    }
+
+    /**
+     * Basic permissions for restricted mode.
+     *
+     * @return a PermissionCollection containing the J2EE permissions
+     */
+    public static PermissionCollection getJ2EEPermissions() {
+        if (j2EEPermissions == null) {
+            j2EEPermissions = new Permissions();
+
+            j2EEPermissions.add(new AWTPermission("accessClipboard"));
+            // disabled because we can't at this time prevent an
+            // application from accessing other applications' event
+            // queues, or even prevent access to security dialog queues.
+            //
+            // j2EEPermissions.add(new AWTPermission("accessEventQueue"));
+            j2EEPermissions.add(new RuntimePermission("exitVM"));
+            j2EEPermissions.add(new RuntimePermission("loadLibrary"));
+            j2EEPermissions.add(new RuntimePermission("queuePrintJob"));
+            j2EEPermissions.add(new SocketPermission("*", "connect"));
+            j2EEPermissions.add(new SocketPermission("localhost:1024-", "accept, listen"));
+            j2EEPermissions.add(new FilePermission("*", "read, write"));
+            j2EEPermissions.add(new PropertyPermission("*", PROPERTY_READ_ACTION));
+
+            j2EEPermissions.setReadOnly(); // set permission collection to readonly
+        }
+        return j2EEPermissions;
+    }
+
+    /**
+     * Basic permissions for restricted mode.
+     *
+     * @return a PermissionCollection containing the JNLP RIA permissions
+     */
+    public static PermissionCollection getJnlpRiaPermissions() {
+        if (jnlpRIAPermissions == null) {
+            jnlpRIAPermissions = new Permissions();
+
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_AA_FONT_SETTINGS, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(HTTP_AGENT, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_SYNC_LWREQUESTS, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_WINDOW_LOCATION_BY_PLATFORM, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_DISABLE_MIXING, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(WEBSTART_JAUTHENTICATOR, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(SWING_DEFAULT_LF, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_NO_ERASE_BACKGROUND, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(AWT_ERASE_BACKGROUND_ON_RESIZE, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(JAVA2D_D3D, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(JAVA2D_DPI_AWARE, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(JAVA2D_NO_DDRAW, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(JAVA2D_OPENGL, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(SWING_BOLD_METAL, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(SWING_METAL_THEME, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(SWING_NO_XP, PROPERTY_RW_ACTION));
+            jnlpRIAPermissions.add(new PropertyPermission(SWING_USE_SYSTEM_FONT, PROPERTY_RW_ACTION));
+
+            jnlpRIAPermissions.setReadOnly(); // set permission collection to readonly
+        }
+        return jnlpRIAPermissions;
+    }
+
+    private static PermissionCollection getUrlPermissions(final JNLPFile file) {
+        if (urlPermissions == null) {
+            urlPermissions = new Permissions();
+
+            if (urlPermissionClass != null && urlPermissionConstructor != null) {
+                final PermissionCollection permissions = new Permissions();
+                for (final JARDesc jar : file.getResources().getJARs()) {
+                    try {
+                        // Allow applets all HTTP methods (ex POST, GET) with any request headers
+                        // on resources anywhere recursively in or below the applet codebase, only on
+                        // default ports and ports explicitly specified in resource locations
+                        final URI resourceLocation = jar.getLocation().toURI().normalize();
+                        final URI host = getHost(resourceLocation);
+                        final String hostUriString = host.toString();
+                        final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(hostUriString);
+                        final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
+                        permissions.add(p);
+                    } catch (final ReflectiveOperationException e) {
+                        LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
+                    } catch (final URISyntaxException e) {
+                        LOG.error("Could not determine codebase host for resource at " + jar.getLocation() + " while generating URLPermissions", e);
+                    }
+                }
+                try {
+                    final URI codebase = file.getNotNullProbableCodeBase().toURI().normalize();
+                    final URI host = getHost(codebase);
+                    final String codebaseHostUriString = host.toString();
+                    final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(codebaseHostUriString);
+                    final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
+                    permissions.add(p);
+                } catch (final ReflectiveOperationException e) {
+                    LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
+                } catch (final URISyntaxException e) {
+                    LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() + "  while generating URLPermissions", e);
+                }
+            }
+
+            urlPermissions.setReadOnly();
+        }
+
+        return urlPermissions;
+    }
+
+    /**
+     * @param cs the CodeSource to get permissions for
+     * @return a PermissionCollection containing the basic
+     * permissions granted depending on the security type.
+     */
+    public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
+        PermissionCollection permissions = getSandBoxPermissions();
+        final Policy customTrustedPolicy = getCustomTrustedPolicy();
+        final PermissionCollection j2eePermissions = getJ2EEPermissions();
+
+
+        if (applicationEnvironment == ApplicationEnvironment.ALL) {
+            permissions = new Permissions();
+            if (customTrustedPolicy == null) {
+                permissions.add(new AllPermission());
+                return permissions;
+            } else {
+                return customTrustedPolicy.getPermissions(cs);
+            }
+        }
+
+        if (applicationEnvironment == ApplicationEnvironment.J2EE)
+            for (Permission j2eePermission : Collections.list(j2eePermissions.elements())) {
+                permissions.add(j2eePermission);
+            }
+
+        return permissions;
+    }
+
+    /**
+     * Check whether {@link AWTPermission} should be added, as a property is defined in the {@link JNLPRuntime}
+     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration}.
+     *
+     * @return true, if permission should be added
+     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/awt/AWTPermission.html"></a>
+     */
+    private static boolean shouldAddShowWindowWithoutWarningBannerAwtPermission() {
+        return Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING));
     }
 
     /**
@@ -234,97 +357,6 @@ public class PermissionsManager {
         }
 
         return policy;
-    }
-
-    /**
-     * @return a PermissionCollection containing the sandbox permissions
-     */
-    public PermissionCollection getSandBoxPermissions() {
-        final Permissions permissions = new Permissions();
-
-        Arrays.stream(sandboxPermissions).forEach(permissions::add);
-
-        if (shouldAddShowWindowWithoutWarningBannerAwtPermission()) {
-            permissions.add(new AWTPermission("showWindowWithoutWarningBanner"));
-        }
-
-        if (file.isApplication()) {
-            Arrays.stream(jnlpRIAPermissions).forEach(permissions::add);
-        }
-
-        if (downloadHost != null && downloadHost.getHost().length() > 0) {
-            permissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost), "connect, accept"));
-        }
-
-        final Collection<Permission> urlPermissions = getUrlPermissions(file);
-        urlPermissions.forEach(permissions::add);
-
-        return permissions;
-    }
-
-    /**
-     * @return a PermissionCollection containing the J2EE permissions
-     */
-    public static PermissionCollection getJ2EEPermissions() {
-        final Permissions permissions = new Permissions();
-        Arrays.stream(j2eePermissions).forEach(permissions::add);
-
-        return permissions;
-    }
-
-    public static PermissionCollection getJnlpRiaPermissions() {
-        final Permissions permissions = new Permissions();
-        Arrays.stream(jnlpRIAPermissions).forEach(permissions::add);
-
-        return permissions;
-    }
-
-    /**
-     * Check whether {@link AWTPermission} should be added, as a property is defined in the {@link JNLPRuntime}
-     * {@link net.sourceforge.jnlp.config.DeploymentConfiguration}.
-     *
-     * @return true, if permission should be added
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/awt/AWTPermission.html"></a>
-     */
-    private static boolean shouldAddShowWindowWithoutWarningBannerAwtPermission() {
-        return Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_ALLOW_HIDE_WINDOW_WARNING));
-    }
-
-    private static Set<Permission> getUrlPermissions(final JNLPFile file) {
-        if (urlPermissionClass == null || urlPermissionConstructor == null) {
-            return Collections.emptySet();
-        }
-        final Set<Permission> permissions = new HashSet<>();
-        for (final JARDesc jar : file.getResources().getJARs()) {
-            try {
-                // Allow applets all HTTP methods (ex POST, GET) with any request headers
-                // on resources anywhere recursively in or below the applet codebase, only on
-                // default ports and ports explicitly specified in resource locations
-                final URI resourceLocation = jar.getLocation().toURI().normalize();
-                final URI host = getHost(resourceLocation);
-                final String hostUriString = host.toString();
-                final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(hostUriString);
-                final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
-                permissions.add(p);
-            } catch (final ReflectiveOperationException e) {
-                LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
-            } catch (final URISyntaxException e) {
-                LOG.error("Could not determine codebase host for resource at " + jar.getLocation() + " while generating URLPermissions", e);
-            }
-        }
-        try {
-            final URI codebase = file.getNotNullProbableCodeBase().toURI().normalize();
-            final URI host = getHost(codebase);
-            final String codebaseHostUriString = host.toString();
-            final String urlPermissionUrlString = appendRecursiveSubdirToCodebaseHostString(codebaseHostUriString);
-            final Permission p = urlPermissionConstructor.newInstance(urlPermissionUrlString);
-            permissions.add(p);
-        } catch (final ReflectiveOperationException e) {
-            LOG.error("Exception while attempting to reflectively generate a URLPermission, probably not running on Java 8+?", e);
-        } catch (final URISyntaxException e) {
-            LOG.error("Could not determine codebase host for codebase " + file.getCodeBase() + "  while generating URLPermissions", e);
-        }
-        return permissions;
     }
 
     /**
