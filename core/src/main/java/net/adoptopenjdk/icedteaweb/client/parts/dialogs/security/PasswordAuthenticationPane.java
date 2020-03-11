@@ -56,8 +56,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials
+ * @deprecated will be replaced by new security dialogs
  */
-
+@Deprecated
 public class PasswordAuthenticationPane extends SecurityDialogPanel {
 
     private final JTextField jtfUserName = new JTextField();

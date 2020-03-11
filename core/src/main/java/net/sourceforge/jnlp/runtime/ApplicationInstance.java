@@ -120,8 +120,7 @@ public class ApplicationInstance {
         this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
         this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
-        final PermissionsManager permissionsManager = new PermissionsManager(file);
-        this.applicationPermissions = new ApplicationPermissions(permissionsManager, tracker);
+        this.applicationPermissions = new ApplicationPermissions(tracker);
 
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
@@ -194,7 +193,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-        final ProtectionDomain pd = new ProtectionDomain(cs, applicationPermissions.getPermissions(cs, applicationEnvironment), null, null);
+        final ProtectionDomain pd = new ProtectionDomain(cs, PermissionsManager.getPermissions(file, cs, applicationEnvironment), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
@@ -331,6 +330,6 @@ public class ApplicationInstance {
     }
 
     public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(cs, addJarConsumer);
+        return applicationPermissions.getPermissions(file, cs, addJarConsumer);
     }
 }

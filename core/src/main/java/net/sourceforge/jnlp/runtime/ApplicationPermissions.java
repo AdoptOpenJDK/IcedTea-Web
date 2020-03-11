@@ -11,6 +11,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -38,12 +39,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static net.adoptopenjdk.icedteaweb.security.PermissionsManager.getSandBoxPermissions;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 public class ApplicationPermissions {
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationPermissions.class);
 
-    private PermissionsManager permissionsManager;
     private final ResourceTracker tracker;
 
     /**
@@ -66,8 +67,7 @@ public class ApplicationPermissions {
 
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
 
-    public ApplicationPermissions(final PermissionsManager permissionsManager, final ResourceTracker tracker) {
-        this.permissionsManager = Assert.requireNonNull(permissionsManager, "permissionsManager");
+    public ApplicationPermissions(final ResourceTracker tracker) {
         this.tracker = tracker;
     }
 
@@ -102,7 +102,7 @@ public class ApplicationPermissions {
         });
     }
 
-    public PermissionCollection getPermissions(CodeSource codeSource, final Consumer<JARDesc> addJarConsumer) {
+    public PermissionCollection getPermissions(final JNLPFile file, CodeSource codeSource, final Consumer<JARDesc> addJarConsumer) {
         try {
             Assert.requireNonNull(codeSource, "codeSource");
 
@@ -111,10 +111,10 @@ public class ApplicationPermissions {
             // should check for extensions or boot, automatically give all
             // access w/o security dialog once we actually check certificates.
 
-            // set default perms
-            PermissionCollection permissions = permissionsManager.getSandBoxPermissions();
+            // start with sandbox permissions as default
+            PermissionCollection permissions = getSandBoxPermissions(file);
 
-            // If more than default is needed:
+            // if more than default is needed:
             // 1. Code must be signed
             // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
             if (codeSource.getCodeSigners() != null) {
@@ -130,22 +130,13 @@ public class ApplicationPermissions {
                     LOG.error("Warning! Code source security application environment was null");
                 }
                 if (applicationEnvironment == ApplicationEnvironment.ALL || applicationEnvironment == ApplicationEnvironment.J2EE) {
-                    permissions = permissionsManager.getPermissions(codeSource, applicationEnvironment);
+                    permissions = PermissionsManager.getPermissions(file, codeSource, applicationEnvironment);
                 }
             }
-            for (Permission perm : Collections.list(permissions.elements())) {
-                result.add(perm);
-            }
 
-            // add in permission to read the cached JAR files
-            for (Permission perm : resourcePermissions) {
-                result.add(perm);
-            }
-
-            // add in the permissions that the user granted.
-            for (Permission perm : runtimePermissions) {
-                result.add(perm);
-            }
+            Collections.list(permissions.elements()).forEach(result::add);
+            resourcePermissions.forEach(result::add); // add in permission to read the cached JAR files
+            runtimePermissions.forEach(result::add); // add in the permissions that the user granted
 
             // Class from host X should be allowed to connect to host X
             if (codeSource.getLocation() != null && codeSource.getLocation().getHost().length() > 0) {
@@ -160,16 +151,6 @@ public class ApplicationPermissions {
         }
     }
 
-    /**
-     * @param cs the CodeSource to get permissions for
-     * @return a PermissionCollection containing the basic
-     * permissions granted depending on the security type.
-     */
-    public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
-        return permissionsManager.getPermissions(cs, applicationEnvironment);
-    }
-
-
     public void addSecurityForJarLocation(final URL location, SecurityDesc securityDesc) {
         jarLocationSecurityMap.put(location, securityDesc);
     }
@@ -182,7 +163,7 @@ public class ApplicationPermissions {
         return jarLocationSecurityMap.keySet();
     }
 
-    public AccessControlContext getAccessControlContextForClassLoading(final List<URL> codeBaseLoaderUrls) {
+    public AccessControlContext getAccessControlContextForClassLoading(final JNLPFile file, final List<URL> codeBaseLoaderUrls) {
         AccessControlContext context = AccessController.getContext();
 
         try {
@@ -195,7 +176,7 @@ public class ApplicationPermissions {
         // Since this is for class-loading, technically any class from one jar
         // should be able to access a class from another, therefore making the
         // original context code source irrelevant
-        PermissionCollection permissions = permissionsManager.getSandBoxPermissions();
+        PermissionCollection permissions = getSandBoxPermissions(file);
 
         // Local cache access permissions
         for (Permission resourcePermission : resourcePermissions) {

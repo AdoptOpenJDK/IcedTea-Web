@@ -80,12 +80,12 @@ public class JNLPPolicy extends Policy {
     /**
      * the system level policy for jnlps
      */
-    private Policy systemJnlpPolicy;
+    private final Policy systemJnlpPolicy;
 
     /**
      * the user-level policy for jnlps
      */
-    private Policy userJnlpPolicy;
+    private final Policy userJnlpPolicy;
 
     protected JNLPPolicy(final JNLPSecurityManager securityManager) {
         this.securityManager = securityManager;
@@ -101,8 +101,7 @@ public class JNLPPolicy extends Policy {
     }
 
     /**
-     * Return a mutable, heterogeneous-capable permission collection
-     * for the source.
+     * Return a mutable, heterogeneous-capable permission collection for the source.
      */
     public PermissionCollection getPermissions(CodeSource source) {
         if (source.equals(systemSource) || source.equals(shellSource))

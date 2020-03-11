@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.security;
 
-import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -79,9 +78,6 @@ import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
 public class PermissionsManager {
     private static final Logger LOG = LoggerFactory.getLogger(PermissionsManager.class);
 
-    private final URL downloadHost;
-    private final JNLPFile file;
-
     /**
      * URLPermission is new in Java 8, so we use reflection to check for it to keep compatibility
      * with Java 6/7. If we can't find the class or fail to construct it then we continue as usual
@@ -89,14 +85,14 @@ public class PermissionsManager {
      * <p>
      * These are saved as fields so that the reflective lookup only needs to be performed once
      * when the SecurityDesc is constructed, rather than every time a call is made to
-     * {@link PermissionsManager#getSandBoxPermissions()}, which is called frequently.
+     * {@link PermissionsManager#getSandBoxPermissions(JNLPFile)}, which is called frequently.
      */
     private static Class<Permission> urlPermissionClass;
     private static Constructor<Permission> urlPermissionConstructor;
 
     private static PermissionCollection j2EEPermissions;
     private static PermissionCollection jnlpRIAPermissions;
-    private PermissionCollection sandboxPermissions;
+    private static PermissionCollection sandboxPermissions;
     private static PermissionCollection urlPermissions;
 
     static {
@@ -117,21 +113,9 @@ public class PermissionsManager {
     // Allow only what is specifically allowed, and deny everything else
 
     /**
-     * Create a security descriptor.
-     *
-     * @param file         the JNLP file
+     * @return a read-only PermissionCollection containing the sandbox permissions
      */
-    public PermissionsManager(final JNLPFile file) {
-        Assert.requireNonNull(file, "file");
-
-        this.file = file;
-        this.downloadHost = UrlUtils.guessCodeBase(file);
-    }
-
-    /**
-     * @return a PermissionCollection containing the sandbox permissions
-     */
-    public PermissionCollection getSandBoxPermissions() {
+    public static PermissionCollection getSandBoxPermissions(final JNLPFile file) {
         if (sandboxPermissions == null) {
             sandboxPermissions = new Permissions();
 
@@ -177,7 +161,7 @@ public class PermissionsManager {
             if (file.isApplication()) {
                 Collections.list(getJnlpRiaPermissions().elements()).forEach(sandboxPermissions::add);
             }
-
+            URL downloadHost = UrlUtils.guessCodeBase(file);
             if (downloadHost != null && downloadHost.getHost().length() > 0) {
                 sandboxPermissions.add(new SocketPermission(UrlUtils.getHostAndPort(downloadHost), "connect, accept"));
             }
@@ -190,9 +174,7 @@ public class PermissionsManager {
     }
 
     /**
-     * Basic permissions for restricted mode.
-     *
-     * @return a PermissionCollection containing the J2EE permissions
+     * @return a read-only PermissionCollection containing the J2EE permissions
      */
     public static PermissionCollection getJ2EEPermissions() {
         if (j2EEPermissions == null) {
@@ -218,9 +200,7 @@ public class PermissionsManager {
     }
 
     /**
-     * Basic permissions for restricted mode.
-     *
-     * @return a PermissionCollection containing the JNLP RIA permissions
+     * @return a read-only PermissionCollection containing the JNLP RIA permissions
      */
     public static PermissionCollection getJnlpRiaPermissions() {
         if (jnlpRIAPermissions == null) {
@@ -250,6 +230,10 @@ public class PermissionsManager {
         return jnlpRIAPermissions;
     }
 
+    /**
+     * @param file
+     * @return a read-only PermissionCollection containing the URL permissions
+     */
     private static PermissionCollection getUrlPermissions(final JNLPFile file) {
         if (urlPermissions == null) {
             urlPermissions = new Permissions();
@@ -295,31 +279,34 @@ public class PermissionsManager {
 
     /**
      * @param cs the CodeSource to get permissions for
-     * @return a PermissionCollection containing the basic
-     * permissions granted depending on the security type.
+     * @return a read-only PermissionCollection containing the basic permissions granted depending on
+     * the {@link ApplicationEnvironment}
      */
-    public PermissionCollection getPermissions(final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
-        PermissionCollection permissions = getSandBoxPermissions();
-        final Policy customTrustedPolicy = getCustomTrustedPolicy();
-        final PermissionCollection j2eePermissions = getJ2EEPermissions();
-
+    public static PermissionCollection getPermissions(final JNLPFile file, final CodeSource cs, final ApplicationEnvironment applicationEnvironment) {
 
         if (applicationEnvironment == ApplicationEnvironment.ALL) {
-            permissions = new Permissions();
-            if (customTrustedPolicy == null) {
-                permissions.add(new AllPermission());
-                return permissions;
-            } else {
-                return customTrustedPolicy.getPermissions(cs);
+            final Policy customTrustedPolicy = getCustomTrustedPolicy();
+            if (customTrustedPolicy != null) {
+                final PermissionCollection customPolicyPermissions = customTrustedPolicy.getPermissions(cs);
+                customPolicyPermissions.setReadOnly();
+                return customPolicyPermissions;
             }
+
+            final PermissionCollection allPermissions = new Permissions();
+            allPermissions.add(new AllPermission());
+            allPermissions.setReadOnly();
+            return allPermissions;
         }
 
-        if (applicationEnvironment == ApplicationEnvironment.J2EE)
-            for (Permission j2eePermission : Collections.list(j2eePermissions.elements())) {
-                permissions.add(j2eePermission);
-            }
+        if (applicationEnvironment == ApplicationEnvironment.J2EE) {
+            PermissionCollection j2eePermissions = new Permissions();
+            Collections.list(getSandBoxPermissions(file).elements()).forEach(j2eePermissions::add);
+            Collections.list(getJ2EEPermissions().elements()).forEach(j2eePermissions::add);
+            j2eePermissions.setReadOnly();
+            return j2eePermissions;
+        }
 
-        return permissions;
+        return getSandBoxPermissions(file);
     }
 
     /**
@@ -341,7 +328,7 @@ public class PermissionsManager {
      * indicates that no policy exists and AllPermissions should be granted
      * instead.
      */
-    public static Policy getCustomTrustedPolicy() {
+    private static Policy getCustomTrustedPolicy() {
         final String key = ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY;
         final String policyLocation = JNLPRuntime.getConfiguration().getProperty(key);
 
