@@ -41,11 +41,13 @@ import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
-import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.jar.Attributes;
 import java.util.stream.Stream;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
+import static net.sourceforge.jnlp.LaunchException.FATAL;
 
 /**
  * Represents a running instance of an application described in a
@@ -78,11 +80,6 @@ public class ApplicationInstance {
      */
     private boolean stopped = false;
 
-    /**
-     * whether or not this application is signed
-     */
-    private boolean isSigned;
-
     private ApplicationEnvironment applicationEnvironment;
 
     /**
@@ -104,7 +101,6 @@ public class ApplicationInstance {
         this.group = applicationThreadGroup;
         this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
-
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
@@ -116,13 +112,11 @@ public class ApplicationInstance {
      * Initialize the application's environment (installs
      * environment variables, etc).
      */
-    public void initialize() {
+    public void initialize() throws LaunchException {
 
         loader.initializeEagerJars();
 
         ApplicationManager.addApplication(this);
-
-        this.isSigned = true; // TODO: REFACTOR!!!!!!!!
 
         AppContext.getAppContext();
 
@@ -132,13 +126,10 @@ public class ApplicationInstance {
         installShortcutsIfRequested();
     }
 
-    private void installSandboxIfRequested() {
-        if (JNLPRuntime.isSecurityEnabled() && JNLPRuntime.getForksStrategy().mayRunManagedApplication()) {
-            final JNLPSecurityManager security = new JNLPSecurityManager();
-            final JNLPPolicy policy = new JNLPPolicy(security);
-
-            Policy.setPolicy(policy);
-            System.setSecurityManager(security);
+    private void installSandboxIfRequested() throws LaunchException {
+        if (JNLPRuntime.isSecurityEnabled() && applicationEnvironment != ALL) {
+            throw new LaunchException(file, null, FATAL, "Not Supported", "Sandbox not supported",
+                    "Currently Icedtea-Web does not support sandboxing of a managed application");
         }
     }
 
@@ -178,7 +169,7 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-        final ProtectionDomain pd = new ProtectionDomain(cs, PermissionsManager.getPermissions(file, cs, applicationEnvironment), null, null);
+            final ProtectionDomain pd = new ProtectionDomain(cs, PermissionsManager.getPermissions(file, cs, applicationEnvironment), null, null);
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
@@ -212,7 +203,6 @@ public class ApplicationInstance {
     }
 
     /**
-     *
      * @return
      */
     public ApplicationEnvironment getApplicationEnvironment() {
@@ -249,7 +239,7 @@ public class ApplicationInstance {
             return;
 
         try {
-             Thread[] threads = new Thread[group.activeCount() * 2];
+            Thread[] threads = new Thread[group.activeCount() * 2];
             group.enumerate(threads);
             Stream.of(threads).forEach(t -> {
                 try {
@@ -310,13 +300,6 @@ public class ApplicationInstance {
         }
 
         return null;
-    }
-
-    /**
-     * @return whether or not this application is signed.
-     */
-    public boolean isSigned() {
-        return isSigned;
     }
 
     public PermissionCollection getPermissions(CodeSource cs) {
