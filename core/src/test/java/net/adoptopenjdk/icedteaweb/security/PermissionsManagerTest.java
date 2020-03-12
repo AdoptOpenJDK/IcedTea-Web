@@ -1,29 +1,24 @@
 package net.adoptopenjdk.icedteaweb.security;
 
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import org.junit.Test;
 
 import java.awt.AWTPermission;
 import java.net.URI;
 import java.security.PermissionCollection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PermissionsManagerTest {
     @Test
     public void testNotNullJnlpFile() throws Exception {
         Throwable t = null;
         try {
-            new PermissionsManager(new DummyJNLPFile());
+            new PermissionsManager();
         } catch (Exception ex) {
             t = ex;
         }
         assertNull("securityDesc should not throw exception", t);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullJnlpFile() throws Exception {
-        new PermissionsManager(null);
     }
 
     @Test
