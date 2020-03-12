@@ -1,3 +1,19 @@
+// Copyright (C) 2019 Karakun AG
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
@@ -15,7 +31,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
-class NativeLibrarySupport {
+/**
+ * Handles loading and access of native code loading through a JNLP application.
+ * Stores native code in a temporary folder.
+ */
+ class NativeLibrarySupport {
 
     private static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", ".dylib", ".jnilib", ".framework", ".dll"};
 
@@ -23,7 +43,6 @@ class NativeLibrarySupport {
 
     public NativeLibrarySupport() {
         this.nativeSearchDirectory = createNativeStoreDirectory();
-        this.nativeSearchDirectory.deleteOnExit();
     }
 
     public Optional<String> findLibrary(final String libname) {
@@ -57,6 +76,7 @@ class NativeLibrarySupport {
             }
             if (!outFile.isFile()) {
                 FileUtils.createRestrictedFile(outFile);
+                outFile.deleteOnExit();
             }
             try (final FileOutputStream out = new FileOutputStream(outFile)) {
                 IOUtils.copy(jarFile.getInputStream(entry), out);
@@ -85,6 +105,7 @@ class NativeLibrarySupport {
         final File nativeDir = new File(parent, "itw-native-" + UUID.randomUUID().toString());
         try {
             FileUtils.createRestrictedDirectory(nativeDir);
+            nativeDir.deleteOnExit();
             return nativeDir;
         } catch (IOException e) {
             throw new RuntimeException("Exception while creating native storage directory '" + nativeDir + "'", e);
