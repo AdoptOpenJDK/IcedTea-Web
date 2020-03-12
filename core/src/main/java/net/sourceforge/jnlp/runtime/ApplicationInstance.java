@@ -108,12 +108,17 @@ public class ApplicationInstance {
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
-        try {
-            final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
-            this.loader = new JnlpApplicationClassLoader(partsHandler);
-        } catch (final Exception e) {
-            throw new RuntimeException("ARGH!!!", e);
-        }
+        final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
+        this.loader = new JnlpApplicationClassLoader(partsHandler);
+    }
+
+    /**
+     * Initialize the application's environment (installs
+     * environment variables, etc).
+     */
+    public void initialize() {
+
+        loader.initializeEagerJars();
 
         ApplicationManager.addApplication(this);
 
@@ -128,6 +133,10 @@ public class ApplicationInstance {
             Policy.setPolicy(policy);
             System.setSecurityManager(security);
         }
+
+        installEnvironment();
+        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
+        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**
@@ -143,16 +152,6 @@ public class ApplicationInstance {
 
             ((ApplicationListener) list[i]).applicationDestroyed(event);
         }
-    }
-
-    /**
-     * Initialize the application's environment (installs
-     * environment variables, etc).
-     */
-    public void initialize() {
-        installEnvironment();
-        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
-        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**

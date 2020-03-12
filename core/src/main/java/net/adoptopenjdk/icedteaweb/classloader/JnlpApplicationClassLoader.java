@@ -25,7 +25,9 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
         this.jarProvider = jarProvider;
         this.nativeLibrarySupport = nativeLibrarySupport;
+    }
 
+    public void initializeEagerJars() {
         jarProvider.loadEagerJars().forEach(this::addJar);
     }
 
@@ -96,6 +98,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
         /**
          * Loads more jars. If no more jars can be loaded then an empty list is returned.
+         *
          * @param name the name of the class/resource which is needed by the classloader.
          * @return the list of additional jars or an empty list if all jars have been loaded.
          */
