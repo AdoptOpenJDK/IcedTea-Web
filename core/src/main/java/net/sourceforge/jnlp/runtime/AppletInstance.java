@@ -75,14 +75,6 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
-     * @return the application title.
-     */
-    @Override
-    public String getTitle() {
-        return getJNLPFile().getApplet().getName();
-    }
-
-    /**
      * @return the applet environment.
      */
     public AppletEnvironment getAppletEnvironment() {

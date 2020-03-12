@@ -34,7 +34,6 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.JarFile;
 import sun.awt.AppContext;
 
-import javax.swing.event.EventListenerList;
 import java.io.File;
 import java.io.IOException;
 import java.security.AccessControlContext;
@@ -68,12 +67,10 @@ public class ApplicationInstance {
     // installed by the application.
 
     private final JNLPFile file;
+    private final String mainClass;
     private final ThreadGroup group;
-    private final ResourceTracker tracker;
     private final JnlpApplicationClassLoader loader;
     private final ApplicationPermissions applicationPermissions;
-
-    private final EventListenerList listeners = new EventListenerList();
 
     /**
      * whether the application has stopped running
@@ -88,7 +85,7 @@ public class ApplicationInstance {
      *
      * @param file jnlpfile for which the instance do exists
      */
-    public ApplicationInstance(final JNLPFile file, final ThreadGroup applicationThreadGroup) throws LaunchException {
+    public ApplicationInstance(final JNLPFile file, final ThreadGroup applicationThreadGroup) {
         this(file, new DefaultResourceTrackerFactory(), applicationThreadGroup);
     }
 
@@ -99,13 +96,15 @@ public class ApplicationInstance {
         this.file = file;
         this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
         this.group = applicationThreadGroup;
-        this.tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        final ResourceTracker tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.applicationPermissions = new ApplicationPermissions(tracker);
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
         final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
         this.loader = new JnlpApplicationClassLoader(partsHandler);
+
+        this.mainClass = determineMainClass(file, tracker);
     }
 
     /**
@@ -130,21 +129,6 @@ public class ApplicationInstance {
         if (JNLPRuntime.isSecurityEnabled() && applicationEnvironment != ALL) {
             throw new LaunchException(file, null, FATAL, "Not Supported", "Sandbox not supported",
                     "Currently Icedtea-Web does not support sandboxing of a managed application");
-        }
-    }
-
-    /**
-     * Notify listeners that the application has been terminated.
-     */
-    private void fireDestroyed() {
-        Object[] list = listeners.getListenerList();
-        ApplicationEvent event = null;
-
-        for (int i = list.length - 1; i > 0; i -= 2) { // last to first required
-            if (event == null)
-                event = new ApplicationEvent(this);
-
-            ((ApplicationListener) list[i]).applicationDestroyed(event);
         }
     }
 
@@ -203,7 +187,7 @@ public class ApplicationInstance {
     }
 
     /**
-     * @return
+     * @return the environment for the application to run in.
      */
     public ApplicationEnvironment getApplicationEnvironment() {
         return applicationEnvironment;
@@ -211,24 +195,6 @@ public class ApplicationInstance {
 
     public void setApplicationEnvironment(ApplicationEnvironment applicationEnvironment) {
         this.applicationEnvironment = applicationEnvironment;
-    }
-
-    /**
-     * Returns the application title.
-     *
-     * @return the title of this application
-     */
-    public String getTitle() {
-        return file.getTitle();
-    }
-
-    /**
-     * Returns whether the application is running.
-     *
-     * @return state of application
-     */
-    public boolean isRunning() {
-        return !stopped;
     }
 
     /**
@@ -253,7 +219,6 @@ public class ApplicationInstance {
             LOG.error("ERROR IN DESTROYING APP!", e);
         } finally {
             stopped = true;
-            fireDestroyed();
         }
     }
 
@@ -264,8 +229,9 @@ public class ApplicationInstance {
      * @throws IllegalStateException if the app is not running
      */
     public ThreadGroup getThreadGroup() throws IllegalStateException {
-        if (stopped)
+        if (stopped) {
             throw new IllegalStateException();
+        }
 
         return group;
     }
@@ -277,13 +243,23 @@ public class ApplicationInstance {
      * @throws IllegalStateException if the app is not running
      */
     public ClassLoader getClassLoader() throws IllegalStateException {
-        if (stopped)
+        if (stopped) {
             throw new IllegalStateException();
+        }
 
         return loader;
     }
 
-    public String getMainClassName() throws IOException {
+
+    public PermissionCollection getPermissions(CodeSource cs) {
+        return applicationPermissions.getPermissions(file, cs);
+    }
+
+    public String getMainClassName() {
+        return mainClass;
+    }
+
+    private String determineMainClass(JNLPFile file, ResourceTracker tracker) {
         final String mainName = file.getApplication().getMainClass();
 
         // When the application-desc field is empty, we should take a
@@ -296,13 +272,11 @@ public class ApplicationInstance {
         if (f != null) {
             try (final JarFile mainJar = new JarFile(f)) {
                 return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
         return null;
-    }
-
-    public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(file, cs);
     }
 }
