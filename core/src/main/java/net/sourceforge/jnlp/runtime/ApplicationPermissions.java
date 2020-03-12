@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static net.adoptopenjdk.icedteaweb.security.PermissionsManager.getSandBoxPermissions;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
@@ -102,7 +101,7 @@ public class ApplicationPermissions {
         });
     }
 
-    public PermissionCollection getPermissions(final JNLPFile file, CodeSource codeSource, final Consumer<JARDesc> addJarConsumer) {
+    public PermissionCollection getPermissions(final JNLPFile file, CodeSource codeSource) {
         try {
             Assert.requireNonNull(codeSource, "codeSource");
 
@@ -121,7 +120,7 @@ public class ApplicationPermissions {
                 if (codeSource.getLocation() == null) {
                     throw new IllegalStateException("Code source location was null");
                 }
-                final SecurityDesc codeSourceSecurity = getCodeSourceSecurity(codeSource.getLocation(), addJarConsumer);
+                final SecurityDesc codeSourceSecurity = getCodeSourceSecurity(codeSource.getLocation());
                 if (codeSourceSecurity == null) {
                     throw new IllegalStateException("Code source security was null");
                 }
@@ -197,17 +196,15 @@ public class ApplicationPermissions {
         return new AccessControlContext(new ProtectionDomain[]{pd});
     }
 
-    private SecurityDesc getCodeSourceSecurity(final URL source, final Consumer<JARDesc> addJarConsumer) {
+    private SecurityDesc getCodeSourceSecurity(final URL source) {
         final SecurityDesc storedValue = jarLocationSecurityMap.get(source);
         if (storedValue == null) {
             synchronized (alreadyTried) {
                 if (!alreadyTried.contains(source)) {
                     alreadyTried.add(source);
-                    //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
+                    // FIXME: try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
                     LOG.info("Application is trying to get permissions for {}, which was not added by standard way. Trying to download and verify!", source.toString());
                     try {
-                        final JARDesc des = new JARDesc(source, null, null, false, false, false, false);
-                        addJarConsumer.accept(des);
                         final SecurityDesc newValue = jarLocationSecurityMap.get(source);
                         if (newValue != null) {
                             return newValue;

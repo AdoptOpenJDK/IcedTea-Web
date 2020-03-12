@@ -19,7 +19,6 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
 import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
 import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -45,7 +44,6 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
-import java.util.function.Consumer;
 import java.util.jar.Attributes;
 import java.util.stream.Stream;
 
@@ -68,18 +66,12 @@ public class ApplicationInstance {
     // installed by the application.
 
     private final JNLPFile file;
-
-    private ApplicationEnvironment applicationEnvironment;
-
-    /**
-     * the thread group
-     */
     private final ThreadGroup group;
-
-    /**
-     * the classloader
-     */
+    private final ResourceTracker tracker;
     private final JnlpApplicationClassLoader loader;
+    private final ApplicationPermissions applicationPermissions;
+
+    private final EventListenerList listeners = new EventListenerList();
 
     /**
      * whether the application has stopped running
@@ -87,20 +79,11 @@ public class ApplicationInstance {
     private boolean stopped = false;
 
     /**
-     * list of application listeners
-     */
-    private final EventListenerList listeners = new EventListenerList();
-
-    /**
      * whether or not this application is signed
      */
     private boolean isSigned;
 
-    private final ResourceTracker tracker;
-
-    private final ApplicationPermissions applicationPermissions;
-
-    final Consumer<JARDesc> addJarConsumer = jarDesc -> System.out.println("addJarConsumer called for " + jarDesc);
+    private ApplicationEnvironment applicationEnvironment;
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -330,6 +313,6 @@ public class ApplicationInstance {
     }
 
     public PermissionCollection getPermissions(CodeSource cs) {
-        return applicationPermissions.getPermissions(file, cs, addJarConsumer);
+        return applicationPermissions.getPermissions(file, cs);
     }
 }
