@@ -88,12 +88,6 @@ public class JREDesc {
      * @param resources list of ResourceDesc objects
      * @throws ParseException is something goes wrong
      */
-    public JREDesc(final VersionString version, final URL location,
-                   final String vmArgs, final String initialHeapSize,
-                   final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
-        this(version, null, location, vmArgs, initialHeapSize, maximumHeapSize, resources);
-    }
-
     public JREDesc(final VersionString version, final String vendor, final URL location,
                    final String vmArgs, final String initialHeapSize,
                    final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
