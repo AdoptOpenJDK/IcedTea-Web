@@ -126,6 +126,13 @@ public class ApplicationInstance {
 
         AppContext.getAppContext();
 
+        installSandboxIfRequested();
+
+        installEnvironment();
+        installShortcutsIfRequested();
+    }
+
+    private void installSandboxIfRequested() {
         if (JNLPRuntime.isSecurityEnabled() && JNLPRuntime.getForksStrategy().mayRunManagedApplication()) {
             final JNLPSecurityManager security = new JNLPSecurityManager();
             final JNLPPolicy policy = new JNLPPolicy(security);
@@ -133,10 +140,6 @@ public class ApplicationInstance {
             Policy.setPolicy(policy);
             System.setSecurityManager(security);
         }
-
-        installEnvironment();
-        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
-        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**
@@ -192,6 +195,11 @@ public class ApplicationInstance {
         // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible
         // for the started application to detect the execution context.
         System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
+    }
+
+    private void installShortcutsIfRequested() {
+        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
+        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
     }
 
     /**
