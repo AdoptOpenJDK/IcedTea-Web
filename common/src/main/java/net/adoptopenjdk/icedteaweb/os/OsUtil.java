@@ -7,14 +7,24 @@ import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
  */
 public class OsUtil {
 
-    private final static String WIN = "win";
+    private static final String WIN = "win";
+
+    private static final String LINUX = "linux";
 
     /**
      * Returns {@code true} if we are on windows.
      * @return {@code true} if we are on windows.
      */
     public static boolean isWindows() {
+        return isOs(WIN);
+    }
+
+    public static boolean isLinux() {
+        return isOs(LINUX);
+    }
+
+    private static boolean isOs(String osName) {
         String operSys = JavaSystemProperties.getOsName().toLowerCase();
-        return (operSys.contains(WIN));
+        return (operSys.contains(osName));
     }
 }
