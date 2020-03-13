@@ -15,8 +15,8 @@ public class IpUtilTest {
     @Test
     public void testLocalhost() {
         assertTrue(IpUtil.isLocalhostOrLoopback("localhost"));
-        assertFalse(IpUtil.isLocalhostOrLoopback((String) null));
-        assertFalse(IpUtil.isLocalhostOrLoopback(""));
+        assertTrue(IpUtil.isLocalhostOrLoopback((String) null));
+        assertTrue(IpUtil.isLocalhostOrLoopback(""));
 
         // IPV4
         assertTrue(IpUtil.isLocalhostOrLoopback("127.0.0.1")); // loopback standard address
