@@ -57,4 +57,10 @@ public class IpUtilTest {
         assertTrue(IpUtil.isLocalhostOrLoopback(new URI("http://[::1]/")));
         assertTrue(IpUtil.isLocalhostOrLoopback(new URI("https://[::1]/")));
     }
+
+    @Test
+    public void testLocalFile() throws MalformedURLException {
+        URL url = new URL("file:/C:/OpenWebStart/../OWSFiles/AccessibleScrollDemo.jnlp");
+        assertTrue(IpUtil.isLocalhostOrLoopback(url));
+    }
 }

@@ -17,12 +17,12 @@ public class IpUtil {
 
     /**
      * @param host host string to verify
-     * @return true if the given host string represents or resolves to the hostname or the IP address
+     * @return true if the given host string is blank or represents or resolves to the hostname or the IP address
      * of localhost or the loopback address.
      */
     static boolean isLocalhostOrLoopback(String host) {
         if (StringUtils.isBlank(host)) {
-            return false;
+            return true; // java.net.InetAddress.getByName(host).isLoopbackAddress() returns true
         }
         final HostName hostName = new HostName(host);
         return hostName.resolvesToSelf();
