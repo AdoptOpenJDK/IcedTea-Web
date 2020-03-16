@@ -21,7 +21,8 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-1.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -111,7 +112,8 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-8.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -196,7 +198,8 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-21.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(2, partsHandler.getDownloaded().size());

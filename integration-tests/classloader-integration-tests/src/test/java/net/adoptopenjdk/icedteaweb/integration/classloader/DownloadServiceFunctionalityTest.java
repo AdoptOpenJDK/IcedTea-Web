@@ -73,7 +73,9 @@ public class DownloadServiceFunctionalityTest {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-21.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+
 
         //than
         Assertions.assertTrue(partsHandler.isPartDownloaded("eager-package"));

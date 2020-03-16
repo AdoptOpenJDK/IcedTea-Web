@@ -39,7 +39,8 @@ public class LocaleSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-12.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(2, partsHandler.getDownloaded().size());
@@ -56,7 +57,8 @@ public class LocaleSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-13.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());

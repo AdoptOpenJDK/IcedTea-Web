@@ -78,7 +78,8 @@ public class OsSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-5.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -181,7 +182,8 @@ public class OsSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-24.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
