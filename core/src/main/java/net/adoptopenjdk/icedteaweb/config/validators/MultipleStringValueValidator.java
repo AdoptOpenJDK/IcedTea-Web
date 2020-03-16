@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.config.validators;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Checks that the value is one of the acceptable single String values
@@ -35,7 +36,7 @@ public class MultipleStringValueValidator implements ValueValidator {
         }
 
         if (!found) {
-            final String[] possibleCombo = ValidatorUtils.splitCombination(stringVal);
+            final List<String> possibleCombo = ValidatorUtils.splitCombination(stringVal);
             for (final String val : possibleCombo) {
                 if (comboOptionsContains(val)) {
                     found = true;

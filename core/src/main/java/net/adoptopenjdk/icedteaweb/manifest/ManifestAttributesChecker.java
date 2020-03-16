@@ -51,9 +51,9 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SigningState;
+import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -67,7 +67,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
@@ -143,10 +142,9 @@ public class ManifestAttributesChecker {
     }
 
     public static List<MANIFEST_ATTRIBUTES_CHECK> getAttributesCheck() {
-        final String deploymentProperty = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
-        String[] attributesCheck = splitCombination(deploymentProperty);
+        final List<String> configs = JNLPRuntime.getConfiguration().getPropertyAsList(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
         List<MANIFEST_ATTRIBUTES_CHECK> manifestAttributesCheckList = new ArrayList<>();
-        for (String attribute : attributesCheck) {
+        for (String attribute : configs) {
             for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute  : MANIFEST_ATTRIBUTES_CHECK.values()) {
                 if (manifestAttribute.toString().equals(attribute)) {
                     manifestAttributesCheckList.add(manifestAttribute);
