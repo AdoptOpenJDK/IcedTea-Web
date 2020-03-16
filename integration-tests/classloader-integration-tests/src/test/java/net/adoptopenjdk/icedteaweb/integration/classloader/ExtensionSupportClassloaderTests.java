@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -21,7 +22,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(0, partsHandler.getDownloaded().size());
@@ -36,7 +37,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -55,8 +56,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-20.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -72,7 +72,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-20.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -91,7 +91,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-22.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -110,7 +110,7 @@ public class ExtensionSupportClassloaderTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-22.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_B);
 
         //than
@@ -120,4 +120,10 @@ public class ExtensionSupportClassloaderTests {
         Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 
+
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
+    }
 }

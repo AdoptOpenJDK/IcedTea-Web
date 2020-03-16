@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -19,8 +20,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-9.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -37,8 +37,7 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-14.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -55,11 +54,16 @@ public class JavaVersionSpecificClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-10.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
         Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+    }
+
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
     }
 }

@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.Extension;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.integration.IntegrationTestResources;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
@@ -20,7 +21,7 @@ public class DownloadServiceFunctionalityTest {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        createAndInitClassloader(partsHandler);
 
 
         //than
@@ -33,7 +34,7 @@ public class DownloadServiceFunctionalityTest {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-19.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         classLoader.loadClass(CLASS_A);
 
         //than
@@ -48,7 +49,7 @@ public class DownloadServiceFunctionalityTest {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         classLoader.loadClass(CLASS_A);
 
         //than
@@ -73,9 +74,7 @@ public class DownloadServiceFunctionalityTest {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-21.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
-
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertTrue(partsHandler.isPartDownloaded("eager-package"));
@@ -97,5 +96,11 @@ public class DownloadServiceFunctionalityTest {
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
         Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
 
+    }
+
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
     }
 }

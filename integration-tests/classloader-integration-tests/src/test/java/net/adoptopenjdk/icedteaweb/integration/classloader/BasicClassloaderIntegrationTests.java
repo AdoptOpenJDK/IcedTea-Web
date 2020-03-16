@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -21,8 +22,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-1.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -38,7 +38,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-1.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -57,7 +57,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(0, partsHandler.getDownloaded().size());
@@ -69,10 +69,11 @@ public class BasicClassloaderIntegrationTests {
     @RepeatedTest(10)
     public void testLoadClassFromLazyJar() throws Exception {
         //given
-        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");;
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
+        ;
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -92,7 +93,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-7.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -112,8 +113,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-8.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -132,7 +132,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-2.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
         final Class<?> loadedClass2 = classLoader.loadClass(CLASS_A);
 
@@ -155,7 +155,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-3.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
 
         //than
@@ -175,7 +175,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-11.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass1 = classLoader.loadClass(CLASS_A);
         final Class<?> loadedClass2 = classLoader.loadClass(CLASS_B);
 
@@ -198,8 +198,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-21.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(2, partsHandler.getDownloaded().size());
@@ -216,7 +215,7 @@ public class BasicClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-23.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadedClass = classLoader.loadClass(CLASS_B);
 
         //than
@@ -227,4 +226,9 @@ public class BasicClassloaderIntegrationTests {
         Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
+    }
 }

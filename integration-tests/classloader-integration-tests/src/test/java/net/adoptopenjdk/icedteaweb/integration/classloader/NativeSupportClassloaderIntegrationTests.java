@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
@@ -26,8 +27,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(1, partsHandler.getDownloaded().size());
@@ -44,7 +44,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
         
         //than
@@ -61,7 +61,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-15.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
         final Object classInstance = loadClass.newInstance();
         final Object result = loadClass.getMethod("callNative").invoke(classInstance);
@@ -91,7 +91,7 @@ public class NativeSupportClassloaderIntegrationTests {
 
         //than
         Assertions.assertThrows(UnsatisfiedLinkError.class, () -> {
-            final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+            final ClassLoader classLoader = createAndInitClassloader(partsHandler);
             classLoader.loadClass(NATIVE_CLASS).newInstance();
         });
     }
@@ -106,7 +106,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-18.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(partsHandler);
+        createAndInitClassloader(partsHandler);
 
         //than
         Assertions.assertEquals(0, partsHandler.getDownloaded().size());
@@ -123,7 +123,7 @@ public class NativeSupportClassloaderIntegrationTests {
         final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-18.jnlp");
 
         //when
-        final ClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        final ClassLoader classLoader = createAndInitClassloader(partsHandler);
         final Class<?> loadClass = classLoader.loadClass(NATIVE_CLASS);
         final Object classInstance = loadClass.newInstance();
         final Object result = loadClass.getMethod("callNative").invoke(classInstance);
@@ -133,5 +133,11 @@ public class NativeSupportClassloaderIntegrationTests {
         Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_WITH_NATIVE));
         Assertions.assertNotNull(result);
         Assertions.assertEquals("Hello from native world!", result);
+    }
+
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
     }
 }
