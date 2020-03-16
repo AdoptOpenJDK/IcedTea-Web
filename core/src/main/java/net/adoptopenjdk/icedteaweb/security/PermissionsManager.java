@@ -29,7 +29,6 @@ import java.util.PropertyPermission;
 
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ARRAY_LEGACY_MERGE_SORT;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_AA_FONT_SETTINGS;
-import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_DISABLE_MIXING;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_ERASE_BACKGROUND_ON_RESIZE;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_NO_ERASE_BACKGROUND;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.AWT_SYNC_LWREQUESTS;
@@ -201,6 +200,7 @@ public class PermissionsManager {
 
     /**
      * @return a read-only PermissionCollection containing the JNLP RIA permissions
+     * @see <a href="https://docs.oracle.com/javase/tutorial/deployment/doingMoreWithRIA/properties.html">Secure System Properties </a>
      */
     public static PermissionCollection getJnlpRiaPermissions() {
         if (jnlpRIAPermissions == null) {
@@ -211,7 +211,6 @@ public class PermissionsManager {
             jnlpRIAPermissions.add(new PropertyPermission(HTTP_KEEP_ALIVE, PROPERTY_RW_ACTION));
             jnlpRIAPermissions.add(new PropertyPermission(AWT_SYNC_LWREQUESTS, PROPERTY_RW_ACTION));
             jnlpRIAPermissions.add(new PropertyPermission(AWT_WINDOW_LOCATION_BY_PLATFORM, PROPERTY_RW_ACTION));
-            jnlpRIAPermissions.add(new PropertyPermission(AWT_DISABLE_MIXING, PROPERTY_RW_ACTION));
             jnlpRIAPermissions.add(new PropertyPermission(WEBSTART_JAUTHENTICATOR, PROPERTY_RW_ACTION));
             jnlpRIAPermissions.add(new PropertyPermission(SWING_DEFAULT_LF, PROPERTY_RW_ACTION));
             jnlpRIAPermissions.add(new PropertyPermission(AWT_NO_ERASE_BACKGROUND, PROPERTY_RW_ACTION));
