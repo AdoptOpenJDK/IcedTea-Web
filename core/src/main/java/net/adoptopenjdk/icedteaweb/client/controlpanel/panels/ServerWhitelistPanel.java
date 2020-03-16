@@ -46,7 +46,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
         Assert.requireNonNull(config, "config");
 
-        final List<String> whitelist = config.getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST, ',');
+        final List<String> whitelist = config.getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST);
         final JList<String> jList = new JList<>(new Vector<>(whitelist));
         jList.setFixedCellHeight(20);
         add(new JScrollPane(jList), BorderLayout.CENTER);

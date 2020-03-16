@@ -56,7 +56,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -304,7 +303,7 @@ public class DeploymentConfigurationTest extends NoStdOutErrTest {
         config.load();
 
         config.setProperty(key, String.join(", ", values));
-        final List<String> result = config.getPropertyAsList(key, ',');
+        final List<String> result = config.getPropertyAsList(key);
 
         assertEquals(values, result);
     }
