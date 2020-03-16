@@ -78,7 +78,7 @@ public class JvmUtils {
      * @return
      * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
      */
-    static boolean isValidSecureProperty(final String argument) {
+    public static boolean isValidSecureProperty(final String argument) {
         if (argument.startsWith("jnlp.") || argument.startsWith("javaws.")) {
             return true;
         }
