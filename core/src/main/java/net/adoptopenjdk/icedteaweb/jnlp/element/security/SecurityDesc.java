@@ -16,9 +16,6 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.security;
 
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-
 /**
  * The security element.
  *
@@ -26,8 +23,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
  * @version $Revision: 1.7 $
  */
 public class SecurityDesc {
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
-
     public static final String SECURITY_ELEMENT = "security";
 
     private final ApplicationEnvironment applicationEnvironment;

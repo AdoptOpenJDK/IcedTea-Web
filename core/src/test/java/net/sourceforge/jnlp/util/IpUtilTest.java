@@ -15,8 +15,8 @@ public class IpUtilTest {
     @Test
     public void testLocalhost() {
         assertTrue(IpUtil.isLocalhostOrLoopback("localhost"));
-        assertFalse(IpUtil.isLocalhostOrLoopback((String) null));
-        assertFalse(IpUtil.isLocalhostOrLoopback(""));
+        assertTrue(IpUtil.isLocalhostOrLoopback((String) null));
+        assertTrue(IpUtil.isLocalhostOrLoopback(""));
 
         // IPV4
         assertTrue(IpUtil.isLocalhostOrLoopback("127.0.0.1")); // loopback standard address
@@ -56,5 +56,11 @@ public class IpUtilTest {
         // IP6
         assertTrue(IpUtil.isLocalhostOrLoopback(new URI("http://[::1]/")));
         assertTrue(IpUtil.isLocalhostOrLoopback(new URI("https://[::1]/")));
+    }
+
+    @Test
+    public void testLocalFile() throws MalformedURLException {
+        URL url = new URL("file:/C:/OpenWebStart/../OWSFiles/AccessibleScrollDemo.jnlp");
+        assertTrue(IpUtil.isLocalhostOrLoopback(url));
     }
 }

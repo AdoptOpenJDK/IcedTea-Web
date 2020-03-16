@@ -124,6 +124,7 @@ class ResourceHandler {
             return; // empty whitelist == allow all connections
         }
 
+        // if host is null or "" or it is localhost or loopback
         if (IpUtil.isLocalhostOrLoopback(url)) {
             return; // local server need not be in whitelist
         }
