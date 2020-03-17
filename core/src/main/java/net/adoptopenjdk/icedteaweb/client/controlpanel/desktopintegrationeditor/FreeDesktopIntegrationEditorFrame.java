@@ -35,11 +35,10 @@
  */
 package net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.adoptopenjdk.icedteaweb.client.console.ConsoleOutputPaneModel;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.XDesktopEntry;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -65,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public class FreeDesktopIntegrationEditorFrame extends JFrame {
 
@@ -134,7 +134,7 @@ public class FreeDesktopIntegrationEditorFrame extends JFrame {
         reloadsListButton.setText(R("DIMreloadLists"));
         selectAll.setText(R("DIMselectAll"));
         cleanAll.setText(R("DIMclearSelection"));
-        title.setText(SecurityDialogPanel.htmlWrap("<p>" + R("DIMdescription") + "</p>"));
+        title.setText(htmlWrap("<p>" + R("DIMdescription") + "</p>"));
     }
 
     private JPanel createMainControls() {

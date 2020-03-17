@@ -77,15 +77,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
-/*
+/**
  * This class is meant to provide a common layout and functionality for warning dialogs
  * that appear when the user needs to confirm the running of applets/applications.
  * Subclasses include UnsignedAppletTrustWarningPanel, for unsigned plugin applets, and
  * PartiallySignedAppTrustWarningPanel, for partially signed JNLP applications as well as
  * plugin applets. New implementations should be added to the unit test at
  * unit/net/sourceforge/jnlp/security/AppTrustWarningPanelTest
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public abstract class AppTrustWarningPanel extends SecurityDialogPanel implements RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(AppTrustWarningPanel.class);

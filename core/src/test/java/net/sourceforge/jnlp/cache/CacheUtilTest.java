@@ -36,7 +36,7 @@ exception statement from your version.
  */
 package net.sourceforge.jnlp.cache;
 
-import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerTest;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerTest;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.Assert;
@@ -61,8 +61,8 @@ public class CacheUtilTest {
 
     @Test
     public void testNormalizeUrlComparisons() throws Exception {
-        URL[] u = ResourceTrackerTest.getUrls();
-        URL[] n = ResourceTrackerTest.getNormalizedUrls();
+        URL[] u = DefaultResourceTrackerTest.getUrls();
+        URL[] n = DefaultResourceTrackerTest.getNormalizedUrls();
         for (int i = 0; i < u.length; i++) {
             Assert.assertTrue("url " + i + " must CacheUtil.urlEquals to its normalized form " + i, UrlUtils.urlEquals(u[i], n[i]));
             Assert.assertTrue("normalized form " + i + " must CacheUtil.urlEquals to its original " + i, UrlUtils.urlEquals(n[i], u[i]));

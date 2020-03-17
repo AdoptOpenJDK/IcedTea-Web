@@ -51,7 +51,7 @@
         <module>core</module>
         <module>artifact-no-dependencies</module>
         <module>artifact-all-dependencies</module>
-        <module>integration</module>
+<!--        <module>integration</module>-->
         <module>clients</module>
         <module>jnlp-servlet</module>
         <module>launchers</module>

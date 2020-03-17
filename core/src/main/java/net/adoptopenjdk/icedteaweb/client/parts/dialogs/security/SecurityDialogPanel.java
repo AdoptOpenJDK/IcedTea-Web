@@ -78,15 +78,6 @@ public abstract class SecurityDialogPanel extends JPanel {
         this.setLayout(new BorderLayout());
     }
 
-    /**
-     * Needed to get word wrap working in JLabels.
-     * @param s string to be wrapped to html tag
-     * @return 
-     */
-    public  static String htmlWrap(String s) {
-        return "<html>" + s + "</html>";
-    }
-
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);

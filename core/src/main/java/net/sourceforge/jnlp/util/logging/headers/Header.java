@@ -40,7 +40,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
@@ -86,7 +85,7 @@ public class Header {
                 level, // level
                 timestamp, // timestamp
                 timestamp.toString(), // date
-                JNLPRuntime.isWebstartApplication(), // application
+                true, // application
                 false, // isPlugin
                 isClientApp, // isClientApp
                 default_user, // user

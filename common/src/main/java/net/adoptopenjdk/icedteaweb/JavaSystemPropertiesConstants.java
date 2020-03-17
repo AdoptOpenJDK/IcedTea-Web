@@ -80,6 +80,8 @@ public interface JavaSystemPropertiesConstants {
 
     String AWT_ERASE_BACKGROUND_ON_RESIZE = "sun.awt.erasebackgroundonresize";
 
+    String AWT_DISABLE_MIXING = "sun.awt.disableMixing";
+
     String JAVA2D_D3D = "sun.java2d.d3d";
 
     String JAVA2D_DPI_AWARE = "sun.java2d.dpiaware";
@@ -120,6 +122,12 @@ public interface JavaSystemPropertiesConstants {
     String HTTP_AGENT = "http.agent";
 
     String HTTP_KEEP_ALIVE = "http.keepAlive";
+
+    String HTTP_MAX_REDIRECTS = "http.maxRedirects";
+
+    String HTTP_AUTH_DIGEST_VALIDATEPROXY = "http.auth.digest.validateProxy";
+
+    String HTTP_AUTH_DIGEST_VALIDATESERVER = "http.auth.digest.validateServer";
 
     String ITW_EDT_DEBUG = "icedtea-web.edt.debug";
 

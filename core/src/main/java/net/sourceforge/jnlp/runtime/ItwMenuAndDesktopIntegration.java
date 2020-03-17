@@ -1,13 +1,14 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.security.AccessType;
@@ -131,12 +132,12 @@ public class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
             AccessWarningPaneComplexReturn r = new AccessWarningPaneComplexReturn(mainResult);
             if (mainResult){
                 if (sd.onDesktop()){
-                    r.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.setDesktop(new ShortcutResult(true));
                     r.getDesktop().setBrowser(XDesktopEntry.getBrowserBin());
                     r.getDesktop().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
                 if (sd.getMenu() != null){
-                    r.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(true));
+                    r.setMenu(new ShortcutResult(true));
                     r.getMenu().setBrowser(XDesktopEntry.getBrowserBin());
                     r.getMenu().setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
                 }
@@ -156,10 +157,10 @@ public class ItwMenuAndDesktopIntegration implements MenuAndDesktopIntegration {
             case ShortcutDesc.CREATE_ALWAYS:
                 return new AccessWarningPaneComplexReturn(true);
             case ShortcutDesc.CREATE_ASK_USER:
-                return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
+                return Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
             case ShortcutDesc.CREATE_ASK_USER_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {
-                    return SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
+                    return Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, file, null);
                 }
             case ShortcutDesc.CREATE_ALWAYS_IF_HINTED:
                 if (sd != null && (sd.onDesktop() || sd.toMenu())) {

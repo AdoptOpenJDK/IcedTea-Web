@@ -5,12 +5,13 @@ import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -36,18 +37,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
+import static net.adoptopenjdk.icedteaweb.security.PermissionsManager.getSandBoxPermissions;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
 public class ApplicationPermissions {
-
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationPermissions.class);
-
-    /**
-     * the security section
-     */
-    private SecurityDesc security;
 
     private final ResourceTracker tracker;
 
@@ -67,21 +62,12 @@ public class ApplicationPermissions {
     /**
      * Permissions granted by the user during runtime.
      */
-    private final ArrayList<Permission> runtimePermissions = new ArrayList<>();
+    private final List<Permission> runtimePermissions = new ArrayList<>();
 
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
 
     public ApplicationPermissions(final ResourceTracker tracker) {
         this.tracker = tracker;
-    }
-
-    public void setSecurity(final JNLPFile file, final SecurityDelegate securityDelegate) throws LaunchException {
-        URL codebase = UrlUtils.guessCodeBase(file);
-        this.security = securityDelegate.getClassLoaderSecurity(codebase);
-    }
-
-    public SecurityDesc getSecurity() {
-        return security;
     }
 
     public void addRuntimePermission(Permission p) {
@@ -115,7 +101,7 @@ public class ApplicationPermissions {
         });
     }
 
-    public PermissionCollection getPermissions(CodeSource codeSource, final Consumer<JARDesc> addJarConsumer) {
+    public PermissionCollection getPermissions(final JNLPFile file, CodeSource codeSource) {
         try {
             Assert.requireNonNull(codeSource, "codeSource");
 
@@ -123,48 +109,33 @@ public class ApplicationPermissions {
 
             // should check for extensions or boot, automatically give all
             // access w/o security dialog once we actually check certificates.
-            // copy security permissions from SecurityDesc element
-            if (security != null) {
-                // Security desc. is used only to track security settings for the
-                // application. However, an application may comprise of multiple
-                // jars, and as such, security must be evaluated on a per jar basis.
 
-                // set default perms
-                PermissionCollection permissions = security.getSandBoxPermissions();
+            // start with sandbox permissions as default
+            PermissionCollection permissions = getSandBoxPermissions(file);
 
-                // If more than default is needed:
-                // 1. Code must be signed
-                // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
-                if (codeSource.getCodeSigners() != null) {
-                    if (codeSource.getLocation() == null) {
-                        throw new IllegalStateException("Code source location was null");
-                    }
-                    final SecurityDesc codeSourceSecurity = getCodeSourceSecurity(codeSource.getLocation(), addJarConsumer);
-                    if (codeSourceSecurity == null) {
-                        throw new IllegalStateException("Code source security was null");
-                    }
-                    if (codeSourceSecurity.getSecurityType() == null) {
-                        LOG.error("Warning! Code source security type was null");
-                    }
-                    Object securityType = codeSourceSecurity.getSecurityType();
-                    if (SecurityDesc.ALL_PERMISSIONS.equals(securityType) || SecurityDesc.J2EE_PERMISSIONS.equals(securityType)) {
-                        permissions = codeSourceSecurity.getPermissions(codeSource);
-                    }
+            // if more than default is needed:
+            // 1. Code must be signed
+            // 2. ALL or J2EE permissions must be requested (note: plugin requests ALL automatically)
+            if (codeSource.getCodeSigners() != null) {
+                if (codeSource.getLocation() == null) {
+                    throw new IllegalStateException("Code source location was null");
                 }
-                for (Permission perm : Collections.list(permissions.elements())) {
-                    result.add(perm);
+                final SecurityDesc codeSourceSecurity = getCodeSourceSecurity(codeSource.getLocation());
+                if (codeSourceSecurity == null) {
+                    throw new IllegalStateException("Code source security was null");
+                }
+                final ApplicationEnvironment applicationEnvironment = codeSourceSecurity.getApplicationEnvironment();
+                if (applicationEnvironment == null) {
+                    LOG.error("Warning! Code source security application environment was null");
+                }
+                if (applicationEnvironment == ApplicationEnvironment.ALL || applicationEnvironment == ApplicationEnvironment.J2EE) {
+                    permissions = PermissionsManager.getPermissions(file, codeSource, applicationEnvironment);
                 }
             }
 
-            // add in permission to read the cached JAR files
-            for (Permission perm : resourcePermissions) {
-                result.add(perm);
-            }
-
-            // add in the permissions that the user granted.
-            for (Permission perm : runtimePermissions) {
-                result.add(perm);
-            }
+            Collections.list(permissions.elements()).forEach(result::add);
+            resourcePermissions.forEach(result::add); // add in permission to read the cached JAR files
+            runtimePermissions.forEach(result::add); // add in the permissions that the user granted
 
             // Class from host X should be allowed to connect to host X
             if (codeSource.getLocation() != null && codeSource.getLocation().getHost().length() > 0) {
@@ -191,7 +162,7 @@ public class ApplicationPermissions {
         return jarLocationSecurityMap.keySet();
     }
 
-    public AccessControlContext getAccessControlContextForClassLoading(final List<URL> codeBaseLoaderUrls) {
+    public AccessControlContext getAccessControlContextForClassLoading(final JNLPFile file, final List<URL> codeBaseLoaderUrls) {
         AccessControlContext context = AccessController.getContext();
 
         try {
@@ -204,7 +175,7 @@ public class ApplicationPermissions {
         // Since this is for class-loading, technically any class from one jar
         // should be able to access a class from another, therefore making the
         // original context code source irrelevant
-        PermissionCollection permissions = getSecurity().getSandBoxPermissions();
+        PermissionCollection permissions = getSandBoxPermissions(file);
 
         // Local cache access permissions
         for (Permission resourcePermission : resourcePermissions) {
@@ -213,29 +184,27 @@ public class ApplicationPermissions {
 
         synchronized (this) {
             getAllJarLocations().stream()
-                    .map(l -> new SocketPermission(UrlUtils.getHostAndPort(l),"connect, accept"))
+                    .map(l -> new SocketPermission(UrlUtils.getHostAndPort(l), "connect, accept"))
                     .forEach(permissions::add);
         }
 
         // Permissions for codebase urls (if there is a loader)
-        codeBaseLoaderUrls.forEach(u -> permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),"connect, accept")));
+        codeBaseLoaderUrls.forEach(u -> permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u), "connect, accept")));
 
         ProtectionDomain pd = new ProtectionDomain(null, permissions);
 
         return new AccessControlContext(new ProtectionDomain[]{pd});
     }
 
-    private SecurityDesc getCodeSourceSecurity(final URL source, final Consumer<JARDesc> addJarConsumer) {
+    private SecurityDesc getCodeSourceSecurity(final URL source) {
         final SecurityDesc storedValue = jarLocationSecurityMap.get(source);
         if (storedValue == null) {
             synchronized (alreadyTried) {
                 if (!alreadyTried.contains(source)) {
                     alreadyTried.add(source);
-                    //try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
+                    // FIXME: try to load the jar which is requesting the permissions, but was NOT downloaded by standard way
                     LOG.info("Application is trying to get permissions for {}, which was not added by standard way. Trying to download and verify!", source.toString());
                     try {
-                        final JARDesc des = new JARDesc(source, null, null, false, false, false, false);
-                        addJarConsumer.accept(des);
                         final SecurityDesc newValue = jarLocationSecurityMap.get(source);
                         if (newValue != null) {
                             return newValue;

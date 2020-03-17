@@ -66,12 +66,10 @@ public class ErrorSplashUtilsTest {
 
     @Test
     public void determineCallerTest() {
-        assertErrorSplashReason(false, APPLET);
-        assertErrorSplashReason(true, JAVAWS);
+        assertErrorSplashReason(JAVAWS);
     }
 
-    private void assertErrorSplashReason(boolean isWebstartApplication, SplashUtils.SplashReason reason) {
-        SplashUtilsTest.modifyIsWebstartApplicationRuntime(isWebstartApplication);
+    private void assertErrorSplashReason(SplashUtils.SplashReason reason) {
         final SplashPanel p2 = SplashUtils.getErrorSplashScreen(null);
         assertThat(p2.getSplashReason(), is(reason));
     }

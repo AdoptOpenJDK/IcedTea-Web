@@ -8,11 +8,15 @@ public enum AccessType {
     READ_WRITE_FILE,
     READ_FILE,
     WRITE_FILE,
-    CREATE_DESKTOP_SHORTCUT,
     CLIPBOARD_READ,
     CLIPBOARD_WRITE,
     PRINTER,
     NETWORK,
+
+    // the following is for creating desktop shortcuts and has nothing to do with access types
+    CREATE_DESKTOP_SHORTCUT,
+
+    // the following are certificate related states and have nothing to do with access types
     VERIFIED,
     UNVERIFIED,
     PARTIALLY_SIGNED,

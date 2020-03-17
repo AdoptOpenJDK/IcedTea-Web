@@ -39,9 +39,9 @@ package net.sourceforge.jnlp.config;
 
 
 import net.adoptopenjdk.icedteaweb.config.ValidatorFactory;
-import net.adoptopenjdk.icedteaweb.config.validators.SecurityValueValidator;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
 import net.sourceforge.jnlp.proxy.ProxyType;
 
 import java.util.Arrays;
@@ -81,7 +81,7 @@ public class Defaults {
      * configuration page, with occasional replacements of "" or no-defaults
      * with null
      */
-    private static final List<Setting<String>> DEFAULTS = Arrays.asList(
+    private static final List<Setting> DEFAULTS = Arrays.asList(
             /*
              * infrastructure
              */
@@ -270,8 +270,8 @@ public class Defaults {
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL,
-                    null,
-                    null
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTP_HOST,
@@ -281,7 +281,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTP_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_HOST,
@@ -291,7 +291,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_HTTPS_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_HOST,
@@ -301,7 +301,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_FTP_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_HOST,
@@ -311,7 +311,7 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_SOCKS4_PORT,
                     null,
-                    null
+                    ValidatorFactory.createPortValidator()
             ),
             Setting.createDefault(
                     ConfigurationConstants.KEY_PROXY_OVERRIDE_HOSTS,
@@ -468,8 +468,8 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_LEVEL,
-                    null,
-                    new SecurityValueValidator()
+                    SecurityLevel.HIGH.name(),
+                    ValidatorFactory.createStringValidator(SecurityLevel.values())
             ),
 
             /*
@@ -553,7 +553,7 @@ public class Defaults {
             )
     );
 
-    private static final List<Setting<String>> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
+    private static final List<Setting> additionalDefaults = loadServiceAsStream(DefaultsProvider.class)
             .flatMap(provider -> provider.getDefaults().stream())
             .collect(Collectors.toList());
 
@@ -562,7 +562,7 @@ public class Defaults {
      *
      * @return the default settings for deployment
      */
-    public static Map<String, Setting<String>> getDefaults() {
+    public static Map<String, Setting> getDefaults() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkRead(USER_DEPLOYMENT_FILE.getDefaultFullPath());

@@ -301,7 +301,7 @@ public class OutputController extends BasicOutputController {
 
         private static SingleStreamLogger initSystemLogger() {
             if (OsUtil.isWindows()) {
-                return new WinSystemLog();
+                return new NoopSystemLog();
             } else {
                 return new UnixSystemLog();
             }

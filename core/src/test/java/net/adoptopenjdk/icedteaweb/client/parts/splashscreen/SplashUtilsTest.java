@@ -43,8 +43,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import java.lang.reflect.Field;
-
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
@@ -71,12 +69,10 @@ public class SplashUtilsTest {
 
     @Test
     public void determineCallerTest() {
-        assertSplashReason(false, APPLET);
-        assertSplashReason(true, JAVAWS);
+        assertSplashReason(JAVAWS);
     }
 
-    private void assertSplashReason(boolean isWebstartApplication, SplashUtils.SplashReason reason) {
-        modifyIsWebstartApplicationRuntime(isWebstartApplication);
+    private void assertSplashReason(SplashUtils.SplashReason reason) {
         final SplashPanel p2 = SplashUtils.getSplashScreen();
         assertThat(p2.getSplashReason(), is(reason));
     }
@@ -183,15 +179,5 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
         assertThat(sw, is(nullValue()));
-    }
-
-    static void modifyIsWebstartApplicationRuntime(boolean isWebstartApplication) {
-        try {
-            Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
-            field.setAccessible(true);
-            field.set(null, isWebstartApplication);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }

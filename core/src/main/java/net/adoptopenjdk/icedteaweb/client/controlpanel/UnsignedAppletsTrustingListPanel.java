@@ -539,7 +539,6 @@ public class UnsignedAppletsTrustingListPanel extends JPanel {
     private void mainPolicyComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             conf.setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, ((AppletSecurityLevel) mainPolicyComboBox.getSelectedItem()).toChars());
-            conf.save();
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
             JOptionPane.showMessageDialog(this, ex);

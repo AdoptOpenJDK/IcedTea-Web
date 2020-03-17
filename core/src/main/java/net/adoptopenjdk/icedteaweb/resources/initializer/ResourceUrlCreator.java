@@ -53,6 +53,7 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.StringUtils.urlEncode;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CURRENT_VERSION_ID_QUERY_PARAM;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_QUERY_PARAM;
+import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_PREFIX;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_HTTPS_DONT_ENFORCE;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import static net.sourceforge.jnlp.util.UrlUtils.HTTPS_PROTOCOL;
@@ -127,7 +128,7 @@ class ResourceUrlCreator {
                 sb.append(parts[i]);
                 // Append __V<number> before last '.'
                 if (i == parts.length - 2) {
-                    sb.append("__V").append(resource.getRequestVersion());
+                    sb.append(VERSION_PREFIX).append(resource.getRequestVersion());
                 }
                 sb.append('.');
             }

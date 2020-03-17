@@ -40,6 +40,8 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Semaphore;
 import javax.swing.JDialog;
+
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.DialogType;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.security.AccessType;
@@ -60,7 +62,7 @@ public final class SecurityDialogMessage {
      * These fields contain information need to display the correct dialog type
      */
 
-    public SecurityDialogs.DialogType dialogType;
+    public DialogType dialogType;
     public AccessType accessType;
     //all information dialogs needs are in file. 
     //The only known exception is, and should remain, showAuthenticationPrompt

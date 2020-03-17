@@ -50,6 +50,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
@@ -211,7 +212,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
     public void testSecurity() throws ParseException {
         SecurityDesc security = parser.getSecurity(root);
         Assert.assertNotNull(security);
-        Assert.assertEquals(SecurityDesc.ALL_PERMISSIONS, security.getSecurityType());
+        Assert.assertEquals(ApplicationEnvironment.ALL, security.getApplicationEnvironment());
     }
 
     @Test

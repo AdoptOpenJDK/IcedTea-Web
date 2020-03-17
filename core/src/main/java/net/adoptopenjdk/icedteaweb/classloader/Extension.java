@@ -28,14 +28,6 @@ public class Extension {
         return Objects.hash(extensionLocation, version);
     }
 
-    public URL getExtensionLocation() {
-        return extensionLocation;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
     @Override
     public String toString() {
         return "Extension{" +

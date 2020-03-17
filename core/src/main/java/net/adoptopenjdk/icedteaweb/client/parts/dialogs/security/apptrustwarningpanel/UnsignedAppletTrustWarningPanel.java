@@ -37,7 +37,6 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletActionEntry;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
@@ -47,8 +46,12 @@ import javax.swing.ImageIcon;
 import java.awt.Dimension;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
-
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     public UnsignedAppletTrustWarningPanel(SecurityDialog securityDialog, final JNLPFile file) {
@@ -56,7 +59,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
         this.INFO_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
-            securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+            securityDialog.getViewableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 
@@ -80,7 +83,7 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
 
     @Override
     protected String getTopPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getTopPanelTextKey()));
+        return htmlWrap(R(getTopPanelTextKey()));
     }
 
     @Override
@@ -95,11 +98,11 @@ public class UnsignedAppletTrustWarningPanel extends AppTrustWarningPanel {
                 text += "<br>" + R("SUnsignedRejectedBefore", rememberedEntry.getLocalisedTimeStamp());
             }
         }
-        return SecurityDialogPanel.htmlWrap(text);
+        return htmlWrap(text);
     }
 
     @Override
     protected String getQuestionPanelText() {
-        return SecurityDialogPanel.htmlWrap(R(getQuestionPanelTextKey()));
+        return htmlWrap(R(getQuestionPanelTextKey()));
     }
 }

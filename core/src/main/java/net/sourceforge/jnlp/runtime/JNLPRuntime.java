@@ -76,6 +76,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
@@ -104,8 +105,6 @@ import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 public class JNLPRuntime {
 
     private static final Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
-
-    private static final ClassContextProvider contextProvider = new ClassContextProvider();
 
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
@@ -148,12 +147,6 @@ public class JNLPRuntime {
      */
     private static Boolean pluginDebug = null;
 
-    /** mutex to wait on, for initialization */
-    public static Object initMutex = new Object();
-
-    /** set to true if this is a webstart application. */
-    private static boolean isWebstartApplication;
-
     /** set to NEVER to indicate another JVM should not be spawned, even if necessary */
     private static ForkingStrategy forkingStrategy = IF_JNLP_REQUIRES;
 
@@ -164,7 +157,7 @@ public class JNLPRuntime {
     private static boolean trustNone = false;
 
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
-    private static boolean allowRedirect = false;;
+    private static boolean allowRedirect = false;
 
     /** when this is true, ITW will not attempt any inet connections and will work only with what is in cache*/
     private static boolean offlineForced = false;
@@ -215,11 +208,9 @@ public class JNLPRuntime {
      * called by the exit class.
      * </p>
      *
-     * @param isApplication is {@code true} if a webstart application is being
-     * initialized
      * @throws IllegalStateException if the runtime was previously initialized
      */
-    public static void initialize(boolean isApplication) throws IllegalStateException {
+    public static void initialize() throws IllegalStateException {
         checkInitialized();
 
         try {
@@ -228,21 +219,17 @@ public class JNLPRuntime {
             LOG.error("Unable to set system look and feel", e);
         }
 
-        if (JavaConsole.canShowOnStartup(isApplication)) {
+        if (JavaConsole.canShowOnStartup()) {
             JavaConsole.getConsole().showConsoleLater();
         }
         /* exit if there is a fatal exception loading the configuration */
-        if (getConfiguration().getLoadingException() != null) {
-            if (getConfiguration().getLoadingException() instanceof ConfigurationException){
-                // ConfigurationException is thrown only if deployment.config's field
-                // deployment.system.config.mandatory is true, and the destination
-                //where deployment.system.config points is not readable
-                throw new RuntimeException(getConfiguration().getLoadingException());
-            }
-            LOG.warn("Fatal error while reading the configuration, continuing with empty. Please fix: {}", getConfiguration().getLoadingException().getMessage());
+        final ConfigurationException loadingException = getConfiguration().getLoadingException();
+        if (loadingException != null) {
+            // ConfigurationException is thrown only if deployment.config's field
+            // deployment.system.config.mandatory is true, and the destination
+            // where deployment.system.config points is not readable
+            throw new RuntimeException(loadingException);
         }
-
-        isWebstartApplication = isApplication;
 
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
@@ -303,7 +290,7 @@ public class JNLPRuntime {
      * @return TrustManager the trust manager to use for verifying https certificates
      */
     private static TrustManager getSSLSocketTrustManager() throws
-                                ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+                                IllegalAccessException, InstantiationException, InvocationTargetException {
 
         try {
 
@@ -476,14 +463,6 @@ public class JNLPRuntime {
     }
 
     /**
-     * @return true if a webstart application has been initialized, and false
-     * for a plugin applet.
-     */
-    public static boolean isWebstartApplication() {
-        return isWebstartApplication;
-    }
-
-    /**
      * @return whether the JNLP client will use any AWT/Swing
      * components.
      */
@@ -581,7 +560,7 @@ public class JNLPRuntime {
      * @return the current Application, or null if none can be
      * determined.
      */
-    public static ApplicationInstance getApplication() {
+    public static Optional<ApplicationInstance> getApplication() {
         return ApplicationManager.getApplication();
     }
 
@@ -624,14 +603,6 @@ public class JNLPRuntime {
      */
     public static UpdatePolicy getDefaultUpdatePolicy() {
         return updatePolicy;
-    }
-
-    /**
-     * Sets the default launch handler.
-     * @param handler default handler
-     */
-    public static void setDefaultLaunchHandler(LaunchHandler handler) {
-        JNLPRuntime.handler = handler;
     }
 
     /**
@@ -871,19 +842,11 @@ public class JNLPRuntime {
     }
 
     /**
-     * Used by java-abrt-connector via reflection
-     * @return history
+     * @param showWebSplash show splash screen at start of webstart application
      */
-    private static String getHistory() {
-        return history;
+    public static void setShowWebSplash(boolean showWebSplash) {
+        JNLPRuntime.showWebSplash = showWebSplash;
     }
-
-	/**
-	 * @param showWebSplash show splash screen at start of webstart application
-	 */
-	public static void setShowWebSplash(boolean showWebSplash) {
-		JNLPRuntime.showWebSplash = showWebSplash;
-	}
 
     /**
      * @return show splash screen at start of webstart application
@@ -916,13 +879,6 @@ public class JNLPRuntime {
                 LOG.error(msg);
                 throw new IllegalStateException(msg);
             }
-        }
-    }
-
-    private static class ClassContextProvider extends SecurityManager {
-        @Override
-        public Class<?>[] getClassContext() {
-            return super.getClassContext();
         }
     }
 }

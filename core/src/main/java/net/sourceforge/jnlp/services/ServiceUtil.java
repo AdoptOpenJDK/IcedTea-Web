@@ -17,7 +17,7 @@
 package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -260,7 +260,7 @@ public class ServiceUtil {
                 return false;
             }
             if (app == null) {
-                app = JNLPRuntime.getApplication();
+                app = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("Could not determine application"));
             }
 
             final AccessType tmpType = type;
@@ -273,7 +273,7 @@ public class ServiceUtil {
             Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                 @Override
                 public Boolean run() {
-                    AccessWarningPaneComplexReturn r = SecurityDialogs.showAccessWarningDialog(tmpType,
+                    AccessWarningPaneComplexReturn r = Dialogs.showAccessWarningDialog(tmpType,
                             tmpApp.getJNLPFile(), tmpExtras);
                     if (r == null) {
                         return false;
@@ -316,9 +316,6 @@ public class ServiceUtil {
 
     public static boolean isSigned(ApplicationInstance app) {
 
-        if (app == null) {
-            app = JNLPRuntime.getApplication();
-        }
 
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
@@ -329,6 +326,9 @@ public class ServiceUtil {
             } catch (Exception e1) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                 try {
+                    if (app == null) {
+                        app = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("Could not determine application"));
+                    }
                     c = Class.forName(stack1.getClassName(), false, app.getClassLoader());
                 }catch (Exception e2) {
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e2);

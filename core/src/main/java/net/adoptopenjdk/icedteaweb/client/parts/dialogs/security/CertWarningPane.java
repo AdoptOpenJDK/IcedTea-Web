@@ -37,7 +37,7 @@ exception statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -49,11 +49,7 @@ import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.HttpsCertVerifier;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -71,12 +67,11 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides the panel for using inside a SecurityDialog. These dialogs are
@@ -85,7 +80,10 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * printer, etc) is needed with unsigned code.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class CertWarningPane extends SecurityDialogPanel {
 
     private final static Logger LOG = LoggerFactory.getLogger(CertWarningPane.class);
@@ -302,8 +300,8 @@ public class CertWarningPane extends SecurityDialogPanel {
     private class MoreInfoButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            SecurityDialog.showMoreInfoDialog(parent.getCertVerifier(),
-                                parent);
+            Dialogs.showMoreInfoDialog(parent.getCertVerifier(),
+                                parent.getFile());
         }
     }
 
@@ -330,26 +328,8 @@ public class CertWarningPane extends SecurityDialogPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (alwaysTrust != null && alwaysTrust.isSelected()) {
-                saveCert();
+                CertificateUtils.saveCertificate((X509Certificate) parent.getCertVerifier().getPublisher(null));
             }
-        }
-    }
-
-    public void saveCert() {
-        try {
-            KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS).getKs();
-            X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
-            CertificateUtils.addToKeyStore(c, ks);
-            File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
-            if (!keyStoreFile.isFile()) {
-                FileUtils.createRestrictedFile(keyStoreFile);
-            }
-            SecurityUtil.storeKeyStore(ks, keyStoreFile);
-            LOG.debug("certificate is now permanently trusted");
-        } catch (Exception ex) {
-                    // TODO: Let NetX show a dialog here notifying user
-            // about being unable to add cert to keystore
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
     }
 

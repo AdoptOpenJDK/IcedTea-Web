@@ -40,8 +40,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,8 +47,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import static net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils.splitCombination;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROPERTIES;
 
@@ -87,10 +85,10 @@ public final class DeploymentConfiguration {
     private File userPropertiesFile = null;
 
     /** the current deployment properties */
-    private final Map<String, Setting<String>> currentConfiguration;
+    private final Map<String, Setting> currentConfiguration;
 
     /** the deployment properties that cannot be changed */
-    private final Map<String, Setting<String>> unchangeableConfiguration;
+    private final Map<String, Setting> unchangeableConfiguration;
 
     public DeploymentConfiguration() {
         this(PathsAndFiles.USER_DEPLOYMENT_FILE);
@@ -109,7 +107,7 @@ public final class DeploymentConfiguration {
         }
     }
 
-    private Optional<Setting<String>> getSetting(final String key) {
+    private Optional<Setting> getSetting(final String key) {
         return Optional.ofNullable(getRaw().get(key));
     }
 
@@ -184,8 +182,8 @@ public final class DeploymentConfiguration {
             sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
 
-        final Map<String, Setting<String>> initialProperties = Defaults.getDefaults();
-        final Map<String, Setting<String>> systemProperties = loadSystemProperties();
+        final Map<String, Setting> initialProperties = Defaults.getDefaults();
+        final Map<String, Setting> systemProperties = loadSystemProperties();
 
         mergeMaps(initialProperties, systemProperties);
 
@@ -201,7 +199,7 @@ public final class DeploymentConfiguration {
          */
         userPropertiesFile = userDeploymentFileDescriptor.getFile();
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
-        final Map<String, Setting<String>> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
+        final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
         if (userProperties != null) {
             mergeMaps(initialProperties, userProperties);
@@ -215,7 +213,7 @@ public final class DeploymentConfiguration {
         currentConfiguration.putAll(initialProperties);
     }
 
-    private Map<String, Setting<String>> loadSystemProperties() throws MalformedURLException, ConfigurationException {
+    private Map<String, Setting> loadSystemProperties() throws MalformedURLException, ConfigurationException {
         /*
          * First, try to read the system's deployment.config file to find if
          * there is a system-level deployment.properties file
@@ -268,11 +266,8 @@ public final class DeploymentConfiguration {
         return null;
     }
 
-    public List<String> getPropertyAsList(final String key, final char separator) {
-        return Optional.ofNullable(getProperty(key))
-                .map(v -> v.split("\\s*" + Pattern.quote(Character.toString(separator)) + "\\s*"))
-                .map(Arrays::asList)
-                .orElseGet(Collections::emptyList);
+    public List<String> getPropertyAsList(final String key) {
+        return splitCombination(getProperty(key));
     }
 
     /**
@@ -292,7 +287,7 @@ public final class DeploymentConfiguration {
     /**
      * @return a map containing property names and the corresponding settings
      */
-    public Map<String, Setting<String>> getRaw() {
+    public Map<String, Setting> getRaw() {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             if (userPropertiesFile != null) {
@@ -318,7 +313,7 @@ public final class DeploymentConfiguration {
             }
         }
 
-        final Setting<String> currentValue = currentConfiguration.get(key);
+        final Setting currentValue = currentConfiguration.get(key);
         if (currentValue != null) {
             if (!currentValue.isLocked()) {
                 currentValue.setValue(value);
@@ -336,12 +331,12 @@ public final class DeploymentConfiguration {
      *
      * @param initial a map representing the initial configuration
      */
-    private void checkAndFixConfiguration(final Map<String, Setting<String>> initial) {
+    private void checkAndFixConfiguration(final Map<String, Setting> initial) {
 
-        final Map<String, Setting<String>> defaults = Defaults.getDefaults();
+        final Map<String, Setting> defaults = Defaults.getDefaults();
 
         for (final String key : initial.keySet()) {
-            final Setting<String> s = initial.get(key);
+            final Setting s = initial.get(key);
             if (!(s.getName().equals(key))) {
                 LOG.info("key '{}' does not match setting name '{}'", key, s.getName());
             } else if (!defaults.containsKey(key)) {
@@ -372,8 +367,8 @@ public final class DeploymentConfiguration {
 
         String jrePath = null;
         try {
-            final Map<String, Setting<String>> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getUrl());
-            final Setting<String> jreSetting = tmpProperties.get(ConfigurationConstants.KEY_JRE_DIR);
+            final Map<String, Setting> tmpProperties = parsePropertiesFile(userDeploymentFileDescriptor.getUrl());
+            final Setting jreSetting = tmpProperties.get(ConfigurationConstants.KEY_JRE_DIR);
             if (jreSetting != null) {
                 jrePath = jreSetting.getValue();
             }
@@ -404,7 +399,7 @@ public final class DeploymentConfiguration {
 
         LOG.info("Loading system configuration from: {}", configFile);
 
-        final Map<String, Setting<String>> systemConfiguration;
+        final Map<String, Setting> systemConfiguration;
         try {
             systemConfiguration = new HashMap<>(parsePropertiesFile(configFile));
         } catch (final IOException e) {
@@ -418,13 +413,13 @@ public final class DeploymentConfiguration {
          */
         String urlString = null;
         try {
-            final Setting<String> urlSettings = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG);
+            final Setting urlSettings = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG);
             if (urlSettings == null || urlSettings.getValue() == null) {
                 LOG.info("No System level {} found in {}", DEPLOYMENT_PROPERTIES, configFile.toExternalForm());
                 return false;
             }
             urlString = urlSettings.getValue();
-            final Setting<String> mandatory = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
+            final Setting mandatory = systemConfiguration.get(ConfigurationConstants.KEY_SYSTEM_CONFIG_MANDATORY);
             systemPropertiesMandatory = Boolean.parseBoolean(mandatory == null ? null : mandatory.getValue()); //never null
             LOG.info("System level settings {} are mandatory: {}", DEPLOYMENT_PROPERTIES, systemPropertiesMandatory);
             systemPropertiesFile = new URL(urlString);
@@ -453,7 +448,7 @@ public final class DeploymentConfiguration {
      *
      * @throws ConfigurationException if the file is mandatory but does not exist or cannot be read properly
      */
-    static Map<String, Setting<String>> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
+    static Map<String, Setting> loadProperties(final ConfigType type, final URL file, final boolean mandatory)
             throws ConfigurationException {
         if (file == null || !checkUrl(file)) {
             final String message = String.format("No %s level %s found at %s.", type, DEPLOYMENT_PROPERTIES, file);
@@ -503,8 +498,8 @@ public final class DeploymentConfiguration {
         final Properties toSave = new Properties();
 
         for (final String key : currentConfiguration.keySet()) {
-            final Setting<String> defaultSetting = unchangeableConfiguration.get(key);
-            final Setting<String> currentSetting = currentConfiguration.get(key);
+            final Setting defaultSetting = unchangeableConfiguration.get(key);
+            final Setting currentSetting = currentConfiguration.get(key);
 
             final String defaultValue = defaultSetting == null ? null : defaultSetting.getValue();
             final String newValue = currentSetting == null ? null : currentSetting.getValue();
@@ -552,8 +547,8 @@ public final class DeploymentConfiguration {
      * @param propertiesFile the file to read Properties from
      * @throws IOException if an IO problem occurs
      */
-    private static Map<String, Setting<String>> parsePropertiesFile(final URL propertiesFile) throws IOException {
-        final Map<String, Setting<String>> result = new HashMap<>();
+    private static Map<String, Setting> parsePropertiesFile(final URL propertiesFile) throws IOException {
+        final Map<String, Setting> result = new HashMap<>();
 
         final Properties properties = new Properties();
 
@@ -565,12 +560,12 @@ public final class DeploymentConfiguration {
         for (final String key : keys) {
             if (key.endsWith(LOCKED_POSTFIX)) {
                 final String realKey = key.substring(0, key.length() - LOCKED_POSTFIX.length());
-                final Setting<String> configValue = result.get(realKey);
+                final Setting configValue = result.get(realKey);
                 final String value = configValue == null ? null : configValue.getValue();
                 result.put(realKey, Setting.createFromPropertyFile(realKey, value, true, propertiesFile));
             } else {
                 final String newValue = properties.getProperty(key);
-                final Setting<String> configValue = result.get(key);
+                final Setting configValue = result.get(key);
                 final boolean locked = configValue != null && configValue.isLocked();
                 result.put(key, Setting.createFromPropertyFile(key, newValue, locked, propertiesFile));
             }
@@ -587,10 +582,10 @@ public final class DeploymentConfiguration {
      * @param finalMap the destination for putting values
      * @param srcMap the source for reading key value pairs
      */
-    private void mergeMaps(final Map<String, Setting<String>> finalMap, final Map<String, Setting<String>> srcMap) {
+    private void mergeMaps(final Map<String, Setting> finalMap, final Map<String, Setting> srcMap) {
         for (String key : srcMap.keySet()) {
-            final Setting<String> destValue = finalMap.get(key);
-            final Setting<String> srcValue = srcMap.get(key);
+            final Setting destValue = finalMap.get(key);
+            final Setting srcValue = srcMap.get(key);
             if (destValue == null) {
                 finalMap.put(key, srcValue);
             } else {
@@ -609,11 +604,11 @@ public final class DeploymentConfiguration {
      * @param out the PrintStream to write data to
      */
     @SuppressWarnings("unused")
-    private static void dumpConfiguration(final Map<String, Setting<String>> config, final PrintStream out) {
+    private static void dumpConfiguration(final Map<String, Setting> config, final PrintStream out) {
         LOG.info("KEY: VALUE [Locked]");
 
         for (final String key : config.keySet()) {
-            Setting<String> value = config.get(key);
+            Setting value = config.get(key);
             out.println("'" + key + "': '" + value.getValue() + "'"
                     + (value.isLocked() ? " [LOCKED]" : ""));
         }

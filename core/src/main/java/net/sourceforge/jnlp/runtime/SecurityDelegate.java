@@ -1,10 +1,7 @@
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.sourceforge.jnlp.LaunchException;
 
-import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
 
@@ -21,12 +18,6 @@ import java.util.Collection;
  * does not require one.
  */
 public interface SecurityDelegate {
-
-    SecurityDesc getCodebaseSecurityDesc(final JARDesc jarDesc, final URL codebaseHost);
-
-    SecurityDesc getClassLoaderSecurity(final URL codebaseHost) throws LaunchException;
-
-    SecurityDesc getJarPermissions(final URL codebaseHost);
 
     void promptUserOnPartialSigning() throws LaunchException;
 

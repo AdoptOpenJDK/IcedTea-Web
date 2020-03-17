@@ -40,19 +40,19 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 
 import javax.swing.BorderFactory;
@@ -61,7 +61,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -79,6 +78,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides a panel to show inside a SecurityDialog. These dialogs are
@@ -87,20 +87,16 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * printer, etc) is needed with unsigned code.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class AccessWarningPane extends SecurityDialogPanel implements RememberableDialog{
 
     private Object[] extras;
     private JCheckBox desktopCheck;
     private JCheckBox menuCheck;
-    HtmlShortcutPanel htmlPanelDesktop;
-    HtmlShortcutPanel htmlPanelMenu;
     RememberPanel rememberPanel;
-
-    public AccessWarningPane(SecurityDialog x, CertVerifier certVerifier) {
-        super(x, certVerifier);
-        addComponents();
-    }
 
     public AccessWarningPane(SecurityDialog x, Object[] extras, CertVerifier certVerifier) {
         super(x, certVerifier);
@@ -201,8 +197,8 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         fromLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 
-        final JButton run = new JButton(R("ButOk"));
-        final JButton cancel = new JButton(R("ButCancel"));
+        final JButton okButton = new JButton(R("ButOk"));
+        final JButton cancelButton = new JButton(R("ButCancel"));
         
         JPanel infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -239,20 +235,8 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             c.gridy++;
             infoPanel.add(desktopCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
-                htmlPanelDesktop = new HtmlShortcutPanel();
-                infoPanel.add(htmlPanelDesktop, c);
-                htmlPanelDesktop.setVisible(false);
-                c.gridy++;
-            }
             infoPanel.add(menuCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
-                htmlPanelMenu = new HtmlShortcutPanel();
-                infoPanel.add(htmlPanelMenu, c);
-                htmlPanelMenu.setVisible(false);
-                c.gridy++;
-            }
             infoPanel.add(new JLabel(R("EXAWsettingsInfo",
                     ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT)),
                     R("CPTabDesktopIntegration"))),c);
@@ -269,15 +253,13 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         //run and cancel buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton showAdvanced = new JButton(R("ButAdvancedOptions"));
-        showAdvanced.addActionListener(new ActionListener() {
+        JButton showAdvancedButton = new JButton(R("ButAdvancedOptions"));
+        showAdvancedButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 negateVisibility(rememberPanel);
-                negateVisibility(htmlPanelDesktop);
-                negateVisibility(htmlPanelMenu);
-                AccessWarningPane.this.parent.getViwableDialog().pack();
+                AccessWarningPane.this.parent.getViewableDialog().pack();
                 
             }
 
@@ -288,26 +270,18 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             }
         }
         );
-        run.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(Primitive.YES));
-                parent.getViwableDialog().dispose();
-            }
+        okButton.addActionListener(e -> {
+            parent.setValue(getModifier(Primitive.YES));
+            parent.getViewableDialog().dispose();
         });
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.setValue(getModifier(Primitive.NO));
-                parent.getViwableDialog().dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            parent.setValue(getModifier(Primitive.NO));
+            parent.getViewableDialog().dispose();
         });
-        initialFocusComponent = cancel;
-        buttonPanel.add(run);
-        buttonPanel.add(cancel);
-        buttonPanel.add(showAdvanced);
+        initialFocusComponent = cancelButton;
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(showAdvancedButton);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         //all of the above
@@ -317,34 +291,22 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         add(buttonPanel);
         
         rememberPanel.setVisible(false);
-        this.parent.getViwableDialog().pack();
+        this.parent.getViewableDialog().pack();
 
     }
 
     private AccessWarningPaneComplexReturn getModifier(Primitive button) {
         AccessWarningPaneComplexReturn ar = new AccessWarningPaneComplexReturn(button);
         if (desktopCheck != null) {
-            if (htmlPanelDesktop != null) {
-                //html
-                ar.setDesktop(htmlPanelDesktop.getShortcutResult(desktopCheck.isSelected()));
-            } else {
-                //jnlp
-                ar.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(desktopCheck.isSelected()));
-            }
+            ar.setDesktop(new ShortcutResult(desktopCheck.isSelected()));
         }
         if (menuCheck != null) {
-            if (htmlPanelMenu != null) {
-                //html
-                ar.setMenu(htmlPanelMenu.getShortcutResult(menuCheck.isSelected()));
-            } else {
-                //jnlp
-                ar.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(menuCheck.isSelected()));
-            }
+            ar.setMenu(new ShortcutResult(menuCheck.isSelected()));
         }
         return ar;
     }
 
-    private class RememberPanel extends JPanel {
+    private static class RememberPanel extends JPanel {
 
         final JRadioButton byApp = new JRadioButton(R("EXAWrememberByApp"));
         final JRadioButton byPage = new JRadioButton(R("EXAWrememberByPage"));
@@ -364,7 +326,6 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             bg.add(byPage);
             bg.add(dont);
             this.validate();
-
         }
 
         private boolean isRemembered(){
@@ -375,108 +336,11 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         }
 
         private RememberPanelResult getResult() {
-            return new RememberPanelResult(isRemembered(), isRememberedForCodebase());
+           return new RememberPanelResult(isRemembered(), isRememberedForCodebase());
         }
-
     }
 
-    private class HtmlShortcutPanel extends JPanel {
-
-        final JRadioButton browser = new JRadioButton(R("EXAWbrowser"), true);
-        final JComboBox<String> browsers = new JComboBox<>(XDesktopEntry.BROWSERS);
-        final JRadioButton jnlpGen = new JRadioButton(R("EXAWgenjnlp"));
-        final JRadioButton jnlpHref = new JRadioButton(R("EXAWjnlphref"));
-        final JRadioButton javawsHtml = new JRadioButton(R("EXAWhtml"));
-        final JCheckBox fix = new JCheckBox(R("EXAWfixhref"));
-        final ActionListener modifySecondaryControls = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                if (browser.isSelected()) {
-                    browsers.setEnabled(true);
-                } else {
-                    browsers.setEnabled(false);
-                }
-                if (jnlpHref.isSelected()) {
-                    fix.setEnabled(true);
-                    fix.setSelected(true);
-                } else {
-                    fix.setEnabled(false);
-                    fix.setSelected(false);
-                }
-            }
-        };
-
-        public HtmlShortcutPanel() {
-            super(new FlowLayout(FlowLayout.CENTER, 1, 5));
-            this.setBorder(new EmptyBorder(0, 0, 0, 0));
-            addMainComponents();
-            setTooltips();
-            ButtonGroup bg = createRadiosGroup();
-            // init checkbox
-            modifySecondaryControls.actionPerformed(null);
-            this.validate();
-
-        }
-
-        public AccessWarningPaneComplexReturn.ShortcutResult getShortcutResult(boolean mainResolution) {
-            AccessWarningPaneComplexReturn.ShortcutResult r = new AccessWarningPaneComplexReturn.ShortcutResult(mainResolution);
-            r.setBrowser((String) browsers.getSelectedItem());
-            r.setFixHref(fix.isSelected());
-            if (browser.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.BROWSER);
-            } else if (jnlpGen.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP);
-            } else if (jnlpHref.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF);
-            } else if (javawsHtml.isSelected()) {
-                r.setShortcutType(AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML);
-            }
-            return r;
-        }
-
-        private ButtonGroup createRadiosGroup() {
-            ButtonGroup bg = new ButtonGroup();
-            bg.add(browser);
-            bg.add(jnlpGen);
-            bg.add(jnlpHref);
-            bg.add(javawsHtml);
-            setCheckboxModifierListener();
-            return bg;
-        }
-
-        private void setCheckboxModifierListener() {
-            browser.addActionListener(modifySecondaryControls);
-            jnlpGen.addActionListener(modifySecondaryControls);
-            jnlpHref.addActionListener(modifySecondaryControls);
-            javawsHtml.addActionListener(modifySecondaryControls);
-        }
-
-        private void addMainComponents() {
-            this.add(browser);
-            browsers.setEditable(true);
-            browsers.setSelectedItem(XDesktopEntry.getBrowserBin());
-            this.add(browsers);
-            this.add(jnlpGen);
-            this.add(jnlpHref);
-            this.add(javawsHtml);
-            this.add(fix);
-            jnlpHref.setEnabled(false);
-        }
-
-        private void setTooltips() {
-            browser.setToolTipText(R("EXAWbrowserTolltip"));
-            browsers.setToolTipText(R("EXAWbrowsersTolltip"));
-            jnlpGen.setToolTipText(R("EXAWgeneratedTolltip"));
-            jnlpHref.setToolTipText(R("EXAWhrefTolltip"));
-            javawsHtml.setToolTipText(R("EXAWhtmlTolltip"));
-            fix.setToolTipText(R("EXAWfixTolltip"));
-        }
-
-    }
-    
-    
-     @Override
+    @Override
     public RememberPanelResult getRememberAction() {
        return rememberPanel.getResult();
     }
@@ -522,5 +386,4 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             return YesNo.yes().getAllowedValues().toString();
         }
     }
-    
 }

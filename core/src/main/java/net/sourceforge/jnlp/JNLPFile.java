@@ -29,15 +29,14 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
@@ -48,8 +47,9 @@ import sun.net.www.protocol.http.HttpURLConnection;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.PermissionCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -194,17 +194,12 @@ public class JNLPFile {
     /**
      * A signed JNLP file is missing from the main jar
      */
-    private boolean missingSignedJNLP = false;
+    private boolean isSigned = false;
 
     /**
      * List of acceptable properties (not-special)
      */
-    final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
-
-    /**
-     * important manifests' attributes
-     */
-    private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
+    final private PermissionCollection generalProperties = PermissionsManager.getJnlpRiaPermissions();
 
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
@@ -224,7 +219,7 @@ public class JNLPFile {
      * Empty stub, allowing child classes to override the constructor
      */
     // only used for tests
-    protected JNLPFile() {
+    public JNLPFile() {
         this.parserSettings = null;
         this.fileLocation = null;
         this.uniqueKey = null;
@@ -276,19 +271,9 @@ public class JNLPFile {
     }
 
     private String getTitleImpl() {
-        String jnlpTitle = getTitleFromJnlp();
-        String manifestTitle = getTitleFromManifest();
-        if (jnlpTitle != null && manifestTitle != null) {
-            if (jnlpTitle.equals(manifestTitle)) {
-                return jnlpTitle;
-            }
-            return jnlpTitle + " (" + manifestTitle + ")";
-        }
-        if (jnlpTitle != null && manifestTitle == null) {
+        final String jnlpTitle = getTitleFromJnlp();
+        if (jnlpTitle != null) {
             return jnlpTitle;
-        }
-        if (jnlpTitle == null && manifestTitle != null) {
-            return manifestTitle;
         }
         return null;
     }
@@ -299,11 +284,6 @@ public class JNLPFile {
      */
     public String getTitleFromJnlp() {
         return getInformation().getTitle();
-    }
-
-    public String getTitleFromManifest() {
-        String inManifestTitle = getManifestAttributesReader().getApplicationName();
-        return inManifestTitle;
     }
 
     /**
@@ -497,15 +477,8 @@ public class JNLPFile {
     /**
      * @return the requested security level of the application represented by this JNLP file.
      */
-    public ApplicationPermissionLevel getApplicationPermissionLevel() {
-        return this.security.getApplicationPermissionLevel();
-    }
-
-    /**
-     * @return the requested security level of the applet represented by this JNLP file.
-     */
-    public AppletPermissionLevel getAppletPermissionLevel() {
-        return this.security.getAppletPermissionLevel();
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return this.security.getApplicationEnvironment();
     }
 
     /**
@@ -699,7 +672,8 @@ public class JNLPFile {
      */
     private boolean checkForSpecialProperties() {
         final Map<String, String> props = getJnlpResources().getPropertiesMap();
-        return Arrays.stream(generalProperties).anyMatch(gp -> !props.containsKey(gp));
+
+        return Collections.list(generalProperties.elements()).stream().anyMatch(gp -> !props.containsKey(gp.getName()));
     }
 
     /**
@@ -750,66 +724,37 @@ public class JNLPFile {
      * @return true if a warning should be displayed; otherwise false
      */
     public boolean requiresSignedJNLPWarning() {
-        return (missingSignedJNLP && checkForSpecialProperties());
+        return (isUnsigend() && checkForSpecialProperties());
+    }
+
+    /**
+     * Marks this file as signed. I.e. the file is matched by an entry in the main jar.
+     */
+    public void markFileAsSigned() {
+        isSigned = true;
     }
 
     /**
      * Informs that a signed JNLP file is missing in the main jar
      */
-    public void setSignedJNLPAsMissing() {
-        missingSignedJNLP = true;
+    public boolean isUnsigend() {
+        return !isSigned;
     }
 
-    public ManifestAttributesReader getManifestAttributesReader() {
-        return manifestAttributesReader;
-    }
-
-
-    public String createJnlpVendorValue() {
-        final String location;
+    private String createShortcutNameFromLocation() {
         if (getSourceLocation() != null) {
-            location = getSourceLocation().toString();
+            return new File(getSourceLocation().getFile()).getName();
         } else if (getCodeBase() != null) {
-            location = getCodeBase().toString();
+            return new File(getCodeBase().getFile()).getName();
         } else {
-            location = "unknown";
+            return "unknown";
         }
-        return location;
     }
 
-    public String createJnlpVendor() {
-        return "Generated from applet from " + createJnlpVendorValue();
-    }
-
-    private String createJnlpTitleValue() {
-        final String location;
-        if (getSourceLocation() != null) {
-            location = new File(getSourceLocation().getFile()).getName();
-        } else if (getCodeBase() != null) {
-            location = new File(getCodeBase().getFile()).getName();
-        } else {
-            location = "unknown";
-        }
-        return location;
-    }
-
-    public String createJnlpTitle() {
-        //case when creating name from already created name
-        String shortenedTitle = getTitle();
-        int i = shortenedTitle.lastIndexOf("(");
-        if (i >= 2) { // not cutting immediately...
-            shortenedTitle = shortenedTitle.substring(0, i - 1);
-        }
-        if (createJnlpTitleValue().startsWith(shortenedTitle)) {
-            return createJnlpTitleValue();
-        }
-        return getTitle() + " from " + createJnlpTitleValue();
-    }
-
-    public String createNameForDesktopFile() {
-        String basicTitle = getTitle();
-        if (basicTitle == null || basicTitle.trim().isEmpty()) {
-            return createJnlpTitleValue().replaceAll(".jnlp$", "");
+    public String getShortcutName() {
+        String basicTitle = getInformation().getTitle();
+        if (StringUtils.isBlank(basicTitle)) {
+            return createShortcutNameFromLocation().replaceAll("\\.jnlp$", "");
         } else {
             return basicTitle;
         }

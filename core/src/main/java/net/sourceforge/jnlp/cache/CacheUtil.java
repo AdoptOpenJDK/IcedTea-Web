@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
@@ -66,7 +67,7 @@ public class CacheUtil {
      */
     public static File downloadAndGetCacheFile(final URL location, final VersionString version) {
         try {
-            final ResourceTracker rt = new ResourceTracker();
+            final ResourceTracker rt = new DefaultResourceTracker();
             rt.addResource(location, version);
             return rt.getCacheFile(location);
         } catch (Exception ex) {

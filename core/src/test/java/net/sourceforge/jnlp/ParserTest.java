@@ -40,6 +40,7 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationType;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.mock.MockJNLPFile;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
@@ -59,6 +60,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 
@@ -1537,8 +1540,7 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(null, u);
         try {
             NodeUtils.getURL(root, JNLPFile.CODEBASE_ATTRIBUTE, null, defaultParser.isStrict());
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             eex = ex;
         }
         Assert.assertEquals(true, eex != null);
@@ -1836,15 +1838,15 @@ public class ParserTest extends NoStdOutErrTest {
             Node root = xmlParser.getRootNode(is);
             MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
             Parser parser = new Parser(file1, null, root, defaultParser, null);
-            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            AppletDesc ad = (AppletDesc) (parser.getEntryPointDesc(root));
 
             Rectangle screen = ScreenFinder.getCurrentScreenSizeWithoutBounds();
-            double expectedWidth = screen.getWidth()/2;
-            double expectedHeight = screen.getHeight()/10;
+            double expectedWidth = screen.getWidth() / 2;
+            double expectedHeight = screen.getHeight() / 10;
             double errorMargin = 2;
 
-            Assert.assertTrue(ad.getWidth() > expectedWidth - errorMargin && ad.getWidth() < expectedWidth + errorMargin );
-            Assert.assertTrue(ad.getHeight() > expectedHeight - errorMargin && ad.getHeight() < expectedHeight + errorMargin );
+            Assert.assertTrue(ad.getWidth() > expectedWidth - errorMargin && ad.getWidth() < expectedWidth + errorMargin);
+            Assert.assertTrue(ad.getHeight() > expectedHeight - errorMargin && ad.getHeight() < expectedHeight + errorMargin);
         }
     }
 
@@ -1856,7 +1858,7 @@ public class ParserTest extends NoStdOutErrTest {
             Node root = xmlParser.getRootNode(is);
             MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
             Parser parser = new Parser(file1, null, root, defaultParser, null);
-            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            AppletDesc ad = (AppletDesc) (parser.getEntryPointDesc(root));
             Assert.assertEquals(111, ad.getHeight());
             Assert.assertEquals(555, ad.getWidth());
         }
@@ -1870,7 +1872,7 @@ public class ParserTest extends NoStdOutErrTest {
             Node root = xmlParser.getRootNode(is);
             MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
             Parser parser = new Parser(file1, null, root, defaultParser, null);
-            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            AppletDesc ad = (AppletDesc) (parser.getEntryPointDesc(root));
             Assert.assertEquals(100, ad.getHeight());
             Assert.assertEquals(100, ad.getWidth());
         }
@@ -1884,9 +1886,61 @@ public class ParserTest extends NoStdOutErrTest {
             Node root = xmlParser.getRootNode(is);
             MockJNLPFile file1 = new MockJNLPFile(LANG_LOCALE);
             Parser parser = new Parser(file1, null, root, defaultParser, null);
-            AppletDesc ad = (AppletDesc)(parser.getEntryPointDesc(root));
+            AppletDesc ad = (AppletDesc) (parser.getEntryPointDesc(root));
             ad.getHeight();
             ad.getWidth();
         }
+    }
+
+    @Test
+    public void testJ2seVendor() throws Exception {
+        String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<jnlp spec=\"1.0+\" codebase=\"http://someNotExistingUrl.com\" href=\"dummy.jnlp\">" +
+                "<information><offline-allowed/></information>" +
+                "<security><all-permissions/></security>" +
+                "<resources>" +
+                "<j2se version=\"1.8+\" vendor=\"amazon\"/>" +
+                "<jar href=\"dummy.jar\"/>" +
+                "</resources>" +
+                "<application-desc main-class=\"com.karakun.DummyMain\"/>" +
+                "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser, null);
+        final List<ResourcesDesc> resources = parser.getResources(root, false);
+        final List<String> vendors = resources.stream().flatMap(r -> Stream.of(r.getJREs()))
+                .map(jreDesc -> jreDesc.getVendor())
+                .collect(Collectors.toList());
+
+        Assert.assertEquals(1, vendors.size());
+        Assert.assertEquals("amazon", vendors.get(0));
+    }
+
+    @Test
+    public void testJ2seNoVendor() throws Exception {
+        String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<jnlp spec=\"1.0+\" codebase=\"http://someNotExistingUrl.com\" href=\"dummy.jnlp\">" +
+                "<information><offline-allowed/></information>" +
+                "<security><all-permissions/></security>" +
+                "<resources>" +
+                "<j2se version=\"1.8+\"/>" +
+                "<jar href=\"dummy.jar\"/>" +
+                "</resources>" +
+                "<application-desc main-class=\"com.karakun.DummyMain\"/>" +
+                "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        Node root = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser, null);
+        final List<ResourcesDesc> resources = parser.getResources(root, false);
+        final List<String> vendors = resources.stream().flatMap(r -> Stream.of(r.getJREs()))
+                .map(jreDesc -> jreDesc.getVendor())
+                .collect(Collectors.toList());
+
+        Assert.assertEquals(1, vendors.size());
+        Assert.assertEquals(null, vendors.get(0));
     }
 }

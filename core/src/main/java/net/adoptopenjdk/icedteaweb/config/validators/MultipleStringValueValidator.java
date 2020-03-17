@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.config.validators;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Checks that the value is one of the acceptable single String values
@@ -20,22 +21,21 @@ public class MultipleStringValueValidator implements ValueValidator {
     }
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
-        if (!(value instanceof String)) {
-            throw new IllegalArgumentException("Must be a string");
+    public void validate(final String value) throws IllegalArgumentException {
+        if (value == null) {
+            throw new IllegalArgumentException("Must not be null");
         }
 
-        final String stringVal = (String) value;
         boolean found = false;
         for (final String knownVal : singleOptions) {
-            if (knownVal.equals(stringVal)) {
+            if (knownVal.equals(value)) {
                 found = true;
                 break;
             }
         }
 
         if (!found) {
-            final String[] possibleCombo = ValidatorUtils.splitCombination(stringVal);
+            final List<String> possibleCombo = ValidatorUtils.splitCombination(value);
             for (final String val : possibleCombo) {
                 if (comboOptionsContains(val)) {
                     found = true;

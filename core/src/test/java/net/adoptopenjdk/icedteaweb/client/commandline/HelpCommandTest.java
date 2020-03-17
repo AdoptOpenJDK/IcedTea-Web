@@ -19,6 +19,9 @@ package net.adoptopenjdk.icedteaweb.client.commandline;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import org.junit.Ignore;
+import net.sourceforge.jnlp.util.logging.LogConfig;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -33,7 +36,20 @@ import static org.hamcrest.Matchers.is;
  */
 public class HelpCommandTest extends AbstractCommandTest {
 
+    private static boolean originalEnableLogging;
     private static final String EOL = JavaSystemProperties.getLineSeparator();
+
+
+    @Before
+    public void setUp() {
+        originalEnableLogging = LogConfig.getLogConfig().isEnableLogging();
+        setEnableLogging(false);
+    }
+
+    @After
+    public void tearDown() {
+        setEnableLogging(originalEnableLogging);
+    }
 
     /**
      * Test whether the {@code -help}, command executes and terminates with {@link CommandLine#SUCCESS}.

@@ -72,7 +72,7 @@ public class SetValueHandler implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         dialog.setValue(returnValue);
-        dialog.getViwableDialog().dispose();
+        dialog.getViewableDialog().dispose();
     }
 
 }

@@ -26,10 +26,10 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 
@@ -124,12 +124,12 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @param info result of user's interference
      * @return string with desktop shortcut specification
      */
-    String getContent(boolean menu, AccessWarningPaneComplexReturn.ShortcutResult info) {
+    String getContent(boolean menu, ShortcutResult info) {
         File generatedJnlp = null;
 
         String fileContents = "[Desktop Entry]\n";
         fileContents += "Version=1.0\n";
-        fileContents += "Name=" + getDesktopIconName() + "\n";
+        fileContents += "Name=" + getShortcutName() + "\n";
         fileContents += "GenericName=Java Web Start Application\n";
         fileContents += "Comment=" + sanitize(file.getInformation().getDescription()) + "\n";
         if (menu) {
@@ -156,7 +156,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         }
         String exec;
         String title = "xdesktop writing";
-        if (JNLPRuntime.isWebstartApplication()) {
+        if (true) {
             exec = "Exec=" + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
             fileContents += exec;
         } else {
@@ -212,30 +212,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
         /* key=value pairs must be a single line */
         input = FileUtils.sanitizeFileName(input, '-');
         //return first line or replace new lines by space?
-        return input.split("\n")[0];
-    }
-
-    /**
-     * @return the size of the icon (in pixels) for the desktop shortcut
-     */
-    private int getIconSize() {
-        return iconSize;
+        return input.split("\\R")[0];
     }
 
     File getShortcutTmpFile() {
         String userTmp = PathsAndFiles.TMP_DIR.getFullPath();
-        File shortcutFile = new File(userTmp + File.separator + getDesktopIconFileName());
+        File shortcutFile = new File(userTmp + File.separator + getShortcutFileName());
         return shortcutFile;
-    }
-
-    /**
-     * Set the icon size to use for the desktop shortcut
-     *
-     * @param size the size (in pixels) of the icon to use. Commonly used sizes
-     *        are of 16, 22, 32, 48, 64 and 128
-     */
-    private void setIconSize(int size) {
-        iconSize = size;
     }
 
     /**
@@ -244,7 +227,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
      * @param desktop how to create on desktop
      */
     @Override
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
+    public void createDesktopShortcuts(ShortcutResult menu, ShortcutResult desktop) {
         boolean isDesktop = false;
         if (desktop != null && desktop.isCreate()) {
             isDesktop = true;
@@ -276,7 +259,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's menu.
      */
-    private void installMenuLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
+    private void installMenuLauncher(ShortcutResult info) {
         //TODO add itweb-settings tab which allows to remove individual items/icons
         try {
             File f = getLinuxMenuIconFile();
@@ -292,7 +275,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
     /**
      * Install this XDesktopEntry into the user's desktop as a launcher.
      */
-    private void installDesktopLauncher(AccessWarningPaneComplexReturn.ShortcutResult info) {
+    private void installDesktopLauncher(ShortcutResult info) {
         File shortcutFile = getShortcutTmpFile();
         try {
 
@@ -341,7 +324,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public File getGeneratedJnlpFileName() {
-        String name = FileUtils.sanitizeFileName(file.createNameForDesktopFile());
+        String name = FileUtils.sanitizeFileName(file.getShortcutName());
         while (name.endsWith(".jnlp")) {
             name = name.substring(0, name.length() - 5);
         }
@@ -543,17 +526,13 @@ public class XDesktopEntry implements GenericDesktopEntry {
         throw new NonFileProtocolException("Unable to cache icon");
     }
 
-    private String getDesktopIconName() {
-        return getDesktopIconName(file);
-    }
-
-    static String getDesktopIconName(JNLPFile file) {
-        return sanitize(file.createNameForDesktopFile());
+    private String getShortcutName() {
+        return sanitize(file.getShortcutName());
     }
 
     @Override
     public File getDesktopIconFile() {
-            return new File(getDesktop(), getDesktopIconFileName());
+            return new File(getDesktop(), getShortcutFileName());
     }
 
     static File getDesktop() {
@@ -562,12 +541,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
     @Override
     public File getLinuxMenuIconFile() {
-        return new File(findAndVerifyJavawsMenuDir() + "/" + getDesktopIconFileName());
+        return new File(findAndVerifyJavawsMenuDir() + "/" + getShortcutFileName());
     }
 
-    @Override
-    public String getDesktopIconFileName() {
-        return getDesktopIconName() + ".desktop";
+    private String getShortcutFileName() {
+        return getShortcutName() + ".desktop";
     }
 
     private static String findAndVerifyGeneratedJnlpDir() {

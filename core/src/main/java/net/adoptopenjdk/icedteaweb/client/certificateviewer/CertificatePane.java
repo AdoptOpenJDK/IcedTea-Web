@@ -39,7 +39,8 @@ package net.adoptopenjdk.icedteaweb.client.certificateviewer;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialog;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -47,7 +48,6 @@ import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -563,7 +563,7 @@ public class CertificatePane extends JPanel {
             if (selectedRow != -1 && selectedRow >= 0) {
                 int modelIndex = table.getRowSorter().convertRowIndexToModel(selectedRow);
                 X509Certificate c = certs.get(modelIndex);
-                SecurityDialog.showSingleCertInfoDialog(c, parent);
+                Dialogs.showSingleCertInfoDialog(c, parent);
             }
         }
     }

@@ -1,21 +1,19 @@
 package net.adoptopenjdk.icedteaweb.integration.classloader;
 
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
-import net.adoptopenjdk.icedteaweb.classloader.Part;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.util.List;
 import java.util.Locale;
 
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_1;
 import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.JAR_2;
-import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createPartsFor;
+import static net.adoptopenjdk.icedteaweb.integration.classloader.ClassloaderTestUtils.createDummyPartsHandlerFor;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class LocaleSpecificClassloaderIntegrationTests {
@@ -36,40 +34,40 @@ public class LocaleSpecificClassloaderIntegrationTests {
     /**
      * Resources with a matching local will be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testLoadForConcreteLocale() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-12.jnlp");
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-12.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        createAndInitClassloader(partsHandler);
 
         //than
-        Assertions.assertEquals(2, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(2, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_2));
     }
 
     /**
      * Resources with a not matching local won't be loaded
      */
-    @Test
     @RepeatedTest(10)
     public void testNotLoadForWrongLocale() throws Exception {
         //given
-        final DummyJarProvider jarProvider = new DummyJarProvider();
-        final List<Part> parts = createPartsFor("integration-app-13.jnlp");
+        final DummyPartsHandler partsHandler = createDummyPartsHandlerFor("integration-app-13.jnlp");
 
         //when
-        new JnlpApplicationClassLoader(parts, jarProvider);
+        createAndInitClassloader(partsHandler);
 
         //than
-        Assertions.assertEquals(1, jarProvider.getDownloaded().size());
-        Assertions.assertTrue(jarProvider.hasTriedToDownload(JAR_1));
-        Assertions.assertFalse(jarProvider.hasTriedToDownload(JAR_2));
+        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
+        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_2));
     }
 
-
+    private ClassLoader createAndInitClassloader(PartsHandler partsHandler) {
+        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
+        classLoader.initializeEagerJars();
+        return classLoader;
+    }
 }

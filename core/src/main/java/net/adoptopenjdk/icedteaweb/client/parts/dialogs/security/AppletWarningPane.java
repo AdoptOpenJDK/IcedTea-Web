@@ -54,6 +54,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
+
 public class AppletWarningPane extends SecurityDialogPanel {
 
     public AppletWarningPane(SecurityDialog x, CertVerifier certVerifier) {

@@ -49,7 +49,7 @@ public class GetCommandTest extends AbstractCommandTest {
 
         // THEN ------------
         assertEquals(SUCCESS, status);
-        assertThat(getOutContent(), containsString(KEY_SECURITY_LEVEL + ": " + "null"));
+        assertThat(getOutContent(), containsString(KEY_SECURITY_LEVEL + ": " + "HIGH"));
     }
 
 

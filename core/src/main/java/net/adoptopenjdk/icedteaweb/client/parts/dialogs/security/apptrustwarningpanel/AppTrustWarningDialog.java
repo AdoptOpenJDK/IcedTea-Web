@@ -42,18 +42,30 @@ import net.sourceforge.jnlp.runtime.SecurityDelegate;
 
 /**
  * A panel that confirms that the user is OK with unsigned code running.
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class AppTrustWarningDialog  {
 
+    /**
+     * @deprecated will be replaced by new security dialogs
+     * @param dialog
+     * @param file
+     * @return
+     */
+    @Deprecated
     public static AppTrustWarningPanel unsigned(final SecurityDialog dialog, final JNLPFile file) {
         return new UnsignedAppletTrustWarningPanel(dialog, file);
 
     }
 
+    @Deprecated
     public static AppTrustWarningPanel partiallySigned(final SecurityDialog dialog, final JNLPFile file, final SecurityDelegate securityDelegate) {
         return new PartiallySignedAppTrustWarningPanel(file, dialog, securityDelegate);
     }
-    
+
+    @Deprecated
     public static AppTrustWarningPanel matchingAlaca(SecurityDialog x, JNLPFile file, String codebase, String remoteUrls) {
         return new MatchingALACAttributePanel(x, file, codebase, remoteUrls);
     }

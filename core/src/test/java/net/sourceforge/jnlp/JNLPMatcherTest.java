@@ -37,333 +37,335 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
-import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Random;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JNLPMatcherTest {
 
-    static final String tests[] = {
-            "Testing template with CDATA",
-            "Testing template with an exact duplicate of the launching JNLP file",
-            "Testing template with wildchars as attribute/element values",
-            "Testing template with attributes/elements in different order",
-            "Testing template with wildchars as ALL element/attribute values",
-            "Testing template with comments",
-            "Testing template with different attribute/element values",
-            "Testing template by adding an additional children to element",
-            "Testing template by removing children from element",
-            "Testing template with a complete different JNLP template file ",
-            "Testing application with CDATA",
-            "Testing application with an exact duplicate of the launching JNLP file",
-            "Testing application with the same element/attribute name and value pair in different orders",
-            "Testing application with comments",
-            "Testing application with wildchars as attribute/element values",
-            "Testing application with a different codebase attribute value",
-            "Testing application by adding additional children to element",
-            "Testing application by removing children from element",
-            "Testing application with a complete different JNLP application file",
-            "Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent" };
+    private static final boolean IS_TEMPLATE = true;
+    private static final boolean IS_NOT_TEMPLATE = false;
+    private static final boolean MALFORMED_ALLOWED = false;
+    private static final ParserSettings DEFAULT_SETTINGS = new ParserSettings(true, true, MALFORMED_ALLOWED);
+
 
     private final ClassLoader cl = ClassLoader.getSystemClassLoader();
-    private final boolean MALFORMED_ALLOWED = false;
 
-    private InputStream getLaunchReader() {
-        return cl.getResourceAsStream("net/sourceforge/jnlp/launchApp.jnlp");
-    }
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     @KnownToFail
     @Ignore
-    public void testTemplateCDATA() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template0.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-             Assert.assertEquals(tests[0], true, test.isMatch());
-        }
+    public void testTemplateCDATA() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template0.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing template with CDATA", test.isMatch());
     }
 
     @Test
-    public void testTemplateDuplicate() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template1.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[1], true, test.isMatch());
-        }
+    public void testTemplateDuplicate() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template1.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing template with an exact duplicate of the launching JNLP file", test.isMatch());
     }
 
     @Test
-    public void testTemplateWildCharsRandom() throws JNLPMatcherException, IOException {
+    public void testTemplateWildCharsRandom() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template2.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template2.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[2], true, test.isMatch());
-        }
+        assertTrue("Testing template with wildchars as attribute/element values", test.isMatch());
     }
 
     @Test
-    public void testTemplateDifferentOrder() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template3.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[3], true, test.isMatch());
-        }
+    public void testTemplateDifferentOrder() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template3.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing template with attributes/elements in different order", test.isMatch());
     }
 
     @Test
-    public void testTemplateWildCharsAsAllValues() throws JNLPMatcherException,
-            IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template4.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[4], true, test.isMatch());
-        }
+    public void testTemplateWildCharsAsAllValues() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template4.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing template with wildchars as ALL element/attribute values", test.isMatch());
     }
 
     @Test
-    public void testTemplateComments() throws JNLPMatcherException, IOException {
+    public void testTemplateComments() throws Exception {
         //having comment inside element declaration is invalid but internal parser can handle it
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[5], true, test.isMatch());
-        }
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template5.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing template with comments", test.isMatch());
     }
 
     @Test
-    public void testTemplateDifferentValues() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template6.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[6], false, test.isMatch());
-        }
+    public void testTemplateDifferentValues() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template6.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing template with different attribute/element values", test.isMatch());
     }
 
     @Test
-    public void testTemplateExtraChild() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template7.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[7], false, test.isMatch());
-        }
+    public void testTemplateExtraChild() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template7.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing template by adding an additional children to element", test.isMatch());
     }
 
     @Test
-    public void testTemplateFewerChild() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template8.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[8], false, test.isMatch());
-        }
+    public void testTemplateFewerChild() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template8.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing template by removing children from element", test.isMatch());
     }
 
     @Test
-    public void testTemplateDifferentFile() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template9.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[9], false, test.isMatch());
-        }
+    public void testTemplateDifferentFile() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template9.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing template with a complete different JNLP template file", test.isMatch());
     }
 
     @Test
     @KnownToFail
     @Ignore
-    public void testApplicationCDATA() throws JNLPMatcherException, IOException {
+    public void testApplicationCDATA() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application0.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application0.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[10], true, test.isMatch());
-        }
+        assertTrue("Testing application with CDATA", test.isMatch());
     }
 
     @Test
-    public void testApplicationDuplicate() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application1.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[11], true, test.isMatch());
-        }
+    public void testApplicationDuplicate() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application1.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing application with an exact duplicate of the launching JNLP file", test.isMatch());
     }
 
     @Test
-    public void testApplicationDifferentOrder() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application2.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[12], true, test.isMatch());
-        }
+    public void testApplicationDifferentOrder() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application2.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing application with the same element/attribute name and value pair in different orders", test.isMatch());
     }
 
     @Test
-    public void testApplicationComments() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application3.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[13], true, test.isMatch());
-        }
+    public void testApplicationComments() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application3.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertTrue("Testing application with comments", test.isMatch());
     }
 
     @Test
-    public void testApplicationWildCharsRandom() throws JNLPMatcherException, IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application4.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[14], false, test.isMatch());
-        }
+    public void testApplicationWildCharsRandom() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application4.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing application with wildchars as attribute/element values", test.isMatch());
     }
 
     @Test
-    public void testApplicationDifferentCodebaseValue() throws JNLPMatcherException,
-            IOException {
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application5.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[15], false, test.isMatch());
-        }
+    public void testApplicationDifferentCodebaseValue() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application5.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
+
+        assertFalse("Testing application with a different codebase attribute value", test.isMatch());
     }
 
     @Test
-    public void testApplicationExtraChild() throws JNLPMatcherException, IOException {
+    public void testApplicationExtraChild() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application6.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application6.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[16], false, test.isMatch());
-        }
+        assertFalse("Testing application by adding additional children to element", test.isMatch());
     }
 
     @Test
-    public void testApplicationFewerChild() throws JNLPMatcherException, IOException {
+    public void testApplicationFewerChild() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application7.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application7.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[17], false, test.isMatch());
-        }
+        assertFalse("Testing application by removing children from element", test.isMatch());
     }
 
     @Test
-    public void testApplicationDifferentFile() throws JNLPMatcherException, IOException {
+    public void testApplicationDifferentFile() throws Exception {
+        final JNLPMatcher test = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application8.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        try (InputStream launchReader = this.getLaunchReader(); InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application8.jnlp")) {
-            JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            Assert.assertEquals(tests[18], false, test.isMatch());
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @Test
-    public void testNullJNLPFiles() throws IOException {
-
-        Exception expectedException = null;
-        InputStream fileStream;
-        try (InputStream launchReader = this.getLaunchReader()) {
-            fileStream = cl
-                    .getResourceAsStream("net/sourceforge/jnlp/application/application8.jnlp");
-            try {
-                JNLPMatcher test = new JNLPMatcher(null, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with null signed application/template reader",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-            try {
-                JNLPMatcher test = new JNLPMatcher(fileStream, null, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with null launching JNLP file reader",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-            try {
-                JNLPMatcher test = new JNLPMatcher(null, null, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-            } catch (Exception e) {
-                expectedException = e;
-            }
-            Assert.assertEquals(
-                    "Checking exception after trying to create an instance with both readers being null",
-                    expectedException.getClass().getName(),
-                    "net.sourceforge.jnlp.JNLPMatcherException");
-        }        fileStream.close();
+        assertFalse("Testing application with a complete different JNLP application file", test.isMatch());
     }
 
     @Test
-    public void testCallingMatchMultiple() throws JNLPMatcherException, IOException {
+    public void testCallingMatchMultiple() throws Exception {
+        final JNLPMatcher appMatcher = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/application/application8.jnlp", IS_NOT_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        // Check with application
-        InputStream launchReader = this.getLaunchReader();
+        assertFalse("Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent", appMatcher.isMatch());
+        assertFalse("Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent", appMatcher.isMatch());
 
-        InputStream fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/application/application8.jnlp");
-        
+        final JNLPMatcher tempMatcher = new JNLPMatcher(
+                jarFile("net/sourceforge/jnlp/templates/template6.jnlp", IS_TEMPLATE),
+                jnlpFile(),
+                DEFAULT_SETTINGS
+        );
 
-        JNLPMatcher test = new JNLPMatcher(fileStream, launchReader, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-
-        Assert.assertEquals(tests[19], false, test.isMatch());
-        Assert.assertEquals(tests[19], false, test.isMatch());
-
-        fileStream.close();
-        launchReader.close();
-
-        // Check with template
-        launchReader = this.getLaunchReader();
-
-        fileStream = cl
-                .getResourceAsStream("net/sourceforge/jnlp/templates/template6.jnlp");
-
-        test = new JNLPMatcher(fileStream, launchReader, true, new ParserSettings(true, true, MALFORMED_ALLOWED));
-
-        Assert.assertEquals(tests[19], false, test.isMatch());
-        Assert.assertEquals(tests[19], false, test.isMatch());
-
-        fileStream.close();
-        launchReader.close();
+        assertFalse("Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent", tempMatcher.isMatch());
+        assertFalse("Testing by calling JNLPMatcher.match() multiple times. Checking to see if the returns value is consistent", tempMatcher.isMatch());
     }
 
-    @Test (timeout=5000 /*ms*/)
-    public void testIsMatchDoesNotHangOnLargeData() throws JNLPMatcherException {
+    @Test(timeout = 5000 /*ms*/)
+    public void testIsMatchDoesNotHangOnLargeData() throws Exception {
         /* construct an alphabet containing characters 'a' to 'z' */
-        final int ALPHABET_SIZE = 26;
-        char[] alphabet = new char[ALPHABET_SIZE];
-        for (int i = 0; i < ALPHABET_SIZE; i++) {
-            alphabet[i] = (char)('a' + i);
-        }
+        final char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+        final int ALPHABET_SIZE = alphabet.length;
+
         /* generate a long but random string using the alphabet */
         final Random r = new Random();
         final int STRING_SIZE = 1024 * 1024; // 1 MB
-        StringBuilder descriptionBuilder = new StringBuilder(STRING_SIZE);
+        final StringBuilder descriptionBuilder = new StringBuilder(STRING_SIZE);
         for (int i = 0; i < STRING_SIZE; i++) {
             descriptionBuilder.append(alphabet[r.nextInt(ALPHABET_SIZE)]);
         }
-        String longDescription = descriptionBuilder.toString();
+        final String longDescription = descriptionBuilder.toString();
 
-        String file =
+        final String file =
                 "<jnlp>\n" +
-                "  <information>\n" +
-                "    <title>JNLPMatcher hangs on large file size</title>\n" +
-                "    <vendor>IcedTea</vendor>\n" +
-                "    <description>" + longDescription + "</description>\n" +
-                "  </information>\n" +
-                "</jnlp>\n";
+                        "  <information>\n" +
+                        "    <title>JNLPMatcher hangs on large file size</title>\n" +
+                        "    <vendor>IcedTea</vendor>\n" +
+                        "    <description>" + longDescription + "</description>\n" +
+                        "  </information>\n" +
+                        "</jnlp>\n";
 
         InputStream reader1 = new ByteArrayInputStream(file.getBytes(UTF_8));
-        InputStream reader2 = new ByteArrayInputStream(file.getBytes(UTF_8));
-        JNLPMatcher matcher = new JNLPMatcher(reader1, reader2, false, new ParserSettings(true, true, MALFORMED_ALLOWED));
-        Assert.assertTrue(matcher.isMatch());
+        JNLPMatcher matcher = new JNLPMatcher(jarFile(reader1, IS_NOT_TEMPLATE), jnlpFile(file), DEFAULT_SETTINGS);
+        assertTrue(matcher.isMatch());
+    }
+
+    private File jnlpFile() throws URISyntaxException {
+        final URL url = cl.getResource("net/sourceforge/jnlp/launchApp.jnlp");
+        assertNotNull(url);
+        return Paths.get(url.toURI()).toFile();
+    }
+
+    private File jnlpFile(String content) throws IOException {
+        final File jnlp = File.createTempFile("jnlpMatcherTest", ".jnlp", temporaryFolder.getRoot());
+        FileUtils.saveFileUtf8(content, jnlp);
+        return jnlp;
+    }
+
+    private File jarFile(String jnlpPath, boolean isTemplate) throws IOException {
+        try (final InputStream inStream = cl.getResourceAsStream(jnlpPath)) {
+            return jarFile(inStream, isTemplate);
+        }
+    }
+
+    private File jarFile(InputStream in, boolean isTemplate) throws IOException {
+        final File jar = File.createTempFile("jnlpMatcherTest", ".jar", temporaryFolder.getRoot());
+
+        try (final JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(jar))) {
+            final JarEntry jarEntry = new JarEntry(isTemplate ? JNLPMatcher.TEMPLATE : JNLPMatcher.APPLICATION);
+            jarOutputStream.putNextEntry(jarEntry);
+            IOUtils.copy(in, jarOutputStream);
+        }
+
+        return jar;
     }
 }

@@ -37,7 +37,11 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember;
 
-
+/**
+ * remembered == false => do not remember
+ * remembered == true && codebase == true => by domain
+ * remembered == true && codebase == false => by application
+ */
 public class RememberPanelResult {
     
     //when null, then information was not available
@@ -56,9 +60,4 @@ public class RememberPanelResult {
     public boolean isCodebase() {
         return codebase;
     }
-    
-    
-    
-    
-    
 }

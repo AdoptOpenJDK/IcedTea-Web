@@ -46,6 +46,7 @@ public class JREDesc {
     private static final char QUOTES = '"';
 
     public static final String VERSION_ATTRIBUTE = "version";
+    public static final String VENDOR_ATTRIBUTE = "vendor";
     public static final String HREF_ATTRIBUTE = "href";
     public static final String JAVA_VM_ARGS_ATTRIBUTE = "java-vm-args";
     public static final String INITIAL_HEAP_SIZE_ATTRIBUTE = "initial-heap-size";
@@ -56,6 +57,8 @@ public class JREDesc {
     /** The platform version or product version according to JSR-56, section 4.6.1 Java Runtime Environment Version Specification
      *  if location is not null */
     private final VersionString version;
+
+    private final String vendor;
 
     /** the location of a JRE product or null */
     private final URL location;
@@ -85,10 +88,11 @@ public class JREDesc {
      * @param resources list of ResourceDesc objects
      * @throws ParseException is something goes wrong
      */
-    public JREDesc(final VersionString version, final URL location,
+    public JREDesc(final VersionString version, final String vendor, final URL location,
                    final String vmArgs, final String initialHeapSize,
                    final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
+        this.vendor = vendor;
         this.location = location;
         this.vmArgs = vmArgs;
         this.parsedArguments = parseArguments(vmArgs);
@@ -113,6 +117,10 @@ public class JREDesc {
      */
     public boolean isPlatformVersion() {
         return getLocation() == null;
+    }
+
+    public String getVendor() {
+        return vendor;
     }
 
     /**
