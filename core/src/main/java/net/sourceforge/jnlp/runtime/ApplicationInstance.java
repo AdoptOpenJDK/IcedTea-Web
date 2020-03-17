@@ -113,9 +113,9 @@ public class ApplicationInstance {
      */
     public void initialize() throws LaunchException {
 
-        loader.initializeEagerJars();
-
         ApplicationManager.addApplication(this);
+
+        loader.initializeEagerJars();
 
         AppContext.getAppContext();
 
