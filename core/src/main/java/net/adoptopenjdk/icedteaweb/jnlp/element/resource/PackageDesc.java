@@ -68,7 +68,7 @@ public class PackageDesc {
             // Form 2: name is a package name
             final String pkName = name.substring(0, name.length() - 1);
             if (className.startsWith(pkName)) {
-                final String postfix = className.substring(pkName.length() + 1);
+                final String postfix = className.substring(pkName.length());
                 return recursive || !postfix.contains(".");
             }
         }
