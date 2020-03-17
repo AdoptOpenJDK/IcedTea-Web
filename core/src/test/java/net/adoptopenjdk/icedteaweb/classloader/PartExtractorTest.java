@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -116,7 +117,10 @@ public class PartExtractorTest {
             public boolean matches(Object actual) {
                 if (actual instanceof Part) {
                     final Part part = (Part) actual;
-                    return Objects.equals(part.getName(), name) &&
+                    final int expectedLength = UUID.randomUUID().toString().length();
+                    final boolean isDefaultName = part.getName().length() == expectedLength && Objects.equals(name, DEFAULT_NAME);
+                    final boolean nameMatches = Objects.equals(part.getName(), name) || isDefaultName;
+                    return nameMatches &&
                             part.isLazy() == lazy &&
                             matchesInAnyOrder(part.getJars(), jars) &&
                             matchesInAnyOrder(part.getPackages(), packages);

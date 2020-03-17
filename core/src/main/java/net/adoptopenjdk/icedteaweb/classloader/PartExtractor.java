@@ -8,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,11 +44,11 @@ public class PartExtractor {
     public PartExtractor(final JNLPFile jnlpFile, JNLPFileFactory jnlpFileFactory) {
         this.jnlpFileFactory = jnlpFileFactory;
 
-        this.defaultEagerPart = new Part(null);
+        this.defaultEagerPart = new Part();
         parts.add(defaultEagerPart);
         defaultEagerPart.markAsEager();
 
-        this.defaultLazyPart = new Part(null);
+        this.defaultLazyPart = new Part();
         parts.add(defaultLazyPart);
 
         addJnlpFile(jnlpFile, false);

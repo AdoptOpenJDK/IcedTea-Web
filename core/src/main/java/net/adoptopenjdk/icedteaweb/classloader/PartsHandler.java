@@ -87,7 +87,8 @@ public class PartsHandler implements JarProvider {
         partsLock.lock();
         try {
             final List<Part> notLoaded = parts.stream()
-                    .filter(o -> !loadedByClassloader.contains(o))
+                    .filter(part -> !loadedByClassloader.contains(part))
+                    .filter(part -> !part.getJars().isEmpty())
                     .collect(Collectors.toList());
 
             if (notLoaded.isEmpty()) {

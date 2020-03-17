@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 /**
  * ...
@@ -21,6 +22,10 @@ public class Part {
 
     private final List<JARDesc> jars = new ArrayList<>();
     private final List<PackageDesc> packages = new ArrayList<>();
+
+    Part() {
+        this(UUID.randomUUID().toString());
+    }
 
     Part(final String name) {
         this(null, name);
@@ -77,12 +82,13 @@ public class Part {
         if (o == null || getClass() != o.getClass()) return false;
         final Part part = (Part) o;
         return Objects.equals(name, part.name) &&
-                Objects.equals(extension, part.extension);
+                Objects.equals(extension, part.extension) &&
+                lazy == part.lazy;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, extension);
+        return Objects.hash(name, extension, lazy);
     }
 
     @Override
