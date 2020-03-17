@@ -145,12 +145,16 @@ public class Launcher {
 
         final String applicationTitle = file.getTitle();
         final CompletableFuture<ApplicationInstance> cf = applicationExecutor.execute(applicationTitle, () -> launchApplicationInstance(file));
-        final ApplicationInstance applicationInstance = cf.join();
-
-        if (handler != null) {
-            handler.launchCompleted(applicationInstance);
+        try {
+            final ApplicationInstance applicationInstance = cf.join();
+            if (handler != null) {
+                handler.launchCompleted(applicationInstance);
+            }
+            return applicationInstance;
+        } catch (Exception ex) {
+            LOG.error("Could not launch application instance", ex);
+            throw new LaunchException("Could not launch application instance", ex);
         }
-        return applicationInstance;
     }
 
     private ApplicationInstance launchApplicationInstance(final JNLPFile file) {

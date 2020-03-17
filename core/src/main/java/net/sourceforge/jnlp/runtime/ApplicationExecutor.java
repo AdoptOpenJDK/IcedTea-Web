@@ -37,7 +37,7 @@ public class ApplicationExecutor {
             private final ThreadGroup group = new ThreadGroup(mainGroup, applicationTitle);
 
             public Thread newThread(Runnable r) {
-                final Thread thread = new Thread(group, "Application-" + applicationTitle + "-thread-" + counter.incrementAndGet());
+                final Thread thread = new Thread(group, r, "Application-" + applicationTitle + "-thread-" + counter.incrementAndGet());
                 thread.setUncaughtExceptionHandler((t, e) -> LOG.error("Error in application thread for app '" + applicationTitle + "'", e));
                 return thread;
             }
