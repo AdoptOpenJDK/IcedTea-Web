@@ -52,10 +52,40 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     @Override
-    protected Class<?> findClass(final String name) throws ClassNotFoundException {
+    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        try {
+            return super.loadClass(name, resolve);
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        try {
+            return loadClassFromSystemClassLoader(name, resolve);
+        } catch (ClassNotFoundException ignored) {
+        }
+
+        return loadClassFromLazyLoadedJars(name, resolve);
+    }
+
+    private Class<?> loadClassFromSystemClassLoader(final String name, final boolean resolve) throws ClassNotFoundException {
+        final ClassLoader systemClassLoader = getSystemClassLoader();
+        if (systemClassLoader != null) {
+            final Class<?> c = systemClassLoader.loadClass(name);
+            if (resolve) {
+                resolveClass(c);
+            }
+            return c;
+        }
+        throw new ClassNotFoundException(name);
+    }
+
+    private Class<?> loadClassFromLazyLoadedJars(final String name, final boolean resolve) throws ClassNotFoundException {
         do {
             try {
-                return super.findClass(name);
+                final Class<?> c = super.findClass(name);
+                if (resolve) {
+                    resolveClass(c);
+                }
+                return c;
             } catch (ClassNotFoundException ignored) {
             }
         }
