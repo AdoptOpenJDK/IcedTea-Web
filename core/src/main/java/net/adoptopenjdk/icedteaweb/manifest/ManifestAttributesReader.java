@@ -33,8 +33,10 @@ import java.util.jar.Manifest;
  */
 public class ManifestAttributesReader {
     private final Manifest manifest;
+    private final String jarFilename;
 
     public ManifestAttributesReader(File jarFile) {
+        this.jarFilename = jarFile.getName();
         this.manifest = getManifest(Assert.requireNonNull(jarFile, "jarFile"));
     }
 
@@ -203,5 +205,9 @@ public class ManifestAttributesReader {
                     throw new IllegalArgumentException("Unknown value of " + name + " attribute " + value + ". Expected true or false");
             }
         }
+    }
+
+    public String getJarName() {
+        return jarFilename;
     }
 }

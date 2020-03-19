@@ -304,12 +304,11 @@ public class ManifestAttributesChecker {
     }
 
     private void validateRequestedEnvironmentMatchesManifestPermissions(final ApplicationEnvironment requested, final ManifestBoolean sandboxForced) throws LaunchException {
-        if (requested == ALL && sandboxForced != ManifestBoolean.FALSE) {
-            throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
-        }
 
-        if (requested == SANDBOX && sandboxForced != ManifestBoolean.TRUE) {
-            throw new LaunchException("The 'permissions' attribute is '" + permissionsToString() + "' but the applet requested " + requested + ". This is fatal");
+        if ((requested != SANDBOX && sandboxForced != ManifestBoolean.FALSE) ||
+                (requested == SANDBOX && sandboxForced != ManifestBoolean.TRUE)) {
+            throw new LaunchException(
+                    String.format("The 'permissions' attribute in %s is '%s' but the application requested %s. This is fatal.", reader.getJarName(), permissionsToString(), requested));
         }
     }
 

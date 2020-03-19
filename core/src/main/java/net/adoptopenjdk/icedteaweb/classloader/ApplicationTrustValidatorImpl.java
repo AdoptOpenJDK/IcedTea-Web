@@ -86,7 +86,8 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
             validateJars(jars, true);
 
         } catch (LaunchException e) {
-            LOG.info("Abort application launch - {}", e.getMessage());
+            LOG.error("Abort application launch - {}", e.getMessage());
+            // TODO: show dialog here
             JNLPRuntime.exit(0);
         }
     }
