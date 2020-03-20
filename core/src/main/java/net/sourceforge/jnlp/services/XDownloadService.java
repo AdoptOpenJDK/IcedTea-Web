@@ -17,14 +17,19 @@
 package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.classloader.Extension;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
 
 /**
  * The {@link DownloadService} service allows an application to control how its own resources are cached.
@@ -81,13 +86,24 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Returns whether the resource is cached locally.  This method
-     * only returns true if the resource is specified by the calling
-     * application or extension.
+     * {@inheritDoc}
      */
     @Override
     public boolean isResourceCached(final URL ref, final String version) {
-        throw new RuntimeException("Not implemented yet!");
+
+        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
+        boolean isAllowedToCheckCache = getApplication().getApplicationEnvironment() == ALL;
+
+        if (!isAllowedToCheckCache) {
+            isAllowedToCheckCache = getApplication().getPartsCache().isInAnyPart(ref, resourceVersion);
+        }
+
+        if (!isAllowedToCheckCache) {
+            final URL codeBase = getApplication().getJNLPFile().getCodeBase();
+            isAllowedToCheckCache = UrlUtils.urlRelativeTo(ref, codeBase);
+        }
+
+        return isAllowedToCheckCache && Cache.isAnyCached(ref, resourceVersion);
     }
 
     /**

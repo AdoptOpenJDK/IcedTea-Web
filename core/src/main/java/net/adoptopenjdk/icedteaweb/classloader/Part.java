@@ -2,7 +2,9 @@ package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -101,4 +103,9 @@ public class Part {
                 .toString();
     }
 
+    public boolean containsJar(final URL ref, final VersionString version) {
+        return jars.stream().anyMatch(jarDesc ->
+                Objects.equals(jarDesc.getLocation(), ref) && Objects.equals(jarDesc.getVersion(), version)
+        );
+    }
 }

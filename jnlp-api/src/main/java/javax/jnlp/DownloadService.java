@@ -4,6 +4,15 @@ import java.net.URL;
 
 public interface DownloadService {
 
+    /**
+     * Returns true if the resource referred to by the given URL and version is cached, and that resource
+     * is either mentioned in the calling applications JNLP file, is within the codebase of the calling
+     * applications JNLP file, or the calling application has been granted all-permissions.
+     *
+     * @param ref The URL for the resource.
+     * @param version The version string, or null for no version.
+     * @return true if the above conditions are met, and false otherwise.
+     */
     boolean isResourceCached(URL ref, String version);
 
     /**

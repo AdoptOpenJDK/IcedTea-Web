@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.classloader;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.JarProvider;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.LoadableJar;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
@@ -196,6 +197,11 @@ public class PartsHandler implements JarProvider, PartsCache {
         } finally {
             partsLock.unlock();
         }
+    }
+
+    @Override
+    public boolean isInAnyPart(final URL ref, final VersionString version) {
+        return parts.stream().anyMatch(part -> part.containsJar(ref, version));
     }
 
     //JUST FOR CURRENT TESTS!
