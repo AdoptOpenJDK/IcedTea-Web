@@ -48,9 +48,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String part) {
-        final ApplicationInstance applicationInstance = getApplication();
-
-        return applicationInstance.getPartsCache().isPartDownloaded(part, new Extension(ref, version));
+        return getApplication().getPartsCache().isPartDownloaded(part, new Extension(ref, version));
     }
 
     private ApplicationInstance getApplication() {
@@ -67,32 +65,19 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Returns whether the part of the calling application is cached
-     * locally.  If called by code specified by an extension
-     * descriptor, the specified part refers to the extension not
-     * the application.
+     * {@inheritDoc}
      */
     @Override
     public boolean isPartCached(final String part) {
-        throw new RuntimeException("Not implemented yet!");
+        return getApplication().getPartsCache().isPartDownloaded(part);
     }
 
     /**
-     * Returns whether all of the parts of the calling application
-     * are cached locally.  If called by code in an extension, the
-     * part refers the the part of the extension not the
-     * application.
+     * {@inheritDoc}
      */
     @Override
     public boolean isPartCached(final String[] parts) {
-        boolean allCached = true;
-        if (parts.length <= 0)
-            return false;
-
-        for (final String eachPart : parts)
-            allCached = this.isPartCached(eachPart);
-
-        return allCached;
+        return Arrays.stream(parts).allMatch(part -> isPartCached(part));
     }
 
     /**

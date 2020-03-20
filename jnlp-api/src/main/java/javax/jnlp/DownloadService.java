@@ -4,11 +4,23 @@ import java.net.URL;
 
 public interface DownloadService {
 
-    public boolean isResourceCached(URL ref, String version);
+    boolean isResourceCached(URL ref, String version);
 
-    public boolean isPartCached(String part);
+    /**
+     * Returns true if the part referred to by the given string is cached, and that part is mentioned in the JNLP file for the application.
+     *
+     * @param part The name of the part.
+     * @return true if the above conditions are met, and false otherwise.
+     */
+    boolean isPartCached(String part);
 
-    public boolean isPartCached(String[] parts);
+    /**
+     * Returns true if the parts referred to by the given array are cached, and those parts are mentioned in the JNLP file for the application.
+     *
+     * @param parts An array of part names.
+     * @return true if the above conditions are met, and false otherwise.
+     */
+    boolean isPartCached(String[] parts);
 
     /**
      * Returns true if the given part of the given extension is cached, and the extension and part
@@ -32,25 +44,25 @@ public interface DownloadService {
      */
     boolean isExtensionPartCached(URL ref, String version, String[] parts);
 
-    public void loadResource(URL ref, String version, DownloadServiceListener progress) throws java.io.IOException;
+    void loadResource(URL ref, String version, DownloadServiceListener progress) throws java.io.IOException;
 
-    public void loadPart(String part, DownloadServiceListener progress) throws java.io.IOException;
+    void loadPart(String part, DownloadServiceListener progress) throws java.io.IOException;
 
-    public void loadPart(String[] parts, DownloadServiceListener progress) throws java.io.IOException;
+    void loadPart(String[] parts, DownloadServiceListener progress) throws java.io.IOException;
 
-    public void loadExtensionPart(URL ref, String version, String part, DownloadServiceListener progress) throws java.io.IOException;
+    void loadExtensionPart(URL ref, String version, String part, DownloadServiceListener progress) throws java.io.IOException;
 
-    public void loadExtensionPart(URL ref, String version, String[] parts, DownloadServiceListener progress) throws java.io.IOException;
+    void loadExtensionPart(URL ref, String version, String[] parts, DownloadServiceListener progress) throws java.io.IOException;
 
-    public void removeResource(URL ref, String version) throws java.io.IOException;
+    void removeResource(URL ref, String version) throws java.io.IOException;
 
-    public void removePart(String part) throws java.io.IOException;
+    void removePart(String part) throws java.io.IOException;
 
-    public void removePart(String[] parts) throws java.io.IOException;
+    void removePart(String[] parts) throws java.io.IOException;
 
-    public void removeExtensionPart(URL ref, String version, String part) throws java.io.IOException;
+    void removeExtensionPart(URL ref, String version, String part) throws java.io.IOException;
 
-    public void removeExtensionPart(URL ref, String version, String[] parts) throws java.io.IOException;
+    void removeExtensionPart(URL ref, String version, String[] parts) throws java.io.IOException;
 
     /**
      * Return a default DownloadServiceListener implementation which, when passed to a load method,
