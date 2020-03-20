@@ -60,6 +60,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * The {@link BasicService} service provides a set of methods for querying and interacting with the environment.
+ * @implSpec See <b>JSR-56, Section 7.1 The BasicService Service</b> for a details.
  */
 class XBasicService implements BasicService {
 
@@ -72,7 +73,6 @@ class XBasicService implements BasicService {
      * @return the codebase for the application. This will typically be the URL specified
      * in the codebase attribute in the jnlp element. However, if the JNLP file does not specify this attribute,
      * then the codebase is defined to be the URL of the JAR file containing the class with the main method.
-     * @implSpec See <b>JSR-56, Section 7.1 The BasicService Service</b> for a details.
      */
     @Override
     public URL getCodeBase() {
@@ -89,15 +89,17 @@ class XBasicService implements BasicService {
             if (mainJar != null) {
                 return mainJar.getLocation();
             }
-
-            throw new IllegalStateException("Could not determine the codebase for application: " + file.getTitle());
         }
 
-        throw new IllegalStateException("Could not determine the codebase as application is null.");
+        LOG.warn("Could not find application instance.");
+        return null;
     }
 
     /**
-     * Return true if the Environment is Offline
+     * @return true if the application is running without access to the network. An application can use this
+     * method to adjust its behavior to work properly in an offline environment. The method provides a hint
+     * from the JNLP Client. The network might be unavailable, even though the JNLP Client indicated that it
+     * was, and vice-versa.
      */
     @Override
     public boolean isOffline() {
