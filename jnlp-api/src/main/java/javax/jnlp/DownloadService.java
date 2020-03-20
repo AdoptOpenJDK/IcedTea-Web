@@ -2,6 +2,14 @@ package javax.jnlp;
 
 import java.net.URL;
 
+/**
+ * DownloadService service allows an application to control how its own resources are cached,
+ * to determine which of its resources are currently cached, to force resources to be cached,
+ * and to remove resources from the cache.
+ * The JNLP Client is responsible for providing a specific implementation of this service.
+ *
+ * @since 1.4.2
+ */
 public interface DownloadService {
 
     /**
