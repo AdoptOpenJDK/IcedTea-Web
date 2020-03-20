@@ -1,4 +1,5 @@
 // Copyright (C) 2001 Jon A. Maxwell (JAM)
+// Copyright (C) 2020 Karakun AG
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -58,11 +59,7 @@ import java.util.StringTokenizer;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
- * The BasicService JNLP service.
- *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell
- * (JAM)</a> - initial author
- * @version $Revision: 1.10 $
+ * The {@link BasicService} service provides a set of methods for querying and interacting with the environment.
  */
 class XBasicService implements BasicService {
 
@@ -72,10 +69,10 @@ class XBasicService implements BasicService {
     }
 
     /**
-     * Returns the codebase of the application, applet, or installer. If the
-     * codebase was not specified in the JNLP element then the main JAR's
-     * location is returned. If no main JAR was specified then the location of
-     * the JAR containing the main class is returned.
+     * @return the codebase for the application. This will typically be the URL specified
+     * in the codebase attribute in the jnlp element. However, if the JNLP file does not specify this attribute,
+     * then the codebase is defined to be the URL of the JAR file containing the class with the main method.
+     * @implSpec See <b>JSR-56, Section 7.1 The BasicService Service</b> for a details.
      */
     @Override
     public URL getCodeBase() {
@@ -84,26 +81,19 @@ class XBasicService implements BasicService {
         if (app.isPresent()) {
             final JNLPFile file = app.get().getJNLPFile();
 
-            // return the codebase.
             if (file.getCodeBase() != null) {
                 return file.getCodeBase();
             }
 
-            // else return the main JAR's URL.
             final JARDesc mainJar = file.getResources().getMainJAR();
             if (mainJar != null) {
                 return mainJar.getLocation();
             }
 
-            // else find JAR where main class was defined.
-            //
-            // JNLPFile file = app.getJNLPFile();
-            // String mainClass = file.getEntryPointDesc().getMainClass()+".class";
-            // URL jarUrl = app.getClassLoader().getResource(mainClass);
-            // go through list of JARDesc to find one matching jarUrl
+            throw new IllegalStateException("Could not determine the codebase for application: " + file.getTitle());
         }
 
-        return null;
+        throw new IllegalStateException("Could not determine the codebase as application is null.");
     }
 
     /**
