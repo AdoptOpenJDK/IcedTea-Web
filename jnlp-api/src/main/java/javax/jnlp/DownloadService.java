@@ -8,6 +8,15 @@ public interface DownloadService {
 
     public boolean isPartCached(java.lang.String[] parts);
 
+    /**
+     * Returns true if the given part of the given extension is cached, and the extension and part
+     * are mentioned in the JNLP file for the application.
+     *
+     * @param ref The URL for the resource.
+     * @param version The version string, or null for no version.
+     * @param part The name of the part.
+     * @return true if the above conditions are met, and false otherwise.
+     */
     public boolean isExtensionPartCached(java.net.URL ref, java.lang.String version, java.lang.String part);
 
     public boolean isExtensionPartCached(java.net.URL ref, java.lang.String version, java.lang.String[] parts);
@@ -32,6 +41,12 @@ public interface DownloadService {
 
     public void removeExtensionPart(java.net.URL ref, java.lang.String version, java.lang.String[] parts) throws java.io.IOException;
 
-    public DownloadServiceListener getDefaultProgressWindow();
+    /**
+     * Return a default DownloadServiceListener implementation which, when passed to a load method,
+     * should pop up and update a progress window as the load progresses.
+     *
+     * @return A DownloadServiceListener object representing a download progress listener.
+     */
+    DownloadServiceListener getDefaultProgressWindow();
 
 }

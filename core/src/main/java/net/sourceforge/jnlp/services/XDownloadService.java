@@ -16,16 +16,19 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.classloader.Extension;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
 import java.io.IOException;
 import java.net.URL;
 
 /**
- * The DownloadService JNLP service.
+ * The {@link DownloadService} service allows an application to control how its own resources are cached.
  *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.7 $
+ * @implSpec See <b>JSR-56, Section 7.2 The DownloadService Service</b> for a details.
  */
 class XDownloadService implements DownloadService {
 
@@ -40,12 +43,18 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Returns whether the part in an extension (specified by the
-     * url and version) is cached locally.
+     * {@inheritDoc}
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String part) {
-        throw new RuntimeException("Not implemented yet!");
+        final ApplicationInstance applicationInstance = getApplication();
+
+        return applicationInstance.getPartsCache().isPartDownloaded(part, new Extension(ref, version));
+    }
+
+    private ApplicationInstance getApplication() {
+        return JNLPRuntime.getApplication()
+                    .orElseThrow(() -> new IllegalStateException("Could not find application."));
     }
 
     /**

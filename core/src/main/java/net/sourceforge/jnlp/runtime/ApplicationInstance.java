@@ -31,6 +31,7 @@ import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.services.PartsCache;
 import net.sourceforge.jnlp.util.JarFile;
 import sun.awt.AppContext;
 
@@ -69,6 +70,7 @@ public class ApplicationInstance {
     private final JNLPFile file;
     private final String mainClass;
     private final ThreadGroup group;
+    private final PartsHandler partsHandler;
     private final JnlpApplicationClassLoader loader;
     private final ApplicationPermissions applicationPermissions;
 
@@ -78,6 +80,7 @@ public class ApplicationInstance {
     private boolean stopped = false;
 
     private ApplicationEnvironment applicationEnvironment;
+
 
     /**
      * Create an application instance for the file. This should be done in the
@@ -101,7 +104,7 @@ public class ApplicationInstance {
         final JNLPFileFactory fileFactory = new JNLPFileFactory();
         final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
-        final PartsHandler partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
+        this.partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
         this.loader = new JnlpApplicationClassLoader(partsHandler);
 
         this.mainClass = determineMainClass(file, tracker);
@@ -184,6 +187,10 @@ public class ApplicationInstance {
      */
     public JNLPFile getJNLPFile() {
         return file;
+    }
+
+    public PartsCache getPartsCache() {
+        return partsHandler;
     }
 
     /**

@@ -10,6 +10,7 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.services.PartsCache;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.getClassloaderBackgroundExecutor;
 import static net.adoptopenjdk.icedteaweb.classloader.ClassLoaderUtils.waitForCompletion;
 
-public class PartsHandler implements JarProvider {
+public class PartsHandler implements JarProvider, PartsCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(PartsHandler.class);
 
@@ -160,10 +161,12 @@ public class PartsHandler implements JarProvider {
 
     //Methods that are needed for JNLP DownloadService interface
 
+    @Override
     public void downloadPart(final String partName) {
         downloadPart(partName, null);
     }
 
+    @Override
     public void downloadPart(final String partName, final Extension extension) {
         partsLock.lock();
         try {
@@ -177,10 +180,12 @@ public class PartsHandler implements JarProvider {
         }
     }
 
+    @Override
     public boolean isPartDownloaded(final String partName) {
         return isPartDownloaded(partName, null);
     }
 
+    @Override
     public boolean isPartDownloaded(final String partName, final Extension extension) {
         partsLock.lock();
         try {
