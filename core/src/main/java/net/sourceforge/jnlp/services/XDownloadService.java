@@ -24,6 +24,7 @@ import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * The {@link DownloadService} service allows an application to control how its own resources are cached.
@@ -58,19 +59,11 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Returns whether the parts in an extension (specified by the
-     * url and version) are cached locally.
+     * {@inheritDoc}
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String[] parts) {
-        boolean allCached = true;
-        if (parts.length <= 0)
-            return false;
-
-        for (String eachPart : parts)
-            allCached = this.isExtensionPartCached(ref, version, eachPart);
-
-        return allCached;
+        return Arrays.stream(parts).allMatch(part -> isExtensionPartCached(ref, version, part));
     }
 
     /**
