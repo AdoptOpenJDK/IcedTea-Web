@@ -22,7 +22,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     private JnlpApplicationClassLoader(JarProvider jarProvider, NativeLibrarySupport nativeLibrarySupport) {
-        super(new URL[0], JnlpApplicationClassLoader.class.getClassLoader());
+        super(new URL[0], getSystemClassLoader());
         this.jarProvider = jarProvider;
         this.nativeLibrarySupport = nativeLibrarySupport;
     }
@@ -52,40 +52,10 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     @Override
-    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        try {
-            return super.loadClass(name, resolve);
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        try {
-            return loadClassFromSystemClassLoader(name, resolve);
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        return loadClassFromLazyLoadedJars(name, resolve);
-    }
-
-    private Class<?> loadClassFromSystemClassLoader(final String name, final boolean resolve) throws ClassNotFoundException {
-        final ClassLoader systemClassLoader = getSystemClassLoader();
-        if (systemClassLoader != null) {
-            final Class<?> c = systemClassLoader.loadClass(name);
-            if (resolve) {
-                resolveClass(c);
-            }
-            return c;
-        }
-        throw new ClassNotFoundException(name);
-    }
-
-    private Class<?> loadClassFromLazyLoadedJars(final String name, final boolean resolve) throws ClassNotFoundException {
+    protected Class<?> findClass(final String name) throws ClassNotFoundException {
         do {
             try {
-                final Class<?> c = super.findClass(name);
-                if (resolve) {
-                    resolveClass(c);
-                }
-                return c;
+                return super.findClass(name);
             } catch (ClassNotFoundException ignored) {
             }
         }
