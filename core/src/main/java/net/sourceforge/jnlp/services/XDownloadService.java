@@ -153,26 +153,21 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Notify the system that an extension's part is no longer
-     * important to cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void removeExtensionPart(final URL ref, final String version, final String part) throws IOException {
-        throw new RuntimeException("Not implemented yet!");
+        getApplication().getPartsCache().removePart(part, new Extension(ref, version));
     }
 
     /**
-     * Notify the system that an extension's parts are no longer
-     * important to cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void removeExtensionPart(final URL ref, final String version, final String[] parts) throws IOException {
-        for (String eachPart : parts)
+        for (String eachPart : parts) {
             this.removeExtensionPart(ref, version, eachPart);
+        }
     }
 
     /**
