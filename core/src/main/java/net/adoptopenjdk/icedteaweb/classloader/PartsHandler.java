@@ -204,6 +204,25 @@ public class PartsHandler implements JarProvider, PartsCache {
         return parts.stream().anyMatch(part -> part.containsJar(ref, version));
     }
 
+    @Override
+    public void removePart(final String partName) {
+        removePart(partName, null);
+    }
+
+    @Override
+    public void removePart(final String partName, final Extension extension) {
+        partsLock.lock();
+        try {
+            parts.stream()
+                .filter(part -> Objects.equals(extension, part.getExtension()))
+                .filter(part -> Objects.equals(partName, part.getName()))
+                .findFirst()
+                .ifPresent(parts::remove);
+        } finally {
+            partsLock.unlock();
+        }
+    }
+
     //JUST FOR CURRENT TESTS!
     @Deprecated
     private void print(final String message) {

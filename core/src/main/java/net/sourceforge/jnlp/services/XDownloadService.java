@@ -176,26 +176,21 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Notifies the system that a part  is no longer important to
-     * cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void removePart(final String part) throws IOException {
-        throw new RuntimeException("Not implemented yet!");
+        getApplication().getPartsCache().removePart(part);
     }
 
     /**
-     * Notifies the system that the parts  is no longer important to
-     * cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void removePart(final String[] parts) throws IOException {
-        for (String eachPart : parts)
+        for (String eachPart : parts) {
             this.removePart(eachPart);
+        }
     }
 
     /**
