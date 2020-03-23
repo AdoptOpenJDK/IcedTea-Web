@@ -82,7 +82,7 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isPartCached(final String[] parts) {
-        return Arrays.stream(parts).allMatch(part -> isPartCached(part));
+        return Arrays.stream(parts).allMatch(this::isPartCached);
     }
 
     /**
@@ -125,24 +125,21 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Downloads the parts.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void loadPart(final String[] parts, final DownloadServiceListener progress) throws IOException {
-        for (String eachPart : parts)
+        for (String eachPart : parts) {
             this.loadPart(eachPart, progress);
+        }
     }
 
     /**
-     * Downloads the part.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void loadPart(final String part, final DownloadServiceListener progress) throws IOException {
-        throw new RuntimeException("Not implemented yet!");
+        getApplication().getPartsCache().downloadPart(part);
     }
 
     /**
