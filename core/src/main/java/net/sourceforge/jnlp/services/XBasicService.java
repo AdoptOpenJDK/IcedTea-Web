@@ -52,6 +52,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -60,6 +62,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * The {@link BasicService} service provides a set of methods for querying and interacting with the environment.
+ *
  * @implSpec See <b>JSR-56, Section 7.1 The BasicService Service</b> for a details.
  */
 class XBasicService implements BasicService {
@@ -160,55 +163,57 @@ class XBasicService implements BasicService {
     }
 
     /**
-     * Show a document.
+     * Displays the given URL in a Web browser. This may be the default browser on the platform, or it may be
+     * chosen by the JNLP Client some other way. This method returns false if the request failed, or the
+     * operation is not supported.
      *
-     * @return whether the document was opened
+     * @param url giving the location of the document. A relative URL will be relative to the codebase.
+     * @return true if the request succeeded, false if the url is null or the request failed.
      */
     @Override
     public boolean showDocument(final URL url) {
-        try {
-//        if (url.toString().endsWith(".jnlp")) {
-//            try {
-//                new Launcher(false).launchExternal(url);
-//                return true;
-//            } catch (Exception ex) {
-//                return false;
-//            }
-//        }
-// Ignorance of this code is the only regression against original code (if you assume most of the jnlps have jnlp suffix...) we had
-// anyway, also jnlp protocol should be handled via this, so while this can be set via 
-// ALWAYS-ASK, or directly via BROWSER of deployment.browser.path , it still should be better then it was
-// in all cases, the mime recognition is much harder then .jnlp suffix
-
-            final String urls = url.toExternalForm();
-            LOG.debug("showDocument for: {}", urls);
-
-            final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-            final String command = config.getProperty(ConfigurationConstants.KEY_BROWSER_PATH);
-            //for various debugging
-            //command=DeploymentConfiguration.ALWAYS_ASK;
-            if (command != null) {
-                LOG.debug("{} located. Using: {}", ConfigurationConstants.KEY_BROWSER_PATH, command);
-                return exec(command, urls);
-            }
-            if (System.getenv(ConfigurationConstants.BROWSER_ENV_VAR) != null) {
-                final String cmd = System.getenv(ConfigurationConstants.BROWSER_ENV_VAR);
-                LOG.debug("variable {} located. Using: {}", ConfigurationConstants.BROWSER_ENV_VAR, command);
-                return exec(cmd, urls);
-            }
-
-            if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
-                final String cmd = promptForCommand(urls, false);
-                return exec(cmd, urls);
-            } else {
-                LOG.debug("using default browser");
-                Desktop.getDesktop().browse(url.toURI());
-                return true;
-            }
-        } catch (Exception e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+        if (url == null) {
             return false;
         }
+
+        final String urlString = url.toExternalForm();
+        LOG.debug("About to display '{}' in a Web browser", urlString);
+
+        final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        final String command = config.getProperty(ConfigurationConstants.KEY_BROWSER_PATH);
+        if (command != null) {
+            LOG.debug("Browser path configuration property '{} = {}' detected.", ConfigurationConstants.KEY_BROWSER_PATH, command);
+            return exec(command, urlString);
+        }
+        if (System.getenv(ConfigurationConstants.BROWSER_ENV_VAR) != null) {
+            final String cmd = System.getenv(ConfigurationConstants.BROWSER_ENV_VAR);
+            LOG.debug("Browser environment variable '{} = {}' detected.", ConfigurationConstants.BROWSER_ENV_VAR, cmd);
+            return exec(cmd, urlString);
+        }
+
+        if (JNLPRuntime.isHeadless() || !Desktop.isDesktopSupported()) {
+            final String cmd;
+            try {
+                cmd = promptForCommand(urlString, false);
+                return exec(cmd, urlString);
+            } catch (IOException e) {
+                LOG.error("Could not display '{}' in a Web browser as prompt for command failed", url);
+            }
+        } else {
+            try {
+                final URI uri = url.toURI();
+                LOG.debug("Using default browser to show {}", uri.toString());
+                Desktop.getDesktop().browse(uri);
+                return true;
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                LOG.error("Could not display '{}' in a Web browser as it is not a valid URI reference", url);
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOG.error("Could not display '{}' in a Web browser as the default browser is not found", url);
+            }
+        }
+        return false;
     }
 
     //cmd form user can contains spaces, quotes and so... now we are relying on default dummy impl

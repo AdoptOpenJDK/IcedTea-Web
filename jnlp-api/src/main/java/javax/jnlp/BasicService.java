@@ -33,7 +33,7 @@ public interface BasicService {
      * being viewed in a browser with the given URL, or cause a browser to be launched that will show the given URL.
      *
      * @param url an URL giving the location of the document. A relative URL will be relative to the codebase.
-     * @return true if the request succeded false if the url is null or the request failed.
+     * @return true if the request succeeded false if the url is null or the request failed.
      */
     boolean showDocument(URL url);
 
