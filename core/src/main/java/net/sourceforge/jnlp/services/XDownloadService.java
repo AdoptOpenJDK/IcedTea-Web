@@ -25,7 +25,6 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -93,7 +92,7 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void loadExtensionPart(final URL ref, final String version, final String[] parts, final DownloadServiceListener progress) throws IOException {
+    public void loadExtensionPart(final URL ref, final String version, final String[] parts, final DownloadServiceListener progress) {
         for (String part : parts) {
             this.loadExtensionPart(ref, version, part, progress);
         }
@@ -103,7 +102,7 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) throws IOException {
+    public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) {
         getApplication().getPartsCache().downloadPart(part, new Extension(ref, version));
     }
 
@@ -111,7 +110,7 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void loadPart(final String[] parts, final DownloadServiceListener progress) throws IOException {
+    public void loadPart(final String[] parts, final DownloadServiceListener progress) {
         for (String eachPart : parts) {
             this.loadPart(eachPart, progress);
         }
@@ -121,7 +120,7 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void loadPart(final String part, final DownloadServiceListener progress) throws IOException {
+    public void loadPart(final String part, final DownloadServiceListener progress) {
         getApplication().getPartsCache().downloadPart(part);
     }
 
@@ -129,7 +128,7 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) throws IOException {
+    public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) {
         final VersionString resourceVersion = getVersionString(version);
         if (resourceFitToJnlpDetails(ref, resourceVersion)) {
             getApplication().getPartsCache().downloadPartContainingJar(ref, resourceVersion);
@@ -161,47 +160,40 @@ class XDownloadService implements DownloadService {
      * {@inheritDoc}
      */
     @Override
-    public void removeExtensionPart(final URL ref, final String version, final String part) throws IOException {
-        getApplication().getPartsCache().removePart(part, new Extension(ref, version));
+    public void removeExtensionPart(final URL ref, final String version, final String part) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void removeExtensionPart(final URL ref, final String version, final String[] parts) throws IOException {
-        for (String eachPart : parts) {
-            this.removeExtensionPart(ref, version, eachPart);
-        }
+    public void removeExtensionPart(final URL ref, final String version, final String[] parts) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void removePart(final String part) throws IOException {
-        getApplication().getPartsCache().removePart(part);
+    public void removePart(final String part) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void removePart(final String[] parts) throws IOException {
-        for (String eachPart : parts) {
-            this.removePart(eachPart);
-        }
+    public void removePart(final String[] parts) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
-     * Notifies the system that the resource is no longer important
-     * to cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void removeResource(final URL ref, final String version) throws IOException {
-        getApplication().getPartsCache().removePartContainingJar(ref, getVersionString(version));
+    public void removeResource(final URL ref, final String version) {
+        throw new RuntimeException("Currently not supported");
     }
 
     private ApplicationInstance getApplication() {

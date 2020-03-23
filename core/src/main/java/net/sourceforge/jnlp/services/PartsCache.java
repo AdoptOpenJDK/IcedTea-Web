@@ -18,10 +18,4 @@ public interface PartsCache {
     boolean isPartDownloaded(String partName, Extension extension);
 
     boolean isPartContainingJar(URL ref, VersionString version);
-
-    void removePart(final String partName);
-
-    void removePart(final String partName, Extension extension);
-
-    void removePartContainingJar(URL ref, VersionString version);
 }

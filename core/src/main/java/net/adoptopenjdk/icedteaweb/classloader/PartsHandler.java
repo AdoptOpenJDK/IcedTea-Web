@@ -8,7 +8,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
-import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -211,44 +210,6 @@ public class PartsHandler implements JarProvider, PartsCache {
     @Override
     public boolean isPartContainingJar(final URL ref, final VersionString version) {
         return parts.stream().anyMatch(part -> part.containsJar(ref, version));
-    }
-
-    @Override
-    public void removePart(final String partName) {
-        removePart(partName, null);
-    }
-
-    @Override
-    public void removePart(final String partName, final Extension extension) {
-        partsLock.lock();
-        try {
-            parts.stream()
-                    .filter(part -> Objects.equals(extension, part.getExtension()))
-                    .filter(part -> Objects.equals(partName, part.getName()))
-                    .findFirst()
-                    .ifPresent(this::removeAllOfPart);
-        } finally {
-            partsLock.unlock();
-        }
-    }
-
-    @Override
-    public void removePartContainingJar(final URL ref, final VersionString version) {
-        partsLock.lock();
-        try {
-            parts.stream()
-                    .filter(part -> part.containsJar(ref, version))
-                    .findFirst()
-                    .ifPresent(this::removeAllOfPart);
-        } finally {
-            partsLock.unlock();
-        }
-    }
-
-    private void removeAllOfPart(final Part part) {
-        downloadedParts.remove(part);
-        final List<JARDesc> jars = part.getJars();
-        jars.forEach(jarDesc -> Cache.deleteFromCache(jarDesc.getLocation(), jarDesc.getVersion()));
     }
 
     //JUST FOR CURRENT TESTS!
