@@ -56,11 +56,6 @@ class XDownloadService implements DownloadService {
         return getApplication().getPartsCache().isPartDownloaded(part, new Extension(ref, version));
     }
 
-    private ApplicationInstance getApplication() {
-        return JNLPRuntime.getApplication()
-                    .orElseThrow(() -> new IllegalStateException("Could not find application."));
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -90,20 +85,8 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public boolean isResourceCached(final URL ref, final String version) {
-
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        boolean isAllowedToCheckCache = getApplication().getApplicationEnvironment() == ALL;
-
-        if (!isAllowedToCheckCache) {
-            isAllowedToCheckCache = getApplication().getPartsCache().isInAnyPart(ref, resourceVersion);
-        }
-
-        if (!isAllowedToCheckCache) {
-            final URL codeBase = getApplication().getJNLPFile().getCodeBase();
-            isAllowedToCheckCache = UrlUtils.urlRelativeTo(ref, codeBase);
-        }
-
-        return isAllowedToCheckCache && Cache.isAnyCached(ref, resourceVersion);
+        final VersionString resourceVersion = getVersionString(version);
+        return Cache.isAnyCached(ref, resourceVersion) && resourceFitToJnlpDetails(ref, resourceVersion);
     }
 
     /**
@@ -143,14 +126,36 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Downloads a resource.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) throws IOException {
-        throw new RuntimeException("Not implemented yet!");
+        final VersionString resourceVersion = getVersionString(version);
+        if (resourceFitToJnlpDetails(ref, resourceVersion)) {
+            getApplication().getPartsCache().downloadPartContainingJar(ref, resourceVersion);
+        }
     }
+
+    /**
+     * @return true if the resource is either mentioned in the calling applications JNLP file, or
+     * is within the codebase of the calling applications JNLP file, or
+     * if the calling application has been granted all-permissions.
+     */
+    private boolean resourceFitToJnlpDetails(final URL ref, final VersionString version) {
+        boolean isResourceAllowedToBeProcessed = getApplication().getApplicationEnvironment() == ALL;
+
+        if (!isResourceAllowedToBeProcessed) {
+            isResourceAllowedToBeProcessed = getApplication().getPartsCache().isPartContainingJar(ref, version);
+        }
+
+        if (!isResourceAllowedToBeProcessed) {
+            final URL codeBase = getApplication().getJNLPFile().getCodeBase();
+            isResourceAllowedToBeProcessed = UrlUtils.urlRelativeTo(ref, codeBase);
+        }
+
+        return isResourceAllowedToBeProcessed;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -196,6 +201,15 @@ class XDownloadService implements DownloadService {
      */
     @Override
     public void removeResource(final URL ref, final String version) throws IOException {
-        throw new RuntimeException("Not implemented yet!");
+        getApplication().getPartsCache().removePartContainingJar(ref, getVersionString(version));
+    }
+
+    private ApplicationInstance getApplication() {
+        return JNLPRuntime.getApplication()
+                .orElseThrow(() -> new IllegalStateException("Could not find application."));
+    }
+
+    private static VersionString getVersionString(String version) {
+        return (version == null) ? null : VersionString.fromString(version);
     }
 }

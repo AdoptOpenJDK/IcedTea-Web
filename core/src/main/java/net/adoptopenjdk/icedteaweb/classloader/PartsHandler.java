@@ -8,6 +8,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -40,7 +41,7 @@ public class PartsHandler implements JarProvider, PartsCache {
     private final List<Part> parts;
     private final Lock partsLock = new ReentrantLock();
     private final Set<Part> downloadedParts = new HashSet<>();
-    private final Set<Part> loadedByClassloader = new HashSet<>();
+    private final Set<Part> loadedByClassloaderParts = new HashSet<>();
 
     private final Map<URL, Lock> resourceDownloadLocks = new HashMap<>();
 
@@ -68,7 +69,7 @@ public class PartsHandler implements JarProvider, PartsCache {
         try {
             return parts.stream()
                     .filter(part -> !part.isLazy())
-                    .filter(part -> !loadedByClassloader.contains(part))
+                    .filter(part -> !loadedByClassloaderParts.contains(part))
                     .map(this::loadEagerPart)
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
@@ -80,7 +81,7 @@ public class PartsHandler implements JarProvider, PartsCache {
     private List<LoadableJar> loadEagerPart(final Part part) {
         final List<LoadableJar> result = downloadAllOfPart(part);
         trustValidator.validateEagerJars(result);
-        loadedByClassloader.add(part);
+        loadedByClassloaderParts.add(part);
         return result;
     }
 
@@ -89,7 +90,7 @@ public class PartsHandler implements JarProvider, PartsCache {
         partsLock.lock();
         try {
             final List<Part> notLoaded = parts.stream()
-                    .filter(part -> !loadedByClassloader.contains(part))
+                    .filter(part -> !loadedByClassloaderParts.contains(part))
                     .filter(part -> !part.getJars().isEmpty())
                     .collect(Collectors.toList());
 
@@ -111,7 +112,7 @@ public class PartsHandler implements JarProvider, PartsCache {
     private List<LoadableJar> loadLazyPart(final Part part) {
         final List<LoadableJar> result = downloadAllOfPart(part);
         trustValidator.validateLazyJars(result);
-        loadedByClassloader.add(part);
+        loadedByClassloaderParts.add(part);
         return result;
     }
 
@@ -182,6 +183,14 @@ public class PartsHandler implements JarProvider, PartsCache {
     }
 
     @Override
+    public void downloadPartContainingJar(final URL ref, final VersionString version) {
+        parts.stream()
+                .filter(part -> part.containsJar(ref, version))
+                .findFirst()
+                .ifPresent(this::downloadAllOfPart);
+    }
+
+    @Override
     public boolean isPartDownloaded(final String partName) {
         return isPartDownloaded(partName, null);
     }
@@ -200,7 +209,7 @@ public class PartsHandler implements JarProvider, PartsCache {
     }
 
     @Override
-    public boolean isInAnyPart(final URL ref, final VersionString version) {
+    public boolean isPartContainingJar(final URL ref, final VersionString version) {
         return parts.stream().anyMatch(part -> part.containsJar(ref, version));
     }
 
@@ -214,13 +223,32 @@ public class PartsHandler implements JarProvider, PartsCache {
         partsLock.lock();
         try {
             parts.stream()
-                .filter(part -> Objects.equals(extension, part.getExtension()))
-                .filter(part -> Objects.equals(partName, part.getName()))
-                .findFirst()
-                .ifPresent(parts::remove);
+                    .filter(part -> Objects.equals(extension, part.getExtension()))
+                    .filter(part -> Objects.equals(partName, part.getName()))
+                    .findFirst()
+                    .ifPresent(this::removeAllOfPart);
         } finally {
             partsLock.unlock();
         }
+    }
+
+    @Override
+    public void removePartContainingJar(final URL ref, final VersionString version) {
+        partsLock.lock();
+        try {
+            parts.stream()
+                    .filter(part -> part.containsJar(ref, version))
+                    .findFirst()
+                    .ifPresent(this::removeAllOfPart);
+        } finally {
+            partsLock.unlock();
+        }
+    }
+
+    private void removeAllOfPart(final Part part) {
+        downloadedParts.remove(part);
+        final List<JARDesc> jars = part.getJars();
+        jars.forEach(jarDesc -> Cache.deleteFromCache(jarDesc.getLocation(), jarDesc.getVersion()));
     }
 
     //JUST FOR CURRENT TESTS!
