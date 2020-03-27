@@ -18,6 +18,7 @@ package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.util.WeakList;
@@ -86,6 +87,11 @@ public class AppletInstance extends ApplicationInstance {
      */
     public Applet getApplet() {
         return applet;
+    }
+
+    @Override
+    protected String determineMainClass(JNLPFile file, ResourceTracker tracker) {
+        return null;
     }
 
     /**

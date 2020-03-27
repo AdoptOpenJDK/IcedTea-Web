@@ -15,6 +15,7 @@ import net.sourceforge.jnlp.services.PartsCache;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -130,12 +132,12 @@ public class PartsHandler implements JarProvider, PartsCache {
 
     private Future<LoadableJar> downloadJar(final JARDesc jarDesc) {
         return CompletableFuture.supplyAsync(() -> {
-            final URL localCacheUrl = getLocalUrlForJar(jarDesc);
+            final Optional<URL> localCacheUrl = getLocalUrlForJar(jarDesc);
             return new LoadableJar(localCacheUrl, jarDesc);
         }, getClassloaderBackgroundExecutor());
     }
 
-    protected URL getLocalUrlForJar(final JARDesc jarDesc) {
+    protected Optional<URL> getLocalUrlForJar(final JARDesc jarDesc) {
         LOG.debug("Trying to get local URL of JAR '{}'", jarDesc.getLocation());
         print("Trying to get local URL of JAR '" + jarDesc.getLocation() + "'");
         final Lock jarLock = getOrCreateLock(jarDesc.getLocation());
@@ -144,7 +146,16 @@ public class PartsHandler implements JarProvider, PartsCache {
             if (!tracker.isResourceAdded(jarDesc.getLocation())) {
                 tracker.addResource(jarDesc.getLocation(), jarDesc.getVersion());
             }
-            final URL url = tracker.getCacheFile(jarDesc.getLocation()).toURI().toURL();
+            final Optional<URL> url = Optional.ofNullable(tracker.getCacheFile(jarDesc.getLocation()))
+                    .map(File::toURI)
+                    .map(uri -> {
+                        try {
+                            return uri.toURL();
+                        } catch (MalformedURLException e) {
+                            LOG.warn("MalformedURLException for URI '{}'", uri);
+                            return null;
+                        }
+                    });
             LOG.debug("Local URL of JAR '{}' is '{}'", jarDesc.getLocation(), url);
             print("Local URL of JAR '" + jarDesc.getLocation() + "' is '" + url + "'");
             return url;

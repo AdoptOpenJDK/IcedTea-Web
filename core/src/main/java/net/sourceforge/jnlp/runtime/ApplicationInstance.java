@@ -266,7 +266,7 @@ public class ApplicationInstance {
         return mainClass;
     }
 
-    private String determineMainClass(JNLPFile file, ResourceTracker tracker) {
+    protected String determineMainClass(JNLPFile file, ResourceTracker tracker) {
         final String mainName = file.getApplication().getMainClass();
 
         // When the application-desc field is empty, we should take a

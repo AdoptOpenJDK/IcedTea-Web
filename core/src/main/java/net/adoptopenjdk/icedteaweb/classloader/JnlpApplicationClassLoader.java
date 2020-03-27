@@ -8,6 +8,7 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
@@ -40,12 +41,14 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     private void addJar(LoadableJar jar) {
         addJarLock.lock();
         try {
-            if (!Arrays.asList(getURLs()).contains(jar.getLocation())) {
-                if (jar.containsNativeLib()) {
-                    nativeLibrarySupport.addSearchJar(jar.getLocation());
+            jar.getLocation().ifPresent(location -> {
+                if (!Arrays.asList(getURLs()).contains(location)) {
+                    if (jar.containsNativeLib()) {
+                        nativeLibrarySupport.addSearchJar(location);
+                    }
+                    addURL(location);
                 }
-                addURL(jar.getLocation());
-            }
+            });
         } finally {
             addJarLock.unlock();
         }
@@ -106,15 +109,15 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     public static class LoadableJar {
-        private final URL location;
+        private final Optional<URL> location;
         private final JARDesc jarDesc;
 
-        LoadableJar(final URL location, final JARDesc jarDesc) {
+        LoadableJar(final Optional<URL> location, final JARDesc jarDesc) {
             this.location = location;
             this.jarDesc = jarDesc;
         }
 
-        public URL getLocation() {
+        public Optional<URL> getLocation() {
             return location;
         }
 

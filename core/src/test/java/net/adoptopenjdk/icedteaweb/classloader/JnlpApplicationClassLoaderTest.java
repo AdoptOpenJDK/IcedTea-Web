@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -192,10 +193,10 @@ public class JnlpApplicationClassLoaderTest {
         }
 
         @Override
-        protected URL getLocalUrlForJar(final JARDesc jarDesc) {
+        protected Optional<URL> getLocalUrlForJar(final JARDesc jarDesc) {
             System.out.println("Should load " + jarDesc.getLocation());
             downloaded.add(jarDesc);
-            return jarDesc.getLocation();
+            return Optional.ofNullable(jarDesc.getLocation());
         }
 
         public boolean hasTriedToDownload(final String name) {
@@ -217,7 +218,7 @@ public class JnlpApplicationClassLoaderTest {
         }
 
         @Override
-        protected URL getLocalUrlForJar(final JARDesc jarDesc) {
+        protected Optional<URL> getLocalUrlForJar(final JARDesc jarDesc) {
             throw new RuntimeException("Can not download " + jarDesc.getLocation());
         }
 

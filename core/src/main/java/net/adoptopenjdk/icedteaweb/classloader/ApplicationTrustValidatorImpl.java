@@ -28,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -173,15 +174,21 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
     private static List<File> toFiles(List<LoadableJar> jars) {
         return jars.stream()
                 .map(ApplicationTrustValidatorImpl::toFile)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    private static File toFile(LoadableJar loadableJar) {
-        try {
-            return new File(loadableJar.getLocation().toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    private static Optional<File> toFile(LoadableJar loadableJar) {
+        return loadableJar.getLocation()
+                .map(location -> {
+                    try {
+                        return new File(location.toURI());
+                    } catch (URISyntaxException e) {
+                        LOG.warn("URISyntaxException for url '{}'", location);
+                        return null;
+                    }
+                });
     }
 
 
@@ -196,7 +203,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                 .filter(jar -> Objects.equals(jar.getJarDesc(), mainJarDesc))
                 .findFirst()
                 .orElseThrow(() -> new LaunchException("Main jar not found"));
-        return toFile(mainJar);
+        return toFile(mainJar).orElseThrow(() -> new LaunchException("Could not find/download main jar file."));
     }
 
     private void markJnlpAsSignedIfContainedInMainJarAndMainJarIsSignedByTrustedCertificate(final JNLPFile file, final File mainJarFile) {
