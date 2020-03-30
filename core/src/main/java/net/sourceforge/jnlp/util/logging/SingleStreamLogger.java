@@ -41,6 +41,6 @@ public interface SingleStreamLogger extends AutoCloseable {
     void log(String s);
 
     @Override
-    void close() throws Exception;
+    void close();
 
 }
