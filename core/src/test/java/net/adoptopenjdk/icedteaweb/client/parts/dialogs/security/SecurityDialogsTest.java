@@ -36,18 +36,10 @@
  */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
-
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
@@ -61,7 +53,6 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -70,6 +61,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 
 @Ignore
 public class SecurityDialogsTest extends NoStdOutErrTest {
@@ -308,7 +308,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
         YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
         Assert.assertEquals(r.ea, r3);
-        //cant emulate security delegate now
+        //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
@@ -332,7 +332,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         Assert.assertEquals(null, r2);
         YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
         Assert.assertEquals(null, r3);
-        //cant emulate security delegate now
+        //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
