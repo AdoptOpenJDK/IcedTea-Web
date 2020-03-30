@@ -113,7 +113,7 @@ public class DeadLockTestTest {
         waitForBackgroundDeadlock(bd);
         List<String> after = countJavaInstances();
         ServerAccess.logOutputReprint("java6: " + after.size());
-        Assert.assertNotNull("proces inside background deadlock cant be null. It was.", bd.getPr());
+        Assert.assertNotNull("proces inside background deadlock cannot be null. It was.", bd.getPr());
         assertDeadlockTestLaunched(bd.getPr());
         killDiff(before, during);
         List<String> afterKill = countJavaInstances();
@@ -135,7 +135,7 @@ public class DeadLockTestTest {
         waitForBackgroundDeadlock(bd);
         List<String> after = countJavaInstances();
         ServerAccess.logOutputReprint("java9: " + after.size());
-        Assert.assertNotNull("proces inside background deadlock cant be null. It was.", bd.getPr());
+        Assert.assertNotNull("proces inside background deadlock cannot be null. It was.", bd.getPr());
         assertDeadlockTestLaunched(bd.getPr());
         killDiff(before, during);
         List<String> afterKill = countJavaInstances();
