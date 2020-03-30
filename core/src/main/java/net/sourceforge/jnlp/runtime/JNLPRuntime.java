@@ -915,7 +915,7 @@ public class JNLPRuntime {
                 Thread.sleep(100);
             }
         } catch (Exception ex) {
-            //to late
+            LOG.debug("Exception while waiting for ExceptionDialog to close", ex);
         }
         finally {
             OutputController.getLogger().close();
