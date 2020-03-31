@@ -83,10 +83,10 @@ public class HelpCommandTest extends AbstractCommandTest {
                 "    -check          - Checks that all the current settings have valid values.(No argument expected)" + EOL +
                 "    -get name       - Shows the value of the specified settings.(Expected one or more arguments)" + EOL +
                 "    -headless       - Disables download window, other UIs.(No argument expected)" + EOL +
-                "    -help           - Prints out information about supported command and basic usage. Can also take an parameter, and then it prints detailed help for this command.(No argument expected)" + EOL +
+                "    -help           - Prints out information about supported command and basic usage. Can also take a parameter, and then it prints detailed help for this command.(No argument expected)" + EOL +
                 "    -info name      - Shows additional information about the named settings. Includes a description, the current value, the possible values, and the source of the setting.(Expected one or more arguments)" + EOL +
                 "    -list           - Shows a list of all the IcedTea-Web settings and their current values.(No argument expected)" + EOL +
-                "    -reset name     - Resets the specified settings to their original value.(Expected one or more arguments)" + EOL +
+                "    -reset name     - Resets the specified settings to their original values.(Expected one or more arguments)" + EOL +
                 "    -reset all      - Resets all settings to their original values.(No argument expected)" + EOL +
                 "    -set name value - Sets the settings to the new value specified, if it is an appropriate value.(Expected even number of arguments with param=value as valid argument)" + EOL +
                 "    -verbose        - Enable verbose output.(No argument expected)" + EOL +
