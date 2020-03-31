@@ -101,7 +101,8 @@ public class OutputController extends BasicOutputController {
         }
     }
 
-    public void close() throws Exception {
+    public void close() {
+        LOG.debug("Closing logger - good bye");
         flush();
         if (LogConfig.getLogConfig().isLogToFile()){
             getFileLog().close();

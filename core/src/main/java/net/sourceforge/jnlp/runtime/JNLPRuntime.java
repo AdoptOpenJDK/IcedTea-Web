@@ -908,12 +908,17 @@ public class JNLPRuntime {
 
     public static void closeLoggerAndWaitForExceptionDialogsToBeClosed() {
         try {
-            OutputController.getLogger().close();
+            if (BasicExceptionDialog.areShown()) {
+                LOG.debug("Waiting for exception dialog to be closed");
+            }
             while (BasicExceptionDialog.areShown()){
                 Thread.sleep(100);
             }
         } catch (Exception ex) {
-            //to late
+            LOG.debug("Exception while waiting for ExceptionDialog to close", ex);
+        }
+        finally {
+            OutputController.getLogger().close();
         }
     }
 

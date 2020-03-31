@@ -86,13 +86,12 @@ public final class WriterBasedFileLog implements SingleStreamLogger {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         try {
-            bw.flush();
-        } finally {
             bw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
 }
