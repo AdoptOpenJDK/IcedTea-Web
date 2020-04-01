@@ -41,7 +41,7 @@ public class MultipleStringValueValidator implements ValueValidator {
                 if (comboOptionsContains(val)) {
                     found = true;
                 } else {
-                    throw new IllegalArgumentException("Invalid value found: '" + val + "'");
+                    throw new IllegalArgumentException("Invalid value '" + val + "' in combo");
                 }
             }
         }
