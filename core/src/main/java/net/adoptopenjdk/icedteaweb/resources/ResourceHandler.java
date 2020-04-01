@@ -95,7 +95,9 @@ class ResourceHandler {
             try {
                 return downloadResource();
             } catch (Exception e) {
-                if (--triesLeft <= 0) {
+                if (--triesLeft < 0) {
+                    LOG.info("giving up while downloading '{}' because of {}", resource.getLocation(), e.getMessage());
+                    LOG.debug("Exception while downloading", e);
                     resource.setStatus(ERROR);
                     throw e;
                 }
