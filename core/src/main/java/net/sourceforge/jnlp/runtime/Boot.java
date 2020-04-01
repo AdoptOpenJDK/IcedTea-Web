@@ -110,9 +110,8 @@ public final class Boot implements PrivilegedAction<Integer> {
     public static void main(String[] args) {
         EnvironmentPrinter.logEnvironment(args);
         final int status = mainWithReturnCode(args);
-        if (status != 0) {
-            System.exit(status);
-        }
+        LOG.debug("Exiting Boot.main().");
+        System.exit(status);
     }
 
     /**
