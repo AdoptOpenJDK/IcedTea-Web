@@ -91,6 +91,8 @@ public class OutputController extends BasicOutputController {
                     }
 
                 } catch (Throwable t) {
+                    // we must not use the logging framework as this would add a new message to the queue
+                    // which most likely will end also in this catch block thus creating an endless loop
                     final File logDir = PathsAndFiles.LOG_DIR.getFile();
                     final File file = new File(logDir, "log-trace-" + System.currentTimeMillis() + ".log");
                     try (FileOutputStream out = new FileOutputStream(file)) {
