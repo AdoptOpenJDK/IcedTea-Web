@@ -45,7 +45,7 @@ public class NoClassDeff extends Applet {
 
     private static void checkStage() {
         if (stage == null) {
-            throw new NullPointerException("satge cant be null");
+            throw new NullPointerException("satge cannot be null");
         }
         System.out.println(stage);
         System.out.println("catchError: " + catchError);

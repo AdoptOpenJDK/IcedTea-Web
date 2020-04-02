@@ -60,7 +60,7 @@ public class SecurityValueValidator implements ValueValidator {
         try {
             final AppletSecurityLevel validated = AppletSecurityLevel.fromString((String) value);
             if (validated == null) {
-                throw new IllegalArgumentException("Result can't be null, was");
+                throw new IllegalArgumentException("Result cannot be null, was");
             }
             //thrown by fromString
         } catch (final RuntimeException ex) {

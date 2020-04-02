@@ -191,7 +191,7 @@ public final class FileUtils {
         // but exists on /a/b/../c is false on linux  even afterwards
         // without hexing of .. paths,
         if (!parent.isDirectory() && !parent.mkdirs()) {
-            throw new IOException("Cant create directory " + (eMsg == null ? parent : eMsg));
+            throw new IOException("Cannot create directory " + (eMsg == null ? parent : eMsg));
         }
     }
 
@@ -217,7 +217,7 @@ public final class FileUtils {
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
             if (!f.delete()) {
-                LOG.error("Cant delete file {}", eMsg == null ? f : eMsg);
+                LOG.error("Cannot delete file {}", eMsg == null ? f : eMsg);
             }
         }
     }
@@ -243,11 +243,11 @@ public final class FileUtils {
 
         if (isDir) {
             if (!tempFile.mkdir()) {
-                throw new IOException("Cant create directory {} " + tempFile);
+                throw new IOException("Cannot create directory {} " + tempFile);
             }
         } else {
             if (!tempFile.createNewFile()) {
-                throw new IOException("Cant create file {} " + tempFile);
+                throw new IOException("Cannot create file {} " + tempFile);
             }
         }
 
@@ -327,7 +327,7 @@ public final class FileUtils {
         // opened the file right after it was created might still be able to
         // read the data.
         if (!tempFile.renameTo(file)) {
-            throw new IOException("Cant rename " + tempFile + " to " + file);
+            throw new IOException("Cannot rename " + tempFile + " to " + file);
         }
     }
 

@@ -541,7 +541,7 @@ public class UrlUtils {
             //StringBuilder do not have endsWith method. Check on that are more expensive then recreations
             String head = new String();
             byte[] body = new byte[0];
-            //we cant use bufferedreader, otherwise buffer consume also part of body
+            //we can't use bufferedreader, otherwise buffer consume also part of body
             try (InputStream is = s.getInputStream()) {
                 while (true) {
                     int readChar = is.read();

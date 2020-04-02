@@ -101,7 +101,7 @@ public class UnsignedAppletActionEntry {
                 + " " + ((codeBase == null) ? "" : codeBase.getRegEx())
                 + " " + createArchivesString(archives);
         if (s.contains("\n") || s.contains("\r") || s.contains("\f")){
-            throw new InvalidLineException("Cant write line with \\n, \\r or \\f");
+            throw new InvalidLineException("Cannot write line with \\n, \\r or \\f");
         }
         return s;
     }

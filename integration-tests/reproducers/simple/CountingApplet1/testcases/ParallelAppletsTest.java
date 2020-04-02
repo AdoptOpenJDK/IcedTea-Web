@@ -170,8 +170,8 @@ public class ParallelAppletsTest extends BrowserTest {
 
 
     private void checkExitNotAllowed(ProcessResult pr) {
-        Assert.assertTrue("Applets cant call " + Sexit, pr.stderr.contains(ACE));
-        Assert.assertTrue("Applets cant call " + Sexit, pr.stderr.contains(Sexit));
+        Assert.assertTrue("Applets cannot call " + Sexit, pr.stderr.contains(ACE));
+        Assert.assertTrue("Applets cannot call " + Sexit, pr.stderr.contains(Sexit));
     }
 
     private void checkNotInitialised(ProcessResult pr) {
