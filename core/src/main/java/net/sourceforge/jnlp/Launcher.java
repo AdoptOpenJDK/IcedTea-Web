@@ -398,6 +398,7 @@ public class Launcher {
 
             LOG.info("Invoking main() with args: {}", Arrays.toString(args));
             main.invoke(null, new Object[] { args });
+            LOG.info("main completed");
 
             return app;
         } catch (LaunchException lex) {
