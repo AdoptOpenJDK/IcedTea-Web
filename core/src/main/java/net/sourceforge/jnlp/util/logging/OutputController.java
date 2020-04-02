@@ -112,14 +112,6 @@ public class OutputController extends BasicOutputController {
         }
     }
 
-    public void close() {
-        LOG.debug("Closing logger - good bye");
-        flush();
-        if (LogConfig.getLogConfig().isLogToFile()){
-            getFileLog().close();
-        }
-    }
-
     private void consume() {
         final MessageWithHeader message = messageQue.remove(0);
 

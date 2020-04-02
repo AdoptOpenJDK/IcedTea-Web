@@ -136,7 +136,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             LOG.debug("Exiting Boot.mainWithReturnCode() exceptionally", e);
             throw e;
         } finally {
-            JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
+            JNLPRuntime.waitForExceptionDialogsToBeClosed();
         }
     }
 

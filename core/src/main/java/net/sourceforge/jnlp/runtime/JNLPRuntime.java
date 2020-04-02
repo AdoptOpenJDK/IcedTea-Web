@@ -901,12 +901,12 @@ public class JNLPRuntime {
     }
 
     public static <T> T exit(int i) {
-        closeLoggerAndWaitForExceptionDialogsToBeClosed();
+        waitForExceptionDialogsToBeClosed();
         System.exit(i);
         return null;
     }
 
-    public static void closeLoggerAndWaitForExceptionDialogsToBeClosed() {
+    public static void waitForExceptionDialogsToBeClosed() {
         try {
             if (BasicExceptionDialog.areShown()) {
                 LOG.debug("Waiting for exception dialog to be closed");
@@ -916,9 +916,6 @@ public class JNLPRuntime {
             }
         } catch (Exception ex) {
             LOG.debug("Exception while waiting for ExceptionDialog to close", ex);
-        }
-        finally {
-            OutputController.getLogger().close();
         }
     }
 
