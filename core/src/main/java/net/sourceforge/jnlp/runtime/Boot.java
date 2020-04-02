@@ -110,7 +110,6 @@ public final class Boot implements PrivilegedAction<Integer> {
     public static void main(String[] args) {
         EnvironmentPrinter.logEnvironment(args);
         final int status = mainWithReturnCode(args);
-        LOG.debug("Exiting Boot.main().");
         System.exit(status);
     }
 
@@ -126,6 +125,7 @@ public final class Boot implements PrivilegedAction<Integer> {
         try {
             return runMain(args);
         } finally {
+            LOG.debug("Exiting Boot.mainWithReturnCode(). Closing Logger...");
             JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
         }
     }
