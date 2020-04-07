@@ -45,7 +45,7 @@ public class DefaultDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new DefaultDialogFactoryTest().showCertWarning();
+        // new DefaultDialogFactoryTest().showCertWarning();
         // new DefaultDialogFactoryTest().showPartiallySignedWarning();
         // new DefaultDialogFactoryTest().showCertInfoDialog();
         // new DefaultDialogFactoryTest().showMoreInfoDialog();
@@ -54,7 +54,7 @@ public class DefaultDialogFactoryTest {
         // new DefaultDialogFactoryTest().showMissingPermissionsAttributeDialogue();
 
         // new DefaultDialogFactoryTest().showAuthenticationPrompt();
-        // new DefaultDialogFactoryTest().show511Dialog();
+         new DefaultDialogFactoryTest().show511Dialog();
         // new DefaultDialogFactoryTest().showAppletWarningPane(); -> applets only
     }
 

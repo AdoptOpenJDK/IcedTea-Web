@@ -45,6 +45,7 @@ public class NewDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
+        new NewDialogFactoryTest().showReadWriteFileAccessWarningDialog();
         // new NewDialogFactoryTest().showAccessWarningDialog();
         // new NewDialogFactoryTest().showCertWarningDialog();
         // new NewDialogFactoryTest().showMoreInfoDialog();
@@ -53,7 +54,11 @@ public class NewDialogFactoryTest {
         // new NewDialogFactoryTest().showMissingPermissionsAttributeDialog();
         // new NewDialogFactoryTest().showMissingALACAttributeDialog();
         // new NewDialogFactoryTest().showMatchingALACAttributeDialog();
-        new NewDialogFactoryTest().showAuthenticationPrompt();
+        // new NewDialogFactoryTest().showAuthenticationPrompt();
+    }
+
+    private void showReadWriteFileAccessWarningDialog() {
+        dialogFactory.showAccessWarningDialog(READ_WRITE_FILE, file, new Object[]{"test"});
     }
 
     private void showAccessWarningDialog() {

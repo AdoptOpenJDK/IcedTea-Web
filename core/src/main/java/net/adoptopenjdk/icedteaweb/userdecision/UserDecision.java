@@ -15,8 +15,11 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.adoptopenjdk.icedteaweb.userdecision;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.sourceforge.jnlp.security.AccessType;
 
+import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 public class UserDecision<T extends Enum<T>> {
@@ -60,8 +63,8 @@ public class UserDecision<T extends Enum<T>> {
     }
 
     private UserDecision(final Key key, final T value) {
-        this.key = key;
-        this.value = value;
+        this.key = Assert.requireNonNull(key, "key");
+        this.value = Assert.requireNonNull(value, "value");
     }
 
     public static <T extends Enum<T>> UserDecision<T> of(final Key key, final T value) {
@@ -78,5 +81,26 @@ public class UserDecision<T extends Enum<T>> {
 
     public T getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserDecision)) return false;
+        final UserDecision<?> that = (UserDecision<?>) o;
+        return key == that.key;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", UserDecision.class.getSimpleName() + "[", "]")
+                .add("key=" + key)
+                .add("value=" + value)
+                .toString();
     }
 }
