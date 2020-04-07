@@ -114,6 +114,11 @@ if [ "x$MSLINKS_SRC" == "x" ] ; then
 else
   readonly MSLINKS_SRC=$MSLINKS_SRC
 fi
+if [ "x$GSON_SRC" == "x" ] ; then
+  readonly GSON_SRC=`getJar "gson"`
+else
+  readonly GSON_SRC=$GSON_SRC
+fi
 
 readonly SPLASH_PNG_SRC=`find $PROJECT_TOP/core/src |  grep /javaws_splash.png$`
 if isWindows; then

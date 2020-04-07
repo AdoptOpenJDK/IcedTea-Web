@@ -50,6 +50,11 @@
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.inet.ipaddr</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>com.google.code.gson</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.com.google.code.gson
+                                    </shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>org.ccil.cowan.tagsoup</pattern>
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.tagsoup</shadedPattern>
                                 </relocation>
