@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DECISIONS_FILE_STORE;
 
 public class UserDecisionsFileStore implements UserDecisions {
@@ -72,11 +74,13 @@ public class UserDecisionsFileStore implements UserDecisions {
             try {
                 final Set<FileStoreEntry> fileStoreEntries = new LinkedHashSet<>(readFileStoreEntries());
                 final T[] enumConstants = resultType.getEnumConstants();
+                final Set<String> jarNames = getJarNames(file);
 
                 return fileStoreEntries.stream()
                         .filter(entry -> entry.getUserDecisionKey() == key)
+                        .filter(entry -> entry.getJarNames().isEmpty() || entry.getJarNames().equals(jarNames))
                         .filter(entry -> Arrays.stream(enumConstants).anyMatch((t) -> t.name().equals(entry.getUserDecisionValue())))
-                        .findFirst()
+                        .max(Comparator.comparingInt(entry -> entry.getJarNames().size()))
                         .map(entry -> Enum.valueOf(resultType, entry.getUserDecisionValue()));
 
             } finally {
@@ -87,30 +91,30 @@ public class UserDecisionsFileStore implements UserDecisions {
             LOG.error("Failed to read from user decisions file store: " + store, ex);
         }
 
-
-        // TODO implementation missing
-        // TODO prefer entries with jar lists (application) over empty list (domain), order of jars is irrelevant
-        // TODO lockable file
         return Optional.empty();
     }
 
     @Override
     public <T extends Enum<T>> void saveForDomain(final JNLPFile file, final UserDecision<T> userDecision) {
         final URL codebase = file.getNotNullProbableCodeBase();
-        save(userDecision, codebase, emptyList());
+        save(userDecision, codebase, emptySet());
     }
 
     @Override
     public <T extends Enum<T>> void saveForApplication(final JNLPFile file, final UserDecision<T> userDecision) {
         final URL codebase = file.getNotNullProbableCodeBase();
-        final List<String> jarNames = file.getResourcesDescs().stream()
-                .flatMap(resourcesDesc -> Arrays.stream(resourcesDesc.getJARs()))
-                .map(jarDesc -> new File(jarDesc.getLocation().toString()).getName())
-                .collect(Collectors.toList());
+        final Set<String> jarNames = getJarNames(file);
         save(userDecision, codebase, jarNames);
     }
 
-    private <T extends Enum<T>> void save(final UserDecision<T> userDecision, final URL codebase, final List<String> jarNames) {
+    private Set<String> getJarNames(final JNLPFile file) {
+        return file.getResourcesDescs().stream()
+                    .flatMap(resourcesDesc -> Arrays.stream(resourcesDesc.getJARs()))
+                    .map(jarDesc -> new File(jarDesc.getLocation().toString()).getName())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private <T extends Enum<T>> void save(final UserDecision<T> userDecision, final URL codebase, final Set<String> jarNames) {
         final FileStoreEntry fileStoreEntry = createFileStoreEntry(userDecision, codebase, jarNames);
 
         try {
@@ -130,7 +134,7 @@ public class UserDecisionsFileStore implements UserDecisions {
         }
     }
 
-    private <T extends Enum<T>> FileStoreEntry createFileStoreEntry(final UserDecision<T> userDecision, final URL codebase, final List<String> jarNames) {
+    private <T extends Enum<T>> FileStoreEntry createFileStoreEntry(final UserDecision<T> userDecision, final URL codebase, final Set<String> jarNames) {
         final URL domain = getDomain(codebase);
         return new FileStoreEntry(userDecision.getKey(), userDecision.getValue().toString(), domain, jarNames);
     }
