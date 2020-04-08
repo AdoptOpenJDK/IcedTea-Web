@@ -43,16 +43,24 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DECISIONS_FILE_STORE;
 
 public class UserDecisionsFileStore implements UserDecisions {
-    private static final Logger LOG = LoggerFactory.getLogger(UserDecisionsFileStore.class);
-    private final static File store = USER_DECISIONS_FILE_STORE.getFile();
-    private final LockableFile lockableFile = LockableFile.getInstance(store);
 
+    private static final Logger LOG = LoggerFactory.getLogger(UserDecisionsFileStore.class);
+
+    private final LockableFile lockableFile;
     private final Gson gson;
+    private File store;
 
     public UserDecisionsFileStore() {
+        this(USER_DECISIONS_FILE_STORE.getFile());
+    }
+
+    UserDecisionsFileStore(final File store) {
+        this.store = requireNonNull(store, "store");
+        this.lockableFile = LockableFile.getInstance(store);
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
@@ -86,8 +94,7 @@ public class UserDecisionsFileStore implements UserDecisions {
             } finally {
                 lockableFile.unlock();
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             LOG.error("Failed to read from user decisions file store: " + store, ex);
         }
 
@@ -109,9 +116,9 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     private Set<String> getJarNames(final JNLPFile file) {
         return file.getResourcesDescs().stream()
-                    .flatMap(resourcesDesc -> Arrays.stream(resourcesDesc.getJARs()))
-                    .map(jarDesc -> new File(jarDesc.getLocation().toString()).getName())
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                .flatMap(resourcesDesc -> Arrays.stream(resourcesDesc.getJARs()))
+                .map(jarDesc -> new File(jarDesc.getLocation().toString()).getName())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private <T extends Enum<T>> void save(final UserDecision<T> userDecision, final URL codebase, final Set<String> jarNames) {
@@ -128,8 +135,7 @@ public class UserDecisionsFileStore implements UserDecisions {
             } finally {
                 lockableFile.unlock();
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             LOG.error("Failed to lock/unlock user decisions file store: " + store, ex);
         }
     }
