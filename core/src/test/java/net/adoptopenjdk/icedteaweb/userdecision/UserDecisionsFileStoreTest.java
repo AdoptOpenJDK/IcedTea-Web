@@ -50,12 +50,25 @@ public class UserDecisionsFileStoreTest {
     }
 
     @Test
-    public void shouldSaveDecisionInFileStore() throws Exception {
+    public void shouldSaveDecisionInForApplication() throws Exception {
         // given
         final JNLPFile file = loadJnlpFile("/net/sourceforge/jnlp/basic.jnlp");
 
         // when
         userDecisions.saveForApplication(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, DENY));
+        final Optional<AllowDeny> result = userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
+
+        // then
+        assertThat(result, is(Optional.of(DENY)));
+    }
+
+    @Test
+    public void shouldSaveDecisionForDomain() throws Exception {
+        // given
+        final JNLPFile file = loadJnlpFile("/net/sourceforge/jnlp/basic.jnlp");
+
+        // when
+        userDecisions.saveForDomain(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, DENY));
         final Optional<AllowDeny> result = userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
 
         // then
@@ -91,6 +104,20 @@ public class UserDecisionsFileStoreTest {
 
         // then
         assertThat(result, is(Optional.of(DENY)));
+    }
+
+    @Test
+    public void shouldNotReturnSavedValueOfOtherApplication() throws Exception {
+        // given
+        final JNLPFile file = loadJnlpFile("/net/sourceforge/jnlp/basic.jnlp");
+        final JNLPFile otherFile = loadJnlpFile("/net/sourceforge/jnlp/launchApp.jnlp");
+
+        // when
+        userDecisions.saveForApplication(otherFile, UserDecision.of(RUN_UNSIGNED_APPLICATION, DENY));
+        final Optional<AllowDeny> result = userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
+
+        // then
+        assertThat(result, is(Optional.empty()));
     }
 
     private JNLPFile loadJnlpFile(String name) throws IOException, ParseException {
