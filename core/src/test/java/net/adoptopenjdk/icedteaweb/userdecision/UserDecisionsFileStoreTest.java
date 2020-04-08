@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.ALLOW;
 import static net.adoptopenjdk.icedteaweb.security.dialog.result.AllowDeny.DENY;
 import static net.adoptopenjdk.icedteaweb.userdecision.UserDecision.Key.RUN_UNSIGNED_APPLICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,6 +70,23 @@ public class UserDecisionsFileStoreTest {
 
         // when
         userDecisions.saveForApplication(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, DENY));
+        final Optional<AllowDeny> result = userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
+
+        // then
+        assertThat(result, is(Optional.of(DENY)));
+    }
+
+    @Test
+    public void applicationShouldTakePrecedenceOverDomain() throws Exception {
+        // given
+        final JNLPFile file = loadJnlpFile("/net/sourceforge/jnlp/basic.jnlp");
+        assertTrue(store.delete());
+
+        // when
+        // save domain twice to ensure order does not matter
+        userDecisions.saveForDomain(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, ALLOW));
+        userDecisions.saveForApplication(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, DENY));
+        userDecisions.saveForDomain(file, UserDecision.of(RUN_UNSIGNED_APPLICATION, ALLOW));
         final Optional<AllowDeny> result = userDecisions.getUserDecisions(RUN_UNSIGNED_APPLICATION, file, AllowDeny.class);
 
         // then
