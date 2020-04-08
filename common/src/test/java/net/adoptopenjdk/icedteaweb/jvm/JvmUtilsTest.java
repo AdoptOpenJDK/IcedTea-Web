@@ -171,7 +171,12 @@ public class JvmUtilsTest {
     @Test
     public void testValidJavaModuleVMArgs() {
         final String javaVMArgs = "-Dsun.java2d.d3d=true --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
-
+        try {
+            JvmUtils.checkVMArgs(javaVMArgs);
+        } catch (IllegalArgumentException ile) {
+            fail(ile.getMessage());
+        }
+        final String java_vm_args = "-Djnlp.ccc=ccc -XX:SurvivorRatio=6 -Xmx512m -Xms128m -XX:NewSize=96m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 --add-modules=java.scripting,java.sql --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports=jdk.deploy/com.sun.deploy.config=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.desktop/javax.imageio.spi=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED";
         try {
             JvmUtils.checkVMArgs(javaVMArgs);
         } catch (IllegalArgumentException ile) {
@@ -189,6 +194,16 @@ public class JvmUtilsTest {
             fail("Illegal arg accepted!");
         } catch (IllegalArgumentException ile) {
             assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testMoreThanOneBlankBtwnArgs() {
+        final String java_vm_args = "   -Djnlp.ccc=ccc  -XX:SurvivorRatio=6    -Dsun.java2d.d3d=true   ";
+        try {
+            JvmUtils.checkVMArgs(java_vm_args);
+        } catch (IllegalArgumentException ile) {
+            fail(ile.getMessage());
         }
     }
 }

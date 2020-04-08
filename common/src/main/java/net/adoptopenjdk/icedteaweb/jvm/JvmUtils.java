@@ -39,7 +39,7 @@ public class JvmUtils {
             return;
         }
 
-        final String[] arguments = vmArgs.split(" ");
+        final String[] arguments = vmArgs.trim().split("\\s+");
         for (String argument : arguments) {
             if (isInvalidValidArgument(argument)) {
                 throw new IllegalArgumentException(argument);
