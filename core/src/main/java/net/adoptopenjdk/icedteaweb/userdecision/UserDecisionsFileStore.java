@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DECISIONS_FILE_STORE;
 
@@ -116,7 +117,7 @@ public class UserDecisionsFileStore implements UserDecisions {
         try {
             return new URL(codebase.getProtocol(), codebase.getHost(), codebase.getPort(), "");
         } catch (MalformedURLException ex) {
-            LOG.error("Codebase is not a valid URL", ex);
+            LOG.error(format("Failed to determine domain as codebase '%s' is not a valid URL", codebase), ex);
             throw new RuntimeException(ex);
         }
     }
@@ -129,7 +130,7 @@ public class UserDecisionsFileStore implements UserDecisions {
                     .orElse(emptyList());
 
         } catch (IOException ex) {
-            LOG.warn("Could not read from user decisions file store.", ex);
+            LOG.error("Could not read from user decisions file store: " + store, ex);
             return emptyList();
         }
     }
@@ -139,7 +140,7 @@ public class UserDecisionsFileStore implements UserDecisions {
             IOUtils.writeUtf8Content(out, gson.toJson(new FileStoreEntries(entries)));
 
         } catch (IOException ex) {
-            LOG.warn("Could not write to user decisions file store.", ex);
+            LOG.error("Could not write to user decisions file store: " + store, ex);
         }
     }
 }
