@@ -66,6 +66,28 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     @Override
     public <T extends Enum<T>> Optional<T> getUserDecisions(final UserDecision.Key key, final JNLPFile file, final Class<T> resultType) {
+        try {
+            lockableFile.lock();
+
+            try {
+                final Set<FileStoreEntry> fileStoreEntries = new LinkedHashSet<>(readFileStoreEntries());
+                final T[] enumConstants = resultType.getEnumConstants();
+
+                return fileStoreEntries.stream()
+                        .filter(entry -> entry.getUserDecisionKey() == key)
+                        .filter(entry -> Arrays.stream(enumConstants).anyMatch((t) -> t.name().equals(entry.getUserDecisionValue())))
+                        .findFirst()
+                        .map(entry -> Enum.valueOf(resultType, entry.getUserDecisionValue()));
+
+            } finally {
+                lockableFile.unlock();
+            }
+        }
+        catch (IOException ex) {
+            LOG.error("Failed to read from user decisions file store: " + store, ex);
+        }
+
+
         // TODO implementation missing
         // TODO prefer entries with jar lists (application) over empty list (domain), order of jars is irrelevant
         // TODO lockable file
@@ -110,7 +132,7 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     private <T extends Enum<T>> FileStoreEntry createFileStoreEntry(final UserDecision<T> userDecision, final URL codebase, final List<String> jarNames) {
         final URL domain = getDomain(codebase);
-        return new FileStoreEntry(userDecision, domain, jarNames);
+        return new FileStoreEntry(userDecision.getKey(), userDecision.getValue().toString(), domain, jarNames);
     }
 
     private URL getDomain(final URL codebase) {

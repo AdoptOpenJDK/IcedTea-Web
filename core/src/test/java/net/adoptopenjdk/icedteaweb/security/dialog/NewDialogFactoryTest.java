@@ -45,8 +45,8 @@ public class NewDialogFactoryTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new NewDialogFactoryTest().showReadWriteFileAccessWarningDialog();
-        // new NewDialogFactoryTest().showAccessWarningDialog();
+        // new NewDialogFactoryTest().showReadWriteFileAccessWarningDialog();
+        new NewDialogFactoryTest().showAccessWarningDialog();
         // new NewDialogFactoryTest().showCertWarningDialog();
         // new NewDialogFactoryTest().showMoreInfoDialog();
         // new NewDialogFactoryTest().showPartiallySignedWarningDialog();
