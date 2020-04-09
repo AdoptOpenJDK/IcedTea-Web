@@ -324,8 +324,8 @@ public class JvmUtils {
 
     /**
      * https://docs.oracle.com/javase/9/tools/java.htm#JSWOR624
-     * Java 9 VM args. specified by app developer in jnlp file.
-     * ITW add its own set of jvm args (specified in file itw-modularjdk.args) required for its own execution
+     * Java Module VM args. specified by app developer in jnlp file.
+     * OWS adds its own set of jvm args {@link #getPredefinedJavaModulesVMArgumentsMap()} (which are same as those specified in file itw-modularjdk.args from ITW) required for its own execution
      *
      * @return
      */
