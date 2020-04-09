@@ -388,9 +388,12 @@ public class JvmUtils {
                     String[] vmArgValueStrs = vmArgValues.split(",");
                     predefArgSet.addAll(Arrays.asList(vmArgValueStrs));
                     moduleArgMap.put(predefArgKey, predefArgSet);
+                } else { // module arg but not predef
+                    mergedVMArgs.add(arg);
                 }
+            } else { // non module arg
+                mergedVMArgs.add(arg);
             }
-            mergedVMArgs.add(arg);
         });
         // Now add merged predefined args
         moduleArgMap.keySet().forEach(key -> mergedVMArgs.add(key + "=" + String.join(",", moduleArgMap.get(key))));
