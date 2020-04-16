@@ -1,5 +1,9 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +29,9 @@ public class JvmUtils {
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
 
+    public static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
+    public static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
+
     /**
      * Check that the VM args are valid and safe.
      * <p>
@@ -48,8 +55,11 @@ public class JvmUtils {
     }
 
     private static boolean isInvalidValidArgument(final String argument) {
-        return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isValidStartingJavaModulesArgument(argument)
-                && !isSecurePropertyAValidJVMArg(argument);
+         boolean result = !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isSecurePropertyAValidJVMArg(argument);
+         if (JAVA_9_OR_GREATER.contains(JVM_VERSION)) {
+             result = result && !isValidStartingJavaModulesArgument(argument);
+         }
+         return result;
     }
 
     /**
