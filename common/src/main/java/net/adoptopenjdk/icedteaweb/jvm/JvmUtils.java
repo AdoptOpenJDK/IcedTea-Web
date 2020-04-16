@@ -28,8 +28,8 @@ public class JvmUtils {
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
-    private static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
 
+    public static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
     public static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
 
     /**
