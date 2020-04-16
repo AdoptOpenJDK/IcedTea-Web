@@ -28,9 +28,8 @@ public class JvmUtils {
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
-
-    public static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
-    public static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
+    private static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
+    private static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
 
     /**
      * Check that the VM args are valid and safe.
@@ -42,33 +41,35 @@ public class JvmUtils {
      * @throws IllegalArgumentException if the VM arguments are invalid or dangerous
      */
     public static void checkVMArgs(final String vmArgs) throws IllegalArgumentException {
+        final boolean isJava9orGreater = JAVA_9_OR_GREATER.contains(JVM_VERSION);
+        checkVMArgs(vmArgs, isJava9orGreater);
+    }
+
+    // visible for testing
+    static void checkVMArgs(final String vmArgs, final boolean isJava9orGreater) {
         if (isBlank(vmArgs)) {
             return;
         }
 
         final String[] arguments = vmArgs.trim().split("\\s+");
         for (String argument : arguments) {
-            if (isInvalidValidArgument(argument)) {
+            if (!isValidArgument(argument, isJava9orGreater)) {
                 throw new IllegalArgumentException(argument);
             }
         }
     }
 
-    private static boolean isInvalidValidArgument(final String argument) {
-         boolean result = !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isSecurePropertyAValidJVMArg(argument);
-         if (JAVA_9_OR_GREATER.contains(JVM_VERSION)) {
-             result = result && !isValidStartingJavaModulesArgument(argument);
-         }
-         return result;
+    private static boolean isValidArgument(final String argument, final boolean isJava9orGreater) {
+        return VALID_VM_ARGUMENTS.contains(argument)
+                || isValidStartingArgument(argument)
+                || isSecurePropertyAValidJVMArg(argument)
+                || (isJava9orGreater && isValidStartingJavaModulesArgument(argument));
     }
 
     /**
      * Properties set in the JNLP file will normally be set by Web Start after the VM is started but before the
      * application is invoked. Some properties are considered "secure" properties and can be passed
      * as -Dkey=value arguments on the java invocation command line.
-     *
-     * @param argument
-     * @return
      */
     static boolean isSecurePropertyAValidJVMArg(String argument) {
         if (argument.startsWith("-D") && argument.length() > 2) {
@@ -100,8 +101,6 @@ public class JvmUtils {
     /**
      * A secure property is valid if it is in the whitelist or it begins with "jnlp." or "javaws."
      *
-     * @param argument
-     * @return
      * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
      */
     public static boolean isValidSecureProperty(final String argument) {
@@ -236,8 +235,6 @@ public class JvmUtils {
      * the application is invoked. These properties are considered "secure" properties and can be passed as
      * -Dkey=value arguments on the java invocation command line. The following properties are predefined secure
      * properties and will be passed to the VM in this way.
-     *
-     * @return
      */
     private static String[] getValidSecureProperties() {
         return new String[]{
@@ -336,8 +333,6 @@ public class JvmUtils {
      * https://docs.oracle.com/javase/9/tools/java.htm#JSWOR624
      * Java Module VM args. specified by app developer in jnlp file.
      * OWS adds its own set of jvm args {@link #getPredefinedJavaModulesVMArgumentsMap()} (which are same as those specified in file itw-modularjdk.args from ITW) required for its own execution
-     *
-     * @return
      */
     public static String[] getValidStartingJavaModuleVMArguments() {
         return new String[]{
@@ -354,28 +349,27 @@ public class JvmUtils {
      * Defined in itw-modularjdk.args. Required for running ITW with jdk 9 or higher
      */
     static Map<String, Set<String>> getPredefinedJavaModulesVMArgumentsMap() {
-        return new HashMap() {{
-
+        return new HashMap<String, Set<String>>() {{
             put("--add-reads=java.base", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED","java.desktop")));
-            put("--add-reads=java.desktop", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED","java.naming")));
-            put("--add-reads=java.naming", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-reads=java.desktop", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.naming")));
+            put("--add-reads=java.naming", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
 
-            put("--add-exports=java.desktop/sun.awt", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.desktop/javax.jnlp", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.awt", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/javax.jnlp", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
 
-            put("--add-exports=java.base/com.sun.net.ssl.internal.ssl", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.net.www.protocol.jar", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.action", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.provider", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.util", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.validator", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.x509", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/jdk.internal.util.jar", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.net.www.protocol.http", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/com.sun.net.ssl.internal.ssl", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.net.www.protocol.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.action", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.provider", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.util", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.validator", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.x509", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/jdk.internal.util.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.net.www.protocol.http", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
 
-            put("--add-exports=java.desktop/sun.awt.X11", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.desktop/sun.applet", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop,jdk.jsobject")));
-            put("--add-exports=java.naming/com.sun.jndi.toolkit.url", new LinkedHashSet<String>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.awt.X11", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.applet", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop,jdk.jsobject")));
+            put("--add-exports=java.naming/com.sun.jndi.toolkit.url", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
         }};
     }
 
