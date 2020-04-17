@@ -29,6 +29,7 @@ set "JAVAWS_SRC=@JAVAWS_JAR@"
 set "TAGSOUP_SRC=@TAGSOUP_JAR@"
 set "RHINO_SRC=@RHINO_JAR@"
 set "MSLINKS_SRC=@MSLINKS_JAR@"
+set "GSON_SRC=@GSON_JAR@"
 
 
 rem resolve folder of this script:
@@ -106,14 +107,16 @@ if "%ITW_LIBS%" == "BUNDLED" (
   set "RHINO_JAR="
   set "TAGSOUP_JAR="
   set "MSLINKS_JAR="
+  set "GSON_JAR="
 ) else (
   set "JAVAWS_JAR=!JAVAWS_SRC!"
 
   set "RHINO_JAR=!RHINO_SRC!"
   set "TAGSOUP_JAR=!TAGSOUP_SRC!"
   set "MSLINKS_JAR=!MSLINKS_SRC!"
+  set "GSON_JAR=!GSON_SRC!"
 )
-set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;"
+set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;%GSON_JAR%;"
 
 
 rem Fix classpaths for custom JRE:
