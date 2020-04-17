@@ -45,6 +45,7 @@ import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
 import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
+import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.NullJnlpFileException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -62,6 +63,8 @@ import java.net.URL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+@NotThreadSafe
+@Ignore
 public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
     private static AppletSecurityLevel level;

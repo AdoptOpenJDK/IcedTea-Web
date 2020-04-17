@@ -93,6 +93,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @NotThreadSafe
+@Ignore
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     private final JNLPFileFactory jnlpFileFactory = new JNLPFileFactory();
