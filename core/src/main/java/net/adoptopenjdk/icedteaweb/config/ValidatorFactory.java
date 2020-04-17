@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.config;
 
 import net.adoptopenjdk.icedteaweb.config.validators.BooleanValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
-import net.adoptopenjdk.icedteaweb.config.validators.ManifestAttributeCheckValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.MultipleStringValueValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.PortValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.RangedIntegerValidator;
@@ -11,6 +10,7 @@ import net.adoptopenjdk.icedteaweb.config.validators.StringValueValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.UrlValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.ValidatorUtils;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
 import java.util.Arrays;
@@ -117,7 +117,16 @@ public class ValidatorFactory {
      * from the possible single or combination ManifestAttributeCheck values
      */
     public static ValueValidator createManifestAttributeCheckValidator() {
-        return new ManifestAttributeCheckValidator();
+        return createMultipleStringValidator(new String[] {
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALL.toString(),
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.NONE.toString()
+        }, new String[] {
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.toString(),
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.CODEBASE.toString(),
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ENTRYPOINT.toString(),
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.toString(),
+                ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.TRUSTED.toString()
+        });
     }
 
     /**

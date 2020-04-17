@@ -36,8 +36,12 @@
  */
 package net.sourceforge.jnlp.runtime.classloader;
 
+import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Ignore;
 
+@NotThreadSafe
+@Ignore
 public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
     //TODO: How to ahndle old Classloader tests?

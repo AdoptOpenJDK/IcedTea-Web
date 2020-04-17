@@ -108,10 +108,14 @@ public final class Boot implements PrivilegedAction<Integer> {
      * @param args launching arguments
      */
     public static void main(String[] args) {
-        EnvironmentPrinter.logEnvironment(args);
-        final int status = mainWithReturnCode(args);
-        if (status != 0) {
-            System.exit(status);
+        int status = -42;
+        try {
+            EnvironmentPrinter.logEnvironment(args);
+            status = mainWithReturnCode(args);
+        } finally {
+            if (status != 0) {
+                System.exit(status);
+            }
         }
     }
 
@@ -125,9 +129,14 @@ public final class Boot implements PrivilegedAction<Integer> {
      */
     public static int mainWithReturnCode(String[] args) {
         try {
-            return runMain(args);
+            final Integer result = runMain(args);
+            LOG.debug("Exiting Boot.mainWithReturnCode() with {}", result);
+            return result;
+        } catch (RuntimeException | Error e) {
+            LOG.debug("Exiting Boot.mainWithReturnCode() exceptionally", e);
+            throw e;
         } finally {
-            JNLPRuntime.closeLoggerAndWaitForExceptionDialogsToBeClosed();
+            JNLPRuntime.waitForExceptionDialogsToBeClosed();
         }
     }
 

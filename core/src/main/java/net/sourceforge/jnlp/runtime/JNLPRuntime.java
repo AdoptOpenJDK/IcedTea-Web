@@ -820,19 +820,21 @@ public class JNLPRuntime {
     }
 
     public static <T> T exit(int i) {
-        closeLoggerAndWaitForExceptionDialogsToBeClosed();
+        waitForExceptionDialogsToBeClosed();
         System.exit(i);
         return null;
     }
 
-    public static void closeLoggerAndWaitForExceptionDialogsToBeClosed() {
+    public static void waitForExceptionDialogsToBeClosed() {
         try {
-            OutputController.getLogger().close();
+            if (BasicExceptionDialog.areShown()) {
+                LOG.debug("Waiting for exception dialog to be closed");
+            }
             while (BasicExceptionDialog.areShown()){
                 Thread.sleep(100);
             }
         } catch (Exception ex) {
-            //to late
+            LOG.debug("Exception while waiting for ExceptionDialog to close", ex);
         }
     }
 

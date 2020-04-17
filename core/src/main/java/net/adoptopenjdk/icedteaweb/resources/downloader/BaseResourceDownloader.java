@@ -175,7 +175,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
         final Map<String, String> headerMap = Stream.of(head.split("\\n"))
                 .map(s -> s.split(":"))
-                .filter(a -> a.length != 2)
+                .filter(a -> a.length == 2)
                 .collect(Collectors.toMap(a -> a[0], a -> a[1]));
 
         final long lastModified = parseLong(headerMap.get(LAST_MODIFIED_HEADER), System.currentTimeMillis());

@@ -307,7 +307,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //shortcut
         AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
-        //cant emulate security delegate now
+        //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
@@ -329,7 +329,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //shortcut
         AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(null, r2);
-        //cant emulate security delegate now
+        //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);

@@ -35,16 +35,18 @@
  */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -88,7 +90,15 @@ public class OutputController extends BasicOutputController {
                     }
 
                 } catch (Throwable t) {
-                    LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, t);
+                    // we must not use the logging framework as this would add a new message to the queue
+                    // which most likely will end also in this catch block thus creating an endless loop
+                    final File logDir = PathsAndFiles.LOG_DIR.getFile();
+                    final File file = new File(logDir, "log-trace-" + System.currentTimeMillis() + ".log");
+                    try (FileOutputStream out = new FileOutputStream(file)) {
+                        out.write("Exception while logging".getBytes());
+                        t.printStackTrace(new PrintStream(out));
+                    } catch (final Exception ignored) {
+                    }
                 }
             }
         }
@@ -98,13 +108,6 @@ public class OutputController extends BasicOutputController {
 
         while (!messageQue.isEmpty()) {
             consume();
-        }
-    }
-
-    public void close() throws Exception {
-        flush();
-        if (LogConfig.getLogConfig().isLogToFile()){
-            getFileLog().close();
         }
     }
 

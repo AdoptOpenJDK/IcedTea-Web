@@ -1,8 +1,18 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -14,10 +24,12 @@ import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 public class JvmUtils {
-
     private static final Set<String> VALID_VM_ARGUMENTS = unmodifiableSet(new HashSet<>(asList(getValidVMArguments())));
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
+    private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
+    private static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
+    private static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
 
     /**
      * Check that the VM args are valid and safe.
@@ -29,29 +41,35 @@ public class JvmUtils {
      * @throws IllegalArgumentException if the VM arguments are invalid or dangerous
      */
     public static void checkVMArgs(final String vmArgs) throws IllegalArgumentException {
+        final boolean isJava9orGreater = JAVA_9_OR_GREATER.contains(JVM_VERSION);
+        checkVMArgs(vmArgs, isJava9orGreater);
+    }
+
+    // visible for testing
+    static void checkVMArgs(final String vmArgs, final boolean isJava9orGreater) {
         if (isBlank(vmArgs)) {
             return;
         }
 
-        final String[] arguments = vmArgs.split(" ");
+        final String[] arguments = vmArgs.trim().split("\\s+");
         for (String argument : arguments) {
-            if (isInvalidValidArgument(argument)) {
+            if (!isValidArgument(argument, isJava9orGreater)) {
                 throw new IllegalArgumentException(argument);
             }
         }
     }
 
-    private static boolean isInvalidValidArgument(final String argument) {
-        return !VALID_VM_ARGUMENTS.contains(argument) && !isValidStartingArgument(argument) && !isSecurePropertyAValidJVMArg(argument);
+    private static boolean isValidArgument(final String argument, final boolean isJava9orGreater) {
+        return VALID_VM_ARGUMENTS.contains(argument)
+                || isValidStartingArgument(argument)
+                || isSecurePropertyAValidJVMArg(argument)
+                || (isJava9orGreater && isValidStartingJavaModulesArgument(argument));
     }
 
     /**
      * Properties set in the JNLP file will normally be set by Web Start after the VM is started but before the
      * application is invoked. Some properties are considered "secure" properties and can be passed
      * as -Dkey=value arguments on the java invocation command line.
-     *
-     * @param argument
-     * @return
      */
     static boolean isSecurePropertyAValidJVMArg(String argument) {
         if (argument.startsWith("-D") && argument.length() > 2) {
@@ -71,11 +89,18 @@ public class JvmUtils {
         return false;
     }
 
+    private static boolean isValidStartingJavaModulesArgument(final String argument) {
+        for (String validStartingArgument : VALID_STARTING_JAVA_MODULES_ARGUMENTS) {
+            if (argument.startsWith(validStartingArgument)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * A secure property is valid if it is in the whitelist or it begins with "jnlp." or "javaws."
      *
-     * @param argument
-     * @return
      * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property">Java 8 Spec</a>
      */
     public static boolean isValidSecureProperty(final String argument) {
@@ -210,8 +235,6 @@ public class JvmUtils {
      * the application is invoked. These properties are considered "secure" properties and can be passed as
      * -Dkey=value arguments on the java invocation command line. The following properties are predefined secure
      * properties and will be passed to the VM in this way.
-     *
-     * @return
      */
     private static String[] getValidSecureProperties() {
         return new String[]{
@@ -301,9 +324,83 @@ public class JvmUtils {
                         break outerloop;
                     }
                 }
-
             }
         }
         return exec;
+    }
+
+    /**
+     * https://docs.oracle.com/javase/9/tools/java.htm#JSWOR624
+     * Java Module VM args. specified by app developer in jnlp file.
+     * OWS adds its own set of jvm args {@link #getPredefinedJavaModulesVMArgumentsMap()} (which are same as those specified in file itw-modularjdk.args from ITW) required for its own execution
+     */
+    public static String[] getValidStartingJavaModuleVMArguments() {
+        return new String[]{
+                "--module-path", /* Specifies the path to a semicolon-separated list of directories  */
+                "--add-reads", /* Updates module to read the target-module, regardless of the module declaration. */
+                "--add-exports", /* Updates module to export package to target-module, regardless of module declaration.  */
+                "--add-opens", /* Updates module to open package to target-module, regardless of module declaration.*/
+                "--add-modules", /* Specifies the root modules to resolve in addition to the initial module. */
+                "--patch-module" /* Overrides or augments a module with classes and resources in JAR files or directories. */
+        };
+    }
+
+    /**
+     * Defined in itw-modularjdk.args. Required for running ITW with jdk 9 or higher
+     */
+    static Map<String, Set<String>> getPredefinedJavaModulesVMArgumentsMap() {
+        return new HashMap<String, Set<String>>() {{
+            put("--add-reads=java.base", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED","java.desktop")));
+            put("--add-reads=java.desktop", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.naming")));
+            put("--add-reads=java.naming", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+
+            put("--add-exports=java.desktop/sun.awt", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/javax.jnlp", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+
+            put("--add-exports=java.base/com.sun.net.ssl.internal.ssl", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.net.www.protocol.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.action", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.provider", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.util", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.validator", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.security.x509", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/jdk.internal.util.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/sun.net.www.protocol.http", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+
+            put("--add-exports=java.desktop/sun.awt.X11", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.applet", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop,jdk.jsobject")));
+            put("--add-exports=java.naming/com.sun.jndi.toolkit.url", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+        }};
+    }
+
+    /**
+     * Combines PREDEFINED_JAVA_MODULES_VM_ARGUMENTS with the Java Module VM Args in the input vmargs.
+     * Does not check legality of args, this is done by {@link #checkVMArgs(String)}check
+     */
+    public static List<String> mergeJavaModulesVMArgs(final List<String> vmArgs) {
+
+       final List<String> mergedVMArgs = new ArrayList<>();
+       final Map<String, Set<String>> moduleArgMap = new LinkedHashMap<>(getPredefinedJavaModulesVMArgumentsMap());
+
+       vmArgs.forEach(arg -> {
+            if (isValidStartingJavaModulesArgument(arg)) { // it is a Java Module VM arg
+                final int vmArgEndIndex = arg.lastIndexOf("=");
+                String predefArgKey = arg.substring(0, vmArgEndIndex);
+                Set<String> predefArgSet = moduleArgMap.get(predefArgKey);
+                if (predefArgSet != null) { // this vm arg is a predef arg so need to merge its values
+                    String vmArgValues = arg.substring(vmArgEndIndex+1);
+                    String[] vmArgValueStrs = vmArgValues.split(",");
+                    predefArgSet.addAll(Arrays.asList(vmArgValueStrs));
+                    moduleArgMap.put(predefArgKey, predefArgSet);
+                } else { // module arg but not predef
+                    mergedVMArgs.add(arg);
+                }
+            } else { // non module arg
+                mergedVMArgs.add(arg);
+            }
+        });
+        // Now add merged predefined args
+        moduleArgMap.keySet().forEach(key -> mergedVMArgs.add(key + "=" + String.join(",", moduleArgMap.get(key))));
+        return mergedVMArgs;
     }
 }

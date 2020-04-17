@@ -1,7 +1,5 @@
 package net.adoptopenjdk.icedteaweb.config.validators;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,13 +38,13 @@ public class MultipleStringValueValidator implements ValueValidator {
                 if (comboOptionsContains(val)) {
                     found = true;
                 } else {
-                    throw new IllegalArgumentException(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE);
+                    throw new IllegalArgumentException("Invalid value '" + val + "' in combo");
                 }
             }
         }
 
         if (!found) {
-            throw new IllegalArgumentException(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE);
+            throw new IllegalArgumentException("Invalid value found: '" + value + "'");
         }
     }
 

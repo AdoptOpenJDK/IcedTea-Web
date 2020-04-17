@@ -140,7 +140,7 @@ class LeastRecentlyUsedCache {
                     if (cDir.mkdirs()) {
                         return cDir;
                     }
-                    throw new RuntimeException("Can't create directory " + cDir);
+                    throw new RuntimeException("Cannot create directory " + cDir);
                 }
             }
         }

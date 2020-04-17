@@ -37,8 +37,10 @@ package net.sourceforge.jnlp.runtime.classloader;
 
 import net.jcip.annotations.NotThreadSafe;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
+import org.junit.Ignore;
 
 @NotThreadSafe
+@Ignore
 public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
     //TODO: How to handle old Classloader tests???????

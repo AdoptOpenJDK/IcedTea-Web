@@ -18,6 +18,7 @@ package net.sourceforge.jnlp.proxy;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -38,7 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import static net.sourceforge.jnlp.proxy.ProxyConstants.FTP_SCHEMA;
 import static net.sourceforge.jnlp.proxy.ProxyConstants.HTTPS_SCHEMA;
@@ -106,22 +107,14 @@ public abstract class JNLPProxySelector extends ProxySelector {
             pacEvaluator = PacEvaluatorFactory.getPacEvaluator(autoConfigUrl);
         }
 
-        bypassList = new ArrayList<>();
-        String proxyBypass = config.getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LIST);
-        if (proxyBypass != null) {
-            StringTokenizer tokenizer = new StringTokenizer(proxyBypass, ",");
-            while (tokenizer.hasMoreTokens()) {
-                String host = tokenizer.nextToken();
-                if (host != null && host.trim().length() != 0) {
-                    bypassList.add(host);
-                }
-            }
-        }
+        bypassList = config.getPropertyAsList(ConfigurationConstants.KEY_PROXY_BYPASS_LIST).stream()
+                .filter(s -> !StringUtils.isBlank(s))
+                .collect(Collectors.toList());
 
-        bypassLocal = Boolean.valueOf(config
+        bypassLocal = Boolean.parseBoolean(config
                 .getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL));
 
-        sameProxy = Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
+        sameProxy = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
 
         proxyHttpHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST);
         proxyHttpPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT);
