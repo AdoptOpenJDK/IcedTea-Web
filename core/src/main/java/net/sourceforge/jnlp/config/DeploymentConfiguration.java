@@ -17,6 +17,8 @@
 package net.sourceforge.jnlp.config;
 
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
+import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
+import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -37,6 +39,7 @@ import java.io.Reader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -572,8 +575,10 @@ public final class DeploymentConfiguration {
 
         final Properties properties = new Properties();
 
-        try (final Reader reader = new BufferedReader(new InputStreamReader(propertiesFile.openStream(), StandardCharsets.UTF_8))) {
-            properties.load(reader);
+        try (final CloseableConnection con = ConnectionFactory.openConnection(propertiesFile)) {
+            try (final InputStream inputStream = con.getInputStream()) {
+                properties.load(inputStream);
+            }
         }
 
         final Set<String> keys = properties.stringPropertyNames();
