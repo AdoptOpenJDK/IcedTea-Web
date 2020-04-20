@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.config;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.icon.IcoReaderSpi;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -60,7 +59,7 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.DEPLOYMENT_PROP
  */
 public final class DeploymentConfiguration {
 
-    private final static Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
     public static final String LOCKED_POSTFIX = ".locked";
 
     private String userComments;
@@ -68,7 +67,7 @@ public final class DeploymentConfiguration {
     private ConfigurationException loadingException = null;
 
 
-    public enum ConfigType {
+    enum ConfigType {
         SYSTEM, USER
     }
 
@@ -112,7 +111,9 @@ public final class DeploymentConfiguration {
     }
 
     public boolean isLocked(final String key) {
-        return getSetting(key).map(s -> s.isLocked()).orElse(false);
+        return getSetting(key)
+                .map(Setting::isLocked)
+                .orElse(false);
     }
 
     public void lock(final String key) {
@@ -138,12 +139,12 @@ public final class DeploymentConfiguration {
 
     static boolean checkUrl(final URL file) {
         try {
-            try (InputStream s = file.openStream()) {
+            try (InputStream ignored = file.openStream()) {
                 return true;
             } catch (ConnectException e) {
                 // get some sleep and retry
                 Thread.sleep(500);
-                try (InputStream s = file.openStream()) {
+                try (InputStream ignored = file.openStream()) {
                     return true;
                 }
             }
@@ -182,16 +183,15 @@ public final class DeploymentConfiguration {
             sm.checkRead(userDeploymentFileDescriptor.getFullPath());
         }
 
-        final Map<String, Setting> initialProperties = Defaults.getDefaults();
+        final Map<String, Setting> properties = Defaults.getDefaults();
         final Map<String, Setting> systemProperties = loadSystemProperties();
 
-        mergeMaps(initialProperties, systemProperties);
+        mergeMaps(properties, systemProperties);
 
         /* need a copy of the original when we have to save */
         unchangeableConfiguration.clear();
-        final Set<String> keys = initialProperties.keySet();
-        for (final String key : keys) {
-            unchangeableConfiguration.put(key, initialProperties.get(key).copy());
+        for (final Map.Entry<String, Setting> entry : properties.entrySet()) {
+            unchangeableConfiguration.put(entry.getKey(), entry.getValue().copy());
         }
 
         /*
@@ -201,18 +201,26 @@ public final class DeploymentConfiguration {
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
-        if (userProperties != null) {
-            mergeMaps(initialProperties, userProperties);
-        }
+        mergeMaps(properties, userProperties);
 
         if (fixIssues) {
-            checkAndFixConfiguration(initialProperties);
+            checkAndFixConfiguration(properties);
         }
 
         currentConfiguration.clear();
-        currentConfiguration.putAll(initialProperties);
+        currentConfiguration.putAll(properties);
     }
 
+    /**
+     * First loads the {@code deployment.config} file to determine the URL of the system properties.
+     * The deployment config file must contain a property with the key {@link ConfigurationConstants#KEY_SYSTEM_CONFIG}.
+     * Optionally it can require the system properties to exist with the kye {@link ConfigurationConstants#KEY_SYSTEM_CONFIG_MANDATORY}.
+     *
+     * @see #findSystemConfigFile()
+     * @see #loadSystemConfiguration(URL)
+     *
+     * @return the system properties
+     */
     private Map<String, Setting> loadSystemProperties() throws MalformedURLException, ConfigurationException {
         /*
          * First, try to read the system's deployment.config file to find if
@@ -358,6 +366,18 @@ public final class DeploymentConfiguration {
     }
 
     /**
+     * Looks in the following locations:
+     * <pre>
+     * Unix:
+     *   - /etc/.java/deployment.config
+     *   - ${JAVA_HOME}/lib/deployment.config
+     *
+     * Windows:
+     *   - ${WINDIR}\Sun\Java\deployment.config
+     *   - ${JAVA_HOME}/lib/deployment.config
+     * </pre>
+     *
+     *
      * @return the location of system-level deployment.config file, or null if none can be found
      */
     private URL findSystemConfigFile() throws MalformedURLException {
@@ -373,7 +393,7 @@ public final class DeploymentConfiguration {
                 jrePath = jreSetting.getValue();
             }
         } catch (final Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Failed to parse property file " + userDeploymentFileDescriptor.getFile(), ex);
         }
 
         File jreFile;
@@ -618,7 +638,7 @@ public final class DeploymentConfiguration {
     private static final SimpleDateFormat pattern = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 
     private static String loadComments(final URL path) {
-        final StringBuilder r = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(path.openStream(), StandardCharsets.UTF_8))) {
             while (true) {
                 String s = br.readLine();
@@ -642,7 +662,7 @@ public final class DeploymentConfiguration {
                         //we really don't care, failure is our decision point
                     }
                     if (dd == null){
-                        r.append(decommented).append("\n");
+                        result.append(decommented).append("\n");
                     }
                 }
             }
@@ -650,7 +670,7 @@ public final class DeploymentConfiguration {
             LOG.warn("Exception while loading comment form config file: {}", ex.getMessage());
         }
 
-        return r.toString().trim();
+        return result.toString().trim();
     }
 
     /**
