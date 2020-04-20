@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static net.adoptopenjdk.icedteaweb.CollectionUtils.isNullOrEmpty;
+import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -153,7 +154,7 @@ class LeastRecentlyUsedCache {
             FileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
 
             final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
-            if (StringUtils.isBlank(jnlpPath)) {
+            if (isBlank(jnlpPath)) {
                 LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
             } else {
                 final PropertiesFile propertiesFile = new PropertiesFile(infoFile, R("CAutoGen"));
@@ -501,6 +502,11 @@ class LeastRecentlyUsedCache {
     }
 
     private String getCacheFileName(URL resourceHref) {
+        final String fileName = extractFileNameFromUrl(resourceHref);
+        return isBlank(fileName) ? "0" : fileName;
+    }
+
+    private String extractFileNameFromUrl(URL resourceHref) {
         final String path = resourceHref.getPath();
         final int i = path.lastIndexOf('/');
         if (i < 0) {
