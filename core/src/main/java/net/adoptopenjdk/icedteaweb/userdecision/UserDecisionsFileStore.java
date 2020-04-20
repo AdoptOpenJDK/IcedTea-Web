@@ -31,17 +31,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.sourceforge.jnlp.config.PathsAndFiles.USER_DECISIONS_FILE_STORE;
@@ -52,12 +48,13 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     private final LockableFile lockableFile;
     private final Gson gson;
-    private File store;
+    private final File store;
 
     public UserDecisionsFileStore() {
         this(USER_DECISIONS_FILE_STORE.getFile());
     }
 
+    // visible for testing
     UserDecisionsFileStore(final File store) {
         this.store = requireNonNull(store, "store");
         this.lockableFile = LockableFile.getInstance(store);
@@ -76,26 +73,20 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     @Override
     public <T extends Enum<T>> Optional<T> getUserDecisions(final UserDecision.Key key, final JNLPFile file, final Class<T> resultType) {
+        requireNonNull(file, "file");
+        requireNonNull(key, "key");
+
+        final URL domain = getDomain(file);
+        final Set<String> jarNames = getJarNames(file);
         try {
             lockableFile.lock();
-
             try {
-                final Set<FileStoreEntry> fileStoreEntries = new LinkedHashSet<>(readFileStoreEntries());
-                final T[] enumConstants = resultType.getEnumConstants();
-                final Set<String> jarNames = getJarNames(file);
-
-                return fileStoreEntries.stream()
-                        .filter(entry -> entry.getUserDecisionKey() == key)
-                        .filter(entry -> entry.getJarNames().isEmpty() || entry.getJarNames().equals(jarNames))
-                        .filter(entry -> Arrays.stream(enumConstants).anyMatch((t) -> t.name().equals(entry.getUserDecisionValue())))
-                        .max(Comparator.comparingInt(entry -> entry.getJarNames().size()))
-                        .map(entry -> Enum.valueOf(resultType, entry.getUserDecisionValue()));
-
+                return readJsonFile().getDecision(domain, jarNames, key, resultType);
             } finally {
                 lockableFile.unlock();
             }
         } catch (IOException ex) {
-            LOG.error("Failed to read from user decisions file store: " + store, ex);
+            LOG.error("Failed to lock/unlock user decisions file store: " + store, ex);
         }
 
         return Optional.empty();
@@ -103,15 +94,36 @@ public class UserDecisionsFileStore implements UserDecisions {
 
     @Override
     public <T extends Enum<T>> void saveForDomain(final JNLPFile file, final UserDecision<T> userDecision) {
-        final URL codebase = file.getNotNullProbableCodeBase();
-        save(userDecision, codebase, emptySet());
+        requireNonNull(file, "file");
+        requireNonNull(userDecision, "userDecision");
+
+        final URL domain = getDomain(file);
+        save(userDecision, domain, emptySet());
     }
 
     @Override
     public <T extends Enum<T>> void saveForApplication(final JNLPFile file, final UserDecision<T> userDecision) {
-        final URL codebase = file.getNotNullProbableCodeBase();
+        requireNonNull(file, "file");
+        requireNonNull(userDecision, "userDecision");
+
+        final URL domain = getDomain(file);
         final Set<String> jarNames = getJarNames(file);
-        save(userDecision, codebase, jarNames);
+        save(userDecision, domain, jarNames);
+    }
+
+    private <T extends Enum<T>> void save(final UserDecision<T> userDecision, final URL domain, final Set<String> jarNames) {
+        try {
+            lockableFile.lock();
+            try {
+                final FileStoreEntries userDecisions = readJsonFile();
+                userDecisions.addDecision(domain, jarNames, userDecision);
+                writeJsonFile(userDecisions);
+            } finally {
+                lockableFile.unlock();
+            }
+        } catch (IOException ex) {
+            LOG.error("Failed to lock/unlock user decisions file store: " + store, ex);
+        }
     }
 
     private Set<String> getJarNames(final JNLPFile file) {
@@ -121,31 +133,8 @@ public class UserDecisionsFileStore implements UserDecisions {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private <T extends Enum<T>> void save(final UserDecision<T> userDecision, final URL codebase, final Set<String> jarNames) {
-        final FileStoreEntry fileStoreEntry = createFileStoreEntry(userDecision, codebase, jarNames);
-
-        try {
-            lockableFile.lock();
-
-            try {
-                final Set<FileStoreEntry> fileStoreEntries = new LinkedHashSet<>(readFileStoreEntries());
-                fileStoreEntries.add(fileStoreEntry);
-                writeFileStoreEntries(new ArrayList<>(fileStoreEntries));
-
-            } finally {
-                lockableFile.unlock();
-            }
-        } catch (IOException ex) {
-            LOG.error("Failed to lock/unlock user decisions file store: " + store, ex);
-        }
-    }
-
-    private <T extends Enum<T>> FileStoreEntry createFileStoreEntry(final UserDecision<T> userDecision, final URL codebase, final Set<String> jarNames) {
-        final URL domain = getDomain(codebase);
-        return new FileStoreEntry(userDecision.getKey(), userDecision.getValue().toString(), domain, jarNames);
-    }
-
-    private URL getDomain(final URL codebase) {
+    private URL getDomain(final JNLPFile file) {
+        final URL codebase = file.getNotNullProbableCodeBase();
         try {
             return new URL(codebase.getProtocol(), codebase.getHost(), codebase.getPort(), "");
         } catch (MalformedURLException ex) {
@@ -154,23 +143,20 @@ public class UserDecisionsFileStore implements UserDecisions {
         }
     }
 
-    private List<FileStoreEntry> readFileStoreEntries() {
+    private FileStoreEntries readJsonFile() {
         try (FileInputStream in = new FileInputStream(store)) {
             final InputStreamReader reader = new InputStreamReader(in);
             return Optional.ofNullable(gson.fromJson(reader, FileStoreEntries.class))
-                    .map(FileStoreEntries::getUserDecisions)
-                    .orElse(emptyList());
-
+                    .orElse(new FileStoreEntries());
         } catch (IOException ex) {
             LOG.error("Could not read from user decisions file store: " + store, ex);
-            return emptyList();
+            return new FileStoreEntries();
         }
     }
 
-    private void writeFileStoreEntries(List<FileStoreEntry> entries) {
+    private void writeJsonFile(FileStoreEntries entries) {
         try (FileOutputStream out = new FileOutputStream(store)) {
-            IOUtils.writeUtf8Content(out, gson.toJson(new FileStoreEntries(entries)));
-
+            IOUtils.writeUtf8Content(out, gson.toJson(entries));
         } catch (IOException ex) {
             LOG.error("Could not write to user decisions file store: " + store, ex);
         }

@@ -23,8 +23,8 @@ import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 public class UserDecision<T extends Enum<T>> {
-    private Key key;
-    private T value;
+    private final Key key;
+    private final T value;
 
     public enum Key {
         CREATE_DESKTOP_SHORTCUT,
