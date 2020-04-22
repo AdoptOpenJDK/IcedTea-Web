@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,16 +55,6 @@ public class BasicComponentSplashScreenTest {
         tested.setVersion(null);
         String s2 = tested.createAdditionalInfoTest();
         Assert.assertNull("Not null input must result to something", s2);
-        tested.setVersion(v);
-        Exception ex = null;
-        try {
-            tested.createAdditionalInfoTest();
-        } catch (Exception exx) {
-            ex = exx;
-        }
-        Assert.assertNotNull("Null reason with set version must causes exception", ex);
-
-
     }
 
     private static class BasicComponentSplashScreenImpl extends BasicComponentSplashScreen {
