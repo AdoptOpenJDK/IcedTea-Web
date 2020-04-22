@@ -463,10 +463,8 @@ public class BasePainter implements Observer {
     };
 
     private String getAlternativeProductName() {
-        if (SplashUtils.SplashReason.JAVAWS.equals(master.getSplashReason())) {
+        if (SplashUtils.SplashReason.JAVAWS == master.getSplashReason()) {
             return alternativeWeb;
-        } else if (SplashUtils.SplashReason.APPLET.equals(master.getSplashReason())) {
-            return alternativeWeb + alternativePlugin;
         } else {
             return "....";
         }
@@ -493,14 +491,6 @@ public class BasePainter implements Observer {
             }
             g2d.setFont(pluginFont);
             g2d.setColor(pluginColor);
-            if (SplashUtils.SplashReason.APPLET.equals(master.getSplashReason())) {
-                if (showLeaf) {
-                    g2d.drawString(plugin, scaleX(420), scaleY(145));
-                } else {
-                    FontMetrics wfm = g2d.getFontMetrics(webFont);
-                    g2d.drawString(plugin, wfm.stringWidth(web) + scaleX(WEB_LEFT_ALIGMENT) + 10, scaleY(WEB_TOP_ALIGMENT));
-                }
-            }
             g2d.setFont(plainTextsFont);
             g2d.setColor(plainTextColor);
             FontMetrics fm = g2d.getFontMetrics();

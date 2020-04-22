@@ -37,7 +37,6 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -74,7 +73,7 @@ public final class ErrorPainterTest {
 //    }
     @Test
     public void adjustForSizeTest() {
-        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET));
+        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012());
         bp.master.setSplashHeight(100);
         bp.master.setSplashWidth(100);
         bp.adjustForSize(100, 100);
@@ -94,7 +93,7 @@ public final class ErrorPainterTest {
 
     @Test
     public void adjustForSizeTest2() {
-        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(SplashUtils.SplashReason.APPLET), false);
+        ErrorPainter bp = new ErrorPainter(new DefaultSplashScreen2012(), false);
         Assert.assertNull(bp.prerenderedStuff);
         bp.master.setSplashHeight(10);
         bp.master.setSplashWidth(10);

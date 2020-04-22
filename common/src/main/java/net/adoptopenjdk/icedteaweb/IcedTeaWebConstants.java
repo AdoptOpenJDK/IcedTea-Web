@@ -12,9 +12,7 @@ public interface IcedTeaWebConstants {
     String DOUBLE_QUOTE = "\"";
 
     String JAVAWS = "javaws";
-    String JAVAWS_JAR = "javaws.jar";
 
     String ICEDTEA_WEB_SPLASH = "ICEDTEA_WEB_SPLASH";
-    String ICEDTEA_WEB_PLUGIN_SPLASH = "ICEDTEA_WEB_PLUGIN_SPLASH";
     String NO_SPLASH = "none";
 }

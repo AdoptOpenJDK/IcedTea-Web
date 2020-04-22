@@ -46,8 +46,8 @@ public final class DefaultSplashScreen2012 extends BasicComponentSplashScreen  {
 
     private final DefaultSplashScreens2012Commons commons;
 
-    public DefaultSplashScreen2012(SplashUtils.SplashReason splashReason) {
-        setSplashReason(splashReason);
+    public DefaultSplashScreen2012() {
+        setSplashReason(SplashUtils.SplashReason.JAVAWS);
         commons = new DefaultSplashScreens2012Commons(new BasePainter(this), this);
     }
 
