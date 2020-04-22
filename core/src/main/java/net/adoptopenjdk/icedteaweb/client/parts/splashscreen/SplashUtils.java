@@ -50,21 +50,6 @@ public class SplashUtils {
     private static final Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
     /**
-     * Indicator whether to show icedtea-web plugin or just icedtea-web
-     * For "just icedtea-web" will be done an attempt to show content of
-     * information element
-     */
-    public enum SplashReason {
-
-        JAVAWS;
-
-        @Override
-        public String toString() {
-            return "IcedTea-Web";
-        }
-    }
-
-    /**
      * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable.
      *
      * Warning - splash should have receive width and height without borders.

@@ -95,10 +95,6 @@ public interface SplashPanel {
 
     void paintTo(Graphics g);
 
-    void setSplashReason(SplashUtils.SplashReason splashReason);
-
-    SplashUtils.SplashReason getSplashReason();
-
     /**
      * Version can be printed in splash window
      *

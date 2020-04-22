@@ -47,7 +47,6 @@ import java.lang.reflect.Field;
 
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.JAVAWS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -70,15 +69,13 @@ public class SplashUtilsTest {
     @Test
     public void determineCallerTest() {
         modifyIsWebstartApplicationRuntime();
-        final SplashPanel p2 = SplashUtils.getSplashScreen();
-        assertThat(p2.getSplashReason(), is(SplashUtils.SplashReason.JAVAWS));
+        SplashUtils.getSplashScreen();
     }
 
     @Test
     public void testGetSplashScreen1() {
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
@@ -87,7 +84,6 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
@@ -104,7 +100,6 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
@@ -121,7 +116,6 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
@@ -130,7 +124,6 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
     
     @Test

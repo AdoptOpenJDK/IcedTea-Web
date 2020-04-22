@@ -50,7 +50,6 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
     /** Height of the plugin window */
     protected int pluginHeight;
     /** The project name to display */
-    private SplashUtils.SplashReason splashReason;
     private boolean animationRunning = false;
     private InformationElement content;
     private String version;
@@ -113,22 +112,6 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
     }
 
     /**
-     * @return the splashReason
-     */
-    @Override
-    public SplashUtils.SplashReason getSplashReason() {
-        return splashReason;
-    }
-
-    /**
-     * @param splashReason the splashReason to set
-     */
-    @Override
-    public void setSplashReason(SplashUtils.SplashReason splashReason) {
-        this.splashReason = splashReason;
-    }
-
-    /**
      * @return the version
      */
     @Override
@@ -146,7 +129,7 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
 
     protected String createAdditionalInfo() {
         if (getVersion() != null) {
-            return getSplashReason().toString() + " version: " + getVersion();
+            return "IcedTea-Web version: " + getVersion();
         } else {
             return null;
         }

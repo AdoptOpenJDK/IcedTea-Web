@@ -49,17 +49,13 @@ public class BasicComponentSplashScreenTest {
         BasicComponentSplashScreenImpl tested = new BasicComponentSplashScreenImpl();
         String v = "2.118x08";
         tested.setVersion(v);
-        tested.setSplashReason(SplashUtils.SplashReason.JAVAWS);
         String s1 = tested.createAdditionalInfoTest();
         Assert.assertNotNull("Not null input must result to something", s1);
         Assert.assertTrue("Not null input must have version value", s1.contains(v));
         Assert.assertTrue("Not null input must have version string", s1.contains("version"));
-        Assert.assertTrue("Not null input must have version string", s1.contains(SplashUtils.SplashReason.JAVAWS.toString()));
         tested.setVersion(null);
-        tested.setSplashReason(null);
         String s2 = tested.createAdditionalInfoTest();
         Assert.assertNull("Not null input must result to something", s2);
-        tested.setSplashReason(null);
         tested.setVersion(v);
         Exception ex = null;
         try {
