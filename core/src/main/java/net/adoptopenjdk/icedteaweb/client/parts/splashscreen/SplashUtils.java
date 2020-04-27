@@ -37,14 +37,12 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultErrorSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.Boot;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
 
@@ -52,114 +50,34 @@ public class SplashUtils {
     private static final Logger LOG = LoggerFactory.getLogger(SplashUtils.class);
 
     /**
-     * Indicator whether to show icedtea-web plugin or just icedtea-web
-     * For "just icedtea-web" will be done an attempt to show content of
-     * information element 
-     */
-    public enum SplashReason {
-
-        APPLET, JAVAWS;
-
-        @Override
-        public String toString() {
-            switch (this) {
-                case APPLET:
-                    return "IcedTea-Web Plugin";
-                case JAVAWS:
-                    return "IcedTea-Web";
-            }
-            return "unknown";
-        }
-    }
-
-    private static SplashReason getReason() {
-        if (JNLPRuntime.isWebstartApplication()) {
-            return SplashReason.JAVAWS;
-        } else {
-            return SplashReason.APPLET;
-        }        
-    }
-    
-
-    /**
-     * Warning - splash should have receive width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This must 
-     * be calculated prior calling this method
-     */
-    public static SplashPanel getSplashScreen() {
-        return getSplashScreen(getReason());
-    }
-
-    /**
-     * Warning - splash should have receive width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calculated prior calling this method
-     * @param ex exception to be shown if any
-     */
-    public static SplashErrorPanel getErrorSplashScreen(Throwable ex) {
-        return getErrorSplashScreen(getReason(), ex);
-    }
-
-    /**
-     * Warning - splash should have receive width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calculated prior calling this method
-     * @param splashReason
-     */
-    static SplashPanel getSplashScreen(SplashUtils.SplashReason splashReason) {
-        return getSplashScreen(splashReason, null, false);
-    }
-
-    /**
-     * Warning - splash should have receive width and height without borders.
-     * plugin's window have NO border, but javaws window HAVE border. This must
-     * be calculated prior calling this method
-     * @param splashReason
-     * @param ex exception to be shown if any
-     */
-    static SplashErrorPanel getErrorSplashScreen(SplashUtils.SplashReason splashReason, Throwable ex) {
-        return (SplashErrorPanel) getSplashScreen(splashReason, ex, true);
-    }
-
-    /**
-     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable
+     * Returns a splash or null if splash is suppressed by {@link IcedTeaWebConstants#ICEDTEA_WEB_SPLASH} environment variable.
      *
-     * @param splashReason
-     * @param loadingException
-     * @param isError
+     * Warning - splash should have receive width and height without borders.
+     * Javaws window HAVE border. This must be calculated prior calling this method
      */
-    public static SplashPanel getSplashScreen(final SplashUtils.SplashReason splashReason, final Throwable loadingException, final boolean isError) {
+    static SplashPanel getSplashScreen() {
         SplashPanel splashPanel;
 
-        if (NO_SPLASH.equalsIgnoreCase(getSplashEnvironmentVariable(splashReason))) {
+        if (NO_SPLASH.equalsIgnoreCase(getSplashEnvironmentVariable())) {
             return null;
         }
 
-        if (isError) {
-            splashPanel = new DefaultErrorSplashScreen2012(splashReason, loadingException);
-        } else {
-            splashPanel = new DefaultSplashScreen2012(splashReason);
-        }
+        splashPanel = new DefaultSplashScreen2012();
 
         splashPanel.setVersion(Boot.version);
         return splashPanel;
     }
 
-    private static String getSplashEnvironmentVariable(final SplashReason splashReason) {
+    private static String getSplashEnvironmentVariable() {
         try {
-            if (SplashReason.JAVAWS == splashReason) {
-            	// the command line arg -Xnosplash overrules the env var
-            	if (!JNLPRuntime.isShowWebSplash()) {
-            		return NO_SPLASH;
-            	}
-                return System.getenv(ICEDTEA_WEB_SPLASH);
+            // the command line arg -Xnosplash overrules the env var
+            if (!JNLPRuntime.isShowWebSplash()) {
+                return NO_SPLASH;
             }
-            else if (SplashReason.APPLET == splashReason) {
-                return System.getenv(ICEDTEA_WEB_PLUGIN_SPLASH);
-            }
+            return System.getenv(ICEDTEA_WEB_SPLASH);
         } catch (Exception ex) {
             LOG.error("Problem reading environment variable for splash screen.", ex);
+            return null;
         }
-        return null;
     }
 }

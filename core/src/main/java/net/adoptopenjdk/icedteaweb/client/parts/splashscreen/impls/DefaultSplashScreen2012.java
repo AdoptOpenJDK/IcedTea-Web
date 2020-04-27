@@ -40,14 +40,12 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplash
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
 
 import java.awt.Graphics;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 
 public final class DefaultSplashScreen2012 extends BasicComponentSplashScreen  {
 
     private final DefaultSplashScreens2012Commons commons;
 
-    public DefaultSplashScreen2012(SplashUtils.SplashReason splashReason) {
-        setSplashReason(splashReason);
+    public DefaultSplashScreen2012() {
         commons = new DefaultSplashScreens2012Commons(new BasePainter(this), this);
     }
 

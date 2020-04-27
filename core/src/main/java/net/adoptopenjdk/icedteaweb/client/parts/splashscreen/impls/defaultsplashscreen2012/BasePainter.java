@@ -37,7 +37,6 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplashscreen2012;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.DefaultSplashScreen2012;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.BasicComponentSplashScreen;
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts.InfoItem;
@@ -68,7 +67,7 @@ import java.util.Observer;
 
 public class BasePainter implements Observer {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BasePainter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BasePainter.class);
 
     protected final BasicComponentSplashScreen master;
     //animations
@@ -76,7 +75,7 @@ public class BasePainter implements Observer {
     private int waterLevel = 0;
     //waving of water and position of shhadowed WEB
     private int animationsPosition = 0;
-    private int greyTextIncrement = 15; //how quickly is greyed web moving
+    private final int greyTextIncrement = 15; //how quickly is greyed web moving
     //colors
     protected static final Color TEA_LIVE_COLOR = new Color(205, 1, 3);
     protected static final Color BACKGROUND_LIVE_COLOR = ExtensionManager.getExtension().getBackground();
@@ -102,14 +101,12 @@ public class BasePainter implements Observer {
     private static final String alternativeICED = "Iced    ";
     private static final String alternativeWeb = "Web  ";
     private static final String alternativeTtea = "    Tea";
-    private static final String alternativePlugin = "plugin ";
     private static final String ICED = "Iced";
     private static final String web = "web";
     private static final String tea = "Tea";
-    private static final String plugin = "plugin  ";
     //individual sizes, all converging to ZERO!!
     /**
-     * Experimentally measured best top position for painted parts of vectros
+     * Experimentally measured best top position for painted parts of vectors
      */
     private final int WEB_TOP_ALIGMENT = 324;
     /**
@@ -125,12 +122,12 @@ public class BasePainter implements Observer {
     protected boolean canWave = true;
     private Point aboutOffset = new Point();
 
-    private final static float dash1[] = {10.0f};
-    private final static BasicStroke dashed
+    private static final float[] dash1 = {10.0f};
+    private static final BasicStroke dashed
             = new BasicStroke(1.0f,
-                    BasicStroke.CAP_BUTT,
-                    BasicStroke.JOIN_MITER,
-                    10.0f, dash1, 0.0f);
+            BasicStroke.CAP_BUTT,
+            BasicStroke.JOIN_MITER,
+            10.0f, dash1, 0.0f);
 
     protected void paintNiceTexts(Graphics2D g2d) {
         //the only animated stuff
@@ -155,7 +152,7 @@ public class BasePainter implements Observer {
         g2d.setColor(teaColor);
         drawTextAroundCenter(g2d, -0.6d, alternativeTtea);
         g2d.setColor(pluginColor);
-        String s = getAlternativeProductName();
+        String s = alternativeWeb;
         int sub = animationsPosition / greyTextIncrement;
         sub = sub % s.length();
         if (!master.isAnimationRunning()) {
@@ -165,28 +162,12 @@ public class BasePainter implements Observer {
     }
     //enabling end
 
-    private int scaleAverage(double origValue) {
-        return (int) (averageRatio() * origValue);
-    }
-
-    private int scaleMax(double origValue) {
-        return (int) (maxRatio() * origValue);
-    }
-
     private int scaleMin(double origValue) {
         return (int) (minRatio() * origValue);
     }
 
-    private double averageRatio() {
-        return (getRatioX() + getRatioY()) / 2d;
-    }
-
     private double minRatio() {
         return Math.min(getRatioX(), getRatioY());
-    }
-
-    private double maxRatio() {
-        return Math.max(getRatioX(), getRatioY());
     }
 
     private int scaleY(double origValue) {
@@ -211,14 +192,6 @@ public class BasePainter implements Observer {
 
     private static double scaleX(double currentSize, double origValue) {
         return scale(DefaultSplashScreen2012.ORIGINAL_W, currentSize, origValue);
-    }
-
-    private static double getRatioY(double currentSize) {
-        return getRatio(DefaultSplashScreen2012.ORIGINAL_H, currentSize);
-    }
-
-    private static double getRatioX(double currentSize) {
-        return getRatio(DefaultSplashScreen2012.ORIGINAL_W, currentSize);
     }
 
     public static double scale(double origSize, double currentSize, double origValue) {
@@ -300,11 +273,7 @@ public class BasePainter implements Observer {
                 showInfo = false;
             }
         }
-        if (Math.min(h, w) < ScreenFinder.getCurrentScreenSizeWithoutBounds().getHeight() / 10) {
-            showNiceTexts = false;
-        } else {
-            showNiceTexts = true;
-        }
+        showNiceTexts = !(Math.min(h, w) < ScreenFinder.getCurrentScreenSizeWithoutBounds().getHeight() / 10);
     }
 
     public final void startAnimationThreads() {
@@ -317,34 +286,34 @@ public class BasePainter implements Observer {
     private void prepareFonts(int w, int h) {
         master.setSplashHeight(h);
         master.setSplashWidth(w);
-        Map<TextAttribute, Object> teaFontAttributes = new HashMap<TextAttribute, Object>();
-        teaFontAttributes.put(TextAttribute.SIZE, new Integer(scaleMin(84)));
-        teaFontAttributes.put(TextAttribute.WIDTH, new Double((0.95)));
+        Map<TextAttribute, Object> teaFontAttributes = new HashMap<>();
+        teaFontAttributes.put(TextAttribute.SIZE, scaleMin(84));
+        teaFontAttributes.put(TextAttribute.WIDTH, 0.95);
         teaFontAttributes.put(TextAttribute.FAMILY, "Serif");
         teaFont = new Font(teaFontAttributes);
-        Map<TextAttribute, Object> icedFontAttributes = new HashMap<TextAttribute, Object>();
-        icedFontAttributes.put(TextAttribute.SIZE, new Integer(scaleMin(82)));
-        icedFontAttributes.put(TextAttribute.WIDTH, new Double((0.80)));
+        Map<TextAttribute, Object> icedFontAttributes = new HashMap<>();
+        icedFontAttributes.put(TextAttribute.SIZE, scaleMin(82));
+        icedFontAttributes.put(TextAttribute.WIDTH, 0.80);
         icedFontAttributes.put(TextAttribute.FAMILY, "Serif");
         icedFont = new Font(icedFontAttributes);
-        Map<TextAttribute, Object> webFontAttributes = new HashMap<TextAttribute, Object>();
-        webFontAttributes.put(TextAttribute.SIZE, new Integer(scaleMin(41)));
-        webFontAttributes.put(TextAttribute.WIDTH, new Double((2)));
+        Map<TextAttribute, Object> webFontAttributes = new HashMap<>();
+        webFontAttributes.put(TextAttribute.SIZE, scaleMin(41));
+        webFontAttributes.put(TextAttribute.WIDTH, 2.0);
         webFontAttributes.put(TextAttribute.FAMILY, "Serif");
         webFont = new Font(webFontAttributes);
-        Map<TextAttribute, Object> pluginFontAttributes = new HashMap<TextAttribute, Object>();
-        pluginFontAttributes.put(TextAttribute.SIZE, new Integer(scaleMin(32)));
-        pluginFontAttributes.put(TextAttribute.WEIGHT, new Double((5d)));
-        pluginFontAttributes.put(TextAttribute.WIDTH, new Double((0.9)));
+        Map<TextAttribute, Object> pluginFontAttributes = new HashMap<>();
+        pluginFontAttributes.put(TextAttribute.SIZE, scaleMin(32));
+        pluginFontAttributes.put(TextAttribute.WEIGHT, 5.0);
+        pluginFontAttributes.put(TextAttribute.WIDTH, 0.9);
         pluginFontAttributes.put(TextAttribute.FAMILY, "Serif");
         pluginFont = new Font(pluginFontAttributes);
-        Map<TextAttribute, Object> plainFontAttributes = new HashMap<TextAttribute, Object>();
-        plainFontAttributes.put(TextAttribute.SIZE, new Integer(12));
+        Map<TextAttribute, Object> plainFontAttributes = new HashMap<>();
+        plainFontAttributes.put(TextAttribute.SIZE, 12);
         plainFontAttributes.put(TextAttribute.FAMILY, "Monospaced");
         plainTextsFont = new Font(plainFontAttributes);
-        Map<TextAttribute, Object> alternativeTextFontAttributes = new HashMap<TextAttribute, Object>();
+        Map<TextAttribute, Object> alternativeTextFontAttributes = new HashMap<>();
         alternativeTextFontAttributes.put(TextAttribute.SIZE, Math.min(w, h) / 5);
-        alternativeTextFontAttributes.put(TextAttribute.WIDTH, new Double((0.7)));
+        alternativeTextFontAttributes.put(TextAttribute.WIDTH, 0.7);
         alternativeTextFontAttributes.put(TextAttribute.FAMILY, "Monospaced");
         alternativeTextFont = new Font(alternativeTextFontAttributes);
 
@@ -426,7 +395,7 @@ public class BasePainter implements Observer {
                 }
             }
         }
-    };
+    }
 
     private Thread getWaterLevelThread() {
         Thread t = new Thread(new WaterLevelThread(this));
@@ -460,16 +429,6 @@ public class BasePainter implements Observer {
                 }
             }
         }
-    };
-
-    private String getAlternativeProductName() {
-        if (SplashUtils.SplashReason.JAVAWS.equals(master.getSplashReason())) {
-            return alternativeWeb;
-        } else if (SplashUtils.SplashReason.APPLET.equals(master.getSplashReason())) {
-            return alternativeWeb + alternativePlugin;
-        } else {
-            return "....";
-        }
     }
 
     protected FontMetrics drawBase(Graphics2D g2d, InformationElement ic, String version) {
@@ -493,14 +452,6 @@ public class BasePainter implements Observer {
             }
             g2d.setFont(pluginFont);
             g2d.setColor(pluginColor);
-            if (SplashUtils.SplashReason.APPLET.equals(master.getSplashReason())) {
-                if (showLeaf) {
-                    g2d.drawString(plugin, scaleX(420), scaleY(145));
-                } else {
-                    FontMetrics wfm = g2d.getFontMetrics(webFont);
-                    g2d.drawString(plugin, wfm.stringWidth(web) + scaleX(WEB_LEFT_ALIGMENT) + 10, scaleY(WEB_TOP_ALIGMENT));
-                }
-            }
             g2d.setFont(plainTextsFont);
             g2d.setColor(plainTextColor);
             FontMetrics fm = g2d.getFontMetrics();
@@ -525,20 +476,20 @@ public class BasePainter implements Observer {
             String aboutPrefix = Translator.R("AboutDialogueTabAbout") + ": ";
             int aboutPrefixWidth = fm.stringWidth(aboutPrefix);
             String niceVersion = stripCommitFromVersion(version);
-            int y = master.getSplashWidth() - fm.stringWidth(niceVersion + " ");
-            if (y < 0) {
-                y = 0;
+            int x = master.getSplashWidth() - fm.stringWidth(niceVersion + " ");
+            if (x < 0) {
+                x = 0;
             }
-            if (y > aboutPrefixWidth) {
+            if (x > aboutPrefixWidth) {
                 niceVersion = aboutPrefix + niceVersion;
-                y -= aboutPrefixWidth;
+                x -= aboutPrefixWidth;
             }
-            aboutOffset = new Point(y, fm.getHeight());
+            aboutOffset = new Point(x, fm.getHeight());
             Stroke backup = g2d.getStroke();
             g2d.setStroke(dashed);
             g2d.drawRect(aboutOffset.x - 1, 1, master.getSplashWidth() - aboutOffset.x - 1, aboutOffset.y + 1);
             g2d.setStroke(backup);
-            g2d.drawString(niceVersion, y, fm.getHeight());
+            g2d.drawString(niceVersion, x, fm.getHeight());
         }
         return fm;
     }
@@ -561,20 +512,12 @@ public class BasePainter implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        SwingUtils.invokeAndWait(new Runnable() {
-
-            @Override
-            public void run() {
-                if (master.isAnimationRunning()) {
-                    ExtensionManager.getExtension().animate();
-                    master.repaint();
-                }
+        SwingUtils.invokeAndWait(() -> {
+            if (master.isAnimationRunning()) {
+                ExtensionManager.getExtension().animate();
+                master.repaint();
             }
         });
-    }
-
-    public BasicComponentSplashScreen getMaster() {
-        return master;
     }
 
     public Point getAboutOffset() {

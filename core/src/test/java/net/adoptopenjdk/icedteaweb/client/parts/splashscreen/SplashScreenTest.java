@@ -55,7 +55,6 @@ public class SplashScreenTest extends JDialog {
     static int width = JNLPSplashScreen.DEF_WIDTH;
     static int height = JNLPSplashScreen.DEF_HEIGHT;
     static SplashPanel panel;
-    private static boolean swap = true;
     private static InformationElement ie = new InformationElement();
 
     public SplashScreenTest() {
@@ -67,7 +66,7 @@ public class SplashScreenTest extends JDialog {
         //setLocation(x, y);
         setLocationRelativeTo(null);
         this.pack();
-        panel = SplashUtils.getSplashScreen(SplashUtils.SplashReason.APPLET);
+        panel = SplashUtils.getSplashScreen();
         ie.setHomepage("http://someones.org/amazing?page");
         ie.setTitle("Testing information title");
         ie.setvendor("IcedTea-Web team");
@@ -140,50 +139,5 @@ public class SplashScreenTest extends JDialog {
         panel.setPercentage(100);
         panel.paintTo(buf.createGraphics());
         // TextOutlineRendererTest.save(buf,"s100");
-    }
-
-    public static void main(String args[]) {
-        SplashScreenTest app = new SplashScreenTest();
-        app.setSize(800, 600);
-        app.setVisible(true);
-
-        app.addWindowListener(
-                new WindowAdapter() {
-
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-
-        panel.startAnimation();
-
-        try {
-            Thread.sleep(10000);
-        } catch (Exception e) {
-        }
-        //not needed
-        //panel.stopAnimation();
-        if (swap) {
-            SplashErrorPanel r = SplashUtils.getErrorSplashScreen(SplashUtils.SplashReason.APPLET, null);
-            r.setInformationElement(ie);
-            app.remove(panel.getSplashComponent());
-            r.setPercentage(panel.getPercentage());
-            r.adjustForSize();
-            r.setLoadingException(new RuntimeException(":)"));
-            panel = r;
-            panel.setVersion("1.2-re45fdg");
-
-            app.add(panel.getSplashComponent());
-            app.validate();
-            app.pack();
-            app.setVisible(true);
-            try {
-                Thread.sleep(10000);
-            } catch (Exception e) {
-            }
-        }
-
-
     }
 }

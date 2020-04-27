@@ -36,7 +36,6 @@ obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,30 +48,16 @@ public class BasicComponentSplashScreenTest {
         BasicComponentSplashScreenImpl tested = new BasicComponentSplashScreenImpl();
         String v = "2.118x08";
         tested.setVersion(v);
-        tested.setSplashReason(SplashUtils.SplashReason.APPLET);
         String s1 = tested.createAdditionalInfoTest();
         Assert.assertNotNull("Not null input must result to something", s1);
         Assert.assertTrue("Not null input must have version value", s1.contains(v));
         Assert.assertTrue("Not null input must have version string", s1.contains("version"));
-        Assert.assertTrue("Not null input must have version string", s1.contains(SplashUtils.SplashReason.APPLET.toString()));
         tested.setVersion(null);
-        tested.setSplashReason(null);
         String s2 = tested.createAdditionalInfoTest();
         Assert.assertNull("Not null input must result to something", s2);
-        tested.setSplashReason(null);
-        tested.setVersion(v);
-        Exception ex = null;
-        try {
-            String s3 = tested.createAdditionalInfoTest();
-        } catch (Exception exx) {
-            ex = exx;
-        }
-        Assert.assertNotNull("Null reason with set version must causes exception", ex);
-
-
     }
 
-    private class BasicComponentSplashScreenImpl extends BasicComponentSplashScreen {
+    private static class BasicComponentSplashScreenImpl extends BasicComponentSplashScreen {
 
         public BasicComponentSplashScreenImpl() {
         }
