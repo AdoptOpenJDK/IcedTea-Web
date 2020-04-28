@@ -371,20 +371,25 @@ public final class Boot implements PrivilegedAction<Integer> {
 
     private URL locationToUrl(String location) throws LaunchException {
         LOG.info("JNLP file location: {}", location);
+        final File localFile = new File(location);
         try {
-            if (new File(location).exists()) {
-                return new File(location).toURI().toURL(); // Why use file.getCanonicalFile?
-            } else {
-                final BasicService basicService = ServiceUtil.getBasicService();
-                if (basicService != null) {
-                    return new URL(basicService.getCodeBase(), location);
-                } else {
-                    LOG.warn("Warning, null basicService");
-                    return new URL(location);
-                }
+            if (localFile.exists()) {
+                return localFile.toURI().toURL(); // Why use file.getCanonicalFile?
             }
         } catch (Exception e) {
-            throw new LaunchException("Invalid jnlp file " + location, e);
+            throw new LaunchException("Unable to create URL from local file '" + localFile + "'", e);
+        }
+
+        try {
+            final BasicService basicService = ServiceUtil.getBasicService();
+            if (basicService != null) {
+                return new URL(basicService.getCodeBase(), location);
+            } else {
+                LOG.warn("Warning, null basicService");
+                return new URL(location);
+            }
+        } catch (Exception e) {
+            throw new LaunchException("No local file '" + localFile + "' found and failed to create an URL from " + location, e);
         }
     }
 
