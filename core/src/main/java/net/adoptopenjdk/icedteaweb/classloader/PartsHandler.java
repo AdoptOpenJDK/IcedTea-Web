@@ -68,21 +68,26 @@ public class PartsHandler implements JarProvider, PartsCache {
     public List<LoadableJar> loadEagerJars() {
         partsLock.lock();
         try {
-            return parts.stream()
+            final List<Part> eagerParts = parts.stream()
                     .filter(part -> !part.isLazy())
                     .filter(part -> !loadedByClassloaderParts.contains(part))
-                    .map(this::loadEagerPart)
-                    .flatMap(List::stream)
                     .collect(Collectors.toList());
+
+            return loadEagerParts(eagerParts);
         } finally {
             partsLock.unlock();
         }
     }
 
-    private List<LoadableJar> loadEagerPart(final Part part) {
-        final List<LoadableJar> result = downloadAllOfPart(part);
+    private List<LoadableJar> loadEagerParts(final List<Part> eagerParts) {
+        final List<LoadableJar> result = eagerParts.stream()
+                .map(this::downloadAllOfPart)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
         trustValidator.validateEagerJars(result);
-        loadedByClassloaderParts.add(part);
+        loadedByClassloaderParts.addAll(eagerParts);
+
         return result;
     }
 
