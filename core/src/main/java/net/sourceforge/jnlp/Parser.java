@@ -553,7 +553,7 @@ public final class Parser {
             }
         }
 
-        return new JARDesc(location, versionString, part, lazy, main, nativeJar, true);
+        return new JARDesc(location, versionString, part, lazy, main, nativeJar);
 
     }
 

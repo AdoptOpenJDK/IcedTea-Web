@@ -43,7 +43,7 @@ public class JARDesc {
     /**
      * The required JAR version. The version attribute can specify an exact version or
      * a list of versions (version string). See JSR-56, section 3.4 for details. */
-    private VersionString version;
+    private final VersionString version;
 
     /** the part name */
     private final String part;
@@ -57,9 +57,6 @@ public class JARDesc {
     /** whether the JAR contains native libraries */
     private final boolean nativeJar;
 
-    /** whether the JAR can be cached */
-    private final boolean cacheable;
-
     /**
      * Create a JAR descriptor.
      *
@@ -69,16 +66,14 @@ public class JARDesc {
      * @param lazy whether to load the JAR on demand
      * @param main whether the JAR contains the main class
      * @param nativeJar whether the JAR contains native libraries
-     * @param cacheable whether the JAR can be cached or not
      */
-    public JARDesc(final URL location, final VersionString version, final String part, final boolean lazy, final boolean main, final boolean nativeJar, final boolean cacheable) {
+    public JARDesc(final URL location, final VersionString version, final String part, final boolean lazy, final boolean main, final boolean nativeJar) {
         this.location = location;
         this.version = version;
         this.part = part;
         this.lazy = lazy;
         this.main = main;
         this.nativeJar = nativeJar;
-        this.cacheable = cacheable;
     }
 
     /**
@@ -93,10 +88,6 @@ public class JARDesc {
      */
     public VersionString getVersion() {
         return version;
-    }
-
-    public void setVersion(final VersionString version) {
-        this.version = version;
     }
 
     /**
@@ -144,17 +135,15 @@ public class JARDesc {
         return main;
     }
 
-    /**
-     * Returns if this jar is cacheable
-     *
-     * @return Whether or not this jar is cacheable
-     */
-    public boolean isCacheable() {
-        return cacheable;
-    }
-
     @Override
     public String toString() {
-        return String.valueOf(location);
+        return new StringJoiner(", ", JARDesc.class.getSimpleName() + "[", "]")
+                .add("location='" + location + "'")
+                .add("version=" + version)
+                .add("part='" + part + "'")
+                .add("lazy=" + lazy)
+                .add("main=" + main)
+                .add("nativeJar=" + nativeJar)
+                .toString();
     }
 }

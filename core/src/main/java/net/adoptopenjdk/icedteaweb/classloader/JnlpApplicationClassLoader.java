@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
@@ -127,6 +128,14 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
         public JARDesc getJarDesc() {
             return jarDesc;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", LoadableJar.class.getSimpleName() + "[", "]")
+                    .add("location=" + location.map(URL::toString).orElse("--NOT FOUND IN CACHE--"))
+                    .add("jarDesc=" + jarDesc)
+                    .toString();
         }
     }
 }
