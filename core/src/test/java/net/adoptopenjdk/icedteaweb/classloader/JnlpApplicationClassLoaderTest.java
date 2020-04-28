@@ -41,21 +41,6 @@ public class JnlpApplicationClassLoaderTest {
     }
 
     @Test
-    public void findClass3() throws Exception {
-
-        //given
-        final PartsHandler partsHandler = createErrorPartsHandler("unavailable-jar.jnlp");
-
-        // expect
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Error while downloading jar!");
-
-        //when
-        final JnlpApplicationClassLoader classLoader = new JnlpApplicationClassLoader(partsHandler);
-        classLoader.initializeEagerJars();
-    }
-
-    @Test
     public void findClass4() throws Exception {
 
         //given
@@ -210,20 +195,6 @@ public class JnlpApplicationClassLoaderTest {
 
     }
 
-    private static class ErrorPartsHandler extends PartsHandler {
-
-
-        public ErrorPartsHandler(final List<Part> parts) {
-            super(parts, new DummyApplicationTrustValidator());
-        }
-
-        @Override
-        protected Optional<URL> getLocalUrlForJar(final JARDesc jarDesc) {
-            throw new RuntimeException("Can not download " + jarDesc.getLocation());
-        }
-
-    }
-
     private static class DummyApplicationTrustValidator implements ApplicationTrustValidator {
         @Override
         public void validateEagerJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
@@ -232,12 +203,6 @@ public class JnlpApplicationClassLoaderTest {
         @Override
         public void validateLazyJars(List<JnlpApplicationClassLoader.LoadableJar> jars) {
         }
-    }
-
-    public static ErrorPartsHandler createErrorPartsHandler(final String name) throws IOException, ParseException {
-        final JNLPFile file = createFile(name);
-        final List<Part> parts = createFor(file).getParts();
-        return new ErrorPartsHandler(parts);
     }
 
     public static DummyPartsHandler createDummyPartsHandlerFor(final String name) throws IOException, ParseException {
