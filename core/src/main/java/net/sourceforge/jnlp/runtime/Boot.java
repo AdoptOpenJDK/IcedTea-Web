@@ -377,7 +377,7 @@ public final class Boot implements PrivilegedAction<Integer> {
                 return localFile.toURI().toURL(); // Why use file.getCanonicalFile?
             }
         } catch (Exception e) {
-            throw new LaunchException("Unable to create URL from local file '" + localFile + "'", e);
+            throw new LaunchException("Unable to create URL from local file '" + localFile.getAbsolutePath() + "'", e);
         }
 
         try {
@@ -389,7 +389,7 @@ public final class Boot implements PrivilegedAction<Integer> {
                 return new URL(location);
             }
         } catch (Exception e) {
-            throw new LaunchException("No local file '" + localFile + "' found and failed to create an URL from " + location, e);
+            throw new LaunchException("No local file '" + localFile.getAbsolutePath() + "' found and failed to create an URL from " + location, e);
         }
     }
 
