@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.JarProvider;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.LoadableJar;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -85,6 +86,20 @@ public class PartsHandler implements JarProvider, PartsCache {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
 
+        LOG.debug("eager loaded the following jars: {}", result.stream()
+                .filter(jar -> jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .sorted()
+                .collect(Collectors.toList())
+        );
+
+        LOG.debug("failed to eager load the following jars: {}", result.stream()
+                .filter(jar -> !jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .sorted()
+                .collect(Collectors.toList())
+        );
+
         trustValidator.validateEagerJars(result);
         loadedByClassloaderParts.addAll(eagerParts);
 
@@ -101,6 +116,7 @@ public class PartsHandler implements JarProvider, PartsCache {
                     .collect(Collectors.toList());
 
             if (notLoaded.isEmpty()) {
+                LOG.info("No more parts to load.");
                 return Collections.emptyList();
             }
 
@@ -119,6 +135,24 @@ public class PartsHandler implements JarProvider, PartsCache {
         final List<LoadableJar> result = downloadAllOfPart(part);
         trustValidator.validateLazyJars(result);
         loadedByClassloaderParts.add(part);
+
+        LOG.debug("lazy loaded part {}", part.getName());
+        LOG.debug("downloaded the following jars: {}", result.stream()
+                .filter(jar -> jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .sorted()
+                .collect(Collectors.joining(", "))
+        );
+
+        final String failedToLoadJars = result.stream()
+                .filter(jar -> !jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .sorted()
+                .collect(Collectors.joining(", "));
+        if (!StringUtils.isBlank(failedToLoadJars)) {
+            LOG.debug("failed to download the following jars: {}", failedToLoadJars);
+        }
+
         return result;
     }
 

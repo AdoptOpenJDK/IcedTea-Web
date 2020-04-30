@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
 import java.io.IOException;
 import java.net.URL;
@@ -136,6 +137,12 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                     .add("location=" + location.map(URL::toString).orElse("--NOT FOUND IN CACHE--"))
                     .add("jarDesc=" + jarDesc)
                     .toString();
+        }
+
+        public String toLoggingString() {
+            final VersionString version = getJarDesc().getVersion();
+            final URL location = getJarDesc().getLocation();
+            return version != null ? location +"(v:" + version + ")" : location.toString();
         }
     }
 }
