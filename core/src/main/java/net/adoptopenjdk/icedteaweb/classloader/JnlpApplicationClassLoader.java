@@ -45,7 +45,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
         if (result) {
             if (reason != null) {
-                LOG.debug("loaded more jars because of {}", reason);
+                LOG.debug("loaded more jars because of {} for {}", reason, name);
             }
         }
 
