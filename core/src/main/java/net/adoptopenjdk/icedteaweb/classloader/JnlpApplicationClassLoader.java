@@ -2,6 +2,8 @@ package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,6 +16,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JnlpApplicationClassLoader.class);
 
     private final JarProvider jarProvider;
     private final NativeLibrarySupport nativeLibrarySupport;
@@ -34,10 +38,18 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         jarProvider.loadEagerJars().forEach(this::addJar);
     }
 
-    private boolean loadMoreJars(final String name) {
-        return jarProvider.loadMoreJars(name).stream()
+    private boolean loadMoreJars(final String name, final String reason) {
+        final boolean result = jarProvider.loadMoreJars(name).stream()
                 .peek(this::addJar)
                 .count() > 0;
+
+        if (result) {
+            if (reason != null) {
+                LOG.debug("loaded more jars because of {}", reason);
+            }
+        }
+
+        return result;
     }
 
     private void addJar(LoadableJar jar) {
@@ -64,7 +76,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException ignored) {
             }
         }
-        while (loadMoreJars(name));
+        while (loadMoreJars(name, "findClass()"));
         throw new ClassNotFoundException(name);
     }
 
@@ -82,15 +94,19 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                 return result;
             }
         }
-        while (loadMoreJars(name));
+        while (loadMoreJars(name, "findResource()"));
         return null;
     }
 
     @Override
     public Enumeration<URL> findResources(final String name) throws IOException {
-        //noinspection StatementWithEmptyBody
-        while (loadMoreJars(name)) {
+        boolean hasLoaded = false;
+        while (loadMoreJars(name, null)) {
+            hasLoaded = true;
             // continue until finished
+        }
+        if (hasLoaded) {
+            LOG.debug("", new Exception("loaded all jars because of call to findResources()"));
         }
         return super.findResources(name);
     }
@@ -142,7 +158,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         public String toLoggingString() {
             final VersionString version = getJarDesc().getVersion();
             final URL location = getJarDesc().getLocation();
-            return version != null ? location +"(v:" + version + ")" : location.toString();
+            return version != null ? location + "(v:" + version + ")" : location.toString();
         }
     }
 }
