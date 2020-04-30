@@ -93,12 +93,14 @@ public class PartsHandler implements JarProvider, PartsCache {
                 .collect(Collectors.toList())
         );
 
-        LOG.debug("failed to eager load the following jars: {}", result.stream()
+        final String failedToLoadJars = result.stream()
                 .filter(jar -> !jar.getLocation().isPresent())
                 .map(LoadableJar::toLoggingString)
                 .sorted()
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.joining(", "));
+        if (!StringUtils.isBlank(failedToLoadJars)) {
+            LOG.debug("failed to download the following jars: {}", failedToLoadJars);
+        }
 
         trustValidator.validateEagerJars(result);
         loadedByClassloaderParts.addAll(eagerParts);
