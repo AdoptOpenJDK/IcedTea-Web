@@ -75,6 +75,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
             }
         }
         while (loadMoreJars(name, "findClass()"));
+        LOG.debug("Could not find class {}", name);
         throw new ClassNotFoundException(name);
     }
 
@@ -93,6 +94,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
             }
         }
         while (loadMoreJars(name, "findResource()"));
+        LOG.debug("Could not find resource {}", name);
         return null;
     }
 
