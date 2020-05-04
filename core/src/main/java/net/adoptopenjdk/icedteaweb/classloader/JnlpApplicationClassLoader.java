@@ -44,9 +44,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                 .count() > 0;
 
         if (result) {
-            if (reason != null) {
-                LOG.debug("loaded more jars because of {} for {}", reason, name);
-            }
+            LOG.debug("loaded more jars because of {} for {}", reason, name);
         }
 
         return result;
@@ -100,14 +98,6 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
 
     @Override
     public Enumeration<URL> findResources(final String name) throws IOException {
-        boolean hasLoaded = false;
-        while (loadMoreJars(name, null)) {
-            hasLoaded = true;
-            // continue until finished
-        }
-        if (hasLoaded) {
-            LOG.debug("", new Exception("loaded all jars because of call to findResources()"));
-        }
         return super.findResources(name);
     }
 
