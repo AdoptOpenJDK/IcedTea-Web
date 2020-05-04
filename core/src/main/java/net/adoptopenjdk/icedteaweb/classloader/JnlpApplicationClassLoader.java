@@ -51,6 +51,7 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
     }
 
     private void addJar(LoadableJar jar) {
+        LOG.debug("add jar: {}", jar.jarDesc.getLocation());
         addJarLock.lock();
         try {
             jar.getLocation().ifPresent(location -> {
