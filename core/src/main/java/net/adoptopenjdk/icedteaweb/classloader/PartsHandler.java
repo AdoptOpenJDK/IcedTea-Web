@@ -122,12 +122,22 @@ public class PartsHandler implements JarProvider, PartsCache {
                 return Collections.emptyList();
             }
 
-            final Part next = notLoaded.stream()
+            final Optional<Part> supportingPart = notLoaded.stream()
                     .filter(part -> part.supports(resourceName))
-                    .findFirst()
-                    .orElse(notLoaded.get(0));
+                    .findFirst();
 
-            return loadLazyPart(next);
+            if (supportingPart.isPresent()) {
+                return loadLazyPart(supportingPart.get());
+            }
+
+            final Optional<Part> genericPart = notLoaded.stream()
+                    .filter(part -> part.getPackages().isEmpty())
+                    .findFirst();
+
+            if (genericPart.isPresent()) {
+                return loadLazyPart(genericPart.get());
+            }
+            return Collections.emptyList();
         } finally {
             partsLock.unlock();
         }
