@@ -89,14 +89,12 @@ public class PartsHandler implements JarProvider, PartsCache {
         LOG.debug("eager loaded the following jars: {}", result.stream()
                 .filter(jar -> jar.getLocation().isPresent())
                 .map(LoadableJar::toLoggingString)
-                .sorted()
                 .collect(Collectors.toList())
         );
 
         final String failedToLoadJars = result.stream()
                 .filter(jar -> !jar.getLocation().isPresent())
                 .map(LoadableJar::toLoggingString)
-                .sorted()
                 .collect(Collectors.joining(", "));
         if (!StringUtils.isBlank(failedToLoadJars)) {
             LOG.debug("failed to download the following jars: {}", failedToLoadJars);
@@ -122,22 +120,21 @@ public class PartsHandler implements JarProvider, PartsCache {
                 return Collections.emptyList();
             }
 
-            final Optional<Part> supportingPart = notLoaded.stream()
+            final List<LoadableJar> supportingJars = notLoaded.stream()
                     .filter(part -> part.supports(resourceName))
-                    .findFirst();
+                    .findFirst()
+                    .map(this::loadLazyPart)
+                    .orElse(Collections.emptyList());
 
-            if (supportingPart.isPresent()) {
-                return loadLazyPart(supportingPart.get());
+            if (!supportingJars.isEmpty()) {
+                return supportingJars;
             }
 
-            final Optional<Part> genericPart = notLoaded.stream()
+            return notLoaded.stream()
                     .filter(part -> part.getPackages().isEmpty())
-                    .findFirst();
-
-            if (genericPart.isPresent()) {
-                return loadLazyPart(genericPart.get());
-            }
-            return Collections.emptyList();
+                    .findFirst()
+                    .map(this::loadLazyPart)
+                    .orElse(Collections.emptyList());
         } finally {
             partsLock.unlock();
         }
@@ -152,14 +149,12 @@ public class PartsHandler implements JarProvider, PartsCache {
         LOG.debug("downloaded the following jars: {}", result.stream()
                 .filter(jar -> jar.getLocation().isPresent())
                 .map(LoadableJar::toLoggingString)
-                .sorted()
                 .collect(Collectors.joining(", "))
         );
 
         final String failedToLoadJars = result.stream()
                 .filter(jar -> !jar.getLocation().isPresent())
                 .map(LoadableJar::toLoggingString)
-                .sorted()
                 .collect(Collectors.joining(", "));
         if (!StringUtils.isBlank(failedToLoadJars)) {
             LOG.debug("failed to download the following jars: {}", failedToLoadJars);
