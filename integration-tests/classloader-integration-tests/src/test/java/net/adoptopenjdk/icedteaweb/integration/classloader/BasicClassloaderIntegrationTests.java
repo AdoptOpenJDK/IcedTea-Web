@@ -105,7 +105,6 @@ public class BasicClassloaderIntegrationTests {
 
     /**
      * if recursive attribute is not defined only direct classes in the package of a part can be downloaded.
-     * Never the less the remaining parts are downloaded one by one in a trial and error approach to find the class.
      */
     @RepeatedTest(10)
     public void testLoadClassFromLazyJarWithoutRecursive() throws Exception {
@@ -114,13 +113,15 @@ public class BasicClassloaderIntegrationTests {
 
         //when
         final ClassLoader classLoader = createAndInitClassloader(partsHandler);
-        final Class<?> loadedClass = classLoader.loadClass(CLASS_A);
+        try {
+            classLoader.loadClass(CLASS_A);
+            Assertions.fail("should not have found the class");
+        } catch (ClassNotFoundException ignored) {
+        }
 
         //than
-        Assertions.assertNotNull(loadedClass);
-        Assertions.assertEquals(classLoader, loadedClass.getClassLoader());
-        Assertions.assertEquals(1, partsHandler.getDownloaded().size());
-        Assertions.assertTrue(partsHandler.hasTriedToDownload(JAR_1));
+        Assertions.assertEquals(0, partsHandler.getDownloaded().size());
+        Assertions.assertFalse(partsHandler.hasTriedToDownload(JAR_1));
     }
 
     /**
