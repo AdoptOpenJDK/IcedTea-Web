@@ -118,7 +118,7 @@ public class JnlpApplicationClassLoaderTest {
         } catch (final Exception ignore) {}
 
         //than
-        assertEquals(1, partsHandler.getDownloaded().size());
+        assertEquals(0, partsHandler.getDownloaded().size());
     }
 
     @Test
