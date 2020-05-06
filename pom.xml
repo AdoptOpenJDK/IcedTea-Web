@@ -53,7 +53,6 @@
         <module>artifact-all-dependencies</module>
         <module>integration</module>
         <module>clients</module>
-        <module>jnlp-servlet</module>
         <module>launchers</module>
     </modules>
 
