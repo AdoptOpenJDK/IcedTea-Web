@@ -23,6 +23,8 @@ readonly TARGET_TMP=$TARGET/tmp
 readonly TARGET_IMAGES=$TARGET/images
 readonly TARGET_DOCS_PARENT=$TARGET/icedtea-web-docs
 readonly TARGET_DOCS=$TARGET_DOCS_PARENT/$VERSION
+readonly BASHD_TARGET=$TARGET/extensions/bash_completion.d
+readonly XDESKTOP_TARGET=$TARGET/extensions/xdesktop
 
 rm -rf "$TARGET"
 
@@ -38,37 +40,37 @@ fi
 if [ "x$LIB_TARGET_DIR" == "x" ] ; then
   readonly LIB_TARGET_DIR=$TARGET/libs
 else
-  readonly LIB_TARGET_DIR=$LIB_TARGET_DIR
+  readonly LIB_TARGET_DIR=$TARGET/$LIB_TARGET_DIR
 fi
 # where to gather itw's libraries
 if [ "x$ITW_TARGET_DIR" == "x" ] ; then
   readonly ITW_TARGET_DIR=$TARGET/libs
 else
-  readonly ITW_TARGET_DIR=$ITW_TARGET_DIR
+  readonly ITW_TARGET_DIR=$TARGET/$ITW_TARGET_DIR
 fi
 # where to gather config files
 if [ "x$ETC_TARGET_DIR" == "x" ] ; then
   readonly ETC_TARGET_DIR=$TARGET/libs
 else
-  readonly ETC_TARGET_DIR=$ETC_TARGET_DIR
+  readonly ETC_TARGET_DIR=$TARGET/$ETC_TARGET_DIR
 fi
 # where to executables
 if [ "x$BIN_TARGET_DIR" == "x" ] ; then
   readonly BIN_TARGET_DIR=$TARGET/bin
 else
-  readonly BIN_TARGET_DIR=$BIN_TARGET_DIR
+  readonly BIN_TARGET_DIR=$TARGET/$BIN_TARGET_DIR
 fi
 # where to splash
 if [ "x$SPLASH_TARGET_DIR" == "x" ] ; then
   readonly SPLASH_TARGET_DIR=$TARGET/libs
 else
-  readonly SPLASH_TARGET_DIR=$SPLASH_TARGET_DIR
+  readonly SPLASH_TARGET_DIR=$TARGET/$SPLASH_TARGET_DIR
 fi
 # where to icons
 if [ "x$ICO_TARGET_DIR" == "x" ] ; then
   readonly ICO_TARGET_DIR=$TARGET/libs
 else
-  readonly ICO_TARGET_DIR=$ICO_TARGET_DIR
+  readonly ICO_TARGET_DIR=$TARGET/$ICO_TARGET_DIR
 fi
 
 if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then

@@ -79,7 +79,22 @@ fi
 if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
   sedBashCompletions
   sedDesktopIcons
-  echo "not creating images in $ITW_LIBS mode; image is already done, as launchers are built against your system libraries."
+  set +x
+  echo "not creating images in $ITW_LIBS mode; launchers are built against your system libraries, for theirs future locations"
+  echo "To install this system-linked image, you must copy:"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$JAVAWS_ICO_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$JAVAWS_ICO_SRC"]}`"
+  for file in `find  $BIN_TARGET_DIR -type f` ; do
+    echo "cp $file `cutIfNecessary $file`"
+  done
+  for file in `find  $TARGET_DOCS -type d -maxdepth 1 -mindepth 1` ; do
+    echo "cp $file ...ENYWHERE..."
+  done
+  for file in `find  $BASHD_TARGET $XDESKTOP_TARGET -type f` ; do
+    echo "cp $file ...ENYWHERE..."
+  done
   exit 0
 fi
 
