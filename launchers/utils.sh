@@ -168,6 +168,14 @@ function sedBashCompletion() {
   mkdir -p $TARGET/extensions/bash_completion.d
   OPTIONS=`$OPTIONS_COMMAND $1`; \
   echo $OPTIONS ; \
-  cat $SCRIPT_DIR/completion/$1.bash.in |   sed "s/@OPTIONS@/${OPTIONS}/" > $TARGET/extensions/bash_completion.d/$1.bash
+  cat $SCRIPT_DIR/completion.in/$1.bash.in |   sed "s/@OPTIONS@/${OPTIONS}/" > $TARGET/extensions/bash_completion.d/$1.bash
+}
+
+function sedDesktopIcons() {
+  local OUT=$TARGET/extensions/xdesktop
+  mkdir -p $OUT
+  cat $SCRIPT_DIR/xdesktop.in/javaws.desktop.in | sed "s#PATH_TO_JAVAWS#$BIN_TARGET_DIR/javaws#"  > $OUT/javaws.desktop
+  cat $SCRIPT_DIR/xdesktop.in/itweb-settings.desktop.in | sed "s#PATH_TO_ITWEB_SETTINGS#$BIN_TARGET_DIR/itweb-settings#" > $OUT/itweb-settings.desktop
+  cat $SCRIPT_DIR/xdesktop.in/policyeditor.desktop.in | sed "s#PATH_TO_POLICYEDITOR#$BIN_TARGET_DIR/policyeditor#" > $OUT/policyeditor.desktop
 }
 

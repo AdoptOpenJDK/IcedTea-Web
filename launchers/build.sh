@@ -81,6 +81,7 @@ if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
   echo "TODO automate below; defualt none? or as in Fedora? Overwritable as all others in configure?"
   echo "If you wish, copy man pages, desktop files. Sed as necessary"
   sedBashCompletions
+  sedDesktopIcons
   exit 0
 fi
 
