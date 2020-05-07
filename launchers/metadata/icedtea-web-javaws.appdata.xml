@@ -2,7 +2,7 @@
 <component type="desktop">
 <!-- <component> -->
   <id>javaws.desktop</id>
-  <name>%{name}</name>
+  <name>IcedTea-Web</name>
   <name>Java</name>
   <summary>Javaws implementation from OpenJDK</summary>
 <!--   <provides>
