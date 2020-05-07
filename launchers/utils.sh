@@ -82,6 +82,7 @@ function image() {
   popd
   pushd $TARGET_IMAGES
     zip -r $img_name.zip icedtea-web
+    tar -cJf $img_name.tar.xz icedtea-web
   popd
   mv $TARGET_IMAGES/icedtea-web $TARGET_IMAGES/$img_name
 }
