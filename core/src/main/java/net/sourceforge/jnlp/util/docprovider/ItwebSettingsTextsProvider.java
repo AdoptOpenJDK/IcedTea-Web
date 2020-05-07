@@ -38,6 +38,7 @@ exception statement from your version.
 package net.sourceforge.jnlp.util.docprovider;
 
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -64,7 +65,7 @@ public class ItwebSettingsTextsProvider extends TextsProvider {
 
     @Override
     public String getId() {
-        return ITWEB_SETTINGS;
+        return IcedTeaWebConstants.ITWEB_SETTINGS;
     }
 
     @Override

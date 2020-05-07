@@ -36,6 +36,7 @@ exception statement from your version.
 */
 package net.sourceforge.jnlp.util.docprovider;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -56,7 +57,7 @@ public class PolicyEditorTextsProvider extends TextsProvider {
 
     @Override
     public String getId() {
-        return POLICY_EDITOR;
+        return IcedTeaWebConstants.POLICY_EDITOR;
     }
 
     @Override

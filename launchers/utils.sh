@@ -158,3 +158,16 @@ function splitVersion() {
   MICRO_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 3 | sed "s/[^0-9]*//g"`
 }
 
+function sedBashCompletions() {
+  sedBashCompletion itweb-settings
+  sedBashCompletion javaws
+  sedBashCompletion policyeditor
+}
+
+function sedBashCompletion() {
+  mkdir -p $TARGET/extensions/bash_completion.d
+  OPTIONS=`$OPTIONS_COMMAND $1`; \
+  echo $OPTIONS ; \
+  cat $SCRIPT_DIR/completion/$1.bash.in |   sed "s/@OPTIONS@/${OPTIONS}/" > $TARGET/extensions/bash_completion.d/$1.bash
+}
+

@@ -79,7 +79,8 @@ fi
 if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
   echo "not creating images in $ITW_LIBS mode; image is already done, as launchers are built against your system libraries."
   echo "TODO automate below; defualt none? or as in Fedora? Overwritable as all others in configure?"
-  echo "If you wish, copy man pages, desktop files and bash completion. Sed as necessary"
+  echo "If you wish, copy man pages, desktop files. Sed as necessary"
+  sedBashCompletions
   exit 0
 fi
 

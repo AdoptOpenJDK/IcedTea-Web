@@ -493,7 +493,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 boolean modal = getModality();
-                AboutDialog.display(modal, TextsProvider.POLICY_EDITOR, AboutDialog.ShowPage.HELP);
+                AboutDialog.display(modal, IcedTeaWebConstants.POLICY_EDITOR, AboutDialog.ShowPage.HELP);
             }
         };
 
@@ -501,7 +501,7 @@ public class PolicyEditor extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 boolean modal = getModality();
-                AboutDialog.display(modal, TextsProvider.POLICY_EDITOR);
+                AboutDialog.display(modal, IcedTeaWebConstants.POLICY_EDITOR);
             }
         };
 

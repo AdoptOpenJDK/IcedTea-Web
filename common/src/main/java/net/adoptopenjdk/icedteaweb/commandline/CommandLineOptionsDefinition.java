@@ -36,6 +36,7 @@ exception statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.commandline;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -104,5 +105,30 @@ public class CommandLineOptionsDefinition {
         l.add(CommandLineOptions.TRUSTALL);
         return Collections.unmodifiableList(l);
     }
+
+    public static void main(String... args) throws IOException {
+        switch (args[0]) {
+            case net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS:
+                printOptions(getJavaWsOptions());
+                break;
+            case net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ITWEB_SETTINGS:
+                printOptions(getItwsettingsCommands());
+                break;
+            case net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.POLICY_EDITOR:
+                printOptions(getPolicyEditorOptions());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void printOptions(List<CommandLineOptions> options) {
+        StringBuilder sb = new StringBuilder();
+        for (CommandLineOptions option : options) {
+            sb.append(option.getOption()).append(" ");
+        }
+        System.out.println(sb.toString().trim());
+    }
+
 
 }

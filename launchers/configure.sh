@@ -73,6 +73,9 @@ fi
 
 if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
   readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-no-dependencies/target/icedtea-web-no-dependencies-*.jar | grep -v sources | grep -v javadoc | grep -v shaded`
+  readonly OPTIONS_COMMAND="$JRE/bin/java -cp 
+  `ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep -v sources | grep -v javadoc | grep -v shaded`
+  net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsDefinition" ;
 else
   readonly JAVAWS_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep -v sources | grep -v javadoc | grep -v shaded`
   readonly JAVAWS_SRC_SRC=`ls $PROJECT_TOP/artifact-all-dependencies/target/icedtea-web-all-dependencies-*.jar | grep sources`
