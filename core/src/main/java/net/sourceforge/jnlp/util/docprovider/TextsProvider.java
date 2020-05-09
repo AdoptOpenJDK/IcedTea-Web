@@ -65,7 +65,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ITWEB_SETTINGS;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
+import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.POLICY_EDITOR;
 
 public abstract class TextsProvider {
 
@@ -220,10 +222,8 @@ public abstract class TextsProvider {
     public static final String ITW_ECLIPSE = ITW_HOME + "/DevelopingWithEclipse";
     private static final String ITW_REPO = "https://github.com/AdoptOpenJDK/icedtea-web.git";
 
-    public static final String ITWEB_SETTINGS = "itweb-settings";
     public static final String ITW = "icedtea-web";
     public static final String ITW_PLUGIN = "icedtea-web-plugin";
-    public static final String POLICY_EDITOR = "policyeditor";
 
     public static final String DISTRO_PKG = "http://mail.openjdk.java.net/mailman/listinfo/distro-pkg-dev";
 
