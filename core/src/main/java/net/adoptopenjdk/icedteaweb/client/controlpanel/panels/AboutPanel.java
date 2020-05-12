@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.client.parts.about.AboutDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
@@ -52,7 +53,7 @@ public class AboutPanel extends NamedBorderPanel {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AboutDialog.display(TextsProvider.ITWEB_SETTINGS);
+                AboutDialog.display(IcedTeaWebConstants.ITWEB_SETTINGS);
             }
         });
         c.fill = GridBagConstraints.BOTH;

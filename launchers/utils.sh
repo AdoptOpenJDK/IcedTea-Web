@@ -26,9 +26,9 @@ function build() {
   fi
   export JRE
   export ITW_LIBS
-  export JAVAWS_JAR=${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]}
-  export SPLASH_PNG=${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}
-  export MODULARJDK_ARGS_LOCATION=${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}
+  export JAVAWS_JAR=`cutIfNecessary ${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]}`
+  export SPLASH_PNG=`cutIfNecessary ${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}`
+  export MODULARJDK_ARGS_LOCATION=`cutIfNecessary ${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}`
   BUILD_DIR=$TARGET/launcher.in.$PROGRAM_NAME
   if [ "x$TYPE" = "xrust" ]; then
     cp -r $SCRIPT_DIR/rust-launcher $BUILD_DIR
@@ -84,6 +84,7 @@ function image() {
   popd
   pushd $TARGET_IMAGES
     zip -r $img_name.zip icedtea-web
+    tar -cJf $img_name.tar.xz icedtea-web
   popd
   mv $TARGET_IMAGES/icedtea-web $TARGET_IMAGES/$img_name
 }
@@ -158,5 +159,34 @@ function splitVersion() {
   MAJOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 1`
   MINOR_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 2`
   MICRO_VERSION=`echo ${PACKAGE_VERSION} | cut -d'.' -f 3 | sed "s/[^0-9]*//g"`
+}
+
+function sedBashCompletions() {
+  sedBashCompletion itweb-settings
+  sedBashCompletion javaws
+  sedBashCompletion policyeditor
+}
+
+function sedBashCompletion() {
+  mkdir -p $BASHD_TARGET
+  OPTIONS=`$OPTIONS_COMMAND $1`; \
+  echo $OPTIONS ; \
+  cat $SCRIPT_DIR/completion.in/$1.bash.in |   sed "s/@OPTIONS@/${OPTIONS}/" > $BASHD_TARGET/$1.bash
+}
+
+function sedDesktopIcons() {
+  mkdir -p $XDESKTOP_TARGET
+  cat $SCRIPT_DIR/xdesktop.in/javaws.desktop.in | sed "s#PATH_TO_JAVAWS#`cutIfNecessary $BIN_TARGET_DIR/javaws`#"  > $XDESKTOP_TARGET/javaws.desktop
+  cat $SCRIPT_DIR/xdesktop.in/itweb-settings.desktop.in | sed "s#PATH_TO_ITWEB_SETTINGS#`cutIfNecessary $BIN_TARGET_DIR/itweb-settings`#" > $XDESKTOP_TARGET/itweb-settings.desktop
+  cat $SCRIPT_DIR/xdesktop.in/policyeditor.desktop.in | sed "s#PATH_TO_POLICYEDITOR#`cutIfNecessary $BIN_TARGET_DIR/policyeditor`#" > $XDESKTOP_TARGET/policyeditor.desktop
+}
+
+function cutIfNecessary() {
+  #for distribution, we uses only the "installed" part of path
+  if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
+    echo "$1" | sed "s|$TARGET||g"
+  else
+    echo "$1"
+  fi
 }
 

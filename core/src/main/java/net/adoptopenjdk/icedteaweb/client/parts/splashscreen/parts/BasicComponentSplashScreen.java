@@ -37,20 +37,19 @@ exception statement from your version. */
 package net.adoptopenjdk.icedteaweb.client.parts.splashscreen.parts;
 
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashPanel;
+import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 
 import javax.swing.JComponent;
-import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils;
 
 public abstract class BasicComponentSplashScreen extends JComponent implements SplashPanel {
     //scaling 100%
     public static final double ORIGINAL_W = 635;
     public static final double ORIGINAL_H = 480;
-       /** Width of the plugin window */
+    /** Width of the plugin window */
     protected int pluginWidth;
     /** Height of the plugin window */
     protected int pluginHeight;
     /** The project name to display */
-    private SplashUtils.SplashReason splashReason;
     private boolean animationRunning = false;
     private InformationElement content;
     private String version;
@@ -65,8 +64,8 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
         return animationRunning;
     }
 
-    public void setAnimationRunning(boolean b){
-        animationRunning=b;
+    public void setAnimationRunning(boolean b) {
+        animationRunning = b;
     }
 
     @Override
@@ -79,7 +78,7 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
         return content;
     }
 
-   
+
     /**
      * @return the pluginWidth
      */
@@ -113,22 +112,6 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
     }
 
     /**
-     * @return the splashReason
-     */
-    @Override
-    public SplashUtils.SplashReason getSplashReason() {
-        return splashReason;
-    }
-
-    /**
-     * @param splashReason the splashReason to set
-     */
-    @Override
-    public void setSplashReason(SplashUtils.SplashReason splashReason) {
-        this.splashReason = splashReason;
-    }
-
-    /**
      * @return the version
      */
     @Override
@@ -144,14 +127,11 @@ public abstract class BasicComponentSplashScreen extends JComponent implements S
         this.version = version;
     }
 
-   
     protected String createAdditionalInfo() {
         if (getVersion() != null) {
-            return getSplashReason().toString() + " version: " + getVersion();
+            return "IcedTea-Web version: " + getVersion();
         } else {
             return null;
         }
     }
-
-   
 }

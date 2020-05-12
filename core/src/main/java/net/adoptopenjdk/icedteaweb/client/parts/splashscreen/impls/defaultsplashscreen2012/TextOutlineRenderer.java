@@ -89,7 +89,6 @@ public class TextOutlineRenderer {
 
         FontRenderContext frc = g2.getFontRenderContext();
         TextLayout tl = new TextLayout(getText(), getFont(), frc);
-        float sw = (float) tl.getBounds().getWidth();
         AffineTransform transform = new AffineTransform();
         transform.setToTranslation(x, y);
         Shape shape = tl.getOutline(transform);

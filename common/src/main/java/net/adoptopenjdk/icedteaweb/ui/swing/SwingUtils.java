@@ -42,7 +42,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import javax.swing.JLabel;
 import javax.swing.JWindow;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.EventQueue;
@@ -81,11 +80,6 @@ public final class SwingUtils {
     public static void setup() {
         if (DO_SETUP) {
             DO_SETUP = false; // avoid reentrance
-
-            if (DEBUG_EDT) {
-                trace("Using ThreadCheckingRepaintManager");
-                RepaintManager.setCurrentManager(new ThreadCheckingRepaintManager());
-            }
         }
     }
 

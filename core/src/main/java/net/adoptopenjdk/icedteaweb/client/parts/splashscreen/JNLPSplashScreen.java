@@ -178,14 +178,4 @@ public class JNLPSplashScreen extends JDialog {
     public void stopAnimation() {
         if (isCustomSplashscreen()) componentSplash.stopAnimation();
     }
-
-    public void setErrorSplash(Throwable ex) {
-        if (splash != null){
-            this.remove(splash.getSplashComponent());
-            splash = SplashUtils.getErrorSplashScreen(ex);
-            this.add(splash.getSplashComponent());
-            this.componentSplash = splash;
-            this.validate();
-    }
-    }
 }

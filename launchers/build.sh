@@ -40,7 +40,9 @@ mkdir -p "$ICO_TARGET_DIR"
 mkdir -p "$SPLASH_TARGET_DIR"
 
 publishInternalLib "$JAVAWS_SRC" "$ITW_TARGET_DIR" "javaws.jar"
-publishInternalLib "$JAVAWS_SRC_SRC" "$ITW_TARGET_DIR" "javaws-srcs.jar"
+if [ ! "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
+  publishInternalLib "$JAVAWS_SRC_SRC" "$ITW_TARGET_DIR" "javaws-srcs.jar"
+fi
 publishInternalLib "$SPLASH_PNG_SRC" "$SPLASH_TARGET_DIR"
 publishInternalLib "$JAVAWS_ICO_SRC" "$ICO_TARGET_DIR"
 publishInternalLib "$MODULARJDK_ARGS_FILE_SRC" "$ETC_TARGET_DIR"
@@ -75,9 +77,24 @@ else
 fi
 
 if [ $ITW_LIBS == "DISTRIBUTION" ] ; then
-  echo "not creating images in $ITW_LIBS mode; image is already done, as launchers are built against your system libraries."
-  echo "TODO automate below; defualt none? or as in Fedora? Overwritable as all others in configure?"
-  echo "If you wish, copy man pages, desktop files and bash completion. Sed as necessary"
+  sedBashCompletions
+  sedDesktopIcons
+  set +x
+  echo "not creating images in $ITW_LIBS mode; launchers are built against your system libraries, for theirs future locations"
+  echo "To install this system-linked image, you must copy:"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$JAVAWS_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$SPLASH_PNG_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$MODULARJDK_ARGS_FILE_SRC"]}`"
+  echo "cp ${RESOURCES_SRC_TO_DEST["$JAVAWS_ICO_SRC"]} `cutIfNecessary ${RESOURCES_SRC_TO_DEST["$JAVAWS_ICO_SRC"]}`"
+  for file in `find  $BIN_TARGET_DIR -type f` ; do
+    echo "cp $file `cutIfNecessary $file`"
+  done
+  for file in `find  $TARGET_DOCS -type d -maxdepth 1 -mindepth 1` ; do
+    echo "cp $file ...ENYWHERE..."
+  done
+  for file in `find  $BASHD_TARGET $XDESKTOP_TARGET -type f` ; do
+    echo "cp $file ...ENYWHERE..."
+  done
   exit 0
 fi
 

@@ -43,11 +43,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_PLUGIN_SPLASH;
+import java.lang.reflect.Field;
+
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.APPLET;
-import static net.adoptopenjdk.icedteaweb.client.parts.splashscreen.SplashUtils.SplashReason.JAVAWS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -69,115 +68,68 @@ public class SplashUtilsTest {
 
     @Test
     public void determineCallerTest() {
-        assertSplashReason(JAVAWS);
-    }
-
-    private void assertSplashReason(SplashUtils.SplashReason reason) {
-        final SplashPanel p2 = SplashUtils.getSplashScreen();
-        assertThat(p2.getSplashReason(), is(reason));
+        SplashUtils.getSplashScreen();
     }
 
     @Test
     public void testGetSplashScreen1() {
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
     public void testGetSplashScreen2() {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
     public void testGetSplashScreen3() {
         envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(nullValue()));
     }
 
     @Test
     public void testGetSplashScreen4() {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(nullValue()));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
     public void testGetSplashScreen5() {
         envVars.set(ICEDTEA_WEB_SPLASH, NO_SPLASH);
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, NO_SPLASH);
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(nullValue()));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(nullValue()));
     }
 
     @Test
     public void testGetSplashScreen6() {
         envVars.set(ICEDTEA_WEB_SPLASH, DEFAULT);
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, "fgdthyfjtuk");
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
 
     @Test
     public void testGetSplashScreen7() {
         envVars.set(ICEDTEA_WEB_SPLASH, "egtrutkyukl");
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sw.getSplashReason(), is(JAVAWS));
     }
     
     @Test
     public void testGetSplashScreen8() {
-        envVars.set(ICEDTEA_WEB_PLUGIN_SPLASH, DEFAULT);
-        
         JNLPRuntime.setShowWebSplash(false);
 
-        SplashPanel sa = SplashUtils.getSplashScreen(APPLET);
-        assertThat(sa, is(instanceOf(DefaultSplashScreen2012.class)));
-        assertThat(sa.getSplashReason(), is(APPLET));
-
-        SplashPanel sw = SplashUtils.getSplashScreen(JAVAWS);
+        SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(nullValue()));
     }
 }

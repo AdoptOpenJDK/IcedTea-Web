@@ -50,64 +50,70 @@ public interface SplashPanel {
      * Mostly your SplashScreen will extend some JComponent, so this method will
      * just return "this"
      */
-    public JComponent getSplashComponent();
+    JComponent getSplashComponent();
 
-  
-    public void setInformationElement(InformationElement content);
+    void setInformationElement(InformationElement content);
 
-    public InformationElement getInformationElement();
+    InformationElement getInformationElement();
 
-    /** Width of the plugin window */
-    public void setSplashWidth(int pluginWidth);
+    /**
+     * Width of the plugin window
+     */
+    void setSplashWidth(int pluginWidth);
 
-    /** Height of the plugin window */
-    public void setSplashHeight(int pluginHeight);
+    /**
+     * Height of the plugin window
+     */
+    void setSplashHeight(int pluginHeight);
 
-    /** Width of the plugin window */
-    public int getSplashWidth();
+    /**
+     * Width of the plugin window
+     */
+    int getSplashWidth();
 
-    /** Height of the plugin window */
-    public int getSplashHeight();
+    /**
+     * Height of the plugin window
+     */
+    int getSplashHeight();
 
-    public void adjustForSize();
+    void adjustForSize();
 
     // Add a new listener for resizes
-    public void addComponentListener(ComponentListener cl);
+    void addComponentListener(ComponentListener cl);
 
-    public boolean isAnimationRunning();
+    boolean isAnimationRunning();
 
     /**
      * Methods to start the animation in the splash panel.
-     *
+     * <p>
      * This method exits after starting a new thread to do the animation. It
      * is synchronized to prevent multiple startAnimation threads from being created.
      */
-    public void startAnimation();
+    void startAnimation();
 
-    public void stopAnimation();
+    void stopAnimation();
 
     void paintTo(Graphics g);
 
-    public void setSplashReason(SplashUtils.SplashReason splashReason);
-
-    public SplashUtils.SplashReason getSplashReason();
-
     /**
      * Version can be printed in splash window
+     *
      * @param version
      */
-    public void setVersion(String version);
+    void setVersion(String version);
 
     String getVersion();
 
     /**
      * how mny percentage loaded  is shown in progress bar (if any)
+     *
      * @param done - should be in 0-100 inclusive
      */
-    public void setPercentage(int done);
+    void setPercentage(int done);
 
     /**
      * returns state of loading progress bar
+     *
      * @return percentage showed in possible progress bar  - should be in 0-100
      */
     int getPercentage();

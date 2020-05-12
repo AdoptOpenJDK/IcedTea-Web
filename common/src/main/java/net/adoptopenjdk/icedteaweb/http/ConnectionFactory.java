@@ -87,7 +87,7 @@ public class ConnectionFactory {
         final URLConnection connection = url.openConnection();
 
         if (!(connection instanceof HttpURLConnection)) {
-            throw new IllegalArgumentException("onle HTTP and HTTPS urls are supported: " + url.toExternalForm());
+            throw new IllegalArgumentException("only HTTP and HTTPS urls are supported: " + url.toExternalForm());
         }
         return createHttpConnection((HttpURLConnection) connection, requestMethod, requestProperties);
     }
