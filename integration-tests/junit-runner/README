@@ -1,3 +1,0 @@
-junit-runner is used to run tests instead of the standard runner
-org.junit.runner.JUnitCore.  It provides output similar to that used by JTreg,
-which is useful for automated comparison.
