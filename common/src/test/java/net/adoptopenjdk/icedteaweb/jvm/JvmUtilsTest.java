@@ -200,7 +200,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testValidJavaModuleVMArgsWithJava9() {
-        final String javaVMArgs = "-Dsun.java2d.d3d=true --module-path=java.base=java.xxx  --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
+        final String javaVMArgs = "-Dsun.java2d.d3d=true --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
         try {
             JvmUtils.checkVMArgs(javaVMArgs, JAVA_9);
         } catch (IllegalArgumentException ile) {

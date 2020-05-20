@@ -337,12 +337,15 @@ public class JvmUtils {
 
     /**
      * https://docs.oracle.com/javase/9/tools/java.htm#JSWOR624
-     * Java Module VM args. specified by app developer in jnlp file.
-     * OWS adds its own set of jvm args {@link #getPredefinedJavaModulesVMArgumentsMap()} (which are same as those specified in file itw-modularjdk.args from ITW) required for its own execution
+     * Java Module VM arguments specified by app developer in jnlp file.
+     * ITW adds its own set of jvm args either through {@link #getPredefinedJavaModulesVMArgumentsMap()}
+     * or the itw-modularjdk.args file. These are required for the execution of ITW.
+     *
+     * Note:
+     * --module-path is not accepted by ITW as it would circumvent the classloader and security.
      */
     public static String[] getValidStartingJavaModuleVMArguments() {
         return new String[]{
-                "--module-path", /* Specifies the path to a semicolon-separated list of directories  */
                 "--add-reads", /* Updates module to read the target-module, regardless of the module declaration. */
                 "--add-exports", /* Updates module to export package to target-module, regardless of module declaration.  */
                 "--add-opens", /* Updates module to open package to target-module, regardless of module declaration.*/
