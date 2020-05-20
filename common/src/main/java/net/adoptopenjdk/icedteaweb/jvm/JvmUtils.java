@@ -270,7 +270,13 @@ public class JvmUtils {
                 "javaplugin.lifecycle.cachesize",
                 "http.maxRedirects",
                 "http.auth.digest.validateProxy",
-                "http.auth.digest.validateServer"
+                "http.auth.digest.validateServer",
+                // https://news.kynosarges.org/2019/03/24/swing-high-dpi-properties/
+                "sun.java2d.uiScale.enabled",
+                "sun.java2d.win.uiScaleX",
+                "sun.java2d.win.uiScaleY",
+                "sun.java2d.uiScale",
+                "prism.allowhidpi" // for JavaFX
         };
     }
 

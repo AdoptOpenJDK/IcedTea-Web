@@ -76,7 +76,9 @@ public class JvmUtilsTest {
 
     @Test
     public void testValidPropertyInJavaVMArgs() {
-        final String javaVMArgs = "-Dsun.java2d.d3d=true -Dsun.java2d.dpiaware=false -Djnlp.abc=def -Djavaws.xyz=uvw";
+        final String javaVMArgs = "-Dsun.java2d.d3d=true -Dsun.java2d.dpiaware=false -Djnlp.abc=def -Djavaws.xyz=uvw " +
+                "-Dsun.java2d.uiScale.enabled=false -Dsun.java2d.win.uiScaleX=1.25 -Dsun.java2d.win.uiScaleY=125% " +
+                "-Dsun.java2d.win.uiScaleX=125dpi -Dsun.java2d.win.uiScaleY=1.25 -Dsun.java2d.uiScale=1.0";
         try {
             JvmUtils.checkVMArgs(javaVMArgs);
         } catch (IllegalArgumentException ile) {
@@ -177,13 +179,14 @@ public class JvmUtilsTest {
 
     @Test
     public void testNonPredefJavaModuleVMArgs() {
-        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--module-path=java.base=java.xxx", "--add-opens=java.base=java.aaa", "--add-modules=java.base=java.bbb", "--patch-module=java.base=java.ccc", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
+        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb",  "--module-path=java.base=java.xxx", "--add-opens=java.base=java.aaa", "--add-modules=java.base=java.bbb", "--patch-module=java.base=java.ccc", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
         assertTrue(result.contains("-DnoModuleArg=bbb"));
         assertTrue(result.contains("--add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy"));
         assertTrue(result.contains("--module-path=java.base=java.xxx"));
+        //assertTrue(result.contains("-p C:\\Java\\javafx-sdk-11.0.2\\lib\\javafx.base.jar"));
         assertTrue(result.contains("--add-opens=java.base=java.aaa"));
         assertTrue(result.contains("--add-modules=java.base=java.bbb"));
         assertTrue(result.contains("--patch-module=java.base=java.ccc"));
@@ -197,7 +200,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testValidJavaModuleVMArgsWithJava9() {
-        final String javaVMArgs = "-Dsun.java2d.d3d=true --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
+        final String javaVMArgs = "-Dsun.java2d.d3d=true --module-path=java.base=java.xxx  --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
         try {
             JvmUtils.checkVMArgs(javaVMArgs, JAVA_9);
         } catch (IllegalArgumentException ile) {
