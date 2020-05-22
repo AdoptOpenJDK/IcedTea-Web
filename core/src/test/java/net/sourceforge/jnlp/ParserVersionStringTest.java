@@ -21,9 +21,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
@@ -41,7 +41,7 @@ import static org.hamcrest.Matchers.hasToString;
  * Test various corner cases of the parser
  */
 public class ParserVersionStringTest extends NoStdOutErrTest {
-    private static Node root;
+    private static XmlNode root;
     private static Parser parser;
 
     @BeforeClass

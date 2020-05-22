@@ -52,9 +52,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
@@ -69,7 +69,7 @@ import java.util.List;
  */
 public class ParserBasicTest extends NoStdOutErrTest {
 
-    private static Node root;
+    private static XmlNode root;
     private static Parser parser;
 
     @BeforeClass
@@ -246,7 +246,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
         ParserSettings defaultParserSettings = new ParserSettings();
         InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
         final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
-        Node omega = xmlParser.getRootNode(jnlpStream);
+        XmlNode omega = xmlParser.getRootNode(jnlpStream);
         Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParserSettings);
         ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
         JARDesc[] r = resources.getJARs();

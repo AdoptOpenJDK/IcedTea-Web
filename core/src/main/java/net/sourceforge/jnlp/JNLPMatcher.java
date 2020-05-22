@@ -40,8 +40,8 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 
 import java.io.InputStream;
@@ -60,10 +60,10 @@ import java.util.List;
 
 public final class JNLPMatcher {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPMatcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPMatcher.class);
 
-    private final Node appTemplateNode;
-    private final Node launchJNLPNode;
+    private final XmlNode appTemplateNode;
+    private final XmlNode launchJNLPNode;
     private final boolean isTemplate;
 
     /**
@@ -119,15 +119,15 @@ public final class JNLPMatcher {
      * @param launchJNLP  launching JNLP file's Node
      * @return true if both Nodes are 'matched', otherwise false
      */
-    private boolean matchNodes(Node appTemplate, Node launchJNLP) {
+    private boolean matchNodes(XmlNode appTemplate, XmlNode launchJNLP) {
 
         if (appTemplate != null && launchJNLP != null) {
 
-            Node templateNode = appTemplate;
-            Node launchNode = launchJNLP;
+            XmlNode templateNode = appTemplate;
+            XmlNode launchNode = launchJNLP;
             // Store children of Node
-            List<Node> appTemplateChild = new LinkedList<>(Arrays.asList(templateNode.getChildNodes()));
-            List<Node> launchJNLPChild = new LinkedList<>(Arrays.asList(launchNode.getChildNodes()));
+            List<XmlNode> appTemplateChild = new LinkedList<>(Arrays.asList(templateNode.getChildNodes()));
+            List<XmlNode> launchJNLPChild = new LinkedList<>(Arrays.asList(launchNode.getChildNodes()));
 
             // Compare only if both Nodes have the same name, else return false
             if (templateNode.getNodeName().equals(launchNode.getNodeName())) {
@@ -172,13 +172,13 @@ public final class JNLPMatcher {
     }
 
     /**
-     * Compares attributes of two {@link Node Nodes} regardless of order
+     * Compares attributes of two {@link XmlNode Nodes} regardless of order
      *
-     * @param templateNode signed application or template's {@link Node} with attributes
-     * @param launchNode   launching JNLP file's {@link Node} with attributes
-     * @return {@code true} if both {@link Node Nodes} have 'matched' attributes, otherwise {@code false}
+     * @param templateNode signed application or template's {@link XmlNode} with attributes
+     * @param launchNode   launching JNLP file's {@link XmlNode} with attributes
+     * @return {@code true} if both {@link XmlNode Nodes} have 'matched' attributes, otherwise {@code false}
      */
-    private boolean matchAttributes(Node templateNode, Node launchNode) {
+    private boolean matchAttributes(XmlNode templateNode, XmlNode launchNode) {
 
         if (templateNode != null && launchNode != null) {
 

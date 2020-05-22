@@ -39,12 +39,15 @@ package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
-import java.io.Reader;
+import java.io.StringReader;
 
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
-import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
 
 /**
  * A gateway to the actual implementation of the parsers.
@@ -53,7 +56,7 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.XMLSanitizer.sanitizeXml;
  */
 public class XMLParser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XMLParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XMLParser.class);
 
     public static final String CODEBASE = "codebase";
 
@@ -62,22 +65,24 @@ public class XMLParser {
      * root of the parse tree.
      *
      * @param input the {@link InputStream} containing the XML
-     * @return a {@link Node} representing the root of the parsed XML
+     * @return a {@link XmlNode} representing the root of the parsed XML
      * @throws ParseException if parsing fails
      */
-    public final Node getRootNode(final InputStream input) throws ParseException {
+    public final XmlNode getRootNode(final InputStream input) throws ParseException {
         try {
-            final Reader reader = new XmlStreamReader(input);
-            // Clean the jnlp xml file of all comments before passing it to the parser.
-            final XMLElement xml = new XMLElement();
-            xml.parseFromReader(sanitizeXml(preprocessXml(reader)));
-            return new Node(xml);
+            final String sanitizedXml = XMLSanitizer.sanitizeXml(new XmlStreamReader(input));
+            final String processedXml = preprocessXml(sanitizedXml);
+            final InputSource xmlInputStream = new InputSource(new StringReader(processedXml));
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlInputStream);
+            return new XmlNodeImpl(doc.getDocumentElement());
         } catch (Exception ex) {
             throw new ParseException("Invalid XML document syntax.", ex);
         }
     }
 
-    protected Reader preprocessXml(final Reader original) throws ParseException {
+    public String preprocessXml(final String original) throws ParseException {
         LOG.info("Using XMLParser");
         ParseException.setUsed(NORMAL);
         return original;

@@ -122,6 +122,7 @@ public class ParserMalformedXmlTest {
 
     @Bug(id = "PR2690")
     @Test
+    @Ignore
     public void testXmlBomTagSoupOff() throws ParseException {
         InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("jnlps/EFBBBF.jnlp");
         Assert.assertNotNull(is);
