@@ -66,6 +66,7 @@ class SingleInstanceLock {
      */
     public void createWithPort(int localPort) throws IOException {
 
+	FileUtils.deleteWithErrMesg(lockFile, "Could not delete lock file [" + lockFile + "]");
         FileUtils.createRestrictedFile(lockFile);
         BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false));
         lockFileWriter.write(String.valueOf(localPort));
