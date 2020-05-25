@@ -17,7 +17,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
@@ -95,12 +94,6 @@ public class JNLPFile {
     public static final String CODEBASE_ATTRIBUTE = "codebase";
 
     public static final String SPEC_VERSION_DEFAULT = "1.0+";
-
-    // todo: save the update policy, then if file was not updated
-    // then do not check resources for being updated.
-    //
-    // todo: currently does not filter resources by jvm version.
-    //
 
     /**
      * the location this JNLP file was created from
@@ -199,7 +192,7 @@ public class JNLPFile {
     /**
      * List of acceptable properties (not-special)
      */
-    final private PermissionCollection generalProperties = PermissionsManager.getJnlpRiaPermissions();
+    private final PermissionCollection generalProperties = PermissionsManager.getJnlpRiaPermissions();
 
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
@@ -256,7 +249,7 @@ public class JNLPFile {
     }
 
     public String getTitle(boolean kill) throws MissingTitleException {
-        final String title = getTitleImpl();
+        final String title = getTitleFromJnlp();
 
         if (StringUtils.isBlank(title)) {
             LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
@@ -268,14 +261,6 @@ public class JNLPFile {
         }
 
         return title;
-    }
-
-    private String getTitleImpl() {
-        final String jnlpTitle = getTitleFromJnlp();
-        if (jnlpTitle != null) {
-            return jnlpTitle;
-        }
-        return null;
     }
 
     /**
@@ -388,7 +373,7 @@ public class JNLPFile {
         try {
             return UrlUtils.removeFileName(getSourceLocation());
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Exception while removing file name from URL", ex);
         }
         return getSourceLocation();
     }
@@ -439,7 +424,7 @@ public class JNLPFile {
                 .flatMap(infoDesc -> infoDesc.getItems().entrySet().stream())
                 .forEach(itemEntry -> {
                     final List<Object> newValues = itemEntry.getValue().stream()
-                            .filter(v -> v != null)
+                            .filter(Objects::nonNull)
                             .filter(v -> !StringUtils.isBlank(v.toString()))
                             .collect(toList());
 
@@ -545,7 +530,7 @@ public class JNLPFile {
                 .findFirst()
                 .map(JREDesc::getJnlpResources)
                 .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
-                .map(jnlpResources -> jnlpResources.all())
+                .map(JNLPResources::all)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Could not locate a suitable JRE description in the JNLP file for" +
                                         " the underlying execution environment. The system properties detected" +
@@ -666,7 +651,7 @@ public class JNLPFile {
         } catch (ParseException ex) {
             throw ex;
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Exception while parsing JNLP file", ex);
             throw new RuntimeException(ex.toString());
         }
     }
@@ -709,15 +694,9 @@ public class JNLPFile {
      * @return the download options to use for downloading jars listed in this jnlp file.
      */
     public DownloadOptions getDownloadOptions() {
-        boolean usePack = false;
-        boolean useVersion = false;
-        ResourcesDesc desc = getResources();
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
-            usePack = true;
-        }
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
-            useVersion = true;
-        }
+        final ResourcesDesc desc = getResources();
+        final boolean usePack = Boolean.parseBoolean(desc.getPropertiesMap().get("jnlp.packEnabled"));
+        final boolean useVersion = Boolean.parseBoolean(desc.getPropertiesMap().get("jnlp.versionEnabled"));
         return new DownloadOptions(usePack, useVersion);
     }
 
