@@ -4,7 +4,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import java.text.Collator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,9 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
 
         final NodeList childNodes = internalElement.getChildNodes();
         final List<Element> childrenElements = IntStream.range(0, childNodes.getLength())
-                .mapToObj(i -> childNodes.item(i))
+                .mapToObj(childNodes::item)
                 .filter(n -> n instanceof Element)
                 .map(n -> (Element) n)
-                .sorted((e1, e2) -> Collator.getInstance().compare(e1.getTagName(), e2.getTagName()))
                 .collect(Collectors.toList());
         final Map<Element, XmlNodeImpl> mappedChildren = new HashMap<>();
         for (int i = childrenElements.size() - 1; i >= 0; i--) {
@@ -50,7 +48,7 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
                 mappedChildren.put(element, new XmlNodeImpl(element));
             }
         }
-        this.children = childrenElements.stream().map(e -> mappedChildren.get(e))
+        this.children = childrenElements.stream().map(mappedChildren::get)
                 .collect(Collectors.toList());
     }
 
@@ -72,20 +70,20 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
         if(children.size() == 0) {
             return internalElement.getTextContent();
         } else {
-            return children.get(0).getNodeValue();
+            return "";
         }
     }
 
     @Override
     public XmlNode[] getChildNodes() {
-        return children.toArray(new XmlNode[children.size()]);
+        return children.toArray(new XmlNode[0]);
     }
 
     @Override
     public List<String> getAttributeNames() {
         final NamedNodeMap attributes = internalElement.getAttributes();
-        final int lenght = attributes.getLength();
-        return IntStream.range(0, lenght).mapToObj(i -> attributes.item(i).getNodeName())
+        final int length = attributes.getLength();
+        return IntStream.range(0, length).mapToObj(i -> attributes.item(i).getNodeName())
                 .collect(Collectors.toList());
     }
 
@@ -115,7 +113,7 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
     public int compareTo(final XmlNode o) {
         final String nameA = getNodeName();
         final String nameB = Optional.ofNullable(o)
-                .map(n -> n.getNodeName())
+                .map(XmlNode::getNodeName)
                 .orElse("");
         return nameA.compareTo(nameB);
     }

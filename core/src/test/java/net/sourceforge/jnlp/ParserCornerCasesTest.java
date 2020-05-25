@@ -37,13 +37,11 @@ exception statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -149,14 +147,13 @@ public class ParserCornerCasesTest {
     }
 
     @Test
-    @Ignore
     public void testCommentInElements2() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp <!-- comment --> spec='1.0'> </jnlp>";
         final XMLParser xmlParser = XmlParserFactory.getParser(MALFORMED);
         XmlNode root = xmlParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
         Parser p = new Parser(null, null, root, defaultParser);
         //default is used
-        Assert.assertEquals("1.0+", p.getSpecVersion().toString());
+        Assert.assertEquals("1.0", p.getSpecVersion().toString());
     }
 
     @Test
@@ -168,13 +165,14 @@ public class ParserCornerCasesTest {
         Assert.assertEquals("1.0", p.getSpecVersion().toString());
     }
 
-    @Test (expected = java.lang.IllegalArgumentException.class)
-    @Ignore
+    @Test
     public void testCommentInAttributes() throws ParseException {
         String malformedJnlp = "<?xml?><jnlp spec='<!-- something -->'></jnlp>";
         final XMLParser xmlParser = XmlParserFactory.getParser(MALFORMED);
         XmlNode root = xmlParser.getRootNode(new ByteArrayInputStream(malformedJnlp.getBytes()));
         Parser p = new Parser(null, null, root, defaultParser);
+        //default is used
+        Assert.assertEquals("1.0+", p.getSpecVersion().toString());
     }
 
     @Test
@@ -199,8 +197,6 @@ public class ParserCornerCasesTest {
     }
 
     @Test
-    @Ignore
-    @KnownToFail
     public void testCommentInElements3_malformedOn() throws IOException, ParseException {
         //having comment inside element declaration is invalid anyway, so tagsoup can be excused for failing in this case
         try (InputStream fileStream = ClassLoader.getSystemClassLoader().getResourceAsStream("net/sourceforge/jnlp/templates/template5.jnlp")) {
